@@ -1,0 +1,8 @@
+addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.4")
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.0")
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
+addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.3.4")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.4")
+addSbtPlugin("de.heikoseeberger" % "sbt-header" % "4.1.0")
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
+addSbtPlugin("net.pishen" % "sbt-lighter" % "1.2.0")
