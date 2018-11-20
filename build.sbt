@@ -73,22 +73,21 @@ sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkEmrBootstrap           := List(
   BootstrapAction(
-    "GIS", "s3://azavea/scripts/bootstrap.sh",
-    "s3://azavea",
+    "GIS", "s3://your-bucket/scripts/bootstrap.sh",
+    "s3://your-bucket",
     "53794c3617582e61536c9767bc4bf9a46f5dbed3",
     "https://github.com/locationtech-labs/geopyspark/archive/22afdb0d9b8d7743010258343d8a28cb25b6d1b0.zip",
     "azavea",
     "notebooks",
     "0.4.4"))
-sparkS3JarFolder            := "s3://azavea/jars/"
-sparkS3LogUri               := Some("s3://azavea/emr-logs/")
+sparkS3JarFolder            := "s3://your-bucket/jars/"
+sparkS3LogUri               := Some("s3://your-bucket/emr-logs/")
 sparkInstanceCount          := 8
 sparkMasterType             := "m4.xlarge"
 sparkCoreType               := "m4.xlarge"
 sparkMasterPrice            := Some(0.5)
 sparkCorePrice              := Some(0.5)
-sparkSubnetId               := Some("subnet-faf66eb0")
-sparkClusterName            := s"footprints-demo"
+sparkClusterName            := s"geotrellis-demo"
 sparkEmrServiceRole         := "EMR_DefaultRole"
 sparkInstanceRole           := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName("AzaveaKeyPair")
