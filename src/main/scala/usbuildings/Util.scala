@@ -1,11 +1,13 @@
-package geotrellis.demo.footprint
+package usbuildings
 
 import java.io.{File, FileInputStream}
 
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.ObjectMetadata
-import geotrellis.contrib.vlm.RasterRef
+import geotrellis.contrib.vlm.RasterRegion
 import geotrellis.spark.io.s3.S3Client
+import geotrellis.vector.Extent
+import geotrellis.vectortile.{StrictLayer, VectorTile}
 import org.geotools.data.ogr.OGRDataStore
 import org.geotools.data.ogr.bridj.BridjOGRDataStoreFactory
 
@@ -24,9 +26,9 @@ object Util {
   /** Join intersecting buildings with their overlapping rasters */
   def joinBuildingsToRasters(
      buildings: Iterable[Building],
-     rasters: Iterable[RasterRef]
-   ): Map[Building, Seq[RasterRef]] = {
-    val intersecting: Seq[(Building, RasterRef)] = {
+     rasters: Iterable[RasterRegion]
+   ): Map[Building, Seq[RasterRegion]] = {
+    val intersecting: Seq[(Building, RasterRegion)] = {
       for {
         building <- buildings
         dem <- rasters if dem.extent.intersects(building.footprint.envelope)
@@ -43,5 +45,19 @@ object Util {
     } catch {
       case NonFatal(e) => is.close()
     } finally { is.close() }
+  }
+
+  def makeVectorTile(extent: Extent, buildings: Iterable[Building]): VectorTile = {
+    val layer = StrictLayer(
+      name = "buildings",
+      tileWidth = 4096,
+      version = 2,
+      tileExtent = extent,
+      points = Seq.empty, multiPoints = Seq.empty,
+      lines = Seq.empty, multiLines = Seq.empty,
+      multiPolygons = Seq.empty,
+      polygons = buildings.map(_.toVectorTileFeature).toSeq)
+
+    VectorTile(Map("buildings" -> layer), extent)
   }
 }

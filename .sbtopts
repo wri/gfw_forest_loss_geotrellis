@@ -1,0 +1,7 @@
+-J-Xmx6g
+-J-Xms2g
+-J-Xss6M
+-Dfile.encoding=UTF8
+-Djava.awt.headless=true
+-Dsun.io.serialization.extendedDebugInfo=true
+-Djava.library.path=/usr/local/lib

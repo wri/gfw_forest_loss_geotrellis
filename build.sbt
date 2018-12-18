@@ -1,6 +1,6 @@
 import Dependencies._
 
-name := "footprints-demo"
+name := "geotrellis-usbuildings"
 
 scalaVersion := Version.scala
 scalaVersion in ThisBuild := Version.scala
@@ -27,26 +27,29 @@ resolvers ++= Seq(
   "locationtech-releases" at "https://repo.locationtech.org/content/groups/releases",
   "locationtech-snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
   "osgeo" at "http://download.osgeo.org/webdav/geotools/",
-   Resolver.bintrayRepo("azavea", "geotrellis"),
+   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
 libraryDependencies ++= Seq(
   sparkCore % Provided,
+  sparkSQL % Provided,
+  sparkHive % Provided,
   geotrellisSpark,
   geotrellisS3,
   geotrellisShapefile,
   geotrellisGeotools,
+  geotrellisVectorTile,
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
-  "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.3.0",
+  "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.4.0",
   "com.monovore"  %% "decline" % "0.5.1"
 )
 
 // auto imports for local dev console
 initialCommands in console :=
 """
-import geotrellis.demo.footprint._
+import usbuildings._
 import java.net._
 """
 
