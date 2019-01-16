@@ -2,7 +2,8 @@ package usbuildings
 
 import geotrellis.contrib.vlm.RasterSource
 import geotrellis.contrib.vlm.gdal.GDALRasterSource
-import geotrellis.raster.{CellSize, RasterExtent}
+import geotrellis.raster.{CellSize, RasterExtent, TileLayout}
+import geotrellis.vector.Point
 import geotrellis.spark.SpatialKey
 import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.vector.{Extent, Geometry}
@@ -10,10 +11,9 @@ import geotrellis.vector.{Extent, Geometry}
 object Terrain {
 
   val terrainTilesSkadiGrid: LayoutDefinition = {
-    val nedRasterExtent = RasterExtent(
-      Extent(-180.0000, -90.0000, 180.0000, 90.0000),
-      CellSize(1, 1))
-    LayoutDefinition(nedRasterExtent, tileCols = 3601, tileRows = 3601)
+    val worldExtent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
+    val tileLayout = TileLayout(layoutCols = 360, layoutRows = 180, tileCols = 3601, tileRows = 3601)
+    LayoutDefinition(worldExtent, tileLayout)
   }
 
   /** Skadi raster for each a 1x1 degree tile */
