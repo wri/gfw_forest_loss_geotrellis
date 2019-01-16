@@ -18,9 +18,14 @@ object Terrain {
 
   /** Skadi raster for each a 1x1 degree tile */
   def tileUri(key: SpatialKey): String = {
-    val lat: String = if (key.row < 90) f"N${89 - key.row}%02d" else f"S${-89 + key.row}%02d"
-    val long: String = if (key.col < 180) f"E${179 - key.col}%02d" else f"W${-179 + key.col}%02d"
-    f"/vsigzip//vsis3/elevation-tiles-prod/v2/skadi/$lat/$lat$long.hgt.gz"
+    // col: 0 = W179, col: 179 = W001, col: 180 = W000/E000
+    val col = key.col - 180
+    val long: String = if (col >= 0) f"E${col}%03d" else f"W${-col}%03d"
+
+    val row = 89 - key.row
+    val lat: String = if (row >= 0) f"N${row}%02d" else f"S${-row}%02d"
+
+    f"s3://elevation-tiles-prod/v2/skadi/$lat/$lat$long.hgt.gz"
   }
 
   def getRasterSource(tileKey: SpatialKey): RasterSource = {
