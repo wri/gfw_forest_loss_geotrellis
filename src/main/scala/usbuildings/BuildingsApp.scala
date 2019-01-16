@@ -4,6 +4,7 @@ import java.net.URL
 
 import com.typesafe.scalalogging.LazyLogging
 import geotrellis.proj4.{LatLng, WebMercator}
+import geotrellis.raster.summary.polygonal.{DoubleHistogramSummary, MaxSummary}
 import geotrellis.spark.SpatialKey
 import geotrellis.spark.tiling.ZoomedLayoutScheme
 import geotrellis.vectortile.VectorTile
@@ -13,6 +14,7 @@ import org.apache.spark.{HashPartitioner, SparkContext}
 class BuildingsApp(
   val buildingsUri: Seq[String]
 )(@transient implicit val sc: SparkContext) extends LazyLogging with Serializable {
+
   /** Explode each layer so we can parallelize reading over layers */
 
   val allBuildings: RDD[Building] =
@@ -33,19 +35,25 @@ class BuildingsApp(
 
   // per partition: set of tiles is << set of geometries
   org.gdal.gdal.gdal.SetConfigOption("CPL_VSIL_GZIP_WRITE_PROPERTIES", "NO")
-  import geotrellis.vector.io._
 
   // TODO why can't I just do polygonal summary over RasterSource ?
-  val taggedBuildings: RDD[((String, Int), Building)] =
+  def taggedBuildings: RDD[((String, Int), Building)] =
     keyedBuildings.mapPartitions { buildingsPartition =>
       val histPerTile =
         for {
-          (tileKey, buildings) <- buildingsPartition.toSeq.groupBy(_._1)
+          (tileKey, buildings) <- buildingsPartition.toArray.groupBy(_._1)
           rasterSource = Terrain.getRasterSource(tileKey)
+          // it is three times slower to read the full tile vs just intersecting pixels
+          //raster <- rasterSource.read(tileKey.extent(Terrain.terrainTilesSkadiGrid)).toList
           (_, building) <- buildings
           raster <- rasterSource.read(building.footprint.envelope)
         } yield {
-          val hist = raster.tile.polygonalHistogramDouble(raster.extent, building.footprint)(0)
+          val hist = raster.tile.band(bandIndex = 0)
+            .polygonalSummary(
+              extent = raster.extent,
+              polygon = building.footprint,
+              handler = CustomDoubleHistogramSummary)
+
           (building.id, building.withHistogram(hist))
         }
 
@@ -54,11 +62,11 @@ class BuildingsApp(
 
 
   // TODO: assign buildings to keys at Zoom=X, group buildings by key
-  val layoutScheme = ZoomedLayoutScheme(WebMercator)
-  val layout = layoutScheme.levelForZoom(15).layout
+  def layoutScheme = ZoomedLayoutScheme(WebMercator)
+  def layout = layoutScheme.levelForZoom(15).layout
 
-  // I'm reprojecting them so I can make WebMercator vector tiles
-  val buildingsPerWmTile: RDD[(SpatialKey, Iterable[Building])] =
+  // I'm reproject them so I can make WebMercator vector tiles
+  def buildingsPerWmTile: RDD[(SpatialKey, Iterable[Building])] =
     taggedBuildings.flatMap { case (id, building) =>
       val wmFootprint = building.footprint.reproject(LatLng, WebMercator)
       val reprojected = building.withFootprint(wmFootprint)
@@ -66,11 +74,9 @@ class BuildingsApp(
       layoutKeys.toSeq.map( key => (key, reprojected))
     }.groupByKey(partitioner)
 
-  val tiles: RDD[(SpatialKey, VectorTile)] =
+  def tiles: RDD[(SpatialKey, VectorTile)] =
     buildingsPerWmTile.map { case (key, buildings) =>
       val extent = layout.mapTransform.keyToExtent(key)
-      (key, Util.makeVectorTile(extent, buildings))
+      (key, Util.makeVectorTile(extent, buildings.take(100)))
     }
-
-
 }
