@@ -32,6 +32,8 @@ class BuildingsApp(
     }.partitionBy(partitioner)
 
   // per partition: set of tiles is << set of geometries
+  org.gdal.gdal.gdal.SetConfigOption("CPL_VSIL_GZIP_WRITE_PROPERTIES", "NO")
+  import geotrellis.vector.io._
 
   // TODO why can't I just do polygonal summary over RasterSource ?
   val taggedBuildings: RDD[((String, Int), Building)] =
