@@ -42,7 +42,7 @@ libraryDependencies ++= Seq(
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
-  "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.4.0",
+  "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.7.11-2.2",
   "com.monovore"  %% "decline" % "0.5.1"
 )
 
@@ -51,6 +51,13 @@ initialCommands in console :=
 """
 import usbuildings._
 import java.net._
+import geotrellis.raster._
+import geotrellis.vector._
+import geotrellis.vector.io._
+import geotrellis.spark._
+import geotrellis.spark.tiling._
+import geotrellis.contrib.vlm._
+import geotrellis.contrib.vlm.gdal._
 """
 
 // settings for local testing
