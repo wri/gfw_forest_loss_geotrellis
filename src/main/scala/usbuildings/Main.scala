@@ -29,12 +29,13 @@ object Main extends CommandApp(
         .enableHiveSupport
         .getOrCreate
       implicit val sc: SparkContext = ss.sparkContext
+
       println(buildingsUri)
       println(new URL(buildingsUri))
+
       val app = new BuildingsApp(List(buildingsUri))
 
-      app.taggedBuildings.take(10).foreach(println)
-
+      GenerateVT.save(app.tiles, zoom= 15, "geotrellis-test", "usbuildings/vt01")
 
     }
   }
