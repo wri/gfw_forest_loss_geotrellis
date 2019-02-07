@@ -83,24 +83,27 @@ sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkEmrBootstrap           := List(
   BootstrapAction(
-    "GIS", "s3://your-bucket/scripts/bootstrap.sh",
-    "s3://your-bucket",
-    "53794c3617582e61536c9767bc4bf9a46f5dbed3",
-    "https://github.com/locationtech-labs/geopyspark/archive/22afdb0d9b8d7743010258343d8a28cb25b6d1b0.zip",
-    "azavea",
-    "notebooks",
-    "0.4.4"))
-sparkS3JarFolder            := "s3://your-bucket/jars/"
-sparkS3LogUri               := Some("s3://your-bucket/emr-logs/")
-sparkInstanceCount          := 8
+    "JupyterHub and GeoPyspark"
+    "s3://geopyspark-test/jbouffard/bootstrap/bootstrap.sh",
+    "s3://geopyspark-resources/rpms/86d70ff7d21b74e2dfea6ec395a4564d713d44ee",
+    "s3://geopyspark-resources/notebooks",
+    "github",
+    "LocalGitHubOAuthenticator",
+    "51c3c12344d06e2b0850",
+    "c7b608e3be66ae4332c88db21cae3f4a47313535",
+    "s3://geopyspark-resources/jars/read-to-layout-improved-test.jar",
+    "https://github.com/jbouffard/geopyspark/archive/cf381434a9d05f8286dea27c353df4b03f4e4fdd.zip"
+  ))
+sparkS3JarFolder            := "s3://geotrellis-test/usbuildings/jars"
+sparkInstanceCount          := 6
 sparkMasterType             := "m4.xlarge"
 sparkCoreType               := "m4.xlarge"
 sparkMasterPrice            := Some(0.5)
 sparkCorePrice              := Some(0.5)
-sparkClusterName            := s"geotrellis-demo"
+sparkClusterName            := s"geotrellis-usbuildings"
 sparkEmrServiceRole         := "EMR_DefaultRole"
 sparkInstanceRole           := "EMR_EC2_DefaultRole"
-sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName("AzaveaKeyPair")
+sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName("geotrellis-emr")
 sparkEmrConfigs             := List(
   EmrConfig("spark").withProperties(
     "maximizeResourceAllocation" -> "true"
