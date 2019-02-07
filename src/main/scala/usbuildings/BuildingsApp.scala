@@ -11,6 +11,8 @@ import geotrellis.vectortile.VectorTile
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{HashPartitioner, SparkContext}
 
+import scala.util.Try
+
 class BuildingsApp(
   val buildingsUri: Seq[String]
 )(@transient implicit val sc: SparkContext) extends LazyLogging with Serializable {
@@ -34,15 +36,16 @@ class BuildingsApp(
     }.partitionBy(partitioner)
 
   // per partition: set of tiles is << set of geometries
-  org.gdal.gdal.gdal.SetConfigOption("CPL_VSIL_GZIP_WRITE_PROPERTIES", "NO")
-
   // TODO why can't I just do polygonal summary over RasterSource ?
   def taggedBuildings: RDD[((String, Int), Building)] =
     keyedBuildings.mapPartitions { buildingsPartition =>
+      org.gdal.gdal.gdal.SetConfigOption("CPL_VSIL_GZIP_WRITE_PROPERTIES", "NO")
+
       val histPerTile =
         for {
           (tileKey, buildings) <- buildingsPartition.toArray.groupBy(_._1)
           rasterSource = Terrain.getRasterSource(tileKey)
+          _ <- Try(rasterSource.extent).toOption.toList // filter out tiles that are not there
           // it is three times slower to read the full tile vs just intersecting pixels
           //raster <- rasterSource.read(tileKey.extent(Terrain.terrainTilesSkadiGrid)).toList
           (_, building) <- buildings
@@ -63,20 +66,20 @@ class BuildingsApp(
 
   // TODO: assign buildings to keys at Zoom=X, group buildings by key
   def layoutScheme = ZoomedLayoutScheme(WebMercator)
-  def layout = layoutScheme.levelForZoom(15).layout
+  def layout = layoutScheme.levelForZoom(12).layout
 
   // I'm reproject them so I can make WebMercator vector tiles
   def buildingsPerWmTile: RDD[(SpatialKey, Iterable[Building])] =
     taggedBuildings.flatMap { case (id, building) =>
       val wmFootprint = building.footprint.reproject(LatLng, WebMercator)
       val reprojected = building.withFootprint(wmFootprint)
-      val layoutKeys: Set[SpatialKey] = layout.mapTransform.keysForGeometry(building.footprint)
-      layoutKeys.toSeq.map( key => (key, reprojected))
+      val layoutKeys: Set[SpatialKey] = layout.mapTransform.keysForGeometry(wmFootprint)
+      layoutKeys.toIterator.map( key => (key, reprojected))
     }.groupByKey(partitioner)
 
   def tiles: RDD[(SpatialKey, VectorTile)] =
     buildingsPerWmTile.map { case (key, buildings) =>
       val extent = layout.mapTransform.keyToExtent(key)
-      (key, Util.makeVectorTile(extent, buildings.take(100)))
+      (key, Util.makeVectorTile(extent, buildings))
     }
 }

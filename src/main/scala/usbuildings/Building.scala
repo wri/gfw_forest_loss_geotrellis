@@ -21,7 +21,14 @@ case class Building(file: String, idx: Int)(
 ) {
   def id: (String, Int) = (file, idx)
 
-  def toVectorTileFeature: Feature[Polygon, Map[String, vectortile.Value]] = ???
+  def toVectorTileFeature: Feature[Polygon, Map[String, vectortile.Value]] = {
+    val attributes = for {
+      hist <- histogram
+      (min, max) <- hist.minMaxValues()
+    } yield Map("elevation_min" -> vectortile.VDouble(min), "elecation_max" -> vectortile.VDouble(max))
+
+    Feature(footprint, attributes.getOrElse(Map.empty))
+  }
 
   def withHistogram(hist: Histogram[Double]): Building = {
     copy()(footprint, Some(hist))

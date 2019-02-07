@@ -13,11 +13,12 @@ object Main extends CommandApp(
   name = "geotrellis-usbuildings",
   header = "Collect building footprint elevations from terrain tiles",
   main = {
+    val buildingsAllOpt = Opts.flag(long = "all-buildings", help = "Read all building footprints from hosted source.").orFalse
     val buildingsOpt = Opts.option[String]("buildings", help = "URI of the building shapes layers")
     val outputOpt = Opts.option[String]("output", help = "URI prefix of output shapefiles")
     val layersOpt = Opts.options[String]("layer", help = "Layer to read exclusively, empty for all layers").orEmpty
 
-    (buildingsOpt, outputOpt, layersOpt).mapN { (buildingsUri, outputUri, layers) =>
+    (buildingsAllOpt, buildingsOpt, outputOpt, layersOpt).mapN { (buildingsAll, buildingsUri, outputUri, layers) =>
       val conf = new SparkConf().
         setIfMissing("spark.master", "local[*]").
         setAppName("Building Footprint Elevation").
@@ -30,12 +31,14 @@ object Main extends CommandApp(
         .getOrCreate
       implicit val sc: SparkContext = ss.sparkContext
 
-      println(buildingsUri)
-      println(new URL(buildingsUri))
+      val app = if (buildingsAll) {
+        new BuildingsApp(Building.geoJsonURLs)
+      } else {
+        new BuildingsApp(List(buildingsUri))
+      }
 
-      val app = new BuildingsApp(List(buildingsUri))
-
-      GenerateVT.save(app.tiles, zoom= 15, "geotrellis-test", "usbuildings/vt01")
+      // TODO: use outputUri
+      GenerateVT.save(app.tiles, zoom= 12, "geotrellis-test", "usbuildings/vt01")
 
     }
   }
