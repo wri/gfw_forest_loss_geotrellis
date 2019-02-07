@@ -38,7 +38,7 @@ object Main extends CommandApp(
       }
 
       // TODO: use outputUri
-      GenerateVT.save(app.tiles, zoom= 12, "geotrellis-test", "usbuildings/vt01")
+      GenerateVT.save(app.tiles, zoom= 15, "geotrellis-test", "usbuildings/vt02")
 
     }
   }

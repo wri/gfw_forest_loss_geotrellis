@@ -66,7 +66,7 @@ class BuildingsApp(
 
   // TODO: assign buildings to keys at Zoom=X, group buildings by key
   def layoutScheme = ZoomedLayoutScheme(WebMercator)
-  def layout = layoutScheme.levelForZoom(12).layout
+  def layout = layoutScheme.levelForZoom(15).layout
 
   // I'm reproject them so I can make WebMercator vector tiles
   def buildingsPerWmTile: RDD[(SpatialKey, Iterable[Building])] =
