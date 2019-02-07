@@ -83,7 +83,7 @@ sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkEmrBootstrap           := List(
   BootstrapAction(
-    "JupyterHub and GeoPyspark"
+    "JupyterHub and GeoPyspark",
     "s3://geopyspark-test/jbouffard/bootstrap/bootstrap.sh",
     "s3://geopyspark-resources/rpms/86d70ff7d21b74e2dfea6ec395a4564d713d44ee",
     "s3://geopyspark-resources/notebooks",
