@@ -78,13 +78,12 @@ assemblyMergeStrategy in assembly := {
 // Settings from sbt-lighter plugin that will automate creating and submitting this job to EMR
 import sbtlighter._
 
-sparkEmrRelease             := "emr-5.17.0"
+sparkEmrRelease             := "emr-5.13.0"
 sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkEmrBootstrap           := List(
   BootstrapAction(
-    "JupyterHub and GeoPyspark",
-    "s3://geopyspark-test/jbouffard/bootstrap/bootstrap.sh",
+    "GIS", "s3://geotrellis-test/eac/bootstrap-geopyspark.sh",
     "s3://geopyspark-resources/rpms/86d70ff7d21b74e2dfea6ec395a4564d713d44ee",
     "s3://geopyspark-resources/notebooks",
     "github",
@@ -92,10 +91,9 @@ sparkEmrBootstrap           := List(
     "51c3c12344d06e2b0850",
     "c7b608e3be66ae4332c88db21cae3f4a47313535",
     "s3://geopyspark-resources/jars/read-to-layout-improved-test.jar",
-    "https://github.com/jbouffard/geopyspark/archive/cf381434a9d05f8286dea27c353df4b03f4e4fdd.zip"
-  ))
+    "https://github.com/jbouffard/geopyspark/archive/cf381434a9d05f8286dea27c353df4b03f4e4fdd.zip"))
 sparkS3JarFolder            := "s3://geotrellis-test/usbuildings/jars"
-sparkInstanceCount          := 6
+sparkInstanceCount          := 20
 sparkMasterType             := "m4.xlarge"
 sparkCoreType               := "m4.xlarge"
 sparkMasterPrice            := Some(0.5)
