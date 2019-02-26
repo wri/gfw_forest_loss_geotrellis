@@ -4,16 +4,45 @@ import java.io.{File, FileInputStream}
 
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.ObjectMetadata
-import geotrellis.contrib.vlm.RasterRegion
 import geotrellis.spark.io.s3.S3Client
-import geotrellis.vector.Extent
-import geotrellis.vectortile.{StrictLayer, VectorTile}
 import org.geotools.data.ogr.OGRDataStore
 import org.geotools.data.ogr.bridj.BridjOGRDataStoreFactory
 
 import scala.util.control.NonFatal
+import geotrellis.vector.io._
+import org.apache.spark.sql.{SparkSession, DataFrame}
+import org.apache.spark.rdd.RDD
+import java.net.URL
+
 
 object Util {
+
+  /** Read features from GeoJSON file to generate CSV file
+    * This function was used to generate sample input for Vermont
+    */
+  def createTestGeometryFile(url: String)(implicit spark: SparkSession): DataFrame = {
+    val arr: Array[String] = Array(url)
+
+    val rdd: RDD[String] = spark.sparkContext.parallelize(arr)
+
+    val rddPolygons: RDD[(String, Int, String)] =
+      rdd.flatMap { fileUrl =>
+        Building.
+          readFromGeoJson(new URL(fileUrl)).
+          zipWithIndex.
+          map { case (polygon, index) =>
+            ("vermont", index, polygon.toWKT)
+          }
+      }
+
+    import spark.sqlContext.implicits._
+    val dataframe: DataFrame = rddPolygons.toDF("state", "index", "polygon")
+
+    // dataframe.write.option("header", true).csv("/Users/eugene/sample")
+    dataframe
+  }
+
+  /** Open GeoTools OGRDataStore */
   def getOgrDataStore(uri: String, driver: Option[String] =  None): OGRDataStore = {
     println(s"Opening: $uri")
     val factory = new BridjOGRDataStoreFactory()
@@ -23,21 +52,6 @@ object Util {
     factory.createDataStore(params).asInstanceOf[OGRDataStore]
   }
 
-  /** Join intersecting buildings with their overlapping rasters */
-  def joinBuildingsToRasters(
-     buildings: Iterable[Building],
-     rasters: Iterable[RasterRegion]
-   ): Map[Building, Seq[RasterRegion]] = {
-    val intersecting: Seq[(Building, RasterRegion)] = {
-      for {
-        building <- buildings
-        dem <- rasters if dem.extent.intersects(building.footprint.envelope)
-      } yield (building, dem)
-    }.toSeq
-
-    intersecting.groupBy(_._1).mapValues(_.map(_._2))
-  }
-
   def uploadFile(file: File, uri: AmazonS3URI): Unit = {
     val is = new FileInputStream(file)
     try {
@@ -45,19 +59,5 @@ object Util {
     } catch {
       case NonFatal(e) => is.close()
     } finally { is.close() }
-  }
-
-  def makeVectorTile(extent: Extent, buildings: Iterable[Building]): VectorTile = {
-    val layer = StrictLayer(
-      name = "buildings",
-      tileWidth = 4096,
-      version = 2,
-      tileExtent = extent,
-      points = Seq.empty, multiPoints = Seq.empty,
-      lines = Seq.empty, multiLines = Seq.empty,
-      multiPolygons = Seq.empty,
-      polygons = buildings.map(_.toVectorTileFeature).toSeq)
-
-    VectorTile(Map("buildings" -> layer), extent)
   }
 }
