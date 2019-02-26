@@ -76,12 +76,12 @@ object Building extends LazyLogging {
     * California.geojson is 2.66GB uncompressed, need to read it as a stream to avoid blowing the heap\
     * Supports: .zip, .json, .geojson files
   */
-  def readFromGeoJson(url: URL): Iterator[Building] = {
+  def readFromGeoJson(url: URL): Iterator[Polygon] = {
     // TODO: consider how bad it is to leave the InputStream open
     // TODO: consider using is.seek(n) to partition reading the list
     val is: InputStream = url.getPath match {
       case null =>
-        throw new FileNotFoundException("Can't read")
+        throw new FileNotFoundException(s"Can't read")
 
       case p if p.endsWith(".geojson") || p.endsWith(".json") =>
         url.openStream()
@@ -104,7 +104,7 @@ object Building extends LazyLogging {
         val poly = json.parseGeoJson[Polygon]
         idx += 1
         if (poly.isValid)
-          Some(Building(url.getFile, idx)(poly))
+          Some(poly)
         else {
           logger.warn(s"Dropping invalid geometry: ${poly.toWKT}")
           None

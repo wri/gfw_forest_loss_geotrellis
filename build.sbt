@@ -1,6 +1,6 @@
 import Dependencies._
 
-name := "geotrellis-usbuildings"
+name := "geotrellis-wri"
 
 scalaVersion := Version.scala
 scalaVersion in ThisBuild := Version.scala
@@ -21,12 +21,11 @@ publishArtifact in Test := false
 pomIncludeRepository := { _ => false }
 addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.4" cross CrossVersion.binary)
 addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.1" cross CrossVersion.full)
-dependencyUpdatesFilter := moduleFilter(organization = "org.scala-lang")
 resolvers ++= Seq(
-  "geosolutions" at "http://maven.geo-solutions.it/",
-  "locationtech-releases" at "https://repo.locationtech.org/content/groups/releases",
-  "locationtech-snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
-  "osgeo" at "http://download.osgeo.org/webdav/geotools/",
+  "GeoSolutions" at "http://maven.geo-solutions.it/",
+  "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
+  "LT-snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
+  "OSGeo" at "http://download.osgeo.org/webdav/geotools/",
    Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
@@ -34,6 +33,8 @@ libraryDependencies ++= Seq(
   sparkCore % Provided,
   sparkSQL % Provided,
   sparkHive % Provided,
+  hadoopAws % Provided,
+  sparkJts,
   geotrellisSpark,
   geotrellisS3,
   geotrellisShapefile,
@@ -42,14 +43,14 @@ libraryDependencies ++= Seq(
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
-  "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.7.11-2.2",
+  "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.8.11",
+  "com.azavea.geotrellis" %% "geotrellis-contrib-summary" % "0.0.1",
   "com.monovore"  %% "decline" % "0.5.1"
 )
 
-// auto imports for local dev console
+// auto imports for local SBT console
 initialCommands in console :=
 """
-import usbuildings._
 import java.net._
 import geotrellis.raster._
 import geotrellis.vector._
@@ -58,15 +59,29 @@ import geotrellis.spark._
 import geotrellis.spark.tiling._
 import geotrellis.contrib.vlm._
 import geotrellis.contrib.vlm.gdal._
+
+import org.apache.spark.sql.{SparkSession, DataFrame}
+import org.apache.spark.{SparkConf, SparkContext}
+import org.locationtech.geomesa.spark.jts._
+
+val conf = new SparkConf().
+setIfMissing("spark.master", "local[*]").
+setAppName("Building Footprint Elevation").
+set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
+set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
+
+implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate.withJTS
+implicit val sc: SparkContext = spark.sparkContext
 """
 
 // settings for local testing
+console / fork := true
 Test / fork := true
 Test / parallelExecution := false
 Test / testOptions += Tests.Argument("-oD")
-Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m", "-Djava.library.path=/usr/local/lib")
+Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m")
 
-// Settings for sbt-assembly plugin which builds fat jars for spark-submit
+// Settings for sbt-assembly plugin which builds fat jars for use by spark jobs
 assemblyMergeStrategy in assembly := {
   case s if s.startsWith("META-INF/services") => MergeStrategy.concat
   case "reference.conf" | "application.conf"  => MergeStrategy.concat
@@ -78,27 +93,16 @@ assemblyMergeStrategy in assembly := {
 // Settings from sbt-lighter plugin that will automate creating and submitting this job to EMR
 import sbtlighter._
 
-sparkEmrRelease             := "emr-5.13.0"
+sparkEmrRelease             := "emr-5.20.0"
 sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
-sparkEmrBootstrap           := List(
-  BootstrapAction(
-    "GIS", "s3://geotrellis-test/eac/bootstrap-geopyspark.sh",
-    "s3://geopyspark-resources/rpms/86d70ff7d21b74e2dfea6ec395a4564d713d44ee",
-    "s3://geopyspark-resources/notebooks",
-    "github",
-    "LocalGitHubOAuthenticator",
-    "51c3c12344d06e2b0850",
-    "c7b608e3be66ae4332c88db21cae3f4a47313535",
-    "s3://geopyspark-resources/jars/read-to-layout-improved-test.jar",
-    "https://github.com/jbouffard/geopyspark/archive/cf381434a9d05f8286dea27c353df4b03f4e4fdd.zip"))
-sparkS3JarFolder            := "s3://geotrellis-test/usbuildings/jars"
+sparkS3JarFolder            := "s3://geotrellis-test/wri/jars"
 sparkInstanceCount          := 20
 sparkMasterType             := "m4.xlarge"
 sparkCoreType               := "m4.xlarge"
 sparkMasterPrice            := Some(0.5)
 sparkCorePrice              := Some(0.5)
-sparkClusterName            := s"geotrellis-usbuildings"
+sparkClusterName            := s"geotrellis-wri"
 sparkEmrServiceRole         := "EMR_DefaultRole"
 sparkInstanceRole           := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName("geotrellis-emr")
