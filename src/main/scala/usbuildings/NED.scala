@@ -1,7 +1,6 @@
 package usbuildings
 
 import geotrellis.contrib.vlm.RasterSource
-import geotrellis.contrib.vlm.gdal.GDALRasterSource
 import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
 import geotrellis.raster.{CellSize, RasterExtent, TileLayout}
 import geotrellis.spark.SpatialKey

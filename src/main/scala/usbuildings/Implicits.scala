@@ -16,20 +16,20 @@ object Implicits {
     */
   implicit val streamingHistogramMonoid: Monoid[StreamingHistogram] =
     new Monoid[StreamingHistogram] {
-      override def empty: StreamingHistogram = new StreamingHistogram(256)
-      override def combine(x: StreamingHistogram, y: StreamingHistogram): StreamingHistogram = x.merge(y)
+      def empty: StreamingHistogram = new StreamingHistogram(256)
+      def combine(x: StreamingHistogram, y: StreamingHistogram): StreamingHistogram = x.merge(y)
     }
 
   /** Interface that defines how to register a single cell value with StreamingHistogram.
     */
   implicit val streamingHistogramCellAccumulator: CellAccumulator[StreamingHistogram] =
-      new CellAccumulator[StreamingHistogram] {
-      override def add(self: StreamingHistogram, v: Int): StreamingHistogram = {
+    new CellAccumulator[StreamingHistogram] {
+      def add(self: StreamingHistogram, v: Int): StreamingHistogram = {
         self.countItem(v, 1)
         self
       }
 
-      override def add(self: StreamingHistogram, v: Double): StreamingHistogram = {
+      def add(self: StreamingHistogram, v: Double): StreamingHistogram = {
         self.countItem(v, 1)
         self
       }

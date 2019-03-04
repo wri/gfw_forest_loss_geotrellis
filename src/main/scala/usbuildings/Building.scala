@@ -32,7 +32,7 @@ object Building extends LazyLogging {
     *
     * Supports: .zip, .json, .geojson files
   */
-  def readFromGeoJson(url: URL): Iterator[Polygon] = {
+  def readFromGeoJson(url: URL): Iterator[Feature[Polygon, FeatureId]] = {
     val is: InputStream = url.getPath match {
       case null =>
         throw new FileNotFoundException(s"Can't read")
@@ -53,12 +53,16 @@ object Building extends LazyLogging {
     val reader: BufferedReader = new BufferedReader(new InputStreamReader(is))
     val stream = reader.lines()
     var idx: Int = 0
+
+    val FileNameRx = """.*\/(\w+)\.\w+""".r
+    val FileNameRx(name)= url.getFile
+
     stream.iterator().asScala.flatMap {
       case FeatureRx(json) =>
         val poly = json.parseGeoJson[Polygon]
         idx += 1
         if (poly.isValid)
-          Some(poly)
+          Some(Feature(poly, FeatureId(name, idx)))
         else {
           // Invalid geometry can't be checked for intersection, they are sadly inevitable
           logger.warn(s"Dropping invalid geometry: ${poly.toWKT}")

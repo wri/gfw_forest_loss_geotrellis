@@ -30,8 +30,8 @@ object Util {
         Building.
           readFromGeoJson(new URL(fileUrl)).
           zipWithIndex.
-          map { case (polygon, index) =>
-            ("vermont", index, polygon.toWKT)
+          map { case (feature, index) =>
+            ("vermont", index, feature.geom.toWKT)
           }
       }
 

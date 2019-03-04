@@ -62,7 +62,6 @@ import geotrellis.contrib.vlm.gdal._
 
 import org.apache.spark.sql.{SparkSession, DataFrame}
 import org.apache.spark.{SparkConf, SparkContext}
-import org.locationtech.geomesa.spark.jts._
 
 val conf = new SparkConf().
 setIfMissing("spark.master", "local[*]").
@@ -70,7 +69,7 @@ setAppName("Building Footprint Elevation").
 set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
 set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
 
-implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate.withJTS
+implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
 implicit val sc: SparkContext = spark.sparkContext
 """
 
@@ -118,7 +117,7 @@ sparkEmrConfigs             := List(
     "spark.shuffle.spill.compress" -> "true",
     "spark.rdd.compress" -> "true",
     "spark.driver.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib",
-    "spark.executor.extraJavaOptions" -> "-XX:+UseParallelGC -Dgeotrellis.s3.threads.rdd.write=64 -Djava.library.path=/usr/local/lib",
+    "spark.executor.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib",
     "spark.executorEnv.LD_LIBRARY_PATH" -> "/usr/local/lib"
   ),
   EmrConfig("spark-env").withProperties(
@@ -130,3 +129,5 @@ sparkEmrConfigs             := List(
     "yarn.nodemanager.pmem-check-enabled" -> "false"
   )
 )
+
+enablePlugins(TutPlugin)
