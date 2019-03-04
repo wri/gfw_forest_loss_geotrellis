@@ -19,7 +19,7 @@ object BuildingElevationFromJsonMain extends CommandApp (
     val allFeaturesOpt = Opts.flag("all-features", "Use input from all available states")
     val featuresOpt = Opts.options[String]("features", "URI of building GeoJSON file (optionally zipped)")
     val outputOpt = Opts.option[String]("output", help = "URI of the output features CSV files")
-    val limitOpt = Opts.option[Int]("limit", help = "Limit number of records processed")
+    val sampleOpt = Opts.option[Double]("sample", help = "Fraction of input to sample").orNone
 
     val logger = Logger.getLogger(getClass)
 
@@ -27,7 +27,7 @@ object BuildingElevationFromJsonMain extends CommandApp (
       allFeaturesOpt.map( _ => Building.geoJsonURLs ).
       orElse(featuresOpt.map(_.toList))
 
-    (featuresListOpt, outputOpt).mapN { (featuresUrl, outputUrl) =>
+    (featuresListOpt, outputOpt, sampleOpt).mapN { (featuresUrl, outputUrl, sample) =>
       val conf = new SparkConf().
         setIfMissing("spark.master", "local[*]").
         setAppName("Building Footprint Elevation").
@@ -37,12 +37,17 @@ object BuildingElevationFromJsonMain extends CommandApp (
       implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
 
       /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
-      val featureRDD: RDD[Feature[Polygon, FeatureId]] =
+      var featureRDD: RDD[Feature[Polygon, FeatureId]] =
         spark.sparkContext.
           parallelize(featuresUrl, featuresUrl.length).
           flatMap { url =>
             Building.readFromGeoJson(new URL(url))
           }
+
+      sample.map { r =>
+        logger.info(s"Taking sample of ${r * 100} %")
+        featureRDD = featureRDD.sample(withReplacement = false, fraction = r, seed = 0L)
+      }
 
       /* Increasing number of partitions produces better work distribution and increases reliability */
       val partitioner = new HashPartitioner(partitions = featureRDD.getNumPartitions * 16)

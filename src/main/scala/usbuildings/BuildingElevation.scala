@@ -44,10 +44,11 @@ object BuildingElevation extends LazyLogging {
 
         groupedByKey.toIterator.flatMap { case (tileKey, features) =>
           val rasterSource: RasterSource = NED.getRasterSource(tileKey)
-          logger.info(s"Loading: ${rasterSource.uri} for $tileKey")
+          logger.info(s"Loading ${rasterSource.uri} for $tileKey")
 
           features.map { case (_, feature) =>
             // Result is optional because we may have read a non-intersecting extent
+            logger.trace(s"Reading ${feature.data}}")
             val maybeRaster: Option[Raster[MultibandTile]] = rasterSource.read(feature.envelope)
 
             require(rasterSource.extent.intersects(feature.envelope), {

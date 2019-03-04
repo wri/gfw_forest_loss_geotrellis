@@ -130,4 +130,4 @@ sparkEmrConfigs             := List(
   )
 )
 
-enablePlugins(TutPlugin)
+// enablePlugins(TutPlugin)
