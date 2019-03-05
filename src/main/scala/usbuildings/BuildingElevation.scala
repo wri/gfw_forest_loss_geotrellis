@@ -2,7 +2,7 @@ package usbuildings
 
 import com.typesafe.scalalogging.LazyLogging
 import geotrellis.contrib.vlm.RasterSource
-import geotrellis.raster.{MultibandTile, Raster, Tile}
+import geotrellis.raster.{MultibandTile, Raster, RasterExtent, Tile}
 import geotrellis.raster.histogram.StreamingHistogram
 import geotrellis.spark.SpatialKey
 import geotrellis.spark.io.index.zcurve.Z2
@@ -10,6 +10,7 @@ import geotrellis.vector.io._
 import geotrellis.vector.{Feature, Point, Polygon}
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
+import cats.implicits._
 
 object BuildingElevation extends LazyLogging {
 
@@ -44,26 +45,33 @@ object BuildingElevation extends LazyLogging {
           featurePartition.toArray.groupBy(_._1)
 
         groupedByKey.toIterator.flatMap { case (tileKey, featuresAndKeys) =>
+          val maybeRasterSource: Either[Throwable, RasterSource] = Either.catchNonFatal {
+            val rs = NED.getRasterSource(tileKey)
+            logger.info(s"Load ${rs.uri} for $tileKey")
+            rs
+          }
+
           val features = featuresAndKeys.map(_._2)
-          val rasterSource: RasterSource = NED.getRasterSource(tileKey)
-          logger.info(s"Loading ${rasterSource.uri} for $tileKey")
+          val tileRasterExtent: RasterExtent = NED.tileRasterExtent(tileKey)
 
-          // sorting features by their pixel z-index minimized segment thrashing on read
-          Util.sortByZIndex(features, rasterSource.rasterExtent).map { feature =>
-            // Result is optional because we may have read a non-intersecting extent
+          Util.sortByZIndex(features, tileRasterExtent).map { feature =>
             logger.trace(s"Reading ${feature.data}}")
-            val maybeRaster: Option[Raster[MultibandTile]] = rasterSource.read(feature.envelope)
 
-            require(rasterSource.extent.intersects(feature.envelope), {
-              val tileWKT = tileKey.extent(NED.tileGrid).toPolygon().toWKT
-              val wktSource = rasterSource.extent.toPolygon().toWKT
-              s"$tileKey: $tileWKT does not intersect RasterSource(${rasterSource.uri}): $wktSource"
-            })
+            val maybeRaster: Either[Throwable, Option[Raster[MultibandTile]]] =
+              maybeRasterSource.flatMap { rs => Either.catchNonFatal(rs.read(feature.envelope)) }
 
             val id: FeatureId = feature.data
 
             maybeRaster match {
-              case Some(raster) =>
+              case Left(exception) =>
+                logger.error(s"Feature $id: $exception")
+                (id, Feature(feature.geom, FeatureProperties(id, None)))
+
+              case Right(None) =>
+                logger.warn(s"Feature $id: did not intersect RasterSource")
+                (id, Feature(feature.geom, FeatureProperties(id, None)))
+
+              case Right(Some(raster)) =>
                 val firstBandRaster: Raster[Tile] = raster.mapTile(_.band(0))
 
                 // these imports are needed for .polygonalSummary call (to be hidden up)
@@ -75,10 +83,7 @@ object BuildingElevation extends LazyLogging {
                   firstBandRaster.polygonalSummary[Polygon, StreamingHistogram](feature.geom)
 
                 (id, Feature(geom, FeatureProperties(id, Some(histogram))))
-
-              case None =>
-                (id, Feature(feature.geom, FeatureProperties(id, None)))
-            }
+              }
           }
         }
       }

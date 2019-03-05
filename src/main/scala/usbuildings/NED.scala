@@ -45,6 +45,15 @@ object NED {
     rasterSource
   }
 
+  def tileRasterExtent(tileKey: SpatialKey): RasterExtent = {
+    RasterExtent(
+      extent = tileKey.extent(tileGrid),
+      cellwidth = tileGrid.cellSize.width,
+      cellheight = tileGrid.cellSize.height,
+      cols = tileGrid.tileCols,
+      rows = tileGrid.tileRows)
+  }
+
   def getRasterSource(geom: Geometry): Seq[RasterSource] = {
     val tileKeys = tileGrid.mapTransform.keysForGeometry(geom)
     tileKeys.toSeq.map({ key => getRasterSource(key) })
