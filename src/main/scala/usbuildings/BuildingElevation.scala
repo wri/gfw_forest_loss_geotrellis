@@ -5,8 +5,9 @@ import geotrellis.contrib.vlm.RasterSource
 import geotrellis.raster.{MultibandTile, Raster, Tile}
 import geotrellis.raster.histogram.StreamingHistogram
 import geotrellis.spark.SpatialKey
+import geotrellis.spark.io.index.zcurve.Z2
 import geotrellis.vector.io._
-import geotrellis.vector.{Feature, Polygon}
+import geotrellis.vector.{Feature, Point, Polygon}
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 
@@ -42,11 +43,13 @@ object BuildingElevation extends LazyLogging {
         val groupedByKey: Map[SpatialKey, Array[(SpatialKey,Feature[Polygon, FeatureId])]] =
           featurePartition.toArray.groupBy(_._1)
 
-        groupedByKey.toIterator.flatMap { case (tileKey, features) =>
+        groupedByKey.toIterator.flatMap { case (tileKey, featuresAndKeys) =>
+          val features = featuresAndKeys.map(_._2)
           val rasterSource: RasterSource = NED.getRasterSource(tileKey)
           logger.info(s"Loading ${rasterSource.uri} for $tileKey")
 
-          features.map { case (_, feature) =>
+          // sorting features by their pixel z-index minimized segment thrashing on read
+          Util.sortByZIndex(features, rasterSource.rasterExtent).map { feature =>
             // Result is optional because we may have read a non-intersecting extent
             logger.trace(s"Reading ${feature.data}}")
             val maybeRaster: Option[Raster[MultibandTile]] = rasterSource.read(feature.envelope)

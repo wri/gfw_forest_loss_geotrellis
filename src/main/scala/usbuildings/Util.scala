@@ -10,9 +10,14 @@ import org.geotools.data.ogr.bridj.BridjOGRDataStoreFactory
 
 import scala.util.control.NonFatal
 import geotrellis.vector.io._
-import org.apache.spark.sql.{SparkSession, DataFrame}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.rdd.RDD
 import java.net.URL
+
+import geotrellis.raster._
+import geotrellis.spark.SpatialKey
+import geotrellis.spark.io.index.zcurve.Z2
+import geotrellis.vector._
 
 
 object Util {
@@ -59,5 +64,18 @@ object Util {
     } catch {
       case NonFatal(e) => is.close()
     } finally { is.close() }
+  }
+
+  def sortByZIndex(
+    features: Seq[Feature[Polygon, FeatureId]],
+    rasterExtent: RasterExtent
+  ): Seq[Feature[Polygon, FeatureId]] = {
+    def zindex(p: Point): Long = {
+      val col = rasterExtent.mapXToGrid(p.x)
+      val row = rasterExtent.mapXToGrid(p.y)
+      Z2(col, row).z
+    }
+
+    features.sortBy{ feature => zindex(feature.geom.envelope.northWest) }
   }
 }
