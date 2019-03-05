@@ -16,7 +16,9 @@ object NED {
     */
   val tileGrid: LayoutDefinition = {
     val worldExtent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
-    val tileLayout = TileLayout(layoutCols = 360, layoutRows = 180, tileCols = 3601, tileRows = 3601)
+    val tileLayout = TileLayout(
+      layoutCols = 360, layoutRows = 180,
+      tileCols = 10812, tileRows = 10812)
     LayoutDefinition(worldExtent, tileLayout)
   }
 
