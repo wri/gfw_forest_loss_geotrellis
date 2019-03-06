@@ -21,8 +21,9 @@ class RasterSourceSpec extends FunSpec with Matchers {
   it("calculate stats") {
 
     val loss_raster: Raster[MultibandTile] = rs.read(Extent(-72.97754892, 43.85921846, -72.80676639, 43.97153490)).get
-    val loss_tile: MultibandTile = loss_raster.tile
+    val loss_tile: MultibandTile = loss_raster.tile.interpretAs(FloatUserDefinedNoDataCellType(0))
     val loss: Tile = loss_tile.band(0)
+
 
     val tcd_raster: Raster[MultibandTile] = rs2.read(Extent(-72.97754892, 43.85921846, -72.80676639, 43.97153490)).get
     val tcd_tile: MultibandTile = tcd_raster.tile
