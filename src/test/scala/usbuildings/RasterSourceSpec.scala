@@ -67,7 +67,7 @@ class RasterSourceSpec extends FunSpec with Matchers {
     val keys = tileSource.keys
     val (rasterKey, raster) = tileSource.readAll.next
     val (regionKey, region) = tileSource.keyedRasterRegions.next
-    info(s"Tile Count: ${keys.count}")
+    info(s"Tile Count: ${keys.size}")
     info(s"$rasterKey - $raster")
     info(s"$regionKey - $region")
   }
