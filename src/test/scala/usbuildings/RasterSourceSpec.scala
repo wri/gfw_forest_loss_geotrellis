@@ -16,7 +16,7 @@ class RasterSourceSpec extends FunSpec with Matchers {
 
   val rs = GeoTiffRasterSource("s3://gfw2-data/forest_change/hansen_2018/50N_080W.tif")
   val rs2 = GeoTiffRasterSource("s3://gfw2-data/forest_cover/2000_treecover/Hansen_GFC2014_treecover2000_50N_080W.tif")
-  val rs3 = GeoTiffRasterSource("s3://gfw2-data/climate/WHRC_biomass/WHRC_V4/t_co2_pixel/50N_080W_t_co2_pixel_2000.tif")
+  val rs3 = GeoTiffRasterSource("s3://gfw2-data/climate/WHRC_biomass/WHRC_V4/Processed/50N_080W_t_aboveground_biomass_ha_2000.tif")
 
   it("calculate stats") {
 
@@ -46,9 +46,9 @@ class RasterSourceSpec extends FunSpec with Matchers {
         (col, row, v, v2)
       }
 
-    val table3: Vector[(Int, Int, Int, Int, Double)] =
+    val table3: Vector[(Int, Int, Int, Int, Int)] =
       table2.map { case (col, row, v, v2) =>
-        val v3 = tcd.getDouble(col, row)
+        val v3 = co2.get(col, row)
         (col, row, v, v2, v3)
       }
 
