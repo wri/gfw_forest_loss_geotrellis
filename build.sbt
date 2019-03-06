@@ -40,6 +40,7 @@ libraryDependencies ++= Seq(
   geotrellisGeotools,
   geotrellisVectorTile,
   logging,
+  scalatest % Test,
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
