@@ -8,11 +8,53 @@ import geotrellis.vector.Extent
 import geotrellis.raster.RasterExtent
 import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.raster.TileLayout
+import geotrellis.raster.histogram._
+import geotrellis.vector._
+import geotrellis.raster._
 
 class RasterSourceSpec extends FunSpec with Matchers {
 
-  val rs = GeoTiffRasterSource("s3://azavea-datahub/raw/ned-13arcsec-geotiff/imgn44w073_13.tif")
+  val rs = GeoTiffRasterSource("s3://gfw2-data/forest_change/hansen_2018/50N_080W.tif")
+  val rs2 = GeoTiffRasterSource("s3://gfw2-data/forest_cover/2000_treecover/Hansen_GFC2014_treecover2000_50N_080W.tif")
+  val rs3 = GeoTiffRasterSource("s3://gfw2-data/climate/WHRC_biomass/WHRC_V4/t_co2_pixel/50N_080W_t_co2_pixel_2000.tif")
 
+  it("calculate stats") {
+
+    val loss_raster: Raster[MultibandTile] = rs.read(Extent(-72.97754892, 43.85921846, -72.80676639, 43.97153490)).get
+    val loss_tile: MultibandTile = loss_raster.tile
+    val loss: Tile = loss_tile.band(0)
+
+    val tcd_raster: Raster[MultibandTile] = rs2.read(Extent(-72.97754892, 43.85921846, -72.80676639, 43.97153490)).get
+    val tcd_tile: MultibandTile = tcd_raster.tile
+    val tcd: Tile = tcd_tile.band(0)
+
+    val co2_raster: Raster[MultibandTile] = rs3.read(Extent(-72.97754892, 43.85921846, -72.80676639, 43.97153490)).get
+    val co2_tile: MultibandTile = co2_raster.tile
+    val co2: Tile = co2_tile.band(0)
+
+    var table = Vector.empty[(Int, Int, Int)]
+    loss.foreach { (col: Int, row: Int, v: Int) =>
+      if (isData(v)) {
+        val tup = (col, row, v)
+        table = table :+ tup
+      }
+    }
+
+    val table2: Vector[(Int, Int, Int, Int)] =
+      table.map { case (col, row, v) =>
+        val v2 = tcd.get(col, row)
+        (col, row, v, v2)
+      }
+
+    val table3: Vector[(Int, Int, Int, Int, Double)] =
+      table2.map { case (col, row, v, v2) =>
+        val v3 = tcd.getDouble(col, row)
+        (col, row, v, v2, v3)
+      }
+
+    info(s"Loss values ${table3.toList}")
+
+  }
   it("can access basic metadata") {
     rs.crs
     rs.extent
@@ -20,9 +62,19 @@ class RasterSourceSpec extends FunSpec with Matchers {
   }
 
   it("can read a window from raster") {
+    val extent  = Extent(-72.97754892, 43.85921846, -72.80676639, 43.97153490)
+    val geom = extent.buffer(-0.01).toPolygon()
     val raster = rs.read(Extent(-72.97754892, 43.85921846, -72.80676639, 43.97153490)).get
-    info(s"${raster.extent}")
-    info(s"${raster.dimensions}")
+    val histo = raster.tile.polygonalHistogram(raster.extent, geom)
+    // val histo: Array[Histogram[Int]] = raster.tile.histogram
+    val binCounts = histo(0).binCounts()
+    val Some((min, max)) = histo(0).minMaxValues()
+
+    info(s"Extent is ${raster.extent}")
+    info(s"Dimensions are ${raster.dimensions}")
+    info(s"Minimum value is $min")
+    info(s"Maximum value is $max")
+    info(s"Bin Count is ${binCounts}")
   }
 
   it("can read multiple windows at a time") {
@@ -62,7 +114,7 @@ class RasterSourceSpec extends FunSpec with Matchers {
       LayoutDefinition(worldExtent, tileLayout)
     }
 
-    val tileSource = LayoutTileSource(rs, tileGrid)
+    val tileSource = rs.tileToLayout(tileGrid)
 
     val keys = tileSource.keys
     val (rasterKey, raster) = tileSource.readAll.next

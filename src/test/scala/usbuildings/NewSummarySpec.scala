@@ -40,7 +40,7 @@ object MyMean {
 }
 
 class NewSummarySpec extends FunSpec {
-  val rasterSource = GeoTiffRasterSource("s3://azavea-datahub/raw/ned-13arcsec-geotiff/imgn44w073_13.tif")
+  val rasterSource = GeoTiffRasterSource("s3://gfw2-data/forest_change/hansen_2018/50N_080W.tif")
   val raster: Raster[Tile] = rasterSource.read(Extent(-72.97754892, 43.85921846, -72.80676639, 43.97153490)).get.mapTile(_.band(0))
 
   val nonIntersectingWkt = "POLYGON ((-73.175445 43.055058, -73.175373 43.055098, -73.175462 43.055181, -73.175534 43.055141, -73.175445 43.055058))"
