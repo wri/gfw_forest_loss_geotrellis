@@ -17,11 +17,11 @@ object BuildingElevationCsvMain extends CommandApp (
   main = {
     val featuresOpt = Opts.option[String]("features", help = "URI of the features CSV files")
     val outputOpt = Opts.option[String]("output", help = "URI of the output features CSV files")
-    val limitOpt = Opts.option[Int]("limit", help = "Limit number of records processed")
+    val limitOpt = Opts.option[Int]("limit", help = "Limit number of records processed").orNone
 
     val logger = Logger.getLogger(getClass)
 
-    (featuresOpt, outputOpt).mapN { (featuresUrl, outputUrl) =>
+    (featuresOpt, outputOpt, limitOpt).mapN { (featuresUrl, outputUrl, maybeLimit) =>
       val conf = new SparkConf().
         setIfMissing("spark.master", "local[*]").
         setAppName("Building Footprint Elevation").
@@ -38,7 +38,7 @@ object BuildingElevationCsvMain extends CommandApp (
         csv(path = featuresUrl)
 
       // If limit is defined apply it on input.
-      limitOpt.map { n: Int => features = features.limit(n) }
+      maybeLimit.map { n: Int => features = features.limit(n) }
 
       /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
       val featureRDD: RDD[Feature[Polygon, FeatureId]] =

@@ -27,7 +27,7 @@ object BuildingElevation extends LazyLogging {
         // set of tile grid keys that intersect this particular feature
         val keys: Set[SpatialKey] = NED.tileGrid.mapTransform.keysForGeometry(feature.geom)
         keys.map { key => (key, feature) }
-      }.partitionBy(partitioner)
+      }.partitionBy(partitioner) // this will produce stragler partitions for us, lets talk about why
 
     /* Here we're going to work with the features one partition at a time.
      * We're going to use the tile grid key to read pixels from appropriate raster.
