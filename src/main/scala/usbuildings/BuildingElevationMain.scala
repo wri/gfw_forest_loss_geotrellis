@@ -1,27 +1,33 @@
 package usbuildings
 
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.{HashPartitioner, SparkConf, SparkContext}
-import com.monovore.decline.{CommandApp, Opts}
-import cats.implicits._
+import java.net.URL
 
-import org.apache.log4j.Logger
-import geotrellis.vector.{Feature, Polygon}
+import cats.implicits._
+import com.monovore.decline.{CommandApp, Opts}
 import geotrellis.vector.io._
 import geotrellis.vector.io.wkt.WKT
+import geotrellis.vector.{Feature, Polygon}
+import org.apache.log4j.Logger
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.{HashPartitioner, SparkConf}
 
 object BuildingElevationMain extends CommandApp (
   name = "geotrellis-usbuildings",
   header = "Collect building footprint elevations from terrain tiles",
   main = {
-    val featuresOpt = Opts.option[String]("features", help = "URI of the features CSV files")
+    val allFeaturesOpt = Opts.flag("all-features", "Use input from all available states")
+    val featuresOpt = Opts.options[String]("features", "URI of building GeoJSON file (optionally zipped)")
     val outputOpt = Opts.option[String]("output", help = "URI of the output features CSV files")
-    val limitOpt = Opts.option[Int]("limit", help = "Limit number of records processed")
+    val sampleOpt = Opts.option[Double]("sample", help = "Fraction of input to sample").orNone
 
     val logger = Logger.getLogger(getClass)
 
-    (featuresOpt, outputOpt).mapN { (featuresUrl, outputUrl) =>
+    val featuresListOpt: Opts[List[String]] =
+      allFeaturesOpt.map( _ => Building.geoJsonURLs ).
+      orElse(featuresOpt.map(_.toList))
+
+    (featuresListOpt, outputOpt, sampleOpt).mapN { (featuresUrl, outputUrl, sample) =>
       val conf = new SparkConf().
         setIfMissing("spark.master", "local[*]").
         setAppName("Building Footprint Elevation").
@@ -30,29 +36,21 @@ object BuildingElevationMain extends CommandApp (
 
       implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
 
-      /* Use spark DataFrame API to read input CSV file
-       * https://github.com/databricks/spark-csv
-       */
-      var features: DataFrame = spark.read.
-        options(Map("header" -> "true", "delimiter" -> ",")).
-        csv(path = featuresUrl)
-
-      // If limit is defined apply it on input.
-      limitOpt.map { n: Int => features = features.limit(n) }
-
       /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
-      val featureRDD: RDD[Feature[Polygon, FeatureId]] =
-        features.rdd.map { row: Row =>
-          val state: String = row.getString(0)
-          val id: Int = row.getString(1).toInt
-          val wkt: String = row.getString(2)
+      var featureRDD: RDD[Feature[Polygon, FeatureId]] =
+        spark.sparkContext.
+          parallelize(featuresUrl, featuresUrl.length).
+          flatMap { url =>
+            Building.readFromGeoJson(new URL(url))
+          }
 
-          val geom: Polygon = WKT.read(wkt).asInstanceOf[Polygon]
-          Feature(geom, FeatureId(state, id))
-        }
+      sample.map { r =>
+        logger.info(s"Taking sample of ${r * 100} %")
+        featureRDD = featureRDD.sample(withReplacement = false, fraction = r, seed = 0L)
+      }
 
       /* Increasing number of partitions produces better work distribution and increases reliability */
-      val partitioner = new HashPartitioner(partitions = featureRDD.getNumPartitions * 16)
+      val partitioner = new HashPartitioner(partitions = featureRDD.getNumPartitions * 128)
 
       val featureWithSummaryRDD: RDD[Feature[Polygon, FeatureProperties]] =
         BuildingElevation(featureRDD, partitioner)
