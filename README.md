@@ -38,6 +38,8 @@ Output is a set of `.csv` files with geometry WKT, feature id and min/max NED va
 
 ```
 sbt:geotrellis-wri> test:runMain usbuildings.BuildingElevationMain --features file:/User/Vermont.geojson --output file:/User/output-dir --sample 0.01
+
+sbt:geotrellis-wri> test:runMain usbuildings.BuildingElevationCsvMain --features file:/User/vermont-buildings.csv --output file:/User/output-dir --limit 100
 ```
 
 ### EMR
