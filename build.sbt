@@ -45,7 +45,7 @@ libraryDependencies ++= Seq(
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
   "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.9.0",
-  "com.azavea.geotrellis" %% "geotrellis-contrib-summary" % "0.0.3",
+  "com.azavea.geotrellis" %% "geotrellis-contrib-summary" % "0.1.1",
   "com.monovore"  %% "decline" % "0.5.1"
 )
 

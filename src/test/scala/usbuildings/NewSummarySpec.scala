@@ -4,8 +4,6 @@ import geotrellis.raster._
 import geotrellis.vector._
 import geotrellis.contrib.vlm.geotiff._
 import org.scalatest._
-import geotrellis.contrib.polygonal.PolygonalSummary.ops._
-import geotrellis.contrib.polygonal.Implicits._
 import geotrellis.contrib.polygonal._
 import geotrellis.vector.io.wkt.WKT
 import cats._
@@ -18,14 +16,15 @@ case class MyMean(total: Double, count: Long)
  */
 object MyMean {
   // Tell me how to add cell values to your accumulator
-  implicit val myMeanIsCellAccumulator: CellAccumulator[MyMean] = {
-    new CellAccumulator[MyMean] {
-      def add(self: MyMean, v: Int): MyMean = {
-        MyMean(self.total + v, self.count + 1)
-      }
-
-      def add(self: MyMean, v: Double): MyMean = {
-        MyMean(self.total + v, self.count + 1)
+  implicit val myMeanIsCellVisitor: CellVisitor[Raster[Tile], MyMean] = {
+    new CellVisitor[Raster[Tile], MyMean] {
+      def register(raster: Raster[Tile], col: Int, row: Int, acc: MyMean): MyMean = {
+        val v = raster.tile.getDouble(col, row)
+        if (isData(v)) {
+          MyMean(acc.total + v, acc.count + 1)
+        } else {
+          acc
+        }
       }
     }
   }
@@ -47,15 +46,13 @@ class NewSummarySpec extends FunSpec {
   val nonIntersectingGeom: Geometry = WKT.read(nonIntersectingWkt)
 
   it("will perform a summary (non-intersecting)") {
-    val Feature(_, mymean) =
-      raster.polygonalSummary[Geometry, MyMean](nonIntersectingGeom)
+    val mymean = raster.polygonalSummary[MyMean](nonIntersectingGeom)
     info(s"Result: $mymean")
   }
 
   val intersectingGeom = raster.extent.toPolygon
   it("will perform a summary (intersecting)") {
-    val Feature(_, mymean) =
-      raster.polygonalSummary[Polygon, MyMean](intersectingGeom)
+    val mymean = raster.polygonalSummary[MyMean](intersectingGeom)
     info(s"raster cols: ${raster.cols} rows: ${raster.rows}")
     info(s"Result: $mymean")
   }

@@ -7,10 +7,13 @@ import geotrellis.raster.histogram.StreamingHistogram
 import geotrellis.spark.SpatialKey
 import geotrellis.spark.io.index.zcurve.Z2
 import geotrellis.vector.io._
-import geotrellis.vector.{Feature, Point, Polygon}
+import geotrellis.vector._
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import cats.implicits._
+import geotrellis.contrib.polygonal._
+import Implicits._
+
 
 object BuildingElevation extends LazyLogging {
 
@@ -61,6 +64,7 @@ object BuildingElevation extends LazyLogging {
               maybeRasterSource.flatMap { rs => Either.catchNonFatal(rs.read(feature.envelope)) }
 
             val id: FeatureId = feature.data
+            val geom: Polygon = feature.geom
 
             maybeRaster match {
               case Left(exception) =>
@@ -74,13 +78,8 @@ object BuildingElevation extends LazyLogging {
               case Right(Some(raster)) =>
                 val firstBandRaster: Raster[Tile] = raster.mapTile(_.band(0))
 
-                // these imports are needed for .polygonalSummary call (to be hidden up)
-                import geotrellis.contrib.polygonal.PolygonalSummary.ops._
-                import geotrellis.contrib.polygonal.Implicits._
-                import usbuildings.Implicits._
-
-                val Feature(geom, histogram) =
-                  firstBandRaster.polygonalSummary[Polygon, StreamingHistogram](feature.geom)
+                val histogram =
+                  firstBandRaster.polygonalSummary[StreamingHistogram](feature.geom)
 
                 (id, Feature(geom, FeatureProperties(id, Some(histogram))))
               }

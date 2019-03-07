@@ -40,7 +40,8 @@ object StatsMain extends CommandApp (
       }
       val rddOfRasterTiles = rddOfRasterSource.flatMap { case (rs1, rs2, rs3) =>
         RasterUtils.rasterTiles(rs1, rs2, rs3)
-      }
+      }.repartition(arr.length * 100)
+
       val rddOfTuples = rddOfRasterTiles.flatMap{ case (r1, r2, r3) =>
         RasterUtils.rasterAsTable(r1, r2, r3)
       }
