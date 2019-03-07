@@ -35,6 +35,7 @@ libraryDependencies ++= Seq(
   sparkHive % Provided,
   hadoopAws % Provided,
   geotrellisSpark,
+  geotrellisSparkTestKit % Test,
   geotrellisS3,
   geotrellisShapefile,
   geotrellisGeotools,
@@ -60,9 +61,10 @@ import geotrellis.spark._
 import geotrellis.spark.tiling._
 import geotrellis.contrib.vlm._
 import geotrellis.contrib.vlm.gdal._
-
+import org.apache.spark.rdd._
 import org.apache.spark.sql.{SparkSession, DataFrame}
 import org.apache.spark.{SparkConf, SparkContext}
+import usbuildings._
 
 val conf = new SparkConf().
 setIfMissing("spark.master", "local[*]").

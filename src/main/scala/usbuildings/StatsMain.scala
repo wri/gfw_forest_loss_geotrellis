@@ -2,17 +2,15 @@ package usbuildings
 
 import java.net.URL
 
-import cats.implicits._
 import com.monovore.decline.{CommandApp, Opts}
-import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
-import geotrellis.raster.FloatUserDefinedNoDataCellType
 import geotrellis.vector.io._
-import geotrellis.vector.io.wkt.WKT
-import geotrellis.vector.{Feature, Polygon}
 import org.apache.log4j.Logger
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.{HashPartitioner, SparkConf}
+import org.apache.spark._
+import org.apache.spark.rdd._
+import org.apache.spark.sql._
+import org.apache.spark.sql.functions._
+
+import cats.implicits._
 
 object StatsMain extends CommandApp (
   name = "geotrellis-usbuildings",
@@ -21,12 +19,12 @@ object StatsMain extends CommandApp (
     val rasterOpt = Opts.options[String]("raster", "URI of raster")
     val sampleOpt = Opts.option[Double]("sample", help = "Fraction of input to sample").orNone
 
-    val logger = Logger.getLogger(getClass)
+    val logger = Logger.getLogger("StatsMain")
 
     (rasterOpt, sampleOpt).mapN { (rasterUrl, sample) =>
       val conf = new SparkConf().
         setIfMissing("spark.master", "local[*]").
-        setAppName("Building Footprint Elevation").
+        setAppName("Tree Cover Loss Dataframe").
         set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
         set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
 
@@ -51,7 +49,6 @@ object StatsMain extends CommandApp (
 
 
       import spark.sqlContext._
-      import org.apache.spark.sql.functions._
 
       val ag_df =
         dataframe.groupBy("loss_year", "col").

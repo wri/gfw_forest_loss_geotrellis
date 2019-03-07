@@ -37,13 +37,19 @@ object RasterUtils {
     tcd_rs: RasterSource,
     co2_rs: RasterSource
   ): Iterator[(Raster[MultibandTile], Raster[MultibandTile], Raster[MultibandTile])] = {
-    val loss_it = loss_rs.tileToLayout(tileGrid).readAll()
-    val tcd_it = tcd_rs.tileToLayout(tileGrid).readAll().map(_._2)
-    val co2_it = tcd_rs.tileToLayout(tileGrid).readAll().map(_._2)
 
-    loss_it.zip(tcd_it).zip(co2_it).map { case (((key,t1), t2), t3) =>
+    val loss_tiled = loss_rs.tileToLayout(tileGrid)
+    val tcd_tiled = tcd_rs.tileToLayout(tileGrid)
+    val co2_tiled = tcd_rs.tileToLayout(tileGrid)
+
+    val keys = loss_tiled.keys
+
+    keys.toIterator.map { key =>
       val extent: Extent = key.extent(tileGrid)
-      (Raster(t1, extent), Raster(t2, extent), Raster(t3, extent))
+      val loss_year = loss_tiled.read(key).get
+      val tcd = tcd_tiled.read(key).get
+      val co2 = co2_tiled.read(key).get
+      (Raster(loss_year, extent), Raster(tcd, extent), Raster(co2, extent))
     }
   }
 
