@@ -25,7 +25,6 @@ class TreeLossSummarySpec extends FunSpec with Matchers {
   val loss_tile: MultibandTile = loss_raster.tile.interpretAs(FloatUserDefinedNoDataCellType(0))
   val loss: Tile = loss_tile.band(0)
 
-
   val tcd_raster: Raster[MultibandTile] = rs2.read(Extent(-72.97754892, 43.85921846, -72.80676639, 43.97153490)).get
   val tcd_tile: MultibandTile = tcd_raster.tile
   val tcd: Tile = tcd_tile.band(0)
@@ -35,8 +34,13 @@ class TreeLossSummarySpec extends FunSpec with Matchers {
   val co2: Tile = co2_tile.band(0)
 
   it("calculate summary") {
-    val composite_loss_raster = Raster(TreeLossTile(loss, tcd, co2), loss_raster.extent)
+    // !!! This will throw an exception for failed requirement of matched cell types
+    // val mbtile = MultibandTile(loss, tcd, co2)
+    val composite_loss_raster: Raster[TreeLossTile] = Raster(TreeLossTile(loss, tcd, co2), loss_raster.extent)
     val summary = composite_loss_raster.polygonalSummary(sampleExtent, TreeLossSummary())
+    summary.years.foreach { case (year, lossData: LossData) =>
+      info(s"$year -> TCD: ${lossData.tcd.mean()} CO2: ${lossData.totalCo2}")
+    }
     info(s"Summary: $summary")
   }
 

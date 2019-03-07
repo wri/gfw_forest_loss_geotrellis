@@ -9,7 +9,9 @@ import geotrellis.vector.io.wkt.WKT
 import cats._
 
 /* application specific accumulator for polygonal summary */
-case class MyMean(total: Double, count: Long)
+case class MyMean(total: Double, count: Long) {
+  def result: Double = total / count.toDouble
+}
 
 /**
  *  Contained example of how to add application specific accumulator for polygonal summary
@@ -52,7 +54,8 @@ class NewSummarySpec extends FunSpec {
 
   val intersectingGeom = raster.extent.toPolygon
   it("will perform a summary (intersecting)") {
-    val mymean = raster.polygonalSummary[MyMean](intersectingGeom)
+
+    val mymean: MyMean = raster.polygonalSummary[MyMean](intersectingGeom, MyMean(0, 0))
     info(s"raster cols: ${raster.cols} rows: ${raster.rows}")
     info(s"Result: $mymean")
   }
