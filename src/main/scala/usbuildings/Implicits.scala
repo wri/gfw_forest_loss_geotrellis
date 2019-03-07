@@ -1,10 +1,7 @@
 package usbuildings
 
 import cats._
-import geotrellis.contrib.polygonal.CellVisitor
-import geotrellis.raster.{CellGrid, MultibandRaster, Raster, RasterExtent, isData}
 import geotrellis.raster.histogram.StreamingHistogram
-import geotrellis.util.GetComponent
 
 /** Here we define ad-hoc interface implementations.
   * These are interfaces required to perform polygonalSummary on a Raster[Tile]

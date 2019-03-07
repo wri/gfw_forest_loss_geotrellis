@@ -18,8 +18,7 @@ class RasterSourceSpec extends FunSpec with Matchers {
   val rs2 = GeoTiffRasterSource("s3://gfw2-data/forest_cover/2000_treecover/Hansen_GFC2014_treecover2000_50N_080W.tif")
   val rs3 = GeoTiffRasterSource("s3://gfw2-data/climate/WHRC_biomass/WHRC_V4/Processed/50N_080W_t_aboveground_biomass_ha_2000.tif")
 
-  it("calculate stats") {
-
+  ignore("calculate stats") {
     val loss_raster: Raster[MultibandTile] = rs.read(Extent(-72.97754892, 43.85921846, -72.80676639, 43.97153490)).get
     val loss_tile: MultibandTile = loss_raster.tile.interpretAs(FloatUserDefinedNoDataCellType(0))
     val loss: Tile = loss_tile.band(0)
@@ -54,7 +53,6 @@ class RasterSourceSpec extends FunSpec with Matchers {
       }
 
     info(s"Loss values ${table3.toList}")
-
   }
   it("can access basic metadata") {
     rs.crs
