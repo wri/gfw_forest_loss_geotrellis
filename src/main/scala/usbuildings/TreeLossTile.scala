@@ -9,5 +9,5 @@ case class TreeLossTile(
 ) extends CellGrid {
   def cellType: CellType = tcd.cellType
   def cols: Int = tcd.cols
-  def rows: Int = tcd.cols
+  def rows: Int = tcd.rows
 }
