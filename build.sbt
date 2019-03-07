@@ -62,8 +62,9 @@ import geotrellis.spark.tiling._
 import geotrellis.contrib.vlm._
 import geotrellis.contrib.vlm.gdal._
 import org.apache.spark.rdd._
-import org.apache.spark.sql.{SparkSession, DataFrame}
+import org.apache.spark.sql._
 import org.apache.spark.{SparkConf, SparkContext}
+import geotrellis.vector.io.wkt.WKT
 import usbuildings._
 
 val conf = new SparkConf().
@@ -84,6 +85,7 @@ Test / testOptions += Tests.Argument("-oD")
 Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m")
 
 // Settings for sbt-assembly plugin which builds fat jars for use by spark jobs
+test in assembly := {}
 assemblyMergeStrategy in assembly := {
   case s if s.startsWith("META-INF/services") => MergeStrategy.concat
   case "reference.conf" | "application.conf"  => MergeStrategy.concat
@@ -99,7 +101,7 @@ sparkEmrRelease             := "emr-5.20.0"
 sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkS3JarFolder            := "s3://geotrellis-test/wri/jars"
-sparkInstanceCount          := 20
+sparkInstanceCount          := 10
 sparkMasterType             := "m4.xlarge"
 sparkCoreType               := "m4.xlarge"
 sparkMasterPrice            := Some(0.5)
