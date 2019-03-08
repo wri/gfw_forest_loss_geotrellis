@@ -19,7 +19,7 @@ object Implicits {
 class TypeClassSpec {
   import Implicits._
 
-  /** At call site the compile will implicitly find instances of Comparable[Int] and Comparable[String] *//
+  /** At call site the compile will implicitly find instances of Comparable[Int] and Comparable[String] */
   val sort: (Int, Int) = Sort(1, 2)
   val sorted: (String, String) = Sort("a", "b")
 
@@ -38,5 +38,3 @@ object Sort {
     }
   }
 }
-
-
