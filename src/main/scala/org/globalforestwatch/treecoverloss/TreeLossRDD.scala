@@ -49,8 +49,6 @@ object TreeLossRDD extends LazyLogging {
         val groupedByKey: Map[SpatialKey, Array[(SpatialKey, Feature[Geometry, FeatureId])]] =
           featurePartition.toArray.groupBy{ case (windowKey, feature) => windowKey }
 
-
-
         groupedByKey.toIterator.flatMap { case (windowKey, keysAndFeatures) =>
           val window: Extent = windowKey.extent(windowLayout)
 

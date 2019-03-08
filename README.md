@@ -27,10 +27,11 @@ Output is a set of `.csv` files with geometry WKT, feature id and min/max NED va
 
 ## Inventory
 
-[`build.sbt`](build.sbt): Scala Build Tool build configuration file
-[`.sbtopts`](.sbtopts): Command line options for SBT, including JVM parameters
-[`project`](project): Additional configuration for SBT project, plugins, utility, versions
-[`src/main/scala`](src/main/scala): Application and utility code
+- [`build.sbt`](build.sbt): Scala Build Tool build configuration file
+- [`.sbtopts`](.sbtopts): Command line options for SBT, including JVM parameters
+- [`project`](project): Additional configuration for SBT project, plugins, utility, versions
+- [`src/main/scala`](src/main/scala): Application and utility code
+- [`src/test/scala`](src/test/scala): Unit test files
 
 ## Spark Job Commands
 
@@ -49,5 +50,5 @@ Before running review `sbtlighter` configuration in `build.sbt`, `reload` SBT se
 ```
 sbt:geotrellis-wri> sparkCreateCluster
 
-sbt:geotrellis-wri> sparkSubmitMain usbuildings.BuildingElevationMain --all-features --output s3://bucket/buildings/output
+sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.treecoverloss.TreeLossSummaryMain --features s3://gfw2-data/alerts-tsv/country-pages/ten-by-ten-gadm36/wdpa__10N_010E.tsv --output s3://geotrellis-test/wri/out/summary
 ```

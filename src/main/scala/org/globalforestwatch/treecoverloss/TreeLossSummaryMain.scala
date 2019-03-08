@@ -21,13 +21,24 @@ object TreeLossSummaryMain extends CommandApp (
     val outputOpt = Opts.option[String](
       "output", "URI of output dir for CSV files")
 
+    // Can be used to increase the level of job parallelism
+    val intputPartitionsOpt = Opts.option[Int](
+      "input-partitions", "Partition multiplier for input").withDefault(16)
+
+    // Can be used to consolidate output into fewer files
+    val outputPartitionsOpt = Opts.option[Int](
+      "output-partitions", "Number of output partitions / files to be written").orNone
+
     val limitOpt = Opts.option[Int](
       "limit", help = "Limit number of records processed").orNone
 
     val logger = Logger.getLogger("TreeLossSummaryMain")
 
 
-    (featuresOpt, outputOpt, limitOpt).mapN { (featureUris, outputUrl, limit) =>
+    (
+      featuresOpt, outputOpt, intputPartitionsOpt, outputPartitionsOpt, limitOpt
+    ).mapN { (featureUris, outputUrl, inputPartitionMultiplier, maybeOutputPartitions, limit) =>
+
       val conf = new SparkConf().
         setIfMissing("spark.master", "local[*]").
         setAppName("Tree Cover Loss DataFrame").
@@ -57,7 +68,7 @@ object TreeLossSummaryMain extends CommandApp (
           Feature(geom, FeatureId(areaType, countryCode, admin1, admin2))
         }
 
-      val part = new HashPartitioner(partitions = featureRDD.getNumPartitions * 16)
+      val part = new HashPartitioner(partitions = featureRDD.getNumPartitions * inputPartitionMultiplier)
 
       val summaryRDD: RDD[(FeatureId, TreeLossSummary)] =
         TreeLossRDD(featureRDD, TenByTenGrid.stripedTileGrid, part)
@@ -69,8 +80,10 @@ object TreeLossSummaryMain extends CommandApp (
           }
         }.toDF("country", "area_type", "admin1", "admin2", "year", "tcd_mean", "biomass_sum")
 
+      val outputPartitionCount = maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
+
       summaryDF.
-        repartition(featureRDD.getNumPartitions).
+        repartition(outputPartitionCount).
         write.
           options(Map("header" -> "true", "delimiter" -> ",")).
           csv(path = outputUrl)
