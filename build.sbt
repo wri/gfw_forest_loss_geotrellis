@@ -63,15 +63,19 @@ import geotrellis.spark._
 import geotrellis.spark.tiling._
 import geotrellis.contrib.vlm._
 import geotrellis.contrib.vlm.gdal._
+import geotrellis.contrib.vlm.geotiff._
+import geotrellis.vector.io.wkt.WKT
+
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.apache.spark.{SparkConf, SparkContext}
-import geotrellis.vector.io.wkt.WKT
-import usbuildings._
+
+import org.globalforestwatch.treecoverloss._
+import org.globalforestwatch.util._
 
 val conf = new SparkConf().
 setIfMissing("spark.master", "local[*]").
-setAppName("Building Footprint Elevation").
+setAppName("Tree Cover Loss Console").
 set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
 set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
 
