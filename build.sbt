@@ -140,5 +140,3 @@ sparkEmrConfigs             := List(
     "yarn.nodemanager.pmem-check-enabled" -> "false"
   )
 )
-
-enablePlugins(TutPlugin)
