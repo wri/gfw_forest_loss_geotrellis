@@ -1,12 +1,12 @@
-package usbuildings
+package workshop
 
+import cats._
+import geotrellis.contrib.polygonal._
+import geotrellis.contrib.vlm.geotiff._
 import geotrellis.raster._
 import geotrellis.vector._
-import geotrellis.contrib.vlm.geotiff._
-import org.scalatest._
-import geotrellis.contrib.polygonal._
 import geotrellis.vector.io.wkt.WKT
-import cats._
+import org.scalatest._
 
 /* application specific accumulator for polygonal summary */
 case class MyMean(total: Double, count: Long) {
@@ -14,10 +14,10 @@ case class MyMean(total: Double, count: Long) {
 }
 
 /**
- *  Contained example of how to add application specific accumulator for polygonal summary
+ * Contained example of how to add application specific result type for polygonal summary
  */
 object MyMean {
-  // Tell me how to add cell values to your accumulator
+  /** Specifies how to register each cell under polygon with MyMean */
   implicit val myMeanIsCellVisitor: CellVisitor[Raster[Tile], MyMean] = {
     new CellVisitor[Raster[Tile], MyMean] {
       def register(raster: Raster[Tile], col: Int, row: Int, acc: MyMean): MyMean = {
@@ -31,7 +31,9 @@ object MyMean {
     }
   }
 
-  // Tell me what is empty and how to combine them
+  /** Specified empty value for MyMean and how it can be merged
+    *
+    * */
   implicit val myMeanIsMonoid: Monoid[MyMean] =
     new Monoid[MyMean] {
       def empty: MyMean = MyMean(0, 0L)

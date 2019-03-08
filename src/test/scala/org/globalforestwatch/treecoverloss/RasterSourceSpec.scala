@@ -1,16 +1,11 @@
-package usbuildings
+package org.globalforestwatch.treecoverloss
 
-import org.scalatest._
-import geotrellis.contrib.vlm.LayoutTileSource
 import geotrellis.contrib.vlm.geotiff._
 import geotrellis.proj4._
-import geotrellis.vector.Extent
-import geotrellis.raster.RasterExtent
+import geotrellis.raster.{RasterExtent, TileLayout, _}
 import geotrellis.spark.tiling.LayoutDefinition
-import geotrellis.raster.TileLayout
-import geotrellis.raster.histogram._
-import geotrellis.vector._
-import geotrellis.raster._
+import geotrellis.vector.Extent
+import org.scalatest._
 
 class RasterSourceSpec extends FunSpec with Matchers {
 

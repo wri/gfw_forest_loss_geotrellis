@@ -1,17 +1,10 @@
-package usbuildings
+package org.globalforestwatch.treecoverloss
 
-import org.scalatest._
-import geotrellis.contrib.vlm.LayoutTileSource
-import geotrellis.contrib.vlm.geotiff._
-import geotrellis.proj4._
-import geotrellis.vector.Extent
-import geotrellis.raster.RasterExtent
-import geotrellis.spark.tiling.LayoutDefinition
-import geotrellis.raster.TileLayout
-import geotrellis.raster.histogram._
-import geotrellis.vector._
-import geotrellis.raster._
 import geotrellis.contrib.polygonal._
+import geotrellis.contrib.vlm.geotiff._
+import geotrellis.raster._
+import geotrellis.vector.Extent
+import org.scalatest._
 
 class TreeLossSummarySpec extends FunSpec with Matchers {
 
@@ -39,33 +32,8 @@ class TreeLossSummarySpec extends FunSpec with Matchers {
     val composite_loss_raster: Raster[TreeLossTile] = Raster(TreeLossTile(loss, tcd, co2), loss_raster.extent)
     val summary = composite_loss_raster.polygonalSummary(sampleExtent, TreeLossSummary())
     summary.years.foreach { case (year, lossData: LossData) =>
-      info(s"$year -> TCD: ${lossData.tcd.mean()} CO2: ${lossData.totalCo2}")
+      info(s"$year -> TCD: ${lossData.tcdHistogram.mean()} CO2: ${lossData.totalCo2}")
     }
     info(s"Summary: $summary")
   }
-
-  ignore("calculate stats") {
-    var table = Vector.empty[(Int, Int, Int)]
-    loss.foreach { (col: Int, row: Int, v: Int) =>
-      if (isData(v)) {
-        val tup = (col, row, v)
-        table = table :+ tup
-      }
-    }
-
-    val table2: Vector[(Int, Int, Int, Int)] =
-      table.map { case (col, row, v) =>
-        val v2 = tcd.get(col, row)
-        (col, row, v, v2)
-      }
-
-    val table3: Vector[(Int, Int, Int, Int, Int)] =
-      table2.map { case (col, row, v, v2) =>
-        val v3 = co2.get(col, row)
-        (col, row, v, v2, v3)
-      }
-
-    info(s"Loss values ${table3.toList}")
-  }
-
 }

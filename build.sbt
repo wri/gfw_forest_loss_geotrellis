@@ -1,11 +1,12 @@
 import Dependencies._
 
-name := "geotrellis-wri"
+name := "treecoverloss"
+organization := "org.globalforestwatch"
+licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html"))
 
 scalaVersion := Version.scala
 scalaVersion in ThisBuild := Version.scala
 
-licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html"))
 scalacOptions ++= Seq(
   "-deprecation", "-unchecked", "-feature",
   "-language:implicitConversions",
@@ -41,16 +42,17 @@ libraryDependencies ++= Seq(
   geotrellisGeotools,
   geotrellisVectorTile,
   logging,
+  decline,
   scalatest % Test,
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
   "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.9.0",
   "com.azavea.geotrellis" %% "geotrellis-contrib-summary" % "0.1.1",
-  "com.monovore"  %% "decline" % "0.5.1"
 )
 
 // auto imports for local SBT console
+// can be used with `test:console` command
 initialCommands in console :=
 """
 import java.net._
@@ -106,7 +108,7 @@ sparkMasterType             := "m4.xlarge"
 sparkCoreType               := "m4.xlarge"
 sparkMasterPrice            := Some(0.5)
 sparkCorePrice              := Some(0.5)
-sparkClusterName            := s"geotrellis-wri"
+sparkClusterName            := s"geotrellis-treecoverloss"
 sparkEmrServiceRole         := "EMR_DefaultRole"
 sparkInstanceRole           := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName("geotrellis-emr")

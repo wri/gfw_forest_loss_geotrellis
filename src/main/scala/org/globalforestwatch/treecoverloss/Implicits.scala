@@ -1,6 +1,6 @@
-package usbuildings
+package org.globalforestwatch.treecoverloss
 
-import cats._
+import cats.Monoid
 import geotrellis.raster.histogram.StreamingHistogram
 
 /** Here we define ad-hoc interface implementations.
@@ -11,7 +11,13 @@ object Implicits {
     * - get an empty/initial value of StreamingHistogram
     * - combine two instances of StreamingHistogram
     *
-    * ref: https://typelevel.org/cats/typeclasses/monoid.html
+    * This allows using polygonalSummary methods without providing initial value like:
+    *
+    * {{{
+    * val summary = raster.polygonalSummary(geometry)
+    * }}}
+    *
+    * @see https://typelevel.org/cats/typeclasses/monoid.html
     */
   implicit val streamingHistogramMonoid: Monoid[StreamingHistogram] =
     new Monoid[StreamingHistogram] {

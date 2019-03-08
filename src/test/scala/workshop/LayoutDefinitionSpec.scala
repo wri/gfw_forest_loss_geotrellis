@@ -1,12 +1,11 @@
-package usbuildings
+package workshop
 
-import org.scalatest._
-import geotrellis.vector.io.wkt.WKT
-import geotrellis.vector._
-import geotrellis.spark._
-import geotrellis.spark.tiling._
-import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.raster.TileLayout
+import geotrellis.spark._
+import geotrellis.spark.tiling.LayoutDefinition
+import geotrellis.vector._
+import geotrellis.vector.io.wkt.WKT
+import org.scalatest._
 
 class LayoutDefinitionSpec extends FunSpec {
 

@@ -17,10 +17,10 @@
 import sbt._
 
 object Version {
-  val geotrellis  = "2.2.0"
   val scala       = "2.11.12"
+  val geotrellis  = "2.2.0"
   val hadoop      = "2.8.0"
-  val spark       = "2.3.1"
+  val spark       = "2.4.0"
   val geotools    = "17.1"
 }
 
@@ -37,15 +37,11 @@ object Dependencies {
   val geotrellisRasterTestkit = "org.locationtech.geotrellis" %% "geotrellis-raster-testkit" % Version.geotrellis
   val sparkJts                = "org.locationtech.geomesa"    %% "geomesa-spark-jts"         % "2.2.0"
 
-  val pureconfig          = "com.github.pureconfig"        %% "pureconfig"                % "0.9.1"
+  val pureconfig          = "com.github.pureconfig"      %% "pureconfig"               % "0.9.1"
   val logging             = "com.typesafe.scala-logging" %% "scala-logging"            % "3.9.0"
   val scalatest           = "org.scalatest"              %% "scalatest"                % "3.0.5"
   val scalactic           = "org.scalactic"              %% "scalactic"                % "3.0.5"
-
-  val catsCore            = "org.typelevel"              %% "cats-core"                % "1.4.0"
-  val catsEffect          = "org.typelevel"              %% "cats-effect"              % "1.0.0"
-  val fs2Core             = "co.fs2"                     %% "fs2-core"                 % "1.0.0"
-  val fs2Io               = "co.fs2"                     %% "fs2-io"                   % "1.0.0"
+  val decline             = "com.monovore"               %% "decline"                  % "0.5.1"
 
   val sparkCore           = "org.apache.spark"           %% "spark-core"               % Version.spark
   val sparkSQL            = "org.apache.spark"           %% "spark-sql"                % Version.spark
