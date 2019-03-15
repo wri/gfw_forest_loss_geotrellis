@@ -62,7 +62,8 @@ object TreeLossRDD extends LazyLogging {
           val maybeRaster: Either[Throwable, Raster[TreeLossTile]] =
             maybeRasterSource.flatMap { rs: TenByTenGridSources =>
               Either.catchNonFatal {
-                // TODO: Talk about how to make biomass optional and still produce an answer
+                // TODO: THis currently skips the entire block when one raster is missing
+                //  Will need to find a way to not skip block but replace missing raster with empty tile
                 logger.info(s"Reading: $windowKey, ${rs.lossSourceUri}")
                 val loss: MultibandTile = rs.lossSource.read(window).get.tile // .withNoData(Some(0))
 
