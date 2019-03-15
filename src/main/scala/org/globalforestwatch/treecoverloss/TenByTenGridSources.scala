@@ -6,18 +6,34 @@ import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
   * @param grid top left corner, padded from east ex: "10N_010E"
   */
 case class TenByTenGridSources(grid: String) {
-  val forestChangeSourceUri =
-    s"s3://gfw2-data/forest_change/hansen_2018/${grid}.tif"
+  val lossSourceUri =
+    s"s3://wri-users/tmaschler/prep_tiles/loss/${grid}.tif"
 
-  val treeCoverSourceUri =
-    s"s3://gfw2-data/forest_cover/2000_treecover/Hansen_GFC2014_treecover2000_${grid}.tif"
+  val gainSourceUri =
+    s"s3://wri-users/tmaschler/prep_tiles/gain/${grid}.tif"
 
-  val bioMassSourceUri  =
-    s"s3://gfw2-data/climate/WHRC_biomass/WHRC_V4/Processed/${grid}_t_aboveground_biomass_ha_2000.tif"
+  val tcd2000SourceUri =
+    s"s3://wri-users/tmaschler/prep_tiles/tcd_2000/${grid}.tif"
 
-  lazy val forestChangeSource = GeoTiffRasterSource(forestChangeSourceUri)
+  val tcd2010SourceUri =
+    s"s3://wri-users/tmaschler/prep_tiles/tcd_2010/${grid}.tif"
 
-  lazy val treeCoverSource = GeoTiffRasterSource(treeCoverSourceUri)
+  val co2PixelSourceUri  =
+    s"s3://wri-users/tmaschler/prep_tiles/co2_pixel/${grid}.tif"
 
-  lazy val bioMassSource = GeoTiffRasterSource(bioMassSourceUri)
+  val gadm36SourceUri  =
+    s"s3://wri-users/tmaschler/prep_tiles/co2_pixel/${grid}.tif"
+
+  lazy val lossSource = GeoTiffRasterSource(lossSourceUri)
+
+  lazy val gainSource = GeoTiffRasterSource(gainSourceUri)
+
+  lazy val tcd2000Source = GeoTiffRasterSource(tcd2000SourceUri)
+
+  lazy val tcd2010Source = GeoTiffRasterSource(tcd2010SourceUri)
+
+  lazy val co2PixelSource = GeoTiffRasterSource(co2PixelSourceUri)
+
+  lazy val gadm36Source = GeoTiffRasterSource(gadm36SourceUri)
+
 }
