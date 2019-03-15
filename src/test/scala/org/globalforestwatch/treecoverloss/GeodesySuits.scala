@@ -9,18 +9,18 @@ class GeodesySuits extends FunSuite {
   }
 
   test("Geodesic Area Lat 45.0"){
-    assert(pixelArea(0.0,0.00025, 0.00025) === 547.6481292317709)
+    assert(pixelArea(45.0,0.00025, 0.00025) === 547.6481292317709)
   }
 
   test("Geodesic Area Lat 90.0"){
-    assert(pixelArea(0.0,0.00025, 0.00025) === 0.0017010416666666667)
+    assert(pixelArea(90.0,0.00025, 0.00025) === 0.0017010416666666667)
   }
 
   test("Geodesic Area Lat -45.0"){
-    assert(pixelArea(0.0,0.00025, 0.00025) === 547.65048671875)
+    assert(pixelArea(-45.0,0.00025, 0.00025) === 547.65048671875)
   }
 
   test("Geodesic Area Lat -90.0"){
-    assert(pixelArea(0.0,0.00025, 0.00025) === 0.0017010416666666667)
+    assert(pixelArea(-90.0,0.00025, 0.00025) === 0.0017010416666666667)
   }
 }
