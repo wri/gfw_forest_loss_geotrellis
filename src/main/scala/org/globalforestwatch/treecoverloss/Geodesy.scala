@@ -1,9 +1,10 @@
 package org.globalforestwatch.treecoverloss
 
 import breeze.numerics._
+import geotrellis.raster.CellSize
 
 object Geodesy {
-  def pixelArea(lat:Double, d_lat: Double, d_lon: Double): Double = {
+  def pixelArea(lat:Double, cellSize: CellSize): Double = {
     /** Calculate geodesic area for a pixel using giving pixel size and latitude
       * Assumes WGS 1984 as spatial reference
       */
@@ -11,6 +12,9 @@ object Geodesy {
     val b: Double = 6356752.314245179  // Semi minor axis of WGS 1984 ellipsoid
 
     val pi: Double = Math.PI
+
+    val d_lon: Double = cellSize.width
+    val d_lat: Double = cellSize.height
 
     val q: Double = d_lon/360
     val e: Double = sqrt(1 - pow((b/a),2))
