@@ -63,19 +63,31 @@ object TreeLossRDD extends LazyLogging {
             maybeRasterSource.flatMap { rs: TenByTenGridSources =>
               Either.catchNonFatal {
                 // TODO: Talk about how to make biomass optional and still produce an answer
-                logger.info(s"Reading: $windowKey, ${rs.forestChangeSourceUri}")
-                val lossYear: MultibandTile = rs.forestChangeSource.read(window).get.tile.withNoData(Some(0))
+                logger.info(s"Reading: $windowKey, ${rs.lossSourceUri}")
+                val loss: MultibandTile = rs.lossSource.read(window).get.tile // .withNoData(Some(0))
 
-                logger.info(s"Reading: $windowKey, ${rs.treeCoverSourceUri}")
-                val treeCover: MultibandTile = rs.treeCoverSource.read(window).get.tile
+                logger.info(s"Reading: $windowKey, ${rs.gainSourceUri}")
+                val gain: MultibandTile = rs.gainSource.read(window).get.tile
 
-                logger.info(s"Reading: $windowKey, ${rs.bioMassSourceUri}")
-                val biomass: MultibandTile = rs.bioMassSource.read(window).get.tile
+                logger.info(s"Reading: $windowKey, ${rs.tcd2000SourceUri}")
+                val tcd2000: MultibandTile = rs.tcd2000Source.read(window).get.tile
+
+                logger.info(s"Reading: $windowKey, ${rs.tcd2010SourceUri}")
+                val tcd2010: MultibandTile = rs.tcd2010Source.read(window).get.tile
+
+                logger.info(s"Reading: $windowKey, ${rs.co2PixelSourceUri}")
+                val co2Pixel: MultibandTile = rs.co2PixelSource.read(window).get.tile
+
+                logger.info(s"Reading: $windowKey, ${rs.gadm36SourceUri}")
+                val gadm36: MultibandTile = rs.gadm36Source.read(window).get.tile
 
                 val tile = TreeLossTile(
-                  lossYear.band(0),
-                  treeCover.band(0),
-                  biomass.band(0))
+                  loss.band(0),
+                  gain.band(0),
+                  tcd2000.band(0),
+                  tcd2010.band(0),
+                  co2Pixel.band(0),
+                  gadm36.band(0))
                 Raster(tile, window)
               }
             }

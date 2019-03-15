@@ -55,12 +55,18 @@ object TenByTenGrid {
     val source = TenByTenGridSources(gridId)
 
     // NOTE: This check will cause an eager fetch of raster metadata
-    require(source.forestChangeSource.extent.intersects(windowExtent),
-      s"${source.forestChangeSource.uri} does not intersect: $windowExtent")
-    require(source.bioMassSource.extent.intersects(windowExtent),
-      s"${source.bioMassSource.uri} does not intersect: $windowExtent")
-    require(source.treeCoverSource.extent.intersects(windowExtent),
-      s"${source.treeCoverSource.uri} does not intersect: $windowExtent")
+    require(source.lossSource.extent.intersects(windowExtent),
+      s"${source.lossSource.uri} does not intersect: $windowExtent")
+    require(source.gainSource.extent.intersects(windowExtent),
+      s"${source.gainSource.uri} does not intersect: $windowExtent")
+    require(source.tcd2000Source.extent.intersects(windowExtent),
+      s"${source.tcd2000Source.uri} does not intersect: $windowExtent")
+    require(source.tcd2010Source.extent.intersects(windowExtent),
+      s"${source.tcd2010Source.uri} does not intersect: $windowExtent")
+    require(source.co2PixelSource.extent.intersects(windowExtent),
+      s"${source.co2PixelSource.uri} does not intersect: $windowExtent")
+    require(source.gadm36Source.extent.intersects(windowExtent),
+      s"${source.gadm36Source.uri} does not intersect: $windowExtent")
 
     source
   }
