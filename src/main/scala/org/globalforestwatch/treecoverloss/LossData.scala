@@ -1,7 +1,7 @@
 package org.globalforestwatch.treecoverloss
 
 import cats.{Monoid, Semigroup}
-import geotrellis.raster.histogram.StreamingHistogram
+
 
 /** Summary data per class
   * Note: This case class contains mutable values
@@ -20,4 +20,7 @@ object LossData {
   implicit val lossDataSemigroup = new Semigroup[LossData] {
     def combine(x: LossData, y: LossData): LossData = x.merge(y)
   }
+
 }
+
+

@@ -1,7 +1,7 @@
 package org.globalforestwatch.treecoverloss
 
 import com.typesafe.scalalogging.LazyLogging
-import geotrellis.raster.{MultibandTile, Raster, RasterExtent, Tile}
+import geotrellis.raster.{ArrayTile, CellType, MultibandTile, MutableArrayTile, Raster, RasterExtent, Tile}
 import geotrellis.spark.SpatialKey
 import geotrellis.vector._
 import org.apache.spark.Partitioner
@@ -10,6 +10,7 @@ import cats.implicits._
 import geotrellis.contrib.polygonal._
 import geotrellis.spark.tiling.LayoutDefinition
 import Implicits._
+import geotrellis.macros.{DoubleTileMapper, DoubleTileVisitor, IntTileMapper, IntTileVisitor}
 
 object TreeLossRDD extends LazyLogging {
 
@@ -64,8 +65,24 @@ object TreeLossRDD extends LazyLogging {
               Either.catchNonFatal {
                 // TODO: THis currently skips the entire block when one raster is missing
                 //  Will need to find a way to not skip block but replace missing raster with empty tile
+//
+//                val cols = TenByTenGrid.blockTileGrid.tileCols
+//                val rows = TenByTenGrid.blockTileGrid.tileRows
+//                val arr = Array.ofDim[Int](rows * cols)
+//                val blankTile: MultibandTile = MultibandTile(ArrayTile(arr, cols, rows))
+//
+//                val maybeLoss: Either[Throwable,MultibandTile] =
+//                  Either.catchNonFatal {
+//                  rs.lossSource.read(window).get.tile
+//                 }
+//
+//                maybeLoss match {
+//                  case Left(exception) => val loss = blankTile
+//                  case Right(tile) => val loss = maybeLoss // what comes between the parenthesis. It should be something of type MultibandTile?
+//                }
+
                 logger.info(s"Reading: $windowKey, ${rs.lossSourceUri}")
-                val loss: MultibandTile = rs.lossSource.read(window).get.tile // .withNoData(Some(0))
+                val loss: MultibandTile = rs.lossSource.read(window).get.tile
 
                 logger.info(s"Reading: $windowKey, ${rs.gainSourceUri}")
                 val gain: MultibandTile = rs.gainSource.read(window).get.tile
@@ -81,6 +98,8 @@ object TreeLossRDD extends LazyLogging {
 
                 logger.info(s"Reading: $windowKey, ${rs.gadm36SourceUri}")
                 val gadm36: MultibandTile = rs.gadm36Source.read(window).get.tile
+
+
 
                 val tile = TreeLossTile(
                   loss.band(0),
