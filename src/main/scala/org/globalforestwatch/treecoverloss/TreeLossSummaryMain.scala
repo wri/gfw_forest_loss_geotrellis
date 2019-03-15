@@ -71,14 +71,14 @@ object TreeLossSummaryMain extends CommandApp (
       val part = new HashPartitioner(partitions = featureRDD.getNumPartitions * inputPartitionMultiplier)
 
       val summaryRDD: RDD[(FeatureId, TreeLossSummary)] =
-        TreeLossRDD(featureRDD, TenByTenGrid.stripedTileGrid, part)
+        TreeLossRDD(featureRDD, TenByTenGrid.blockTileGrid, part)
 
       val summaryDF =
         summaryRDD.flatMap { case (id, treeLossSummary) =>
-          treeLossSummary.years.map { case (year, lossData) =>
-            (id.country, id.areaType, id.admin1, id.admin2, year, lossData.tcdHistogram.mean(), lossData.totalCo2)
+          treeLossSummary.stats.map { case (stats, lossData) =>
+            (id.country, id.areaType, id.admin1, id.admin2, stats._1, stats._2, stats._3, stats._4, lossData.totalArea, lossData.totalCo2, lossData.totalGainArea)
           }
-        }.toDF("country", "area_type", "admin1", "admin2", "year", "tcd_mean", "biomass_sum")
+        }.toDF("country", "area_type", "admin1", "admin2", "loss_year", "tcd_2000", "tcd_2010", "gadm36_id", "total_area", "total_co2", "total_gain")
 
       val outputPartitionCount = maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
