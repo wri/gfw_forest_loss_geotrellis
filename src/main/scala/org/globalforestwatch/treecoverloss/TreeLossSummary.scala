@@ -32,7 +32,7 @@ object TreeLossSummary {
         val tcd2000Thresh: Int = TreeCoverDensity.threshold(tcd2000)
         val tcd2010Thresh: Int = TreeCoverDensity.threshold(tcd2010)
 
-        val lat: Double = raster.extent.ymin + col * raster.cellSize.height
+        val lat:Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize)
 
         val gainArea: Double = gain * area // TODO: verify that gain is binary -> 0 | 1
