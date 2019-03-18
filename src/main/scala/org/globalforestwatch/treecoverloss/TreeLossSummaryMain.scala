@@ -8,6 +8,7 @@ import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import cats.implicits._
+import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.io.wkt.WKT
 import geotrellis.vector.{Feature, Geometry}
 
@@ -15,6 +16,10 @@ object TreeLossSummaryMain extends CommandApp (
   name = "geotrellis-tree-cover-loss",
   header = "Compute statistics on tree cover loss",
   main = {
+
+    val unitNameOpt = Opts.option[String](
+      "unit-name", "Name of the reporting unit (input features)")
+
     val featuresOpt = Opts.options[String](
       "features", "URI of features in TSV format")
 
@@ -36,8 +41,8 @@ object TreeLossSummaryMain extends CommandApp (
 
 
     (
-      featuresOpt, outputOpt, intputPartitionsOpt, outputPartitionsOpt, limitOpt
-    ).mapN { (featureUris, outputUrl, inputPartitionMultiplier, maybeOutputPartitions, limit) =>
+      unitNameOpt, featuresOpt, outputOpt, intputPartitionsOpt, outputPartitionsOpt, limitOpt
+    ).mapN { (unitName, featureUris, outputUrl, inputPartitionMultiplier, maybeOutputPartitions, limit) =>
 
       val conf = new SparkConf().
         setIfMissing("spark.master", "local[*]").
@@ -60,11 +65,11 @@ object TreeLossSummaryMain extends CommandApp (
       /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
       val featureRDD: RDD[Feature[Geometry, FeatureId]] =
         featuresDF.rdd.map { row: Row =>
-          val areaType = row.getString(1)
-          val countryCode: String = row.getString(6)
-          val admin1: Int = row.getString(7).toInt
-          val admin2: Int = row.getString(8).toInt
-          val geom: Geometry = WKT.read(row.getString(0))
+          val areaType = unitName
+          val countryCode: String = row.getString(1)
+          val admin1: Int = row.getString(2).toInt
+          val admin2: Int = row.getString(3).toInt
+          val geom: Geometry = WKB.read(row.getString(4))
           Feature(geom, FeatureId(areaType, countryCode, admin1, admin2))
         }
 
