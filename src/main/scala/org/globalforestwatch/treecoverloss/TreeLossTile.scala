@@ -18,8 +18,8 @@ case class TreeLossTile(
   gain: Tile,
   tcd2000: Tile,
   tcd2010: Tile,
-  co2Pixel: Tile,
-  gadm36: Tile
+  co2Pixel: Option[Tile],
+  gadm36: Option[Tile]
 ) extends CellGrid {
   def cellType: CellType = loss.cellType
   def cols: Int = loss.cols
