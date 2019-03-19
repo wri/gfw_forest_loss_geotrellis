@@ -9,16 +9,12 @@ import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import cats.implicits._
 import geotrellis.vector.io.wkb.WKB
-import geotrellis.vector.io.wkt.WKT
 import geotrellis.vector.{Feature, Geometry}
 
 object TreeLossSummaryMain extends CommandApp (
   name = "geotrellis-tree-cover-loss",
   header = "Compute statistics on tree cover loss",
   main = {
-
-    val unitNameOpt = Opts.option[String](
-      "unit-name", "Name of the reporting unit (input features)")
 
     val featuresOpt = Opts.options[String](
       "features", "URI of features in TSV format")
@@ -41,8 +37,8 @@ object TreeLossSummaryMain extends CommandApp (
 
 
     (
-      unitNameOpt, featuresOpt, outputOpt, intputPartitionsOpt, outputPartitionsOpt, limitOpt
-    ).mapN { (unitName, featureUris, outputUrl, inputPartitionMultiplier, maybeOutputPartitions, limit) =>
+      featuresOpt, outputOpt, intputPartitionsOpt, outputPartitionsOpt, limitOpt
+    ).mapN { (featureUris, outputUrl, inputPartitionMultiplier, maybeOutputPartitions, limit) =>
 
       val conf = new SparkConf().
         setIfMissing("spark.master", "local[*]").
@@ -55,7 +51,7 @@ object TreeLossSummaryMain extends CommandApp (
 
       // ref: https://github.com/databricks/spark-csv
       var featuresDF: DataFrame = spark.read.
-        options(Map("header" -> "false", "delimiter" -> "\t")).
+        options(Map("header" -> "true", "delimiter" -> "\t")).
         csv(featureUris.toList: _*)
 
       limit.foreach{ n =>
@@ -65,12 +61,11 @@ object TreeLossSummaryMain extends CommandApp (
       /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
       val featureRDD: RDD[Feature[Geometry, FeatureId]] =
         featuresDF.rdd.map { row: Row =>
-          val areaType = unitName
-          val countryCode: String = row.getString(1)
-          val admin1: Int = row.getString(2).toInt
-          val admin2: Int = row.getString(3).toInt
-          val geom: Geometry = WKB.read(row.getString(4))
-          Feature(geom, FeatureId(areaType, countryCode, admin1, admin2))
+          val countryCode: String = row.getString(2)
+          val admin1: String = row.getString(3)
+          val admin2: String = row.getString(4)
+          val geom: Geometry = WKB.read(row.getString(7))
+          Feature(geom, FeatureId(countryCode, admin1, admin2))
         }
 
       val part = new HashPartitioner(partitions = featureRDD.getNumPartitions * inputPartitionMultiplier)
@@ -81,9 +76,9 @@ object TreeLossSummaryMain extends CommandApp (
       val summaryDF =
         summaryRDD.flatMap { case (id, treeLossSummary) =>
           treeLossSummary.stats.map { case (stats, lossData) =>
-            (id.country, id.areaType, id.admin1, id.admin2, stats._1, stats._2, stats._3, stats._4, lossData.totalArea, lossData.totalCo2, lossData.totalGainArea)
+            (id.country, id.admin1, id.admin2, stats._1, stats._2, stats._3, stats._4, lossData.totalArea, lossData.totalCo2, lossData.totalGainArea)
           }
-        }.toDF("country", "area_type", "admin1", "admin2", "loss_year", "tcd_2000", "tcd_2010", "gadm36_id", "total_area", "total_co2", "total_gain")
+        }.toDF("country", "admin1", "admin2", "loss_year", "tcd_2000", "tcd_2010", "gadm36_id", "total_area", "total_co2", "total_gain")
 
       val outputPartitionCount = maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
