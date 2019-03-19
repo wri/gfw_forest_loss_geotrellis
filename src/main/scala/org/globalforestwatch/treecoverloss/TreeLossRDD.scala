@@ -62,54 +62,7 @@ object TreeLossRDD extends LazyLogging {
 
           val maybeRaster: Either[Throwable, Raster[TreeLossTile]] =
             maybeRasterSource.flatMap { rs: TenByTenGridSources =>
-              Either.catchNonFatal {
-                // TODO: THis currently skips the entire block when one raster is missing
-                //  Will need to find a way to not skip block but replace missing raster with empty tile
-//
-//                val cols = TenByTenGrid.blockTileGrid.tileCols
-//                val rows = TenByTenGrid.blockTileGrid.tileRows
-//                val arr = Array.ofDim[Int](rows * cols)
-//                val blankTile: MultibandTile = MultibandTile(ArrayTile(arr, cols, rows))
-//
-//                val maybeLoss: Either[Throwable,MultibandTile] =
-//                  Either.catchNonFatal {
-//                  rs.lossSource.read(window).get.tile
-//                 }
-//
-//                maybeLoss match {
-//                  case Left(exception) => val loss = blankTile
-//                  case Right(tile) => val loss = maybeLoss // what comes between the parenthesis. It should be something of type MultibandTile?
-//                }
-
-                logger.info(s"Reading: $windowKey, ${rs.lossSourceUri}")
-                val loss: MultibandTile = rs.lossSource.read(window).get.tile
-
-                logger.info(s"Reading: $windowKey, ${rs.gainSourceUri}")
-                val gain: MultibandTile = rs.gainSource.read(window).get.tile
-
-                logger.info(s"Reading: $windowKey, ${rs.tcd2000SourceUri}")
-                val tcd2000: MultibandTile = rs.tcd2000Source.read(window).get.tile
-
-                logger.info(s"Reading: $windowKey, ${rs.tcd2010SourceUri}")
-                val tcd2010: MultibandTile = rs.tcd2010Source.read(window).get.tile
-
-                logger.info(s"Reading: $windowKey, ${rs.co2PixelSourceUri}")
-                val co2Pixel: MultibandTile = rs.co2PixelSource.read(window).get.tile
-
-                logger.info(s"Reading: $windowKey, ${rs.gadm36SourceUri}")
-                val gadm36: MultibandTile = rs.gadm36Source.read(window).get.tile
-
-
-
-                val tile = TreeLossTile(
-                  loss.band(0),
-                  gain.band(0),
-                  tcd2000.band(0),
-                  tcd2010.band(0),
-                  co2Pixel.band(0),
-                  gadm36.band(0))
-                Raster(tile, window)
-              }
+              rs.readWindow(window)
             }
 
           // flatMap here flattens out and ignores the errors
