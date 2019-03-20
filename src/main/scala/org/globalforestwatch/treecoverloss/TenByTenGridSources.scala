@@ -1,5 +1,7 @@
 package org.globalforestwatch.treecoverloss
 
+import java.io.FileNotFoundException
+
 import com.typesafe.scalalogging.LazyLogging
 import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
 import geotrellis.raster.{MultibandTile, Raster, Tile}
@@ -29,13 +31,13 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
   val gadm36SourceUri  =
     s"s3://wri-users/tmaschler/prep_tiles/gadm36/${grid}.tif"
 
-  lazy val lossSource = GeoTiffRasterSource(lossSourceUri)
+  lazy val lossSource = TenByTenGridSources.requiredSource(lossSourceUri)
 
-  lazy val gainSource = GeoTiffRasterSource(gainSourceUri)
+  lazy val gainSource = TenByTenGridSources.requiredSource(gainSourceUri)
 
-  lazy val tcd2000Source = GeoTiffRasterSource(tcd2000SourceUri)
+  lazy val tcd2000Source = TenByTenGridSources.requiredSource(tcd2000SourceUri)
 
-  lazy val tcd2010Source = GeoTiffRasterSource(tcd2010SourceUri)
+  lazy val tcd2010Source = TenByTenGridSources.requiredSource(tcd2010SourceUri)
 
   lazy val co2PixelSource: Option[GeoTiffRasterSource] =
     TenByTenGridSources.optionalSource(co2PixelSourceUri)
@@ -62,7 +64,10 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
       val gadm36: Option[Tile] =
         for {
           source <- gadm36Source
-          raster <- Either.catchNonFatal(source.read(window).get.tile.band(0)).toOption
+          raster <- {
+            println(s"About to read: ${source.uri}")
+            Either.catchNonFatal(source.read(window).get.tile.band(0)).toOption
+          }
         } yield raster
 
       val tile = TreeLossTile(
@@ -86,7 +91,18 @@ object TenByTenGridSources {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
     if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+      println(s"Opening: $uri")
       Some(GeoTiffRasterSource(uri))
     } else None
+  }
+
+  def requiredSource(uri: String): GeoTiffRasterSource = {
+    // Removes the expected 404 errors from console log
+    val s3uri = new AmazonS3URI(uri)
+    if (! s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+      throw new FileNotFoundException(uri)
+    }
+
+    GeoTiffRasterSource(uri)
   }
 }
