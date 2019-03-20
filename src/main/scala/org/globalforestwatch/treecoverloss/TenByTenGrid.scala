@@ -41,10 +41,10 @@ object TenByTenGrid {
     * Top-Left corner, exclusive on south, east, inclusive on north and west
     */
   def pointGridId(point: Point): String = {
-    val col = (math.floor(point.y / 10).toInt * 10) + 10
+    val col = (math.floor(point.y / 10).toInt * 10)
     val long: String = if (col >= 0) f"${col}%03dE" else f"${-col}%03dW"
 
-    val row = (math.floor(point.x / 10).toInt * 10)
+    val row = (math.ceil(point.x / 10).toInt * 10)
     val lat: String = if (row >= 0) f"${row}%02dN" else f"${-row}%02dS"
 
     s"${lat}_${long}"
