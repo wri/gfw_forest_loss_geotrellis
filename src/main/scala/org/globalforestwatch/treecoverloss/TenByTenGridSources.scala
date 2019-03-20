@@ -5,6 +5,7 @@ import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
 import geotrellis.raster.{MultibandTile, Raster, Tile}
 import geotrellis.vector.Extent
 import cats.implicits._
+import com.amazonaws.services.s3.AmazonS3URI
 
 /**
   * @param grid top left corner, padded from east ex: "10N_010E"
@@ -36,9 +37,11 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
 
   lazy val tcd2010Source = GeoTiffRasterSource(tcd2010SourceUri)
 
-  lazy val co2PixelSource = GeoTiffRasterSource(co2PixelSourceUri)
+  lazy val co2PixelSource: Option[GeoTiffRasterSource] =
+    TenByTenGridSources.optionalSource(co2PixelSourceUri)
 
-  lazy val gadm36Source = GeoTiffRasterSource(gadm36SourceUri)
+  lazy val gadm36Source: Option[GeoTiffRasterSource] =
+    TenByTenGridSources.optionalSource(gadm36SourceUri)
 
   def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
     for {
@@ -51,10 +54,16 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
       val co2Pixel: Option[Tile] =
-        Either.catchNonFatal(co2PixelSource.read(window).get.tile.band(0)).toOption
+        for {
+          source <- co2PixelSource
+          raster <- Either.catchNonFatal(source.read(window).get.tile.band(0)).toOption
+        } yield raster
 
       val gadm36: Option[Tile] =
-        Either.catchNonFatal(gadm36Source.read(window).get.tile.band(0)).toOption
+        for {
+          source <- gadm36Source
+          raster <- Either.catchNonFatal(source.read(window).get.tile.band(0)).toOption
+        } yield raster
 
       val tile = TreeLossTile(
         loss.band(0),
@@ -66,5 +75,18 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
 
       Raster(tile, window)
     }
+  }
+}
+
+object TenByTenGridSources {
+  val s3Client = geotrellis.spark.io.s3.S3Client.DEFAULT
+
+  /** Check if URI exists before trying to open it, return None if no file found */
+  def optionalSource(uri: String): Option[GeoTiffRasterSource] = {
+    // Removes the expected 404 errors from console log
+    val s3uri = new AmazonS3URI(uri)
+    if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+      Some(GeoTiffRasterSource(uri))
+    } else None
   }
 }

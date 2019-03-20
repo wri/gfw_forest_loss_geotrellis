@@ -63,10 +63,17 @@ object TenByTenGrid {
       s"${source.tcd2000Source.uri} does not intersect: $windowExtent")
     require(source.tcd2010Source.extent.intersects(windowExtent),
       s"${source.tcd2010Source.uri} does not intersect: $windowExtent")
-    require(source.co2PixelSource.extent.intersects(windowExtent),
-      s"${source.co2PixelSource.uri} does not intersect: $windowExtent")
-    require(source.gadm36Source.extent.intersects(windowExtent),
-      s"${source.gadm36Source.uri} does not intersect: $windowExtent")
+
+    // Only check these guys if they're defined
+    source.co2PixelSource.foreach { rs =>
+      require(rs.extent.intersects(windowExtent),
+      s"${rs.uri} does not intersect: $windowExtent")
+    }
+
+    source.gadm36Source.foreach { rs =>
+      require(rs.extent.intersects(windowExtent),
+        s"${rs.uri} does not intersect: $windowExtent")
+    }
 
     source
   }
