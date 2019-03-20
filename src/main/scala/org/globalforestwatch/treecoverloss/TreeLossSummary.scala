@@ -21,7 +21,7 @@ object TreeLossSummary {
       def register(raster: Raster[TreeLossTile], col: Int, row: Int, acc: TreeLossSummary): TreeLossSummary = {
 
         // This is a pixel by pixel operation
-        val loss: Int = raster.tile.loss.get(col, row)
+        val loss: Int = if (isNoData(raster.tile.loss.get(col, row))) 0 else raster.tile.loss.get(col, row)
         val gain: Int = raster.tile.gain.get(col, row)
         val tcd2000: Int = raster.tile.tcd2000.get(col, row)
         val tcd2010: Int = raster.tile.tcd2010.get(col, row)
