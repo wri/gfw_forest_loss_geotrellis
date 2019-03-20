@@ -35,7 +35,6 @@ object TreeLossSummaryMain extends CommandApp (
 
     val logger = Logger.getLogger("TreeLossSummaryMain")
 
-
     (
       featuresOpt, outputOpt, intputPartitionsOpt, outputPartitionsOpt, limitOpt
     ).mapN { (featureUris, outputUrl, inputPartitionMultiplier, maybeOutputPartitions, limit) =>
@@ -64,7 +63,7 @@ object TreeLossSummaryMain extends CommandApp (
           val countryCode: String = row.getString(2)
           val admin1: String = row.getString(3)
           val admin2: String = row.getString(4)
-          val geom: Geometry = WKB.read(row.getString(7))
+          val geom: Geometry = WKB.read(row.getString(5))
           Feature(geom, FeatureId(countryCode, admin1, admin2))
         }
 
