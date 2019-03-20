@@ -27,7 +27,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
     s"s3://wri-users/tmaschler/prep_tiles/co2_pixel/${grid}.tif"
 
   val gadm36SourceUri  =
-    s"s3://wri-users/tmaschler/prep_tiles/co2_pixel/${grid}.tif"
+    s"s3://wri-users/tmaschler/prep_tiles/gadm36/${grid}.tif"
 
   lazy val lossSource = GeoTiffRasterSource(lossSourceUri)
 
