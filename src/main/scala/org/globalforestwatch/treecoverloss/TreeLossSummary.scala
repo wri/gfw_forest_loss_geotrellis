@@ -22,13 +22,13 @@ object TreeLossSummary {
 
         // This is a pixel by pixel operation
         val loss: Int = if (isNoData(raster.tile.loss.get(col, row))) 0 else raster.tile.loss.get(col, row)
-        val gain: Int = raster.tile.gain.get(col, row)
-        val tcd2000: Int = raster.tile.tcd2000.get(col, row)
-        val tcd2010: Int = raster.tile.tcd2010.get(col, row)
+        val gain: Int = if (isNoData(raster.tile.gain.get(col, row))) 0 else 1
+        val tcd2000: Int = if (isNoData(raster.tile.tcd2000.get(col, row))) 0 else raster.tile.tcd2000.get(col, row)
+        val tcd2010: Int = if (isNoData(raster.tile.tcd2010.get(col, row))) 0 else raster.tile.tcd2010.get(col, row)
 
         // If we don't have these tiles use default values for pixel
         val co2Pixel: Double = raster.tile.co2Pixel.map(_.getDouble(col, row)).getOrElse(0)
-        val gadm36: Int = raster.tile.gadm36.map(_.get(col, row)).getOrElse(0)
+        val gadm36: Int = if (isNoData(raster.tile.gadm36.map(_.get(col, row)).getOrElse(0))) 0 else raster.tile.gadm36.map(_.get(col, row)).getOrElse(0)
 
         val tcd2000Thresh: Int = TreeCoverDensity.threshold(tcd2000)
         val tcd2010Thresh: Int = TreeCoverDensity.threshold(tcd2010)
@@ -36,7 +36,7 @@ object TreeLossSummary {
         val lat:Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize)
 
-        val gainArea: Double = gain * area // TODO: verify that gain is binary -> 0 | 1
+        val gainArea: Double = gain * area
 
         val pKey = (loss, tcd2000Thresh, tcd2010Thresh, gadm36)
 
