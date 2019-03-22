@@ -131,6 +131,7 @@ sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkS3JarFolder            := "s3://wri-users/tmaschler/geotrellis-test/jars"
 sparkS3LogUri               := Some("s3://wri-users/tmaschler/geotrellis-test/logs")
 sparkSubnetId               := Some("subnet-116d9a4a")
+sparkSecurityGroupIds       := Seq("sg-6c6a5911")
 sparkInstanceCount          := 10
 sparkMasterType             := "m4.xlarge"
 sparkCoreType               := "m4.xlarge"
@@ -141,12 +142,11 @@ sparkCorePrice              := Some(0.5)
 sparkClusterName            := s"geotrellis-treecoverloss"
 sparkEmrServiceRole         := "EMR_DefaultRole"
 sparkInstanceRole           := "EMR_EC2_DefaultRole"
-sparkRunJobFlowRequest      := sparkRunJobFlowRequest.value.withTags(new Tag("Project", "Global Forest Watch"))
-sparkRunJobFlowRequest      := sparkRunJobFlowRequest.value.withTags(new Tag("Job", "Annual Update Geotrellis"))
-sparkRunJobFlowRequest      := sparkRunJobFlowRequest.value.withTags(new Tag("Project Lead", "Thomas Maschler"))
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName("tmaschler_wri2")
-                                                          .withAdditionalMasterSecurityGroups("sg-6c6a5911")
-                                                          .withAdditionalSlaveSecurityGroups("sg-6c6a5911")
+sparkRunJobFlowRequest      := sparkRunJobFlowRequest.value.withTags(new Tag("Project", "Global Forest Watch"))
+                                                      .withTags(new Tag("Job", "Annual Update Geotrellis"))
+                                                      .withTags(new Tag("Project Lead", "Thomas Maschler"))
+                                                      .withTags(new Tag("Name", "geotrellis-treecoverloss"))
 sparkEmrConfigs             := List(
   EmrConfig("spark").withProperties(
     "maximizeResourceAllocation" -> "true"
