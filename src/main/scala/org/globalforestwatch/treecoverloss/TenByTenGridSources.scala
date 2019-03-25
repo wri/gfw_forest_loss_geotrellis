@@ -22,7 +22,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
   val tcd2000SourceUri =
     s"s3://wri-users/tmaschler/prep_tiles/tcd_2000/${grid}.tif"
 
-  val tcd2010SourceUri =
+ // val tcd2010SourceUri =
     s"s3://wri-users/tmaschler/prep_tiles/tcd_2010/${grid}.tif"
 
   val co2PixelSourceUri  =
@@ -37,7 +37,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
 
   lazy val tcd2000Source = TenByTenGridSources.requiredSource(tcd2000SourceUri)
 
-  lazy val tcd2010Source = TenByTenGridSources.requiredSource(tcd2010SourceUri)
+//  lazy val tcd2010Source = TenByTenGridSources.requiredSource(tcd2010SourceUri)
 
   lazy val co2PixelSource: Option[GeoTiffRasterSource] =
     TenByTenGridSources.optionalSource(co2PixelSourceUri)
@@ -52,7 +52,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
       loss <- Either.catchNonFatal(lossSource.read(window).get.tile).right
       gain <- Either.catchNonFatal(gainSource.read(window).get.tile).right
       tcd2000 <- Either.catchNonFatal(tcd2000Source.read(window).get.tile).right
-      tcd2010 <- Either.catchNonFatal(tcd2010Source.read(window).get.tile).right
+    //  tcd2010 <- Either.catchNonFatal(tcd2010Source.read(window).get.tile).right
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
       val co2Pixel: Option[Tile] =
@@ -65,7 +65,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
         for {
           source <- gadm36Source
           raster <- {
-            println(s"About to read: ${source.uri}")
+            println(s"About to read: ${source.uri} for window ${window.xmin} ${window.ymin} ${window.xmax} ${window.ymax}")
             Either.catchNonFatal(source.read(window).get.tile.band(0)).toOption
           }
         } yield raster
@@ -74,7 +74,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
         loss.band(0),
         gain.band(0),
         tcd2000.band(0),
-        tcd2010.band(0),
+       // tcd2010.band(0),
         co2Pixel,
         gadm36)
 

@@ -17,7 +17,7 @@ case class TreeLossTile(
   loss: Tile,
   gain: Tile,
   tcd2000: Tile,
-  tcd2010: Tile,
+ // tcd2010: Tile,
   co2Pixel: Option[Tile],
   gadm36: Option[Tile]
 ) extends CellGrid {
