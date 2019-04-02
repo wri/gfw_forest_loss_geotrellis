@@ -1,14 +1,12 @@
 package org.globalforestwatch.treecoverloss
 
 import java.io.FileNotFoundException
-
 import com.typesafe.scalalogging.LazyLogging
 import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
-import geotrellis.raster.{MultibandTile, Raster, Tile}
+import geotrellis.raster.{Raster, Tile}
 import geotrellis.vector.Extent
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3URI
-
 
 
 class requiredTile(uri: String) {
