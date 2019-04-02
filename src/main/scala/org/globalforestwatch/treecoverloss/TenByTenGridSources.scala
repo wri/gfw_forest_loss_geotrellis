@@ -62,89 +62,47 @@ class optionalTile(uri: String) {
   */
 case class TenByTenGridSources(grid: String) extends LazyLogging {
   val lossSourceUri = s"s3://wri-users/tmaschler/prep_tiles/loss/${grid}.tif"
-
   val gainSourceUri = s"s3://wri-users/tmaschler/prep_tiles/gain/${grid}.tif"
-
   val tcd2000SourceUri = s"s3://wri-users/tmaschler/prep_tiles/tcd_2000/${grid}.tif"
-
   val tcd2010SourceUri = s"s3://wri-users/tmaschler/prep_tiles/tcd_2010/${grid}.tif"
-
   val co2PixelSourceUri = s"s3://wri-users/tmaschler/prep_tiles/co2_pixel/${grid}.tif"
-
   val biomassSourceUri = s"s3://wri-users/tmaschler/prep_tiles/biomass/${grid}.tif"
-
   val mangroveBiomassSourceUri = s"s3://wri-users/tmaschler/prep_tiles/mangrove_biomass/${grid}.tif"
-
   val driversSourceUri = s"s3://wri-users/tmaschler/prep_tiles/drivers/${grid}.tif"
-
   val globalLandCoverSourceUri = s"s3://wri-users/tmaschler/prep_tiles/global_landcover/${grid}.tif"
-
   val primaryForestSourceUri = s"s3://wri-users/tmaschler/prep_tiles/primary_forest/${grid}.tif"
-
   val idnPrimaryForestSourceUri = s"s3://wri-users/tmaschler/prep_tiles/idn_primary_forest/${grid}.tif"
-
   val erosionSourceUri = s"s3://wri-users/tmaschler/prep_tiles/erosion/${grid}.tif"
-
   val biodiversitySignificanceSourceUri = s"s3://wri-users/tmaschler/prep_tiles/biodiversity_significance/${grid}.tif"
-
   val wdpaSourceUri = s"s3://wri-users/tmaschler/prep_tiles/wdpa/${grid}.tif"
-
   val plantationsSourceUri = s"s3://wri-users/tmaschler/prep_tiles/plantations/${grid}.tif"
-
   val riverBasinsSourceUri = s"s3://wri-users/tmaschler/prep_tiles/river_basins/${grid}.tif"
-
   val ecozonesSourceUri = s"s3://wri-users/tmaschler/prep_tiles/ecozones/${grid}.tif"
-
   val urbanWatershedsSourceUri = s"s3://wri-users/tmaschler/prep_tiles/urb_watersheds/${grid}.tif"
-
   val mangroves1996SourceUri = s"s3://wri-users/tmaschler/prep_tiles/mangroves_1996/${grid}.tif"
-
   val mangroves2016SourceUri = s"s3://wri-users/tmaschler/prep_tiles/mangroves_2016/${grid}.tif"
-
   val waterStressSourceUri = s"s3://wri-users/tmaschler/prep_tiles/water_stress/${grid}.tif"
-
   val intactForestLandscapesSourceUri = s"s3://wri-users/tmaschler/prep_tiles/ifl/${grid}.tif"
-
   val endemicBirdAreasSourceUri = s"s3://wri-users/tmaschler/prep_tiles/endemic_bird_areas/${grid}.tif"
-
   val tigerLandscapesSourceUri = s"s3://wri-users/tmaschler/prep_tiles/tiger_landscapes/${grid}.tif"
-
   val landmarkSourceUri = s"s3://wri-users/tmaschler/prep_tiles/landmark/${grid}.tif"
-
   val landRightsSourceUri = s"s3://wri-users/tmaschler/prep_tiles/land_rights/${grid}.tif"
-
   val keyBiodiversityAreasSourceUri = s"s3://wri-users/tmaschler/prep_tiles/kba/${grid}.tif"
-
   val miningSourceUri = s"s3://wri-users/tmaschler/prep_tiles/mining/${grid}.tif"
-
   val rspoSourceUri = s"s3://wri-users/tmaschler/prep_tiles/rspo/${grid}.tif"
-
   val peatlandsSourceUri = s"s3://wri-users/tmaschler/prep_tiles/peatlands/${grid}.tif"
-
   val oilPalmSourceUri = s"s3://wri-users/tmaschler/prep_tiles/oil_palm/${grid}.tif"
-
   val idnForestMoratoriumSourceUri = s"s3://wri-users/tmaschler/prep_tiles/idn_forest_moratorium/${grid}.tif"
-
   val idnLandCoverSourceUri = s"s3://wri-users/tmaschler/prep_tiles/idn_land_cover/${grid}.tif"
-
   val mexProtectedAreasSourceUri = s"s3://wri-users/tmaschler/prep_tiles/mex_protected_areas/${grid}.tif"
-
   val mexPaymentForEcosystemServicesSourceUri = s"s3://wri-users/tmaschler/prep_tiles/mex_psa/${grid}.tif"
-
   val mexForestZoningSourceUri = s"s3://wri-users/tmaschler/prep_tiles/mex_forest_zoning/${grid}.tif"
-
   val perProductionForestSourceUri = s"s3://wri-users/tmaschler/prep_tiles/per_permanent_production_forests/${grid}.tif"
-
   val perProtectedAreasSourceUri = s"s3://wri-users/tmaschler/prep_tiles/per_protected_areas/${grid}.tif"
-
   val perForestConcessionsSourceUri = s"s3://wri-users/tmaschler/prep_tiles/per_forest_concessions/${grid}.tif"
-
   val braBiomesSourceUri = s"s3://wri-users/tmaschler/prep_tiles/bra_biomes/${grid}.tif"
-
   val woodFiberSourceUri = s"s3://wri-users/tmaschler/prep_tiles/wood_fiber/${grid}.tif"
-
   val resourceRightsSourceUri = s"s3://wri-users/tmaschler/prep_tiles/resource_rights/${grid}.tif"
-
   val loggingSourceUri = s"s3://wri-users/tmaschler/prep_tiles/logging/${grid}.tif"
 
 
