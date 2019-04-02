@@ -10,19 +10,50 @@ import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3URI
 
 
-class tileSource(uri: String) {
 
-  lazy val required: GeoTiffRasterSource = TenByTenGridSources.requiredSource(uri)
-  lazy val optional: Option[GeoTiffRasterSource] = TenByTenGridSources.optionalSource(uri)
+class requiredTile(uri: String) {
 
-  def requiredTile(window: Extent):Tile = required.read(window).get.tile.band(0)
+  val s3Client = geotrellis.spark.io.s3.S3Client.DEFAULT
 
-  def optionalTile(window: Extent):Option[Tile] = {
+  lazy val source: GeoTiffRasterSource = fetchSource
+
+  def fetchSource: GeoTiffRasterSource = {
+    // Removes the expected 404 errors from console log
+    val s3uri = new AmazonS3URI(uri)
+    if (! s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+      throw new FileNotFoundException(uri)
+    }
+    GeoTiffRasterSource(uri)
+  }
+
+  def fetchTile(window: Extent):Tile = source.read(window).get.tile.band(0)
+
+}
+
+
+class optionalTile(uri: String) {
+
+  val s3Client = geotrellis.spark.io.s3.S3Client.DEFAULT
+
+  lazy val source: Option[GeoTiffRasterSource] = fetchSource
+
+  /** Check if URI exists before trying to open it, return None if no file found */
+  def fetchSource: Option[GeoTiffRasterSource] = {
+    // Removes the expected 404 errors from console log
+    val s3uri = new AmazonS3URI(uri)
+    if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+      println(s"Opening: $uri")
+      Some(GeoTiffRasterSource(uri))
+    } else None
+  }
+
+  def fetchTile(window: Extent):Option[Tile] = {
     for {
-      source <- optional
+      source <- source
       raster <- Either.catchNonFatal(source.read(window).get.tile.band(0)).toOption
     } yield raster
   }
+
 }
 
 
@@ -122,52 +153,52 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
     for {
       // Failure for any of these reads will result in function returning Left[Throwable]
       // These are effectively required fields without which we can't make sense of the analysis
-      loss <- Either.catchNonFatal(new tileSource(mangroveBiomassSourceUri).requiredTile(window)).right
-      gain <- Either.catchNonFatal(new tileSource(gainSourceUri).requiredTile(window)).right
-      tcd2000 <- Either.catchNonFatal(new tileSource(tcd2000SourceUri).requiredTile(window)).right
-      tcd2010 <- Either.catchNonFatal(new tileSource(tcd2010SourceUri).requiredTile(window)).right
-      co2Pixel <- Either.catchNonFatal(new tileSource(co2PixelSourceUri).requiredTile(window)).right
-      biomass <- Either.catchNonFatal(new tileSource(biomassSourceUri).requiredTile(window)).right
+      loss <- Either.catchNonFatal(new requiredTile(mangroveBiomassSourceUri).fetchTile(window)).right
+      gain <- Either.catchNonFatal(new requiredTile(gainSourceUri).fetchTile(window)).right
+      tcd2000 <- Either.catchNonFatal(new requiredTile(tcd2000SourceUri).fetchTile(window)).right
+      tcd2010 <- Either.catchNonFatal(new requiredTile(tcd2010SourceUri).fetchTile(window)).right
+      co2Pixel <- Either.catchNonFatal(new requiredTile(co2PixelSourceUri).fetchTile(window)).right
+      biomass <- Either.catchNonFatal(new requiredTile(biomassSourceUri).fetchTile(window)).right
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
-      val mangroveBiomass: Option[Tile] = new tileSource(mangroveBiomassSourceUri).optionalTile(window)
-      val drivers: Option[Tile] = new tileSource(driversSourceUri).optionalTile(window)
-      val globalLandCover: Option[Tile] = new tileSource(globalLandCoverSourceUri).optionalTile(window)
-      val primaryForest: Option[Tile] = new tileSource(primaryForestSourceUri).optionalTile(window)
-      val idnPrimaryForest: Option[Tile] = new tileSource(idnPrimaryForestSourceUri).optionalTile(window)
-      val erosion: Option[Tile] = new tileSource(erosionSourceUri).optionalTile(window)
-      val biodiversitySignificance: Option[Tile] = new tileSource(biodiversitySignificanceSourceUri).optionalTile(window)
-      val wdpa: Option[Tile] = new tileSource(wdpaSourceUri).optionalTile(window)
-      val plantations: Option[Tile] = new tileSource(plantationsSourceUri).optionalTile(window)
-      val riverBasins: Option[Tile] = new tileSource(riverBasinsSourceUri).optionalTile(window)
-      val ecozones: Option[Tile] = new tileSource(ecozonesSourceUri).optionalTile(window)
-      val urbanWatersheds: Option[Tile] = new tileSource(urbanWatershedsSourceUri).optionalTile(window)
-      val mangroves1996: Option[Tile] = new tileSource(mangroves1996SourceUri).optionalTile(window)
-      val mangroves2016: Option[Tile] = new tileSource(mangroves2016SourceUri).optionalTile(window)
-      val waterStress: Option[Tile] = new tileSource(waterStressSourceUri).optionalTile(window)
-      val intactForestLandscapes: Option[Tile] = new tileSource(intactForestLandscapesSourceUri).optionalTile(window)
-      val endemicBirdAreas: Option[Tile] = new tileSource(endemicBirdAreasSourceUri).optionalTile(window)
-      val tigerLandscapes: Option[Tile] = new tileSource(tigerLandscapesSourceUri).optionalTile(window)
-      val landmark: Option[Tile] = new tileSource(landmarkSourceUri).optionalTile(window)
-      val landRights: Option[Tile] = new tileSource(landRightsSourceUri).optionalTile(window)
-      val keyBiodiversityAreas: Option[Tile] = new tileSource(keyBiodiversityAreasSourceUri).optionalTile(window)
-      val mining: Option[Tile] = new tileSource(miningSourceUri).optionalTile(window)
-      val rspo: Option[Tile] = new tileSource(rspoSourceUri).optionalTile(window)
-      val peatlands: Option[Tile] = new tileSource(peatlandsSourceUri).optionalTile(window)
-      val oilPalm: Option[Tile] = new tileSource(oilPalmSourceUri).optionalTile(window)
-      val idnForestMoratorium: Option[Tile] = new tileSource(idnForestMoratoriumSourceUri).optionalTile(window)
-      val idnLandCover: Option[Tile] = new tileSource(idnLandCoverSourceUri).optionalTile(window)
-      val mexProtectedAreas: Option[Tile] = new tileSource(mexProtectedAreasSourceUri).optionalTile(window)
-      val mexPaymentForEcosystemServices: Option[Tile] = new tileSource(mexPaymentForEcosystemServicesSourceUri).optionalTile(window)
-      val mexForestZoning: Option[Tile] = new tileSource(mexForestZoningSourceUri).optionalTile(window)
-      val perProductionForest: Option[Tile] = new tileSource(perProductionForestSourceUri).optionalTile(window)
-      val perProtectedAreas: Option[Tile] = new tileSource(perProtectedAreasSourceUri).optionalTile(window)
-      val perForestConcessions: Option[Tile] = new tileSource(perForestConcessionsSourceUri).optionalTile(window)
-      val braBiomes: Option[Tile] = new tileSource(braBiomesSourceUri).optionalTile(window)
-      val woodFiber: Option[Tile] = new tileSource(woodFiberSourceUri).optionalTile(window)
-      val resourceRights: Option[Tile] = new tileSource(resourceRightsSourceUri).optionalTile(window)
-      val logging: Option[Tile] = new tileSource(loggingSourceUri).optionalTile(window)
+      val mangroveBiomass: Option[Tile] = new optionalTile(mangroveBiomassSourceUri).fetchTile(window)
+      val drivers: Option[Tile] = new optionalTile(driversSourceUri).fetchTile(window)
+      val globalLandCover: Option[Tile] = new optionalTile(globalLandCoverSourceUri).fetchTile(window)
+      val primaryForest: Option[Tile] = new optionalTile(primaryForestSourceUri).fetchTile(window)
+      val idnPrimaryForest: Option[Tile] = new optionalTile(idnPrimaryForestSourceUri).fetchTile(window)
+      val erosion: Option[Tile] = new optionalTile(erosionSourceUri).fetchTile(window)
+      val biodiversitySignificance: Option[Tile] = new optionalTile(biodiversitySignificanceSourceUri).fetchTile(window)
+      val wdpa: Option[Tile] = new optionalTile(wdpaSourceUri).fetchTile(window)
+      val plantations: Option[Tile] = new optionalTile(plantationsSourceUri).fetchTile(window)
+      val riverBasins: Option[Tile] = new optionalTile(riverBasinsSourceUri).fetchTile(window)
+      val ecozones: Option[Tile] = new optionalTile(ecozonesSourceUri).fetchTile(window)
+      val urbanWatersheds: Option[Tile] = new optionalTile(urbanWatershedsSourceUri).fetchTile(window)
+      val mangroves1996: Option[Tile] = new optionalTile(mangroves1996SourceUri).fetchTile(window)
+      val mangroves2016: Option[Tile] = new optionalTile(mangroves2016SourceUri).fetchTile(window)
+      val waterStress: Option[Tile] = new optionalTile(waterStressSourceUri).fetchTile(window)
+      val intactForestLandscapes: Option[Tile] = new optionalTile(intactForestLandscapesSourceUri).fetchTile(window)
+      val endemicBirdAreas: Option[Tile] = new optionalTile(endemicBirdAreasSourceUri).fetchTile(window)
+      val tigerLandscapes: Option[Tile] = new optionalTile(tigerLandscapesSourceUri).fetchTile(window)
+      val landmark: Option[Tile] = new optionalTile(landmarkSourceUri).fetchTile(window)
+      val landRights: Option[Tile] = new optionalTile(landRightsSourceUri).fetchTile(window)
+      val keyBiodiversityAreas: Option[Tile] = new optionalTile(keyBiodiversityAreasSourceUri).fetchTile(window)
+      val mining: Option[Tile] = new optionalTile(miningSourceUri).fetchTile(window)
+      val rspo: Option[Tile] = new optionalTile(rspoSourceUri).fetchTile(window)
+      val peatlands: Option[Tile] = new optionalTile(peatlandsSourceUri).fetchTile(window)
+      val oilPalm: Option[Tile] = new optionalTile(oilPalmSourceUri).fetchTile(window)
+      val idnForestMoratorium: Option[Tile] = new optionalTile(idnForestMoratoriumSourceUri).fetchTile(window)
+      val idnLandCover: Option[Tile] = new optionalTile(idnLandCoverSourceUri).fetchTile(window)
+      val mexProtectedAreas: Option[Tile] = new optionalTile(mexProtectedAreasSourceUri).fetchTile(window)
+      val mexPaymentForEcosystemServices: Option[Tile] = new optionalTile(mexPaymentForEcosystemServicesSourceUri).fetchTile(window)
+      val mexForestZoning: Option[Tile] = new optionalTile(mexForestZoningSourceUri).fetchTile(window)
+      val perProductionForest: Option[Tile] = new optionalTile(perProductionForestSourceUri).fetchTile(window)
+      val perProtectedAreas: Option[Tile] = new optionalTile(perProtectedAreasSourceUri).fetchTile(window)
+      val perForestConcessions: Option[Tile] = new optionalTile(perForestConcessionsSourceUri).fetchTile(window)
+      val braBiomes: Option[Tile] = new optionalTile(braBiomesSourceUri).fetchTile(window)
+      val woodFiber: Option[Tile] = new optionalTile(woodFiberSourceUri).fetchTile(window)
+      val resourceRights: Option[Tile] = new optionalTile(resourceRightsSourceUri).fetchTile(window)
+      val logging: Option[Tile] = new optionalTile(loggingSourceUri).fetchTile(window)
 
       val tile = TreeLossTile(
         loss,
@@ -179,29 +210,5 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
 
       Raster(tile, window)
     }
-  }
-}
-
-object TenByTenGridSources {
-  val s3Client = geotrellis.spark.io.s3.S3Client.DEFAULT
-
-  /** Check if URI exists before trying to open it, return None if no file found */
-  def optionalSource(uri: String): Option[GeoTiffRasterSource] = {
-    // Removes the expected 404 errors from console log
-    val s3uri = new AmazonS3URI(uri)
-    if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
-      println(s"Opening: $uri")
-      Some(GeoTiffRasterSource(uri))
-    } else None
-  }
-
-  def requiredSource(uri: String): GeoTiffRasterSource = {
-    // Removes the expected 404 errors from console log
-    val s3uri = new AmazonS3URI(uri)
-    if (! s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
-      throw new FileNotFoundException(uri)
-    }
-
-    GeoTiffRasterSource(uri)
   }
 }
