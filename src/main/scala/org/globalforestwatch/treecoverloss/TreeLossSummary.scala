@@ -30,7 +30,7 @@ object TreeLossSummary {
         val co2Pixel: Double = raster.tile.co2Pixel.map(_.getDouble(col, row)).getOrElse(0)
         val gadm36: Int = if (isNoData(raster.tile.gadm36.map(_.get(col, row)).getOrElse(0))) 0 else raster.tile.gadm36.map(_.get(col, row)).getOrElse(0)
 
-        val tcd2000Thresh: Int = TreeCoverDensity.threshold(tcd2000)
+        val tcd2000Thresh: Int = TreeCoverDensity2000.lookup(tcd2000)
     //    val tcd2010Thresh: Int = TreeCoverDensity.threshold(tcd2010)
 
         val lat:Double = raster.rasterExtent.gridRowToMap(row)
