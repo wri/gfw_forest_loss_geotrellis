@@ -68,7 +68,7 @@ object Ecozones extends Layer {
 }
 
 
-object EndemicBirdAreas extends Layers {
+object EndemicBirdAreas extends Layer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/endemic_bird_areas/${grid}.tif"
 }
 
@@ -617,7 +617,7 @@ object TreeCoverLossDrivers extends Layer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/drivers/${grid}.tif"
 
   def lookup(category:Int): String = category match {
-    ???
+  ???
   }
 }
 
