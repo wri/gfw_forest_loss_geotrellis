@@ -31,39 +31,48 @@ object TreeLossSummary {
           if (isNoData(value)) noDataValue else dataValue
         }
 
+        def getData(band: Tile, noDataValue: Integer, layer: IntegerLayer): Integer = {
+          val value: Integer = band.get(col, row)
+          if (isNoData(value)) noDataValue else layer.lookup(value)
+        }
+
         def getData(band: Tile, noDataValue: Double): Double = {
           val value: Double = band.getDouble(col, row)
           if (isNoData(value)) noDataValue else value
         }
 
-        def getData(band: Tile, noDataValue: Integer): Integer = {
-          val value: Integer = band.get(col, row)
-          if (isNoData(value)) noDataValue else value
+        def getData(band: Option[Tile], noDataValue: String, layer: StringLayer): String = {
+          val value: Int = band.map(_.get(col, row)).getOrElse(-1)
+          if (isNoData(value) || value == -1) noDataValue else layer.lookup(value)
+        }
+
+        def getData(band: Option[Tile], layer: BinaryLayer): Boolean = {
+          val value: Int = band.map(_.get(col, row)).getOrElse(0)
+          if (isNoData(value) || value == 0) false else true
         }
 
         def getData(band: Option[Tile], noDataValue: Int): Int = {
           val value: Int = band.map(_.get(col, row)).getOrElse(noDataValue)
-          if (isNoData(value)) noDataValue else value
+          if (isNoData(value) || value == noDataValue) noDataValue else value
         }
 
         def getData(band: Option[Tile], noDataValue: Double): Double = {
           val value: Double = band.map(_.getDouble(col, row)).getOrElse(noDataValue)
-          if (isNoData(value)) noDataValue else value
+          if (isNoData(value) || value == noDataValue) noDataValue else value
         }
 
 
         // This is a pixel by pixel operation
-        val loss: Integer = getData(raster.tile.loss, null)
+        val loss: Integer = getData(raster.tile.loss, null, TreeCoverLoss)
         val gain: Int = getData(raster.tile.gain, 0, 1)
-        val tcd2000: Int = getData(raster.tile.tcd2000, 0)
-        val tcd2010: Int = getData(raster.tile.tcd2010, 0)
+        val tcd2000: Int = getData(raster.tile.tcd2000, 0, TreeCoverDensity2000)
+        val tcd2010: Int = getData(raster.tile.tcd2010, 0, TreeCoverDensity2010)
 
         // If we don't have these tiles use default values for pixel
         val co2Pixel: Double = getData(raster.tile.co2Pixel, 0)
         //val gadm36: Int = if (isNoData(raster.tile.gadm36.map(_.get(col, row)).getOrElse(0))) 0 else raster.tile.gadm36.map(_.get(col, row)).getOrElse(0)
 
-        val tcd2000Thresh: Int = TreeCoverDensity2000.lookup(tcd2000)
-        val tcd2010Thresh: Int = TreeCoverDensity2010.lookup(tcd2010)
+
 
         val lat:Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize)

@@ -1,28 +1,54 @@
 package org.globalforestwatch.treecoverloss
 
+import org.apache.spark.sql.streaming.StreamingQuery
+
 
 trait Layer{
   def source(grid: String): String
+
 }
 
+trait BinaryLayer extends Layer {
+  def lookup(value: Int): Boolean = value match {
+    case 0 => false
+    case 1 => true
+  }
+}
+
+trait IntegerLayer extends Layer {
+  def lookup(value: Int): Int
+}
+
+trait DoubleLayer extends Layer {
+  def lookup(value: Double): Double = value
+}
+
+trait StringLayer extends Layer {
+  def lookup(value: Int): String
+}
+
+trait TupleLayer extends Layer {
+  def lookup(value: Int): (String, String, String)
+}
 
 object BiodiversitySignificance extends Layer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/biodiversity_significance/${grid}.tif"
-  def lookup(category:Float): String = category match {
+
+  def lookup(value: Float): String = value match {
     ???
   }
 }
 
 
-object BiomassPerHectar extends Layer {
+object BiomassPerHectar extends DoubleLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/biomass/${grid}.tif"
 }
 
-object BrazilBiomes extends Layer {
+object BrazilBiomes extends StringLayer {
 
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/bra_biomes/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
     case 1 => "Caatinga"
     case 2 => "Cerrado"
     case 3 => "Pantanal"
@@ -33,15 +59,15 @@ object BrazilBiomes extends Layer {
 }
 
 
-object Carbon extends Layer {
+object Carbon extends DoubleLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/co2_pixel/${grid}.tif"
 }
 
-object Ecozones extends Layer {
+object Ecozones extends StringLayer {
 
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/ecozones/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
     case 1 => "Boreal coniferous forest"
     case 2 => "Boreal mountain system"
     case 3 => "Boreal tundra woodland"
@@ -68,24 +94,24 @@ object Ecozones extends Layer {
 }
 
 
-object EndemicBirdAreas extends Layer {
+object EndemicBirdAreas extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/endemic_bird_areas/${grid}.tif"
 }
 
 
-object Erosion extends Layer {
+object Erosion extends StringLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/erosion/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
     ???
   }
 }
 
 
-object GlobalLandcover extends Layer {
+object GlobalLandcover extends StringLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/global_landcover/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
     case 10 | 11 | 12 | 20 | 30 | 40 => "Agriculture"
     case 50 | 60 | 61 | 62 | 70 | 71 | 72 | 80 | 81 | 82 | 90 | 100 | 160 | 170 => "Forest"
     case 110 | 130 => "Grassland"
@@ -101,11 +127,11 @@ object GlobalLandcover extends Layer {
 }
 
 
-object IndonesiaForestArea extends Layer {
+object IndonesiaForestArea extends StringLayer {
 
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/idn_forest_area/${grid}.tif"
 
-  def lookup(category: Int): String = category match {
+  def lookup(value: Int): String = value match {
     case 1001 => "Protected Forest"
     case 1003 => "Production Forest"
     case 1004 => "Limited Production Forest"
@@ -119,15 +145,15 @@ object IndonesiaForestArea extends Layer {
 }
 
 
-object IndonesiaForestMoratorium extends Layer {
+object IndonesiaForestMoratorium extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/idn_forest_moratorium/${grid}.tif"
 }
 
-object IndonesiaLandCover extends Layer {
+object IndonesiaLandCover extends StringLayer {
 
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/idn_land_cover/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
 
     case 2001 => "Primary Dry Land Forest"
     case 2002 => "Secondary Dry Land Forest"
@@ -162,51 +188,51 @@ object IndonesiaLandCover extends Layer {
 }
 
 
-object IndonesiaPrimaryForest extends Layer {
+object IndonesiaPrimaryForest extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/idn_primary_forest/${grid}.tif"
 }
 
 
-object IntactForestLandscapes extends Layer {
+object IntactForestLandscapes extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/ifl/${grid}.tif"
 }
 
 
-object KeyBiodiversityAreas extends Layer {
+object KeyBiodiversityAreas extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/kba/${grid}.tif"
 }
 
-object Landmark extends Layer {
+object Landmark extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/landmark/${grid}.tif"
 }
 
-object LandRights extends Layer {
+object LandRights extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/land_rights/${grid}.tif"
 }
 
-object Logging extends Layer {
+object Logging extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/logging/${grid}.tif"
 }
 
-object MangroveBiomass extends Layer {
+object MangroveBiomass extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/mangrove_biomass/${grid}.tif"
 }
 
 
-object Mangroves1996 extends Layer {
+object Mangroves1996 extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/mangroves_1996/${grid}.tif"
 }
 
 
-object Mangroves2016 extends Layer {
+object Mangroves2016 extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/mangroves_2016/${grid}.tif"
 }
 
-object MexicoForestZoning extends Layer {
+object MexicoForestZoning extends TupleLayer {
 
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/mex_forest_zoning/${grid}.tif"
 
-  def lookup(category: Int): (String, String, String) = category match {
+  def lookup(value: Int): (String, String, String) = value match {
     case 1 => ("I A", "Zonas de conservación y aprovechamiento restringido o prohibido", "Áreas Naturales Protegidas")
     case 2 => ("I C", "Zonas de conservación y aprovechamiento restringido o prohibido", "Áreas localizadas arriba de los tres mil metros sobre el nivel del mar")
     case 3 => ("I D", "Zonas de conservación y aprovechamiento restringido o prohibido", "Terrenos con pendientes mayores al cien por ciento o cuarenta y cinco grados")
@@ -230,36 +256,36 @@ object MexicoForestZoning extends Layer {
 }
 
 
-object MexicoPaymentForEcosystemServices extends Layer {
+object MexicoPaymentForEcosystemServices extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/mex_psa/${grid}.tif"
 }
 
 
-object MexicoProtectedAreas extends Layer {
+object MexicoProtectedAreas extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/mex_protected_areas/${grid}.tif"
 }
 
 
-object Mining extends Layer {
+object Mining extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/mining/${grid}.tif"
 }
 
 
-object OilPalm extends Layer {
+object OilPalm extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/oil_palm/${grid}.tif"
 }
 
 
-object Peatlands extends Layer {
+object Peatlands extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/peatlands/${grid}.tif"
 }
 
 
-object PeruForestConcessions extends Layer {
+object PeruForestConcessions extends StringLayer {
 
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/per_forest_concessions/${grid}.tif"
 
-  def lookup(category:Int): String = category match{
+  def lookup(value: Int): String = value match {
     case 1 => "CONSERVATION"
     case 2 => "ECOTOURISM"
     case 3 => "NONTIMBER FOREST PRODUCTS_NUTS"
@@ -271,20 +297,20 @@ object PeruForestConcessions extends Layer {
 }
 
 
-object PeruProductionForest extends Layer {
+object PeruProductionForest extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/per_permanent_production_forests/${grid}.tif"
 }
 
 
-object PeruProtectedAreas extends Layer {
+object PeruProtectedAreas extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/per_protected_areas/${grid}.tif"
 }
 
-object Plantations extends Layer {
+object Plantations extends StringLayer {
 
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/plantations/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
     case 1 => "Fruit"
     case 2 => "Fruit Mix"
     case 3 => "Oil Palm "
@@ -300,30 +326,30 @@ object Plantations extends Layer {
 }
 
 
-object PrimaryForest extends Layer {
+object PrimaryForest extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/primary_forest/${grid}.tif"
 }
 
-object ProtectedAreas extends Layer{
+object ProtectedAreas extends StringLayer {
   
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/wdpa/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
     case 1 => "Category Ia/b or II"
     case 2 => "Othe Category"
   }
 
 }
 
-object ResourceRights extends Layer {
+object ResourceRights extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/resource_rights/${grid}.tif"
 }
 
-object RiverBasins extends Layer {
+object RiverBasins extends StringLayer {
 
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/river_basins/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
     case 1001 => "Gulf of Mexico, North Atlantic Coast"
     case 1002 => "United States, North Atlantic Coast"
     case 1003 => "Mississippi - Missouri"
@@ -558,11 +584,11 @@ object RiverBasins extends Layer {
 }
 
 
-object RSPO extends Layer{
+object RSPO extends StringLayer {
 
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/rspo/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
     case 1 => "certified"
     case 2 => "unknown"
     case 3 => "not certified"
@@ -570,11 +596,11 @@ object RSPO extends Layer{
 }
 
 
-object TigerLandscapes extends Layer {
+object TigerLandscapes extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/tiger_landscapes/${grid}.tif"
 }
 
-trait TreeCoverDensity extends Layer{
+trait TreeCoverDensity extends IntegerLayer {
 
   def lookup(density: Int): Int = {
     if (density <= 10) 0
@@ -604,18 +630,22 @@ object TreeCoverDensity2010 extends TreeCoverDensity {
 }
 
 
-object TreeCoverGain extends Layer {
+object TreeCoverGain extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/gain/${grid}.tif"
 }
 
-object TreeCoverLoss extends Layer {
+object TreeCoverLoss extends IntegerLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/loss/${grid}.tif"
+
+  def lookup(value: Int): Int = {
+    value + 2000
+  }
 }
 
-object TreeCoverLossDrivers extends Layer {
+object TreeCoverLossDrivers extends StringLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/drivers/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
     case 1 => "Commodity driven deforestation"
     case 2 => "Shifting agriculture"
     case 3 => "Forestry"
@@ -625,14 +655,14 @@ object TreeCoverLossDrivers extends Layer {
 }
 
 
-object UrbanWatersheds extends Layer {
+object UrbanWatersheds extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/urb_watersheds/${grid}.tif"
 }
 
-object WaterStress extends Layer{
+object WaterStress extends StringLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/water_stress/${grid}.tif"
 
-  def lookup(category:Int): String = category match {
+  def lookup(value: Int): String = value match {
     case 1 => "Low risk"
     case 2 => "Low to medium risk"
     case 3 => "Medium to high risk"
@@ -642,6 +672,6 @@ object WaterStress extends Layer{
 }
 
 
-object WoodFiber extends Layer {
+object WoodFiber extends BinaryLayer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/wood_fiber/${grid}.tif"
 }
