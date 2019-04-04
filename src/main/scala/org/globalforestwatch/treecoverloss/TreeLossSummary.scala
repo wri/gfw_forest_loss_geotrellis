@@ -3,10 +3,14 @@ package org.globalforestwatch.treecoverloss
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import cats.implicits._
+import org.globalforestwatch.util.Geodesy
+import geotrellis.raster.histogram.StreamingHistogram
 
 
 /** LossData Summary by year */
-case class TreeLossSummary(stats: Map[(Int, Int, Int), LossData] = Map.empty) {
+case class TreeLossSummary(stats: Map[(Integer, String, String, Boolean, Boolean, String, String, String, String, String, String, Boolean,
+  Boolean, Boolean, String, Integer, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String, Boolean, Boolean, Boolean, String, Boolean, Boolean,
+  String, Boolean, Boolean, String, String, Boolean, Boolean, Boolean), LossData] = Map.empty) {
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: TreeLossSummary): TreeLossSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
@@ -16,79 +20,87 @@ case class TreeLossSummary(stats: Map[(Int, Int, Int), LossData] = Map.empty) {
 
 object TreeLossSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
+
+
   implicit val mdhCellRegisterForTreeLossRaster1 =
     new CellVisitor[Raster[TreeLossTile], TreeLossSummary] {
 
       def register(raster: Raster[TreeLossTile], col: Int, row: Int, acc: TreeLossSummary): TreeLossSummary = {
 
-        def getData(band: Tile, noDataValue: Int): Int = {
-          val value: Int = band.get(col, row)
-          if (isNoData(value)) noDataValue else value
-        }
-
-        def getData(band: Tile, noDataValue: Int, dataValue: Int): Int = {
-          val value: Int = band.get(col, row)
-          if (isNoData(value)) noDataValue else dataValue
-        }
-
-        def getData(band: Tile, noDataValue: Integer, layer: IntegerLayer): Integer = {
-          val value: Integer = band.get(col, row)
-          if (isNoData(value)) noDataValue else layer.lookup(value)
-        }
-
-        def getData(band: Tile, noDataValue: Double): Double = {
-          val value: Double = band.getDouble(col, row)
-          if (isNoData(value)) noDataValue else value
-        }
-
-        def getData(band: Option[Tile], noDataValue: String, layer: StringLayer): String = {
-          val value: Int = band.map(_.get(col, row)).getOrElse(-1)
-          if (isNoData(value) || value == -1) noDataValue else layer.lookup(value)
-        }
-
-        def getData(band: Option[Tile], layer: BinaryLayer): Boolean = {
-          val value: Int = band.map(_.get(col, row)).getOrElse(0)
-          if (isNoData(value) || value == 0) false else true
-        }
-
-        def getData(band: Option[Tile], noDataValue: Int): Int = {
-          val value: Int = band.map(_.get(col, row)).getOrElse(noDataValue)
-          if (isNoData(value) || value == noDataValue) noDataValue else value
-        }
-
-        def getData(band: Option[Tile], noDataValue: Double): Double = {
-          val value: Double = band.map(_.getDouble(col, row)).getOrElse(noDataValue)
-          if (isNoData(value) || value == noDataValue) noDataValue else value
-        }
-
-
         // This is a pixel by pixel operation
-        val loss: Integer = getData(raster.tile.loss, null, TreeCoverLoss)
-        val gain: Int = getData(raster.tile.gain, 0, 1)
-        val tcd2000: Int = getData(raster.tile.tcd2000, 0, TreeCoverDensity2000)
-        val tcd2010: Int = getData(raster.tile.tcd2010, 0, TreeCoverDensity2010)
-
-        // If we don't have these tiles use default values for pixel
-        val co2Pixel: Double = getData(raster.tile.co2Pixel, 0)
-        //val gadm36: Int = if (isNoData(raster.tile.gadm36.map(_.get(col, row)).getOrElse(0))) 0 else raster.tile.gadm36.map(_.get(col, row)).getOrElse(0)
-
-
+        val loss: Integer = raster.tile.loss.getData(col, row)
+        val gain: Integer = raster.tile.gain.getData(col, row)
+        val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
+        val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
+        val co2Pixel: Double = raster.tile.co2Pixel.getData(col, row)
+        val biomass: Double = raster.tile.biomass.getData(col, row)
+        val mangroveBiomass: Double = raster.tile.mangroveBiomass.getData(col, row)
+        val drivers: String = raster.tile.drivers.getData(col, row)
+        val globalLandCover: String = raster.tile.globalLandCover.getData(col, row)
+        val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
+        val idnPrimaryForest: Boolean = raster.tile.idnPrimaryForest.getData(col, row)
+        val erosion: String = raster.tile.erosion.getData(col, row)
+        val biodiversitySignificance: String = raster.tile.biodiversitySignificance.getData(col, row)
+        val wdpa: String = raster.tile.wdpa.getData(col, row)
+        val plantations: String = raster.tile.plantations.getData(col, row)
+        val riverBasins: String = raster.tile.riverBasins.getData(col, row)
+        val ecozones: String = raster.tile.ecozones.getData(col, row)
+        val urbanWatersheds: Boolean = raster.tile.urbanWatersheds.getData(col, row)
+        val mangroves1996: Boolean = raster.tile.mangroves1996.getData(col, row)
+        val mangroves2016: Boolean = raster.tile.mangroves2016.getData(col, row)
+        val waterStress: String = raster.tile.waterStress.getData(col, row)
+        val intactForestLandscapes: Integer = raster.tile.intactForestLandscapes.getData(col, row)
+        val endemicBirdAreas: Boolean = raster.tile.endemicBirdAreas.getData(col, row)
+        val tigerLandscapes: Boolean = raster.tile.tigerLandscapes.getData(col, row)
+        val landmark: Boolean = raster.tile.landmark.getData(col, row)
+        val landRights: Boolean = raster.tile.landRights.getData(col, row)
+        val keyBiodiversityAreas: Boolean = raster.tile.keyBiodiversityAreas.getData(col, row)
+        val mining: Boolean = raster.tile.mining.getData(col, row)
+        val rspo: String = raster.tile.rspo.getData(col, row)
+        val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
+        val oilPalm: Boolean = raster.tile.oilPalm.getData(col, row)
+        val idnForestMoratorium: Boolean = raster.tile.idnForestMoratorium.getData(col, row)
+        val idnLandCover: String = raster.tile.idnLandCover.getData(col, row)
+        val mexProtectedAreas: Boolean = raster.tile.mexProtectedAreas.getData(col, row)
+        val mexPaymentForEcosystemServices: Boolean = raster.tile.mexPaymentForEcosystemServices.getData(col, row)
+        val mexForestZoning: String = raster.tile.mexForestZoning.getData(col, row)
+        val perProductionForest: Boolean = raster.tile.perProductionForest.getData(col, row)
+        val perProtectedAreas: Boolean = raster.tile.perProtectedAreas.getData(col, row)
+        val perForestConcessions: String = raster.tile.perForestConcessions.getData(col, row)
+        val braBiomes: String = raster.tile.braBiomes.getData(col, row)
+        val woodFiber: Boolean = raster.tile.woodFiber.getData(col, row)
+        val resourceRights: Boolean = raster.tile.resourceRights.getData(col, row)
+        val logging: Boolean = raster.tile.logging.getData(col, row)
 
         val lat:Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize)
         val gainArea: Double = gain * area
 
-        val pKey = (loss, tcd2000Thresh, gadm36) // tcd2010Thresh, gadm36)
+        val pKey = (loss, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion, biodiversitySignificance,
+          wdpa, plantations, riverBasins, ecozones, urbanWatersheds, mangroves1996, mangroves2016, waterStress,
+          intactForestLandscapes, endemicBirdAreas, tigerLandscapes, landmark, landRights, keyBiodiversityAreas, mining,
+          rspo, peatlands, oilPalm, idnForestMoratorium, idnLandCover, mexProtectedAreas, mexPaymentForEcosystemServices,
+          mexForestZoning, perProductionForest, perProtectedAreas, perForestConcessions, braBiomes, woodFiber,
+          resourceRights, logging)
 
         val summary: LossData = acc.stats.getOrElse(
           key = pKey,
-          default = LossData(0, 0, 0))
+          default = LossData(0, 0, 0, 0, StreamingHistogram(size = 256), 0, 0, StreamingHistogram(size = 256)))
 
         summary.totalArea += area
-        summary.totalCo2 += co2Pixel
         summary.totalGainArea += gainArea
 
-        val updated_summary: Map[(Int, Int, Int), LossData] = acc.stats.updated(pKey, summary)
+        summary.totalBiomass += biomass * area / 10000
+        summary.totalCo2 += ((biomass * area / 10000) * 0.5) * 44 / 12
+        summary.biomassHistogram.countItem(biomass)
+
+        summary.totalMangroveBiomass += mangroveBiomass * area / 10000
+        summary.totalMangroveCo2 += ((mangroveBiomass * area / 10000) * 0.5) * 44 / 12
+        summary.mangroveBiomassHistogram.countItem(mangroveBiomass)
+
+        val updated_summary: Map[(Integer, String, String, Boolean, Boolean, String, String, String, String, String, String, Boolean,
+          Boolean, Boolean, String, Integer, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String, Boolean, Boolean, Boolean, String, Boolean, Boolean,
+          String, Boolean, Boolean, String, String, Boolean, Boolean, Boolean), LossData] = acc.stats.updated(pKey, summary)
 
         TreeLossSummary(updated_summary)
       }

@@ -75,9 +75,17 @@ object TreeLossSummaryMain extends CommandApp (
       val summaryDF =
         summaryRDD.flatMap { case (id, treeLossSummary) =>
           treeLossSummary.stats.map { case (stats, lossData) =>
-            (id.country, id.admin1, id.admin2, stats._1, stats._2, stats._3,  lossData.totalArea, lossData.totalCo2, lossData.totalGainArea)
+            (id.country, id.admin1, id.admin2,
+              stats._1, stats._2, stats._3,
+              lossData.totalArea, lossData.totalGainArea,
+              lossData.totalBiomass, lossData.totalCo2, lossData.biomassHistogram.mean(),
+              lossData.totalMangroveBiomass, lossData.totalMangroveCo2, lossData.mangroveBiomassHistogram.mean())
           }
-        }.toDF("country", "admin1", "admin2", "loss_year", "tcd_2000",  "gadm36_id", "total_area", "total_co2", "total_gain")
+        }.toDF("country", "admin1", "admin2",
+          "loss_year", "tcd_2000", "gadm36_id",
+          "total_area", "total_gain",
+          "total_biomass", "total_co2", "mean_biomass_per_ha",
+          "total_mangrove_biomass", "total_mangrove_co2", "mean_mangrove_biomass_per_ha")
 
       val outputPartitionCount = maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
