@@ -86,7 +86,17 @@ object GlobalLandcover extends Layer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/global_landcover/${grid}.tif"
 
   def lookup(category:Int): String = category match {
-    ???
+    case 10 | 11 | 12 | 20 | 30 | 40 => "Agriculture"
+    case 50 | 60 | 61 | 62 | 70 | 71 | 72 | 80 | 81 | 82 | 90 | 100 | 160 | 170 => "Forest"
+    case 110 | 130 => "Grassland"
+    case 180 => "Wetland"
+    case 190 => "Settlement"
+    case 120 | 121 | 122 => "Shrubland"
+    case 140 | 150 | 151 | 152 | 153 => "Sparse vegetation"
+    case 200 | 201 | 202 => "Bare"
+    case 210 => "Water"
+    case 220 => "Permanent snow and ice"
+
   }
 }
 
@@ -95,27 +105,16 @@ object IndonesiaForestArea extends Layer {
 
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/idn_forest_area/${grid}.tif"
 
-  def lookup(category:Int): (String, String, String) = category match {
-    case 1 => ("Nature Reserve/Nature Conservation Area","Conservation Forest","Sanctuary Reserves/Nature Conservation Area")
-    case 1001 => ("Protected Forest","Protected Forest","Protected Forest")
-    case 1002 => ("Nature Reserve Forest","Conservation Forest","Sanctuary Reserves/Nature Conservation Area")
-    case 1003 => ("Production Forest","Production Forest","Production Forest")
-    case 1004 => ("Limited Production Forest","Production Forest","Limited Production Forest")
-    case 1005=> ("Converted Production Forest","Production Forest","Converted Production Forest")
-    case 1007 => ("Other Utilization Area","Other Utilization Area","Other Utilization Area")
-    case 5001 => (null, null, null)
-    case 5003 => (null, null, null)
-    case 10021 => ("Sanctuary Reserve","Conservation Forest","Sanctuary Reserves/Nature Conservation Area")
-    case 10022 => ("Wildlife Reserve","Conservation Forest","Sanctuary Reserves/Nature Conservation Area")
-    case 10023 => ("Hunting Park","Conservation Forest","Sanctuary Reserves/Nature Conservation Area")
-    case 10024 => ("National Park","Conservation Forest","Sanctuary Reserves/Nature Conservation Area")
-    case 10025 => ("Nature Tourism Park","Conservation Forest","Sanctuary Reserves/Nature Conservation Area")
-    case 10026 => ("Grand Forest Park","Conservation Forest","Sanctuary Reserves/Nature Conservation Area")
-    case 100201 => ("Marine Nature Reserve/Nature Conservation Area","Conservation Forest","Marine Protected Areas")
-    case 100211 => ("Marine Sanctuary Reserve","Conservation Forest","Marine Protected Areas")
-    case 100221 => ("Marine Wildlife Reserve","Conservation Forest","Marine Protected Areas")
-    case 100241 => ("Marine National Park","Conservation Forest","Marine Protected Areas")
-    case 100251 => ("Marine Tourism Park","Conservation Forest","Marine Protected Areas")
+  def lookup(category: Int): String = category match {
+    case 1001 => "Protected Forest"
+    case 1003 => "Production Forest"
+    case 1004 => "Limited Production Forest"
+    case 1005 => "Converted Production Forest"
+    case 1007 => "Other Utilization Area"
+    case 5001 | 5003 => null
+    case 1 | 1002 | 10021 | 10022 | 10023 | 10024 | 10025 | 10026 => "Sanctuary Reserves/Nature Conservation Area"
+    case 100201 | 100211 | 100221 | 100241 | 100251 => "Marine Protected Areas"
+
   }
 }
 
@@ -617,7 +616,11 @@ object TreeCoverLossDrivers extends Layer {
   def source(grid: String): String = s"s3://wri-users/tmaschler/prep_tiles/drivers/${grid}.tif"
 
   def lookup(category:Int): String = category match {
-  ???
+    case 1 => "Commodity driven deforestation"
+    case 2 => "Shifting agriculture"
+    case 3 => "Forestry"
+    case 4 => "Wildfire"
+    case 5 => "Urbanization"
   }
 }
 
