@@ -1,12 +1,11 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.layers
 
-
+/*
 import org.scalatest.FunSuite
-import TreeCoverDensity._
 
 class TreeCoverDensitySuits extends FunSuite {
   test("Threshold 0") {
-    assert(threshold(0) === 0)
+    assert(TreeCover threshold(0) === 0)
     assert(threshold(9) === 0)
   }
 
@@ -47,4 +46,4 @@ class TreeCoverDensitySuits extends FunSuite {
     assert(threshold(100) === 75)
   }
 }
-
+*/

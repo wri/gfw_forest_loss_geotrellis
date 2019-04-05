@@ -18,7 +18,10 @@ trait Layer {
   val s3Client: geotrellis.spark.io.s3.S3Client =
     geotrellis.spark.io.s3.S3Client.DEFAULT
   val uri: String
-  def noDataValue: B
+
+  def internalNoDataValue: A
+
+  def externalNoDataValue: B
   def lookup(a: A): B
 
   val basePath: String = s"s3://gfw-files/2018_update"
@@ -38,24 +41,26 @@ trait ILayer extends Layer {
   implicit class ITile(val t: Tile) {
     def getData(col: Int, row: Int): B = {
       val value: Int = t.get(col, row)
-      if (isNoData(value)) noDataValue else lookup(value)
+      if (isNoData(value)) externalNoDataValue else lookup(value)
     }
     def cellType: CellType = t.cellType
     def cols: Int = t.cols
     def rows: Int = t.rows
-    def noDataValue: B = noDataValue
+
+    def noDataValue: B = externalNoDataValue
   }
 
   implicit class OptionalITile(val t: Option[Tile]) {
     def getData(col: Int, row: Int): B = {
-      val value: Int = t.map(_.get(col, row)).getOrElse(noDataValue)
-      if (isNoData(value) || value == noDataValue) noDataValue
+      val value: Int = t.map(_.get(col, row)).getOrElse(internalNoDataValue)
+      if (isNoData(value) || value == internalNoDataValue) externalNoDataValue
       else lookup(value)
     }
     def cellType: CellType = t.cellType
     def cols: Int = t.cols
     def rows: Int = t.rows
-    def noDataValue: B = noDataValue
+
+    def noDataValue: B = externalNoDataValue
   }
 }
 
@@ -69,24 +74,26 @@ trait DLayer extends Layer {
   implicit class DTile(val t: Tile) {
     def getData(col: Int, row: Int): B = {
       val value: Double = t.getDouble(col, row)
-      if (isNoData(value)) noDataValue else lookup(value)
+      if (isNoData(value)) externalNoDataValue else lookup(value)
     }
     def cellType: CellType = t.cellType
     def cols: Int = t.cols
     def rows: Int = t.rows
-    def noDataValue: B = noDataValue
+
+    def noDataValue: B = externalNoDataValue
   }
 
   implicit class OptionalDTile(val t: Option[Tile]) {
     def getData(col: Int, row: Int): B = {
-      val value: Double = t.map(_.getDouble(col, row)).getOrElse(noDataValue)
-      if (isNoData(value) || value == noDataValue) noDataValue
+      val value: Double = t.map(_.getDouble(col, row)).getOrElse(internalNoDataValue)
+      if (isNoData(value) || value == internalNoDataValue) externalNoDataValue
       else lookup(value)
     }
     def cellType: CellType = t.cellType
     def cols: Int = t.cols
     def rows: Int = t.rows
-    def noDataValue: B = noDataValue
+
+    def noDataValue: B = externalNoDataValue
   }
 
 }
@@ -186,7 +193,10 @@ trait BooleanLayer extends ILayer {
     * Layers which return a Boolean type
     */
   type B = Boolean
-  def noDataValue: Boolean = false
+
+  def internalNoDataValue: Int = 0
+
+  def externalNoDataValue: Boolean = false
   def lookup(value: Int): Boolean = if (value == 0) false else true
 }
 
@@ -197,8 +207,26 @@ trait IntegerLayer extends ILayer {
     * (use java.lang.Integer to be able to use null)
     */
   type B = Integer
-  def noDataValue: Integer = null
+
+  def internalNoDataValue: Int = 0
+
+  def externalNoDataValue: Integer = null
   def lookup(value: Int): Integer = value
+}
+
+trait DIntegerLayer extends DLayer {
+
+  /**
+    * Layers which return an Integer type
+    * (use java.lang.Integer to be able to use null)
+    */
+  type B = Integer
+
+  def internalNoDataValue: Double = 0
+
+  def externalNoDataValue: Integer = null
+
+  def lookup(value: Double): Integer
 }
 
 trait DoubleLayer extends DLayer {
@@ -207,7 +235,10 @@ trait DoubleLayer extends DLayer {
     * Layers which return a Double type
     */
   type B = Double
-  def noDataValue: Double = 0.0
+
+  def internalNoDataValue: Double = 0
+
+  def externalNoDataValue: Double = 0.0
   def lookup(value: Double): Double = value
 }
 
@@ -217,6 +248,9 @@ trait StringLayer extends ILayer {
     * Layers which return a String type
     */
   type B = String
-  def noDataValue: String = null
+
+  def internalNoDataValue: Int = 0
+
+  def externalNoDataValue: String = null
   def lookup(value: Int): String
 }

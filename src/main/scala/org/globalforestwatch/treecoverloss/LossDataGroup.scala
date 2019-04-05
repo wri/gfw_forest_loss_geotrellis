@@ -37,4 +37,5 @@ case class LossDataGroup(loss: Integer,
                          braBiomes: String,
                          woodFiber: Boolean,
                          resourceRights: Boolean,
-                         logging: Boolean)
+                         logging: Boolean
+                        )

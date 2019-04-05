@@ -73,7 +73,7 @@ object TreeLossSummaryMain extends CommandApp (
       val summaryDF =
         summaryRDD.flatMap { case (id, treeLossSummary) =>
           treeLossSummary.stats.map { case (lossDataGroup, lossData) =>
-            (id.country, id.admin1, id.admin2,
+            LossRow(id.country, id.admin1, id.admin2,
               lossDataGroup.loss, lossDataGroup.drivers, lossDataGroup.globalLandCover, lossDataGroup.primaryForest,
               lossDataGroup.idnPrimaryForest, lossDataGroup.erosion, lossDataGroup.biodiversitySignificance,
               lossDataGroup.biodiversityIntactness, lossDataGroup.wdpa, lossDataGroup.plantations,
