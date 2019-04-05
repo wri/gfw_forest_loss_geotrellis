@@ -27,5 +27,6 @@ class Ecozones(grid: String) extends StringLayer with OptionalILayer {
     case 20 => "Tropical rainforest"
     case 21 => "Tropical shrubland"
     case 22 => "Water"
+    case _ => null
   }
 }

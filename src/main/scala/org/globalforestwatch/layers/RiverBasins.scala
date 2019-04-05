@@ -236,5 +236,6 @@ class RiverBasins(grid: String) extends StringLayer with OptionalILayer {
     case 8007 => "South Pacific Islands"
     case 8008 => "New Zealand"
     case 8009 => "Tasmania"
+    case _ => null
   }
 }

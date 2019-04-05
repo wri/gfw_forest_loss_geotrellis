@@ -12,6 +12,7 @@ class BrazilBiomes(grid: String) extends StringLayer with OptionalILayer {
     case 4 => "Pampa"
     case 5 => "Amazônia"
     case 6 => "Mata Atlântica"
+    case _ => null
   }
 
 }

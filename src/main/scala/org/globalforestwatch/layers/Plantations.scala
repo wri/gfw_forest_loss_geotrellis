@@ -15,7 +15,7 @@ class Plantations(grid: String) extends StringLayer with OptionalILayer {
     case 7  => "Rubber Mix"
     case 8  => "Unknown"
     case 9  => "Unknown Mix"
-    case 10 => "Wood fiber / timber"
-    case 11 => "Wood fiber / timber Mix"
+    case 10 => "Wood fiber / Timber"
+    case 11 => "Wood fiber / Timber Mix"
   }
 }

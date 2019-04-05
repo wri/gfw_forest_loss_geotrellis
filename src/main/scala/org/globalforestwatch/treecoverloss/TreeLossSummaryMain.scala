@@ -1,7 +1,5 @@
 package org.globalforestwatch.treecoverloss
 
-import java.net.URL
-
 import com.monovore.decline.{CommandApp, Opts}
 import org.apache.log4j.Logger
 import org.apache.spark._

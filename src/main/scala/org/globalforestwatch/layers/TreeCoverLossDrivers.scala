@@ -11,5 +11,6 @@ class TreeCoverLossDrivers(grid: String)
     case 3 => "Forestry"
     case 4 => "Wildfire"
     case 5 => "Urbanization"
+    case _ => null
   }
 }

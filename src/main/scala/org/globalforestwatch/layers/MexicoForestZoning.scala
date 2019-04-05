@@ -43,5 +43,6 @@ class MexicoForestZoning(grid: String) extends StringLayer with OptionalILayer {
     case 18 =>
       "Terrenos forestales o preferentemente forestales degradados que se encuentran sometidos a tratamientos de recuperación forestal" // ("III E", "Zonas de restauración", "Terrenos forestales o preferentemente forestales degradados que se encuentran sometidos a tratamientos de recuperación forestal")
     case 19 => "No aplica" // ("N/A", "No aplica", "No aplica")
+    case _ => null
   }
 }

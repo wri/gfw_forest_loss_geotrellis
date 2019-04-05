@@ -17,6 +17,7 @@ class IndonesiaForestArea(grid: String)
     case 1 | 1002 | 10021 | 10022 | 10023 | 10024 | 10025 | 10026 =>
       "Sanctuary Reserves/Nature Conservation Area"
     case 100201 | 100211 | 100221 | 100241 | 100251 => "Marine Protected Areas"
+    case _ => null
 
   }
 }

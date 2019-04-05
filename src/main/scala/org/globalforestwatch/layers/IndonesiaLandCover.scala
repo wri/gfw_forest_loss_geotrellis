@@ -36,5 +36,6 @@ class IndonesiaLandCover(grid: String) extends StringLayer with OptionalILayer {
     case 20191 => null
     case 5001  => "Bodies of Water"
     case 50011 => "Swamp"
+    case _ => null
   }
 }

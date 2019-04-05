@@ -2,7 +2,7 @@ package org.globalforestwatch.treecoverloss
 
 
 import com.typesafe.scalalogging.LazyLogging
-import geotrellis.raster.{Raster, Tile}
+import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import cats.implicits._
 import org.globalforestwatch.layers._

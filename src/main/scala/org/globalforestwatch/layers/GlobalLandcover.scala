@@ -6,9 +6,8 @@ class GlobalLandcover(grid: String) extends StringLayer with OptionalILayer {
 
   def lookup(value: Int): String = value match {
     case 10 | 11 | 12 | 20 | 30 | 40 => "Agriculture"
-    case 50 | 60 | 61 | 62 | 70 | 71 | 72 | 80 | 81 | 82 | 90 | 100 | 160 |
-        170 =>
-      "Forest"
+    case 50 | 60 | 61 | 62 | 70 | 71 | 72 | 80 | 81 |
+         82 | 90 | 100 | 160 | 170 => "Forest"
     case 110 | 130                   => "Grassland"
     case 180                         => "Wetland"
     case 190                         => "Settlement"
@@ -17,6 +16,7 @@ class GlobalLandcover(grid: String) extends StringLayer with OptionalILayer {
     case 200 | 201 | 202             => "Bare"
     case 210                         => "Water"
     case 220                         => "Permanent snow and ice"
+    case _ => null
 
   }
 }

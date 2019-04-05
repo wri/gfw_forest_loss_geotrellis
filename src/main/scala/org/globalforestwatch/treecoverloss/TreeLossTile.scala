@@ -1,6 +1,6 @@
 package org.globalforestwatch.treecoverloss
 
-import geotrellis.raster.{CellGrid, CellType, Tile}
+import geotrellis.raster.{CellGrid, CellType}
 import org.globalforestwatch.layers._
 
 /**
