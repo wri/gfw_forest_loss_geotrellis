@@ -21,7 +21,7 @@ trait Layer {
   def noDataValue: B
   def lookup(a: A): B
 
-  val basePath: String = s"s3://gfw-files/2018_loss"
+  val basePath: String = s"s3://gfw-files/2018_update"
 }
 
 trait ILayer extends Layer {
