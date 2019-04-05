@@ -22,6 +22,10 @@ trait Layer {
   def lookup(a: A): B
 
   val basePath: String = s"s3://gfw-files/2018_update"
+
+  implicit class ATile(val t: Tile) {
+
+  }
 }
 
 trait ILayer extends Layer {
@@ -48,7 +52,6 @@ trait ILayer extends Layer {
       if (isNoData(value) || value == noDataValue) noDataValue
       else lookup(value)
     }
-
     def cellType: CellType = t.cellType
     def cols: Int = t.cols
     def rows: Int = t.rows
