@@ -1,7 +1,7 @@
 package org.globalforestwatch.treecoverloss
 
 import com.typesafe.scalalogging.LazyLogging
-import geotrellis.raster.{ArrayTile, CellType, MultibandTile, MutableArrayTile, Raster, RasterExtent, Tile}
+import geotrellis.raster.Raster
 import geotrellis.spark.SpatialKey
 import geotrellis.vector._
 import org.apache.spark.Partitioner
@@ -9,8 +9,7 @@ import org.apache.spark.rdd.RDD
 import cats.implicits._
 import geotrellis.contrib.polygonal._
 import geotrellis.spark.tiling.LayoutDefinition
-import Implicits._
-import geotrellis.macros.{DoubleTileMapper, DoubleTileVisitor, IntTileMapper, IntTileVisitor}
+
 
 object TreeLossRDD extends LazyLogging {
 

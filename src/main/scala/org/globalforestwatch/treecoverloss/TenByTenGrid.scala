@@ -4,6 +4,7 @@ import geotrellis.vector.Point
 import geotrellis.raster.TileLayout
 import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.vector.Extent
+import org.globalforestwatch.layers._
 
 object TenByTenGrid {
 
@@ -41,31 +42,33 @@ object TenByTenGrid {
     * Top-Left corner, exclusive on south, east, inclusive on north and west
     */
   def pointGridId(point: Point): String = {
-    val col = (math.floor(point.x / 10).toInt * 10)
-    val long: String = if (col >= 0) f"${col}%03dE" else f"${-col}%03dW"
+    val col = math.floor(point.x / 10).toInt * 10
+    val long: String = if (col >= 0) f"$col%03dE" else f"${-col}%03dW"
 
-    val row = (math.ceil(point.y / 10).toInt * 10)
-    val lat: String = if (row >= 0) f"${row}%02dN" else f"${-row}%02dS"
+    val row = math.ceil(point.y / 10).toInt * 10
+    val lat: String = if (row >= 0) f"$row%02dN" else f"${-row}%02dS"
 
-    s"${lat}_${long}"
+    s"${lat}_$long"
   }
 
   def getRasterSource(windowExtent: Extent): TenByTenGridSources = {
     val gridId = pointGridId(windowExtent.center)
     val source = TenByTenGridSources(gridId)
 
+
     // NOTE: This check will cause an eager fetch of raster metadata
-    require(source.lossSource.extent.intersects(windowExtent),
-      s"${source.lossSource.uri} does not intersect: $windowExtent")
-    require(source.gainSource.extent.intersects(windowExtent),
-      s"${source.gainSource.uri} does not intersect: $windowExtent")
-    require(source.tcd2000Source.extent.intersects(windowExtent),
-      s"${source.tcd2000Source.uri} does not intersect: $windowExtent")
-  //  require(source.tcd2010Source.extent.intersects(windowExtent),
-  //    s"${source.tcd2010Source.uri} does not intersect: $windowExtent")
+
+    require(source.treeCoverLoss.source.extent.intersects(windowExtent),
+      s"${source.treeCoverLoss.uri} does not intersect: $windowExtent")
+    require(source.treeCoverGain.source.extent.intersects(windowExtent),
+      s"${source.treeCoverGain.uri} does not intersect: $windowExtent")
+    require(source.treeCoverDensity2000.source.extent.intersects(windowExtent),
+      s"${source.treeCoverDensity2000.uri} does not intersect: $windowExtent")
+    require(source.treeCoverDensity2010.source.extent.intersects(windowExtent),
+      s"${source.treeCoverDensity2010.uri} does not intersect: $windowExtent")
 
     // Only check these guys if they're defined
-    source.co2PixelSource.foreach { rs =>
+    source.carbon.source.foreach { rs =>
       require(rs.extent.intersects(windowExtent),
       s"${rs.uri} does not intersect: $windowExtent")
     }
