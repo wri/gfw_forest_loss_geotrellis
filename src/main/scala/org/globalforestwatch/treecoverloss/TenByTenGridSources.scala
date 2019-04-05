@@ -12,52 +12,52 @@ import org.globalforestwatch.layers._
   */
 case class TenByTenGridSources(grid: String) extends LazyLogging {
 
-  val treeCoverLoss = new TreeCoverLoss(grid)
-  val treeCoverGain = new TreeCoverGain(grid)
-  val treeCoverDensity2000 = new TreeCoverDensity2000(grid)
-  val treeCoverDensity2010 = new TreeCoverDensity2010(grid)
-  val carbon = new Carbon(grid)
-  val biomassPerHectar = new BiomassPerHectar(grid)
+  lazy val treeCoverLoss = new TreeCoverLoss(grid)
+  lazy val treeCoverGain = new TreeCoverGain(grid)
+  lazy val treeCoverDensity2000 = new TreeCoverDensity2000(grid)
+  lazy val treeCoverDensity2010 = new TreeCoverDensity2010(grid)
+  //lazy val carbon = new Carbon(grid)
+  lazy val biomassPerHectar = new BiomassPerHectar(grid)
 
-  val mangroveBiomass = new MangroveBiomass(grid)
-  val treeCoverLossDrivers = new TreeCoverLossDrivers(grid)
-  val globalLandCover = new GlobalLandcover(grid)
-  val primaryForest = new PrimaryForest(grid)
-  val indonesiaPrimaryForest = new IndonesiaPrimaryForest(grid)
-  val erosion = new Erosion(grid)
-  val biodiversitySignificance = new BiodiversitySignificance(grid)
-  val biodiversityIntactness = new BiodiversityIntactness(grid)
-  val protectedAreas = new ProtectedAreas(grid)
-  val plantations = new Plantations(grid)
-  val riverBasins = new RiverBasins(grid)
-  val ecozones = new Ecozones(grid)
-  val urbanWatersheds = new UrbanWatersheds(grid)
-  val mangroves1996 = new Mangroves1996(grid)
-  val mangroves2016 = new Mangroves2016(grid)
-  val waterStress = new WaterStress(grid)
-  val intactForestLandscapes = new IntactForestLandscapes(grid)
-  val endemicBirdAreas = new EndemicBirdAreas(grid)
-  val tigerLandscapes = new TigerLandscapes(grid)
-  val landmark = new Landmark(grid)
-  val landRights = new LandRights(grid)
-  val keyBiodiversityAreas = new KeyBiodiversityAreas(grid)
-  val mining = new Mining(grid)
-  val rspo = new RSPO(grid)
-  val peatlands = new Peatlands(grid)
-  val oilPalm = new OilPalm(grid)
-  val indonesiaForestMoratorium = new IndonesiaForestMoratorium(grid)
-  val indonesiaLandCover = new IndonesiaLandCover(grid)
-  val indonesiaForestArea = new IndonesiaForestArea(grid)
-  val mexicoProtectedAreas = new MexicoProtectedAreas(grid)
-  val mexicoPaymentForEcosystemServices = new MexicoPaymentForEcosystemServices(grid)
-  val mexicoForestZoning = new MexicoForestZoning(grid)
-  val peruProductionForest = new PeruProductionForest(grid)
-  val peruProtectedAreas = new PeruProtectedAreas(grid)
-  val peruForestConcessions = new PeruForestConcessions(grid)
-  val brazilBiomes = new BrazilBiomes(grid)
-  val woodFiber = new WoodFiber(grid)
-  val resourceRights = new ResourceRights(grid)
-  val logging = new Logging(grid)
+  lazy val mangroveBiomass = new MangroveBiomass(grid)
+  lazy val treeCoverLossDrivers = new TreeCoverLossDrivers(grid)
+  lazy val globalLandCover = new GlobalLandcover(grid)
+  lazy val primaryForest = new PrimaryForest(grid)
+  lazy val indonesiaPrimaryForest = new IndonesiaPrimaryForest(grid)
+  lazy val erosion = new Erosion(grid)
+  lazy val biodiversitySignificance = new BiodiversitySignificance(grid)
+  lazy val biodiversityIntactness = new BiodiversityIntactness(grid)
+  lazy val protectedAreas = new ProtectedAreas(grid)
+  lazy val plantations = new Plantations(grid)
+  lazy val riverBasins = new RiverBasins(grid)
+  lazy val ecozones = new Ecozones(grid)
+  lazy val urbanWatersheds = new UrbanWatersheds(grid)
+  lazy val mangroves1996 = new Mangroves1996(grid)
+  lazy val mangroves2016 = new Mangroves2016(grid)
+  lazy val waterStress = new WaterStress(grid)
+  lazy val intactForestLandscapes = new IntactForestLandscapes(grid)
+  lazy val endemicBirdAreas = new EndemicBirdAreas(grid)
+  lazy val tigerLandscapes = new TigerLandscapes(grid)
+  lazy val landmark = new Landmark(grid)
+  lazy val landRights = new LandRights(grid)
+  lazy val keyBiodiversityAreas = new KeyBiodiversityAreas(grid)
+  lazy val mining = new Mining(grid)
+  lazy val rspo = new RSPO(grid)
+  lazy val peatlands = new Peatlands(grid)
+  lazy val oilPalm = new OilPalm(grid)
+  lazy val indonesiaForestMoratorium = new IndonesiaForestMoratorium(grid)
+  lazy val indonesiaLandCover = new IndonesiaLandCover(grid)
+  lazy val indonesiaForestArea = new IndonesiaForestArea(grid)
+  lazy val mexicoProtectedAreas = new MexicoProtectedAreas(grid)
+  lazy val mexicoPaymentForEcosystemServices = new MexicoPaymentForEcosystemServices(grid)
+  lazy val mexicoForestZoning = new MexicoForestZoning(grid)
+  lazy val peruProductionForest = new PeruProductionForest(grid)
+  lazy val peruProtectedAreas = new PeruProtectedAreas(grid)
+  lazy val peruForestConcessions = new PeruForestConcessions(grid)
+  lazy val brazilBiomes = new BrazilBiomes(grid)
+  lazy val woodFiber = new WoodFiber(grid)
+  lazy val resourceRights = new ResourceRights(grid)
+  lazy val logging = new Logging(grid)
 
   def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
 
@@ -68,7 +68,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
       gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(window)).right
       tcd2000Tile <- Either.catchNonFatal(treeCoverDensity2000.fetchWindow(window)).right
       tcd2010Tile <- Either.catchNonFatal(treeCoverDensity2010.fetchWindow(window)).right
-      co2PixelTile <- Either.catchNonFatal(carbon.fetchWindow(window)).right
+      // co2PixelTile <- Either.catchNonFatal(carbon.fetchWindow(window)).right
       biomassTile <- Either.catchNonFatal(biomassPerHectar.fetchWindow(window)).right
 
     } yield {
@@ -118,7 +118,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
         gainTile,
         tcd2000Tile,
         tcd2010Tile,
-        co2PixelTile,
+        // co2PixelTile,
         biomassTile,
         mangroveBiomassTile,
         driversTile,

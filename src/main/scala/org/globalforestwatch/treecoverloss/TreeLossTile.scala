@@ -13,7 +13,7 @@ case class TreeLossTile(
                          gain: TreeCoverGain#ITile,
                          tcd2000: TreeCoverDensity#ITile,
                          tcd2010: TreeCoverDensity#ITile,
-                         co2Pixel: Carbon#DTile,
+                         //  co2Pixel: Carbon#DTile,
                          biomass: BiomassPerHectar#DTile,
                          mangroveBiomass: MangroveBiomass#OptionalDTile,
                          drivers: TreeCoverLossDrivers#OptionalITile,

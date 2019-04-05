@@ -20,7 +20,7 @@ object TreeLossSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
 
 
-  implicit val mdhCellRegisterForTreeLossRaster1 =
+  implicit val mdhCellRegisterForTreeLossRaster1: CellVisitor[Raster[TreeLossTile], TreeLossSummary] =
     new CellVisitor[Raster[TreeLossTile], TreeLossSummary] {
 
       def register(raster: Raster[TreeLossTile], col: Int, row: Int, acc: TreeLossSummary): TreeLossSummary = {
@@ -30,7 +30,7 @@ object TreeLossSummary {
         val gain: Integer = raster.tile.gain.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
-        val co2Pixel: Double = raster.tile.co2Pixel.getData(col, row)
+        //  val co2Pixel: Double = raster.tile.co2Pixel.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
         val mangroveBiomass: Double = raster.tile.mangroveBiomass.getData(col, row)
         val drivers: String = raster.tile.drivers.getData(col, row)
