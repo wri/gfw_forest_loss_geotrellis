@@ -33,6 +33,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
       val idnPrimaryForest = new IndonesiaPrimaryForest(grid).fetchWindow(window)
       val erosion = new Erosion(grid).fetchWindow(window)
       val biodiversitySignificance = new BiodiversitySignificance(grid).fetchWindow(window)
+      val biodiversityIntactness = new BiodiversityIntactness(grid).fetchWindow(window)
       val wdpa = new ProtectedAreas(grid).fetchWindow(window)
       val plantations = new Plantations(grid).fetchWindow(window)
       val riverBasins = new RiverBasins(grid).fetchWindow(window)
@@ -79,6 +80,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
         idnPrimaryForest,
         erosion,
         biodiversitySignificance,
+        biodiversityIntactness,
         wdpa,
         plantations,
         riverBasins,

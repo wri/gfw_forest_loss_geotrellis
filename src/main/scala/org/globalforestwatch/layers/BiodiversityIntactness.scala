@@ -1,9 +1,9 @@
 package org.globalforestwatch.layers
 
-class BiodiversityIntactness(grid: String) extends StringLayer with OptionalILayer {
+class BiodiversityIntactness(grid: String) extends IntegerLayer with OptionalDLayer {
   val uri: String = s"$basePath/biodiversity_intactness/$grid.tif"
 
-  def lookup(value: Float): String = value match {
+  def lookup(value: Double): Integer = value match {
   ???
   }
 }

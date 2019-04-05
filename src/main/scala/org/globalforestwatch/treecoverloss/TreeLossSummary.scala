@@ -38,7 +38,8 @@ object TreeLossSummary {
         val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
         val idnPrimaryForest: Boolean = raster.tile.idnPrimaryForest.getData(col, row)
         val erosion: String = raster.tile.erosion.getData(col, row)
-        val biodiversitySignificance: String = raster.tile.biodiversitySignificance.getData(col, row)
+        val biodiversitySignificance: Integer = raster.tile.biodiversitySignificance.getData(col, row)
+        val biodiversityIntactness: Integer = raster.tile.biodiversityIntactness.getData(col, row)
         val wdpa: String = raster.tile.wdpa.getData(col, row)
         val plantations: String = raster.tile.plantations.getData(col, row)
         val riverBasins: String = raster.tile.riverBasins.getData(col, row)
@@ -75,12 +76,12 @@ object TreeLossSummary {
         val gainArea: Double = gain * area
 
 
-        val pKey = LossDataGroup(loss, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion, biodiversitySignificance,
-          wdpa, plantations, riverBasins, ecozones, urbanWatersheds, mangroves1996, mangroves2016, waterStress,
-          intactForestLandscapes, endemicBirdAreas, tigerLandscapes, landmark, landRights, keyBiodiversityAreas, mining,
-          rspo, peatlands, oilPalm, idnForestMoratorium, idnLandCover, mexProtectedAreas, mexPaymentForEcosystemServices,
-          mexForestZoning, perProductionForest, perProtectedAreas, perForestConcessions, braBiomes, woodFiber,
-          resourceRights, logging)
+        val pKey = LossDataGroup(loss, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion,
+          biodiversitySignificance, biodiversityIntactness, wdpa, plantations, riverBasins, ecozones, urbanWatersheds,
+          mangroves1996, mangroves2016, waterStress, intactForestLandscapes, endemicBirdAreas, tigerLandscapes,
+          landmark, landRights, keyBiodiversityAreas, mining, rspo, peatlands, oilPalm, idnForestMoratorium,
+          idnLandCover, mexProtectedAreas, mexPaymentForEcosystemServices, mexForestZoning, perProductionForest,
+          perProtectedAreas, perForestConcessions, braBiomes, woodFiber, resourceRights, logging)
 
         val summary: LossData = acc.stats.getOrElse(
           key = pKey,
