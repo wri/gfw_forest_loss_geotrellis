@@ -3,7 +3,7 @@ package org.globalforestwatch.layers
 class IndonesiaLandCover(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
-    s"s3://wri-users/tmaschler/prep_tiles/idn_land_cover/${grid}.tif"
+    s"$basePath/idn_land_cover/$grid.tif"
 
   def lookup(value: Int): String = value match {
 

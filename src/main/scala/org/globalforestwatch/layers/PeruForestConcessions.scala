@@ -5,7 +5,7 @@ class PeruForestConcessions(grid: String)
     with OptionalILayer {
 
   val uri: String =
-    s"s3://wri-users/tmaschler/prep_tiles/per_forest_concessions/${grid}.tif"
+    s"$basePath/per_forest_concessions/$grid.tif"
 
   def lookup(value: Int): String = value match {
     case 1 => "Conservation"

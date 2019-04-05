@@ -8,9 +8,7 @@ import geotrellis.raster.histogram.StreamingHistogram
 
 
 /** LossData Summary by year */
-case class TreeLossSummary(stats: Map[(Integer, String, String, Boolean, Boolean, String, String, String, String, String, String, Boolean,
-  Boolean, Boolean, String, Integer, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String, Boolean, Boolean, Boolean, String, Boolean, Boolean,
-  String, Boolean, Boolean, String, String, Boolean, Boolean, Boolean), LossData] = Map.empty) {
+case class TreeLossSummary(stats: Map[LossDataGroup, LossData] = Map.empty) {
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: TreeLossSummary): TreeLossSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
@@ -76,7 +74,8 @@ object TreeLossSummary {
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize)
         val gainArea: Double = gain * area
 
-        val pKey = (loss, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion, biodiversitySignificance,
+
+        val pKey = LossDataGroup(loss, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion, biodiversitySignificance,
           wdpa, plantations, riverBasins, ecozones, urbanWatersheds, mangroves1996, mangroves2016, waterStress,
           intactForestLandscapes, endemicBirdAreas, tigerLandscapes, landmark, landRights, keyBiodiversityAreas, mining,
           rspo, peatlands, oilPalm, idnForestMoratorium, idnLandCover, mexProtectedAreas, mexPaymentForEcosystemServices,
@@ -98,9 +97,7 @@ object TreeLossSummary {
         summary.totalMangroveCo2 += ((mangroveBiomass * area / 10000) * 0.5) * 44 / 12
         summary.mangroveBiomassHistogram.countItem(mangroveBiomass)
 
-        val updated_summary: Map[(Integer, String, String, Boolean, Boolean, String, String, String, String, String, String, Boolean,
-          Boolean, Boolean, String, Integer, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, String, Boolean, Boolean, Boolean, String, Boolean, Boolean,
-          String, Boolean, Boolean, String, String, Boolean, Boolean, Boolean), LossData] = acc.stats.updated(pKey, summary)
+        val updated_summary: Map[LossDataGroup, LossData] = acc.stats.updated(pKey, summary)
 
         TreeLossSummary(updated_summary)
       }

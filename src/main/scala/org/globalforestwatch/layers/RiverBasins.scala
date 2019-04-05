@@ -3,7 +3,7 @@ package org.globalforestwatch.layers
 class RiverBasins(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
-    s"s3://wri-users/tmaschler/prep_tiles/river_basins/${grid}.tif"
+    s"$basePath/river_basins/$grid.tif"
 
   def lookup(value: Int): String = value match {
     case 1001 => "Gulf of Mexico, North Atlantic Coast"

@@ -3,7 +3,7 @@ package org.globalforestwatch.layers
 class BrazilBiomes(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
-    s"s3://wri-users/tmaschler/prep_tiles/bra_biomes/${grid}.tif"
+    s"$basePath/bra_biomes/$grid.tif"
 
   def lookup(value: Int): String = value match {
     case 1 => "Caatinga"

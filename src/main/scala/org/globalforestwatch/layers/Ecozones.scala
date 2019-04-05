@@ -2,7 +2,7 @@ package org.globalforestwatch.layers
 
 class Ecozones(grid: String) extends StringLayer with OptionalILayer {
 
-  val uri: String = s"s3://wri-users/tmaschler/prep_tiles/ecozones/${grid}.tif"
+  val uri: String = s"$basePath/ecozones/$grid.tif"
 
   def lookup(value: Int): String = value match {
     case 1  => "Boreal coniferous forest"

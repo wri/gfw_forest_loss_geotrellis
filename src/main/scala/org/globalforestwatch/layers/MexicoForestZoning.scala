@@ -3,7 +3,7 @@ package org.globalforestwatch.layers
 class MexicoForestZoning(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
-    s"s3://wri-users/tmaschler/prep_tiles/mex_forest_zoning/${grid}.tif"
+    s"$basePath/mex_forest_zoning/$grid.tif"
 
   def lookup(value: Int): String = value match {
     case 1 =>
