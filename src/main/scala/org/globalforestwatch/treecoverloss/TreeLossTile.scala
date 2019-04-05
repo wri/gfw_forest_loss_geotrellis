@@ -7,50 +7,6 @@ import org.globalforestwatch.layers._
   *
   * Tile-like structure to hold tiles from datasets required for our summary.
   * We can not use GeoTrellis MultibandTile because it requires all bands share a CellType.
-  *
-  * @param loss
-  * @param gain
-  * @param tcd2000
-  * @param tcd2010
-  * @param co2Pixel
-  * @param biomass
-  * @param mangroveBiomass
-  * @param drivers
-  * @param globalLandCover
-  * @param primaryForest
-  * @param idnPrimaryForest
-  * @param erosion
-  * @param biodiversitySignificance
-  * @param wdpa
-  * @param plantations
-  * @param riverBasins
-  * @param ecozones
-  * @param urbanWatersheds
-  * @param mangroves1996
-  * @param mangroves2016
-  * @param waterStress
-  * @param intactForestLandscapes
-  * @param endemicBirdAreas
-  * @param tigerLandscapes
-  * @param landmark
-  * @param landRights
-  * @param keyBiodiversityAreas
-  * @param mining
-  * @param rspo
-  * @param peatlands
-  * @param oilPalm
-  * @param idnForestMoratorium
-  * @param idnLandCover
-  * @param mexProtectedAreas
-  * @param mexPaymentForEcosystemServices
-  * @param mexForestZoning
-  * @param perProductionForest
-  * @param perProtectedAreas
-  * @param perForestConcessions
-  * @param braBiomes
-  * @param woodFiber
-  * @param resourceRights
-  * @param logging
   */
 case class TreeLossTile(
                          loss: TreeCoverLoss#ITile,
