@@ -1,7 +1,7 @@
 package org.globalforestwatch.layers
 
 class BiodiversitySignificance(grid: String) extends DIntegerLayer with OptionalDLayer {
-  val uri: String = s"s3://$basePath/biodiversity_significance/$grid.tif"
+  val uri: String = s"$basePath/biodiversity_significance/$grid.tif"
 
   def lookup(value: Double): Integer =
     if (value > 9) 100

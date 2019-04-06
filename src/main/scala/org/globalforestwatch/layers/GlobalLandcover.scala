@@ -2,7 +2,7 @@ package org.globalforestwatch.layers
 
 class GlobalLandcover(grid: String) extends StringLayer with OptionalILayer {
   val uri: String =
-    s"s3://$basePath/global_landcover/$grid.tif"
+    s"$basePath/global_landcover/$grid.tif"
 
   def lookup(value: Int): String = value match {
     case 10 | 11 | 12 | 20 | 30 | 40 => "Agriculture"
