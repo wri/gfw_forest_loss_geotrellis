@@ -2,14 +2,16 @@ package org.globalforestwatch.layers
 
 trait TreeCoverDensity extends IntegerLayer with RequiredILayer {
 
-  def lookup(density: Integer): Integer = {
-    if (density <= 10) 0
-    else if (density <= 15) 10
-    else if (density <= 20) 15
-    else if (density <= 25) 20
-    else if (density <= 30) 25
-    else if (density <= 50) 30
-    else if (density <= 75) 50
+  override val externalNoDataValue: Integer = 0
+
+  override def lookup(value: Int): Integer = {
+    if (value <= 10) 0
+    else if (value <= 15) 10
+    else if (value <= 20) 15
+    else if (value <= 25) 20
+    else if (value <= 30) 25
+    else if (value <= 50) 30
+    else if (value <= 75) 50
     else 75
   }
 }

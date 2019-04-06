@@ -18,17 +18,12 @@ trait Layer {
   val s3Client: geotrellis.spark.io.s3.S3Client =
     geotrellis.spark.io.s3.S3Client.DEFAULT
   val uri: String
-
-  def internalNoDataValue: A
-
-  def externalNoDataValue: B
-  def lookup(a: A): B
-
+  val internalNoDataValue: A
+  val externalNoDataValue: B
   val basePath: String = s"s3://gfw-files/2018_update"
 
-  implicit class ATile(val t: Tile) {
+  def lookup(a: A): B
 
-  }
 }
 
 trait ILayer extends Layer {
@@ -47,7 +42,7 @@ trait ILayer extends Layer {
     def cols: Int = t.cols
     def rows: Int = t.rows
 
-    def noDataValue: B = externalNoDataValue
+    val noDataValue: B = externalNoDataValue
   }
 
   implicit class OptionalITile(val t: Option[Tile]) {
@@ -60,7 +55,7 @@ trait ILayer extends Layer {
     def cols: Int = t.cols
     def rows: Int = t.rows
 
-    def noDataValue: B = externalNoDataValue
+    val noDataValue: B = externalNoDataValue
   }
 }
 
@@ -80,7 +75,7 @@ trait DLayer extends Layer {
     def cols: Int = t.cols
     def rows: Int = t.rows
 
-    def noDataValue: B = externalNoDataValue
+    val noDataValue: B = externalNoDataValue
   }
 
   implicit class OptionalDTile(val t: Option[Tile]) {
@@ -93,7 +88,7 @@ trait DLayer extends Layer {
     def cols: Int = t.cols
     def rows: Int = t.rows
 
-    def noDataValue: B = externalNoDataValue
+    val noDataValue: B = externalNoDataValue
   }
 
 }
@@ -197,9 +192,9 @@ trait BooleanLayer extends ILayer {
     */
   type B = Boolean
 
-  def internalNoDataValue: Int = 0
+  val internalNoDataValue: Int = 0
+  val externalNoDataValue: Boolean = false
 
-  def externalNoDataValue: Boolean = false
   def lookup(value: Int): Boolean = if (value == 0) false else true
 }
 
@@ -211,9 +206,9 @@ trait IntegerLayer extends ILayer {
     */
   type B = Integer
 
-  def internalNoDataValue: Int = 0
+  val internalNoDataValue: Int = 0
+  val externalNoDataValue: Integer = null
 
-  def externalNoDataValue: Integer = null
   def lookup(value: Int): Integer = value
 }
 
@@ -225,9 +220,8 @@ trait DIntegerLayer extends DLayer {
     */
   type B = Integer
 
-  def internalNoDataValue: Double = 0
-
-  def externalNoDataValue: Integer = null
+  val internalNoDataValue: Double = 0
+  val externalNoDataValue: Integer = null
 
   def lookup(value: Double): Integer
 }
@@ -239,9 +233,9 @@ trait DoubleLayer extends DLayer {
     */
   type B = Double
 
-  def internalNoDataValue: Double = 0
+  val internalNoDataValue: Double = 0
+  val externalNoDataValue: Double = 0
 
-  def externalNoDataValue: Double = 0.0
   def lookup(value: Double): Double = value
 }
 
@@ -252,8 +246,8 @@ trait StringLayer extends ILayer {
     */
   type B = String
 
-  def internalNoDataValue: Int = 0
+  val internalNoDataValue: Int = 0
+  val externalNoDataValue: String = null
 
-  def externalNoDataValue: String = null
   def lookup(value: Int): String
 }

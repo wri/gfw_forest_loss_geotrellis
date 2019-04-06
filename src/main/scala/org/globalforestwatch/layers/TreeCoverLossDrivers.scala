@@ -5,7 +5,7 @@ class TreeCoverLossDrivers(grid: String)
     with OptionalILayer {
   val uri: String = s"$basePath/drivers/$grid.tif"
 
-  override def internalNoDataValue = 16
+  override val internalNoDataValue = 16
 
   def lookup(value: Int): String = value match {
     case 1 => "Commodity driven deforestation"

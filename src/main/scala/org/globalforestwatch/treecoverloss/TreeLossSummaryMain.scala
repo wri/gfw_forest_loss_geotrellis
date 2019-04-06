@@ -22,7 +22,7 @@ object TreeLossSummaryMain extends CommandApp (
 
     // Can be used to increase the level of job parallelism
     val intputPartitionsOpt = Opts.option[Int](
-      "input-partitions", "Partition multiplier for input").withDefault(16)
+      "input-partitions", "Partition multiplier for input").withDefault(64)
 
     // Can be used to consolidate output into fewer files
     val outputPartitionsOpt = Opts.option[Int](
