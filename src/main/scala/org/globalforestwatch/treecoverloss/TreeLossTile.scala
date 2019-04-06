@@ -52,10 +52,12 @@ case class TreeLossTile(
                          braBiomes: BrazilBiomes#OptionalITile,
                          woodFiber: WoodFiber#OptionalITile,
                          resourceRights: ResourceRights#OptionalITile,
-                         logging: Logging#OptionalITile
-  
-) extends CellGrid {
+                         logging: Logging#OptionalITile,
+                         oilGas: OilGas#OptionalITile
+                       ) extends CellGrid {
   def cellType: CellType = loss.cellType
+
   def cols: Int = loss.cols
+
   def rows: Int = loss.rows
 }

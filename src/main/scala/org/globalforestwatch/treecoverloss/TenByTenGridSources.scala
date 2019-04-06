@@ -58,6 +58,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
   lazy val woodFiber = new WoodFiber(grid)
   lazy val resourceRights = new ResourceRights(grid)
   lazy val logging = new Logging(grid)
+  lazy val oilGas = new OilGas(grid)
 
   def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
 
@@ -112,6 +113,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
       val woodFiberTile = woodFiber.fetchWindow(window)
       val resourceRightsTile = resourceRights.fetchWindow(window)
       val loggingTile = logging.fetchWindow(window)
+      val oilGasTile = oilGas.fetchWindow(window)
 
       val tile = TreeLossTile(
         lossTile,
@@ -157,7 +159,8 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
         braBiomesTile,
         woodFiberTile,
         resourceRightsTile,
-        loggingTile
+        loggingTile,
+        oilGasTile
       )
 
       Raster(tile, window)

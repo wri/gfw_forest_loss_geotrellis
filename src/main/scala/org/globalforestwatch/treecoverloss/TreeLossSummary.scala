@@ -70,18 +70,19 @@ object TreeLossSummary {
         val woodFiber: Boolean = raster.tile.woodFiber.getData(col, row)
         val resourceRights: Boolean = raster.tile.resourceRights.getData(col, row)
         val logging: Boolean = raster.tile.logging.getData(col, row)
+        val oilGas: Boolean = raster.tile.oilGas.getData(col, row)
 
         val lat:Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize)
         val gainArea: Double = gain * area
 
 
-        val pKey = LossDataGroup(loss, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion,
+        val pKey = LossDataGroup(loss, tcd2000, tcd2010, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion,
           biodiversitySignificance, biodiversityIntactness, wdpa, plantations, riverBasins, ecozones, urbanWatersheds,
           mangroves1996, mangroves2016, waterStress, intactForestLandscapes, endemicBirdAreas, tigerLandscapes,
           landmark, landRights, keyBiodiversityAreas, mining, rspo, peatlands, oilPalm, idnForestMoratorium,
           idnLandCover, mexProtectedAreas, mexPaymentForEcosystemServices, mexForestZoning, perProductionForest,
-          perProtectedAreas, perForestConcessions, braBiomes, woodFiber, resourceRights, logging)
+          perProtectedAreas, perForestConcessions, braBiomes, woodFiber, resourceRights, logging, oilGas)
 
         val summary: LossData = acc.stats.getOrElse(
           key = pKey,

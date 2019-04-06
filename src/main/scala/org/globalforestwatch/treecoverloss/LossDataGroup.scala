@@ -1,6 +1,8 @@
 package org.globalforestwatch.treecoverloss
 
 case class LossDataGroup(loss: Integer,
+                         tcd2000: Integer,
+                         tcd2010: Integer,
                          drivers: String,
                          globalLandCover: String,
                          primaryForest: Boolean,
@@ -37,5 +39,6 @@ case class LossDataGroup(loss: Integer,
                          braBiomes: String,
                          woodFiber: Boolean,
                          resourceRights: Boolean,
-                         logging: Boolean
+                         logging: Boolean,
+                         oilGas: Boolean
                         )

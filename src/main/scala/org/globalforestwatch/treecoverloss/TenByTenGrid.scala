@@ -115,7 +115,7 @@ object TenByTenGrid {
     checkOptional(sources.woodFiber)
     checkOptional(sources.resourceRights)
     checkOptional(sources.logging)
-
+    checkOptional(sources.oilGas)
     sources
   }
 }

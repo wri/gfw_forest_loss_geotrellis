@@ -150,8 +150,6 @@ trait OptionalLayer extends Layer {
   def fetchSource: Option[GeoTiffRasterSource] = {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
-    println(s3uri.getBucket)
-    println(s3uri.getKey)
     if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
       println(s"Opening: $uri")
       Some(GeoTiffRasterSource(uri))
