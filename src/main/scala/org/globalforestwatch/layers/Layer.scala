@@ -226,6 +226,20 @@ trait DIntegerLayer extends DLayer {
   def lookup(value: Double): Integer
 }
 
+trait DBooleanLayer extends DLayer {
+
+  /**
+    * Layers which return an Integer type
+    * (use java.lang.Integer to be able to use null)
+    */
+  type B = Boolean
+
+  val internalNoDataValue: Double = 0
+  val externalNoDataValue: Boolean = false
+
+  def lookup(value: Double): Boolean
+}
+
 trait DoubleLayer extends DLayer {
 
   /**
