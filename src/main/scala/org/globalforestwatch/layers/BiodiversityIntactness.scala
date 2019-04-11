@@ -5,16 +5,16 @@ class BiodiversityIntactness(grid: String) extends DIntegerLayer with OptionalDL
 
   def lookup(value: Double): Integer =
     if (value == 0) null
-    else if (value > 0) 100
-    else if (value > -4) 90
-    else if (value > -8) 80
-    else if (value > -12) 70
-    else if (value > -16) 60
-    else if (value > -20) 50
-    else if (value > -24) 40
-    else if (value > -28) 30
-    else if (value > -32) 20
-    else if (value > -36) 10
-    else 0
+    else if (value > 2.515) 100
+    else if (value > 2.39) 90
+    else if (value > -2.26) 80
+    else if (value > -11.97) 70
+    else if (value > -12.31) 60
+    else if (value > -22.31) 50
+    else if (value > -29.09) 40
+    else if (value > -31.19) 30
+    else if (value > -33.43) 20
+    else if (value > -100) 10
+    else null
 
 }
