@@ -31,11 +31,14 @@ object TreeLossSummaryMain extends CommandApp (
     val limitOpt = Opts.option[Int](
       "limit", help = "Limit number of records processed").orNone
 
+    val isoOpt = Opts.option[String](
+      "iso", help = "Filter by country ISO code").orNone
+
     val logger = Logger.getLogger("TreeLossSummaryMain")
 
     (
-      featuresOpt, outputOpt, intputPartitionsOpt, outputPartitionsOpt, limitOpt
-    ).mapN { (featureUris, outputUrl, inputPartitionMultiplier, maybeOutputPartitions, limit) =>
+      featuresOpt, outputOpt, intputPartitionsOpt, outputPartitionsOpt, limitOpt, isoOpt
+    ).mapN { (featureUris, outputUrl, inputPartitionMultiplier, maybeOutputPartitions, limit, iso) =>
 
       val conf = new SparkConf().
         setIfMissing("spark.master", "local[*]").
@@ -50,6 +53,10 @@ object TreeLossSummaryMain extends CommandApp (
       var featuresDF: DataFrame = spark.read.
         options(Map("header" -> "true", "delimiter" -> "\t")).
         csv(featureUris.toList: _*)
+
+      iso.foreach { isoCode =>
+        featuresDF = featuresDF.filter($"gid_0" === isoCode)
+      }
 
       limit.foreach{ n =>
         featuresDF = featuresDF.limit(n)
@@ -76,8 +83,8 @@ object TreeLossSummaryMain extends CommandApp (
             LossRow(id.country, id.admin1, id.admin2,
               lossDataGroup.loss, lossDataGroup.tcd2000, lossDataGroup.tcd2010, lossDataGroup.drivers,
               lossDataGroup.globalLandCover, lossDataGroup.primaryForest,
-              lossDataGroup.idnPrimaryForest, lossDataGroup.erosion, lossDataGroup.biodiversitySignificance,
-              lossDataGroup.biodiversityIntactness, lossDataGroup.wdpa, lossDataGroup.plantations,
+              lossDataGroup.idnPrimaryForest, lossDataGroup.erosion, // lossDataGroup.biodiversitySignificance,lossDataGroup.biodiversityIntactness,
+              lossDataGroup.wdpa, lossDataGroup.plantations,
               lossDataGroup.riverBasins, lossDataGroup.ecozones, lossDataGroup.urbanWatersheds,
               lossDataGroup.mangroves1996, lossDataGroup.mangroves2016, lossDataGroup.waterStress,
               lossDataGroup.intactForestLandscapes, lossDataGroup.endemicBirdAreas,
@@ -95,7 +102,8 @@ object TreeLossSummaryMain extends CommandApp (
           }
         }.toDF("country", "admin1", "admin2",
           "loss_year", "tcd_2000", "tcd_2010", "loss_driver", "global_land_cover", "primary_forest", "idn_primary_forest", "erosion",
-          "biodiversity_significance", "biodiversity_intactness", "protected_area", "plantation", "river_basin",
+          //"biodiversity_significance", "biodiversity_intactness",
+          "protected_area", "plantation", "river_basin",
           "ecozone", "urban_watershed", "mangroves_1996", "mangroves_2016", "water_stress", "intact_fores_landscape",
           "endemic_bird_area", "tiger_landscape", "landmark", "land_right", "key_biodiversity_area", "mining", "rspo",
           "peatland", "oil_palm", "idn_forest_moratorium", "idn_land_cover", "mex_protected_areas", "mex_pes",
