@@ -4,6 +4,7 @@ import java.io.FileNotFoundException
 import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
 import geotrellis.raster.{CellType, Tile, isNoData}
 import geotrellis.vector.Extent
+import geotrellis.raster.crop._
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3URI
 
@@ -109,6 +110,18 @@ trait RequiredLayer extends Layer {
     GeoTiffRasterSource(uri)
   }
 
+  def cropWindow(tile: Tile): Tile = {
+
+    val cols = tile.cols
+    val rows = tile.rows
+
+    if (cols == 401 && rows == 401) tile.crop(1, 1, cols, rows, Crop.Options(force = true))
+    else if (cols == 401) tile.crop(1, 0, cols, rows, Crop.Options(force = true))
+    else if (rows == 401) tile.crop(0, 1, cols, rows, Crop.Options(force = true))
+    else tile
+
+  }
+
 }
 
 
@@ -118,8 +131,7 @@ trait RequiredILayer extends RequiredLayer with ILayer {
     * Define how to fetch data for required Integer rasters
     */
 
-  def fetchWindow(window: Extent): ITile =
-    new ITile(source.read(window).get.tile.band(0))
+  def fetchWindow(window: Extent): ITile = new ITile(cropWindow(source.read(window).get.tile.band(0)))
 
 }
 
@@ -130,7 +142,7 @@ trait RequiredDLayer extends RequiredLayer with DLayer {
     */
 
   def fetchWindow(window: Extent): DTile =
-    new DTile(source.read(window).get.tile.band(0))
+    new DTile(cropWindow(source.read(window).get.tile.band(0)))
 
 }
 
@@ -154,6 +166,23 @@ trait OptionalLayer extends Layer {
     }
   }
 
+  def cropWindow(tile: Option[Tile]): Option[Tile] = {
+
+    tile match {
+      case Some(tile) => {
+        val cols = tile.cols
+        val rows = tile.rows
+
+        if (cols == 401 && rows == 401) Option(tile.crop(1, 1, cols, rows, Crop.Options(force = true)))
+        else if (cols == 401) Option(tile.crop(1, 0, cols, rows, Crop.Options(force = true)))
+        else if (rows == 401) Option(tile.crop(0, 1, cols, rows, Crop.Options(force = true)))
+        else Option(tile)
+      }
+      case None => tile
+    }
+
+
+  }
 }
 
 trait OptionalILayer extends OptionalLayer with ILayer {
@@ -163,12 +192,15 @@ trait OptionalILayer extends OptionalLayer with ILayer {
     */
 
   def fetchWindow(window: Extent): OptionalITile =
-    new OptionalITile(for {
-      source <- source
-      raster <- Either
-        .catchNonFatal(source.read(window).get.tile.band(0))
-        .toOption
-    } yield raster)
+    new OptionalITile(
+      cropWindow(
+        for {
+          source <- source
+          raster <- Either
+            .catchNonFatal(source.read(window).get.tile.band(0))
+            .toOption
+        } yield raster)
+    )
 }
 
 trait OptionalDLayer extends OptionalLayer with DLayer {
@@ -177,12 +209,16 @@ trait OptionalDLayer extends OptionalLayer with DLayer {
     * Define how to fetch data for optional double rasters
     */
 
-  def fetchWindow(window: Extent): OptionalDTile = new OptionalDTile(for {
-    source <- source
-    raster <- Either
-      .catchNonFatal(source.read(window).get.tile.band(0))
-      .toOption
-  } yield raster)
+  def fetchWindow(window: Extent): OptionalDTile =
+    new OptionalDTile(
+      cropWindow(
+        for {
+          source <- source
+          raster <- Either
+            .catchNonFatal(source.read(window).get.tile.band(0))
+            .toOption
+        } yield raster)
+    )
 }
 
 trait BooleanLayer extends ILayer {

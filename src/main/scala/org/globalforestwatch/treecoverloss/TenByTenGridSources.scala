@@ -26,8 +26,8 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
   lazy val primaryForest = new PrimaryForest(grid)
   lazy val indonesiaPrimaryForest = new IndonesiaPrimaryForest(grid)
   lazy val erosion = new Erosion(grid)
-  // lazy val biodiversitySignificance = new BiodiversitySignificance(grid)
-  // lazy val biodiversityIntactness = new BiodiversityIntactness(grid)
+  lazy val biodiversitySignificance = new BiodiversitySignificance(grid)
+  lazy val biodiversityIntactness = new BiodiversityIntactness(grid)
   lazy val protectedAreas = new ProtectedAreas(grid)
   lazy val plantations = new Plantations(grid)
   lazy val riverBasins = new RiverBasins(grid)
@@ -82,8 +82,8 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
       val primaryForestTile = primaryForest.fetchWindow(window)
       val idnPrimaryForestTile = indonesiaPrimaryForest.fetchWindow(window)
       val erosionTile = erosion.fetchWindow(window)
-      // val biodiversitySignificanceTile = biodiversitySignificance.fetchWindow(window)
-      // val biodiversityIntactnessTile = biodiversityIntactness.fetchWindow(window)
+      val biodiversitySignificanceTile = biodiversitySignificance.fetchWindow(window)
+      val biodiversityIntactnessTile = biodiversityIntactness.fetchWindow(window)
       val wdpaTile = protectedAreas.fetchWindow(window)
       val plantationsTile = plantations.fetchWindow(window)
       val riverBasinsTile = riverBasins.fetchWindow(window)
@@ -131,8 +131,8 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
         primaryForestTile,
         idnPrimaryForestTile,
         erosionTile,
-        // biodiversitySignificanceTile,
-        // biodiversityIntactnessTile,
+        biodiversitySignificanceTile,
+        biodiversityIntactnessTile,
         wdpaTile,
         plantationsTile,
         riverBasinsTile,

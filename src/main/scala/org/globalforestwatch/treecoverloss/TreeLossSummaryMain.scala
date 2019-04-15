@@ -97,7 +97,7 @@ object TreeLossSummaryMain extends CommandApp (
             LossRow(id.country, id.admin1, id.admin2,
               lossDataGroup.loss, lossDataGroup.tcd2000, lossDataGroup.tcd2010, lossDataGroup.drivers,
               lossDataGroup.globalLandCover, lossDataGroup.primaryForest,
-              lossDataGroup.idnPrimaryForest, lossDataGroup.erosion, // lossDataGroup.biodiversitySignificance,lossDataGroup.biodiversityIntactness,
+              lossDataGroup.idnPrimaryForest, lossDataGroup.erosion, lossDataGroup.biodiversitySignificance, lossDataGroup.biodiversityIntactness,
               lossDataGroup.wdpa, lossDataGroup.plantations,
               lossDataGroup.riverBasins, lossDataGroup.ecozones, lossDataGroup.urbanWatersheds,
               lossDataGroup.mangroves1996, lossDataGroup.mangroves2016, lossDataGroup.waterStress,
@@ -109,22 +109,21 @@ object TreeLossSummaryMain extends CommandApp (
               lossDataGroup.mexForestZoning, lossDataGroup.perProductionForest, lossDataGroup.perProtectedAreas,
               lossDataGroup.perForestConcessions, lossDataGroup.braBiomes, lossDataGroup.woodFiber,
               lossDataGroup.resourceRights, lossDataGroup.logging, lossDataGroup.oilGas,
-              lossData.preArea, lossData.preAreaPlus, lossData.preAreaMinus, lossData.totalArea, lossData.totalAreaPlus,
-              lossData.totalAreaMinus, lossData.totalGainArea,
+              lossData.totalArea, lossData.totalGainArea,
               lossData.totalBiomass, lossData.totalCo2, lossData.biomassHistogram.mean(),
               lossData.totalMangroveBiomass, lossData.totalMangroveCo2, lossData.mangroveBiomassHistogram.mean()
             )
           }
         }.toDF("country", "admin1", "admin2",
           "loss_year", "tcd_2000", "tcd_2010", "loss_driver", "global_land_cover", "primary_forest", "idn_primary_forest", "erosion",
-          //"biodiversity_significance", "biodiversity_intactness",
+          "biodiversity_significance", "biodiversity_intactness",
           "protected_area", "plantation", "river_basin",
           "ecozone", "urban_watershed", "mangroves_1996", "mangroves_2016", "water_stress", "intact_fores_landscape",
           "endemic_bird_area", "tiger_landscape", "landmark", "land_right", "key_biodiversity_area", "mining", "rspo",
           "peatland", "oil_palm", "idn_forest_moratorium", "idn_land_cover", "mex_protected_areas", "mex_pes",
           "mex_forest_zoning", "per_production_forest", "per_protected_area", "per_forest_concession", "bra_biomes",
           "wood_fiber", "resource_right", "logging", "oil_gas",
-          "precalculated_area", "areaPlus", "AreaMinus", "total_area", "totalPlus", "totalMinus", "total_gain",
+          "total_area", "total_gain",
           "total_biomass", "total_co2", "mean_biomass_per_ha",
           "total_mangrove_biomass", "total_mangrove_co2", "mean_mangrove_biomass_per_ha")
 

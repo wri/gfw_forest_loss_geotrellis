@@ -37,8 +37,8 @@ object TreeLossSummary {
         val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
         val idnPrimaryForest: Boolean = raster.tile.idnPrimaryForest.getData(col, row)
         val erosion: String = raster.tile.erosion.getData(col, row)
-        //val biodiversitySignificance: Boolean = raster.tile.biodiversitySignificance.getData(col, row)
-        //val biodiversityIntactness: Boolean = raster.tile.biodiversityIntactness.getData(col, row)
+        val biodiversitySignificance: Boolean = raster.tile.biodiversitySignificance.getData(col, row)
+        val biodiversityIntactness: Boolean = raster.tile.biodiversityIntactness.getData(col, row)
         val wdpa: String = raster.tile.wdpa.getData(col, row)
         val plantations: String = raster.tile.plantations.getData(col, row)
         val riverBasins: String = raster.tile.riverBasins.getData(col, row)
@@ -76,20 +76,14 @@ object TreeLossSummary {
         val ext = raster.rasterExtent.extent
         val cellSize = raster.cellSize
 
-        val lat:Double = raster.rasterExtent.gridRowToMap(row)
-        val area: Double = Geodesy.pixelArea(lat, raster.cellSize)
-        val areaPlus: Double = Geodesy.pixelArea(lat + 0.00025 / 2, raster.cellSize)
-        val areaMinus: Double = Geodesy.pixelArea(lat - 0.00025 / 2, raster.cellSize)
+        //        val lat:Double = raster.rasterExtent.gridRowToMap(row)
+        //        val area: Double = Geodesy.pixelArea(lat - raster.cellSize.height/2, raster.cellSize)
+        val area: Double = raster.tile.preArea.getData(col, row)
 
         val gainArea: Double = gain * area
 
-        val preArea: Double = raster.tile.preArea.getData(col, row)
-        val preAreaPlus: Double = if (row < 399) raster.tile.preArea.getData(col, row + 1) else raster.tile.preArea.getData(col, row)
-        val preAreaMinus: Double = if (row > 0) raster.tile.preArea.getData(col, row - 1) else raster.tile.preArea.getData(col, row)
-
-
         val pKey = LossDataGroup(loss, tcd2000, tcd2010, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion,
-          // biodiversitySignificance, biodiversityIntactness,
+          biodiversitySignificance, biodiversityIntactness,
           wdpa, plantations, riverBasins, ecozones, urbanWatersheds,
           mangroves1996, mangroves2016, waterStress, intactForestLandscapes, endemicBirdAreas, tigerLandscapes,
           landmark, landRights, keyBiodiversityAreas, mining, rspo, peatlands, oilPalm, idnForestMoratorium,
@@ -98,15 +92,9 @@ object TreeLossSummary {
 
         val summary: LossData = acc.stats.getOrElse(
           key = pKey,
-          default = LossData(0, 0, 0, 0, 0, 0, 0, 0, 0, StreamingHistogram(size = 256), 0, 0, StreamingHistogram(size = 256)))
-
-        summary.preArea += preArea
-        summary.preAreaPlus += preAreaPlus
-        summary.preAreaMinus += preAreaMinus
+          default = LossData(0, 0, 0, 0, StreamingHistogram(size = 1750), 0, 0, StreamingHistogram(size = 1000)))
 
         summary.totalArea += area
-        summary.totalAreaPlus += areaPlus
-        summary.totalAreaMinus += areaMinus
 
         summary.totalGainArea += gainArea
 

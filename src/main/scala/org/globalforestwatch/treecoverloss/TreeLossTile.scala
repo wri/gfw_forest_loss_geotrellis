@@ -1,6 +1,6 @@
 package org.globalforestwatch.treecoverloss
 
-import geotrellis.raster.{CellGrid, CellType}
+import geotrellis.raster.{CellGrid, CellType, Tile}
 import org.globalforestwatch.layers._
 
 /**
@@ -22,8 +22,8 @@ case class TreeLossTile(
                          primaryForest: PrimaryForest#OptionalITile,
                          idnPrimaryForest: IndonesiaPrimaryForest#OptionalITile,
                          erosion: Erosion#OptionalITile,
-                         // biodiversitySignificance: BiodiversitySignificance#OptionalDTile,
-                         // biodiversityIntactness: BiodiversityIntactness#OptionalDTile,
+                         biodiversitySignificance: BiodiversitySignificance#OptionalDTile,
+                         biodiversityIntactness: BiodiversityIntactness#OptionalDTile,
                          wdpa: ProtectedAreas#OptionalITile,
                          plantations: Plantations#OptionalITile,
                          riverBasins: RiverBasins#OptionalITile,
