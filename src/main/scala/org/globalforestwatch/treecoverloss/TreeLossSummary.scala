@@ -76,9 +76,9 @@ object TreeLossSummary {
         val ext = raster.rasterExtent.extent
         val cellSize = raster.cellSize
 
-        //        val lat:Double = raster.rasterExtent.gridRowToMap(row)
-        //        val area: Double = Geodesy.pixelArea(lat - raster.cellSize.height/2, raster.cellSize)
-        val area: Double = raster.tile.preArea.getData(col, row)
+        val lat: Double = raster.rasterExtent.gridRowToMap(row)
+        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
+        //val area: Double = raster.tile.preArea.getData(col, row)
 
         val gainArea: Double = gain * area
 

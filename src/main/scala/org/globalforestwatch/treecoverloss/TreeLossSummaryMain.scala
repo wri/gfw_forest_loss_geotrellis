@@ -114,8 +114,8 @@ object TreeLossSummaryMain extends CommandApp (
               lossData.totalMangroveBiomass, lossData.totalMangroveCo2, lossData.mangroveBiomassHistogram.mean()
             )
           }
-        }.toDF("country", "admin1", "admin2",
-          "loss_year", "tcd_2000", "tcd_2010", "loss_driver", "global_land_cover", "primary_forest", "idn_primary_forest", "erosion",
+        }.toDF("iso", "adm1", "adm2",
+          "loss_year", "threshold_2000", "threshold_2010", "loss_driver", "global_land_cover", "primary_forest", "idn_primary_forest", "erosion",
           "biodiversity_significance", "biodiversity_intactness",
           "protected_area", "plantation", "river_basin",
           "ecozone", "urban_watershed", "mangroves_1996", "mangroves_2016", "water_stress", "intact_fores_landscape",
@@ -123,7 +123,7 @@ object TreeLossSummaryMain extends CommandApp (
           "peatland", "oil_palm", "idn_forest_moratorium", "idn_land_cover", "mex_protected_areas", "mex_pes",
           "mex_forest_zoning", "per_production_forest", "per_protected_area", "per_forest_concession", "bra_biomes",
           "wood_fiber", "resource_right", "logging", "oil_gas",
-          "total_area", "total_gain",
+          "area", "gain",
           "total_biomass", "total_co2", "mean_biomass_per_ha",
           "total_mangrove_biomass", "total_mangrove_co2", "mean_mangrove_biomass_per_ha")
 
