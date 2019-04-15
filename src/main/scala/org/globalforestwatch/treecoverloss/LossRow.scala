@@ -3,7 +3,6 @@ package org.globalforestwatch.treecoverloss
 case class LossRow(country: String,
                    admin1: String,
                    admin2: String,
-                   loss: Integer,
                    tcd2000: Integer,
                    tcd2010: Integer,
                    drivers: String,
@@ -51,4 +50,5 @@ case class LossRow(country: String,
                    meanBiomass: Option[Double],
                    totalMangroveBiomass: Double,
                    totalMangroveCo2: Double,
-                   meanMangroveBiomass: Option[Double])
+                   meanMangroveBiomass: Option[Double],
+                   yearData: String)

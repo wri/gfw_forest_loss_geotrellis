@@ -82,7 +82,7 @@ object TreeLossSummary {
 
         val gainArea: Double = gain * area
 
-        val pKey = LossDataGroup(loss, tcd2000, tcd2010, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion,
+        val pKey = LossDataGroup(tcd2000, tcd2010, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion,
           biodiversitySignificance, biodiversityIntactness,
           wdpa, plantations, riverBasins, ecozones, urbanWatersheds,
           mangroves1996, mangroves2016, waterStress, intactForestLandscapes, endemicBirdAreas, tigerLandscapes,
@@ -92,18 +92,37 @@ object TreeLossSummary {
 
         val summary: LossData = acc.stats.getOrElse(
           key = pKey,
-          default = LossData(0, 0, 0, 0, StreamingHistogram(size = 1750), 0, 0, StreamingHistogram(size = 1000)))
+          default = LossData(LossYearData.empty, 0, 0, 0, 0, StreamingHistogram(size = 1750), 0, 0, StreamingHistogram(size = 1000)))
+
+
+        val biomassPixel = biomass * area / 10000
+        val co2Pixel = ((biomass * area / 10000) * 0.5) * 44 / 12
+        val mangroveBiomassPixel = mangroveBiomass * area / 10000
+        val mangroveCo2Pixel = ((mangroveBiomass * area / 10000) * 0.5) * 44 / 12
+
+        if (loss != null) {
+          val annualLoss: (Double, Double, Double, Double, Double) = (
+            summary.lossYear(loss)._1 + area,
+            summary.lossYear(loss)._2 + biomassPixel,
+            summary.lossYear(loss)._3 + co2Pixel,
+            summary.lossYear(loss)._4 + mangroveBiomassPixel,
+            summary.lossYear(loss)._5 + mangroveCo2Pixel
+          )
+
+          summary.lossYear(loss) = annualLoss
+        }
+
 
         summary.totalArea += area
 
         summary.totalGainArea += gainArea
 
-        summary.totalBiomass += biomass * area / 10000
-        summary.totalCo2 += ((biomass * area / 10000) * 0.5) * 44 / 12
+        summary.totalBiomass += biomassPixel
+        summary.totalCo2 += co2Pixel
         summary.biomassHistogram.countItem(biomass)
 
-        summary.totalMangroveBiomass += mangroveBiomass * area / 10000
-        summary.totalMangroveCo2 += ((mangroveBiomass * area / 10000) * 0.5) * 44 / 12
+        summary.totalMangroveBiomass += mangroveBiomassPixel
+        summary.totalMangroveCo2 += mangroveCo2Pixel
         summary.mangroveBiomassHistogram.countItem(mangroveBiomass)
 
         val updated_summary: Map[LossDataGroup, LossData] = acc.stats.updated(pKey, summary)

@@ -93,9 +93,13 @@ object TreeLossSummaryMain extends CommandApp (
 
       val summaryDF =
         summaryRDD.flatMap { case (id, treeLossSummary) =>
-          treeLossSummary.stats.map { case (lossDataGroup, lossData) =>
-            LossRow(id.country, id.admin1, id.admin2,
-              lossDataGroup.loss, lossDataGroup.tcd2000, lossDataGroup.tcd2010, lossDataGroup.drivers,
+          treeLossSummary.stats.map { case (lossDataGroup, lossData) => {
+
+            val admin1 = if (id.admin1.length > 0) id.admin1.split("[.]")(1).split("[_]")(0) else ""
+            val admin2 = if (id.admin2.length > 0) id.admin2.split("[.]")(2).split("[_]")(0) else ""
+
+            LossRow(id.country, admin1, admin2,
+              lossDataGroup.tcd2000, lossDataGroup.tcd2010, lossDataGroup.drivers,
               lossDataGroup.globalLandCover, lossDataGroup.primaryForest,
               lossDataGroup.idnPrimaryForest, lossDataGroup.erosion, lossDataGroup.biodiversitySignificance, lossDataGroup.biodiversityIntactness,
               lossDataGroup.wdpa, lossDataGroup.plantations,
@@ -111,11 +115,12 @@ object TreeLossSummaryMain extends CommandApp (
               lossDataGroup.resourceRights, lossDataGroup.logging, lossDataGroup.oilGas,
               lossData.totalArea, lossData.totalGainArea,
               lossData.totalBiomass, lossData.totalCo2, lossData.biomassHistogram.mean(),
-              lossData.totalMangroveBiomass, lossData.totalMangroveCo2, lossData.mangroveBiomassHistogram.mean()
+              lossData.totalMangroveBiomass, lossData.totalMangroveCo2, lossData.mangroveBiomassHistogram.mean(), LossYearData.toString(lossData.lossYear)
             )
           }
+          }
         }.toDF("iso", "adm1", "adm2",
-          "loss_year", "threshold_2000", "threshold_2010", "loss_driver", "global_land_cover", "primary_forest", "idn_primary_forest", "erosion",
+          "threshold_2000", "threshold_2010", "loss_driver", "global_land_cover", "primary_forest", "idn_primary_forest", "erosion",
           "biodiversity_significance", "biodiversity_intactness",
           "protected_area", "plantation", "river_basin",
           "ecozone", "urban_watershed", "mangroves_1996", "mangroves_2016", "water_stress", "intact_fores_landscape",
@@ -125,14 +130,14 @@ object TreeLossSummaryMain extends CommandApp (
           "wood_fiber", "resource_right", "logging", "oil_gas",
           "area", "gain",
           "total_biomass", "total_co2", "mean_biomass_per_ha",
-          "total_mangrove_biomass", "total_mangrove_co2", "mean_mangrove_biomass_per_ha")
+          "total_mangrove_biomass", "total_mangrove_co2", "mean_mangrove_biomass_per_ha", "year_data")
 
       val outputPartitionCount = maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
       summaryDF.
         repartition(outputPartitionCount).
         write.
-        options(Map("header" -> "true", "delimiter" -> "\t", "quote" -> "\u0000")). // unicode for nothing. tried "quoteMode" -> "NONE" but didn't work
+        options(Map("header" -> "true", "delimiter" -> "\t", "quote" -> "\u0000", "quoteMode" -> "NONE", "nullValue" -> "NULL")). // unicode for nothing. tried "quoteMode" -> "NONE" but didn't work
           csv(path = outputUrl)
 
       spark.stop
