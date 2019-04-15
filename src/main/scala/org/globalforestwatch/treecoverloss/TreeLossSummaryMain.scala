@@ -34,11 +34,17 @@ object TreeLossSummaryMain extends CommandApp (
     val isoOpt = Opts.option[String](
       "iso", help = "Filter by country ISO code").orNone
 
+    val admin1Opt = Opts.option[String](
+      "admin1", help = "Filter by country Admin1 code").orNone
+
+    val admin2Opt = Opts.option[String](
+      "admin2", help = "Filter by country Admin2 code").orNone
+
     val logger = Logger.getLogger("TreeLossSummaryMain")
 
     (
-      featuresOpt, outputOpt, intputPartitionsOpt, outputPartitionsOpt, limitOpt, isoOpt
-    ).mapN { (featureUris, outputUrl, inputPartitionMultiplier, maybeOutputPartitions, limit, iso) =>
+      featuresOpt, outputOpt, intputPartitionsOpt, outputPartitionsOpt, limitOpt, isoOpt, admin1Opt, admin2Opt
+    ).mapN { (featureUris, outputUrl, inputPartitionMultiplier, maybeOutputPartitions, limit, iso, admin1, admin2) =>
 
       val conf = new SparkConf().
         setIfMissing("spark.master", "local[*]").
@@ -56,6 +62,14 @@ object TreeLossSummaryMain extends CommandApp (
 
       iso.foreach { isoCode =>
         featuresDF = featuresDF.filter($"gid_0" === isoCode)
+      }
+
+      admin1.foreach { admin1Code =>
+        featuresDF = featuresDF.filter($"gid_1" === admin1Code)
+      }
+
+      admin2.foreach { admin2Code =>
+        featuresDF = featuresDF.filter($"gid_2" === admin2Code)
       }
 
       limit.foreach{ n =>
@@ -95,7 +109,8 @@ object TreeLossSummaryMain extends CommandApp (
               lossDataGroup.mexForestZoning, lossDataGroup.perProductionForest, lossDataGroup.perProtectedAreas,
               lossDataGroup.perForestConcessions, lossDataGroup.braBiomes, lossDataGroup.woodFiber,
               lossDataGroup.resourceRights, lossDataGroup.logging, lossDataGroup.oilGas,
-              lossData.totalArea, lossData.totalGainArea,
+              lossData.preArea, lossData.preAreaPlus, lossData.preAreaMinus, lossData.totalArea, lossData.totalAreaPlus,
+              lossData.totalAreaMinus, lossData.totalGainArea,
               lossData.totalBiomass, lossData.totalCo2, lossData.biomassHistogram.mean(),
               lossData.totalMangroveBiomass, lossData.totalMangroveCo2, lossData.mangroveBiomassHistogram.mean()
             )
@@ -109,7 +124,7 @@ object TreeLossSummaryMain extends CommandApp (
           "peatland", "oil_palm", "idn_forest_moratorium", "idn_land_cover", "mex_protected_areas", "mex_pes",
           "mex_forest_zoning", "per_production_forest", "per_protected_area", "per_forest_concession", "bra_biomes",
           "wood_fiber", "resource_right", "logging", "oil_gas",
-          "total_area", "total_gain",
+          "precalculated_area", "areaPlus", "AreaMinus", "total_area", "totalPlus", "totalMinus", "total_gain",
           "total_biomass", "total_co2", "mean_biomass_per_ha",
           "total_mangrove_biomass", "total_mangrove_co2", "mean_mangrove_biomass_per_ha")
 
@@ -118,7 +133,7 @@ object TreeLossSummaryMain extends CommandApp (
       summaryDF.
         repartition(outputPartitionCount).
         write.
-          options(Map("header" -> "true", "delimiter" -> ",")).
+        options(Map("header" -> "true", "delimiter" -> "\t", "quote" -> "\u0000")). // unicode for nothing. tried "quoteMode" -> "NONE" but didn't work
           csv(path = outputUrl)
 
       spark.stop

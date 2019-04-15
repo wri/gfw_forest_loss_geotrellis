@@ -5,13 +5,13 @@ trait TreeCoverDensity extends IntegerLayer with RequiredILayer {
   override val externalNoDataValue: Integer = 0
 
   override def lookup(value: Int): Integer = {
-    if (value <= 10) 0
-    else if (value <= 15) 10
-    else if (value <= 20) 15
-    else if (value <= 25) 20
-    else if (value <= 30) 25
-    else if (value <= 50) 30
-    else if (value <= 75) 50
+    if (value <= 12) 0
+    else if (value <= 17) 10
+    else if (value <= 22) 15
+    else if (value <= 27) 20
+    else if (value <= 32) 25
+    else if (value <= 52) 30
+    else if (value <= 77) 50
     else 75
   }
 }

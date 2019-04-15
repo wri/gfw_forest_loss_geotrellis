@@ -71,9 +71,21 @@ object TreeLossSummary {
         val logging: Boolean = raster.tile.logging.getData(col, row)
         val oilGas: Boolean = raster.tile.oilGas.getData(col, row)
 
+        val cols: Int = raster.rasterExtent.cols
+        val rows: Int = raster.rasterExtent.rows
+        val ext = raster.rasterExtent.extent
+        val cellSize = raster.cellSize
+
         val lat:Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize)
+        val areaPlus: Double = Geodesy.pixelArea(lat + 0.00025 / 2, raster.cellSize)
+        val areaMinus: Double = Geodesy.pixelArea(lat - 0.00025 / 2, raster.cellSize)
+
         val gainArea: Double = gain * area
+
+        val preArea: Double = raster.tile.preArea.getData(col, row)
+        val preAreaPlus: Double = if (row < 399) raster.tile.preArea.getData(col, row + 1) else raster.tile.preArea.getData(col, row)
+        val preAreaMinus: Double = if (row > 0) raster.tile.preArea.getData(col, row - 1) else raster.tile.preArea.getData(col, row)
 
 
         val pKey = LossDataGroup(loss, tcd2000, tcd2010, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion,
@@ -86,9 +98,16 @@ object TreeLossSummary {
 
         val summary: LossData = acc.stats.getOrElse(
           key = pKey,
-          default = LossData(0, 0, 0, 0, StreamingHistogram(size = 256), 0, 0, StreamingHistogram(size = 256)))
+          default = LossData(0, 0, 0, 0, 0, 0, 0, 0, 0, StreamingHistogram(size = 256), 0, 0, StreamingHistogram(size = 256)))
+
+        summary.preArea += preArea
+        summary.preAreaPlus += preAreaPlus
+        summary.preAreaMinus += preAreaMinus
 
         summary.totalArea += area
+        summary.totalAreaPlus += areaPlus
+        summary.totalAreaMinus += areaMinus
+
         summary.totalGainArea += gainArea
 
         summary.totalBiomass += biomass * area / 10000

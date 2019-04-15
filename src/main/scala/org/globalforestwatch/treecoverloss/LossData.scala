@@ -8,6 +8,7 @@ import geotrellis.raster.histogram.StreamingHistogram
   *
   * Note: This case class contains mutable values
   *
+  * @param preArea
   * @param totalArea
   * @param totalGainArea
   * @param totalBiomass
@@ -17,12 +18,18 @@ import geotrellis.raster.histogram.StreamingHistogram
   * @param totalMangroveCo2
   * @param mangroveBiomassHistogram
   */
-case class LossData(var totalArea: Double, var totalGainArea: Double, var totalBiomass: Double,
+case class LossData(var preArea: Double, var preAreaPlus: Double, var preAreaMinus: Double, var totalArea: Double, var totalAreaPlus: Double, var totalAreaMinus: Double, var totalGainArea: Double, var totalBiomass: Double,
                     var totalCo2: Double, var biomassHistogram: StreamingHistogram, var totalMangroveBiomass: Double,
                     var totalMangroveCo2: Double, var mangroveBiomassHistogram: StreamingHistogram) {
   def merge(other: LossData): LossData = {
 
-    LossData(totalArea + other.totalArea,
+    LossData(
+      preArea + other.preArea,
+      preAreaPlus + other.preAreaPlus,
+      preAreaMinus + other.preAreaMinus,
+      totalArea + other.totalArea,
+      totalAreaPlus + other.totalAreaPlus,
+      totalAreaMinus + other.totalAreaMinus,
       totalGainArea + other.totalGainArea,
       totalBiomass + other.totalBiomass,
       totalCo2 + other.totalCo2,
