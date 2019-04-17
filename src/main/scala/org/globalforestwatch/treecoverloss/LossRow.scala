@@ -1,5 +1,7 @@
 package org.globalforestwatch.treecoverloss
 
+import play.api.libs.json._
+
 case class LossRow(country: String,
                    admin1: String,
                    admin2: String,
@@ -13,6 +15,7 @@ case class LossRow(country: String,
                    biodiversitySignificance: Boolean,
                    biodiversityIntactness: Boolean,
                    wdpa: String,
+                   aze: Boolean,
                    plantations: String,
                    riverBasins: String,
                    ecozones: String,
@@ -51,4 +54,4 @@ case class LossRow(country: String,
                    totalMangroveBiomass: Double,
                    totalMangroveCo2: Double,
                    meanMangroveBiomass: Option[Double],
-                   yearData: String)
+                   yearData: List[LossYearData])

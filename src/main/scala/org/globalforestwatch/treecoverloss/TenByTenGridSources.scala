@@ -29,6 +29,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
   lazy val biodiversitySignificance = new BiodiversitySignificance(grid)
   lazy val biodiversityIntactness = new BiodiversityIntactness(grid)
   lazy val protectedAreas = new ProtectedAreas(grid)
+  lazy val aze = new Aze(grid)
   lazy val plantations = new Plantations(grid)
   lazy val riverBasins = new RiverBasins(grid)
   lazy val ecozones = new Ecozones(grid)
@@ -85,6 +86,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
       val biodiversitySignificanceTile = biodiversitySignificance.fetchWindow(window)
       val biodiversityIntactnessTile = biodiversityIntactness.fetchWindow(window)
       val wdpaTile = protectedAreas.fetchWindow(window)
+      val azeTile = aze.fetchWindow(window)
       val plantationsTile = plantations.fetchWindow(window)
       val riverBasinsTile = riverBasins.fetchWindow(window)
       val ecozonesTile = ecozones.fetchWindow(window)
@@ -134,6 +136,7 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
         biodiversitySignificanceTile,
         biodiversityIntactnessTile,
         wdpaTile,
+        azeTile,
         plantationsTile,
         riverBasinsTile,
         ecozonesTile,

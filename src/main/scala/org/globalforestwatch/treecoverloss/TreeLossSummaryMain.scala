@@ -102,7 +102,7 @@ object TreeLossSummaryMain extends CommandApp (
               lossDataGroup.tcd2000, lossDataGroup.tcd2010, lossDataGroup.drivers,
               lossDataGroup.globalLandCover, lossDataGroup.primaryForest,
               lossDataGroup.idnPrimaryForest, lossDataGroup.erosion, lossDataGroup.biodiversitySignificance, lossDataGroup.biodiversityIntactness,
-              lossDataGroup.wdpa, lossDataGroup.plantations,
+              lossDataGroup.wdpa, lossDataGroup.aze, lossDataGroup.plantations,
               lossDataGroup.riverBasins, lossDataGroup.ecozones, lossDataGroup.urbanWatersheds,
               lossDataGroup.mangroves1996, lossDataGroup.mangroves2016, lossDataGroup.waterStress,
               lossDataGroup.intactForestLandscapes, lossDataGroup.endemicBirdAreas,
@@ -115,30 +115,34 @@ object TreeLossSummaryMain extends CommandApp (
               lossDataGroup.resourceRights, lossDataGroup.logging, lossDataGroup.oilGas,
               lossData.totalArea, lossData.totalGainArea,
               lossData.totalBiomass, lossData.totalCo2, lossData.biomassHistogram.mean(),
-              lossData.totalMangroveBiomass, lossData.totalMangroveCo2, lossData.mangroveBiomassHistogram.mean(), LossYearData.toString(lossData.lossYear)
+              lossData.totalMangroveBiomass, lossData.totalMangroveCo2, lossData.mangroveBiomassHistogram.mean(), LossYearDataMap.toList(lossData.lossYear)
             )
           }
           }
         }.toDF("iso", "adm1", "adm2",
-          "threshold_2000", "threshold_2010", "loss_driver", "global_land_cover", "primary_forest", "idn_primary_forest", "erosion",
+          "threshold_2000", "threshold_2010", "tsc", "global_land_cover", "primary_forest", "idn_primary_forest", "erosion",
           "biodiversity_significance", "biodiversity_intactness",
-          "protected_area", "plantation", "river_basin",
-          "ecozone", "urban_watershed", "mangroves_1996", "mangroves_2016", "water_stress", "intact_fores_landscape",
-          "endemic_bird_area", "tiger_landscape", "landmark", "land_right", "key_biodiversity_area", "mining", "rspo",
-          "peatland", "oil_palm", "idn_forest_moratorium", "idn_land_cover", "mex_protected_areas", "mex_pes",
+          "wdpa", "aze", "plantations", "river_basin",
+          "ecozone", "urban_watershed", "mangroves_1996", "mangroves_2016", "water_stress", "ifl",
+          "endemic_bird_area", "tiger_cl", "landmark", "land_right", "kba", "mining", "rspo",
+          "idn_mys_peatlands", "oil_palm", "idn_forest_moratorium", "idn_land_cover", "mex_protected_areas", "mex_pes",
           "mex_forest_zoning", "per_production_forest", "per_protected_area", "per_forest_concession", "bra_biomes",
-          "wood_fiber", "resource_right", "logging", "oil_gas",
+          "wood_fiber", "resource_right", "managed_forests", "oil_gas",
           "area", "gain",
           "total_biomass", "total_co2", "mean_biomass_per_ha",
           "total_mangrove_biomass", "total_mangrove_co2", "mean_mangrove_biomass_per_ha", "year_data")
 
       val outputPartitionCount = maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
-      summaryDF.
-        repartition(outputPartitionCount).
-        write.
-        options(Map("header" -> "true", "delimiter" -> "\t", "quote" -> "\u0000", "quoteMode" -> "NONE", "nullValue" -> "NULL")). // unicode for nothing. tried "quoteMode" -> "NONE" but didn't work
-          csv(path = outputUrl)
+      val jsonDs = summaryDF.repartition(outputPartitionCount).toJSON
+      jsonDs
+        .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
+        .write
+        .text(outputUrl)
+      //write.
+      //options(Map("header" -> "true", "delimiter" -> "\t", "quote" -> "\u0000", "quoteMode" -> "NONE", "nullValue" -> "NULL")). // unicode for nothing. tried "quoteMode" -> "NONE" but didn't work
+
+      //json(path = outputUrl)
 
       spark.stop
     }

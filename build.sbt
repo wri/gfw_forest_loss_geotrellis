@@ -30,6 +30,10 @@ resolvers ++= Seq(
    Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
+dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.9.8"
+dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.8"
+dependencyOverrides += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.8"
+
 libraryDependencies ++= Seq(
   sparkCore % Provided,
   sparkSQL % Provided,
@@ -51,7 +55,8 @@ libraryDependencies ++= Seq(
   "com.azavea.geotrellis" %% "geotrellis-contrib-summary" % "0.1.1",
   "org.scalanlp" %% "breeze" % "0.13.2",
   "org.scalanlp" %% "breeze-natives" % "0.13.2",
-  "org.scalanlp" %% "breeze-viz" % "0.13.2"
+  "org.scalanlp" %% "breeze-viz" % "0.13.2",
+  "com.typesafe.play" %% "play-json" % "2.7.2"
 )
 
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
@@ -75,8 +80,11 @@ import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.apache.spark.{SparkConf, SparkContext}
 
+import play.api.libs.json._
+
 import org.globalforestwatch.treecoverloss._
 import org.globalforestwatch.util._
+
 
 val conf = new SparkConf().
 setIfMissing("spark.master", "local[*]").

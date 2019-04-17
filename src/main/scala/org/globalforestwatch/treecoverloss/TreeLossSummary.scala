@@ -40,6 +40,7 @@ object TreeLossSummary {
         val biodiversitySignificance: Boolean = raster.tile.biodiversitySignificance.getData(col, row)
         val biodiversityIntactness: Boolean = raster.tile.biodiversityIntactness.getData(col, row)
         val wdpa: String = raster.tile.wdpa.getData(col, row)
+        val aze: Boolean = raster.tile.aze.getData(col, row)
         val plantations: String = raster.tile.plantations.getData(col, row)
         val riverBasins: String = raster.tile.riverBasins.getData(col, row)
         val ecozones: String = raster.tile.ecozones.getData(col, row)
@@ -84,7 +85,7 @@ object TreeLossSummary {
 
         val pKey = LossDataGroup(tcd2000, tcd2010, drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion,
           biodiversitySignificance, biodiversityIntactness,
-          wdpa, plantations, riverBasins, ecozones, urbanWatersheds,
+          wdpa, aze, plantations, riverBasins, ecozones, urbanWatersheds,
           mangroves1996, mangroves2016, waterStress, intactForestLandscapes, endemicBirdAreas, tigerLandscapes,
           landmark, landRights, keyBiodiversityAreas, mining, rspo, peatlands, oilPalm, idnForestMoratorium,
           idnLandCover, mexProtectedAreas, mexPaymentForEcosystemServices, mexForestZoning, perProductionForest,
@@ -92,28 +93,25 @@ object TreeLossSummary {
 
         val summary: LossData = acc.stats.getOrElse(
           key = pKey,
-          default = LossData(LossYearData.empty, 0, 0, 0, 0, StreamingHistogram(size = 1750), 0, 0, StreamingHistogram(size = 1000)))
+          default = LossData(LossYearDataMap.empty, 0, 0, 0, 0, StreamingHistogram(size = 1750), 0, 0, StreamingHistogram(size = 1000)))
 
 
-        val biomassPixel = biomass * area / 10000
-        val co2Pixel = ((biomass * area / 10000) * 0.5) * 44 / 12
-        val mangroveBiomassPixel = mangroveBiomass * area / 10000
-        val mangroveCo2Pixel = ((mangroveBiomass * area / 10000) * 0.5) * 44 / 12
+        val areaHa = area / 10000
+        val biomassPixel = biomass * areaHa
+        val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
+        val mangroveBiomassPixel = mangroveBiomass * areaHa
+        val mangroveCo2Pixel = ((mangroveBiomass * areaHa) * 0.5) * 44 / 12
 
         if (loss != null) {
-          val annualLoss: (Double, Double, Double, Double, Double) = (
-            summary.lossYear(loss)._1 + area,
-            summary.lossYear(loss)._2 + biomassPixel,
-            summary.lossYear(loss)._3 + co2Pixel,
-            summary.lossYear(loss)._4 + mangroveBiomassPixel,
-            summary.lossYear(loss)._5 + mangroveCo2Pixel
-          )
-
-          summary.lossYear(loss) = annualLoss
+          summary.lossYear(loss).area_loss += areaHa
+          summary.lossYear(loss).biomass_loss += biomassPixel
+          summary.lossYear(loss).carbon_emissions += co2Pixel
+          summary.lossYear(loss).mangrove_biomass_loss += mangroveBiomassPixel
+          summary.lossYear(loss).mangrove_carbon_emissions += mangroveCo2Pixel
         }
 
 
-        summary.totalArea += area
+        summary.totalArea += areaHa
 
         summary.totalGainArea += gainArea
 

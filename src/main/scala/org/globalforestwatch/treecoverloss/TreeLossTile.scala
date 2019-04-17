@@ -25,6 +25,7 @@ case class TreeLossTile(
                          biodiversitySignificance: BiodiversitySignificance#OptionalDTile,
                          biodiversityIntactness: BiodiversityIntactness#OptionalDTile,
                          wdpa: ProtectedAreas#OptionalITile,
+                         aze: Aze#OptionalITile,
                          plantations: Plantations#OptionalITile,
                          riverBasins: RiverBasins#OptionalITile,
                          ecozones: Ecozones#OptionalITile,
