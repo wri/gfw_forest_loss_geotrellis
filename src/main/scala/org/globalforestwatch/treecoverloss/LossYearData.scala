@@ -1,7 +1,6 @@
 package org.globalforestwatch.treecoverloss
 
 import scala.collection.mutable.Map
-import play.api.libs.json._
 
 
 case class LossYearData(year: Int,
@@ -36,11 +35,6 @@ object LossYearDataMap {
 
   def toList(map: Map[Int, LossYearData]): List[LossYearData] = map.values.toList
 
-  def toJson(map: Map[Int, LossYearData]): JsObject = {
-    implicit val lossYearFormat = Json.format[LossYearData]
-    val list = map.values
-    Json.obj("year_data" -> list)
-  }
 
 }
 
