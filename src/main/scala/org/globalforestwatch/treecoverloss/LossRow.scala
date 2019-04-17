@@ -1,7 +1,5 @@
 package org.globalforestwatch.treecoverloss
 
-import play.api.libs.json._
-
 case class LossRow(country: String,
                    admin1: String,
                    admin2: String,
