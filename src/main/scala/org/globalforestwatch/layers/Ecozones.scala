@@ -3,6 +3,7 @@ package org.globalforestwatch.layers
 class Ecozones(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String = s"$basePath/ecozones/$grid.tif"
+  override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {
     case 1  => "Boreal coniferous forest"
@@ -27,6 +28,6 @@ class Ecozones(grid: String) extends StringLayer with OptionalILayer {
     case 20 => "Tropical rainforest"
     case 21 => "Tropical shrubland"
     case 22 => "Water"
-    case _ => null
+    case _ => "Unknown"
   }
 }

@@ -3,6 +3,7 @@ package org.globalforestwatch.layers
 class GlobalLandcover(grid: String) extends StringLayer with OptionalILayer {
   val uri: String =
     s"$basePath/global_landcover/$grid.tif"
+  override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {
     case 10 | 11 | 12 | 20 | 30 | 40 => "Agriculture"
@@ -16,7 +17,7 @@ class GlobalLandcover(grid: String) extends StringLayer with OptionalILayer {
     case 200 | 201 | 202             => "Bare"
     case 210                         => "Water"
     case 220                         => "Permanent snow and ice"
-    case _ => null
+    case _ => "Unknown"
 
   }
 }

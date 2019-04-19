@@ -4,6 +4,7 @@ class RiverBasins(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
     s"$basePath/river_basins/$grid.tif"
+  override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {
     case 1001 => "Gulf of Mexico, North Atlantic Coast"
@@ -236,6 +237,6 @@ class RiverBasins(grid: String) extends StringLayer with OptionalILayer {
     case 8007 => "South Pacific Islands"
     case 8008 => "New Zealand"
     case 8009 => "Tasmania"
-    case _ => null
+    case _ => "Unknown"
   }
 }
