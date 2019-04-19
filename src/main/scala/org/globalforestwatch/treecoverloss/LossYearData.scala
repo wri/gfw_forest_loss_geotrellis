@@ -10,6 +10,14 @@ case class LossYearData(year: Int,
                         var mangrove_biomass_loss: Double,
                         var mangrove_carbon_emissions: Double)
 
+object LossYearData {
+
+  implicit object YearOrdering extends Ordering[LossYearData] {
+    def compare(a: LossYearData, b: LossYearData): Int = a.year compare b.year
+  }
+
+}
+
 object LossYearDataMap {
   def empty: Map[Int, LossYearData] = Map(
     2001 -> LossYearData(2001, 0, 0, 0, 0, 0),
@@ -33,7 +41,7 @@ object LossYearDataMap {
 
   //def mapValuesToList(map: Map[Int, LossYearData]): List[LossYearData] = ???
 
-  def toList(map: Map[Int, LossYearData]): List[LossYearData] = map.values.toList
+  def toList(map: Map[Int, LossYearData]): List[LossYearData] = map.values.toList.sorted
 
 
 }
