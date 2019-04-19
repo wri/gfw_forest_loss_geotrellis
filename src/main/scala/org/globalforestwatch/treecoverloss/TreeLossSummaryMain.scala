@@ -216,6 +216,10 @@ object TreeLossSummaryMain
                 "year_data"
               )
 
+          val outputPartitionCount =
+            maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
+
+          //          summaryDF.repartition($"feature_id")
           summaryDF.cache()
 
           val WindowPartitionOrder = Window
@@ -227,7 +231,7 @@ object TreeLossSummaryMain
           val thresholdDF =
             Seq(0, 10, 15, 20, 25, 30, 50, 75).toDF("threshold")
 
-          val tAdm2DF = summaryDF
+          val masterDF = summaryDF
             .groupBy("feature_id", "layers")
             .agg(sum("area") as "totalarea")
             .crossJoin(thresholdDF)
@@ -238,9 +242,9 @@ object TreeLossSummaryMain
               $"totalarea"
             )
 
-          tAdm2DF.cache()
+          masterDF.cache()
 
-          val sAnnualLossDF = summaryDF
+          val annualLossDF = summaryDF
             .select(
               $"feature_id",
               $"threshold_2000" as "threshold",
@@ -621,10 +625,8 @@ object TreeLossSummaryMain
               sum("mangrove_carbon_emissions_2017") as "mangrove_carbon_emissions_2017",
               sum("mangrove_carbon_emissions_2018") as "mangrove_carbon_emissions_2018"
             )
-
-          val tAnnualLossDF = sAnnualLossDF
             .join(
-              tAdm2DF,
+              masterDF,
               $"feature_id" <=> $"m_feature_id"
                 && $"layers" <=> $"m_layers" && $"threshold" <=> $"m_threshold",
               "right_outer"
@@ -888,7 +890,7 @@ object TreeLossSummaryMain
 
           val lookup2010 = Map("threshold_2010" -> "threshold")
 
-          val s2010DF = summaryDF
+          val extent2010DF = summaryDF
             .select(
               summaryDF.columns
                 .map(c => col(c).as(lookup2010.getOrElse(c, c))): _*
@@ -896,7 +898,7 @@ object TreeLossSummaryMain
             .groupBy("feature_id", "layers", "threshold")
             .agg(sum("area") as "area")
             .join(
-              tAdm2DF,
+              masterDF,
               $"m_feature_id" <=> $"feature_id" &&
                 $"m_layers" <=> $"layers" &&
                 $"m_threshold" <=> $"threshold",
@@ -911,9 +913,9 @@ object TreeLossSummaryMain
               windowSum("area") as "extent2010"
             )
 
-          val adm2DF = tAnnualLossDF
+          val adm2DF = annualLossDF
             .join(
-              s2010DF,
+              extent2010DF,
               $"m_feature_id" <=> $"feature_id" &&
                 $"m_layers" <=> $"layers" &&
                 $"m_threshold" <=> $"threshold",
@@ -1079,314 +1081,1056 @@ object TreeLossSummaryMain
               $"mangrove_biomass_loss_2018",
               $"mangrove_carbon_emissions_2018"
             )
-          //        .select($"feature_id",
-          //          $"threshold",
-          //          $"layers",
-          //          $"totalarea",
-          //          $"extent2000",
-          //          $"extent2010",
-          //          $"total_biomass",
-          //          $"total_co2",
-          //          $"total_mangrove_biomass",
-          //          $"total_mangrove_co2",
-          //          array(
-          //            struct($"year_2001" as "year",
-          //              $"area_loss_2001" as "area_loss",
-          //              $"biomass_loss_2001" as "biomass_loss",
-          //              $"carbon_emissions_2001" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2001" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2001" as "mangrove_carbon_emissions"),
-          //            struct($"year_2002" as "year",
-          //              $"area_loss_2002" as "area_loss",
-          //              $"biomass_loss_2002" as "biomass_loss",
-          //              $"carbon_emissions_2002" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2002" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2002" as "mangrove_carbon_emissions"),
-          //            struct($"year_2003" as "year",
-          //              $"area_loss_2003" as "area_loss",
-          //              $"biomass_loss_2003" as "biomass_loss",
-          //              $"carbon_emissions_2003" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2003" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2003" as "mangrove_carbon_emissions"),
-          //            struct($"year_2004" as "year",
-          //              $"area_loss_2004" as "area_loss",
-          //              $"biomass_loss_2004" as "biomass_loss",
-          //              $"carbon_emissions_2004" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2004" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2004" as "mangrove_carbon_emissions"),
-          //            struct($"year_2005" as "year",
-          //              $"area_loss_2005" as "area_loss",
-          //              $"biomass_loss_2005" as "biomass_loss",
-          //              $"carbon_emissions_2005" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2005" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2005" as "mangrove_carbon_emissions"),
-          //            struct($"year_2006" as "year",
-          //              $"area_loss_2006" as "area_loss",
-          //              $"biomass_loss_2006" as "biomass_loss",
-          //              $"carbon_emissions_2006" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2006" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2006" as "mangrove_carbon_emissions"),
-          //            struct($"year_2007" as "year",
-          //              $"area_loss_2007" as "area_loss",
-          //              $"biomass_loss_2007" as "biomass_loss",
-          //              $"carbon_emissions_2007" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2007" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2007" as "mangrove_carbon_emissions"),
-          //            struct($"year_2008" as "year",
-          //              $"area_loss_2008" as "area_loss",
-          //              $"biomass_loss_2008" as "biomass_loss",
-          //              $"carbon_emissions_2008" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2008" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2008" as "mangrove_carbon_emissions"),
-          //            struct($"year_2009" as "year",
-          //              $"area_loss_2009" as "area_loss",
-          //              $"biomass_loss_2009" as "biomass_loss",
-          //              $"carbon_emissions_2009" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2009" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2009" as "mangrove_carbon_emissions"),
-          //            struct($"year_2010" as "year",
-          //              $"area_loss_2010" as "area_loss",
-          //              $"biomass_loss_2010" as "biomass_loss",
-          //              $"carbon_emissions_2010" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2010" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2010" as "mangrove_carbon_emissions"),
-          //            struct($"year_2011" as "year",
-          //              $"area_loss_2011" as "area_loss",
-          //              $"biomass_loss_2011" as "biomass_loss",
-          //              $"carbon_emissions_2011" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2011" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2011" as "mangrove_carbon_emissions"),
-          //            struct($"year_2012" as "year",
-          //              $"area_loss_2012" as "area_loss",
-          //              $"biomass_loss_2012" as "biomass_loss",
-          //              $"carbon_emissions_2012" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2012" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2012" as "mangrove_carbon_emissions"),
-          //            struct($"year_2013" as "year",
-          //              $"area_loss_2013" as "area_loss",
-          //              $"biomass_loss_2013" as "biomass_loss",
-          //              $"carbon_emissions_2013" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2013" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2013" as "mangrove_carbon_emissions"),
-          //            struct($"year_2014" as "year",
-          //              $"area_loss_2014" as "area_loss",
-          //              $"biomass_loss_2014" as "biomass_loss",
-          //              $"carbon_emissions_2014" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2014" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2014" as "mangrove_carbon_emissions"),
-          //            struct($"year_2015" as "year",
-          //              $"area_loss_2015" as "area_loss",
-          //              $"biomass_loss_2015" as "biomass_loss",
-          //              $"carbon_emissions_2015" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2015" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2015" as "mangrove_carbon_emissions"),
-          //            struct($"year_2016" as "year",
-          //              $"area_loss_2016" as "area_loss",
-          //              $"biomass_loss_2016" as "biomass_loss",
-          //              $"carbon_emissions_2016" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2016" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2016" as "mangrove_carbon_emissions"),
-          //            struct($"year_2017" as "year",
-          //              $"area_loss_2017" as "area_loss",
-          //              $"biomass_loss_2017" as "biomass_loss",
-          //              $"carbon_emissions_2017" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2017" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2017" as "mangrove_carbon_emissions"),
-          //            struct($"year_2018" as "year",
-          //              $"area_loss_2018" as "area_loss",
-          //              $"biomass_loss_2018" as "biomass_loss",
-          //              $"carbon_emissions_2018" as "carbon_emissions",
-          //              $"mangrove_biomass_loss_2018" as "mangrove_biomass_loss",
-          //              $"mangrove_carbon_emissions_2018" as "mangrove_carbon_emissions")
-          //          ) as "year_data")
 
-          val outputPartitionCount =
-            maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
+          adm2DF.repartition($"iso")
+          adm2DF.cache()
 
-          adm2DF.show()
+          val csvOptions = Map(
+            "header" -> "true",
+            "delimiter" -> "\t",
+            "quote" -> "\u0000",
+            "quoteMode" -> "NONE",
+            "nullValue" -> "\u0000"
+          )
 
-          adm2DF.
-            //        select($"feature_id.iso".alias("iso"),
-            //          $"feature_id.adm1".alias("adm1"),
-            //          $"feature_id.adm2".alias("adm2"),
-            //          $"threshold",
-            //          $"layers.drivers".alias("tcs"),
-            //          $"layers.globalLandCover".alias("global_land_cover"),
-            //          $"layers.primaryForest".alias("primary_forest"),
-            //          $"layers.idnPrimaryForest".alias("idn_primary_forest"),
-            //          $"layers.erosion".alias("erosion"),
-            //          $"layers.biodiversitySignificance".alias("biodiversity_significance"),
-            //          $"layers.biodiversityIntactness".alias("biodiversity_intactness"),
-            //          $"layers.wdpa".alias("wdpa"),
-            //          $"layers.aze".alias("aze"),
-            //          $"layers.plantations".alias("plantations"),
-            //          $"layers.riverBasins".alias("river_basin"),
-            //          $"layers.ecozones".alias("ecozone"),
-            //          $"layers.urbanWatersheds".alias("urban_watershed"),
-            //          $"layers.mangroves1996".alias("mangroves_1996"),
-            //          $"layers.mangroves2016".alias("mangroves_2016"),
-            //          $"layers.waterStress".alias("water_stress"),
-            //          $"layers.intactForestLandscapes".alias("ifl"),
-            //          $"layers.endemicBirdAreas".alias("endemic_bird_area"),
-            //          $"layers.tigerLandscapes".alias("tiger_cl"),
-            //          $"layers.landmark".alias("landmark"),
-            //          $"layers.landRights".alias("land_right"),
-            //          $"layers.keyBiodiversityAreas".alias("kba"),
-            //          $"layers.mining".alias("mining"),
-            //          $"layers.rspo".alias("rspo"),
-            //          $"layers.peatlands".alias("idn_mys_peatlands"),
-            //          $"layers.oilPalm".alias("oil_palm"),
-            //          $"layers.idnForestMoratorium".alias("idn_forest_moratorium"),
-            //          $"layers.idnLandCover".alias("idn_land_cover"),
-            //          $"layers.mexProtectedAreas".alias("mex_protected_areas"),
-            //          $"layers.mexPaymentForEcosystemServices".alias("mex_pes"),
-            //          $"layers.mexForestZoning".alias("mex_forest_zoning"),
-            //          $"layers.perProductionForest".alias("per_production_forest"),
-            //          $"layers.perProtectedAreas".alias("per_protected_area"),
-            //          $"layers.perForestConcessions".alias("per_forest_concession"),
-            //          $"layers.braBiomes".alias("bra_biomes"),
-            //          $"layers.woodFiber".alias("wood_fiber"),
-            //          $"layers.resourceRights".alias("resource_right"),
-            //          $"layers.logging".alias("managed_forests"),
-            //          $"layers.oilGas".alias("oil_gas"),
-            //          $"totalarea",
-            //          $"extent2000",
-            //          $"extent2010",
-            //          $"total_biomass", $"total_co2", $"total_mangrove_biomass", $"total_mangrove_co2", $"year_data"
-            //        ).
-            repartition(1).write
-            .options(
-              Map(
-                "header" -> "true",
-                "delimiter" -> "\t",
-                "quote" -> "\u0000",
-                "quoteMode" -> "NONE",
-                "nullValue" -> "\u0000"
-              )
+          val adm2SummaryDF = adm2DF
+            .groupBy($"iso", $"adm1", $"adm2", $"threshold")
+            .agg(
+              sum("totalarea") as "area_ha",
+              sum("extent2000") as "extent2000_ha",
+              sum("extent2010") as "extent2010_ha",
+              sum("total_biomass") as "biomass_Mt",
+              sum("total_co2") as "carbon_Mt",
+              sum("total_mangrove_biomass") as "mangrove_biomass_Mt",
+              sum("total_mangrove_co2") as "mangrove_carbon_Mt",
+              sum("area_loss_2001") as "tc_loss_ha_2001",
+              sum("area_loss_2002") as "tc_loss_ha_2002",
+              sum("area_loss_2003") as "tc_loss_ha_2003",
+              sum("area_loss_2004") as "tc_loss_ha_2004",
+              sum("area_loss_2005") as "tc_loss_ha_2005",
+              sum("area_loss_2006") as "tc_loss_ha_2006",
+              sum("area_loss_2007") as "tc_loss_ha_2007",
+              sum("area_loss_2008") as "tc_loss_ha_2008",
+              sum("area_loss_2009") as "tc_loss_ha_2009",
+              sum("area_loss_2010") as "tc_loss_ha_2010",
+              sum("area_loss_2011") as "tc_loss_ha_2011",
+              sum("area_loss_2012") as "tc_loss_ha_2012",
+              sum("area_loss_2013") as "tc_loss_ha_2013",
+              sum("area_loss_2014") as "tc_loss_ha_2014",
+              sum("area_loss_2015") as "tc_loss_ha_2015",
+              sum("area_loss_2016") as "tc_loss_ha_2016",
+              sum("area_loss_2017") as "tc_loss_ha_2017",
+              sum("area_loss_2018") as "tc_loss_ha_2018"
             )
-            . // unicode for nothing. tried "quoteMode" -> "NONE" but didn't work
-            csv(path = outputUrl + "/adm2")
 
-          //      val jsonDs = summaryDF.repartition(outputPartitionCount).toJSON
-          //            finalDF.
-          //              repartition(1).
-          //        toJSON. //.repartition(outputPartitionCount).toJSON
-          //        mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]")).
-          //        write.
-          //        text(outputUrl)
+          adm2SummaryDF.write
+            .options(csvOptions)
+            .csv(path = outputUrl + "/summary/adm2")
 
-          //      val adm1DF = adm2DF.groupBy("feature_id.iso", "feature_id.adm1", "layers", "threshold")
-          //        .agg(sum("totalarea") as "totalarea", sum("extent2000") as "extent2000", sum("extent2010") as "extent2010",
-          //          sum("total_biomass") as "total_biomass", sum("total_co2") as "total_co2", sum("total_mangrove_biomass") as "total_mangrove_biomass", sum("total_mangrove_co2") as "total_mangrove_co2")
+          val adm1SummaryDF = adm2SummaryDF
+            .groupBy($"iso", $"adm1", $"threshold")
+            .agg(
+              sum("area_ha") as "area_ha",
+              sum("extent2000_ha") as "extent2000_ha",
+              sum("extent2010_ha") as "extent2010_ha",
+              sum("biomass_Mt") as "biomass_Mt",
+              sum("carbon_Mt") as "carbon_Mt",
+              sum("mangrove_biomass_Mt") as "mangrove_biomass_Mt",
+              sum("mangrove_carbon_Mt") as "mangrove_carbon_Mt",
+              sum("tc_loss_ha_2001") as "tc_loss_ha_2001",
+              sum("tc_loss_ha_2002") as "tc_loss_ha_2002",
+              sum("tc_loss_ha_2003") as "tc_loss_ha_2003",
+              sum("tc_loss_ha_2004") as "tc_loss_ha_2004",
+              sum("tc_loss_ha_2005") as "tc_loss_ha_2005",
+              sum("tc_loss_ha_2006") as "tc_loss_ha_2006",
+              sum("tc_loss_ha_2007") as "tc_loss_ha_2007",
+              sum("tc_loss_ha_2008") as "tc_loss_ha_2008",
+              sum("tc_loss_ha_2009") as "tc_loss_ha_2009",
+              sum("tc_loss_ha_2010") as "tc_loss_ha_2010",
+              sum("tc_loss_ha_2011") as "tc_loss_ha_2011",
+              sum("tc_loss_ha_2012") as "tc_loss_ha_2012",
+              sum("tc_loss_ha_2013") as "tc_loss_ha_2013",
+              sum("tc_loss_ha_2014") as "tc_loss_ha_2014",
+              sum("tc_loss_ha_2015") as "tc_loss_ha_2015",
+              sum("tc_loss_ha_2016") as "tc_loss_ha_2016",
+              sum("tc_loss_ha_2017") as "tc_loss_ha_2017",
+              sum("tc_loss_ha_2018") as "tc_loss_ha_2018"
+            )
 
-          //
-          //      adm1DF.
-          //        select($"iso",
-          //          $"adm1",
-          //          $"threshold",
-          //          $"layers.drivers".alias("tcs"),
-          //          $"layers.globalLandCover".alias("global_land_cover"),
-          //          $"layers.primaryForest".alias("primary_forest"),
-          //          $"layers.idnPrimaryForest".alias("idn_primary_forest"),
-          //          $"layers.erosion".alias("erosion"),
-          //          $"layers.biodiversitySignificance".alias("biodiversity_significance"),
-          //          $"layers.biodiversityIntactness".alias("biodiversity_intactness"),
-          //          $"layers.wdpa".alias("wdpa"),
-          //          $"layers.aze".alias("aze"),
-          //          $"layers.plantations".alias("plantations"),
-          //          $"layers.riverBasins".alias("river_basin"),
-          //          $"layers.ecozones".alias("ecozone"),
-          //          $"layers.urbanWatersheds".alias("urban_watershed"),
-          //          $"layers.mangroves1996".alias("mangroves_1996"),
-          //          $"layers.mangroves2016".alias("mangroves_2016"),
-          //          $"layers.waterStress".alias("water_stress"),
-          //          $"layers.intactForestLandscapes".alias("ifl"),
-          //          $"layers.endemicBirdAreas".alias("endemic_bird_area"),
-          //          $"layers.tigerLandscapes".alias("tiger_cl"),
-          //          $"layers.landmark".alias("landmark"),
-          //          $"layers.landRights".alias("land_right"),
-          //          $"layers.keyBiodiversityAreas".alias("kba"),
-          //          $"layers.mining".alias("mining"),
-          //          $"layers.rspo".alias("rspo"),
-          //          $"layers.peatlands".alias("idn_mys_peatlands"),
-          //          $"layers.oilPalm".alias("oil_palm"),
-          //          $"layers.idnForestMoratorium".alias("idn_forest_moratorium"),
-          //          $"layers.idnLandCover".alias("idn_land_cover"),
-          //          $"layers.mexProtectedAreas".alias("mex_protected_areas"),
-          //          $"layers.mexPaymentForEcosystemServices".alias("mex_pes"),
-          //          $"layers.mexForestZoning".alias("mex_forest_zoning"),
-          //          $"layers.perProductionForest".alias("per_production_forest"),
-          //          $"layers.perProtectedAreas".alias("per_protected_area"),
-          //          $"layers.perForestConcessions".alias("per_forest_concession"),
-          //          $"layers.braBiomes".alias("bra_biomes"),
-          //          $"layers.woodFiber".alias("wood_fiber"),
-          //          $"layers.resourceRights".alias("resource_right"),
-          //          $"layers.logging".alias("managed_forests"),
-          //          $"layers.oilGas".alias("oil_gas"),
-          //          $"totalarea",
-          //          $"extent2000",
-          //          $"extent2010",
-          //          $"total_biomass", $"total_co2", $"total_mangrove_biomass", $"total_mangrove_co2"
-          //        ).
-          //        repartition(1).
-          //        write.options(Map("header" -> "true", "delimiter" -> "\t", "quote" -> "\u0000", "quoteMode" -> "NONE", "nullValue" -> "\u0000")). // unicode for nothing. tried "quoteMode" -> "NONE" but didn't work
-          //        csv(path = outputUrl + "/adm1")
-          //
-          //      val isoDF = adm1DF.groupBy("iso", "layers", "threshold")
-          //        .agg(sum("totalarea") as "totalarea", sum("extent2000") as "extent2000", sum("extent2010") as "extent2010",
-          //          sum("total_biomass") as "total_biomass", sum("total_co2") as "total_co2", sum("total_mangrove_biomass") as "total_mangrove_biomass", sum("total_mangrove_co2") as "total_mangrove_co2")
-          //
-          //
-          //      isoDF.
-          //        select($"iso",
-          //          $"threshold",
-          //          $"layers.drivers".alias("tcs"),
-          //          $"layers.globalLandCover".alias("global_land_cover"),
-          //          $"layers.primaryForest".alias("primary_forest"),
-          //          $"layers.idnPrimaryForest".alias("idn_primary_forest"),
-          //          $"layers.erosion".alias("erosion"),
-          //          $"layers.biodiversitySignificance".alias("biodiversity_significance"),
-          //          $"layers.biodiversityIntactness".alias("biodiversity_intactness"),
-          //          $"layers.wdpa".alias("wdpa"),
-          //          $"layers.aze".alias("aze"),
-          //          $"layers.plantations".alias("plantations"),
-          //          $"layers.riverBasins".alias("river_basin"),
-          //          $"layers.ecozones".alias("ecozone"),
-          //          $"layers.urbanWatersheds".alias("urban_watershed"),
-          //          $"layers.mangroves1996".alias("mangroves_1996"),
-          //          $"layers.mangroves2016".alias("mangroves_2016"),
-          //          $"layers.waterStress".alias("water_stress"),
-          //          $"layers.intactForestLandscapes".alias("ifl"),
-          //          $"layers.endemicBirdAreas".alias("endemic_bird_area"),
-          //          $"layers.tigerLandscapes".alias("tiger_cl"),
-          //          $"layers.landmark".alias("landmark"),
-          //          $"layers.landRights".alias("land_right"),
-          //          $"layers.keyBiodiversityAreas".alias("kba"),
-          //          $"layers.mining".alias("mining"),
-          //          $"layers.rspo".alias("rspo"),
-          //          $"layers.peatlands".alias("idn_mys_peatlands"),
-          //          $"layers.oilPalm".alias("oil_palm"),
-          //          $"layers.idnForestMoratorium".alias("idn_forest_moratorium"),
-          //          $"layers.idnLandCover".alias("idn_land_cover"),
-          //          $"layers.mexProtectedAreas".alias("mex_protected_areas"),
-          //          $"layers.mexPaymentForEcosystemServices".alias("mex_pes"),
-          //          $"layers.mexForestZoning".alias("mex_forest_zoning"),
-          //          $"layers.perProductionForest".alias("per_production_forest"),
-          //          $"layers.perProtectedAreas".alias("per_protected_area"),
-          //          $"layers.perForestConcessions".alias("per_forest_concession"),
-          //          $"layers.braBiomes".alias("bra_biomes"),
-          //          $"layers.woodFiber".alias("wood_fiber"),
-          //          $"layers.resourceRights".alias("resource_right"),
-          //          $"layers.logging".alias("managed_forests"),
-          //          $"layers.oilGas".alias("oil_gas"),
-          //          $"totalarea",
-          //          $"extent2000",
-          //          $"extent2010",
-          //          $"total_biomass", $"total_co2", $"total_mangrove_biomass", $"total_mangrove_co2"
-          //        ).
-          //        repartition(1).
-          //        write.options(Map("header" -> "true", "delimiter" -> "\t", "quote" -> "\u0000", "quoteMode" -> "NONE", "nullValue" -> "\u0000")). // unicode for nothing. tried "quoteMode" -> "NONE" but didn't work
-          //        csv(path = outputUrl + "/iso")
+          adm1SummaryDF.write
+            .options(csvOptions)
+            .csv(path = outputUrl + "/summary/adm1")
+
+          val isoSummaryDF = adm1SummaryDF
+            .groupBy($"iso", $"threshold")
+            .agg(
+              sum("area_ha") as "area_ha",
+              sum("extent2000_ha") as "extent2000_ha",
+              sum("extent2010_ha") as "extent2010_ha",
+              sum("biomass_Mt") as "biomass_Mt",
+              sum("carbon_Mt") as "carbon_Mt",
+              sum("mangrove_biomass_Mt") as "mangrove_biomass_Mt",
+              sum("mangrove_carbon_Mt") as "mangrove_carbon_Mt",
+              sum("tc_loss_ha_2001") as "tc_loss_ha_2001",
+              sum("tc_loss_ha_2002") as "tc_loss_ha_2002",
+              sum("tc_loss_ha_2003") as "tc_loss_ha_2003",
+              sum("tc_loss_ha_2004") as "tc_loss_ha_2004",
+              sum("tc_loss_ha_2005") as "tc_loss_ha_2005",
+              sum("tc_loss_ha_2006") as "tc_loss_ha_2006",
+              sum("tc_loss_ha_2007") as "tc_loss_ha_2007",
+              sum("tc_loss_ha_2008") as "tc_loss_ha_2008",
+              sum("tc_loss_ha_2009") as "tc_loss_ha_2009",
+              sum("tc_loss_ha_2010") as "tc_loss_ha_2010",
+              sum("tc_loss_ha_2011") as "tc_loss_ha_2011",
+              sum("tc_loss_ha_2012") as "tc_loss_ha_2012",
+              sum("tc_loss_ha_2013") as "tc_loss_ha_2013",
+              sum("tc_loss_ha_2014") as "tc_loss_ha_2014",
+              sum("tc_loss_ha_2015") as "tc_loss_ha_2015",
+              sum("tc_loss_ha_2016") as "tc_loss_ha_2016",
+              sum("tc_loss_ha_2017") as "tc_loss_ha_2017",
+              sum("tc_loss_ha_2018") as "tc_loss_ha_2018"
+            )
+
+          isoSummaryDF.write
+            .options(csvOptions)
+            .csv(path = outputUrl + "/summary/iso")
+
+
+          adm1SummaryDF.coalesce(1)
+            .write
+            .options(csvOptions)
+            .csv(path = outputUrl + "/summary/global/adm1")
+
+          isoSummaryDF.coalesce(1)
+            .write
+            .options(csvOptions)
+            .csv(path = outputUrl + "/summary/global/iso")
+
+          val adm2ApiDF = adm2DF
+            .select(
+              $"iso",
+              $"adm1",
+              $"adm2",
+              $"threshold",
+              $"tcs",
+              $"global_land_cover",
+              $"primary_forest",
+              $"idn_primary_forest",
+              $"erosion",
+              $"biodiversity_significance",
+              $"biodiversity_intactness",
+              $"wdpa",
+              $"aze",
+              $"plantations",
+              $"river_basin",
+              $"ecozone",
+              $"urban_watershed",
+              $"mangroves_1996",
+              $"mangroves_2016",
+              $"water_stress",
+              $"ifl",
+              $"endemic_bird_area",
+              $"tiger_cl",
+              $"landmark",
+              $"land_right",
+              $"kba",
+              $"mining",
+              $"rspo",
+              $"idn_mys_peatlands",
+              $"oil_palm",
+              $"idn_forest_moratorium",
+              $"idn_land_cover",
+              $"mex_protected_areas",
+              $"mex_pes",
+              $"mex_forest_zoning",
+              $"per_production_forest",
+              $"per_protected_area",
+              $"per_forest_concession",
+              $"bra_biomes",
+              $"wood_fiber",
+              $"resource_right",
+              $"managed_forests",
+              $"oil_gas",
+              $"totalarea" as "total_area",
+              $"extent2000" as "extent_2000",
+              $"extent2010" as "extent_2010",
+              $"total_biomass",
+              $"total_co2",
+              $"total_mangrove_biomass",
+              $"total_mangrove_co2",
+              array(
+                struct(
+                  $"year_2001" as "year",
+                  $"area_loss_2001" as "area_loss",
+                  $"biomass_loss_2001" as "biomass_loss",
+                  $"carbon_emissions_2001" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2001" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2001" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2002" as "year",
+                  $"area_loss_2002" as "area_loss",
+                  $"biomass_loss_2002" as "biomass_loss",
+                  $"carbon_emissions_2002" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2002" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2002" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2003" as "year",
+                  $"area_loss_2003" as "area_loss",
+                  $"biomass_loss_2003" as "biomass_loss",
+                  $"carbon_emissions_2003" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2003" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2003" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2004" as "year",
+                  $"area_loss_2004" as "area_loss",
+                  $"biomass_loss_2004" as "biomass_loss",
+                  $"carbon_emissions_2004" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2004" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2004" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2005" as "year",
+                  $"area_loss_2005" as "area_loss",
+                  $"biomass_loss_2005" as "biomass_loss",
+                  $"carbon_emissions_2005" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2005" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2005" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2006" as "year",
+                  $"area_loss_2006" as "area_loss",
+                  $"biomass_loss_2006" as "biomass_loss",
+                  $"carbon_emissions_2006" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2006" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2006" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2007" as "year",
+                  $"area_loss_2007" as "area_loss",
+                  $"biomass_loss_2007" as "biomass_loss",
+                  $"carbon_emissions_2007" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2007" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2007" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2008" as "year",
+                  $"area_loss_2008" as "area_loss",
+                  $"biomass_loss_2008" as "biomass_loss",
+                  $"carbon_emissions_2008" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2008" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2008" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2009" as "year",
+                  $"area_loss_2009" as "area_loss",
+                  $"biomass_loss_2009" as "biomass_loss",
+                  $"carbon_emissions_2009" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2009" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2009" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2010" as "year",
+                  $"area_loss_2010" as "area_loss",
+                  $"biomass_loss_2010" as "biomass_loss",
+                  $"carbon_emissions_2010" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2010" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2010" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2011" as "year",
+                  $"area_loss_2011" as "area_loss",
+                  $"biomass_loss_2011" as "biomass_loss",
+                  $"carbon_emissions_2011" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2011" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2011" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2012" as "year",
+                  $"area_loss_2012" as "area_loss",
+                  $"biomass_loss_2012" as "biomass_loss",
+                  $"carbon_emissions_2012" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2012" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2012" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2013" as "year",
+                  $"area_loss_2013" as "area_loss",
+                  $"biomass_loss_2013" as "biomass_loss",
+                  $"carbon_emissions_2013" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2013" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2013" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2014" as "year",
+                  $"area_loss_2014" as "area_loss",
+                  $"biomass_loss_2014" as "biomass_loss",
+                  $"carbon_emissions_2014" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2014" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2014" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2015" as "year",
+                  $"area_loss_2015" as "area_loss",
+                  $"biomass_loss_2015" as "biomass_loss",
+                  $"carbon_emissions_2015" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2015" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2015" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2016" as "year",
+                  $"area_loss_2016" as "area_loss",
+                  $"biomass_loss_2016" as "biomass_loss",
+                  $"carbon_emissions_2016" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2016" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2016" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2017" as "year",
+                  $"area_loss_2017" as "area_loss",
+                  $"biomass_loss_2017" as "biomass_loss",
+                  $"carbon_emissions_2017" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2017" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2017" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2018" as "year",
+                  $"area_loss_2018" as "area_loss",
+                  $"biomass_loss_2018" as "biomass_loss",
+                  $"carbon_emissions_2018" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2018" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2018" as "mangrove_carbon_emissions"
+                )
+              ) as "year_data"
+            )
+          adm2ApiDF.toJSON
+            .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
+            .write
+            .text(outputUrl + "/api/adm2")
+
+          val adm1ApiDF = adm2DF
+            .groupBy(
+              $"iso",
+              $"adm1",
+              $"threshold",
+              $"tcs",
+              $"global_land_cover",
+              $"primary_forest",
+              $"idn_primary_forest",
+              $"erosion",
+              $"biodiversity_significance",
+              $"biodiversity_intactness",
+              $"wdpa",
+              $"aze",
+              $"plantations",
+              $"river_basin",
+              $"ecozone",
+              $"urban_watershed",
+              $"mangroves_1996",
+              $"mangroves_2016",
+              $"water_stress",
+              $"ifl",
+              $"endemic_bird_area",
+              $"tiger_cl",
+              $"landmark",
+              $"land_right",
+              $"kba",
+              $"mining",
+              $"rspo",
+              $"idn_mys_peatlands",
+              $"oil_palm",
+              $"idn_forest_moratorium",
+              $"idn_land_cover",
+              $"mex_protected_areas",
+              $"mex_pes",
+              $"mex_forest_zoning",
+              $"per_production_forest",
+              $"per_protected_area",
+              $"per_forest_concession",
+              $"bra_biomes",
+              $"wood_fiber",
+              $"resource_right",
+              $"managed_forests",
+              $"oil_gas",
+              $"year_2001",
+              $"year_2002",
+              $"year_2003",
+              $"year_2004",
+              $"year_2005",
+              $"year_2006",
+              $"year_2007",
+              $"year_2008",
+              $"year_2009",
+              $"year_2010",
+              $"year_2011",
+              $"year_2012",
+              $"year_2013",
+              $"year_2014",
+              $"year_2015",
+              $"year_2016",
+              $"year_2017",
+              $"year_2018"
+            )
+            .agg(
+              sum("area") as "area",
+              sum("biomass") as "biomass",
+              sum("co2") as "co2",
+              sum("mangrove_biomass") as "mangrove_biomass",
+              sum("mangrove_co2") as "mangrove_co2",
+              sum("area_loss_2001") as "area_loss_2001",
+              sum("area_loss_2002") as "area_loss_2002",
+              sum("area_loss_2003") as "area_loss_2003",
+              sum("area_loss_2004") as "area_loss_2004",
+              sum("area_loss_2005") as "area_loss_2005",
+              sum("area_loss_2006") as "area_loss_2006",
+              sum("area_loss_2007") as "area_loss_2007",
+              sum("area_loss_2008") as "area_loss_2008",
+              sum("area_loss_2009") as "area_loss_2009",
+              sum("area_loss_2010") as "area_loss_2010",
+              sum("area_loss_2011") as "area_loss_2011",
+              sum("area_loss_2012") as "area_loss_2012",
+              sum("area_loss_2013") as "area_loss_2013",
+              sum("area_loss_2014") as "area_loss_2014",
+              sum("area_loss_2015") as "area_loss_2015",
+              sum("area_loss_2016") as "area_loss_2016",
+              sum("area_loss_2017") as "area_loss_2017",
+              sum("area_loss_2018") as "area_loss_2018",
+              sum("biomass_loss_2001") as "biomass_loss_2001",
+              sum("biomass_loss_2002") as "biomass_loss_2002",
+              sum("biomass_loss_2003") as "biomass_loss_2003",
+              sum("biomass_loss_2004") as "biomass_loss_2004",
+              sum("biomass_loss_2005") as "biomass_loss_2005",
+              sum("biomass_loss_2006") as "biomass_loss_2006",
+              sum("biomass_loss_2007") as "biomass_loss_2007",
+              sum("biomass_loss_2008") as "biomass_loss_2008",
+              sum("biomass_loss_2009") as "biomass_loss_2009",
+              sum("biomass_loss_2010") as "biomass_loss_2010",
+              sum("biomass_loss_2011") as "biomass_loss_2011",
+              sum("biomass_loss_2012") as "biomass_loss_2012",
+              sum("biomass_loss_2013") as "biomass_loss_2013",
+              sum("biomass_loss_2014") as "biomass_loss_2014",
+              sum("biomass_loss_2015") as "biomass_loss_2015",
+              sum("biomass_loss_2016") as "biomass_loss_2016",
+              sum("biomass_loss_2017") as "biomass_loss_2017",
+              sum("biomass_loss_2018") as "biomass_loss_2018",
+              sum("carbon_emissions_2001") as "carbon_emissions_2001",
+              sum("carbon_emissions_2002") as "carbon_emissions_2002",
+              sum("carbon_emissions_2003") as "carbon_emissions_2003",
+              sum("carbon_emissions_2004") as "carbon_emissions_2004",
+              sum("carbon_emissions_2005") as "carbon_emissions_2005",
+              sum("carbon_emissions_2006") as "carbon_emissions_2006",
+              sum("carbon_emissions_2007") as "carbon_emissions_2007",
+              sum("carbon_emissions_2008") as "carbon_emissions_2008",
+              sum("carbon_emissions_2009") as "carbon_emissions_2009",
+              sum("carbon_emissions_2010") as "carbon_emissions_2010",
+              sum("carbon_emissions_2011") as "carbon_emissions_2011",
+              sum("carbon_emissions_2012") as "carbon_emissions_2012",
+              sum("carbon_emissions_2013") as "carbon_emissions_2013",
+              sum("carbon_emissions_2014") as "carbon_emissions_2014",
+              sum("carbon_emissions_2015") as "carbon_emissions_2015",
+              sum("carbon_emissions_2016") as "carbon_emissions_2016",
+              sum("carbon_emissions_2017") as "carbon_emissions_2017",
+              sum("carbon_emissions_2018") as "carbon_emissions_2018",
+              sum("mangrove_biomass_loss_2001") as "mangrove_biomass_loss_2001",
+              sum("mangrove_biomass_loss_2002") as "mangrove_biomass_loss_2002",
+              sum("mangrove_biomass_loss_2003") as "mangrove_biomass_loss_2003",
+              sum("mangrove_biomass_loss_2004") as "mangrove_biomass_loss_2004",
+              sum("mangrove_biomass_loss_2005") as "mangrove_biomass_loss_2005",
+              sum("mangrove_biomass_loss_2006") as "mangrove_biomass_loss_2006",
+              sum("mangrove_biomass_loss_2007") as "mangrove_biomass_loss_2007",
+              sum("mangrove_biomass_loss_2008") as "mangrove_biomass_loss_2008",
+              sum("mangrove_biomass_loss_2009") as "mangrove_biomass_loss_2009",
+              sum("mangrove_biomass_loss_2010") as "mangrove_biomass_loss_2010",
+              sum("mangrove_biomass_loss_2011") as "mangrove_biomass_loss_2011",
+              sum("mangrove_biomass_loss_2012") as "mangrove_biomass_loss_2012",
+              sum("mangrove_biomass_loss_2013") as "mangrove_biomass_loss_2013",
+              sum("mangrove_biomass_loss_2014") as "mangrove_biomass_loss_2014",
+              sum("mangrove_biomass_loss_2015") as "mangrove_biomass_loss_2015",
+              sum("mangrove_biomass_loss_2016") as "mangrove_biomass_loss_2016",
+              sum("mangrove_biomass_loss_2017") as "mangrove_biomass_loss_2017",
+              sum("mangrove_biomass_loss_2018") as "mangrove_biomass_loss_2018",
+              sum("mangrove_carbon_emissions_2001") as "mangrove_carbon_emissions_2001",
+              sum("mangrove_carbon_emissions_2002") as "mangrove_carbon_emissions_2002",
+              sum("mangrove_carbon_emissions_2003") as "mangrove_carbon_emissions_2003",
+              sum("mangrove_carbon_emissions_2004") as "mangrove_carbon_emissions_2004",
+              sum("mangrove_carbon_emissions_2005") as "mangrove_carbon_emissions_2005",
+              sum("mangrove_carbon_emissions_2006") as "mangrove_carbon_emissions_2006",
+              sum("mangrove_carbon_emissions_2007") as "mangrove_carbon_emissions_2007",
+              sum("mangrove_carbon_emissions_2008") as "mangrove_carbon_emissions_2008",
+              sum("mangrove_carbon_emissions_2009") as "mangrove_carbon_emissions_2009",
+              sum("mangrove_carbon_emissions_2010") as "mangrove_carbon_emissions_2010",
+              sum("mangrove_carbon_emissions_2011") as "mangrove_carbon_emissions_2011",
+              sum("mangrove_carbon_emissions_2012") as "mangrove_carbon_emissions_2012",
+              sum("mangrove_carbon_emissions_2013") as "mangrove_carbon_emissions_2013",
+              sum("mangrove_carbon_emissions_2014") as "mangrove_carbon_emissions_2014",
+              sum("mangrove_carbon_emissions_2015") as "mangrove_carbon_emissions_2015",
+              sum("mangrove_carbon_emissions_2016") as "mangrove_carbon_emissions_2016",
+              sum("mangrove_carbon_emissions_2017") as "mangrove_carbon_emissions_2017",
+              sum("mangrove_carbon_emissions_2018") as "mangrove_carbon_emissions_2018"
+            )
+            .select(
+              $"iso",
+              $"adm1",
+              $"threshold",
+              $"tcs",
+              $"global_land_cover",
+              $"primary_forest",
+              $"idn_primary_forest",
+              $"erosion",
+              $"biodiversity_significance",
+              $"biodiversity_intactness",
+              $"wdpa",
+              $"aze",
+              $"plantations",
+              $"river_basin",
+              $"ecozone",
+              $"urban_watershed",
+              $"mangroves_1996",
+              $"mangroves_2016",
+              $"water_stress",
+              $"ifl",
+              $"endemic_bird_area",
+              $"tiger_cl",
+              $"landmark",
+              $"land_right",
+              $"kba",
+              $"mining",
+              $"rspo",
+              $"idn_mys_peatlands",
+              $"oil_palm",
+              $"idn_forest_moratorium",
+              $"idn_land_cover",
+              $"mex_protected_areas",
+              $"mex_pes",
+              $"mex_forest_zoning",
+              $"per_production_forest",
+              $"per_protected_area",
+              $"per_forest_concession",
+              $"bra_biomes",
+              $"wood_fiber",
+              $"resource_right",
+              $"managed_forests",
+              $"oil_gas",
+              $"totalarea" as "total_area",
+              $"extent2000" as "extent_2000",
+              $"extent2010" as "extent_2010",
+              $"total_biomass",
+              $"total_co2",
+              $"total_mangrove_biomass",
+              $"total_mangrove_co2",
+              array(
+                struct(
+                  $"year_2001" as "year",
+                  $"area_loss_2001" as "area_loss",
+                  $"biomass_loss_2001" as "biomass_loss",
+                  $"carbon_emissions_2001" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2001" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2001" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2002" as "year",
+                  $"area_loss_2002" as "area_loss",
+                  $"biomass_loss_2002" as "biomass_loss",
+                  $"carbon_emissions_2002" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2002" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2002" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2003" as "year",
+                  $"area_loss_2003" as "area_loss",
+                  $"biomass_loss_2003" as "biomass_loss",
+                  $"carbon_emissions_2003" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2003" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2003" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2004" as "year",
+                  $"area_loss_2004" as "area_loss",
+                  $"biomass_loss_2004" as "biomass_loss",
+                  $"carbon_emissions_2004" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2004" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2004" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2005" as "year",
+                  $"area_loss_2005" as "area_loss",
+                  $"biomass_loss_2005" as "biomass_loss",
+                  $"carbon_emissions_2005" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2005" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2005" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2006" as "year",
+                  $"area_loss_2006" as "area_loss",
+                  $"biomass_loss_2006" as "biomass_loss",
+                  $"carbon_emissions_2006" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2006" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2006" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2007" as "year",
+                  $"area_loss_2007" as "area_loss",
+                  $"biomass_loss_2007" as "biomass_loss",
+                  $"carbon_emissions_2007" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2007" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2007" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2008" as "year",
+                  $"area_loss_2008" as "area_loss",
+                  $"biomass_loss_2008" as "biomass_loss",
+                  $"carbon_emissions_2008" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2008" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2008" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2009" as "year",
+                  $"area_loss_2009" as "area_loss",
+                  $"biomass_loss_2009" as "biomass_loss",
+                  $"carbon_emissions_2009" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2009" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2009" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2010" as "year",
+                  $"area_loss_2010" as "area_loss",
+                  $"biomass_loss_2010" as "biomass_loss",
+                  $"carbon_emissions_2010" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2010" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2010" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2011" as "year",
+                  $"area_loss_2011" as "area_loss",
+                  $"biomass_loss_2011" as "biomass_loss",
+                  $"carbon_emissions_2011" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2011" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2011" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2012" as "year",
+                  $"area_loss_2012" as "area_loss",
+                  $"biomass_loss_2012" as "biomass_loss",
+                  $"carbon_emissions_2012" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2012" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2012" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2013" as "year",
+                  $"area_loss_2013" as "area_loss",
+                  $"biomass_loss_2013" as "biomass_loss",
+                  $"carbon_emissions_2013" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2013" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2013" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2014" as "year",
+                  $"area_loss_2014" as "area_loss",
+                  $"biomass_loss_2014" as "biomass_loss",
+                  $"carbon_emissions_2014" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2014" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2014" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2015" as "year",
+                  $"area_loss_2015" as "area_loss",
+                  $"biomass_loss_2015" as "biomass_loss",
+                  $"carbon_emissions_2015" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2015" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2015" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2016" as "year",
+                  $"area_loss_2016" as "area_loss",
+                  $"biomass_loss_2016" as "biomass_loss",
+                  $"carbon_emissions_2016" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2016" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2016" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2017" as "year",
+                  $"area_loss_2017" as "area_loss",
+                  $"biomass_loss_2017" as "biomass_loss",
+                  $"carbon_emissions_2017" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2017" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2017" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2018" as "year",
+                  $"area_loss_2018" as "area_loss",
+                  $"biomass_loss_2018" as "biomass_loss",
+                  $"carbon_emissions_2018" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2018" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2018" as "mangrove_carbon_emissions"
+                )
+              ) as "year_data"
+            )
+          adm1ApiDF.toJSON
+            .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
+            .write
+            .text(outputUrl + "/api/adm1")
+
+          val isoApiDF = adm1ApiDF
+            .groupBy(
+              $"iso",
+              $"threshold",
+              $"tcs",
+              $"global_land_cover",
+              $"primary_forest",
+              $"idn_primary_forest",
+              $"erosion",
+              $"biodiversity_significance",
+              $"biodiversity_intactness",
+              $"wdpa",
+              $"aze",
+              $"plantations",
+              $"river_basin",
+              $"ecozone",
+              $"urban_watershed",
+              $"mangroves_1996",
+              $"mangroves_2016",
+              $"water_stress",
+              $"ifl",
+              $"endemic_bird_area",
+              $"tiger_cl",
+              $"landmark",
+              $"land_right",
+              $"kba",
+              $"mining",
+              $"rspo",
+              $"idn_mys_peatlands",
+              $"oil_palm",
+              $"idn_forest_moratorium",
+              $"idn_land_cover",
+              $"mex_protected_areas",
+              $"mex_pes",
+              $"mex_forest_zoning",
+              $"per_production_forest",
+              $"per_protected_area",
+              $"per_forest_concession",
+              $"bra_biomes",
+              $"wood_fiber",
+              $"resource_right",
+              $"managed_forests",
+              $"oil_gas",
+              $"year_2001",
+              $"year_2002",
+              $"year_2003",
+              $"year_2004",
+              $"year_2005",
+              $"year_2006",
+              $"year_2007",
+              $"year_2008",
+              $"year_2009",
+              $"year_2010",
+              $"year_2011",
+              $"year_2012",
+              $"year_2013",
+              $"year_2014",
+              $"year_2015",
+              $"year_2016",
+              $"year_2017",
+              $"year_2018"
+            )
+            .agg(
+              sum("area") as "area",
+              sum("biomass") as "biomass",
+              sum("co2") as "co2",
+              sum("mangrove_biomass") as "mangrove_biomass",
+              sum("mangrove_co2") as "mangrove_co2",
+              sum("area_loss_2001") as "area_loss_2001",
+              sum("area_loss_2002") as "area_loss_2002",
+              sum("area_loss_2003") as "area_loss_2003",
+              sum("area_loss_2004") as "area_loss_2004",
+              sum("area_loss_2005") as "area_loss_2005",
+              sum("area_loss_2006") as "area_loss_2006",
+              sum("area_loss_2007") as "area_loss_2007",
+              sum("area_loss_2008") as "area_loss_2008",
+              sum("area_loss_2009") as "area_loss_2009",
+              sum("area_loss_2010") as "area_loss_2010",
+              sum("area_loss_2011") as "area_loss_2011",
+              sum("area_loss_2012") as "area_loss_2012",
+              sum("area_loss_2013") as "area_loss_2013",
+              sum("area_loss_2014") as "area_loss_2014",
+              sum("area_loss_2015") as "area_loss_2015",
+              sum("area_loss_2016") as "area_loss_2016",
+              sum("area_loss_2017") as "area_loss_2017",
+              sum("area_loss_2018") as "area_loss_2018",
+              sum("biomass_loss_2001") as "biomass_loss_2001",
+              sum("biomass_loss_2002") as "biomass_loss_2002",
+              sum("biomass_loss_2003") as "biomass_loss_2003",
+              sum("biomass_loss_2004") as "biomass_loss_2004",
+              sum("biomass_loss_2005") as "biomass_loss_2005",
+              sum("biomass_loss_2006") as "biomass_loss_2006",
+              sum("biomass_loss_2007") as "biomass_loss_2007",
+              sum("biomass_loss_2008") as "biomass_loss_2008",
+              sum("biomass_loss_2009") as "biomass_loss_2009",
+              sum("biomass_loss_2010") as "biomass_loss_2010",
+              sum("biomass_loss_2011") as "biomass_loss_2011",
+              sum("biomass_loss_2012") as "biomass_loss_2012",
+              sum("biomass_loss_2013") as "biomass_loss_2013",
+              sum("biomass_loss_2014") as "biomass_loss_2014",
+              sum("biomass_loss_2015") as "biomass_loss_2015",
+              sum("biomass_loss_2016") as "biomass_loss_2016",
+              sum("biomass_loss_2017") as "biomass_loss_2017",
+              sum("biomass_loss_2018") as "biomass_loss_2018",
+              sum("carbon_emissions_2001") as "carbon_emissions_2001",
+              sum("carbon_emissions_2002") as "carbon_emissions_2002",
+              sum("carbon_emissions_2003") as "carbon_emissions_2003",
+              sum("carbon_emissions_2004") as "carbon_emissions_2004",
+              sum("carbon_emissions_2005") as "carbon_emissions_2005",
+              sum("carbon_emissions_2006") as "carbon_emissions_2006",
+              sum("carbon_emissions_2007") as "carbon_emissions_2007",
+              sum("carbon_emissions_2008") as "carbon_emissions_2008",
+              sum("carbon_emissions_2009") as "carbon_emissions_2009",
+              sum("carbon_emissions_2010") as "carbon_emissions_2010",
+              sum("carbon_emissions_2011") as "carbon_emissions_2011",
+              sum("carbon_emissions_2012") as "carbon_emissions_2012",
+              sum("carbon_emissions_2013") as "carbon_emissions_2013",
+              sum("carbon_emissions_2014") as "carbon_emissions_2014",
+              sum("carbon_emissions_2015") as "carbon_emissions_2015",
+              sum("carbon_emissions_2016") as "carbon_emissions_2016",
+              sum("carbon_emissions_2017") as "carbon_emissions_2017",
+              sum("carbon_emissions_2018") as "carbon_emissions_2018",
+              sum("mangrove_biomass_loss_2001") as "mangrove_biomass_loss_2001",
+              sum("mangrove_biomass_loss_2002") as "mangrove_biomass_loss_2002",
+              sum("mangrove_biomass_loss_2003") as "mangrove_biomass_loss_2003",
+              sum("mangrove_biomass_loss_2004") as "mangrove_biomass_loss_2004",
+              sum("mangrove_biomass_loss_2005") as "mangrove_biomass_loss_2005",
+              sum("mangrove_biomass_loss_2006") as "mangrove_biomass_loss_2006",
+              sum("mangrove_biomass_loss_2007") as "mangrove_biomass_loss_2007",
+              sum("mangrove_biomass_loss_2008") as "mangrove_biomass_loss_2008",
+              sum("mangrove_biomass_loss_2009") as "mangrove_biomass_loss_2009",
+              sum("mangrove_biomass_loss_2010") as "mangrove_biomass_loss_2010",
+              sum("mangrove_biomass_loss_2011") as "mangrove_biomass_loss_2011",
+              sum("mangrove_biomass_loss_2012") as "mangrove_biomass_loss_2012",
+              sum("mangrove_biomass_loss_2013") as "mangrove_biomass_loss_2013",
+              sum("mangrove_biomass_loss_2014") as "mangrove_biomass_loss_2014",
+              sum("mangrove_biomass_loss_2015") as "mangrove_biomass_loss_2015",
+              sum("mangrove_biomass_loss_2016") as "mangrove_biomass_loss_2016",
+              sum("mangrove_biomass_loss_2017") as "mangrove_biomass_loss_2017",
+              sum("mangrove_biomass_loss_2018") as "mangrove_biomass_loss_2018",
+              sum("mangrove_carbon_emissions_2001") as "mangrove_carbon_emissions_2001",
+              sum("mangrove_carbon_emissions_2002") as "mangrove_carbon_emissions_2002",
+              sum("mangrove_carbon_emissions_2003") as "mangrove_carbon_emissions_2003",
+              sum("mangrove_carbon_emissions_2004") as "mangrove_carbon_emissions_2004",
+              sum("mangrove_carbon_emissions_2005") as "mangrove_carbon_emissions_2005",
+              sum("mangrove_carbon_emissions_2006") as "mangrove_carbon_emissions_2006",
+              sum("mangrove_carbon_emissions_2007") as "mangrove_carbon_emissions_2007",
+              sum("mangrove_carbon_emissions_2008") as "mangrove_carbon_emissions_2008",
+              sum("mangrove_carbon_emissions_2009") as "mangrove_carbon_emissions_2009",
+              sum("mangrove_carbon_emissions_2010") as "mangrove_carbon_emissions_2010",
+              sum("mangrove_carbon_emissions_2011") as "mangrove_carbon_emissions_2011",
+              sum("mangrove_carbon_emissions_2012") as "mangrove_carbon_emissions_2012",
+              sum("mangrove_carbon_emissions_2013") as "mangrove_carbon_emissions_2013",
+              sum("mangrove_carbon_emissions_2014") as "mangrove_carbon_emissions_2014",
+              sum("mangrove_carbon_emissions_2015") as "mangrove_carbon_emissions_2015",
+              sum("mangrove_carbon_emissions_2016") as "mangrove_carbon_emissions_2016",
+              sum("mangrove_carbon_emissions_2017") as "mangrove_carbon_emissions_2017",
+              sum("mangrove_carbon_emissions_2018") as "mangrove_carbon_emissions_2018"
+            )
+            .select(
+              $"iso",
+              $"threshold",
+              $"tcs",
+              $"global_land_cover",
+              $"primary_forest",
+              $"idn_primary_forest",
+              $"erosion",
+              $"biodiversity_significance",
+              $"biodiversity_intactness",
+              $"wdpa",
+              $"aze",
+              $"plantations",
+              $"river_basin",
+              $"ecozone",
+              $"urban_watershed",
+              $"mangroves_1996",
+              $"mangroves_2016",
+              $"water_stress",
+              $"ifl",
+              $"endemic_bird_area",
+              $"tiger_cl",
+              $"landmark",
+              $"land_right",
+              $"kba",
+              $"mining",
+              $"rspo",
+              $"idn_mys_peatlands",
+              $"oil_palm",
+              $"idn_forest_moratorium",
+              $"idn_land_cover",
+              $"mex_protected_areas",
+              $"mex_pes",
+              $"mex_forest_zoning",
+              $"per_production_forest",
+              $"per_protected_area",
+              $"per_forest_concession",
+              $"bra_biomes",
+              $"wood_fiber",
+              $"resource_right",
+              $"managed_forests",
+              $"oil_gas",
+              $"totalarea" as "total_area",
+              $"extent2000" as "extent_2000",
+              $"extent2010" as "extent_2010",
+              $"total_biomass",
+              $"total_co2",
+              $"total_mangrove_biomass",
+              $"total_mangrove_co2",
+              array(
+                struct(
+                  $"year_2001" as "year",
+                  $"area_loss_2001" as "area_loss",
+                  $"biomass_loss_2001" as "biomass_loss",
+                  $"carbon_emissions_2001" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2001" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2001" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2002" as "year",
+                  $"area_loss_2002" as "area_loss",
+                  $"biomass_loss_2002" as "biomass_loss",
+                  $"carbon_emissions_2002" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2002" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2002" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2003" as "year",
+                  $"area_loss_2003" as "area_loss",
+                  $"biomass_loss_2003" as "biomass_loss",
+                  $"carbon_emissions_2003" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2003" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2003" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2004" as "year",
+                  $"area_loss_2004" as "area_loss",
+                  $"biomass_loss_2004" as "biomass_loss",
+                  $"carbon_emissions_2004" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2004" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2004" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2005" as "year",
+                  $"area_loss_2005" as "area_loss",
+                  $"biomass_loss_2005" as "biomass_loss",
+                  $"carbon_emissions_2005" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2005" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2005" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2006" as "year",
+                  $"area_loss_2006" as "area_loss",
+                  $"biomass_loss_2006" as "biomass_loss",
+                  $"carbon_emissions_2006" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2006" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2006" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2007" as "year",
+                  $"area_loss_2007" as "area_loss",
+                  $"biomass_loss_2007" as "biomass_loss",
+                  $"carbon_emissions_2007" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2007" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2007" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2008" as "year",
+                  $"area_loss_2008" as "area_loss",
+                  $"biomass_loss_2008" as "biomass_loss",
+                  $"carbon_emissions_2008" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2008" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2008" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2009" as "year",
+                  $"area_loss_2009" as "area_loss",
+                  $"biomass_loss_2009" as "biomass_loss",
+                  $"carbon_emissions_2009" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2009" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2009" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2010" as "year",
+                  $"area_loss_2010" as "area_loss",
+                  $"biomass_loss_2010" as "biomass_loss",
+                  $"carbon_emissions_2010" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2010" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2010" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2011" as "year",
+                  $"area_loss_2011" as "area_loss",
+                  $"biomass_loss_2011" as "biomass_loss",
+                  $"carbon_emissions_2011" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2011" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2011" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2012" as "year",
+                  $"area_loss_2012" as "area_loss",
+                  $"biomass_loss_2012" as "biomass_loss",
+                  $"carbon_emissions_2012" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2012" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2012" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2013" as "year",
+                  $"area_loss_2013" as "area_loss",
+                  $"biomass_loss_2013" as "biomass_loss",
+                  $"carbon_emissions_2013" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2013" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2013" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2014" as "year",
+                  $"area_loss_2014" as "area_loss",
+                  $"biomass_loss_2014" as "biomass_loss",
+                  $"carbon_emissions_2014" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2014" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2014" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2015" as "year",
+                  $"area_loss_2015" as "area_loss",
+                  $"biomass_loss_2015" as "biomass_loss",
+                  $"carbon_emissions_2015" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2015" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2015" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2016" as "year",
+                  $"area_loss_2016" as "area_loss",
+                  $"biomass_loss_2016" as "biomass_loss",
+                  $"carbon_emissions_2016" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2016" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2016" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2017" as "year",
+                  $"area_loss_2017" as "area_loss",
+                  $"biomass_loss_2017" as "biomass_loss",
+                  $"carbon_emissions_2017" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2017" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2017" as "mangrove_carbon_emissions"
+                ),
+                struct(
+                  $"year_2018" as "year",
+                  $"area_loss_2018" as "area_loss",
+                  $"biomass_loss_2018" as "biomass_loss",
+                  $"carbon_emissions_2018" as "carbon_emissions",
+                  $"mangrove_biomass_loss_2018" as "mangrove_biomass_loss",
+                  $"mangrove_carbon_emissions_2018" as "mangrove_carbon_emissions"
+                )
+              ) as "year_data"
+            )
+          isoApiDF.toJSON
+            .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
+            .write
+            .text(outputUrl + "/api/iso")
 
           spark.stop
       }
