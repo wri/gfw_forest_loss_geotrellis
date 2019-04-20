@@ -10,6 +10,8 @@ import org.apache.spark.sql.expressions.Window
 import cats.implicits._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
+import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
 
 object TreeLossSummaryMain
   extends CommandApp(
@@ -216,10 +218,12 @@ object TreeLossSummaryMain
                 "year_data"
               )
 
-          val outputPartitionCount =
-            maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
+          val runOutputUrl = outputUrl + "/treecoverloss_" + DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").format(LocalDateTime.now)
 
-          //          summaryDF.repartition($"feature_id")
+          //          val outputPartitionCount =
+          //            maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
+
+          summaryDF.repartition($"feature_id", $"threshold")
           summaryDF.cache()
 
           val WindowPartitionOrder = Window
@@ -250,6 +254,7 @@ object TreeLossSummaryMain
               $"threshold_2000" as "threshold",
               $"layers",
               $"area",
+              $"gain",
               $"biomass",
               $"co2",
               $"mangrove_biomass",
@@ -530,6 +535,7 @@ object TreeLossSummaryMain
             )
             .agg(
               sum("area") as "area",
+              sum("gain") as "gain",
               sum("biomass") as "biomass",
               sum("co2") as "co2",
               sum("mangrove_biomass") as "mangrove_biomass",
@@ -636,6 +642,7 @@ object TreeLossSummaryMain
               0.0,
               Seq(
                 "area",
+                "gain",
                 "biomass",
                 "co2",
                 "mangrove_biomass",
@@ -774,6 +781,7 @@ object TreeLossSummaryMain
               $"m_layers" as "layers",
               $"totalarea",
               windowSum("area") as "extent2000",
+              windowSum("gain") as "total_gain",
               windowSum("biomass") as "total_biomass",
               windowSum("co2") as "total_co2",
               windowSum("mangrove_biomass") as "total_mangrove_biomass",
@@ -968,6 +976,7 @@ object TreeLossSummaryMain
               $"totalarea",
               $"extent2000",
               $"extent2010",
+              $"total_gain",
               $"total_biomass",
               $"total_co2",
               $"total_mangrove_biomass",
@@ -1096,115 +1105,226 @@ object TreeLossSummaryMain
           val adm2SummaryDF = adm2DF
             .groupBy($"iso", $"adm1", $"adm2", $"threshold")
             .agg(
-              sum("totalarea") as "area_ha",
-              sum("extent2000") as "extent2000_ha",
-              sum("extent2010") as "extent2010_ha",
-              sum("total_biomass") as "biomass_Mt",
-              sum("total_co2") as "carbon_Mt",
-              sum("total_mangrove_biomass") as "mangrove_biomass_Mt",
-              sum("total_mangrove_co2") as "mangrove_carbon_Mt",
-              sum("area_loss_2001") as "tc_loss_ha_2001",
-              sum("area_loss_2002") as "tc_loss_ha_2002",
-              sum("area_loss_2003") as "tc_loss_ha_2003",
-              sum("area_loss_2004") as "tc_loss_ha_2004",
-              sum("area_loss_2005") as "tc_loss_ha_2005",
-              sum("area_loss_2006") as "tc_loss_ha_2006",
-              sum("area_loss_2007") as "tc_loss_ha_2007",
-              sum("area_loss_2008") as "tc_loss_ha_2008",
-              sum("area_loss_2009") as "tc_loss_ha_2009",
-              sum("area_loss_2010") as "tc_loss_ha_2010",
-              sum("area_loss_2011") as "tc_loss_ha_2011",
-              sum("area_loss_2012") as "tc_loss_ha_2012",
-              sum("area_loss_2013") as "tc_loss_ha_2013",
-              sum("area_loss_2014") as "tc_loss_ha_2014",
-              sum("area_loss_2015") as "tc_loss_ha_2015",
-              sum("area_loss_2016") as "tc_loss_ha_2016",
-              sum("area_loss_2017") as "tc_loss_ha_2017",
-              sum("area_loss_2018") as "tc_loss_ha_2018"
+              round(sum("totalarea")) as "area_ha",
+              round(sum("extent2000")) as "extent2000_ha",
+              round(sum("extent2010")) as "extent2010_ha",
+              round(sum("total_gain")) as "gain_2000_2012_ha",
+              round(sum("total_biomass")) as "biomass_Mt",
+              round(sum("total_co2")) as "carbon_Mt",
+              round(sum("total_mangrove_biomass")) as "mangrove_biomass_Mt",
+              round(sum("total_mangrove_co2")) as "mangrove_carbon_Mt",
+              round(sum("area_loss_2001")) as "tc_loss_ha_2001",
+              round(sum("area_loss_2002")) as "tc_loss_ha_2002",
+              round(sum("area_loss_2003")) as "tc_loss_ha_2003",
+              round(sum("area_loss_2004")) as "tc_loss_ha_2004",
+              round(sum("area_loss_2005")) as "tc_loss_ha_2005",
+              round(sum("area_loss_2006")) as "tc_loss_ha_2006",
+              round(sum("area_loss_2007")) as "tc_loss_ha_2007",
+              round(sum("area_loss_2008")) as "tc_loss_ha_2008",
+              round(sum("area_loss_2009")) as "tc_loss_ha_2009",
+              round(sum("area_loss_2010")) as "tc_loss_ha_2010",
+              round(sum("area_loss_2011")) as "tc_loss_ha_2011",
+              round(sum("area_loss_2012")) as "tc_loss_ha_2012",
+              round(sum("area_loss_2013")) as "tc_loss_ha_2013",
+              round(sum("area_loss_2014")) as "tc_loss_ha_2014",
+              round(sum("area_loss_2015")) as "tc_loss_ha_2015",
+              round(sum("area_loss_2016")) as "tc_loss_ha_2016",
+              round(sum("area_loss_2017")) as "tc_loss_ha_2017",
+              round(sum("area_loss_2018")) as "tc_loss_ha_2018",
+              round(sum("biomass_loss_2001")) as "biomass_loss_Mt_2001",
+              round(sum("biomass_loss_2002")) as "biomass_loss_Mt_2002",
+              round(sum("biomass_loss_2003")) as "biomass_loss_Mt_2003",
+              round(sum("biomass_loss_2004")) as "biomass_loss_Mt_2004",
+              round(sum("biomass_loss_2005")) as "biomass_loss_Mt_2005",
+              round(sum("biomass_loss_2006")) as "biomass_loss_Mt_2006",
+              round(sum("biomass_loss_2007")) as "biomass_loss_Mt_2007",
+              round(sum("biomass_loss_2008")) as "biomass_loss_Mt_2008",
+              round(sum("biomass_loss_2009")) as "biomass_loss_Mt_2009",
+              round(sum("biomass_loss_2010")) as "biomass_loss_Mt_2010",
+              round(sum("biomass_loss_2011")) as "biomass_loss_Mt_2011",
+              round(sum("biomass_loss_2012")) as "biomass_loss_Mt_2012",
+              round(sum("biomass_loss_2013")) as "biomass_loss_Mt_2013",
+              round(sum("biomass_loss_2014")) as "biomass_loss_Mt_2014",
+              round(sum("biomass_loss_2015")) as "biomass_loss_Mt_2015",
+              round(sum("biomass_loss_2016")) as "biomass_loss_Mt_2016",
+              round(sum("biomass_loss_2017")) as "biomass_loss_Mt_2017",
+              round(sum("biomass_loss_2018")) as "biomass_loss_Mt_2018",
+              round(sum("carbon_emissions_2001")) as "carbon_emissions_Mt_2001",
+              round(sum("carbon_emissions_2002")) as "carbon_emissions_Mt_2002",
+              round(sum("carbon_emissions_2003")) as "carbon_emissions_Mt_2003",
+              round(sum("carbon_emissions_2004")) as "carbon_emissions_Mt_2004",
+              round(sum("carbon_emissions_2005")) as "carbon_emissions_Mt_2005",
+              round(sum("carbon_emissions_2006")) as "carbon_emissions_Mt_2006",
+              round(sum("carbon_emissions_2007")) as "carbon_emissions_Mt_2007",
+              round(sum("carbon_emissions_2008")) as "carbon_emissions_Mt_2008",
+              round(sum("carbon_emissions_2009")) as "carbon_emissions_Mt_2009",
+              round(sum("carbon_emissions_2010")) as "carbon_emissions_Mt_2010",
+              round(sum("carbon_emissions_2011")) as "carbon_emissions_Mt_2011",
+              round(sum("carbon_emissions_2012")) as "carbon_emissions_Mt_2012",
+              round(sum("carbon_emissions_2013")) as "carbon_emissions_Mt_2013",
+              round(sum("carbon_emissions_2014")) as "carbon_emissions_Mt_2014",
+              round(sum("carbon_emissions_2015")) as "carbon_emissions_Mt_2015",
+              round(sum("carbon_emissions_2016")) as "carbon_emissions_Mt_2016",
+              round(sum("carbon_emissions_2017")) as "carbon_emissions_Mt_2017",
+              round(sum("carbon_emissions_2018")) as "carbon_emissions_Mt_2018"
             )
 
           adm2SummaryDF.write
             .options(csvOptions)
-            .csv(path = outputUrl + "/summary/adm2")
+            .csv(path = runOutputUrl + "/summary/adm2")
 
           val adm1SummaryDF = adm2SummaryDF
             .groupBy($"iso", $"adm1", $"threshold")
             .agg(
-              sum("area_ha") as "area_ha",
-              sum("extent2000_ha") as "extent2000_ha",
-              sum("extent2010_ha") as "extent2010_ha",
-              sum("biomass_Mt") as "biomass_Mt",
-              sum("carbon_Mt") as "carbon_Mt",
-              sum("mangrove_biomass_Mt") as "mangrove_biomass_Mt",
-              sum("mangrove_carbon_Mt") as "mangrove_carbon_Mt",
-              sum("tc_loss_ha_2001") as "tc_loss_ha_2001",
-              sum("tc_loss_ha_2002") as "tc_loss_ha_2002",
-              sum("tc_loss_ha_2003") as "tc_loss_ha_2003",
-              sum("tc_loss_ha_2004") as "tc_loss_ha_2004",
-              sum("tc_loss_ha_2005") as "tc_loss_ha_2005",
-              sum("tc_loss_ha_2006") as "tc_loss_ha_2006",
-              sum("tc_loss_ha_2007") as "tc_loss_ha_2007",
-              sum("tc_loss_ha_2008") as "tc_loss_ha_2008",
-              sum("tc_loss_ha_2009") as "tc_loss_ha_2009",
-              sum("tc_loss_ha_2010") as "tc_loss_ha_2010",
-              sum("tc_loss_ha_2011") as "tc_loss_ha_2011",
-              sum("tc_loss_ha_2012") as "tc_loss_ha_2012",
-              sum("tc_loss_ha_2013") as "tc_loss_ha_2013",
-              sum("tc_loss_ha_2014") as "tc_loss_ha_2014",
-              sum("tc_loss_ha_2015") as "tc_loss_ha_2015",
-              sum("tc_loss_ha_2016") as "tc_loss_ha_2016",
-              sum("tc_loss_ha_2017") as "tc_loss_ha_2017",
-              sum("tc_loss_ha_2018") as "tc_loss_ha_2018"
+              round(sum("area_ha")) as "area_ha",
+              round(sum("extent2000_ha")) as "extent2000_ha",
+              round(sum("extent2010_ha")) as "extent2010_ha",
+              round(sum("gain_2000_2012_ha")) as "gain_2000_2012_ha",
+              round(sum("biomass_Mt")) as "biomass_Mt",
+              round(sum("carbon_Mt")) as "carbon_Mt",
+              round(sum("mangrove_biomass_Mt")) as "mangrove_biomass_Mt",
+              round(sum("mangrove_carbon_Mt")) as "mangrove_carbon_Mt",
+              round(sum("tc_loss_ha_2001")) as "tc_loss_ha_2001",
+              round(sum("tc_loss_ha_2002")) as "tc_loss_ha_2002",
+              round(sum("tc_loss_ha_2003")) as "tc_loss_ha_2003",
+              round(sum("tc_loss_ha_2004")) as "tc_loss_ha_2004",
+              round(sum("tc_loss_ha_2005")) as "tc_loss_ha_2005",
+              round(sum("tc_loss_ha_2006")) as "tc_loss_ha_2006",
+              round(sum("tc_loss_ha_2007")) as "tc_loss_ha_2007",
+              round(sum("tc_loss_ha_2008")) as "tc_loss_ha_2008",
+              round(sum("tc_loss_ha_2009")) as "tc_loss_ha_2009",
+              round(sum("tc_loss_ha_2010")) as "tc_loss_ha_2010",
+              round(sum("tc_loss_ha_2011")) as "tc_loss_ha_2011",
+              round(sum("tc_loss_ha_2012")) as "tc_loss_ha_2012",
+              round(sum("tc_loss_ha_2013")) as "tc_loss_ha_2013",
+              round(sum("tc_loss_ha_2014")) as "tc_loss_ha_2014",
+              round(sum("tc_loss_ha_2015")) as "tc_loss_ha_2015",
+              round(sum("tc_loss_ha_2016")) as "tc_loss_ha_2016",
+              round(sum("tc_loss_ha_2017")) as "tc_loss_ha_2017",
+              round(sum("tc_loss_ha_2018")) as "tc_loss_ha_2018",
+              round(sum("biomass_loss_Mt_2001")) as "biomass_loss_Mt_2001",
+              round(sum("biomass_loss_Mt_2002")) as "biomass_loss_Mt_2002",
+              round(sum("biomass_loss_Mt_2003")) as "biomass_loss_Mt_2003",
+              round(sum("biomass_loss_Mt_2004")) as "biomass_loss_Mt_2004",
+              round(sum("biomass_loss_Mt_2005")) as "biomass_loss_Mt_2005",
+              round(sum("biomass_loss_Mt_2006")) as "biomass_loss_Mt_2006",
+              round(sum("biomass_loss_Mt_2007")) as "biomass_loss_Mt_2007",
+              round(sum("biomass_loss_Mt_2008")) as "biomass_loss_Mt_2008",
+              round(sum("biomass_loss_Mt_2009")) as "biomass_loss_Mt_2009",
+              round(sum("biomass_loss_Mt_2010")) as "biomass_loss_Mt_2010",
+              round(sum("biomass_loss_Mt_2011")) as "biomass_loss_Mt_2011",
+              round(sum("biomass_loss_Mt_2012")) as "biomass_loss_Mt_2012",
+              round(sum("biomass_loss_Mt_2013")) as "biomass_loss_Mt_2013",
+              round(sum("biomass_loss_Mt_2014")) as "biomass_loss_Mt_2014",
+              round(sum("biomass_loss_Mt_2015")) as "biomass_loss_Mt_2015",
+              round(sum("biomass_loss_Mt_2016")) as "biomass_loss_Mt_2016",
+              round(sum("biomass_loss_Mt_2017")) as "biomass_loss_Mt_2017",
+              round(sum("biomass_loss_Mt_2018")) as "biomass_loss_Mt_2018",
+              round(sum("carbon_emissions_Mt_2001")) as "carbon_emissions_Mt_2001",
+              round(sum("carbon_emissions_Mt_2002")) as "carbon_emissions_Mt_2002",
+              round(sum("carbon_emissions_Mt_2003")) as "carbon_emissions_Mt_2003",
+              round(sum("carbon_emissions_Mt_2004")) as "carbon_emissions_Mt_2004",
+              round(sum("carbon_emissions_Mt_2005")) as "carbon_emissions_Mt_2005",
+              round(sum("carbon_emissions_Mt_2006")) as "carbon_emissions_Mt_2006",
+              round(sum("carbon_emissions_Mt_2007")) as "carbon_emissions_Mt_2007",
+              round(sum("carbon_emissions_Mt_2008")) as "carbon_emissions_Mt_2008",
+              round(sum("carbon_emissions_Mt_2009")) as "carbon_emissions_Mt_2009",
+              round(sum("carbon_emissions_Mt_2010")) as "carbon_emissions_Mt_2010",
+              round(sum("carbon_emissions_Mt_2011")) as "carbon_emissions_Mt_2011",
+              round(sum("carbon_emissions_Mt_2012")) as "carbon_emissions_Mt_2012",
+              round(sum("carbon_emissions_Mt_2013")) as "carbon_emissions_Mt_2013",
+              round(sum("carbon_emissions_Mt_2014")) as "carbon_emissions_Mt_2014",
+              round(sum("carbon_emissions_Mt_2015")) as "carbon_emissions_Mt_2015",
+              round(sum("carbon_emissions_Mt_2016")) as "carbon_emissions_Mt_2016",
+              round(sum("carbon_emissions_Mt_2017")) as "carbon_emissions_Mt_2017",
+              round(sum("carbon_emissions_Mt_2018")) as "carbon_emissions_Mt_2018"
             )
 
           adm1SummaryDF.write
             .options(csvOptions)
-            .csv(path = outputUrl + "/summary/adm1")
+            .csv(path = runOutputUrl + "/summary/adm1")
 
           val isoSummaryDF = adm1SummaryDF
             .groupBy($"iso", $"threshold")
             .agg(
-              sum("area_ha") as "area_ha",
-              sum("extent2000_ha") as "extent2000_ha",
-              sum("extent2010_ha") as "extent2010_ha",
-              sum("biomass_Mt") as "biomass_Mt",
-              sum("carbon_Mt") as "carbon_Mt",
-              sum("mangrove_biomass_Mt") as "mangrove_biomass_Mt",
-              sum("mangrove_carbon_Mt") as "mangrove_carbon_Mt",
-              sum("tc_loss_ha_2001") as "tc_loss_ha_2001",
-              sum("tc_loss_ha_2002") as "tc_loss_ha_2002",
-              sum("tc_loss_ha_2003") as "tc_loss_ha_2003",
-              sum("tc_loss_ha_2004") as "tc_loss_ha_2004",
-              sum("tc_loss_ha_2005") as "tc_loss_ha_2005",
-              sum("tc_loss_ha_2006") as "tc_loss_ha_2006",
-              sum("tc_loss_ha_2007") as "tc_loss_ha_2007",
-              sum("tc_loss_ha_2008") as "tc_loss_ha_2008",
-              sum("tc_loss_ha_2009") as "tc_loss_ha_2009",
-              sum("tc_loss_ha_2010") as "tc_loss_ha_2010",
-              sum("tc_loss_ha_2011") as "tc_loss_ha_2011",
-              sum("tc_loss_ha_2012") as "tc_loss_ha_2012",
-              sum("tc_loss_ha_2013") as "tc_loss_ha_2013",
-              sum("tc_loss_ha_2014") as "tc_loss_ha_2014",
-              sum("tc_loss_ha_2015") as "tc_loss_ha_2015",
-              sum("tc_loss_ha_2016") as "tc_loss_ha_2016",
-              sum("tc_loss_ha_2017") as "tc_loss_ha_2017",
-              sum("tc_loss_ha_2018") as "tc_loss_ha_2018"
+              round(sum("area_ha")) as "area_ha",
+              round(sum("extent2000_ha")) as "extent2000_ha",
+              round(sum("extent2010_ha")) as "extent2010_ha",
+              round(sum("gain_2000_2012_ha")) as "gain_2000_2012_ha",
+              round(sum("biomass_Mt")) as "biomass_Mt",
+              round(sum("carbon_Mt")) as "carbon_Mt",
+              round(sum("mangrove_biomass_Mt")) as "mangrove_biomass_Mt",
+              round(sum("mangrove_carbon_Mt")) as "mangrove_carbon_Mt",
+              round(sum("tc_loss_ha_2001")) as "tc_loss_ha_2001",
+              round(sum("tc_loss_ha_2002")) as "tc_loss_ha_2002",
+              round(sum("tc_loss_ha_2003")) as "tc_loss_ha_2003",
+              round(sum("tc_loss_ha_2004")) as "tc_loss_ha_2004",
+              round(sum("tc_loss_ha_2005")) as "tc_loss_ha_2005",
+              round(sum("tc_loss_ha_2006")) as "tc_loss_ha_2006",
+              round(sum("tc_loss_ha_2007")) as "tc_loss_ha_2007",
+              round(sum("tc_loss_ha_2008")) as "tc_loss_ha_2008",
+              round(sum("tc_loss_ha_2009")) as "tc_loss_ha_2009",
+              round(sum("tc_loss_ha_2010")) as "tc_loss_ha_2010",
+              round(sum("tc_loss_ha_2011")) as "tc_loss_ha_2011",
+              round(sum("tc_loss_ha_2012")) as "tc_loss_ha_2012",
+              round(sum("tc_loss_ha_2013")) as "tc_loss_ha_2013",
+              round(sum("tc_loss_ha_2014")) as "tc_loss_ha_2014",
+              round(sum("tc_loss_ha_2015")) as "tc_loss_ha_2015",
+              round(sum("tc_loss_ha_2016")) as "tc_loss_ha_2016",
+              round(sum("tc_loss_ha_2017")) as "tc_loss_ha_2017",
+              round(sum("tc_loss_ha_2018")) as "tc_loss_ha_2018",
+              round(sum("biomass_loss_Mt_2001")) as "biomass_loss_Mt_2001",
+              round(sum("biomass_loss_Mt_2002")) as "biomass_loss_Mt_2002",
+              round(sum("biomass_loss_Mt_2003")) as "biomass_loss_Mt_2003",
+              round(sum("biomass_loss_Mt_2004")) as "biomass_loss_Mt_2004",
+              round(sum("biomass_loss_Mt_2005")) as "biomass_loss_Mt_2005",
+              round(sum("biomass_loss_Mt_2006")) as "biomass_loss_Mt_2006",
+              round(sum("biomass_loss_Mt_2007")) as "biomass_loss_Mt_2007",
+              round(sum("biomass_loss_Mt_2008")) as "biomass_loss_Mt_2008",
+              round(sum("biomass_loss_Mt_2009")) as "biomass_loss_Mt_2009",
+              round(sum("biomass_loss_Mt_2010")) as "biomass_loss_Mt_2010",
+              round(sum("biomass_loss_Mt_2011")) as "biomass_loss_Mt_2011",
+              round(sum("biomass_loss_Mt_2012")) as "biomass_loss_Mt_2012",
+              round(sum("biomass_loss_Mt_2013")) as "biomass_loss_Mt_2013",
+              round(sum("biomass_loss_Mt_2014")) as "biomass_loss_Mt_2014",
+              round(sum("biomass_loss_Mt_2015")) as "biomass_loss_Mt_2015",
+              round(sum("biomass_loss_Mt_2016")) as "biomass_loss_Mt_2016",
+              round(sum("biomass_loss_Mt_2017")) as "biomass_loss_Mt_2017",
+              round(sum("biomass_loss_Mt_2018")) as "biomass_loss_Mt_2018",
+              round(sum("carbon_emissions_Mt_2001")) as "carbon_emissions_Mt_2001",
+              round(sum("carbon_emissions_Mt_2002")) as "carbon_emissions_Mt_2002",
+              round(sum("carbon_emissions_Mt_2003")) as "carbon_emissions_Mt_2003",
+              round(sum("carbon_emissions_Mt_2004")) as "carbon_emissions_Mt_2004",
+              round(sum("carbon_emissions_Mt_2005")) as "carbon_emissions_Mt_2005",
+              round(sum("carbon_emissions_Mt_2006")) as "carbon_emissions_Mt_2006",
+              round(sum("carbon_emissions_Mt_2007")) as "carbon_emissions_Mt_2007",
+              round(sum("carbon_emissions_Mt_2008")) as "carbon_emissions_Mt_2008",
+              round(sum("carbon_emissions_Mt_2009")) as "carbon_emissions_Mt_2009",
+              round(sum("carbon_emissions_Mt_2010")) as "carbon_emissions_Mt_2010",
+              round(sum("carbon_emissions_Mt_2011")) as "carbon_emissions_Mt_2011",
+              round(sum("carbon_emissions_Mt_2012")) as "carbon_emissions_Mt_2012",
+              round(sum("carbon_emissions_Mt_2013")) as "carbon_emissions_Mt_2013",
+              round(sum("carbon_emissions_Mt_2014")) as "carbon_emissions_Mt_2014",
+              round(sum("carbon_emissions_Mt_2015")) as "carbon_emissions_Mt_2015",
+              round(sum("carbon_emissions_Mt_2016")) as "carbon_emissions_Mt_2016",
+              round(sum("carbon_emissions_Mt_2017")) as "carbon_emissions_Mt_2017",
+              round(sum("carbon_emissions_Mt_2018")) as "carbon_emissions_Mt_2018"
             )
 
           isoSummaryDF.write
             .options(csvOptions)
-            .csv(path = outputUrl + "/summary/iso")
+            .csv(path = runOutputUrl + "/summary/iso")
 
 
           adm1SummaryDF.coalesce(1)
             .write
             .options(csvOptions)
-            .csv(path = outputUrl + "/summary/global/adm1")
+            .csv(path = runOutputUrl + "/summary/global/adm1")
 
           isoSummaryDF.coalesce(1)
             .write
             .options(csvOptions)
-            .csv(path = outputUrl + "/summary/global/iso")
+            .csv(path = runOutputUrl + "/summary/global/iso")
 
           val adm2ApiDF = adm2DF
             .select(
@@ -1254,6 +1374,7 @@ object TreeLossSummaryMain
               $"totalarea" as "total_area",
               $"extent2000" as "extent_2000",
               $"extent2010" as "extent_2010",
+              $"total_gain",
               $"total_biomass",
               $"total_co2",
               $"total_mangrove_biomass",
@@ -1408,7 +1529,7 @@ object TreeLossSummaryMain
           adm2ApiDF.toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
-            .text(outputUrl + "/api/adm2")
+            .text(runOutputUrl + "/api/adm2")
 
           val adm1ApiDF = adm2DF
             .groupBy(
@@ -1474,11 +1595,14 @@ object TreeLossSummaryMain
               $"year_2018"
             )
             .agg(
-              sum("area") as "area",
-              sum("biomass") as "biomass",
-              sum("co2") as "co2",
-              sum("mangrove_biomass") as "mangrove_biomass",
-              sum("mangrove_co2") as "mangrove_co2",
+              sum("totalarea") as "total_area",
+              sum("extent2000") as "extent_2000",
+              sum("extent2010") as "extent_2010",
+              sum("total_gain") as "total_gain",
+              sum("total_biomass") as "total_biomass",
+              sum("total_co2") as "total_co2",
+              sum("total_mangrove_biomass") as "total_mangrove_biomass",
+              sum("total_mangrove_co2") as "total_mangrove_co2",
               sum("area_loss_2001") as "area_loss_2001",
               sum("area_loss_2002") as "area_loss_2002",
               sum("area_loss_2003") as "area_loss_2003",
@@ -1613,9 +1737,10 @@ object TreeLossSummaryMain
               $"resource_right",
               $"managed_forests",
               $"oil_gas",
-              $"totalarea" as "total_area",
-              $"extent2000" as "extent_2000",
-              $"extent2010" as "extent_2010",
+              $"total_area",
+              $"extent_2000",
+              $"extent_2010",
+              $"total_gain",
               $"total_biomass",
               $"total_co2",
               $"total_mangrove_biomass",
@@ -1770,9 +1895,9 @@ object TreeLossSummaryMain
           adm1ApiDF.toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
-            .text(outputUrl + "/api/adm1")
+            .text(runOutputUrl + "/api/adm1")
 
-          val isoApiDF = adm1ApiDF
+          val isoApiDF = adm2DF
             .groupBy(
               $"iso",
               $"threshold",
@@ -1835,11 +1960,14 @@ object TreeLossSummaryMain
               $"year_2018"
             )
             .agg(
-              sum("area") as "area",
-              sum("biomass") as "biomass",
-              sum("co2") as "co2",
-              sum("mangrove_biomass") as "mangrove_biomass",
-              sum("mangrove_co2") as "mangrove_co2",
+              sum("totalarea") as "total_area",
+              sum("extent2000") as "extent_2000",
+              sum("extent2010") as "extent_2010",
+              sum("total_gain") as "total_gain",
+              sum("total_biomass") as "total_biomass",
+              sum("total_co2") as "total_co2",
+              sum("total_mangrove_biomass") as "total_mangrove_biomass",
+              sum("total_mangrove_co2") as "total_mangrove_co2",
               sum("area_loss_2001") as "area_loss_2001",
               sum("area_loss_2002") as "area_loss_2002",
               sum("area_loss_2003") as "area_loss_2003",
@@ -1973,9 +2101,10 @@ object TreeLossSummaryMain
               $"resource_right",
               $"managed_forests",
               $"oil_gas",
-              $"totalarea" as "total_area",
-              $"extent2000" as "extent_2000",
-              $"extent2010" as "extent_2010",
+              $"total_area",
+              $"extent_2000",
+              $"extent_2010",
+              $"total_gain",
               $"total_biomass",
               $"total_co2",
               $"total_mangrove_biomass",
@@ -2130,7 +2259,7 @@ object TreeLossSummaryMain
           isoApiDF.toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
-            .text(outputUrl + "/api/iso")
+            .text(runOutputUrl + "/api/iso")
 
           spark.stop
       }
