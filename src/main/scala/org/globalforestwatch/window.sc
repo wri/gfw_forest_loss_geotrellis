@@ -18,9 +18,9 @@ val WindowPartitionOrder = Window.partitionBy($"feature_id", $"layers").orderBy(
 val myDF = Seq((1,1,0,0.3),
               (1,1,1,0.0),
               (1,1,2,0.3),
-              (1,1,3,),
+  (1, 1, 3, 0.1),
               (1,1,4,0.3),
-              (2,1,5,Nil),
+  (2, 1, 5, 0.1),
               (2,1,0,0.3),
               (2,1,1,0.3),
               (2,1,2,0.3),
@@ -32,6 +32,7 @@ def windowSum(col:String) = sum(col).over(WindowPartitionOrder)
 
 myDF.orderBy("feature_id", "threshold").show(false)
 myDF.select($"feature_id", $"layers", $"threshold", windowSum("values") as "values").orderBy("feature_id", "threshold").show(false)
+myDF.groupBy($"feature_id", $"layers").agg(sum($"threshold"), sum($"threshold" * $"values"), sum($"threshold" * $"values") / sum($"threshold"), avg($"values")).show(false)
 
 
 

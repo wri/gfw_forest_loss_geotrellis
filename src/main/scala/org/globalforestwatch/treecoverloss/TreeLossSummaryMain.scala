@@ -6,12 +6,13 @@ import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.expressions.Window
 import cats.implicits._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
+import TreeLossDFHelpers._
+
 
 object TreeLossSummaryMain
   extends CommandApp(
@@ -73,21 +74,7 @@ object TreeLossSummaryMain
          iso,
          admin1,
          admin2) =>
-          val conf = new SparkConf()
-            .setIfMissing("spark.master", "local[*]")
-            .setAppName("Tree Cover Loss DataFrame")
-            .set(
-              "spark.serializer",
-              "org.apache.spark.serializer.KryoSerializer"
-            )
-            .set(
-              "spark.kryo.registrator",
-              "geotrellis.spark.io.kryo.KryoRegistrator"
-            )
-            .set("spark.sql.crossJoin.enabled", "true")
-
-          implicit val spark: SparkSession =
-            SparkSession.builder.config(conf).getOrCreate
+          val spark: SparkSession = TreeLossSparkSession().spark
           import spark.implicits._
 
           // ref: https://github.com/databricks/spark-csv
@@ -223,14 +210,18 @@ object TreeLossSummaryMain
           //          val outputPartitionCount =
           //            maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
-          summaryDF.repartition($"feature_id", $"threshold")
+          summaryDF.repartition($"feature_id", $"threshold_2000")
           summaryDF.cache()
 
-          val WindowPartitionOrder = Window
-            .partitionBy($"m_feature_id", $"m_layers")
-            .orderBy($"m_threshold".desc)
 
-          def windowSum(col: String) = sum(col).over(WindowPartitionOrder)
+
+
+          //          val WindowPartitionOrder = Window
+          //            .partitionBy($"m_feature_id", $"m_layers")
+          //            .orderBy($"m_threshold".desc)
+          //
+          //          def windowSum(e: Column): Column = sum(e).over(WindowPartitionOrder)
+          //          def windowSum(columnName: String): Column = windowSum(col(columnName))
 
           val thresholdDF =
             Seq(0, 10, 15, 20, 25, 30, 50, 75).toDF("threshold")
@@ -248,6 +239,32 @@ object TreeLossSummaryMain
 
           masterDF.cache()
 
+          val lookup2010 = Map("threshold_2010" -> "threshold")
+
+          val extent2010DF = summaryDF
+            .select(
+              summaryDF.columns
+                .map(c => col(c).as(lookup2010.getOrElse(c, c))): _*
+            )
+            .groupBy("feature_id", "layers", "threshold")
+            .agg(sum("area") as "area")
+            .join(
+              masterDF,
+              $"m_feature_id" <=> $"feature_id" &&
+                $"m_layers" <=> $"layers" &&
+                $"m_threshold" <=> $"threshold",
+              "right_outer"
+            )
+            .na
+            .fill(0.0, Seq("area"))
+            .select(
+              $"m_feature_id",
+              $"m_layers",
+              $"m_threshold",
+              windowSum("area") as "extent2010"
+            )
+
+
           val annualLossDF = summaryDF
             .select(
               $"feature_id",
@@ -256,8 +273,10 @@ object TreeLossSummaryMain
               $"area",
               $"gain",
               $"biomass",
+              $"biomass_per_ha",
               $"co2",
               $"mangrove_biomass",
+              $"mangrove_biomass_per_ha",
               $"mangrove_co2",
               'year_data.getItem(0).getItem("year") as "year_2001",
               'year_data.getItem(1).getItem("year") as "year_2002",
@@ -537,8 +556,10 @@ object TreeLossSummaryMain
               sum("area") as "area",
               sum("gain") as "gain",
               sum("biomass") as "biomass",
+              sum($"biomass_per_ha" * $"area") / sum("area") as "biomass_per_ha",
               sum("co2") as "co2",
               sum("mangrove_biomass") as "mangrove_biomass",
+              sum($"mangrove_biomass_per_ha" * $"area") / sum("area") as "mangrove_biomass_per_ha",
               sum("mangrove_co2") as "mangrove_co2",
               sum("area_loss_2001") as "area_loss_2001",
               sum("area_loss_2002") as "area_loss_2002",
@@ -644,8 +665,10 @@ object TreeLossSummaryMain
                 "area",
                 "gain",
                 "biomass",
+                "biomass_per_ha",
                 "co2",
                 "mangrove_biomass",
+                "mangrove_biomass_per_ha",
                 "mangrove_co2",
                 "area_loss_2001",
                 "area_loss_2002",
@@ -783,9 +806,11 @@ object TreeLossSummaryMain
               windowSum("area") as "extent2000",
               windowSum("gain") as "total_gain",
               windowSum("biomass") as "total_biomass",
+              windowSum($"biomass_per_ha" * $"area") / windowSum("area") as "avg_biomass_per_ha",
               windowSum("co2") as "total_co2",
               windowSum("mangrove_biomass") as "total_mangrove_biomass",
               windowSum("mangrove_co2") as "total_mangrove_co2",
+              windowSum($"mangrove_biomass_per_ha" * $"area") / windowSum("area") as "avg_mangrove_biomass_per_ha",
               $"year_2001",
               $"year_2002",
               $"year_2003",
@@ -896,30 +921,6 @@ object TreeLossSummaryMain
               windowSum("mangrove_carbon_emissions_2018") as "mangrove_carbon_emissions_2018"
             )
 
-          val lookup2010 = Map("threshold_2010" -> "threshold")
-
-          val extent2010DF = summaryDF
-            .select(
-              summaryDF.columns
-                .map(c => col(c).as(lookup2010.getOrElse(c, c))): _*
-            )
-            .groupBy("feature_id", "layers", "threshold")
-            .agg(sum("area") as "area")
-            .join(
-              masterDF,
-              $"m_feature_id" <=> $"feature_id" &&
-                $"m_layers" <=> $"layers" &&
-                $"m_threshold" <=> $"threshold",
-              "right_outer"
-            )
-            .na
-            .fill(0.0, Seq("area"))
-            .select(
-              $"m_feature_id",
-              $"m_layers",
-              $"m_threshold",
-              windowSum("area") as "extent2010"
-            )
 
           val adm2DF = annualLossDF
             .join(
@@ -978,8 +979,10 @@ object TreeLossSummaryMain
               $"extent2010",
               $"total_gain",
               $"total_biomass",
+              $"avg_biomass_per_ha",
               $"total_co2",
               $"total_mangrove_biomass",
+              $"avg_mangrove_biomass_per_ha",
               $"total_mangrove_co2",
               $"year_2001",
               $"area_loss_2001",
@@ -1110,8 +1113,10 @@ object TreeLossSummaryMain
               round(sum("extent2010")) as "extent2010_ha",
               round(sum("total_gain")) as "gain_2000_2012_ha",
               round(sum("total_biomass")) as "biomass_Mt",
+              round(sum($"avg_biomass_per_ha" * $"totalarea") / sum("totalarea")) as "avg_biomass_per_ha_Mt",
               round(sum("total_co2")) as "carbon_Mt",
               round(sum("total_mangrove_biomass")) as "mangrove_biomass_Mt",
+              round(sum($"avg_mangrove_biomass_per_ha" * $"totalarea") / sum("totalarea")) as "avg_mangrove_biomass_per_ha_Mt",
               round(sum("total_mangrove_co2")) as "mangrove_carbon_Mt",
               round(sum("area_loss_2001")) as "tc_loss_ha_2001",
               round(sum("area_loss_2002")) as "tc_loss_ha_2002",
@@ -1181,8 +1186,10 @@ object TreeLossSummaryMain
               round(sum("extent2010_ha")) as "extent2010_ha",
               round(sum("gain_2000_2012_ha")) as "gain_2000_2012_ha",
               round(sum("biomass_Mt")) as "biomass_Mt",
+              round(sum($"avg_biomass_per_ha_Mt" * $"area_ha") / sum("area_ha")) as "avg_biomass_per_ha_Mt",
               round(sum("carbon_Mt")) as "carbon_Mt",
               round(sum("mangrove_biomass_Mt")) as "mangrove_biomass_Mt",
+              round(sum($"avg_mangrove_biomass_per_ha_Mt" * $"area_ha") / sum("area_ha")) as "avg_mangrove_biomass_per_ha_Mt",
               round(sum("mangrove_carbon_Mt")) as "mangrove_carbon_Mt",
               round(sum("tc_loss_ha_2001")) as "tc_loss_ha_2001",
               round(sum("tc_loss_ha_2002")) as "tc_loss_ha_2002",
@@ -1252,8 +1259,10 @@ object TreeLossSummaryMain
               round(sum("extent2010_ha")) as "extent2010_ha",
               round(sum("gain_2000_2012_ha")) as "gain_2000_2012_ha",
               round(sum("biomass_Mt")) as "biomass_Mt",
+              round(sum($"avg_biomass_per_ha_Mt" * $"area_ha") / sum("area_ha")) as "avg_biomass_per_ha_Mt",
               round(sum("carbon_Mt")) as "carbon_Mt",
               round(sum("mangrove_biomass_Mt")) as "mangrove_biomass_Mt",
+              round(sum($"avg_mangrove_biomass_per_ha_Mt" * $"area_ha") / sum("area_ha")) as "avg_mangrove_biomass_per_ha_Mt",
               round(sum("mangrove_carbon_Mt")) as "mangrove_carbon_Mt",
               round(sum("tc_loss_ha_2001")) as "tc_loss_ha_2001",
               round(sum("tc_loss_ha_2002")) as "tc_loss_ha_2002",
@@ -1376,8 +1385,10 @@ object TreeLossSummaryMain
               $"extent2010" as "extent_2010",
               $"total_gain",
               $"total_biomass",
+              $"avg_biomass_per_ha",
               $"total_co2",
               $"total_mangrove_biomass",
+              $"avg_mangrove_biomass_per_ha",
               $"total_mangrove_co2",
               array(
                 struct(
@@ -1600,8 +1611,10 @@ object TreeLossSummaryMain
               sum("extent2010") as "extent_2010",
               sum("total_gain") as "total_gain",
               sum("total_biomass") as "total_biomass",
+              sum($"avg_biomass_per_ha" * $"totalarea") / sum("totalarea") as "avg_biomass_per_ha",
               sum("total_co2") as "total_co2",
               sum("total_mangrove_biomass") as "total_mangrove_biomass",
+              sum($"avg_mangrove_biomass_per_ha" * $"totalarea") / sum("totalarea") as "avg_mangrove_biomass_per_ha",
               sum("total_mangrove_co2") as "total_mangrove_co2",
               sum("area_loss_2001") as "area_loss_2001",
               sum("area_loss_2002") as "area_loss_2002",
@@ -1742,8 +1755,10 @@ object TreeLossSummaryMain
               $"extent_2010",
               $"total_gain",
               $"total_biomass",
+              $"avg_biomass_per_ha",
               $"total_co2",
               $"total_mangrove_biomass",
+              $"avg_mangrove_biomass_per_ha",
               $"total_mangrove_co2",
               array(
                 struct(
@@ -1965,8 +1980,10 @@ object TreeLossSummaryMain
               sum("extent2010") as "extent_2010",
               sum("total_gain") as "total_gain",
               sum("total_biomass") as "total_biomass",
+              sum($"avg_biomass_per_ha" * $"totalarea") / sum("totalarea") as "avg_biomass_per_ha",
               sum("total_co2") as "total_co2",
               sum("total_mangrove_biomass") as "total_mangrove_biomass",
+              sum($"avg_mangrove_biomass_per_ha" * $"totalarea") / sum("totalarea") as "avg_mangrove_biomass_per_ha",
               sum("total_mangrove_co2") as "total_mangrove_co2",
               sum("area_loss_2001") as "area_loss_2001",
               sum("area_loss_2002") as "area_loss_2002",
@@ -2106,8 +2123,10 @@ object TreeLossSummaryMain
               $"extent_2010",
               $"total_gain",
               $"total_biomass",
+              $"avg_biomass_per_ha",
               $"total_co2",
               $"total_mangrove_biomass",
+              $"avg_mangrove_biomass_per_ha",
               $"total_mangrove_co2",
               array(
                 struct(
