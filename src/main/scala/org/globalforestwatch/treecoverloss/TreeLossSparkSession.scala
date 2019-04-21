@@ -3,7 +3,7 @@ package org.globalforestwatch.treecoverloss
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 
-case class TreeLossSparkSession() {
+object TreeLossSparkSession {
 
   val conf: SparkConf = new SparkConf()
     .setIfMissing("spark.master", "local[*]")

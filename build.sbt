@@ -57,6 +57,11 @@ libraryDependencies ++= Seq(
 
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 
+// spark-daria
+resolvers += "jitpack" at "https://jitpack.io"
+libraryDependencies += "com.github.mrpowers" % "spark-daria" % "v0.30.0"
+
+
 // auto imports for local SBT console
 // can be used with `test:console` command
 initialCommands in console :=
