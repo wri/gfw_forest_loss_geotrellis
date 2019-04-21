@@ -12,8 +12,8 @@ object Adm2SummaryDF {
     df.groupBy($"iso", $"adm1", $"adm2", $"threshold")
       .agg(
         round(sum("totalarea")) as "area_ha",
-        round(sum("extent2000")) as "extent2000_ha",
-        round(sum("extent2010")) as "extent2010_ha",
+        round(sum("extent2000")) as "extent_2000_ha",
+        round(sum("extent2010")) as "extent_2010_ha",
         round(sum("total_gain")) as "gain_2000_2012_ha",
         round(sum("total_biomass")) as "biomass_Mt",
         round(sum($"avg_biomass_per_ha" * $"extent2000") / sum("extent2000")) as "avg_biomass_per_ha_Mt",
