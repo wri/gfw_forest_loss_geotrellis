@@ -7,7 +7,7 @@ import org.globalforestwatch.treecoverloss.TreeLossDFHelpers.windowSum
 
 object Adm2DF {
 
-  val spark: SparkSession = TreeLossSparkSession().spark
+  val spark: SparkSession = TreeLossSparkSession.spark
   import spark.implicits._
 
   def joinExtent2010(extent2010DF: DataFrame)(df: DataFrame): DataFrame = {

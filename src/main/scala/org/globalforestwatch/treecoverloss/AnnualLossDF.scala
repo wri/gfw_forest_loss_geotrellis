@@ -7,7 +7,7 @@ import org.globalforestwatch.treecoverloss.TreeLossDFHelpers.windowSum
 
 object AnnualLossDF {
 
-  val spark: SparkSession = TreeLossSparkSession().spark
+  val spark: SparkSession = TreeLossSparkSession.spark
   import spark.implicits._
 
   def unpackYearData(df: DataFrame): DataFrame = {

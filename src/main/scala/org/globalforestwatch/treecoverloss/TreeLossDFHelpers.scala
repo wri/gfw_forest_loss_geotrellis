@@ -6,7 +6,7 @@ import org.apache.spark.sql.expressions.Window
 
 object TreeLossDFHelpers {
 
-  val spark: SparkSession = TreeLossSparkSession().spark
+  val spark: SparkSession = TreeLossSparkSession.spark
   import spark.implicits._
 
   val WindowPartitionOrder = Window
