@@ -5,10 +5,8 @@ import org.apache.spark.sql.functions._
 
 object IsoSummaryDF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
-  import spark.implicits._
-
-  def sumArea(df: DataFrame): DataFrame = {
+    def sumArea(spark: SparkSession)(df: DataFrame): DataFrame = {
+        import spark.implicits._
     df.groupBy($"iso", $"threshold")
       .agg(
         round(sum("area_ha")) as "area_ha",
@@ -17,8 +15,8 @@ object IsoSummaryDF {
         round(sum("gain_2000_2012_ha")) as "gain_2000_2012_ha",
         round(sum("biomass_Mt")) as "biomass_Mt",
         round(
-          sum($"avg_biomass_per_ha_Mt" * $"extent2000_ha") / sum(
-            "extent2000_ha"
+            sum($"avg_biomass_per_ha_Mt" * $"extent_2000_ha") / sum(
+                "extent_2000_ha"
           )
         ) as "avg_biomass_per_ha_Mt",
         round(sum("carbon_Mt")) as "carbon_Mt",

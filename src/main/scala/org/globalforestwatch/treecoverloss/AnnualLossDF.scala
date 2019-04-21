@@ -7,10 +7,8 @@ import org.globalforestwatch.treecoverloss.TreeLossDFHelpers.windowSum
 
 object AnnualLossDF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
-  import spark.implicits._
-
-  def unpackYearData(df: DataFrame): DataFrame = {
+  def unpackYearData(spark: SparkSession)(df: DataFrame): DataFrame = {
+    import spark.implicits._
     validatePresenceOfColumns(
       df,
       Seq(
@@ -296,7 +294,8 @@ object AnnualLossDF {
     )
   }
 
-  def sumArea(df: DataFrame): DataFrame = {
+  def sumArea(spark: SparkSession)(df: DataFrame): DataFrame = {
+    import spark.implicits._
     df.groupBy(
         $"feature_id",
         $"threshold",
@@ -422,7 +421,8 @@ object AnnualLossDF {
       )
   }
 
-  def joinMaster(masterDF: DataFrame)(df: DataFrame): DataFrame = {
+  def joinMaster(spark: SparkSession, masterDF: DataFrame)(df: DataFrame): DataFrame = {
+    import spark.implicits._
     df.join(
         masterDF,
         $"feature_id" <=> $"m_feature_id"
@@ -571,7 +571,8 @@ object AnnualLossDF {
       .fill(2018, Seq("year_2018"))
   }
 
-  def aggregateByThreshold(df: DataFrame): DataFrame = {
+  def aggregateByThreshold(spark: SparkSession)(df: DataFrame): DataFrame = {
+    import spark.implicits._
     df.select(
       $"m_feature_id" as "feature_id",
       $"m_threshold" as "threshold",

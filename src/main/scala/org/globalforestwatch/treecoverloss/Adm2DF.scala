@@ -1,16 +1,12 @@
 package org.globalforestwatch.treecoverloss
 
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
-import com.github.mrpowers.spark.daria.sql.DataFrameHelpers._
-import org.globalforestwatch.treecoverloss.TreeLossDFHelpers.windowSum
 
 object Adm2DF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
-  import spark.implicits._
 
-  def joinExtent2010(extent2010DF: DataFrame)(df: DataFrame): DataFrame = {
+  def joinExtent2010(spark: SparkSession, extent2010DF: DataFrame)(df: DataFrame): DataFrame = {
+    import spark.implicits._
     df.join(
       extent2010DF,
       $"m_feature_id" <=> $"feature_id" &&
@@ -20,7 +16,8 @@ object Adm2DF {
     )
   }
 
-  def unpackFeautureIDLayers(df: DataFrame): DataFrame = {
+  def unpackFeautureIDLayers(spark: SparkSession)(df: DataFrame): DataFrame = {
+    import spark.implicits._
     df.select(
       $"feature_id.iso" as "iso",
       $"feature_id.adm1" as "adm1",

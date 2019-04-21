@@ -4,10 +4,8 @@ import org.apache.spark.sql.functions._
 
 object Adm2ApiDF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
-  import spark.implicits._
-
-  def nestYearData(df: DataFrame): DataFrame = {
+  def nestYearData(spark: SparkSession)(df: DataFrame): DataFrame = {
+    import spark.implicits._
     df.select(
       $"iso",
       $"adm1",

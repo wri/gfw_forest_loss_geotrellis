@@ -5,10 +5,8 @@ import org.apache.spark.sql.functions._
 
 object Adm1ApiDF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
-  import spark.implicits._
-
-  def sumArea(df: DataFrame): DataFrame = {
+  def sumArea(spark: SparkSession)(df: DataFrame): DataFrame = {
+    import spark.implicits._
     df.groupBy(
         $"iso",
         $"adm1",
@@ -175,7 +173,8 @@ object Adm1ApiDF {
       )
   }
 
-  def nestYearData(df: DataFrame): DataFrame = {
+  def nestYearData(spark: SparkSession)(df: DataFrame): DataFrame = {
+    import spark.implicits._
     df.select(
       $"iso",
       $"adm1",
