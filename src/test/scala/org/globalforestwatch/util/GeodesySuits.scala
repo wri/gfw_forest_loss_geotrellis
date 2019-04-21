@@ -1,8 +1,8 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.util
 
-import org.scalatest.FunSuite
-import Geodesy._
 import geotrellis.raster.CellSize
+import org.globalforestwatch.util.Geodesy._
+import org.scalatest.FunSuite
 
 class GeodesySuits extends FunSuite {
 

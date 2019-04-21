@@ -1,7 +1,7 @@
 package org.globalforestwatch.treecoverloss
 
 import com.typesafe.scalalogging.LazyLogging
-import geotrellis.raster.{ArrayTile, CellType, MultibandTile, MutableArrayTile, Raster, RasterExtent, Tile}
+import geotrellis.raster.Raster
 import geotrellis.spark.SpatialKey
 import geotrellis.vector._
 import org.apache.spark.Partitioner
@@ -9,8 +9,7 @@ import org.apache.spark.rdd.RDD
 import cats.implicits._
 import geotrellis.contrib.polygonal._
 import geotrellis.spark.tiling.LayoutDefinition
-import Implicits._
-import geotrellis.macros.{DoubleTileMapper, DoubleTileVisitor, IntTileMapper, IntTileVisitor}
+import math.round
 
 object TreeLossRDD extends LazyLogging {
 
@@ -51,7 +50,15 @@ object TreeLossRDD extends LazyLogging {
           featurePartition.toArray.groupBy{ case (windowKey, feature) => windowKey }
 
         groupedByKey.toIterator.flatMap { case (windowKey, keysAndFeatures) =>
-          val window: Extent = windowKey.extent(windowLayout)
+
+          // round to one integer to assure we have 400 * 400 blocks
+          val _window: Extent = windowKey.extent(windowLayout)
+          val xmin: Double = _window.xmin
+          val ymin: Double = _window.ymin
+          val xmax: Double = _window.xmax
+          val ymax: Double = _window.ymax
+
+          val window = new RoundedExtent(xmin, ymin, xmax, ymax, 1)
 
           val maybeRasterSource: Either[Throwable, TenByTenGridSources] =
             Either.catchNonFatal {

@@ -30,6 +30,7 @@ resolvers ++= Seq(
    Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
+
 libraryDependencies ++= Seq(
   sparkCore % Provided,
   sparkSQL % Provided,
@@ -56,6 +57,11 @@ libraryDependencies ++= Seq(
 
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 
+// spark-daria
+resolvers += "jitpack" at "https://jitpack.io"
+libraryDependencies += "com.github.mrpowers" % "spark-daria" % "v0.30.0"
+
+
 // auto imports for local SBT console
 // can be used with `test:console` command
 initialCommands in console :=
@@ -77,6 +83,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 import org.globalforestwatch.treecoverloss._
 import org.globalforestwatch.util._
+
 
 val conf = new SparkConf().
 setIfMissing("spark.master", "local[*]").
@@ -132,11 +139,11 @@ sparkS3JarFolder            := "s3://wri-users/tmaschler/geotrellis-test/jars"
 sparkS3LogUri               := Some("s3://wri-users/tmaschler/geotrellis-test/logs")
 sparkSubnetId               := Some("subnet-116d9a4a")
 sparkSecurityGroupIds       := Seq("sg-6c6a5911")
-sparkInstanceCount          := 10
+sparkInstanceCount := 20
 sparkMasterType             := "m4.xlarge"
 sparkCoreType               := "m4.xlarge"
-sparkMasterEbsSize          := Some(50)
-sparkCoreEbsSize            := Some(50)
+sparkMasterEbsSize := Some(30)
+sparkCoreEbsSize := Some(30)
 sparkMasterPrice            := Some(0.5)
 sparkCorePrice              := Some(0.5)
 sparkClusterName            := s"geotrellis-treecoverloss"

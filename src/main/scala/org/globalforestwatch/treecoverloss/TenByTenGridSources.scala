@@ -1,108 +1,175 @@
 package org.globalforestwatch.treecoverloss
 
-import java.io.FileNotFoundException
 
 import com.typesafe.scalalogging.LazyLogging
-import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
-import geotrellis.raster.{MultibandTile, Raster, Tile}
+import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import cats.implicits._
-import com.amazonaws.services.s3.AmazonS3URI
+import org.globalforestwatch.layers._
 
 /**
   * @param grid top left corner, padded from east ex: "10N_010E"
   */
 case class TenByTenGridSources(grid: String) extends LazyLogging {
-  val lossSourceUri =
-    s"s3://wri-users/tmaschler/prep_tiles/loss/${grid}.tif"
 
-  val gainSourceUri =
-    s"s3://wri-users/tmaschler/prep_tiles/gain/${grid}.tif"
+  //lazy val preArea = new Area(grid)
+  lazy val treeCoverLoss = new TreeCoverLoss(grid)
+  lazy val treeCoverGain = new TreeCoverGain(grid)
+  lazy val treeCoverDensity2000 = new TreeCoverDensity2000(grid)
+  lazy val treeCoverDensity2010 = new TreeCoverDensity2010(grid)
+  //lazy val carbon = new Carbon(grid)
+  lazy val biomassPerHectar = new BiomassPerHectar(grid)
 
-  val tcd2000SourceUri =
-    s"s3://wri-users/tmaschler/prep_tiles/tcd_2000/${grid}.tif"
-
- // val tcd2010SourceUri =
-    s"s3://wri-users/tmaschler/prep_tiles/tcd_2010/${grid}.tif"
-
-  val co2PixelSourceUri  =
-    s"s3://wri-users/tmaschler/prep_tiles/co2_pixel/${grid}.tif"
-
-  val gadm36SourceUri  =
-    s"s3://wri-users/tmaschler/prep_tiles/gadm36/${grid}.tif"
-
-  lazy val lossSource = TenByTenGridSources.requiredSource(lossSourceUri)
-
-  lazy val gainSource = TenByTenGridSources.requiredSource(gainSourceUri)
-
-  lazy val tcd2000Source = TenByTenGridSources.requiredSource(tcd2000SourceUri)
-
-//  lazy val tcd2010Source = TenByTenGridSources.requiredSource(tcd2010SourceUri)
-
-  lazy val co2PixelSource: Option[GeoTiffRasterSource] =
-    TenByTenGridSources.optionalSource(co2PixelSourceUri)
-
-  lazy val gadm36Source: Option[GeoTiffRasterSource] =
-    TenByTenGridSources.optionalSource(gadm36SourceUri)
+  lazy val mangroveBiomass = new MangroveBiomass(grid)
+  lazy val treeCoverLossDrivers = new TreeCoverLossDrivers(grid)
+  lazy val globalLandCover = new GlobalLandcover(grid)
+  lazy val primaryForest = new PrimaryForest(grid)
+  lazy val indonesiaPrimaryForest = new IndonesiaPrimaryForest(grid)
+  lazy val erosion = new Erosion(grid)
+  lazy val biodiversitySignificance = new BiodiversitySignificance(grid)
+  lazy val biodiversityIntactness = new BiodiversityIntactness(grid)
+  lazy val protectedAreas = new ProtectedAreas(grid)
+  lazy val aze = new Aze(grid)
+  lazy val plantations = new Plantations(grid)
+  lazy val riverBasins = new RiverBasins(grid)
+  lazy val ecozones = new Ecozones(grid)
+  lazy val urbanWatersheds = new UrbanWatersheds(grid)
+  lazy val mangroves1996 = new Mangroves1996(grid)
+  lazy val mangroves2016 = new Mangroves2016(grid)
+  lazy val waterStress = new WaterStress(grid)
+  lazy val intactForestLandscapes = new IntactForestLandscapes(grid)
+  lazy val endemicBirdAreas = new EndemicBirdAreas(grid)
+  lazy val tigerLandscapes = new TigerLandscapes(grid)
+  lazy val landmark = new Landmark(grid)
+  lazy val landRights = new LandRights(grid)
+  lazy val keyBiodiversityAreas = new KeyBiodiversityAreas(grid)
+  lazy val mining = new Mining(grid)
+  lazy val rspo = new RSPO(grid)
+  lazy val peatlands = new Peatlands(grid)
+  lazy val oilPalm = new OilPalm(grid)
+  lazy val indonesiaForestMoratorium = new IndonesiaForestMoratorium(grid)
+  lazy val indonesiaLandCover = new IndonesiaLandCover(grid)
+  lazy val indonesiaForestArea = new IndonesiaForestArea(grid)
+  lazy val mexicoProtectedAreas = new MexicoProtectedAreas(grid)
+  lazy val mexicoPaymentForEcosystemServices = new MexicoPaymentForEcosystemServices(grid)
+  lazy val mexicoForestZoning = new MexicoForestZoning(grid)
+  lazy val peruProductionForest = new PeruProductionForest(grid)
+  lazy val peruProtectedAreas = new PeruProtectedAreas(grid)
+  lazy val peruForestConcessions = new PeruForestConcessions(grid)
+  lazy val brazilBiomes = new BrazilBiomes(grid)
+  lazy val woodFiber = new WoodFiber(grid)
+  lazy val resourceRights = new ResourceRights(grid)
+  lazy val logging = new Logging(grid)
+  lazy val oilGas = new OilGas(grid)
 
   def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
+
     for {
       // Failure for any of these reads will result in function returning Left[Throwable]
       // These are effectively required fields without which we can't make sense of the analysis
-      loss <- Either.catchNonFatal(lossSource.read(window).get.tile).right
-      gain <- Either.catchNonFatal(gainSource.read(window).get.tile).right
-      tcd2000 <- Either.catchNonFatal(tcd2000Source.read(window).get.tile).right
-    //  tcd2010 <- Either.catchNonFatal(tcd2010Source.read(window).get.tile).right
+      //preAreaTile <- Either.catchNonFatal(preArea.fetchWindow(window)).right
+      lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(window)).right
+      gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(window)).right
+      tcd2000Tile <- Either.catchNonFatal(treeCoverDensity2000.fetchWindow(window)).right
+      tcd2010Tile <- Either.catchNonFatal(treeCoverDensity2010.fetchWindow(window)).right
+      // co2PixelTile <- Either.catchNonFatal(carbon.fetchWindow(window)).right
+      biomassTile <- Either.catchNonFatal(biomassPerHectar.fetchWindow(window)).right
+
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
-      val co2Pixel: Option[Tile] =
-        for {
-          source <- co2PixelSource
-          raster <- Either.catchNonFatal(source.read(window).get.tile.band(0)).toOption
-        } yield raster
-
-      val gadm36: Option[Tile] =
-        for {
-          source <- gadm36Source
-          raster <- {
-            println(s"About to read: ${source.uri} for window ${window.xmin} ${window.ymin} ${window.xmax} ${window.ymax}")
-            Either.catchNonFatal(source.read(window).get.tile.band(0)).toOption
-          }
-        } yield raster
+      val mangroveBiomassTile = mangroveBiomass.fetchWindow(window)
+      val driversTile = treeCoverLossDrivers.fetchWindow(window)
+      val globalLandCoverTile = globalLandCover.fetchWindow(window)
+      val primaryForestTile = primaryForest.fetchWindow(window)
+      val idnPrimaryForestTile = indonesiaPrimaryForest.fetchWindow(window)
+      val erosionTile = erosion.fetchWindow(window)
+      val biodiversitySignificanceTile = biodiversitySignificance.fetchWindow(window)
+      val biodiversityIntactnessTile = biodiversityIntactness.fetchWindow(window)
+      val wdpaTile = protectedAreas.fetchWindow(window)
+      val azeTile = aze.fetchWindow(window)
+      val plantationsTile = plantations.fetchWindow(window)
+      val riverBasinsTile = riverBasins.fetchWindow(window)
+      val ecozonesTile = ecozones.fetchWindow(window)
+      val urbanWatershedsTile = urbanWatersheds.fetchWindow(window)
+      val mangroves1996Tile = mangroves1996.fetchWindow(window)
+      val mangroves2016Tile = mangroves2016.fetchWindow(window)
+      val waterStressTile = waterStress.fetchWindow(window)
+      val intactForestLandscapesTile = intactForestLandscapes.fetchWindow(window)
+      val endemicBirdAreasTile = endemicBirdAreas.fetchWindow(window)
+      val tigerLandscapesTile = tigerLandscapes.fetchWindow(window)
+      val landmarkTile = landmark.fetchWindow(window)
+      val landRightsTile = landRights.fetchWindow(window)
+      val keyBiodiversityAreasTile = keyBiodiversityAreas.fetchWindow(window)
+      val miningTile = mining.fetchWindow(window)
+      val rspoTile = rspo.fetchWindow(window)
+      val peatlandsTile = peatlands.fetchWindow(window)
+      val oilPalmTile = oilPalm.fetchWindow(window)
+      val idnForestMoratoriumTile = indonesiaForestMoratorium.fetchWindow(window)
+      val idnLandCoverTile = indonesiaLandCover.fetchWindow(window)
+      val idnForestAreaTile = indonesiaForestArea.fetchWindow(window)
+      val mexProtectedAreasTile = mexicoProtectedAreas.fetchWindow(window)
+      val mexPaymentForEcosystemServicesTile = mexicoPaymentForEcosystemServices.fetchWindow(window)
+      val mexForestZoningTile = mexicoForestZoning.fetchWindow(window)
+      val perProductionForestTile = peruProductionForest.fetchWindow(window)
+      val perProtectedAreasTile = peruProtectedAreas.fetchWindow(window)
+      val perForestConcessionsTile = peruForestConcessions.fetchWindow(window)
+      val braBiomesTile = brazilBiomes.fetchWindow(window)
+      val woodFiberTile = woodFiber.fetchWindow(window)
+      val resourceRightsTile = resourceRights.fetchWindow(window)
+      val loggingTile = logging.fetchWindow(window)
+      val oilGasTile = oilGas.fetchWindow(window)
 
       val tile = TreeLossTile(
-        loss.band(0),
-        gain.band(0),
-        tcd2000.band(0),
-       // tcd2010.band(0),
-        co2Pixel,
-        gadm36)
+        //preAreaTile,
+        lossTile,
+        gainTile,
+        tcd2000Tile,
+        tcd2010Tile,
+        // co2PixelTile,
+        biomassTile,
+        mangroveBiomassTile,
+        driversTile,
+        globalLandCoverTile,
+        primaryForestTile,
+        idnPrimaryForestTile,
+        erosionTile,
+        biodiversitySignificanceTile,
+        biodiversityIntactnessTile,
+        wdpaTile,
+        azeTile,
+        plantationsTile,
+        riverBasinsTile,
+        ecozonesTile,
+        urbanWatershedsTile,
+        mangroves1996Tile,
+        mangroves2016Tile,
+        waterStressTile,
+        intactForestLandscapesTile,
+        endemicBirdAreasTile,
+        tigerLandscapesTile,
+        landmarkTile,
+        landRightsTile,
+        keyBiodiversityAreasTile,
+        miningTile,
+        rspoTile,
+        peatlandsTile,
+        oilPalmTile,
+        idnForestMoratoriumTile,
+        idnLandCoverTile,
+        mexProtectedAreasTile,
+        mexPaymentForEcosystemServicesTile,
+        mexForestZoningTile,
+        perProductionForestTile,
+        perProtectedAreasTile,
+        perForestConcessionsTile,
+        braBiomesTile,
+        woodFiberTile,
+        resourceRightsTile,
+        loggingTile,
+        oilGasTile
+      )
 
       Raster(tile, window)
     }
-  }
-}
-
-object TenByTenGridSources {
-  val s3Client = geotrellis.spark.io.s3.S3Client.DEFAULT
-
-  /** Check if URI exists before trying to open it, return None if no file found */
-  def optionalSource(uri: String): Option[GeoTiffRasterSource] = {
-    // Removes the expected 404 errors from console log
-    val s3uri = new AmazonS3URI(uri)
-    if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
-      println(s"Opening: $uri")
-      Some(GeoTiffRasterSource(uri))
-    } else None
-  }
-
-  def requiredSource(uri: String): GeoTiffRasterSource = {
-    // Removes the expected 404 errors from console log
-    val s3uri = new AmazonS3URI(uri)
-    if (! s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
-      throw new FileNotFoundException(uri)
-    }
-
-    GeoTiffRasterSource(uri)
   }
 }

@@ -15,7 +15,12 @@ object Util {
   def uploadFile(file: File, uri: AmazonS3URI): Unit = {
     val is = new FileInputStream(file)
     try {
-      S3Client.DEFAULT.putObject(uri.getBucket, uri.getKey, is, new ObjectMetadata())
+      S3Client.DEFAULT.putObject(
+        uri.getBucket,
+        uri.getKey,
+        is,
+        new ObjectMetadata()
+      )
     } catch {
       case NonFatal(e) => is.close()
     } finally { is.close() }
@@ -31,7 +36,7 @@ object Util {
       Z2(col, row).z
     }
 
-    features.sortBy{ feature =>
+    features.sortBy { feature =>
       zindex(feature.geom.envelope.northWest)
     }
   }

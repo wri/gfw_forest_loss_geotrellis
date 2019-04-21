@@ -1,6 +1,11 @@
 package com.globalforestwatch.util
 
-import java.io.{BufferedReader, FileNotFoundException, InputStream, InputStreamReader}
+import java.io.{
+  BufferedReader,
+  FileNotFoundException,
+  InputStream,
+  InputStreamReader
+}
 import java.net.URL
 import java.security.InvalidParameterException
 import java.util.zip.ZipInputStream
@@ -47,7 +52,7 @@ object GeoJsonUtil {
     var idx: Int = 0
 
     val FileNameRx = """.*\/(\w+)\.\w+""".r
-    val FileNameRx(name)= url.getFile
+    val FileNameRx(name) = url.getFile
 
     stream.iterator().asScala.flatMap {
       case FeatureRx(json) =>
