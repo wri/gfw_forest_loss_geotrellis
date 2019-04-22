@@ -138,11 +138,11 @@ sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-037b97cff4493e3a1")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 100
-sparkMasterType             := "m4.xlarge"
-sparkCoreType               := "m4.xlarge"
-sparkMasterEbsSize := Some(30)
-sparkCoreEbsSize := Some(30)
+sparkInstanceCount := 20
+sparkMasterType := "r5.12xlarge"
+sparkCoreType := "r5.12xlarge"
+sparkMasterEbsSize := Some(50)
+sparkCoreEbsSize := Some(50)
 sparkMasterPrice            := Some(0.5)
 sparkCorePrice              := Some(0.5)
 sparkClusterName            := s"geotrellis-treecoverloss"
@@ -158,20 +158,54 @@ sparkEmrConfigs             := List(
     "maximizeResourceAllocation" -> "true"
   ),
   EmrConfig("spark-defaults").withProperties(
+
+    // https://aws.amazon.com/blogs/big-data/best-practices-for-successfully-managing-memory-for-apache-spark-applications-on-amazon-emr/
+    //    Best practice 1: Choose the right type of instance for each of the node types in an Amazon EMR cluster.
+    //    Doing this is one key to success in running any Spark application on Amazon EMR.
+    //
+    //    Best practice 2: Set spark.dynamicAllocation.enabled to true only if the numbers are properly determined
+    //    for spark.dynamicAllocation.initialExecutors/minExecutors/maxExecutors parameters. Otherwise,
+    //    set spark.dynamicAllocation.enabled to false and control the driver memory, executor memory,
+    //    and CPU parameters yourself. To do this, calculate and set these properties manually for each
+    //    application (see the example following).
+
+    // spark.executor.cores -> always 5 cCPU
+    // Number of executors = (total number of virtual cores per instance - 1)/ spark.executors.cores
+    // Total executor memory = total RAM per instance / number of executors per instance
+    // spark.executors.memory -> total executor memory * 0.90
+    // spark.yarn.executor.memoryOverhead -> total executor memory * 0.10
+    // spark.driver.memory = spark.executors.memory
+    // spark.driver.cores= spark.executors.cores
+    // spark.executor.instances = (number of executors per instance * number of core instances) minus 1 for the driver
+    // spark.default.parallelism = spark.executor.instances * spark.executors.cores * 2
+    // spark.sql.shuffle.partitions = spark.default.parallelism
+
+    "spark.dynamicAllocation.enabled" -> "false",
+    "spark.executor.cores" -> "5",
+    "spark.executor.memory" -> "37",
+    "spark.yarn.executor.memoryOverhead" -> "5",
+    "spark.driver.memory" -> "37",
+    "spark.driver.cores" -> "5",
+    "spark.executor.instances" -> "170",
+    "spark.default.parallelism" -> "1700",
+    "spark.sql.shuffle.partitions" -> "1700",
+
     "spark.driver.maxResultSize" -> "3G",
-    "spark.dynamicAllocation.enabled" -> "true",
     "spark.shuffle.service.enabled" -> "true",
     "spark.shuffle.compress" -> "true",
     "spark.shuffle.spill.compress" -> "true",
     "spark.rdd.compress" -> "true",
-    "spark.driver.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib",
-    "spark.executor.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib",
+
+    //     Best practice 4: Always set up a garbage collector when handling large volume of data through Spark.
+    "spark.executor.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
+    "spark.driver.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
     "spark.executorEnv.LD_LIBRARY_PATH" -> "/usr/local/lib"
   ),
   EmrConfig("spark-env").withProperties(
     "LD_LIBRARY_PATH" -> "/usr/local/lib"
   ),
   EmrConfig("yarn-site").withProperties(
+    //     Best practice 5: Always set the virtual and physical memory check flag to false.
     "yarn.resourcemanager.am.max-attempts" -> "1",
     "yarn.nodemanager.vmem-check-enabled" -> "false",
     "yarn.nodemanager.pmem-check-enabled" -> "false"

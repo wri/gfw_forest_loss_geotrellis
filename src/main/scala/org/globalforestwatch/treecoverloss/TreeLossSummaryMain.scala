@@ -275,19 +275,19 @@ object TreeLossSummaryMain
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/iso")
 
-          //          adm1SummaryDF
-          //            .coalesce(1)
-          //            .orderBy($"iso", $"adm1", $"threshold")
-          //            .write
-          //            .options(csvOptions)
-          //            .csv(path = runOutputUrl + "/summary/global/adm1")
-          //
-          //          isoSummaryDF
-          //            .coalesce(1)
-          //            .orderBy($"iso", $"threshold")
-          //            .write
-          //            .options(csvOptions)
-          //            .csv(path = runOutputUrl + "/summary/global/iso")
+          adm1SummaryDF
+            .coalesce(1)
+            .orderBy($"iso", $"adm1", $"threshold")
+            .write
+            .options(csvOptions)
+            .csv(path = runOutputUrl + "/summary/global/adm1")
+
+          isoSummaryDF
+            .coalesce(1)
+            .orderBy($"iso", $"threshold")
+            .write
+            .options(csvOptions)
+            .csv(path = runOutputUrl + "/summary/global/iso")
 
           val adm2ApiDF = adm2DF
             .transform(Adm2ApiDF.nestYearData)
