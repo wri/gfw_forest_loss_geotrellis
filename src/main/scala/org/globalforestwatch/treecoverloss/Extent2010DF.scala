@@ -1,19 +1,19 @@
 package org.globalforestwatch.treecoverloss
 
-
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers._
-import org.globalforestwatch.treecoverloss.TreeLossDFHelpers.windowSum
-
+import org.globalforestwatch.util.WindowFunctions.windowSum
 
 object Extent2010DF {
 
+  val spark: SparkSession = TreeLossSparkSession.spark
+
+  import spark.implicits._
 
   val lookup2010: Map[String, String] = Map("threshold_2010" -> "threshold")
 
-  def sumArea(spark: SparkSession)(df: DataFrame): DataFrame = {
-    import spark.implicits._
+  def sumArea(df: DataFrame): DataFrame = {
 
     validatePresenceOfColumns(
       df,
@@ -28,8 +28,8 @@ object Extent2010DF {
       .agg(sum("area") as "area")
   }
 
-  def joinMaster(spark: SparkSession, masterDF: DataFrame)(df: DataFrame): DataFrame = {
-    import spark.implicits._
+  def joinMaster(masterDF: DataFrame)(df: DataFrame): DataFrame = {
+
     validatePresenceOfColumns(
       df,
       Seq("feature_id", "layers", "threshold", "area")
@@ -49,8 +49,8 @@ object Extent2010DF {
       .fill(0.0, Seq("area"))
   }
 
-  def aggregateByThreshold(spark: SparkSession)(df: DataFrame): DataFrame = {
-    import spark.implicits._
+  def aggregateByThreshold(df: DataFrame): DataFrame = {
+
     validatePresenceOfColumns(
       df,
       Seq("feature_id", "layers", "threshold", "area")

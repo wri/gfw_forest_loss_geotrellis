@@ -72,16 +72,7 @@ object TreeLossSummaryMain
          admin1,
          admin2) =>
 
-          val conf: SparkConf = new SparkConf()
-            //  .setIfMissing("spark.master", "local[*]")
-            .setAppName("Tree Cover Loss DataFrame")
-            .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-            .set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
-            .set("spark.sql.crossJoin.enabled", "true")
-
-          implicit val spark: SparkSession =
-            SparkSession.builder.config(conf).getOrCreate
-
+          val spark: SparkSession = TreeLossSparkSession.spark
           import spark.implicits._
 
           // ref: https://github.com/databricks/spark-csv
@@ -129,14 +120,17 @@ object TreeLossSummaryMain
                   treeLossSummary.stats.map {
                     case (lossDataGroup, lossData) => {
 
-                      val admin1 =
-                        if (id.admin1.length > 0)
+                      val admin1: String = try {
                           id.admin1.split("[.]")(1).split("[_]")(0)
-                        else ""
-                      val admin2 =
-                        if (id.admin2.length > 0)
+                      } catch {
+                        case e: Exception => null
+                      }
+
+                      val admin2: String = try {
                           id.admin2.split("[.]")(2).split("[_]")(0)
-                        else ""
+                      } catch {
+                        case e: Exception => null
+                      }
 
                       LossRow(
                         LossRowFeatureId(id.country, admin1, admin2),
@@ -222,24 +216,24 @@ object TreeLossSummaryMain
           summaryDF.repartition($"feature_id", $"threshold_2000")
           summaryDF.cache()
 
-          val masterDF = summaryDF.transform(MasterDF.expandByThreshold(spark))
+          val masterDF = summaryDF.transform(MasterDF.expandByThreshold)
 
           masterDF.cache()
 
           val extent2010DF = summaryDF
-            .transform(Extent2010DF.sumArea(spark))
-            .transform(Extent2010DF.joinMaster(spark, masterDF))
-            .transform(Extent2010DF.aggregateByThreshold(spark))
+            .transform(Extent2010DF.sumArea)
+            .transform(Extent2010DF.joinMaster(masterDF))
+            .transform(Extent2010DF.aggregateByThreshold)
 
           val annualLossDF = summaryDF
-            .transform(AnnualLossDF.unpackYearData(spark))
-            .transform(AnnualLossDF.sumArea(spark))
-            .transform(AnnualLossDF.joinMaster(spark, masterDF))
-            .transform(AnnualLossDF.aggregateByThreshold(spark))
+            .transform(AnnualLossDF.unpackYearData)
+            .transform(AnnualLossDF.sumArea)
+            .transform(AnnualLossDF.joinMaster(masterDF))
+            .transform(AnnualLossDF.aggregateByThreshold)
 
           val adm2DF = annualLossDF
-            .transform(Adm2DF.joinExtent2010(spark, extent2010DF))
-            .transform(Adm2DF.unpackFeautureIDLayers(spark))
+            .transform(Adm2DF.joinExtent2010(extent2010DF))
+            .transform(Adm2DF.unpackFeautureIDLayers)
 
           adm2DF.repartition($"iso")
           adm2DF.cache()
@@ -254,7 +248,7 @@ object TreeLossSummaryMain
 
           val adm2SummaryDF = adm2DF
             .filter($"threshold" > 0)
-            .transform(Adm2SummaryDF.sumArea(spark))
+            .transform(Adm2SummaryDF.sumArea)
 
           adm2SummaryDF
             .repartition($"iso")
@@ -263,7 +257,7 @@ object TreeLossSummaryMain
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/adm2")
 
-          val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea(spark))
+          val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
 
           adm1SummaryDF
             .repartition($"iso")
@@ -272,7 +266,7 @@ object TreeLossSummaryMain
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/adm1")
 
-          val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea(spark))
+          val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
 
           isoSummaryDF
             .repartition($"iso")
@@ -281,22 +275,22 @@ object TreeLossSummaryMain
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/iso")
 
-          adm1SummaryDF
-            .coalesce(1)
-            .orderBy($"iso", $"adm1", $"threshold")
-            .write
-            .options(csvOptions)
-            .csv(path = runOutputUrl + "/summary/global/adm1")
-
-          isoSummaryDF
-            .coalesce(1)
-            .orderBy($"iso", $"threshold")
-            .write
-            .options(csvOptions)
-            .csv(path = runOutputUrl + "/summary/global/iso")
+          //          adm1SummaryDF
+          //            .coalesce(1)
+          //            .orderBy($"iso", $"adm1", $"threshold")
+          //            .write
+          //            .options(csvOptions)
+          //            .csv(path = runOutputUrl + "/summary/global/adm1")
+          //
+          //          isoSummaryDF
+          //            .coalesce(1)
+          //            .orderBy($"iso", $"threshold")
+          //            .write
+          //            .options(csvOptions)
+          //            .csv(path = runOutputUrl + "/summary/global/iso")
 
           val adm2ApiDF = adm2DF
-            .transform(Adm2ApiDF.nestYearData(spark))
+            .transform(Adm2ApiDF.nestYearData)
 
           adm2ApiDF
             .repartition($"iso", $"adm1", $"adm2", $"threshold")
@@ -307,8 +301,8 @@ object TreeLossSummaryMain
             .text(runOutputUrl + "/api/adm2")
 
           val adm1ApiDF = adm2DF
-            .transform(Adm1ApiDF.sumArea(spark))
-            .transform(Adm1ApiDF.nestYearData(spark))
+            .transform(Adm1ApiDF.sumArea)
+            .transform(Adm1ApiDF.nestYearData)
 
           adm1ApiDF
             .repartition($"iso", $"adm1", $"threshold")
@@ -319,8 +313,8 @@ object TreeLossSummaryMain
             .text(runOutputUrl + "/api/adm1")
 
           val isoApiDF = adm2DF
-            .transform(IsoApiDF.sumArea(spark))
-            .transform(IsoApiDF.nestYearData(spark))
+            .transform(IsoApiDF.sumArea)
+            .transform(IsoApiDF.nestYearData)
 
           isoApiDF
             .repartition($"iso", $"threshold")

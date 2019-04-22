@@ -131,14 +131,14 @@ assemblyMergeStrategy in assembly := {
 import sbtlighter._
 import com.amazonaws.services.elasticmapreduce.model.Tag
 
-sparkEmrRelease             := "emr-5.20.0"
+sparkEmrRelease := "emr-5.23.0"
 sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-037b97cff4493e3a1")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 3
+sparkInstanceCount := 100
 sparkMasterType             := "m4.xlarge"
 sparkCoreType               := "m4.xlarge"
 sparkMasterEbsSize := Some(30)

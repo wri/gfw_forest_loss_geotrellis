@@ -4,8 +4,12 @@ import org.apache.spark.sql.functions._
 
 object Adm2ApiDF {
 
-  def nestYearData(spark: SparkSession)(df: DataFrame): DataFrame = {
-    import spark.implicits._
+  val spark: SparkSession = TreeLossSparkSession.spark
+
+  import spark.implicits._
+
+  def nestYearData(df: DataFrame): DataFrame = {
+    
     df.select(
       $"iso",
       $"adm1",

@@ -6,9 +6,11 @@ import com.github.mrpowers.spark.daria.sql.DataFrameHelpers._
 
 object MasterDF {
 
-  def expandByThreshold(spark: SparkSession)(df: DataFrame): DataFrame = {
+  val spark: SparkSession = TreeLossSparkSession.spark
 
-    import spark.implicits._
+  import spark.implicits._
+
+  def expandByThreshold(df: DataFrame): DataFrame = {
 
     validatePresenceOfColumns(df, Seq("feature_id", "layers", "area"))
 

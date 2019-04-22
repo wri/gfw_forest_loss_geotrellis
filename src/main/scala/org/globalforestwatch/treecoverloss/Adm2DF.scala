@@ -4,9 +4,12 @@ import org.apache.spark.sql._
 
 object Adm2DF {
 
+  val spark: SparkSession = TreeLossSparkSession.spark
 
-  def joinExtent2010(spark: SparkSession, extent2010DF: DataFrame)(df: DataFrame): DataFrame = {
-    import spark.implicits._
+  import spark.implicits._
+
+  def joinExtent2010(extent2010DF: DataFrame)(df: DataFrame): DataFrame = {
+
     df.join(
       extent2010DF,
       $"m_feature_id" <=> $"feature_id" &&
@@ -16,8 +19,8 @@ object Adm2DF {
     )
   }
 
-  def unpackFeautureIDLayers(spark: SparkSession)(df: DataFrame): DataFrame = {
-    import spark.implicits._
+  def unpackFeautureIDLayers(df: DataFrame): DataFrame = {
+
     df.select(
       $"feature_id.iso" as "iso",
       $"feature_id.adm1" as "adm1",

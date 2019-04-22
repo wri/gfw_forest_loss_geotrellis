@@ -5,8 +5,12 @@ import org.apache.spark.sql.functions._
 
 object IsoApiDF {
 
-  def sumArea(spark: SparkSession)(df: DataFrame): DataFrame = {
-    import spark.implicits._
+  val spark: SparkSession = TreeLossSparkSession.spark
+
+  import spark.implicits._
+
+  def sumArea(df: DataFrame): DataFrame = {
+
     df.groupBy(
         $"iso",
         $"threshold",
@@ -172,8 +176,8 @@ object IsoApiDF {
       )
   }
 
-  def nestYearData(spark: SparkSession)(df: DataFrame): DataFrame = {
-    import spark.implicits._
+  def nestYearData(df: DataFrame): DataFrame = {
+
     df.select(
       $"iso",
       $"threshold",

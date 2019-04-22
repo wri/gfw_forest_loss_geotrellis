@@ -5,8 +5,12 @@ import org.apache.spark.sql.functions._
 
 object Adm2SummaryDF {
 
-  def sumArea(spark: SparkSession)(df: DataFrame): DataFrame = {
-    import spark.implicits._
+  val spark: SparkSession = TreeLossSparkSession.spark
+
+  import spark.implicits._
+
+  def sumArea(df: DataFrame): DataFrame = {
+
     df.groupBy($"iso", $"adm1", $"adm2", $"threshold")
       .agg(
         round(sum("totalarea")) as "area_ha",

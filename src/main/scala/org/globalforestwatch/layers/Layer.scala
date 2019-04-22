@@ -112,6 +112,8 @@ trait RequiredLayer extends Layer {
 
   def cropWindow(tile: Tile): Tile = {
 
+    // TODO: don't use magic number 401. Instead fetch number from 10x10 grid block definition
+
     val cols = tile.cols
     val rows = tile.rows
 
@@ -167,6 +169,8 @@ trait OptionalLayer extends Layer {
   }
 
   def cropWindow(tile: Option[Tile]): Option[Tile] = {
+
+    // TODO: don't use magic number 401. Instead fetch number from 10x10 grid block definition
 
     tile match {
       case Some(tile) => {
