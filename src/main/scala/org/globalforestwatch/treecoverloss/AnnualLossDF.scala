@@ -3,14 +3,16 @@ package org.globalforestwatch.treecoverloss
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers._
-import org.globalforestwatch.treecoverloss.TreeLossDFHelpers.windowSum
+import org.globalforestwatch.util.WindowFunctions.windowSum
 
 object AnnualLossDF {
 
   val spark: SparkSession = TreeLossSparkSession.spark
+
   import spark.implicits._
 
   def unpackYearData(df: DataFrame): DataFrame = {
+
     validatePresenceOfColumns(
       df,
       Seq(
@@ -297,6 +299,7 @@ object AnnualLossDF {
   }
 
   def sumArea(df: DataFrame): DataFrame = {
+
     df.groupBy(
         $"feature_id",
         $"threshold",
@@ -423,6 +426,7 @@ object AnnualLossDF {
   }
 
   def joinMaster(masterDF: DataFrame)(df: DataFrame): DataFrame = {
+
     df.join(
         masterDF,
         $"feature_id" <=> $"m_feature_id"
@@ -572,6 +576,7 @@ object AnnualLossDF {
   }
 
   def aggregateByThreshold(df: DataFrame): DataFrame = {
+
     df.select(
       $"m_feature_id" as "feature_id",
       $"m_threshold" as "threshold",

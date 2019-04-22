@@ -71,6 +71,7 @@ object TreeLossSummaryMain
          iso,
          admin1,
          admin2) =>
+
           val spark: SparkSession = TreeLossSparkSession.spark
           import spark.implicits._
 
@@ -119,14 +120,17 @@ object TreeLossSummaryMain
                   treeLossSummary.stats.map {
                     case (lossDataGroup, lossData) => {
 
-                      val admin1 =
-                        if (id.admin1.length > 0)
+                      val admin1: String = try {
                           id.admin1.split("[.]")(1).split("[_]")(0)
-                        else ""
-                      val admin2 =
-                        if (id.admin2.length > 0)
+                      } catch {
+                        case e: Exception => null
+                      }
+
+                      val admin2: String = try {
                           id.admin2.split("[.]")(2).split("[_]")(0)
-                        else ""
+                      } catch {
+                        case e: Exception => null
+                      }
 
                       LossRow(
                         LossRowFeatureId(id.country, admin1, admin2),
@@ -271,19 +275,19 @@ object TreeLossSummaryMain
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/iso")
 
-          adm1SummaryDF
-            .coalesce(1)
-            .orderBy($"iso", $"adm1", $"threshold")
-            .write
-            .options(csvOptions)
-            .csv(path = runOutputUrl + "/summary/global/adm1")
-
-          isoSummaryDF
-            .coalesce(1)
-            .orderBy($"iso", $"threshold")
-            .write
-            .options(csvOptions)
-            .csv(path = runOutputUrl + "/summary/global/iso")
+          //          adm1SummaryDF
+          //            .coalesce(1)
+          //            .orderBy($"iso", $"adm1", $"threshold")
+          //            .write
+          //            .options(csvOptions)
+          //            .csv(path = runOutputUrl + "/summary/global/adm1")
+          //
+          //          isoSummaryDF
+          //            .coalesce(1)
+          //            .orderBy($"iso", $"threshold")
+          //            .write
+          //            .options(csvOptions)
+          //            .csv(path = runOutputUrl + "/summary/global/iso")
 
           val adm2ApiDF = adm2DF
             .transform(Adm2ApiDF.nestYearData)

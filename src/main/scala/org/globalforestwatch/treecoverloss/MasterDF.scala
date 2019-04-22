@@ -7,13 +7,16 @@ import com.github.mrpowers.spark.daria.sql.DataFrameHelpers._
 object MasterDF {
 
   val spark: SparkSession = TreeLossSparkSession.spark
+
   import spark.implicits._
 
-  val thresholdDF: DataFrame =
-    Seq(0, 10, 15, 20, 25, 30, 50, 75).toDF("threshold")
-
   def expandByThreshold(df: DataFrame): DataFrame = {
+
     validatePresenceOfColumns(df, Seq("feature_id", "layers", "area"))
+
+    val thresholdDF: DataFrame =
+      Seq(0, 10, 15, 20, 25, 30, 50, 75).toDF("threshold")
+
     df.groupBy("feature_id", "layers")
       .agg(sum("area") as "totalarea")
       .crossJoin(thresholdDF)

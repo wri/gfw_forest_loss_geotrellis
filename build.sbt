@@ -86,7 +86,6 @@ import org.globalforestwatch.util._
 
 
 val conf = new SparkConf().
-setIfMissing("spark.master", "local[*]").
 setAppName("Tree Cover Loss Console").
 set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
 set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
@@ -132,14 +131,14 @@ assemblyMergeStrategy in assembly := {
 import sbtlighter._
 import com.amazonaws.services.elasticmapreduce.model.Tag
 
-sparkEmrRelease             := "emr-5.20.0"
+sparkEmrRelease := "emr-5.23.0"
 sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
-sparkS3JarFolder            := "s3://wri-users/tmaschler/geotrellis-test/jars"
-sparkS3LogUri               := Some("s3://wri-users/tmaschler/geotrellis-test/logs")
-sparkSubnetId               := Some("subnet-116d9a4a")
-sparkSecurityGroupIds       := Seq("sg-6c6a5911")
-sparkInstanceCount := 20
+sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
+sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
+sparkSubnetId := Some("subnet-037b97cff4493e3a1")
+sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
+sparkInstanceCount := 100
 sparkMasterType             := "m4.xlarge"
 sparkCoreType               := "m4.xlarge"
 sparkMasterEbsSize := Some(30)
