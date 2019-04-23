@@ -131,20 +131,28 @@ assemblyMergeStrategy in assembly := {
 import sbtlighter._
 import com.amazonaws.services.elasticmapreduce.model.Tag
 
+//  Always check Spot prices for instance type and select subnet based on bested price
+//  GFW subnet zone us-east-1a: subnet-00335589f5f424283
+//  GFW subnet zone us-east-1b: subnet-8c2b5ea1
+//  GFW subnet zone us-east-1c: subnet-08458452c1d05713b
+//  GFW subnet zone us-east-1d: subnet-116d9a4a
+//  GFW subnet zone us-east-1e: subnet-037b97cff4493e3a1
+//  GFW subnet zone us-east-1f: subnet-0360516ee122586ff
+
 sparkEmrRelease := "emr-5.23.0"
 sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
-sparkSubnetId := Some("subnet-037b97cff4493e3a1")
+sparkSubnetId := Some("subnet-8c2b5ea1")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 20
+sparkInstanceCount := 31
 sparkMasterType := "r5.12xlarge"
 sparkCoreType := "r5.12xlarge"
 sparkMasterEbsSize := Some(50)
 sparkCoreEbsSize := Some(50)
-sparkMasterPrice            := Some(0.5)
-sparkCorePrice              := Some(0.5)
+sparkMasterPrice := Some(3.0320)
+sparkCorePrice := Some(3.0320)
 sparkClusterName            := s"geotrellis-treecoverloss"
 sparkEmrServiceRole         := "EMR_DefaultRole"
 sparkInstanceRole           := "EMR_EC2_DefaultRole"
@@ -170,8 +178,8 @@ sparkEmrConfigs             := List(
     //    application (see the example following).
 
     // spark.executor.cores -> always 5 cCPU
-    // Number of executors = (total number of virtual cores per instance - 1)/ spark.executors.cores
-    // Total executor memory = total RAM per instance / number of executors per instance
+    // Number of executors = (total number of virtual cores per instance - 1)/ spark.executors.cores //9
+    // Total executor memory = total RAM per instance / number of executors per instance //42
     // spark.executors.memory -> total executor memory * 0.90
     // spark.yarn.executor.memoryOverhead -> total executor memory * 0.10
     // spark.driver.memory = spark.executors.memory
@@ -182,13 +190,13 @@ sparkEmrConfigs             := List(
 
     "spark.dynamicAllocation.enabled" -> "false",
     "spark.executor.cores" -> "5",
-    "spark.executor.memory" -> "37",
-    "spark.yarn.executor.memoryOverhead" -> "5",
-    "spark.driver.memory" -> "37",
+    "spark.executor.memory" -> "37G",
+    "spark.yarn.executor.memoryOverhead" -> "5G",
     "spark.driver.cores" -> "5",
-    "spark.executor.instances" -> "170",
-    "spark.default.parallelism" -> "1700",
-    "spark.sql.shuffle.partitions" -> "1700",
+    "spark.driver.memory" -> "37G",
+    "spark.executor.instances" -> "269",
+    "spark.default.parallelism" -> "2690",
+    "spark.sql.shuffle.partitions" -> "2690",
 
     "spark.driver.maxResultSize" -> "3G",
     "spark.shuffle.service.enabled" -> "true",
@@ -197,8 +205,12 @@ sparkEmrConfigs             := List(
     "spark.rdd.compress" -> "true",
 
     //     Best practice 4: Always set up a garbage collector when handling large volume of data through Spark.
-    "spark.executor.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
-    "spark.driver.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
+    // TODO: figure out how to merge java path and GC conf
+    //     Whem seperating with space got error:
+    //     ERROR GPLNativeCodeLoader: Could not load native gpl library
+    //     java.lang.UnsatisfiedLinkError: no gplcompression in java.library.path
+    "spark.executor.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib", // -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
+    "spark.driver.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib", // -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
     "spark.executorEnv.LD_LIBRARY_PATH" -> "/usr/local/lib"
   ),
   EmrConfig("spark-env").withProperties(

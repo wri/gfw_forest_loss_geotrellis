@@ -5,6 +5,7 @@ import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
+import org.apache.spark.sql.functions._
 import cats.implicits._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
@@ -40,6 +41,9 @@ object TreeLossSummaryMain
         .option[Int]("limit", help = "Limit number of records processed")
         .orNone
 
+      val isoAbcOpt =
+        Opts.option[String]("abc_iso", help = "Filter by starting letter of ISO code").orNone
+
       val isoOpt =
         Opts.option[String]("iso", help = "Filter by country ISO code").orNone
 
@@ -60,6 +64,7 @@ object TreeLossSummaryMain
         outputPartitionsOpt,
         limitOpt,
         isoOpt,
+        isoAbcOpt,
         admin1Opt,
         admin2Opt
       ).mapN {
@@ -69,6 +74,7 @@ object TreeLossSummaryMain
          maybeOutputPartitions,
          limit,
          iso,
+         isoAbc,
          admin1,
          admin2) =>
 
@@ -79,6 +85,10 @@ object TreeLossSummaryMain
           var featuresDF: DataFrame = spark.read
             .options(Map("header" -> "true", "delimiter" -> "\t"))
             .csv(featureUris.toList: _*)
+
+          isoAbc.foreach { startLetter =>
+            featuresDF = featuresDF.filter(substring($"gid_0", 0, 1) === startLetter(0))
+          }
 
           iso.foreach { isoCode =>
             featuresDF = featuresDF.filter($"gid_0" === isoCode)
@@ -95,6 +105,8 @@ object TreeLossSummaryMain
           limit.foreach { n =>
             featuresDF = featuresDF.limit(n)
           }
+
+          featuresDF.show(false)
 
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
           val featureRDD: RDD[Feature[Geometry, FeatureId]] =
@@ -120,14 +132,14 @@ object TreeLossSummaryMain
                   treeLossSummary.stats.map {
                     case (lossDataGroup, lossData) => {
 
-                      val admin1: String = try {
-                          id.admin1.split("[.]")(1).split("[_]")(0)
+                      val admin1: Integer = try {
+                        id.admin1.split("[.]")(1).split("[_]")(0).toInt
                       } catch {
                         case e: Exception => null
                       }
 
-                      val admin2: String = try {
-                          id.admin2.split("[.]")(2).split("[_]")(0)
+                      val admin2: Integer = try {
+                        id.admin2.split("[.]")(2).split("[_]")(0).toInt
                       } catch {
                         case e: Exception => null
                       }
@@ -251,7 +263,7 @@ object TreeLossSummaryMain
             .transform(Adm2SummaryDF.sumArea)
 
           adm2SummaryDF
-            .repartition($"iso")
+            .coalesce(1)
             .orderBy($"iso", $"adm1", $"adm2", $"threshold")
             .write
             .options(csvOptions)
@@ -260,7 +272,7 @@ object TreeLossSummaryMain
           val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
 
           adm1SummaryDF
-            .repartition($"iso")
+            .coalesce(1)
             .orderBy($"iso", $"adm1", $"threshold")
             .write
             .options(csvOptions)
@@ -269,25 +281,11 @@ object TreeLossSummaryMain
           val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
 
           isoSummaryDF
-            .repartition($"iso")
+            .coalesce(1)
             .orderBy($"iso", $"threshold")
             .write
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/iso")
-
-          adm1SummaryDF
-            .coalesce(1)
-            .orderBy($"iso", $"adm1", $"threshold")
-            .write
-            .options(csvOptions)
-            .csv(path = runOutputUrl + "/summary/global/adm1")
-
-          isoSummaryDF
-            .coalesce(1)
-            .orderBy($"iso", $"threshold")
-            .write
-            .options(csvOptions)
-            .csv(path = runOutputUrl + "/summary/global/iso")
 
           val adm2ApiDF = adm2DF
             .transform(Adm2ApiDF.nestYearData)
