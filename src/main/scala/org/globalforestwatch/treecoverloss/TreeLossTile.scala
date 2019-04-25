@@ -9,12 +9,11 @@ import org.globalforestwatch.layers._
   * We can not use GeoTrellis MultibandTile because it requires all bands share a CellType.
   */
 case class TreeLossTile(
-                         //preArea: Area#DTile,
+
                          loss: TreeCoverLoss#ITile,
                          gain: TreeCoverGain#ITile,
                          tcd2000: TreeCoverDensity#ITile,
                          tcd2010: TreeCoverDensity#ITile,
-                         //  co2Pixel: Carbon#DTile,
                          biomass: BiomassPerHectar#DTile,
                          mangroveBiomass: MangroveBiomass#OptionalDTile,
                          drivers: TreeCoverLossDrivers#OptionalITile,

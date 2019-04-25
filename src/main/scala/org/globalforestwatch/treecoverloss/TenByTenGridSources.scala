@@ -12,12 +12,10 @@ import org.globalforestwatch.layers._
   */
 case class TenByTenGridSources(grid: String) extends LazyLogging {
 
-  //lazy val preArea = new Area(grid)
   lazy val treeCoverLoss = new TreeCoverLoss(grid)
   lazy val treeCoverGain = new TreeCoverGain(grid)
   lazy val treeCoverDensity2000 = new TreeCoverDensity2000(grid)
   lazy val treeCoverDensity2010 = new TreeCoverDensity2010(grid)
-  //lazy val carbon = new Carbon(grid)
   lazy val biomassPerHectar = new BiomassPerHectar(grid)
 
   lazy val mangroveBiomass = new MangroveBiomass(grid)
@@ -67,12 +65,10 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
     for {
       // Failure for any of these reads will result in function returning Left[Throwable]
       // These are effectively required fields without which we can't make sense of the analysis
-      //preAreaTile <- Either.catchNonFatal(preArea.fetchWindow(window)).right
       lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(window)).right
       gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(window)).right
       tcd2000Tile <- Either.catchNonFatal(treeCoverDensity2000.fetchWindow(window)).right
       tcd2010Tile <- Either.catchNonFatal(treeCoverDensity2010.fetchWindow(window)).right
-      // co2PixelTile <- Either.catchNonFatal(carbon.fetchWindow(window)).right
       biomassTile <- Either.catchNonFatal(biomassPerHectar.fetchWindow(window)).right
 
     } yield {
@@ -120,12 +116,10 @@ case class TenByTenGridSources(grid: String) extends LazyLogging {
       val oilGasTile = oilGas.fetchWindow(window)
 
       val tile = TreeLossTile(
-        //preAreaTile,
         lossTile,
         gainTile,
         tcd2000Tile,
         tcd2010Tile,
-        // co2PixelTile,
         biomassTile,
         mangroveBiomassTile,
         driversTile,

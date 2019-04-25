@@ -41,8 +41,15 @@ object TreeLossSummaryMain
         .option[Int]("limit", help = "Limit number of records processed")
         .orNone
 
-      val isoAbcOpt =
-        Opts.option[String]("abc_iso", help = "Filter by starting letter of ISO code").orNone
+      val isoFirstOpt =
+        Opts.option[String]("iso_first", help = "Filter by first letter of ISO code").orNone
+
+
+      val isoStartOpt =
+        Opts.option[String]("iso_start", help = "Filter by ISO code larger than or equal to given value").orNone
+
+      val isoEndOpt =
+        Opts.option[String]("iso_end", help = "Filter by ISO code smaller than given value").orNone
 
       val isoOpt =
         Opts.option[String]("iso", help = "Filter by country ISO code").orNone
@@ -64,7 +71,9 @@ object TreeLossSummaryMain
         outputPartitionsOpt,
         limitOpt,
         isoOpt,
-        isoAbcOpt,
+        isoFirstOpt,
+        isoStartOpt,
+        isoEndOpt,
         admin1Opt,
         admin2Opt
       ).mapN {
@@ -74,7 +83,9 @@ object TreeLossSummaryMain
          maybeOutputPartitions,
          limit,
          iso,
-         isoAbc,
+         isoFirst,
+         isoStart,
+         isoEnd,
          admin1,
          admin2) =>
 
@@ -86,8 +97,16 @@ object TreeLossSummaryMain
             .options(Map("header" -> "true", "delimiter" -> "\t"))
             .csv(featureUris.toList: _*)
 
-          isoAbc.foreach { startLetter =>
-            featuresDF = featuresDF.filter(substring($"gid_0", 0, 1) === startLetter(0))
+          isoFirst.foreach { firstLetter =>
+            featuresDF = featuresDF.filter(substring($"gid_0", 0, 1) === firstLetter(0))
+          }
+
+          isoStart.foreach { startCode =>
+            featuresDF = featuresDF.filter($"gid_0" >= startCode)
+          }
+
+          isoEnd.foreach { endCode =>
+            featuresDF = featuresDF.filter($"gid_0" < endCode)
           }
 
           iso.foreach { isoCode =>
@@ -106,7 +125,8 @@ object TreeLossSummaryMain
             featuresDF = featuresDF.limit(n)
           }
 
-          featuresDF.show(false)
+          featuresDF.select("gid_0").distinct().show()
+
 
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
           val featureRDD: RDD[Feature[Geometry, FeatureId]] =
@@ -243,7 +263,11 @@ object TreeLossSummaryMain
             .transform(AnnualLossDF.joinMaster(masterDF))
             .transform(AnnualLossDF.aggregateByThreshold)
 
+          summaryDF.unpersist()
+          masterDF.unpersist()
+
           val adm2DF = annualLossDF
+            .filter($"threshold" > 0)
             .transform(Adm2DF.joinExtent2010(extent2010DF))
             .transform(Adm2DF.unpackFeautureIDLayers)
 
@@ -259,7 +283,7 @@ object TreeLossSummaryMain
           )
 
           val adm2SummaryDF = adm2DF
-            .filter($"threshold" > 0)
+            //            .filter($"threshold" > 0)
             .transform(Adm2SummaryDF.sumArea)
 
           adm2SummaryDF
@@ -287,18 +311,25 @@ object TreeLossSummaryMain
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/iso")
 
-          val adm2ApiDF = adm2DF
+          val apiDF = adm2DF
+            .transform(ApiDF.setNull)
+
+          adm2DF.unpersist()
+          apiDF.cache()
+
+          val adm2ApiDF = apiDF
             .transform(Adm2ApiDF.nestYearData)
 
           adm2ApiDF
-            .repartition($"iso", $"adm1", $"adm2", $"threshold")
+            .coalesce(1)
+            //.repartition($"iso", $"adm1", $"adm2", $"threshold")
             .orderBy($"iso", $"adm1", $"adm2", $"threshold")
             .toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
             .text(runOutputUrl + "/api/adm2")
 
-          val adm1ApiDF = adm2DF
+          val adm1ApiDF = apiDF
             .transform(Adm1ApiDF.sumArea)
             .transform(Adm1ApiDF.nestYearData)
 
@@ -310,7 +341,7 @@ object TreeLossSummaryMain
             .write
             .text(runOutputUrl + "/api/adm1")
 
-          val isoApiDF = adm2DF
+          val isoApiDF = apiDF
             .transform(IsoApiDF.sumArea)
             .transform(IsoApiDF.nestYearData)
 
