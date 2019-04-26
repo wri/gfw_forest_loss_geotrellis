@@ -5,6 +5,7 @@ import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
+import org.apache.spark.sql.functions._
 import cats.implicits._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
@@ -40,6 +41,30 @@ object TreeLossSummaryMain
         .option[Int]("limit", help = "Limit number of records processed")
         .orNone
 
+      val isoFirstOpt =
+        Opts
+          .option[String](
+          "iso_first",
+          help = "Filter by first letter of ISO code"
+        )
+          .orNone
+
+      val isoStartOpt =
+        Opts
+          .option[String](
+          "iso_start",
+          help = "Filter by ISO code larger than or equal to given value"
+        )
+          .orNone
+
+      val isoEndOpt =
+        Opts
+          .option[String](
+          "iso_end",
+          help = "Filter by ISO code smaller than given value"
+        )
+          .orNone
+
       val isoOpt =
         Opts.option[String]("iso", help = "Filter by country ISO code").orNone
 
@@ -60,6 +85,9 @@ object TreeLossSummaryMain
         outputPartitionsOpt,
         limitOpt,
         isoOpt,
+        isoFirstOpt,
+        isoStartOpt,
+        isoEndOpt,
         admin1Opt,
         admin2Opt
       ).mapN {
@@ -69,16 +97,32 @@ object TreeLossSummaryMain
          maybeOutputPartitions,
          limit,
          iso,
+         isoFirst,
+         isoStart,
+         isoEnd,
          admin1,
          admin2) =>
-
           val spark: SparkSession = TreeLossSparkSession.spark
+
           import spark.implicits._
 
           // ref: https://github.com/databricks/spark-csv
           var featuresDF: DataFrame = spark.read
             .options(Map("header" -> "true", "delimiter" -> "\t"))
             .csv(featureUris.toList: _*)
+
+          isoFirst.foreach { firstLetter =>
+            featuresDF =
+              featuresDF.filter(substring($"gid_0", 0, 1) === firstLetter(0))
+          }
+
+          isoStart.foreach { startCode =>
+            featuresDF = featuresDF.filter($"gid_0" >= startCode)
+          }
+
+          isoEnd.foreach { endCode =>
+            featuresDF = featuresDF.filter($"gid_0" < endCode)
+          }
 
           iso.foreach { isoCode =>
             featuresDF = featuresDF.filter($"gid_0" === isoCode)
@@ -95,6 +139,8 @@ object TreeLossSummaryMain
           limit.foreach { n =>
             featuresDF = featuresDF.limit(n)
           }
+
+          //          featuresDF.select("gid_0").distinct().show()
 
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
           val featureRDD: RDD[Feature[Geometry, FeatureId]] =
@@ -120,14 +166,14 @@ object TreeLossSummaryMain
                   treeLossSummary.stats.map {
                     case (lossDataGroup, lossData) => {
 
-                      val admin1: String = try {
-                          id.admin1.split("[.]")(1).split("[_]")(0)
+                      val admin1: Integer = try {
+                        id.admin1.split("[.]")(1).split("[_]")(0).toInt
                       } catch {
                         case e: Exception => null
                       }
 
-                      val admin2: String = try {
-                          id.admin2.split("[.]")(2).split("[_]")(0)
+                      val admin2: Integer = try {
+                        id.admin2.split("[.]")(2).split("[_]")(0).toInt
                       } catch {
                         case e: Exception => null
                       }
@@ -206,12 +252,12 @@ object TreeLossSummaryMain
                 "year_data"
               )
 
-          val runOutputUrl = outputUrl + "/treecoverloss_" + DateTimeFormatter
-            .ofPattern("yyyyMMdd_HHmm")
-            .format(LocalDateTime.now)
+          val runOutputUrl = outputUrl
+          //            + "/treecoverloss_" + DateTimeFormatter
+          //            .ofPattern("yyyyMMdd_HHmm")
+          //            .format(LocalDateTime.now)
 
-          //          val outputPartitionCount =
-          //            maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
+          val outputPartitionCount = maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
           summaryDF.repartition($"feature_id", $"threshold_2000")
           summaryDF.cache()
@@ -231,7 +277,11 @@ object TreeLossSummaryMain
             .transform(AnnualLossDF.joinMaster(masterDF))
             .transform(AnnualLossDF.aggregateByThreshold)
 
+          summaryDF.unpersist()
+          masterDF.unpersist()
+
           val adm2DF = annualLossDF
+            .filter($"threshold" > 0)
             .transform(Adm2DF.joinExtent2010(extent2010DF))
             .transform(Adm2DF.unpackFeautureIDLayers)
 
@@ -247,11 +297,10 @@ object TreeLossSummaryMain
           )
 
           val adm2SummaryDF = adm2DF
-            .filter($"threshold" > 0)
             .transform(Adm2SummaryDF.sumArea)
 
           adm2SummaryDF
-            .repartition($"iso")
+            .coalesce(1)
             .orderBy($"iso", $"adm1", $"adm2", $"threshold")
             .write
             .options(csvOptions)
@@ -260,7 +309,7 @@ object TreeLossSummaryMain
           val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
 
           adm1SummaryDF
-            .repartition($"iso")
+            .coalesce(1)
             .orderBy($"iso", $"adm1", $"threshold")
             .write
             .options(csvOptions)
@@ -269,55 +318,53 @@ object TreeLossSummaryMain
           val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
 
           isoSummaryDF
-            .repartition($"iso")
+            .coalesce(1)
             .orderBy($"iso", $"threshold")
             .write
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/iso")
 
-          //          adm1SummaryDF
-          //            .coalesce(1)
-          //            .orderBy($"iso", $"adm1", $"threshold")
-          //            .write
-          //            .options(csvOptions)
-          //            .csv(path = runOutputUrl + "/summary/global/adm1")
-          //
-          //          isoSummaryDF
-          //            .coalesce(1)
-          //            .orderBy($"iso", $"threshold")
-          //            .write
-          //            .options(csvOptions)
-          //            .csv(path = runOutputUrl + "/summary/global/iso")
+          val apiDF = adm2DF
+            .transform(ApiDF.setNull)
 
-          val adm2ApiDF = adm2DF
+          adm2DF.unpersist()
+          apiDF.cache()
+
+          val adm2ApiDF = apiDF
             .transform(Adm2ApiDF.nestYearData)
 
           adm2ApiDF
-            .repartition($"iso", $"adm1", $"adm2", $"threshold")
+            //.coalesce(1)
+            .repartition(outputPartitionCount, $"iso", $"adm1", $"adm2", $"threshold")
             .orderBy($"iso", $"adm1", $"adm2", $"threshold")
             .toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
             .text(runOutputUrl + "/api/adm2")
 
-          val adm1ApiDF = adm2DF
+          val tempApiDF = apiDF
             .transform(Adm1ApiDF.sumArea)
+
+          adm2DF.unpersist()
+          tempApiDF.cache()
+
+          val adm1ApiDF = tempApiDF
             .transform(Adm1ApiDF.nestYearData)
 
           adm1ApiDF
-            .repartition($"iso", $"adm1", $"threshold")
+            .repartition(outputPartitionCount, $"iso", $"adm1", $"threshold")
             .orderBy($"iso", $"adm1", $"threshold")
             .toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
             .text(runOutputUrl + "/api/adm1")
 
-          val isoApiDF = adm2DF
+          val isoApiDF = tempApiDF
             .transform(IsoApiDF.sumArea)
             .transform(IsoApiDF.nestYearData)
 
           isoApiDF
-            .repartition($"iso", $"threshold")
+            .repartition(outputPartitionCount, $"iso", $"threshold")
             .orderBy($"iso", $"threshold")
             .toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))

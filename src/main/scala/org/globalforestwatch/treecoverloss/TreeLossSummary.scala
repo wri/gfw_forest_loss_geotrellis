@@ -29,7 +29,6 @@ object TreeLossSummary {
         val gain: Integer = raster.tile.gain.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
-        //  val co2Pixel: Double = raster.tile.co2Pixel.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
         val mangroveBiomass: Double = raster.tile.mangroveBiomass.getData(col, row)
         val drivers: String = raster.tile.drivers.getData(col, row)
@@ -79,16 +78,17 @@ object TreeLossSummary {
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
-        //val area: Double = raster.tile.preArea.getData(col, row)
+
         val areaHa = area / 10000.0
 
         val gainArea: Double = gain * areaHa
 
         val pKey = LossDataGroup(tcd2000, tcd2010,
-          drivers, globalLandCover, primaryForest, idnPrimaryForest, erosion,
-          biodiversitySignificance, biodiversityIntactness,
-          wdpa, aze, plantations, riverBasins, ecozones, urbanWatersheds,
-          mangroves1996, mangroves2016, waterStress, intactForestLandscapes, endemicBirdAreas, tigerLandscapes,
+          drivers, globalLandCover, primaryForest, idnPrimaryForest,
+          erosion, biodiversitySignificance, biodiversityIntactness,
+          wdpa, aze, plantations, riverBasins, ecozones,
+          urbanWatersheds, mangroves1996, mangroves2016,
+          waterStress, intactForestLandscapes, endemicBirdAreas, tigerLandscapes,
           landmark, landRights, keyBiodiversityAreas, mining, rspo, peatlands, oilPalm, idnForestMoratorium,
           idnLandCover, mexProtectedAreas, mexPaymentForEcosystemServices, mexForestZoning, perProductionForest,
           perProtectedAreas, perForestConcessions, braBiomes, woodFiber, resourceRights, logging, oilGas)
@@ -96,8 +96,6 @@ object TreeLossSummary {
         val summary: LossData = acc.stats.getOrElse(
           key = pKey,
           default = LossData(LossYearDataMap.empty, 0, 0, 0, 0, StreamingHistogram(size = 1750), 0, 0, StreamingHistogram(size = 1000)))
-
-
 
         val biomassPixel = biomass * areaHa
         val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
