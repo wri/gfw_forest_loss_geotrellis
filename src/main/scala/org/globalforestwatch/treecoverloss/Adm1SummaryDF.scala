@@ -10,7 +10,7 @@ object Adm1SummaryDF {
   import spark.implicits._
 
   def sumArea(df: DataFrame): DataFrame = {
-        
+
     df.groupBy($"iso", $"adm1", $"threshold")
       .agg(
         round(sum("area_ha")) as "area_ha",

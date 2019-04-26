@@ -144,14 +144,14 @@ sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
-sparkSubnetId := Some("subnet-8c2b5ea1")
+sparkSubnetId := Some("subnet-0360516ee122586ff")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 31
+sparkInstanceCount := 51
 sparkMasterType := "r5.12xlarge"
 sparkCoreType := "r5.12xlarge"
 sparkMasterEbsSize := Some(50)
 sparkCoreEbsSize := Some(50)
-sparkMasterPrice := Some(3.0320)
+//sparkMasterPrice := Some(3.0320)
 sparkCorePrice := Some(3.0320)
 sparkClusterName            := s"geotrellis-treecoverloss"
 sparkEmrServiceRole         := "EMR_DefaultRole"
@@ -194,15 +194,16 @@ sparkEmrConfigs             := List(
     "spark.yarn.executor.memoryOverhead" -> "5G",
     "spark.driver.cores" -> "5",
     "spark.driver.memory" -> "37G",
-    "spark.executor.instances" -> "269",
-    "spark.default.parallelism" -> "2690",
-    "spark.sql.shuffle.partitions" -> "2690",
+    "spark.executor.instances" -> "449",
+    "spark.default.parallelism" -> "4490",
+    "spark.sql.shuffle.partitions" -> "4490",
 
     "spark.driver.maxResultSize" -> "3G",
     "spark.shuffle.service.enabled" -> "true",
     "spark.shuffle.compress" -> "true",
     "spark.shuffle.spill.compress" -> "true",
     "spark.rdd.compress" -> "true",
+    "spark.kryoserializer.buffer.max" -> "2047m",
 
     //     Best practice 4: Always set up a garbage collector when handling large volume of data through Spark.
     // TODO: figure out how to merge java path and GC conf
