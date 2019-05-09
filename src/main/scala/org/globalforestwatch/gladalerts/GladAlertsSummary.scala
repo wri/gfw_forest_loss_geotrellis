@@ -54,7 +54,7 @@ object GladAlertsSummary {
           def updateSummary(tile: Mercantile.Tile, stats: Map[GladAlertsDataGroup, GladAlertsData]): Map[GladAlertsDataGroup, GladAlertsData] = {
             if (tile.z < 0) stats
             else {
-              val pKey = GladAlertsDataGroup(tile, climateMask)
+              val pKey = GladAlertsDataGroup(glad._1, glad._2, tile, climateMask)
 
               val summary: GladAlertsData =
                 stats.getOrElse(key = pKey, default = GladAlertsData(0, 0, 0))
