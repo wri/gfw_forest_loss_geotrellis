@@ -12,6 +12,8 @@ import geotrellis.vector.{Feature, Geometry}
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 
+import org.globalforestwatch.features.GADMFeatureId
+
 object TreeLossSummaryMain
   extends CommandApp(
     name = "geotrellis-tree-cover-loss",
@@ -143,21 +145,21 @@ object TreeLossSummaryMain
           //          featuresDF.select("gid_0").distinct().show()
 
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
-          val featureRDD: RDD[Feature[Geometry, FeatureId]] =
+          val featureRDD: RDD[Feature[Geometry, GADMFeatureId]] =
             featuresDF.rdd.map { row: Row =>
               val countryCode: String = row.getString(2)
               val admin1: String = row.getString(3)
               val admin2: String = row.getString(4)
               val geom: Geometry = WKB.read(row.getString(5))
-              Feature(geom, FeatureId(countryCode, admin1, admin2))
+              Feature(geom, GADMFeatureId(countryCode, admin1, admin2))
             }
 
           val part = new HashPartitioner(
             partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
           )
 
-          val summaryRDD: RDD[(FeatureId, TreeLossSummary)] =
-            TreeLossRDD(featureRDD, TenByTenGrid.blockTileGrid, part)
+          val summaryRDD: RDD[(GADMFeatureId, TreeLossSummary)] =
+            TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, part)
 
           val summaryDF =
             summaryRDD
@@ -178,11 +180,11 @@ object TreeLossSummaryMain
                         case e: Exception => null
                       }
 
-                      LossRow(
-                        LossRowFeatureId(id.country, admin1, admin2),
+                      TreeLossRow(
+                        TreeLossRowFeatureId(id.country, admin1, admin2),
                         lossDataGroup.tcd2000,
                         lossDataGroup.tcd2010,
-                        LossRowLayers(
+                        TreeLossRowLayers(
                           lossDataGroup.drivers,
                           lossDataGroup.globalLandCover,
                           lossDataGroup.primaryForest,

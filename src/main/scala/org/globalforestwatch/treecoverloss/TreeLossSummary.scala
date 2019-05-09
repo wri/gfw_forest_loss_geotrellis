@@ -8,7 +8,7 @@ import geotrellis.raster.histogram.StreamingHistogram
 
 
 /** LossData Summary by year */
-case class TreeLossSummary(stats: Map[LossDataGroup, LossData] = Map.empty) {
+case class TreeLossSummary(stats: Map[TreeLossDataGroup, TreeLossData] = Map.empty) {
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: TreeLossSummary): TreeLossSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
@@ -83,7 +83,7 @@ object TreeLossSummary {
 
         val gainArea: Double = gain * areaHa
 
-        val pKey = LossDataGroup(tcd2000, tcd2010,
+        val pKey = TreeLossDataGroup(tcd2000, tcd2010,
           drivers, globalLandCover, primaryForest, idnPrimaryForest,
           erosion, biodiversitySignificance, biodiversityIntactness,
           wdpa, aze, plantations, riverBasins, ecozones,
@@ -93,9 +93,9 @@ object TreeLossSummary {
           idnLandCover, mexProtectedAreas, mexPaymentForEcosystemServices, mexForestZoning, perProductionForest,
           perProtectedAreas, perForestConcessions, braBiomes, woodFiber, resourceRights, logging, oilGas)
 
-        val summary: LossData = acc.stats.getOrElse(
+        val summary: TreeLossData = acc.stats.getOrElse(
           key = pKey,
-          default = LossData(LossYearDataMap.empty, 0, 0, 0, 0, StreamingHistogram(size = 1750), 0, 0, StreamingHistogram(size = 1000)))
+          default = TreeLossData(LossYearDataMap.empty, 0, 0, 0, 0, StreamingHistogram(size = 1750), 0, 0, StreamingHistogram(size = 1000)))
 
         val biomassPixel = biomass * areaHa
         val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
@@ -123,7 +123,7 @@ object TreeLossSummary {
         summary.totalMangroveCo2 += mangroveCo2Pixel
         summary.mangroveBiomassHistogram.countItem(mangroveBiomass)
 
-        val updated_summary: Map[LossDataGroup, LossData] = acc.stats.updated(pKey, summary)
+        val updated_summary: Map[TreeLossDataGroup, TreeLossData] = acc.stats.updated(pKey, summary)
 
         TreeLossSummary(updated_summary)
       }

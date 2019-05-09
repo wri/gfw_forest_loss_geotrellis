@@ -3,10 +3,10 @@ package org.globalforestwatch.treecoverloss
 
 import org.scalatest.FunSuite
 import geotrellis.vector.Point
-import TenByTenGrid._
+import TreeLossGrid._
 
 
-class TenByTenGridSuits extends FunSuite {
+class TreeLossGridSuits extends FunSuite {
 
   test("pointGridId")  {
 

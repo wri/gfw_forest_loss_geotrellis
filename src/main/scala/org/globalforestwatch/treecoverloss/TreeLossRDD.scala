@@ -9,6 +9,9 @@ import org.apache.spark.rdd.RDD
 import cats.implicits._
 import geotrellis.contrib.polygonal._
 import geotrellis.spark.tiling.LayoutDefinition
+import org.globalforestwatch.features.GADMFeatureId
+import org.globalforestwatch.util.RoundedExtent
+
 import math.round
 
 object TreeLossRDD extends LazyLogging {
@@ -20,16 +23,16 @@ object TreeLossRDD extends LazyLogging {
     * @param partitioner how to partition keys from the windowLayout
     */
   def apply(
-    featureRDD: RDD[Feature[Geometry, FeatureId]],
-    windowLayout: LayoutDefinition,
-    partitioner: Partitioner
-  ): RDD[(FeatureId, TreeLossSummary)] = {
+             featureRDD: RDD[Feature[Geometry, GADMFeatureId]],
+             windowLayout: LayoutDefinition,
+             partitioner: Partitioner
+           ): RDD[(GADMFeatureId, TreeLossSummary)] = {
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.
      * Later we will calculate partial result for each intersection and merge them.
      */
-    val keyedFeatureRDD: RDD[(SpatialKey, Feature[Geometry, FeatureId])] =
-      featureRDD.flatMap { feature: Feature[Geometry, FeatureId] =>
+    val keyedFeatureRDD: RDD[(SpatialKey, Feature[Geometry, GADMFeatureId])] =
+      featureRDD.flatMap { feature: Feature[Geometry, GADMFeatureId] =>
         val keys: Set[SpatialKey] = windowLayout.mapTransform.keysForGeometry(feature.geom)
         keys.toSeq.map { key => (key, feature) }
       }.partitionBy(partitioner)
@@ -40,13 +43,13 @@ object TreeLossRDD extends LazyLogging {
      *
      * The RDD is keyed by Id such that we can join and recombine partial results later.
      */
-    val featuresWithSummaries: RDD[(FeatureId, TreeLossSummary)] =
-      keyedFeatureRDD.mapPartitions { featurePartition: Iterator[(SpatialKey, Feature[Geometry, FeatureId])] =>
+    val featuresWithSummaries: RDD[(GADMFeatureId, TreeLossSummary)] =
+      keyedFeatureRDD.mapPartitions { featurePartition: Iterator[(SpatialKey, Feature[Geometry, GADMFeatureId])] =>
         // Code inside .mapPartitions works in an Iterator of records
         // Doing things this way allows us to reuse resources and perform other optimizations
 
         // Grouping by spatial key allows us to minimize read thrashing from record to record
-        val groupedByKey: Map[SpatialKey, Array[(SpatialKey, Feature[Geometry, FeatureId])]] =
+        val groupedByKey: Map[SpatialKey, Array[(SpatialKey, Feature[Geometry, GADMFeatureId])]] =
           featurePartition.toArray.groupBy{ case (windowKey, feature) => windowKey }
 
         groupedByKey.toIterator.flatMap { case (windowKey, keysAndFeatures) =>
@@ -60,21 +63,21 @@ object TreeLossRDD extends LazyLogging {
 
           val window = new RoundedExtent(xmin, ymin, xmax, ymax, 1)
 
-          val maybeRasterSource: Either[Throwable, TenByTenGridSources] =
+          val maybeRasterSource: Either[Throwable, TreeLossGridSources] =
             Either.catchNonFatal {
-              TenByTenGrid.getRasterSource(window)
+              TreeLossGrid.getRasterSource(window)
             }
 
           val features = keysAndFeatures.map(_._2)
 
           val maybeRaster: Either[Throwable, Raster[TreeLossTile]] =
-            maybeRasterSource.flatMap { rs: TenByTenGridSources =>
+            maybeRasterSource.flatMap { rs: TreeLossGridSources =>
               rs.readWindow(window)
             }
 
           // flatMap here flattens out and ignores the errors
-          features.flatMap { feature: Feature[Geometry, FeatureId] =>
-            val id: FeatureId = feature.data
+          features.flatMap { feature: Feature[Geometry, GADMFeatureId] =>
+            val id: GADMFeatureId = feature.data
 
             maybeRaster match {
               case Left(exception) =>
@@ -96,7 +99,7 @@ object TreeLossRDD extends LazyLogging {
     /* Group records by Id and combine their summaries
      * The features may have intersected multiple grid blocks
      */
-    val featuresGroupedWithSummaries: RDD[(FeatureId, TreeLossSummary)] =
+    val featuresGroupedWithSummaries: RDD[(GADMFeatureId, TreeLossSummary)] =
       featuresWithSummaries.reduceByKey { case (summary1, summary2) =>
         summary1.merge(summary2)
       }

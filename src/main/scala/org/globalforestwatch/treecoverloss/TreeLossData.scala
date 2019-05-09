@@ -16,12 +16,12 @@ import geotrellis.raster.histogram.StreamingHistogram
   * @param totalMangroveCo2
   * @param mangroveBiomassHistogram
   */
-case class LossData(var lossYear: scala.collection.mutable.Map[Int, LossYearData], var totalArea: Double, var totalGainArea: Double, var totalBiomass: Double,
-                    var totalCo2: Double, var biomassHistogram: StreamingHistogram, var totalMangroveBiomass: Double,
-                    var totalMangroveCo2: Double, var mangroveBiomassHistogram: StreamingHistogram) {
-  def merge(other: LossData): LossData = {
+case class TreeLossData(var lossYear: scala.collection.mutable.Map[Int, LossYearData], var totalArea: Double, var totalGainArea: Double, var totalBiomass: Double,
+                        var totalCo2: Double, var biomassHistogram: StreamingHistogram, var totalMangroveBiomass: Double,
+                        var totalMangroveCo2: Double, var mangroveBiomassHistogram: StreamingHistogram) {
+  def merge(other: TreeLossData): TreeLossData = {
 
-    LossData(
+    TreeLossData(
       lossYear ++ other.lossYear.map { case (k, v) => {
         val loss: LossYearData = lossYear(k)
         var otherLoss: LossYearData = v
@@ -45,9 +45,9 @@ case class LossData(var lossYear: scala.collection.mutable.Map[Int, LossYearData
   }
 }
 
-object LossData {
-  implicit val lossDataSemigroup: Semigroup[LossData] = new Semigroup[LossData] {
-    def combine(x: LossData, y: LossData): LossData = x.merge(y)
+object TreeLossData {
+  implicit val lossDataSemigroup: Semigroup[TreeLossData] = new Semigroup[TreeLossData] {
+    def combine(x: TreeLossData, y: TreeLossData): TreeLossData = x.merge(y)
   }
 
 }

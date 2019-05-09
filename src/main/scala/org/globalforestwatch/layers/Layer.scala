@@ -1,6 +1,7 @@
 package org.globalforestwatch.layers
 
 import java.io.FileNotFoundException
+import java.time.LocalDate
 import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
 import geotrellis.raster.{CellType, Tile, isNoData}
 import geotrellis.vector.Extent
@@ -24,6 +25,38 @@ trait Layer {
   val basePath: String = s"s3://gfw-files/2018_update"
 
   def lookup(a: A): B
+
+  def getGladGrid(grid: String): String = {
+    case class Corner(coord: Int, nsew: String) {
+      override def toString: String = {
+        if (nsew == "N" || nsew == "S") "%02d".format(coord) + nsew
+        else "%03d".format(coord) + nsew
+      }
+    }
+
+    def getBottom(top: Corner): Corner = {
+      val coord: Int = if (top.nsew == "N") top.coord - 10 else -top.coord - 10
+      val nsew: String = if (coord >= 0) "N" else "S"
+      Corner(Math.abs(coord), nsew)
+    }
+
+    def getRight(left: Corner): Corner = {
+      val coord: Int = if (left.nsew == "E") left.coord + 10 else -left.coord + 10
+      val nsew: String = if (coord >= 0) "E" else "W"
+      Corner(Math.abs(coord), nsew)
+    }
+
+    val coord = ("""\d+""".r findAllIn grid).toList
+    val nsew = ("""[^0-9,_]""".r findAllIn grid).toList
+
+    val top = Corner(coord(0).toInt, nsew(0))
+    val left = Corner(coord(1).toInt, nsew(1))
+
+    val bottom = getBottom(top)
+    val right = getRight(left)
+
+    Array(left, bottom, right, top).mkString("_")
+  }
 
 }
 
@@ -252,6 +285,20 @@ trait IntegerLayer extends ILayer {
   def lookup(value: Int): Integer = value
 }
 
+
+trait DateConfLayer extends ILayer {
+
+  /**
+    * Layers which return an Integer type
+    * (use java.lang.Integer to be able to use null)
+    */
+  type B = (LocalDate, Boolean)
+
+  val internalNoDataValue: Int = 0
+  val externalNoDataValue: B = null
+
+}
+
 trait DIntegerLayer extends DLayer {
 
   /**
@@ -263,7 +310,6 @@ trait DIntegerLayer extends DLayer {
   val internalNoDataValue: Double = 0
   val externalNoDataValue: Integer = null
 
-  def lookup(value: Double): Integer
 }
 
 trait DBooleanLayer extends DLayer {
@@ -277,7 +323,6 @@ trait DBooleanLayer extends DLayer {
   val internalNoDataValue: Double = 0
   val externalNoDataValue: Boolean = false
 
-  def lookup(value: Double): Boolean
 }
 
 trait DoubleLayer extends DLayer {
@@ -303,5 +348,4 @@ trait StringLayer extends ILayer {
   val internalNoDataValue: Int = 0
   val externalNoDataValue: String = null
 
-  def lookup(value: Int): String
 }
