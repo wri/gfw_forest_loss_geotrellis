@@ -1,5 +1,8 @@
 package org.globalforestwatch.gladalerts
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 import cats.implicits._
 import com.monovore.decline.{CommandApp, Opts}
 import geotrellis.vector.io.wkb.WKB
@@ -178,31 +181,38 @@ object GladAlertsSummaryMain
                         }
 
                         GladAlertsRow(
-                          GladAlertsRowFeatureId(id.country, admin1, admin2),
-                          gladAlertsDataGroup.lat,
-                          gladAlertsDataGroup.lon,
+                          id.country,
+                          admin1,
+                          admin2,
+                          gladAlertsDataGroup.tile.x,
+                          gladAlertsDataGroup.tile.y,
+                          gladAlertsDataGroup.tile.z,
                           gladAlertsDataGroup.climateMask,
                           gladAlertsData.totalArea,
                           gladAlertsData.totalBiomass,
-                          gladAlertsData.totalCo2,
+                          gladAlertsData.totalCo2
+
                         )
                       }
                     }
                 }
                 .toDF(
-                  "feature_id",
-                  "lat",
-                  "lon",
+                  "iso",
+                  "adm1",
+                  "adm2",
+                  "x",
+                  "y",
+                  "z",
                   "climate_mask",
                   "area",
                   "biomass",
                   "co2"
                 )
 
-            val runOutputUrl = outputUrl
-            //            + "/treecoverloss_" + DateTimeFormatter
-            //            .ofPattern("yyyyMMdd_HHmm")
-            //            .format(LocalDateTime.now)
+            val runOutputUrl = outputUrl +
+              "/gladAlerts_" + DateTimeFormatter
+              .ofPattern("yyyyMMdd_HHmm")
+              .format(LocalDateTime.now)
 
             val outputPartitionCount =
               maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
@@ -217,10 +227,10 @@ object GladAlertsSummaryMain
 
             summaryDF
               .coalesce(1)
-              .orderBy($"iso", $"threshold")
+              //              .orderBy($"iso", $"threshold")
               .write
               .options(csvOptions)
-              .csv(path = runOutputUrl + "/summary/iso")
+              .csv(path = runOutputUrl + "/zoom12")
 
             spark.stop
         }

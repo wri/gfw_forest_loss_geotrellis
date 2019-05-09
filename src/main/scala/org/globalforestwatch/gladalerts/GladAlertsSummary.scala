@@ -5,7 +5,7 @@ import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import cats.implicits._
 import org.globalforestwatch.util.Geodesy
-import geotrellis.raster.histogram.StreamingHistogram
+import org.globalforestwatch.util.Mercantile
 
 /** LossData Summary by year */
 case class GladAlertsSummary(
@@ -43,14 +43,17 @@ object GladAlertsSummary {
           val cellSize = raster.cellSize
 
           val lat: Double = raster.rasterExtent.gridRowToMap(row)
-          val lon: Double = raster.rasterExtent.gridColToMap(col)
+          val lng: Double = raster.rasterExtent.gridColToMap(col)
+
+          val tile: Mercantile.Tile = Mercantile.tile(lng, lat, 12)
+
           val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
           val areaHa = area / 10000.0
           val biomassPixel = biomass * areaHa
           val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
 
-          val pKey = GladAlertsDataGroup(lat, lon, climateMask)
+          val pKey = GladAlertsDataGroup(tile, climateMask)
 
           val summary: GladAlertsData =
             acc.stats.getOrElse(key = pKey, default = GladAlertsData(0, 0, 0))
@@ -63,6 +66,9 @@ object GladAlertsSummary {
             acc.stats.updated(pKey, summary)
 
           GladAlertsSummary(updated_summary)
+        }
+        else {
+          acc
         }
       }
     }

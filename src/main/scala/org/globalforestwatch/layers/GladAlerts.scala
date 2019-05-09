@@ -8,7 +8,7 @@ class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
   val gladGrid: String = getGladGrid(grid)
 
   val uri: String =
-    s"s3://gfw2-data/forest_change/umd_landsat_alerts/prod/analysis/loss/$gladGrid.tif"
+    s"s3://gfw2-data/forest_change/umd_landsat_alerts/prod/analysis/$gladGrid.tif"
 
   override def lookup(value: Int): (LocalDate, Boolean) = {
 
@@ -20,16 +20,16 @@ class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
         year % 4
       }
 
-      def getDateString(days: Int, baseYear: Int): String = {
-        val daysInYear = if (isLeapYear(baseYear + 1)) 366 else 365
-        if (days <= daysInYear) "${baseYear + 1}" + "%03d".format(days)
-        else getDateString(daysInYear - daysInYear, baseYear + 1)
+      def getDateString(days: Int, year: Int): String = {
+        val daysInYear = if (isLeapYear(year)) 366 else 365
+        if (days <= daysInYear) s"$year" + "%03d".format(days)
+        else getDateString(days - daysInYear, year + 1)
       }
 
       val julianDate = DateTimeFormatter.ofPattern("yyyyDDD")
       val days: Int = if (confidence) value - 30000 else value - 20000
-      val baseYear = 2015
-      LocalDate.parse(getDateString(days, baseYear), julianDate)
+      val year = 2015
+      LocalDate.parse(getDateString(days, year), julianDate)
 
     }
 

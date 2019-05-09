@@ -1,8 +1,13 @@
 package org.globalforestwatch.gladalerts
 
-case class GladAlertsRow(lossRowFeatureId: GladAlertsRowFeatureId,
-                         lat: Double,
-                         lon: Double,
+import org.globalforestwatch.util.Mercantile
+
+case class GladAlertsRow(iso: String,
+                         adm1: Integer,
+                         adm2: Integer,
+                         x: Int,
+                         y: Int,
+                         z: Int,
                          climateMask: Boolean,
                          totalArea: Double,
                          totalBiomass: Double,

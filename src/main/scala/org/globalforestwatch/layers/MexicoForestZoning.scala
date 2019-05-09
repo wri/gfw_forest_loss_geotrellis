@@ -10,7 +10,7 @@ class MexicoForestZoning(grid: String) extends StringLayer with OptionalILayer {
 
     case 8 | 9 | 10 | 11 | 12 | 13 => "Zonas de producción"
 
-    case 14 | 15 | 16 | 17 | 18 | 19 => "Zonas de restauración"
+    case 14 | 15 | 16 | 17 | 18 => "Zonas de restauración"
 
     case 19 => "No aplica"
 

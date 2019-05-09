@@ -1,3 +1,5 @@
 package org.globalforestwatch.gladalerts
 
-case class GladAlertsDataGroup(lat: Double, lon: Double, climateMask: Boolean)
+import org.globalforestwatch.util.Mercantile
+
+case class GladAlertsDataGroup(tile: Mercantile.Tile, climateMask: Boolean)
