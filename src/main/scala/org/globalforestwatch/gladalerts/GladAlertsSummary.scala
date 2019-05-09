@@ -45,29 +45,35 @@ object GladAlertsSummary {
           val lat: Double = raster.rasterExtent.gridRowToMap(row)
           val lng: Double = raster.rasterExtent.gridColToMap(col)
 
-          val tile: Mercantile.Tile = Mercantile.tile(lng, lat, 12)
-
           val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
           val areaHa = area / 10000.0
           val biomassPixel = biomass * areaHa
           val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
 
-          val pKey = GladAlertsDataGroup(tile, climateMask)
+          def updateSummary(tile: Mercantile.Tile, stats: Map[GladAlertsDataGroup, GladAlertsData]): Map[GladAlertsDataGroup, GladAlertsData] = {
+            if (tile.z < 0) stats
+            else {
+              val pKey = GladAlertsDataGroup(tile, climateMask)
 
-          val summary: GladAlertsData =
-            acc.stats.getOrElse(key = pKey, default = GladAlertsData(0, 0, 0))
+              val summary: GladAlertsData =
+                stats.getOrElse(key = pKey, default = GladAlertsData(0, 0, 0))
 
-          summary.totalArea += areaHa
-          summary.totalBiomass += biomassPixel
-          summary.totalCo2 += co2Pixel
+              summary.totalArea += areaHa
+              summary.totalBiomass += biomassPixel
+              summary.totalCo2 += co2Pixel
+              updateSummary(Mercantile.parent(tile), stats.updated(pKey, summary))
+            }
 
-          val updated_summary: Map[GladAlertsDataGroup, GladAlertsData] =
-            acc.stats.updated(pKey, summary)
+          }
 
-          GladAlertsSummary(updated_summary)
-        }
-        else {
+
+          val tile: Mercantile.Tile = Mercantile.tile(lng, lat, 12)
+          val updatedSummary: Map[GladAlertsDataGroup, GladAlertsData] = updateSummary(tile, acc.stats)
+
+          GladAlertsSummary(updatedSummary)
+
+        } else {
           acc
         }
       }
