@@ -241,13 +241,9 @@ object GladAlertsSummaryMain
               .options(csvOptions)
               .csv(path = runOutputUrl + "/tiles")
 
-            val adm2DailyDF = summaryDF
-              .groupBy($"iso", $"adm1", $"adm2", $"alert_date", $"is_confirmed")
-              .agg(
-                sum("alerts") as "alerts",
-                sum("area") as "area",
-                sum("co2") as "co2_emissions"
-              )
+            val adm2DailyDF = summaryDF.transform(Adm2DailyDF.sumAlerts)
+
+            summaryDF.unpersist()
 
             adm2DailyDF
               .coalesce(1)
@@ -255,31 +251,7 @@ object GladAlertsSummaryMain
               .options(csvOptions)
               .csv(path = runOutputUrl + "/adm2_daily")
 
-            val adm2WeeklyDF = adm2DailyDF
-              .select(
-                $"iso",
-                $"adm1",
-                $"adm2",
-                year($"alert_date") as "year",
-                weekofyear($"alert_date") as "week",
-                $"is_confirmed",
-                $"alerts",
-                $"area",
-                $"co2_emissions"
-              )
-              .groupBy(
-                $"iso",
-                $"adm1",
-                $"adm2",
-                $"year",
-                $"week",
-                $"is_confirmed"
-              )
-              .agg(
-                sum("alerts") as "alerts",
-                sum("area") as "area",
-                sum("co2_emissions") as "co2_emissions"
-              )
+            val adm2WeeklyDF = adm2DailyDF.transform(Adm2WeeklyDF.sumAlerts)
 
             adm2WeeklyDF
               .coalesce(1)
@@ -288,18 +260,7 @@ object GladAlertsSummaryMain
               .csv(path = runOutputUrl + "/adm2_weekly")
 
             val adm1WeeklyDF = adm2WeeklyDF
-              .groupBy(
-                $"iso",
-                $"adm1",
-                $"year",
-                $"week",
-                $"is_confirmed"
-              )
-              .agg(
-                sum("alerts") as "alerts",
-                sum("area") as "area",
-                sum("co2_emissions") as "co2_emissions"
-              )
+              .transform(Adm1WeeklyDF.sumAlerts)
 
             adm1WeeklyDF
               .coalesce(1)
@@ -308,17 +269,7 @@ object GladAlertsSummaryMain
               .csv(path = runOutputUrl + "/adm1_weekly")
 
             val isoWeeklyDF = adm1WeeklyDF
-              .groupBy(
-                $"iso",
-                $"year",
-                $"week",
-                $"is_confirmed"
-              )
-              .agg(
-                sum("alerts") as "alerts",
-                sum("area") as "area",
-                sum("co2_emissions") as "co2_emissions"
-              )
+              .transform(IsoWeeklyDF.sumAlerts)
 
             isoWeeklyDF
               .coalesce(1)
