@@ -184,7 +184,8 @@ object GladAlertsSummaryMain
                           id.country,
                           admin1,
                           admin2,
-                          gladAlertsDataGroup.alertDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                          gladAlertsDataGroup.alertDate
+                            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                           gladAlertsDataGroup.isConfirmed,
                           gladAlertsDataGroup.tile.x,
                           gladAlertsDataGroup.tile.y,
@@ -193,7 +194,6 @@ object GladAlertsSummaryMain
                           gladAlertsData.totalAlerts,
                           gladAlertsData.totalArea,
                           gladAlertsData.totalCo2
-
                         )
                       }
                     }
@@ -213,13 +213,7 @@ object GladAlertsSummaryMain
                   "co2"
                 )
 
-            val runOutputUrl = outputUrl +
-              "/gladAlerts_" + DateTimeFormatter
-              .ofPattern("yyyyMMdd_HHmm")
-              .format(LocalDateTime.now)
-
-            val outputPartitionCount =
-              maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
+            summaryDF.cache()
 
             val csvOptions = Map(
               "header" -> "true",
@@ -229,12 +223,108 @@ object GladAlertsSummaryMain
               "nullValue" -> "\u0000"
             )
 
-            summaryDF
+            val runOutputUrl = outputUrl +
+              "/gladAlerts_" + DateTimeFormatter
+              .ofPattern("yyyyMMdd_HHmm")
+              .format(LocalDateTime.now)
+
+            val outputPartitionCount =
+              maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
+
+            val tileDF = summaryDF
+              .groupBy($"x", $"y", $"z", $"alert_date", $"is_confirmed")
+              .agg(sum($"alerts") as "alerts")
+
+            tileDF
               .coalesce(1)
-              //              .orderBy($"iso", $"threshold")
               .write
               .options(csvOptions)
-              .csv(path = runOutputUrl + "/zoom12")
+              .csv(path = runOutputUrl + "/tiles")
+
+            val adm2DailyDF = summaryDF
+              .groupBy($"iso", $"adm1", $"adm2", $"alert_date", $"is_confirmed")
+              .agg(
+                sum("alerts") as "alerts",
+                sum("area") as "area",
+                sum("co2") as "co2_emissions"
+              )
+
+            adm2DailyDF
+              .coalesce(1)
+              .write
+              .options(csvOptions)
+              .csv(path = runOutputUrl + "/adm2_daily")
+
+            val adm2WeeklyDF = adm2DailyDF
+              .select(
+                $"iso",
+                $"adm1",
+                $"adm2",
+                year($"alert_date") as "year",
+                weekofyear($"alert_date") as "week",
+                $"is_confirmed",
+                $"alerts",
+                $"area",
+                $"co2_emissions"
+              )
+              .groupBy(
+                $"iso",
+                $"adm1",
+                $"adm2",
+                $"year",
+                $"week",
+                $"is_confirmed"
+              )
+              .agg(
+                sum("alerts") as "alerts",
+                sum("area") as "area",
+                sum("co2_emissions") as "co2_emissions"
+              )
+
+            adm2WeeklyDF
+              .coalesce(1)
+              .write
+              .options(csvOptions)
+              .csv(path = runOutputUrl + "/adm2_weekly")
+
+            val adm1WeeklyDF = adm2WeeklyDF
+              .groupBy(
+                $"iso",
+                $"adm1",
+                $"year",
+                $"week",
+                $"is_confirmed"
+              )
+              .agg(
+                sum("alerts") as "alerts",
+                sum("area") as "area",
+                sum("co2_emissions") as "co2_emissions"
+              )
+
+            adm1WeeklyDF
+              .coalesce(1)
+              .write
+              .options(csvOptions)
+              .csv(path = runOutputUrl + "/adm1_weekly")
+
+            val isoWeeklyDF = adm1WeeklyDF
+              .groupBy(
+                $"iso",
+                $"year",
+                $"week",
+                $"is_confirmed"
+              )
+              .agg(
+                sum("alerts") as "alerts",
+                sum("area") as "area",
+                sum("co2_emissions") as "co2_emissions"
+              )
+
+            isoWeeklyDF
+              .coalesce(1)
+              .write
+              .options(csvOptions)
+              .csv(path = runOutputUrl + "/iso_weekly")
 
             spark.stop
         }
