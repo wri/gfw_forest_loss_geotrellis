@@ -9,8 +9,6 @@ import org.apache.spark.sql.functions._
 import cats.implicits._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
-import java.time.format.DateTimeFormatter
-import java.time.LocalDateTime
 
 import org.globalforestwatch.features.GADMFeatureId
 
@@ -233,7 +231,7 @@ object TreeLossSummaryMain
                         lossData.totalMangroveBiomass,
                         lossData.totalMangroveCo2,
                         lossData.mangroveBiomassHistogram.mean(),
-                        LossYearDataMap.toList(lossData.lossYear)
+                        TreeLossYearDataMap.toList(lossData.lossYear)
                       )
                     }
                   }

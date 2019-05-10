@@ -95,7 +95,7 @@ object TreeLossSummary {
 
         val summary: TreeLossData = acc.stats.getOrElse(
           key = pKey,
-          default = TreeLossData(LossYearDataMap.empty, 0, 0, 0, 0, StreamingHistogram(size = 1750), 0, 0, StreamingHistogram(size = 1000)))
+          default = TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, StreamingHistogram(size = 1750), 0, 0, StreamingHistogram(size = 1000)))
 
         val biomassPixel = biomass * areaHa
         val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12

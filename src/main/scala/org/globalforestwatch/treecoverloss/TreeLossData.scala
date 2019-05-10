@@ -16,15 +16,15 @@ import geotrellis.raster.histogram.StreamingHistogram
   * @param totalMangroveCo2
   * @param mangroveBiomassHistogram
   */
-case class TreeLossData(var lossYear: scala.collection.mutable.Map[Int, LossYearData], var totalArea: Double, var totalGainArea: Double, var totalBiomass: Double,
+case class TreeLossData(var lossYear: scala.collection.mutable.Map[Int, TreeLossYearData], var totalArea: Double, var totalGainArea: Double, var totalBiomass: Double,
                         var totalCo2: Double, var biomassHistogram: StreamingHistogram, var totalMangroveBiomass: Double,
                         var totalMangroveCo2: Double, var mangroveBiomassHistogram: StreamingHistogram) {
   def merge(other: TreeLossData): TreeLossData = {
 
     TreeLossData(
       lossYear ++ other.lossYear.map { case (k, v) => {
-        val loss: LossYearData = lossYear(k)
-        var otherLoss: LossYearData = v
+        val loss: TreeLossYearData = lossYear(k)
+        var otherLoss: TreeLossYearData = v
         otherLoss.area_loss += loss.area_loss
         otherLoss.biomass_loss += loss.biomass_loss
         otherLoss.carbon_emissions += loss.carbon_emissions

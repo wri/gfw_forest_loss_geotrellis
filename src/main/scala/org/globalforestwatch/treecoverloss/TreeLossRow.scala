@@ -56,4 +56,4 @@ case class TreeLossRow(
                         totalMangroveBiomass: Double,
                         totalMangroveCo2: Double,
                         meanMangroveBiomass: Option[Double],
-                        yearData: List[LossYearData])
+                        yearData: List[TreeLossYearData])
