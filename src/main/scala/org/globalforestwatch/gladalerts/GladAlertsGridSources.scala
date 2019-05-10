@@ -3,17 +3,17 @@ package org.globalforestwatch.gladalerts
 import cats.implicits._
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
+import org.globalforestwatch.grids.{GridId, GridSources}
 import org.globalforestwatch.layers._
-import org.globalforestwatch.util.TenByTenGridSources
 
 /**
-  * @param grid top left corner, padded from east ex: "10N_010E"
+  * @param gridId top left corner, padded from east ex: "10N_010E"
   */
-case class GladAlertsGridSources(grid: String) extends TenByTenGridSources {
+case class GladAlertsGridSources(gridId: String) extends GridSources {
 
-  lazy val gladAlerts = new GladAlerts(grid)
-  lazy val biomassPerHectar = new BiomassPerHectar(grid)
-  lazy val climateMask = new ClimateMask(grid)
+  lazy val gladAlerts = new GladAlerts(gridId)
+  lazy val biomassPerHectar = new BiomassPerHectar(gridId)
+  lazy val climateMask = new ClimateMask(gridId)
 
   def readWindow(window: Extent): Either[Throwable, Raster[GladAlertsTile]] = {
 
@@ -34,4 +34,5 @@ case class GladAlertsGridSources(grid: String) extends TenByTenGridSources {
       Raster(tile, window)
     }
   }
+
 }

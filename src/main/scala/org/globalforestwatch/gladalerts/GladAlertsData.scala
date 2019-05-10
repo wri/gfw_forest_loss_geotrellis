@@ -6,19 +6,19 @@ import cats.Semigroup
   *
   * Note: This case class contains mutable values
   *
+  * @param totalAlerts
   * @param totalArea
-  * @param totalBiomass
   * @param totalCo2
   *
   */
-case class GladAlertsData(var totalArea: Double,
-                          var totalBiomass: Double,
+case class GladAlertsData(var totalAlerts: Int,
+                          var totalArea: Double,
                           var totalCo2: Double) {
   def merge(other: GladAlertsData): GladAlertsData = {
 
     GladAlertsData(
+      totalAlerts + other.totalAlerts,
       totalArea + other.totalArea,
-      totalBiomass + other.totalBiomass,
       totalCo2 + other.totalCo2
     )
   }

@@ -1,77 +1,72 @@
 package org.globalforestwatch.treecoverloss
 
 import geotrellis.vector.Extent
-import org.globalforestwatch.layers._
-import org.globalforestwatch.util.TenByTenGrid
+import org.globalforestwatch.grids.{TenByTenGrid, GridId}
 
 object TreeLossGrid extends TenByTenGrid {
 
-  def getRasterSource(windowExtent: Extent): TreeLossGridSources = {
-    val gridId = pointGridId(windowExtent.center)
-    val sources = TreeLossGridSources(gridId)
+  val gridExtent: Extent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
 
+  def getSources(gridId: String) = TreeLossGridSources(gridId)
 
-    // NOTE: This check will cause an eager fetch of raster metadata
-    def checkRequired(layer: RequiredLayer): Unit = {
-      require(layer.source.extent.intersects(windowExtent),
-        s"${layer.uri} does not intersect: $windowExtent")
-    }
+  def checkSources(gridId: String,
+                   windowExtent: Extent): TreeLossGridSources = {
 
-    // Only check these guys if they're defined
-    def checkOptional(layer: OptionalLayer): Unit = {
-      layer.source.foreach { source =>
-        require(source.extent.intersects(windowExtent),
-          s"${source.uri} does not intersect: $windowExtent")
-      }
-    }
+    val sources: TreeLossGridSources = getSources(gridId)
 
-    checkRequired(sources.treeCoverLoss)
-    checkRequired(sources.treeCoverGain)
-    checkRequired(sources.treeCoverDensity2000)
-    checkRequired(sources.treeCoverDensity2010)
-    checkRequired(sources.biomassPerHectar)
+    checkRequired(sources.treeCoverLoss, windowExtent)
+    checkRequired(sources.treeCoverGain, windowExtent)
+    checkRequired(sources.treeCoverDensity2000, windowExtent)
+    checkRequired(sources.treeCoverDensity2010, windowExtent)
+    checkRequired(sources.biomassPerHectar, windowExtent)
 
-    checkOptional(sources.mangroveBiomass)
-    checkOptional(sources.treeCoverLossDrivers)
-    checkOptional(sources.globalLandCover)
-    checkOptional(sources.primaryForest)
-    checkOptional(sources.indonesiaPrimaryForest)
-    checkOptional(sources.erosion)
-    checkOptional(sources.biodiversitySignificance)
-    checkOptional(sources.biodiversityIntactness)
-    checkOptional(sources.protectedAreas)
-    checkOptional(sources.aze)
-    checkOptional(sources.plantations)
-    checkOptional(sources.riverBasins)
-    checkOptional(sources.ecozones)
-    checkOptional(sources.urbanWatersheds)
-    checkOptional(sources.mangroves1996)
-    checkOptional(sources.mangroves2016)
-    checkOptional(sources.waterStress)
-    checkOptional(sources.intactForestLandscapes)
-    checkOptional(sources.endemicBirdAreas)
-    checkOptional(sources.tigerLandscapes)
-    checkOptional(sources.landmark)
-    checkOptional(sources.landRights)
-    checkOptional(sources.keyBiodiversityAreas)
-    checkOptional(sources.mining)
-    checkOptional(sources.rspo)
-    checkOptional(sources.peatlands)
-    checkOptional(sources.oilPalm)
-    checkOptional(sources.indonesiaForestMoratorium)
-    checkOptional(sources.indonesiaLandCover)
-    checkOptional(sources.indonesiaForestArea)
-    checkOptional(sources.mexicoProtectedAreas)
-    checkOptional(sources.mexicoPaymentForEcosystemServices)
-    checkOptional(sources.mexicoForestZoning)
-    checkOptional(sources.peruProductionForest)
-    checkOptional(sources.peruProtectedAreas)
-    checkOptional(sources.peruForestConcessions)
-    checkOptional(sources.brazilBiomes)
-    checkOptional(sources.woodFiber)
-    checkOptional(sources.resourceRights)
-    checkOptional(sources.logging)
-    checkOptional(sources.oilGas)
+    checkOptional(sources.mangroveBiomass, windowExtent)
+    checkOptional(sources.treeCoverLossDrivers, windowExtent)
+    checkOptional(sources.globalLandCover, windowExtent)
+    checkOptional(sources.primaryForest, windowExtent)
+    checkOptional(sources.indonesiaPrimaryForest, windowExtent)
+    checkOptional(sources.erosion, windowExtent)
+    checkOptional(sources.biodiversitySignificance, windowExtent)
+    checkOptional(sources.biodiversityIntactness, windowExtent)
+    checkOptional(sources.protectedAreas, windowExtent)
+    checkOptional(sources.aze, windowExtent)
+    checkOptional(sources.plantations, windowExtent)
+    checkOptional(sources.riverBasins, windowExtent)
+    checkOptional(sources.ecozones, windowExtent)
+    checkOptional(sources.urbanWatersheds, windowExtent)
+    checkOptional(sources.mangroves1996, windowExtent)
+    checkOptional(sources.mangroves2016, windowExtent)
+    checkOptional(sources.waterStress, windowExtent)
+    checkOptional(sources.intactForestLandscapes, windowExtent)
+    checkOptional(sources.endemicBirdAreas, windowExtent)
+    checkOptional(sources.tigerLandscapes, windowExtent)
+    checkOptional(sources.landmark, windowExtent)
+    checkOptional(sources.landRights, windowExtent)
+    checkOptional(sources.keyBiodiversityAreas, windowExtent)
+    checkOptional(sources.mining, windowExtent)
+    checkOptional(sources.rspo, windowExtent)
+    checkOptional(sources.peatlands, windowExtent)
+    checkOptional(sources.oilPalm, windowExtent)
+    checkOptional(sources.indonesiaForestMoratorium, windowExtent)
+    checkOptional(sources.indonesiaLandCover, windowExtent)
+    checkOptional(sources.indonesiaForestArea, windowExtent)
+    checkOptional(sources.mexicoProtectedAreas, windowExtent)
+    checkOptional(sources.mexicoPaymentForEcosystemServices, windowExtent)
+    checkOptional(sources.mexicoForestZoning, windowExtent)
+    checkOptional(sources.peruProductionForest, windowExtent)
+    checkOptional(sources.peruProtectedAreas, windowExtent)
+    checkOptional(sources.peruForestConcessions, windowExtent)
+    checkOptional(sources.brazilBiomes, windowExtent)
+    checkOptional(sources.woodFiber, windowExtent)
+    checkOptional(sources.resourceRights, windowExtent)
+    checkOptional(sources.logging, windowExtent)
+    checkOptional(sources.oilGas, windowExtent)
     sources
+
+  }
+
+  def getRasterSource(windowExtent: Extent): TreeLossGridSources = {
+    val gridId = GridId.pointGridId(windowExtent.center, gridSize)
+    checkSources(gridId, windowExtent: Extent)
   }
 }

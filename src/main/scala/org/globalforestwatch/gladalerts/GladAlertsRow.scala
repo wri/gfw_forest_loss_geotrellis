@@ -11,6 +11,6 @@ case class GladAlertsRow(iso: String,
                          y: Int,
                          z: Int,
                          climateMask: Boolean,
+                         totalAlerts: Int,
                          totalArea: Double,
-                         totalBiomass: Double,
                          totalCo2: Double)

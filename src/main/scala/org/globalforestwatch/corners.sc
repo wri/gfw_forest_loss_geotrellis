@@ -19,6 +19,11 @@ def getRight(left: Corner): Corner = {
   Corner(Math.abs(coord), nsew)
 }
 
+
+object myTest {
+  val testVal: String = "test"
+}
+
 val coord = ("""\d+""".r findAllIn grid).toList
 val nsew = ("""[^0-9,_]""".r findAllIn grid).toList
 
@@ -29,3 +34,13 @@ val bottom = getBottom(top)
 val right = getRight(left)
 
 Array(left, bottom, right, top).mkString("_")
+
+import geotrellis.vector.Point
+import org.globalforestwatch.gladalerts.GladAlertsGrid
+import org.globalforestwatch.treecoverloss._
+
+val a = myTest.testVal
+
+val s = GladAlertsGrid.gridSize
+
+val e = TreeLossGrid.pointGridId(Point(14, 1))

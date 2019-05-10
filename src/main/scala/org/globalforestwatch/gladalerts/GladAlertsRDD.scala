@@ -11,6 +11,7 @@ import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.GADMFeatureId
 import org.globalforestwatch.util.RoundedExtent
+import org.globalforestwatch.grids.GridSources
 
 object GladAlertsRDD extends LazyLogging {
 

@@ -190,8 +190,8 @@ object GladAlertsSummaryMain
                           gladAlertsDataGroup.tile.y,
                           gladAlertsDataGroup.tile.z,
                           gladAlertsDataGroup.climateMask,
+                          gladAlertsData.totalAlerts,
                           gladAlertsData.totalArea,
-                          gladAlertsData.totalBiomass,
                           gladAlertsData.totalCo2
 
                         )
@@ -208,8 +208,8 @@ object GladAlertsSummaryMain
                   "y",
                   "z",
                   "climate_mask",
+                  "alerts",
                   "area",
-                  "biomass",
                   "co2"
                 )
 

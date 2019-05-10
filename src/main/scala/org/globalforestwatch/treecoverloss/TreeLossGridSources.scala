@@ -4,13 +4,13 @@ package org.globalforestwatch.treecoverloss
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import cats.implicits._
+import org.globalforestwatch.grids.GridSources
 import org.globalforestwatch.layers._
-import org.globalforestwatch.util.TenByTenGridSources
 
 /**
   * @param grid top left corner, padded from east ex: "10N_010E"
   */
-case class TreeLossGridSources(grid: String) extends TenByTenGridSources {
+case class TreeLossGridSources(grid: String) extends GridSources {
 
   lazy val treeCoverLoss = new TreeCoverLoss(grid)
   lazy val treeCoverGain = new TreeCoverGain(grid)
