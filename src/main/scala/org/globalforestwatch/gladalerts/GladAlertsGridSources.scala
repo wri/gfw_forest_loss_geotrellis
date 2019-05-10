@@ -11,9 +11,9 @@ import org.globalforestwatch.layers._
   */
 case class GladAlertsGridSources(gridId: String) extends GridSources {
 
-  lazy val gladAlerts = new GladAlerts(gridId)
-  lazy val biomassPerHectar = new BiomassPerHectar(gridId)
-  lazy val climateMask = new ClimateMask(gridId)
+  lazy val gladAlerts = GladAlerts(gridId)
+  lazy val biomassPerHectar = BiomassPerHectar(gridId)
+  lazy val climateMask = ClimateMask(gridId)
 
   def readWindow(window: Extent): Either[Throwable, Raster[GladAlertsTile]] = {
 

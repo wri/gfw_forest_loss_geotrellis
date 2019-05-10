@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class RSPO(grid: String) extends StringLayer with OptionalILayer {
+case class RSPO(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String = s"$basePath/rspo/$grid.tif"
 

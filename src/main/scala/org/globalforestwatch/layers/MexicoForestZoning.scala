@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class MexicoForestZoning(grid: String) extends StringLayer with OptionalILayer {
+case class MexicoForestZoning(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
     s"$basePath/mex_forest_zoning/$grid.tif"

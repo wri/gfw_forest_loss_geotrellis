@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class IndonesiaForestArea(grid: String)
+case class IndonesiaForestArea(grid: String)
     extends StringLayer
     with OptionalILayer {
 

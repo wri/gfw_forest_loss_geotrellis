@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class WaterStress(grid: String) extends StringLayer with OptionalILayer {
+case class WaterStress(grid: String) extends StringLayer with OptionalILayer {
   val uri: String =
     s"$basePath/water_stress/$grid.tif"
   override val externalNoDataValue = "Unknown"

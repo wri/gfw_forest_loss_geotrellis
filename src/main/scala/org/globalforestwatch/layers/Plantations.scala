@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class Plantations(grid: String) extends StringLayer with OptionalILayer {
+case class Plantations(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
     s"$basePath/plantations/$grid.tif"

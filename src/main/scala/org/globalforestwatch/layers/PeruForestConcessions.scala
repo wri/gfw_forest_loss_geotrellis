@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class PeruForestConcessions(grid: String)
+case class PeruForestConcessions(grid: String)
     extends StringLayer
     with OptionalILayer {
 

@@ -16,10 +16,10 @@ trait TreeCoverDensity extends IntegerLayer with RequiredILayer {
   }
 }
 
-class TreeCoverDensity2000(grid: String) extends TreeCoverDensity {
+case class TreeCoverDensity2000(grid: String) extends TreeCoverDensity {
   val uri: String = s"$basePath/tcd_2000/$grid.tif"
 }
 
-class TreeCoverDensity2010(grid: String) extends TreeCoverDensity {
+case class TreeCoverDensity2010(grid: String) extends TreeCoverDensity {
   val uri: String = s"$basePath/tcd_2010/$grid.tif"
 }

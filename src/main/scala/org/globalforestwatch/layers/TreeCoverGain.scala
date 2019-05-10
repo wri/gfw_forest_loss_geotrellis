@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class TreeCoverGain(grid: String) extends IntegerLayer with RequiredILayer {
+case class TreeCoverGain(grid: String) extends IntegerLayer with RequiredILayer {
   val uri: String = s"$basePath/gain/$grid.tif"
 
   override val internalNoDataValue: Int = 0

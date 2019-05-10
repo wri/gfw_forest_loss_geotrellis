@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class IndonesiaLandCover(grid: String) extends StringLayer with OptionalILayer {
+case class IndonesiaLandCover(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
     s"$basePath/idn_land_cover/$grid.tif"

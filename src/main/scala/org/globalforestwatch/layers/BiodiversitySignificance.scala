@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class BiodiversitySignificance(grid: String) extends DBooleanLayer with OptionalDLayer {
+case class BiodiversitySignificance(grid: String) extends DBooleanLayer with OptionalDLayer {
   val uri: String = s"$basePath/biodiversity_significance/$grid.tif"
 
   def lookup(value: Double): Boolean =

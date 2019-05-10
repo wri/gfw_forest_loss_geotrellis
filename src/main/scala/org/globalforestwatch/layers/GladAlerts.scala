@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.globalforestwatch.grids.GridId.toGladGridId
 
-class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
+case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
 
   val gladGrid: String = toGladGridId(grid)
 

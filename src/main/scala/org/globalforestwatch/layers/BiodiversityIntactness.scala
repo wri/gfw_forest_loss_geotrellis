@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class BiodiversityIntactness(grid: String) extends DBooleanLayer with OptionalDLayer {
+case class BiodiversityIntactness(grid: String) extends DBooleanLayer with OptionalDLayer {
   val uri: String = s"$basePath/biodiversity_intactness/$grid.tif"
 
   def lookup(value: Double): Boolean =
