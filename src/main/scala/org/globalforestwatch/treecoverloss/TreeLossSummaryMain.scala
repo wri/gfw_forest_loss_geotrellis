@@ -102,7 +102,7 @@ object TreeLossSummaryMain
          isoEnd,
          admin1,
          admin2) =>
-          val spark: SparkSession = TreeLossSparkSession.spark
+          val spark: SparkSession = TreeLossSparkSession()
 
           import spark.implicits._
 

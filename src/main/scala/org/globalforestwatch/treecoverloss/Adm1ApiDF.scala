@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions._
 
 object Adm1ApiDF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
+  val spark: SparkSession = TreeLossSparkSession()
 
   import spark.implicits._
 

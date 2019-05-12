@@ -3,9 +3,7 @@ package org.globalforestwatch.gladalerts
 import geotrellis.vector.Extent
 import org.globalforestwatch.grids.{GridId, TenByTenGrid}
 
-object GladAlertsGrid extends TenByTenGrid {
-
-  type T = GladAlertsGridSources
+object GladAlertsGrid extends TenByTenGrid[GladAlertsGridSources] {
 
   val gridExtent = Extent(-180.0000, -30.0000, 180.0000, 30.0000)
 

@@ -104,7 +104,7 @@ object GladAlertsSummaryMain
            isoEnd,
            admin1,
            admin2) =>
-            val spark: SparkSession = GladAlertsSparkSession.spark
+            val spark: SparkSession = GladAlertsSparkSession()
 
             import spark.implicits._
 

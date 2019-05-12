@@ -1,6 +1,6 @@
 package org.globalforestwatch.grids
 
-trait TenByTenGrid extends Grid {
+trait TenByTenGrid[T <: GridSources] extends Grid[T] {
 
   val pixelSize = 0.00025
   val gridSize = 10

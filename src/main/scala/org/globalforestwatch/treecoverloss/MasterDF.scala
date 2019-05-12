@@ -6,7 +6,7 @@ import com.github.mrpowers.spark.daria.sql.DataFrameHelpers._
 
 object MasterDF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
+  val spark: SparkSession = TreeLossSparkSession()
 
   import spark.implicits._
 

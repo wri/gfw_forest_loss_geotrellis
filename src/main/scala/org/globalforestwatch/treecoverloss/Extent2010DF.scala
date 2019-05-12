@@ -7,7 +7,7 @@ import org.globalforestwatch.util.WindowFunctions.windowSum
 
 object Extent2010DF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
+  val spark: SparkSession = TreeLossSparkSession()
 
   import spark.implicits._
 

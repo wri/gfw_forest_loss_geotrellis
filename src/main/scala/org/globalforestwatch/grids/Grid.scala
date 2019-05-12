@@ -5,9 +5,8 @@ import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.vector.{Extent, Point}
 import org.globalforestwatch.layers.{OptionalLayer, RequiredLayer}
 
-trait Grid {
+trait Grid[T <: GridSources] {
 
-  type T
   val gridExtent: Extent
   val pixelSize: Double
   val gridSize: Int
