@@ -5,6 +5,8 @@ import org.globalforestwatch.grids.{TenByTenGrid, GridId}
 
 object TreeLossGrid extends TenByTenGrid {
 
+  type T = TreeLossGridSources
+
   val gridExtent: Extent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
 
   def getSources(gridId: String) = TreeLossGridSources(gridId)
@@ -65,8 +67,4 @@ object TreeLossGrid extends TenByTenGrid {
 
   }
 
-  def getRasterSource(windowExtent: Extent): TreeLossGridSources = {
-    val gridId = GridId.pointGridId(windowExtent.center, gridSize)
-    checkSources(gridId, windowExtent: Extent)
-  }
 }

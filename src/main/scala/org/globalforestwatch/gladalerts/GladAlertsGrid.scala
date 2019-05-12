@@ -5,6 +5,8 @@ import org.globalforestwatch.grids.{GridId, TenByTenGrid}
 
 object GladAlertsGrid extends TenByTenGrid {
 
+  type T = GladAlertsGridSources
+
   val gridExtent = Extent(-180.0000, -30.0000, 180.0000, 30.0000)
 
   def getSources(gridId: String): GladAlertsGridSources = GladAlertsGridSources(gridId)
@@ -18,8 +20,5 @@ object GladAlertsGrid extends TenByTenGrid {
     sources
   }
 
-  def getRasterSource(windowExtent: Extent): GladAlertsGridSources = {
-    val gridId = GridId.pointGridId(windowExtent.center, gridSize)
-    checkSources(gridId, windowExtent: Extent)
-  }
+
 }

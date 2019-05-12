@@ -6,6 +6,8 @@ import geotrellis.vector.{Extent, Point}
 import org.globalforestwatch.layers.{OptionalLayer, RequiredLayer}
 
 trait Grid {
+
+  type T
   val gridExtent: Extent
   val pixelSize: Double
   val gridSize: Int
@@ -55,9 +57,9 @@ trait Grid {
     LayoutDefinition(gridExtent, tileLayout)
   }
 
-  def getSources(gridId: String): GridSources
+  def getSources(gridId: String): T
 
-  def checkSources(gridId: String, windowExtent: Extent): GridSources
+  def checkSources(gridId: String, windowExtent: Extent): T
 
   // NOTE: This check will cause an eager fetch of raster metadata
   def checkRequired(layer: RequiredLayer, windowExtent: Extent): Unit = {
@@ -77,5 +79,8 @@ trait Grid {
     }
   }
 
-  def getRasterSource(windowExtent: Extent): GridSources
+  def getRasterSource(windowExtent: Extent): T = {
+    val gridId = GridId.pointGridId(windowExtent.center, gridSize)
+    checkSources(gridId, windowExtent: Extent)
+  }
 }
