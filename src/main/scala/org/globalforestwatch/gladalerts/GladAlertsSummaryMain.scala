@@ -105,7 +105,6 @@ object GladAlertsSummaryMain
            admin1,
            admin2) =>
             val spark: SparkSession = GladAlertsSparkSession()
-
             import spark.implicits._
 
             // ref: https://github.com/databricks/spark-csv

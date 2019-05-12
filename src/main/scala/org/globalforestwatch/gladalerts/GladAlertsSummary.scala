@@ -45,7 +45,7 @@ object GladAlertsSummary {
           val lat: Double = raster.rasterExtent.gridRowToMap(row)
           val lng: Double = raster.rasterExtent.gridColToMap(col)
 
-          val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
+          val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordinate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
           val areaHa = area / 10000.0
           val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
