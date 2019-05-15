@@ -6,7 +6,7 @@ import org.globalforestwatch.treecoverloss.TreeLossSparkSession
 
 object IsoWeeklyDF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
+  val spark: SparkSession = TreeLossSparkSession()
   import spark.implicits._
 
   def sumAlerts(df: DataFrame): DataFrame = {
