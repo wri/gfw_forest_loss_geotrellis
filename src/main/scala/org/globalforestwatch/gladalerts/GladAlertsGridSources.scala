@@ -1,7 +1,7 @@
 package org.globalforestwatch.gladalerts
 
 import cats.implicits._
-import geotrellis.raster.Raster
+import geotrellis.raster.{MultibandTile, Raster}
 import geotrellis.vector.Extent
 import org.globalforestwatch.grids.{GridId, GridSources}
 import org.globalforestwatch.layers._
@@ -30,6 +30,7 @@ case class GladAlertsGridSources(gridId: String) extends GridSources {
       val climateMaskTile = climateMask.fetchWindow(window)
 
       val tile = GladAlertsTile(gladAlertsTile, biomassTile, climateMaskTile)
+      //    val tile = MultibandTile(gladAlertsTile, biomassTile, climateMaskTile)
 
       Raster(tile, window)
     }

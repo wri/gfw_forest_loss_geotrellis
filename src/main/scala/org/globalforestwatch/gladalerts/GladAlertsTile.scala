@@ -11,7 +11,7 @@ import org.globalforestwatch.layers._
 case class GladAlertsTile(glad: GladAlerts#ITile,
                           biomass: BiomassPerHectar#DTile,
                           climateMask: ClimateMask#OptionalITile)
-    extends CellGrid {
+  extends CellGrid[Int] {
   def cellType: CellType = glad.cellType
 
   def cols: Int = glad.cols
