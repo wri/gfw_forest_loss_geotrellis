@@ -18,9 +18,9 @@ object ApiDF {
 
     val zeroColumns = df
       .select(
-        "totalarea",
-        "extent2000",
-        "extent2010",
+          "total_area",
+          "extent_2000",
+          "extent_2010",
         "total_gain",
         "total_biomass",
         "avg_biomass_per_ha",

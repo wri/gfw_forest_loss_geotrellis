@@ -1,7 +1,7 @@
 package org.globalforestwatch.treecoverloss
 
-case class TreeLossDataGroup(tcd2000: Integer,
-                             tcd2010: Integer,
+case class TreeLossDataGroup(
+                              threshold: Integer,
                              drivers: String,
                              globalLandCover: String,
                              primaryForest: Boolean,
