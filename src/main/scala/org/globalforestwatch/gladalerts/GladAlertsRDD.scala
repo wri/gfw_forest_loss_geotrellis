@@ -66,13 +66,13 @@ object GladAlertsRDD extends LazyLogging {
           groupedByKey.toIterator.flatMap {
             case (windowKey, keysAndFeatures) =>
               // round to one integer to assure we have 400 * 400 blocks
-              val _window: Extent = windowKey.extent(windowLayout)
-              val xmin: Double = _window.xmin
-              val ymin: Double = _window.ymin
-              val xmax: Double = _window.xmax
-              val ymax: Double = _window.ymax
-
-              val window = new RoundedExtent(xmin, ymin, xmax, ymax, 1)
+              val window: Extent = windowKey.extent(windowLayout)
+              //              val xmin: Double = _window.xmin
+              //              val ymin: Double = _window.ymin
+              //              val xmax: Double = _window.xmax
+              //              val ymax: Double = _window.ymax
+              //
+              //              val window = new RoundedExtent(xmin, ymin, xmax, ymax, 1)
 
               val maybeRasterSource: Either[Throwable, GladAlertsGridSources] =
                 Either.catchNonFatal {
