@@ -30,6 +30,8 @@ case class GladAlertsGridSources(gridId: String) extends GridSources {
   lazy val indonesiaForestArea = IndonesiaForestArea(gridId)
   lazy val peruForestConcessions = PeruForestConcessions(gridId)
   lazy val oilGas = OilGas(gridId)
+  lazy val mangroves2016 = Mangroves2016(gridId)
+  lazy val intactForestLandscapes2016 = IntactForestLandscapes2016(gridId)
 
   def readWindow(window: Extent): Either[Throwable, Raster[GladAlertsTile]] = {
 
@@ -61,6 +63,8 @@ case class GladAlertsGridSources(gridId: String) extends GridSources {
       val indonesiaForestAreaTile = indonesiaForestArea.fetchWindow(window)
       val peruForestConcessionsTile = peruForestConcessions.fetchWindow(window)
       val oilGasTile = oilGas.fetchWindow(window)
+      val mangroves2016Tile = mangroves2016.fetchWindow(window)
+      val intactForestLandscapes2016Tile = intactForestLandscapes2016.fetchWindow(window)
 
       val tile = GladAlertsTile(
         gladAlertsTile,
@@ -81,7 +85,9 @@ case class GladAlertsGridSources(gridId: String) extends GridSources {
         oilPalmTile,
         indonesiaForestAreaTile,
         peruForestConcessionsTile,
-        oilGasTile
+        oilGasTile,
+        mangroves2016Tile,
+        intactForestLandscapes2016Tile
       )
 
       Raster(tile, window)
