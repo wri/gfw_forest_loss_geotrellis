@@ -269,7 +269,7 @@ object TreeLossSummaryMain
           val adm2DF = summaryDF
             .transform(Adm2DF.unpackValues)
 
-          adm2DF.repartition($"iso")
+          //          adm2DF.repartition($"iso")
           adm2DF.cache()
 
           val csvOptions = Map(
@@ -319,14 +319,14 @@ object TreeLossSummaryMain
 
           adm2ApiDF
             //.coalesce(1)
-            .repartition(
-            outputPartitionCount,
-            $"iso",
-            $"adm1",
-            $"adm2",
-            $"threshold"
-          )
-            .orderBy($"iso", $"adm1", $"adm2", $"threshold")
+            //            .repartition(
+            //            outputPartitionCount,
+            //            $"iso",
+            //            $"adm1",
+            //            $"adm2",
+            //            $"threshold"
+            //          )
+            //            .orderBy($"iso", $"adm1", $"adm2", $"threshold")
             .toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
@@ -342,8 +342,8 @@ object TreeLossSummaryMain
             .transform(Adm1ApiDF.nestYearData)
 
           adm1ApiDF
-            .repartition(outputPartitionCount, $"iso", $"adm1", $"threshold")
-            .orderBy($"iso", $"adm1", $"threshold")
+            //            .repartition(outputPartitionCount, $"iso", $"adm1", $"threshold")
+            //            .orderBy($"iso", $"adm1", $"threshold")
             .toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
@@ -354,8 +354,8 @@ object TreeLossSummaryMain
             .transform(IsoApiDF.nestYearData)
 
           isoApiDF
-            .repartition(outputPartitionCount, $"iso", $"threshold")
-            .orderBy($"iso", $"threshold")
+            //            .repartition(outputPartitionCount, $"iso", $"threshold")
+            //            .orderBy($"iso", $"threshold")
             .toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
