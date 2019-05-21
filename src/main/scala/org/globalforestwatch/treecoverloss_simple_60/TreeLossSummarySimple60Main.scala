@@ -110,10 +110,11 @@ object TreeLossSummarySimple60Main
                   "year_data"
                 )
 
-            val runOutputUrl = outputUrl + "/treecoverloss_" +
-              DateTimeFormatter
-                .ofPattern("yyyyMMdd_HHmm")
-                .format(LocalDateTime.now)
+            val runOutputUrl = outputUrl
+            //            + "/treecoverloss_" +
+            //              DateTimeFormatter
+            //                .ofPattern("yyyyMMdd_HHmm")
+            //                .format(LocalDateTime.now)
 
             val dataframe = summaryDF
               .transform(DF.unpackValues)
