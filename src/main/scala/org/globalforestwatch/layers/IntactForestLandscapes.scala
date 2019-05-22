@@ -6,7 +6,7 @@ case class IntactForestLandscapes(grid: String)
   val uri: String = s"$basePath/ifl/$grid.tif"
 
   def lookup(value: Int): String = value match {
-    case 0 => "",
+    case 0 => ""
     case _ => value.toString
 
   }

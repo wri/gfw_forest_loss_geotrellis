@@ -3,7 +3,8 @@ package org.globalforestwatch.treecoverloss_simple_60
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
 import geotrellis.contrib.polygonal._
-import geotrellis.raster.Raster
+import geotrellis.raster.rasterize.Rasterizer
+import geotrellis.raster.{PixelIsPoint, Raster}
 import geotrellis.spark.SpatialKey
 import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.vector._
@@ -91,6 +92,10 @@ object TreeLossRDD extends LazyLogging {
               features.flatMap {
                 feature: Feature[Geometry, TreeLossRowFeatureId] =>
                   val id: TreeLossRowFeatureId = feature.data
+                  val rasterizeOptions = Rasterizer.Options(
+                    includePartial = false,
+                    sampleType = PixelIsPoint
+                  )
 
                   maybeRaster match {
                     case Left(exception) =>
@@ -101,7 +106,8 @@ object TreeLossRDD extends LazyLogging {
                       val summary: TreeLossSummary =
                         raster.polygonalSummary(
                           geometry = feature.geom,
-                          emptyResult = new TreeLossSummary()
+                          emptyResult = new TreeLossSummary(),
+                          options = rasterizeOptions
                         )
 
                       List((id, summary))

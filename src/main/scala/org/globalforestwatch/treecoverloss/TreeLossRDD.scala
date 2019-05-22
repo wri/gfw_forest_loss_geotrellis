@@ -1,7 +1,7 @@
 package org.globalforestwatch.treecoverloss
 
 import com.typesafe.scalalogging.LazyLogging
-import geotrellis.raster.{PixelIsArea, Raster}
+import geotrellis.raster.{PixelIsArea, PixelIsPoint, Raster}
 import geotrellis.spark.SpatialKey
 import geotrellis.vector._
 import org.apache.spark.Partitioner
@@ -91,8 +91,8 @@ object TreeLossRDD extends LazyLogging {
               features.flatMap { feature: Feature[Geometry, GADMFeatureId] =>
                 val id: GADMFeatureId = feature.data
                 val rasterizeOptions = Rasterizer.Options(
-                  includePartial = true,
-                  sampleType = PixelIsArea
+                  includePartial = false,
+                  sampleType = PixelIsPoint
                 )
 
                 maybeRaster match {

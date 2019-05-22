@@ -3,7 +3,8 @@ package org.globalforestwatch.gladalerts
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
 import geotrellis.contrib.polygonal._
-import geotrellis.raster.Raster
+import geotrellis.raster.rasterize.Rasterizer
+import geotrellis.raster.{PixelIsPoint, Raster}
 import geotrellis.spark.SpatialKey
 import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.vector._
@@ -89,6 +90,10 @@ object GladAlertsRDD extends LazyLogging {
               // flatMap here flattens out and ignores the errors
               features.flatMap { feature: Feature[Geometry, GADMFeatureId] =>
                 val id: GADMFeatureId = feature.data
+                val rasterizeOptions = Rasterizer.Options(
+                  includePartial = false,
+                  sampleType = PixelIsPoint
+                )
 
                 maybeRaster match {
                   case Left(exception) =>
@@ -99,7 +104,8 @@ object GladAlertsRDD extends LazyLogging {
                     val summary: GladAlertsSummary =
                       raster.polygonalSummary(
                         geometry = feature.geom,
-                        emptyResult = new GladAlertsSummary()
+                        emptyResult = new GladAlertsSummary(),
+                        options = rasterizeOptions
                       )
 
                     List((id, summary))
