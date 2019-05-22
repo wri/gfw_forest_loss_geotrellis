@@ -58,7 +58,7 @@ object TreeLossSummary {
         val mangroves1996: Boolean = raster.tile.mangroves1996.getData(col, row)
         val mangroves2016: Boolean = raster.tile.mangroves2016.getData(col, row)
         val waterStress: String = raster.tile.waterStress.getData(col, row)
-        val intactForestLandscapes: Integer =
+        val intactForestLandscapes: String =
           raster.tile.intactForestLandscapes.getData(col, row)
         val endemicBirdAreas: Boolean =
           raster.tile.endemicBirdAreas.getData(col, row)
