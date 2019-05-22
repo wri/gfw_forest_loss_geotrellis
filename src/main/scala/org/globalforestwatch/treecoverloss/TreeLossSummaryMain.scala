@@ -284,8 +284,14 @@ object TreeLossSummaryMain
             .transform(Adm2SummaryDF.sumArea)
 
           adm2SummaryDF
+            .transform(Adm2SummaryDF.roundValues)
             .coalesce(1)
-            .orderBy($"iso", $"adm1", $"adm2", $"threshold")
+            .orderBy(
+              $"country",
+              $"subnational1",
+              $"subnational2",
+              $"threshold"
+            )
             .write
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/adm2")
@@ -293,8 +299,9 @@ object TreeLossSummaryMain
           val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
 
           adm1SummaryDF
+            .transform(Adm1SummaryDF.roundValues)
             .coalesce(1)
-            .orderBy($"iso", $"adm1", $"threshold")
+            .orderBy($"country", $"subnational1", $"threshold")
             .write
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/adm1")
@@ -302,6 +309,7 @@ object TreeLossSummaryMain
           val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
 
           isoSummaryDF
+            .transform(IsoSummaryDF.roundValues)
             .coalesce(1)
             .orderBy($"iso", $"threshold")
             .write
