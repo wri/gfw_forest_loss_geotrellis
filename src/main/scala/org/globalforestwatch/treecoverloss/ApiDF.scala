@@ -11,8 +11,8 @@ object ApiDF {
 
   private def setZeroNull(column: Column): Column = when(column =!= 0.0, column)
 
-  private def setFalseNull(column: Column): Column =
-    when(column === true, column)
+  //  private def setFalseNull(column: Column): Column =
+  //    when(column === true, column)
 
   def setNull(df: DataFrame): DataFrame = {
 
