@@ -314,6 +314,6 @@ trait StringLayer extends ILayer {
   type B = String
 
   val internalNoDataValue: Int = 0
-  val externalNoDataValue: String = null
+  val externalNoDataValue: String = ""
 
 }

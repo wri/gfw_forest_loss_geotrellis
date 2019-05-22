@@ -7,6 +7,8 @@ case class PeruForestConcessions(grid: String)
   val uri: String =
     s"$basePath/per_forest_concessions/$grid.tif"
 
+  override val externalNoDataValue: String = null
+
   def lookup(value: Int): String = value match {
     case 1 => "Conservation"
     case 2 => "Ecotourism"
