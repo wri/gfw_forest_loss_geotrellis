@@ -189,7 +189,27 @@ object GladAlertsSummaryMain
                           gladAlertsDataGroup.tile.x,
                           gladAlertsDataGroup.tile.y,
                           gladAlertsDataGroup.tile.z,
-                          gladAlertsDataGroup.climateMask,
+                          GladAlertsRowLayers(
+                            gladAlertsDataGroup.climateMask,
+                            gladAlertsDataGroup.primaryForest,
+                            gladAlertsDataGroup.protectedAreas,
+                            gladAlertsDataGroup.aze,
+                            gladAlertsDataGroup.keyBiodiversityAreas,
+                            gladAlertsDataGroup.landmark,
+                            gladAlertsDataGroup.plantations,
+                            gladAlertsDataGroup.mining,
+                            gladAlertsDataGroup.logging,
+                            gladAlertsDataGroup.rspo,
+                            gladAlertsDataGroup.woodFiber,
+                            gladAlertsDataGroup.peatlands,
+                            gladAlertsDataGroup.indonesiaForestMoratorium,
+                            gladAlertsDataGroup.oilPalm,
+                            gladAlertsDataGroup.indonesiaForestArea,
+                            gladAlertsDataGroup.peruForestConcessions,
+                            gladAlertsDataGroup.oilGas,
+                            gladAlertsDataGroup.mangroves2016,
+                            gladAlertsDataGroup.intactForestLandscapes2016
+                          ),
                           gladAlertsData.totalAlerts,
                           gladAlertsData.totalArea,
                           gladAlertsData.totalCo2
@@ -206,10 +226,10 @@ object GladAlertsSummaryMain
                   "x",
                   "y",
                   "z",
-                  "climate_mask",
-                  "alerts",
-                  "area",
-                  "co2"
+                  "layers",
+                  "alert_count",
+                  "area_ha",
+                  "co2_emissions_Mt"
                 )
 
             summaryDF.cache()
@@ -231,8 +251,7 @@ object GladAlertsSummaryMain
               maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
             val tileDF = summaryDF
-              .groupBy($"x", $"y", $"z", $"alert_date", $"is_confirmed")
-              .agg(sum($"alerts") as "alerts")
+              .transform(TileDF.sumAlerts)
 
             tileDF
               .coalesce(1)
@@ -240,7 +259,9 @@ object GladAlertsSummaryMain
               .options(csvOptions)
               .csv(path = runOutputUrl + "/tiles")
 
-            val adm2DailyDF = summaryDF.transform(Adm2DailyDF.sumAlerts)
+            val adm2DailyDF = summaryDF
+              .transform(Adm2DailyDF.unpackValues)
+              .transform(Adm2DailyDF.sumAlerts)
 
             summaryDF.unpersist()
 
