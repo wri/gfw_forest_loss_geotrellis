@@ -183,6 +183,7 @@ object TreeLossSummary {
               )
 
             summary.totalArea += areaHa
+            summary.totalGainArea += gainArea
 
             if (tcd2000 >= thresholds.head) {
 
@@ -195,7 +196,6 @@ object TreeLossSummary {
               }
 
               summary.extent2000 += areaHa
-              summary.totalGainArea += gainArea
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
               summary.biomassHistogram.countItem(biomass)
