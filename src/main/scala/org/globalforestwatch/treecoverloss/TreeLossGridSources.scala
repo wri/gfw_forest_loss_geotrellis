@@ -1,6 +1,5 @@
 package org.globalforestwatch.treecoverloss
 
-
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import cats.implicits._
@@ -49,7 +48,8 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
   lazy val indonesiaLandCover = IndonesiaLandCover(gridId)
   lazy val indonesiaForestArea = IndonesiaForestArea(gridId)
   lazy val mexicoProtectedAreas = MexicoProtectedAreas(gridId)
-  lazy val mexicoPaymentForEcosystemServices = MexicoPaymentForEcosystemServices(gridId)
+  lazy val mexicoPaymentForEcosystemServices =
+    MexicoPaymentForEcosystemServices(gridId)
   lazy val mexicoForestZoning = MexicoForestZoning(gridId)
   lazy val peruProductionForest = PeruProductionForest(gridId)
   lazy val peruProtectedAreas = PeruProtectedAreas(gridId)
@@ -67,9 +67,15 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
       // These are effectively required fields without which we can't make sense of the analysis
       lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(window)).right
       gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(window)).right
-      tcd2000Tile <- Either.catchNonFatal(treeCoverDensity2000.fetchWindow(window)).right
-      tcd2010Tile <- Either.catchNonFatal(treeCoverDensity2010.fetchWindow(window)).right
-      biomassTile <- Either.catchNonFatal(biomassPerHectar.fetchWindow(window)).right
+      tcd2000Tile <- Either
+        .catchNonFatal(treeCoverDensity2000.fetchWindow(window))
+        .right
+      tcd2010Tile <- Either
+        .catchNonFatal(treeCoverDensity2010.fetchWindow(window))
+        .right
+      biomassTile <- Either
+        .catchNonFatal(biomassPerHectar.fetchWindow(window))
+        .right
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
@@ -79,8 +85,10 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
       val primaryForestTile = primaryForest.fetchWindow(window)
       val idnPrimaryForestTile = indonesiaPrimaryForest.fetchWindow(window)
       val erosionTile = erosion.fetchWindow(window)
-      val biodiversitySignificanceTile = biodiversitySignificance.fetchWindow(window)
-      val biodiversityIntactnessTile = biodiversityIntactness.fetchWindow(window)
+      val biodiversitySignificanceTile =
+        biodiversitySignificance.fetchWindow(window)
+      val biodiversityIntactnessTile =
+        biodiversityIntactness.fetchWindow(window)
       val wdpaTile = protectedAreas.fetchWindow(window)
       val azeTile = aze.fetchWindow(window)
       val plantationsTile = plantations.fetchWindow(window)
@@ -90,7 +98,8 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
       val mangroves1996Tile = mangroves1996.fetchWindow(window)
       val mangroves2016Tile = mangroves2016.fetchWindow(window)
       val waterStressTile = waterStress.fetchWindow(window)
-      val intactForestLandscapesTile = intactForestLandscapes.fetchWindow(window)
+      val intactForestLandscapesTile =
+        intactForestLandscapes.fetchWindow(window)
       val endemicBirdAreasTile = endemicBirdAreas.fetchWindow(window)
       val tigerLandscapesTile = tigerLandscapes.fetchWindow(window)
       val landmarkTile = landmark.fetchWindow(window)
@@ -100,11 +109,13 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
       val rspoTile = rspo.fetchWindow(window)
       val peatlandsTile = peatlands.fetchWindow(window)
       val oilPalmTile = oilPalm.fetchWindow(window)
-      val idnForestMoratoriumTile = indonesiaForestMoratorium.fetchWindow(window)
+      val idnForestMoratoriumTile =
+        indonesiaForestMoratorium.fetchWindow(window)
       val idnLandCoverTile = indonesiaLandCover.fetchWindow(window)
       val idnForestAreaTile = indonesiaForestArea.fetchWindow(window)
       val mexProtectedAreasTile = mexicoProtectedAreas.fetchWindow(window)
-      val mexPaymentForEcosystemServicesTile = mexicoPaymentForEcosystemServices.fetchWindow(window)
+      val mexPaymentForEcosystemServicesTile =
+        mexicoPaymentForEcosystemServices.fetchWindow(window)
       val mexForestZoningTile = mexicoForestZoning.fetchWindow(window)
       val perProductionForestTile = peruProductionForest.fetchWindow(window)
       val perProtectedAreasTile = peruProtectedAreas.fetchWindow(window)
@@ -166,4 +177,18 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
       Raster(tile, window)
     }
   }
+}
+
+object TreeLossGridSources {
+
+  @transient
+  private lazy val cache =
+    scala.collection.concurrent.TrieMap.empty[String, TreeLossGridSources]
+
+  def getCachedSources(grid: String): TreeLossGridSources = {
+
+    cache.getOrElseUpdate(grid, TreeLossGridSources(grid))
+
+  }
+
 }

@@ -100,15 +100,17 @@ trait RequiredLayer extends Layer {
   /**
     * Define how to read sources for required layers
     */
-  lazy val source: GeoTiffRasterSource = fetchSource
-
-  def fetchSource: GeoTiffRasterSource = {
+  lazy val source: GeoTiffRasterSource = {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
     if (!s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
       throw new FileNotFoundException(uri)
     }
     GeoTiffRasterSource(uri)
+  }
+
+  lazy val extent: Extent = {
+    source.extent
   }
 
   def cropWindow(tile: Tile): Tile = {
@@ -154,10 +156,9 @@ trait OptionalLayer extends Layer {
   /**
     * Define how to read sources for optional Layers
     */
-  lazy val source: Option[GeoTiffRasterSource] = fetchSource
 
   /** Check if URI exists before trying to open it, return None if no file found */
-  def fetchSource: Option[GeoTiffRasterSource] = {
+  lazy val source: Option[GeoTiffRasterSource] = {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
     if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
@@ -168,6 +169,14 @@ trait OptionalLayer extends Layer {
       None
     }
   }
+
+  lazy val extent: Option[Extent] = source match {
+
+    case Some(s) => Some(s.extent)
+    case None => None
+
+  }
+
 
   def cropWindow(tile: Option[Tile]): Option[Tile] = {
 

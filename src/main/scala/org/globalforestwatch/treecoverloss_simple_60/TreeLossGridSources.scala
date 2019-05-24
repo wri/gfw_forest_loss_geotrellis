@@ -32,3 +32,17 @@ case class TreeLossGridSources(grid: String) extends GridSources {
     }
   }
 }
+
+object TreeLossGridSources {
+
+  @transient
+  private lazy val cache =
+    scala.collection.concurrent.TrieMap.empty[String, TreeLossGridSources]
+
+  def getCachedSources(grid: String): TreeLossGridSources = {
+
+    cache.getOrElseUpdate(grid, TreeLossGridSources(grid))
+
+  }
+
+}

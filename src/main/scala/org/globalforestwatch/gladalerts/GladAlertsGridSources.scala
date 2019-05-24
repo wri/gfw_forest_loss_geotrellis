@@ -64,7 +64,8 @@ case class GladAlertsGridSources(gridId: String) extends GridSources {
       val peruForestConcessionsTile = peruForestConcessions.fetchWindow(window)
       val oilGasTile = oilGas.fetchWindow(window)
       val mangroves2016Tile = mangroves2016.fetchWindow(window)
-      val intactForestLandscapes2016Tile = intactForestLandscapes2016.fetchWindow(window)
+      val intactForestLandscapes2016Tile =
+        intactForestLandscapes2016.fetchWindow(window)
 
       val tile = GladAlertsTile(
         gladAlertsTile,
@@ -92,6 +93,20 @@ case class GladAlertsGridSources(gridId: String) extends GridSources {
 
       Raster(tile, window)
     }
+  }
+
+}
+
+object GladAlertsGridSources {
+
+  @transient
+  private lazy val cache =
+    scala.collection.concurrent.TrieMap.empty[String, GladAlertsGridSources]
+
+  def getCachedSources(grid: String): GladAlertsGridSources = {
+
+    cache.getOrElseUpdate(grid, GladAlertsGridSources(grid))
+
   }
 
 }
