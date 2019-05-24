@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class TreeCoverLossDrivers(grid: String)
+case class TreeCoverLossDrivers(grid: String)
     extends StringLayer
     with OptionalILayer {
   val uri: String = s"$basePath/drivers/$grid.tif"

@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class Ecozones(grid: String) extends StringLayer with OptionalILayer {
+case class Ecozones(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String = s"$basePath/ecozones/$grid.tif"
   override val externalNoDataValue = "Unknown"

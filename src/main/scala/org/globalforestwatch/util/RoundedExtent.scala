@@ -1,6 +1,8 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.util
+
 import geotrellis.vector.Extent
-import math.{round, pow}
+
+import scala.math.{pow, round}
 
 class RoundedExtent(_xmin: Double,
                     _ymin: Double,

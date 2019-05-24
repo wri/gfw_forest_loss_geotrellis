@@ -1,11 +1,13 @@
 package org.globalforestwatch.layers
 
-class PeruForestConcessions(grid: String)
+case class PeruForestConcessions(grid: String)
     extends StringLayer
     with OptionalILayer {
 
   val uri: String =
     s"$basePath/per_forest_concessions/$grid.tif"
+
+  override val externalNoDataValue: String = null
 
   def lookup(value: Int): String = value match {
     case 1 => "Conservation"

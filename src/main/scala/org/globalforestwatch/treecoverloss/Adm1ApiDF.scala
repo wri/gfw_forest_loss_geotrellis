@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions._
 
 object Adm1ApiDF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
+  val spark: SparkSession = TreeLossSparkSession()
 
   import spark.implicits._
 
@@ -74,15 +74,15 @@ object Adm1ApiDF {
         $"year_2018"
       )
       .agg(
-        sum("totalarea") as "total_area",
-        sum("extent2000") as "extent_2000",
-        sum("extent2010") as "extent_2010",
+        sum("total_area") as "total_area",
+        sum("extent_2000") as "extent_2000",
+        sum("extent_2010") as "extent_2010",
         sum("total_gain") as "total_gain",
         sum("total_biomass") as "total_biomass",
-        sum($"avg_biomass_per_ha" * $"extent2000") / sum("extent2000") as "avg_biomass_per_ha",
+        sum($"avg_biomass_per_ha" * $"extent_2000") / sum("extent_2000") as "avg_biomass_per_ha",
         sum("total_co2") as "total_co2",
         sum("total_mangrove_biomass") as "total_mangrove_biomass",
-        sum($"avg_mangrove_biomass_per_ha" * $"extent2000") / sum("extent2000") as "avg_mangrove_biomass_per_ha",
+        sum($"avg_mangrove_biomass_per_ha" * $"extent_2000") / sum("extent_2000") as "avg_mangrove_biomass_per_ha",
         sum("total_mangrove_co2") as "total_mangrove_co2",
         sum("area_loss_2001") as "area_loss_2001",
         sum("area_loss_2002") as "area_loss_2002",

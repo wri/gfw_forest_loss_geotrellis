@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class Plantations(grid: String) extends StringLayer with OptionalILayer {
+case class Plantations(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
     s"$basePath/plantations/$grid.tif"
@@ -17,5 +17,6 @@ class Plantations(grid: String) extends StringLayer with OptionalILayer {
     case 9  => "Unknown Mix"
     case 10 => "Wood fiber / Timber"
     case 11 => "Wood fiber / Timber Mix"
+    case _ => ""
   }
 }

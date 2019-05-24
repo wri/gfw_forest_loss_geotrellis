@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class Erosion(grid: String) extends StringLayer with OptionalILayer {
+case class Erosion(grid: String) extends StringLayer with OptionalILayer {
   val uri: String = s"$basePath/erosion/$grid.tif"
   override val externalNoDataValue = "Unknown"
 

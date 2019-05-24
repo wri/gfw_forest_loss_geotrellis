@@ -36,20 +36,22 @@ libraryDependencies ++= Seq(
   sparkSQL % Provided,
   sparkHive % Provided,
   hadoopAws % Provided,
-  geotrellisSpark,
-  geotrellisSparkTestKit % Test,
-  geotrellisS3,
-  geotrellisShapefile,
-  geotrellisGeotools,
-  geotrellisVectorTile,
   logging,
   decline,
   scalatest % Test,
+  "org.locationtech.geotrellis" %% "geotrellis-spark" % "3.0.0-M3",
+  "org.locationtech.geotrellis" %% "geotrellis-spark-testkit" % "3.0.0-M3" % Test,
+  "org.locationtech.geotrellis" %% "geotrellis-s3" % "3.0.0-M3",
+  "org.locationtech.geotrellis" %% "geotrellis-raster" % "3.0.0-M3",
+  "org.locationtech.geotrellis" %% "geotrellis-vector" % "3.0.0-M3",
+  "org.locationtech.geotrellis" %% "geotrellis-shapefile" % "3.0.0-M3",
+  "org.locationtech.geotrellis" %% "geotrellis-geotools" % "3.0.0-M3",
+  "org.locationtech.geotrellis" %% "geotrellis-vectortile" % "3.0.0-M3",
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
-  "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.9.0",
-  "com.azavea.geotrellis" %% "geotrellis-contrib-summary" % "0.1.1",
+  "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "3.13.0",
+  "com.azavea.geotrellis" %% "geotrellis-contrib-summary" % "3.13.0",
   "org.scalanlp" %% "breeze" % "0.13.2",
   "org.scalanlp" %% "breeze-natives" % "0.13.2",
   "org.scalanlp" %% "breeze-viz" % "0.13.2"
@@ -144,13 +146,13 @@ sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
-sparkSubnetId := Some("subnet-0360516ee122586ff")
+sparkSubnetId := Some("subnet-08458452c1d05713b")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 51
+sparkInstanceCount := 15
 sparkMasterType := "r5.12xlarge"
 sparkCoreType := "r5.12xlarge"
-sparkMasterEbsSize := Some(50)
-sparkCoreEbsSize := Some(50)
+sparkMasterEbsSize := Some(30)
+sparkCoreEbsSize := Some(30)
 //sparkMasterPrice := Some(3.0320)
 sparkCorePrice := Some(3.0320)
 sparkClusterName            := s"geotrellis-treecoverloss"
@@ -158,9 +160,9 @@ sparkEmrServiceRole         := "EMR_DefaultRole"
 sparkInstanceRole           := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName("tmaschler_wri2")
 sparkRunJobFlowRequest      := sparkRunJobFlowRequest.value.withTags(new Tag("Project", "Global Forest Watch"))
-                                                      .withTags(new Tag("Job", "Annual Update Geotrellis"))
+  .withTags(new Tag("Job", "Tree Cover Loss Analysis Geotrellis"))
                                                       .withTags(new Tag("Project Lead", "Thomas Maschler"))
-                                                      .withTags(new Tag("Name", "geotrellis-treecoverloss"))
+  .withTags(new Tag("Name", "geotrellis-treecoverloss-liz"))
 sparkEmrConfigs             := List(
   EmrConfig("spark").withProperties(
     "maximizeResourceAllocation" -> "true"
@@ -194,9 +196,9 @@ sparkEmrConfigs             := List(
     "spark.yarn.executor.memoryOverhead" -> "5G",
     "spark.driver.cores" -> "5",
     "spark.driver.memory" -> "37G",
-    "spark.executor.instances" -> "449",
-    "spark.default.parallelism" -> "4490",
-    "spark.sql.shuffle.partitions" -> "4490",
+    "spark.executor.instances" -> "134", //9 * 15 -1
+    "spark.default.parallelism" -> "1340",
+    "spark.sql.shuffle.partitions" -> "1340",
 
     "spark.driver.maxResultSize" -> "3G",
     "spark.shuffle.service.enabled" -> "true",

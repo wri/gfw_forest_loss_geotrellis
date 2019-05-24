@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class RiverBasins(grid: String) extends StringLayer with OptionalILayer {
+case class RiverBasins(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
     s"$basePath/river_basins/$grid.tif"

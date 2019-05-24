@@ -1,11 +1,13 @@
 package org.globalforestwatch.layers
 
-class IndonesiaForestArea(grid: String)
+case class IndonesiaForestArea(grid: String)
     extends StringLayer
     with OptionalILayer {
 
   val uri: String =
     s"$basePath/idn_forest_area/$grid.tif"
+
+  override val externalNoDataValue: String = null
 
   def lookup(value: Int): String = value match {
     case 1001        => "Protected Forest"

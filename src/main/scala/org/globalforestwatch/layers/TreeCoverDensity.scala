@@ -16,10 +16,19 @@ trait TreeCoverDensity extends IntegerLayer with RequiredILayer {
   }
 }
 
-class TreeCoverDensity2000(grid: String) extends TreeCoverDensity {
+case class TreeCoverDensity2000(grid: String) extends TreeCoverDensity {
   val uri: String = s"$basePath/tcd_2000/$grid.tif"
 }
 
-class TreeCoverDensity2010(grid: String) extends TreeCoverDensity {
+case class TreeCoverDensity2010(grid: String) extends TreeCoverDensity {
   val uri: String = s"$basePath/tcd_2010/$grid.tif"
+}
+
+case class TreeCoverDensity2010_60(grid: String) extends BooleanLayer with RequiredILayer {
+  val uri: String = s"$basePath/tcd_2010/$grid.tif"
+
+  override def lookup(value: Int): Boolean = {
+    if (value <= 60) false
+    else true
+  }
 }

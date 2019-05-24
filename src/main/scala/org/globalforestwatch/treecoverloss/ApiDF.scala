@@ -5,22 +5,22 @@ import org.apache.spark.sql.functions._
 
 object ApiDF {
 
-  //    val spark: SparkSession = TreeLossSparkSession.spark
+  //  val spark: SparkSession = TreeLossSparkSession()
 //
 //  import spark.implicits._
 
   private def setZeroNull(column: Column): Column = when(column =!= 0.0, column)
 
-  private def setFalseNull(column: Column): Column =
-    when(column === true, column)
+  //  private def setFalseNull(column: Column): Column =
+  //    when(column === true, column)
 
   def setNull(df: DataFrame): DataFrame = {
 
     val zeroColumns = df
       .select(
-        "totalarea",
-        "extent2000",
-        "extent2010",
+          "total_area",
+          "extent_2000",
+          "extent_2010",
         "total_gain",
         "total_biomass",
         "avg_biomass_per_ha",
@@ -120,35 +120,36 @@ object ApiDF {
         "mangrove_carbon_emissions_2018"
       )
       .columns
-    val falseColumns = df
-      .select(
-        "primary_forest",
-        "idn_primary_forest",
-        "biodiversity_significance",
-        "biodiversity_intactness",
-        "aze",
-        "urban_watershed",
-        "mangroves_1996",
-        "mangroves_2016",
-        "endemic_bird_area",
-        "tiger_cl",
-        "landmark",
-        "land_right",
-        "kba",
-        "mining",
-        "idn_mys_peatlands",
-        "oil_palm",
-        "idn_forest_moratorium",
-        "mex_protected_areas",
-        "mex_pes",
-        "per_production_forest",
-        "per_protected_area",
-        "wood_fiber",
-        "resource_right",
-        "managed_forests",
-        "oil_gas"
-      )
-      .columns
+
+    //    val falseColumns = df
+    //      .select(
+    //        "primary_forest",
+    //        "idn_primary_forest",
+    //        "biodiversity_significance",
+    //        "biodiversity_intactness",
+    //        "aze",
+    //        "urban_watershed",
+    //        "mangroves_1996",
+    //        "mangroves_2016",
+    //        "endemic_bird_area",
+    //        "tiger_cl",
+    //        "landmark",
+    //        "land_right",
+    //        "kba",
+    //        "mining",
+    //        "idn_mys_peatlands",
+    //        "oil_palm",
+    //        "idn_forest_moratorium",
+    //        "mex_protected_areas",
+    //        "mex_pes",
+    //        "per_production_forest",
+    //        "per_protected_area",
+    //        "wood_fiber",
+    //        "resource_right",
+    //        "managed_forests",
+    //        "oil_gas"
+    //      )
+    //      .columns
 
     var tempDF = df
 
@@ -156,9 +157,9 @@ object ApiDF {
       tempDF = tempDF.withColumn(column, setZeroNull(col(column)))
     })
 
-    falseColumns.map(column => {
-      tempDF = tempDF.withColumn(column, setFalseNull(col(column)))
-    })
+    //    falseColumns.map(column => {
+    //      tempDF = tempDF.withColumn(column, setFalseNull(col(column)))
+    //    })
 
     tempDF
   }

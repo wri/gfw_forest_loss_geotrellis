@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class PeruProtectedAreas(grid: String)
+case class PeruProtectedAreas(grid: String)
     extends BooleanLayer
     with OptionalILayer {
   val uri: String =

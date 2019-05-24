@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class IndonesiaForestMoratorium(grid: String)
+case class IndonesiaForestMoratorium(grid: String)
     extends BooleanLayer
     with OptionalILayer {
   val uri: String =

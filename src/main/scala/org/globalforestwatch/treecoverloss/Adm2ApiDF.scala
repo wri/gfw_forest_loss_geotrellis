@@ -4,7 +4,7 @@ import org.apache.spark.sql.functions._
 
 object Adm2ApiDF {
 
-  val spark: SparkSession = TreeLossSparkSession.spark
+  val spark: SparkSession = TreeLossSparkSession()
 
   import spark.implicits._
 
@@ -54,9 +54,9 @@ object Adm2ApiDF {
       $"resource_right",
       $"managed_forests",
       $"oil_gas",
-      $"totalarea" as "total_area",
-      $"extent2000" as "extent_2000",
-      $"extent2010" as "extent_2010",
+      $"total_area",
+      $"extent_2000",
+      $"extent_2010",
       $"total_gain",
       $"total_biomass",
       $"avg_biomass_per_ha",

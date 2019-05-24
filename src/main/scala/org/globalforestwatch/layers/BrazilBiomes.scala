@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-class BrazilBiomes(grid: String) extends StringLayer with OptionalILayer {
+case class BrazilBiomes(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String =
     s"$basePath/bra_biomes/$grid.tif"
@@ -12,7 +12,7 @@ class BrazilBiomes(grid: String) extends StringLayer with OptionalILayer {
     case 4 => "Pampa"
     case 5 => "Amazônia"
     case 6 => "Mata Atlântica"
-    case _ => null
+    case _ => ""
   }
 
 }
