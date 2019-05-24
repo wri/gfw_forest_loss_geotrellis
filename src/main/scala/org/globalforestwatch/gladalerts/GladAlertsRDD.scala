@@ -12,7 +12,6 @@ import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.GADMFeatureId
 import org.globalforestwatch.util.RoundedExtent
 import org.globalforestwatch.grids.GridSources
-import org.globalforestwatch.util.Implicits._
 
 object GladAlertsRDD extends LazyLogging {
 

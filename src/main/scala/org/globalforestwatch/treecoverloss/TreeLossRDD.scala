@@ -11,7 +11,6 @@ import geotrellis.contrib.polygonal._
 import geotrellis.spark.tiling.LayoutDefinition
 import org.globalforestwatch.features.GADMFeatureId
 import org.globalforestwatch.util.RoundedExtent
-import org.globalforestwatch.util.Implicits._
 
 import math.round
 
