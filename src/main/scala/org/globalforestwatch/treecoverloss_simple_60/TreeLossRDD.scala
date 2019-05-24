@@ -1,4 +1,4 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.treecoverloss_simple_60
 
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
@@ -12,9 +12,8 @@ import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.GADMFeatureId
 import org.globalforestwatch.util.RoundedExtent
-import org.globalforestwatch.grids.GridSources
 
-object GladAlertsRDD extends LazyLogging {
+object TreeLossRDD extends LazyLogging {
 
   /** Produce RDD of tree cover loss from RDD of areas of interest*
     *
@@ -23,17 +22,18 @@ object GladAlertsRDD extends LazyLogging {
     * @param partitioner how to partition keys from the windowLayout
     */
   def apply(
-    featureRDD: RDD[Feature[Geometry, GADMFeatureId]],
+    featureRDD: RDD[Feature[Geometry, TreeLossRowFeatureId]],
     windowLayout: LayoutDefinition,
     partitioner: Partitioner
-  ): RDD[(GADMFeatureId, GladAlertsSummary)] = {
+  ): RDD[(TreeLossRowFeatureId, TreeLossSummary)] = {
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.
      * Later we will calculate partial result for each intersection and merge them.
      */
-    val keyedFeatureRDD: RDD[(SpatialKey, Feature[Geometry, GADMFeatureId])] =
+    val keyedFeatureRDD
+      : RDD[(SpatialKey, Feature[Geometry, TreeLossRowFeatureId])] =
       featureRDD
-        .flatMap { feature: Feature[Geometry, GADMFeatureId] =>
+        .flatMap { feature: Feature[Geometry, TreeLossRowFeatureId] =>
           val keys: Set[SpatialKey] =
             windowLayout.mapTransform.keysForGeometry(feature.geom)
           keys.toSeq.map { key =>
@@ -48,18 +48,18 @@ object GladAlertsRDD extends LazyLogging {
      *
      * The RDD is keyed by Id such that we can join and recombine partial results later.
      */
-    val featuresWithSummaries: RDD[(GADMFeatureId, GladAlertsSummary)] =
+    val featuresWithSummaries: RDD[(TreeLossRowFeatureId, TreeLossSummary)] =
       keyedFeatureRDD.mapPartitions {
         featurePartition: Iterator[
-          (SpatialKey, Feature[Geometry, GADMFeatureId])
+          (SpatialKey, Feature[Geometry, TreeLossRowFeatureId])
         ] =>
           // Code inside .mapPartitions works in an Iterator of records
           // Doing things this way allows us to reuse resources and perform other optimizations
 
           // Grouping by spatial key allows us to minimize read thrashing from record to record
-          val groupedByKey
-            : Map[SpatialKey,
-                  Array[(SpatialKey, Feature[Geometry, GADMFeatureId])]] =
+          val groupedByKey: Map[SpatialKey, Array[
+            (SpatialKey, Feature[Geometry, TreeLossRowFeatureId])
+          ]] =
             featurePartition.toArray.groupBy {
               case (windowKey, feature) => windowKey
             }
@@ -67,49 +67,51 @@ object GladAlertsRDD extends LazyLogging {
           groupedByKey.toIterator.flatMap {
             case (windowKey, keysAndFeatures) =>
               // round to one integer to assure we have 400 * 400 blocks
-              val window: Extent = windowKey.extent(windowLayout)
-              //              val xmin: Double = _window.xmin
-              //              val ymin: Double = _window.ymin
-              //              val xmax: Double = _window.xmax
-              //              val ymax: Double = _window.ymax
-              //
-              //              val window = new RoundedExtent(xmin, ymin, xmax, ymax, 1)
+              val _window: Extent = windowKey.extent(windowLayout)
 
-              val maybeRasterSource: Either[Throwable, GladAlertsGridSources] =
+              val xmin: Double = _window.xmin
+              val ymin: Double = _window.ymin
+              val xmax: Double = _window.xmax
+              val ymax: Double = _window.ymax
+
+              val window = new RoundedExtent(xmin, ymin, xmax, ymax, 1)
+
+              val maybeRasterSource: Either[Throwable, TreeLossGridSources] =
                 Either.catchNonFatal {
-                  GladAlertsGrid.getRasterSource(window)
+                  TreeLossGrid.getRasterSource(window)
                 }
 
               val features = keysAndFeatures.map(_._2)
 
-              val maybeRaster: Either[Throwable, Raster[GladAlertsTile]] =
-                maybeRasterSource.flatMap { rs: GladAlertsGridSources =>
+              val maybeRaster: Either[Throwable, Raster[TreeLossTile]] =
+                maybeRasterSource.flatMap { rs: TreeLossGridSources =>
                   rs.readWindow(window)
                 }
 
               // flatMap here flattens out and ignores the errors
-              features.flatMap { feature: Feature[Geometry, GADMFeatureId] =>
-                val id: GADMFeatureId = feature.data
-                val rasterizeOptions = Rasterizer.Options(
-                  includePartial = false,
-                  sampleType = PixelIsPoint
-                )
+              features.flatMap {
+                feature: Feature[Geometry, TreeLossRowFeatureId] =>
+                  val id: TreeLossRowFeatureId = feature.data
+                  val rasterizeOptions = Rasterizer.Options(
+                    includePartial = false,
+                    sampleType = PixelIsPoint
+                  )
 
-                maybeRaster match {
-                  case Left(exception) =>
-                    logger.error(s"Feature $id: $exception")
-                    List.empty
+                  maybeRaster match {
+                    case Left(exception) =>
+                      logger.error(s"Feature $id: $exception")
+                      List.empty
 
-                  case Right(raster) =>
-                    val summary: GladAlertsSummary =
-                      raster.polygonalSummary(
-                        geometry = feature.geom,
-                        emptyResult = new GladAlertsSummary(),
-                        options = rasterizeOptions
-                      )
+                    case Right(raster) =>
+                      val summary: TreeLossSummary =
+                        raster.polygonalSummary(
+                          geometry = feature.geom,
+                          emptyResult = new TreeLossSummary(),
+                          options = rasterizeOptions
+                        )
 
-                    List((id, summary))
-                }
+                      List((id, summary))
+                  }
               }
           }
       }
@@ -117,7 +119,8 @@ object GladAlertsRDD extends LazyLogging {
     /* Group records by Id and combine their summaries
      * The features may have intersected multiple grid blocks
      */
-    val featuresGroupedWithSummaries: RDD[(GADMFeatureId, GladAlertsSummary)] =
+    val featuresGroupedWithSummaries
+      : RDD[(TreeLossRowFeatureId, TreeLossSummary)] =
       featuresWithSummaries.reduceByKey {
         case (summary1, summary2) =>
           summary1.merge(summary2)

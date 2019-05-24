@@ -7,6 +7,6 @@ case class ProtectedAreas(grid: String) extends StringLayer with OptionalILayer 
   def lookup(value: Int): String = value match {
     case 1 => "Category Ia/b or II"
     case 2 => "Other Category"
-    case _ => null
+    case _ => ""
   }
 }

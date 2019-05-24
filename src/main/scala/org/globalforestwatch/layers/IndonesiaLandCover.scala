@@ -5,6 +5,8 @@ case class IndonesiaLandCover(grid: String) extends StringLayer with OptionalILa
   val uri: String =
     s"$basePath/idn_land_cover/$grid.tif"
 
+  override val externalNoDataValue: String = null
+
   def lookup(value: Int): String = value match {
 
     case 2001  => "Primary Dry Land Forest"

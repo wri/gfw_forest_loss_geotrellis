@@ -82,7 +82,8 @@ trait DLayer extends Layer {
 
   implicit class OptionalDTile(val t: Option[Tile]) {
     def getData(col: Int, row: Int): B = {
-      val value: Double = t.map(_.getDouble(col, row)).getOrElse(internalNoDataValue)
+      val value: Double =
+        t.map(_.getDouble(col, row)).getOrElse(internalNoDataValue)
       if (isNoData(value) || value == internalNoDataValue) externalNoDataValue
       else lookup(value)
     }
@@ -100,9 +101,7 @@ trait RequiredLayer extends Layer {
   /**
     * Define how to read sources for required layers
     */
-  lazy val source: GeoTiffRasterSource = fetchSource
-
-  def fetchSource: GeoTiffRasterSource = {
+  lazy val source: GeoTiffRasterSource = {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
     if (!s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
@@ -111,6 +110,10 @@ trait RequiredLayer extends Layer {
     GeoTiffRasterSource(uri)
   }
 
+  //  lazy val extent: Extent = {
+  //    source.extent
+  //  }
+
   def cropWindow(tile: Tile): Tile = {
 
     // TODO: don't use magic number 401. Instead fetch number from 10x10 grid block definition
@@ -118,23 +121,29 @@ trait RequiredLayer extends Layer {
     val cols = tile.cols
     val rows = tile.rows
 
-    if (cols == 401 && rows == 401) tile.crop(1, 1, cols, rows, Crop.Options(force = true))
-    else if (cols == 401) tile.crop(1, 0, cols, rows, Crop.Options(force = true))
-    else if (rows == 401) tile.crop(0, 1, cols, rows, Crop.Options(force = true))
+    if (cols == 401 && rows == 401)
+      tile.crop(1, 1, cols, rows, Crop.Options(force = true))
+    else if (cols == 401)
+      tile.crop(1, 0, cols, rows, Crop.Options(force = true))
+    else if (rows == 401)
+      tile.crop(0, 1, cols, rows, Crop.Options(force = true))
     else tile
 
   }
 
 }
 
-
 trait RequiredILayer extends RequiredLayer with ILayer {
 
   /**
     * Define how to fetch data for required Integer rasters
     */
-
-  def fetchWindow(window: Extent): ITile = new ITile(cropWindow(source.read(window).get.tile.band(0)))
+  def fetchWindow(window: Extent): ITile = {
+    val tile = source.synchronized {
+      source.read(window).get.tile.band(0)
+    }
+    new ITile(cropWindow(tile))
+  }
 
 }
 
@@ -143,9 +152,12 @@ trait RequiredDLayer extends RequiredLayer with DLayer {
   /**
     * Define how to fetch data for required Double rasters
     */
-
-  def fetchWindow(window: Extent): DTile =
-    new DTile(cropWindow(source.read(window).get.tile.band(0)))
+  def fetchWindow(window: Extent): DTile = {
+    val tile = source.synchronized {
+      source.read(window).get.tile.band(0)
+    }
+    new DTile(cropWindow(tile))
+  }
 
 }
 
@@ -154,10 +166,8 @@ trait OptionalLayer extends Layer {
   /**
     * Define how to read sources for optional Layers
     */
-  lazy val source: Option[GeoTiffRasterSource] = fetchSource
-
   /** Check if URI exists before trying to open it, return None if no file found */
-  def fetchSource: Option[GeoTiffRasterSource] = {
+  lazy val source: Option[GeoTiffRasterSource] = {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
     if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
@@ -169,6 +179,13 @@ trait OptionalLayer extends Layer {
     }
   }
 
+  //  lazy val extent: Option[Extent] = source match {
+  //
+  //    case Some(s) => Some(s.extent)
+  //    case None => None
+  //
+  //  }
+
   def cropWindow(tile: Option[Tile]): Option[Tile] = {
 
     // TODO: don't use magic number 401. Instead fetch number from 10x10 grid block definition
@@ -178,14 +195,16 @@ trait OptionalLayer extends Layer {
         val cols = tile.cols
         val rows = tile.rows
 
-        if (cols == 401 && rows == 401) Option(tile.crop(1, 1, cols, rows, Crop.Options(force = true)))
-        else if (cols == 401) Option(tile.crop(1, 0, cols, rows, Crop.Options(force = true)))
-        else if (rows == 401) Option(tile.crop(0, 1, cols, rows, Crop.Options(force = true)))
+        if (cols == 401 && rows == 401)
+          Option(tile.crop(1, 1, cols, rows, Crop.Options(force = true)))
+        else if (cols == 401)
+          Option(tile.crop(1, 0, cols, rows, Crop.Options(force = true)))
+        else if (rows == 401)
+          Option(tile.crop(0, 1, cols, rows, Crop.Options(force = true)))
         else Option(tile)
       }
       case None => tile
     }
-
 
   }
 }
@@ -195,17 +214,17 @@ trait OptionalILayer extends OptionalLayer with ILayer {
   /**
     * Define how to fetch data for optional Integer rasters
     */
+  def fetchWindow(window: Extent): OptionalITile = {
 
-  def fetchWindow(window: Extent): OptionalITile =
-    new OptionalITile(
-      cropWindow(
-        for {
-          source <- source
-          raster <- Either
-            .catchNonFatal(source.read(window).get.tile.band(0))
-            .toOption
-        } yield raster)
-    )
+    new OptionalITile(cropWindow(for {
+      source <- source
+      raster <- Either
+        .catchNonFatal(source.synchronized {
+          source.read(window).get.tile.band(0)
+        })
+        .toOption
+    } yield raster))
+  }
 }
 
 trait OptionalDLayer extends OptionalLayer with DLayer {
@@ -213,17 +232,15 @@ trait OptionalDLayer extends OptionalLayer with DLayer {
   /**
     * Define how to fetch data for optional double rasters
     */
-
   def fetchWindow(window: Extent): OptionalDTile =
-    new OptionalDTile(
-      cropWindow(
-        for {
-          source <- source
-          raster <- Either
-            .catchNonFatal(source.read(window).get.tile.band(0))
-            .toOption
-        } yield raster)
-    )
+    new OptionalDTile(cropWindow(for {
+      source <- source
+      raster <- Either
+        .catchNonFatal(source.synchronized {
+          source.read(window).get.tile.band(0)
+        })
+        .toOption
+    } yield raster))
 }
 
 trait BooleanLayer extends ILayer {
@@ -252,7 +269,6 @@ trait IntegerLayer extends ILayer {
 
   def lookup(value: Int): Integer = value
 }
-
 
 trait DateConfLayer extends ILayer {
 
@@ -314,6 +330,6 @@ trait StringLayer extends ILayer {
   type B = String
 
   val internalNoDataValue: Int = 0
-  val externalNoDataValue: String = null
+  val externalNoDataValue: String = ""
 
 }

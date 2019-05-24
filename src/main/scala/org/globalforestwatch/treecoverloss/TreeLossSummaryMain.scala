@@ -1,5 +1,8 @@
 package org.globalforestwatch.treecoverloss
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 import com.monovore.decline.{CommandApp, Opts}
 import org.apache.log4j.Logger
 import org.apache.spark._
@@ -9,7 +12,6 @@ import org.apache.spark.sql.functions._
 import cats.implicits._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
-
 import org.globalforestwatch.features.GADMFeatureId
 
 object TreeLossSummaryMain
@@ -180,8 +182,7 @@ object TreeLossSummaryMain
 
                       TreeLossRow(
                         TreeLossRowFeatureId(id.country, admin1, admin2),
-                        lossDataGroup.tcd2000,
-                        lossDataGroup.tcd2010,
+                        lossDataGroup.threshold,
                         TreeLossRowLayers(
                           lossDataGroup.drivers,
                           lossDataGroup.globalLandCover,
@@ -223,6 +224,8 @@ object TreeLossSummaryMain
                           lossDataGroup.logging,
                           lossDataGroup.oilGas
                         ),
+                        lossData.extent2000,
+                        lossData.extent2010,
                         lossData.totalArea,
                         lossData.totalGainArea,
                         lossData.totalBiomass,
@@ -238,54 +241,35 @@ object TreeLossSummaryMain
               }
               .toDF(
                 "feature_id",
-                "threshold_2000",
-                "threshold_2010",
+                "threshold",
                 "layers",
-                "area",
-                "gain",
-                "biomass",
-                "co2",
-                "biomass_per_ha",
-                "mangrove_biomass",
-                "mangrove_co2",
-                "mangrove_biomass_per_ha",
+                "extent_2000",
+                "extent_2010",
+                "total_area",
+                "total_gain",
+                "total_biomass",
+                "total_co2",
+                "avg_biomass_per_ha",
+                "total_mangrove_biomass",
+                "total_mangrove_co2",
+                "avg_mangrove_biomass_per_ha",
                 "year_data"
               )
 
-          val runOutputUrl = outputUrl
-          //            + "/treecoverloss_" + DateTimeFormatter
-          //            .ofPattern("yyyyMMdd_HHmm")
-          //            .format(LocalDateTime.now)
+          val runOutputUrl = outputUrl + "/treecoverloss_" +
+            DateTimeFormatter
+              .ofPattern("yyyyMMdd_HHmm")
+              .format(LocalDateTime.now)
 
-          val outputPartitionCount = maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
+          val outputPartitionCount =
+            maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
-          summaryDF.repartition($"feature_id", $"threshold_2000")
-          summaryDF.cache()
+          summaryDF.repartition($"feature_id", $"threshold")
 
-          val masterDF = summaryDF.transform(MasterDF.expandByThreshold)
+          val adm2DF = summaryDF
+            .transform(Adm2DF.unpackValues)
 
-          masterDF.cache()
-
-          val extent2010DF = summaryDF
-            .transform(Extent2010DF.sumArea)
-            .transform(Extent2010DF.joinMaster(masterDF))
-            .transform(Extent2010DF.aggregateByThreshold)
-
-          val annualLossDF = summaryDF
-            .transform(AnnualLossDF.unpackYearData)
-            .transform(AnnualLossDF.sumArea)
-            .transform(AnnualLossDF.joinMaster(masterDF))
-            .transform(AnnualLossDF.aggregateByThreshold)
-
-          summaryDF.unpersist()
-          masterDF.unpersist()
-
-          val adm2DF = annualLossDF
-            .filter($"threshold" > 0)
-            .transform(Adm2DF.joinExtent2010(extent2010DF))
-            .transform(Adm2DF.unpackFeautureIDLayers)
-
-          adm2DF.repartition($"iso")
+          //          adm2DF.repartition($"iso")
           adm2DF.cache()
 
           val csvOptions = Map(
@@ -300,8 +284,14 @@ object TreeLossSummaryMain
             .transform(Adm2SummaryDF.sumArea)
 
           adm2SummaryDF
+            .transform(Adm2SummaryDF.roundValues)
             .coalesce(1)
-            .orderBy($"iso", $"adm1", $"adm2", $"threshold")
+            .orderBy(
+              $"country",
+              $"subnational1",
+              $"subnational2",
+              $"threshold"
+            )
             .write
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/adm2")
@@ -309,8 +299,9 @@ object TreeLossSummaryMain
           val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
 
           adm1SummaryDF
+            .transform(Adm1SummaryDF.roundValues)
             .coalesce(1)
-            .orderBy($"iso", $"adm1", $"threshold")
+            .orderBy($"country", $"subnational1", $"threshold")
             .write
             .options(csvOptions)
             .csv(path = runOutputUrl + "/summary/adm1")
@@ -318,6 +309,7 @@ object TreeLossSummaryMain
           val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
 
           isoSummaryDF
+            .transform(IsoSummaryDF.roundValues)
             .coalesce(1)
             .orderBy($"iso", $"threshold")
             .write
@@ -335,8 +327,14 @@ object TreeLossSummaryMain
 
           adm2ApiDF
             //.coalesce(1)
-            .repartition(outputPartitionCount, $"iso", $"adm1", $"adm2", $"threshold")
-            .orderBy($"iso", $"adm1", $"adm2", $"threshold")
+            //            .repartition(
+            //            outputPartitionCount,
+            //            $"iso",
+            //            $"adm1",
+            //            $"adm2",
+            //            $"threshold"
+            //          )
+            //            .orderBy($"iso", $"adm1", $"adm2", $"threshold")
             .toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
@@ -352,8 +350,8 @@ object TreeLossSummaryMain
             .transform(Adm1ApiDF.nestYearData)
 
           adm1ApiDF
-            .repartition(outputPartitionCount, $"iso", $"adm1", $"threshold")
-            .orderBy($"iso", $"adm1", $"threshold")
+            //            .repartition(outputPartitionCount, $"iso", $"adm1", $"threshold")
+            //            .orderBy($"iso", $"adm1", $"threshold")
             .toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
@@ -364,8 +362,8 @@ object TreeLossSummaryMain
             .transform(IsoApiDF.nestYearData)
 
           isoApiDF
-            .repartition(outputPartitionCount, $"iso", $"threshold")
-            .orderBy($"iso", $"threshold")
+            //            .repartition(outputPartitionCount, $"iso", $"threshold")
+            //            .orderBy($"iso", $"threshold")
             .toJSON
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write

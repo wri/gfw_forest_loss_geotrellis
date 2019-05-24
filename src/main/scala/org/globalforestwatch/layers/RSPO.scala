@@ -8,6 +8,6 @@ case class RSPO(grid: String) extends StringLayer with OptionalILayer {
     case 1 => "Certified"
     case 2 => "Unknown"
     case 3 => "Not certified"
-    case _ => null
+    case _ => ""
   }
 }

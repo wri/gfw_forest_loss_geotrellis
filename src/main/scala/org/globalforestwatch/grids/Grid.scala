@@ -73,7 +73,7 @@ trait Grid[T <: GridSources] {
     layer.source.foreach { source =>
       require(
         source.extent.intersects(windowExtent),
-        s"${source.uri} does not intersect: $windowExtent"
+        s"${layer.uri} does not intersect: $windowExtent"
       )
     }
   }
