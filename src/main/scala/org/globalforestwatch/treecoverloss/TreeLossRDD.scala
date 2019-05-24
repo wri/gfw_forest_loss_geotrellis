@@ -8,6 +8,7 @@ import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import cats.implicits._
 import geotrellis.contrib.polygonal._
+import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.spark.tiling.LayoutDefinition
 import org.globalforestwatch.features.GADMFeatureId
 import org.globalforestwatch.util.RoundedExtent
