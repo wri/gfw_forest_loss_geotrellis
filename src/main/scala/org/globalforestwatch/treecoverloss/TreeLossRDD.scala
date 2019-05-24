@@ -1,7 +1,7 @@
 package org.globalforestwatch.treecoverloss
 
 import com.typesafe.scalalogging.LazyLogging
-import geotrellis.raster.Raster
+import geotrellis.raster._
 import geotrellis.spark.SpatialKey
 import geotrellis.vector._
 import org.apache.spark.Partitioner
@@ -11,10 +11,12 @@ import geotrellis.contrib.polygonal._
 import geotrellis.spark.tiling.LayoutDefinition
 import org.globalforestwatch.features.GADMFeatureId
 import org.globalforestwatch.util.RoundedExtent
+import org.globalforestwatch.util.Implicits._
 
 import math.round
 
 object TreeLossRDD extends LazyLogging {
+
 
   /** Produce RDD of tree cover loss from RDD of areas of interest*
     *
@@ -89,7 +91,6 @@ object TreeLossRDD extends LazyLogging {
                   raster.polygonalSummary(
                     geometry = feature.geom,
                     emptyResult = new TreeLossSummary())
-
                 List((id, summary))
             }
           }

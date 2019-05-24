@@ -1,4 +1,4 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.util
 
 import cats.Monoid
 import geotrellis.raster.histogram.StreamingHistogram
