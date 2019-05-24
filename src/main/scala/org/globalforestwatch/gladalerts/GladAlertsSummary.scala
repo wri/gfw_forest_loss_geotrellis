@@ -36,6 +36,32 @@ object GladAlertsSummary {
         if (glad != null) {
           val biomass: Double = raster.tile.biomass.getData(col, row)
           val climateMask: Boolean = raster.tile.climateMask.getData(col, row)
+          val primaryForest: Boolean =
+            raster.tile.primaryForest.getData(col, row)
+          val protectedAreas: String =
+            raster.tile.protectedAreas.getData(col, row)
+          val aze: Boolean = raster.tile.aze.getData(col, row)
+          val keyBiodiversityAreas: Boolean =
+            raster.tile.keyBiodiversityAreas.getData(col, row)
+          val landmark: Boolean = raster.tile.landmark.getData(col, row)
+          val plantations: String = raster.tile.plantations.getData(col, row)
+          val mining: Boolean = raster.tile.mining.getData(col, row)
+          val logging: Boolean = raster.tile.logging.getData(col, row)
+          val rspo: String = raster.tile.rspo.getData(col, row)
+          val woodFiber: Boolean = raster.tile.woodFiber.getData(col, row)
+          val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
+          val indonesiaForestMoratorium: Boolean =
+            raster.tile.indonesiaForestMoratorium.getData(col, row)
+          val oilPalm: Boolean = raster.tile.oilPalm.getData(col, row)
+          val indonesiaForestArea: String =
+            raster.tile.indonesiaForestArea.getData(col, row)
+          val peruForestConcessions: String =
+            raster.tile.peruForestConcessions.getData(col, row)
+          val oilGas: Boolean = raster.tile.oilGas.getData(col, row)
+          val mangroves2016: Boolean =
+            raster.tile.mangroves2016.getData(col, row)
+          val intactForestLandscapes2016: Boolean =
+            raster.tile.intactForestLandscapes2016.getData(col, row)
 
           val cols: Int = raster.rasterExtent.cols
           val rows: Int = raster.rasterExtent.rows
@@ -57,13 +83,33 @@ object GladAlertsSummary {
             if (tile.z < 0) stats
             else {
               val pKey =
-                GladAlertsDataGroup(glad._1, glad._2, tile, climateMask)
+                GladAlertsDataGroup(
+                  glad._1,
+                  glad._2,
+                  tile,
+                  climateMask,
+                  primaryForest,
+                  protectedAreas,
+                  aze,
+                  keyBiodiversityAreas,
+                  landmark,
+                  plantations,
+                  mining,
+                  logging,
+                  rspo,
+                  woodFiber,
+                  peatlands,
+                  indonesiaForestMoratorium,
+                  oilPalm,
+                  indonesiaForestArea,
+                  peruForestConcessions,
+                  oilGas,
+                  mangroves2016,
+                  intactForestLandscapes2016
+                )
 
               val summary: GladAlertsData =
-                stats.getOrElse(
-                  key = pKey,
-                  default = GladAlertsData(0, 0, 0)
-                )
+                stats.getOrElse(key = pKey, default = GladAlertsData(0, 0, 0))
 
               summary.totalAlerts += 1
               summary.totalArea += areaHa
