@@ -63,16 +63,16 @@ trait Grid[T <: GridSources] {
   // NOTE: This check will cause an eager fetch of raster metadata
   def checkRequired(layer: RequiredLayer, windowExtent: Extent): Unit = {
     require(
-      layer.extent.intersects(windowExtent),
+      layer.source.extent.intersects(windowExtent),
       s"${layer.uri} does not intersect: $windowExtent"
     )
   }
 
   // Only check these guys if they're defined
   def checkOptional(layer: OptionalLayer, windowExtent: Extent): Unit = {
-    layer.extent.foreach { extent =>
+    layer.source.foreach { source =>
       require(
-        extent.intersects(windowExtent),
+        source.extent.intersects(windowExtent),
         s"${layer.uri} does not intersect: $windowExtent"
       )
     }
