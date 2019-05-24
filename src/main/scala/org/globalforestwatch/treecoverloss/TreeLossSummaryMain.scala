@@ -319,8 +319,8 @@ object TreeLossSummaryMain
           val apiDF = adm2DF
             .transform(ApiDF.setNull)
 
-          adm2DF.unpersist()
           apiDF.cache()
+          adm2DF.unpersist()
 
           val adm2ApiDF = apiDF
             .transform(Adm2ApiDF.nestYearData)
@@ -343,8 +343,8 @@ object TreeLossSummaryMain
           val tempApiDF = apiDF
             .transform(Adm1ApiDF.sumArea)
 
-          adm2DF.unpersist()
           tempApiDF.cache()
+          apiDF.unpersist()
 
           val adm1ApiDF = tempApiDF
             .transform(Adm1ApiDF.nestYearData)
@@ -368,6 +368,8 @@ object TreeLossSummaryMain
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
             .text(runOutputUrl + "/api/iso")
+
+          tempApiDF.unpersist()
 
           spark.stop
       }
