@@ -30,7 +30,7 @@ case class GladAlertsTile(
                            oilGas: OilGas#OptionalITile,
                            mangroves2016: Mangroves2016#OptionalITile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile
-                         ) extends CellGrid[Int] {
+                         ) extends CellGrid {
   def cellType: CellType = glad.cellType
 
   def cols: Int = glad.cols
