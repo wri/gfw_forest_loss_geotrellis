@@ -197,9 +197,9 @@ sparkEmrConfigs             := List(
     "spark.yarn.executor.memoryOverhead" -> "5G",
     "spark.driver.cores" -> "5",
     "spark.driver.memory" -> "37G",
-    "spark.executor.instances" -> "457", //9 * 50 -1
-    "spark.default.parallelism" -> "4570",
-    "spark.sql.shuffle.partitions" -> "4570",
+    "spark.executor.instances" -> "449", //9 * 50 -1
+    "spark.default.parallelism" -> "4490",
+    "spark.sql.shuffle.partitions" -> "4490",
 
     "spark.driver.maxResultSize" -> "3G",
     "spark.shuffle.service.enabled" -> "true",

@@ -102,11 +102,20 @@ object TreeLossRDD extends LazyLogging {
 
                   case Right(raster) =>
                     val summary: TreeLossSummary =
-                      raster.polygonalSummary(
-                        geometry = feature.geom,
-                        emptyResult = new TreeLossSummary(),
-                        options = rasterizeOptions
-                      )
+                      try {
+                        raster.polygonalSummary(
+                          geometry = feature.geom,
+                          emptyResult = new TreeLossSummary(),
+                          options = rasterizeOptions
+                        )
+                      } catch {
+                        case ise: java.lang.IllegalStateException => {
+                          println(s"There are issue with geometry for ${feature.data.country} ${feature.data.admin1} ${feature.data.admin2}")
+                          throw ise
+                        }
+                        case e: Throwable => throw e
+
+                      }
                     List((id, summary))
                 }
               }

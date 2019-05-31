@@ -115,19 +115,19 @@ object TreeLossSummaryMain
 
           isoFirst.foreach { firstLetter =>
             featuresDF =
-              featuresDF.filter(substring($"gid_0", 0, 1) === firstLetter(0))
+              featuresDF.filter(substring($"iso", 0, 1) === firstLetter(0))
           }
 
           isoStart.foreach { startCode =>
-            featuresDF = featuresDF.filter($"gid_0" >= startCode)
+            featuresDF = featuresDF.filter($"iso" >= startCode)
           }
 
           isoEnd.foreach { endCode =>
-            featuresDF = featuresDF.filter($"gid_0" < endCode)
+            featuresDF = featuresDF.filter($"iso" < endCode)
           }
 
           iso.foreach { isoCode =>
-            featuresDF = featuresDF.filter($"gid_0" === isoCode)
+            featuresDF = featuresDF.filter($"iso" === isoCode)
           }
 
           admin1.foreach { admin1Code =>
@@ -147,10 +147,10 @@ object TreeLossSummaryMain
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
           val featureRDD: RDD[Feature[Geometry, GADMFeatureId]] =
             featuresDF.rdd.map { row: Row =>
-              val countryCode: String = row.getString(2)
-              val admin1: String = row.getString(3)
-              val admin2: String = row.getString(4)
-              val geom: Geometry = WKB.read(row.getString(5))
+              val countryCode: String = row.getString(1)
+              val admin1: String = row.getString(2)
+              val admin2: String = row.getString(3)
+              val geom: Geometry = WKB.read(row.getString(4))
               Feature(geom, GADMFeatureId(countryCode, admin1, admin2))
             }
 
