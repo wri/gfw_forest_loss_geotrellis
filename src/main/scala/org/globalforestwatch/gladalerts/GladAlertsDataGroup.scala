@@ -25,4 +25,5 @@ case class GladAlertsDataGroup(alertDate: LocalDate,
                                peruForestConcessions: String,
                                oilGas: Boolean,
                                mangroves2016: Boolean,
-                               intactForestLandscapes2016: Boolean)
+                               intactForestLandscapes2016: Boolean,
+                               braBiomes: String)

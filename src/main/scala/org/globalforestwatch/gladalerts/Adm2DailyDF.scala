@@ -51,6 +51,7 @@ object Adm2DailyDF {
         $"layers.oilGas" as "oil_gas",
         $"layers.mangroves2016" as "mangroves_2016",
         $"layers.intactForestLandscapes2016" as "ifl_2016",
+        $"layers.braBiomes" as "bra_biomes",
         $"alert_count",
         $"area_ha",
         $"co2_emissions_Mt"
@@ -85,6 +86,7 @@ object Adm2DailyDF {
         "oil_gas",
         "mangroves_2016",
         "ifl_2016",
+        "bra_biomes",
         "alert_count",
         "area_ha",
         "co2_emissions_Mt"
@@ -114,7 +116,8 @@ object Adm2DailyDF {
       $"per_forest_concession",
       $"oil_gas",
       $"mangroves_2016",
-      $"ifl_2016"
+      $"ifl_2016",
+      $"bra_biomes"
     )
       .agg(
         sum("alert_count") as "alert_count",

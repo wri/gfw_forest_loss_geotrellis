@@ -29,7 +29,8 @@ case class GladAlertsTile(
                            peruForestConcessions: PeruForestConcessions#OptionalITile,
                            oilGas: OilGas#OptionalITile,
                            mangroves2016: Mangroves2016#OptionalITile,
-                           intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile
+                           intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
+                           brazilBiomes: BrazilBiomes#OptionalITile
                          ) extends CellGrid {
   def cellType: CellType = glad.cellType
 

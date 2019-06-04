@@ -13,6 +13,7 @@ import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.globalforestwatch.features.GADMFeatureId
+import org.locationtech.jts.precision.GeometryPrecisionReducer
 
 object GladAlertsSummaryMain
     extends CommandApp(
@@ -114,19 +115,19 @@ object GladAlertsSummaryMain
 
             isoFirst.foreach { firstLetter =>
               featuresDF =
-                featuresDF.filter(substring($"gid_0", 0, 1) === firstLetter(0))
+                featuresDF.filter(substring($"iso", 0, 1) === firstLetter(0))
             }
 
             isoStart.foreach { startCode =>
-              featuresDF = featuresDF.filter($"gid_0" >= startCode)
+              featuresDF = featuresDF.filter($"iso" >= startCode)
             }
 
             isoEnd.foreach { endCode =>
-              featuresDF = featuresDF.filter($"gid_0" < endCode)
+              featuresDF = featuresDF.filter($"iso" < endCode)
             }
 
             iso.foreach { isoCode =>
-              featuresDF = featuresDF.filter($"gid_0" === isoCode)
+              featuresDF = featuresDF.filter($"iso" === isoCode)
             }
 
             admin1.foreach { admin1Code =>
@@ -141,17 +142,36 @@ object GladAlertsSummaryMain
               featuresDF = featuresDF.limit(n)
             }
 
-            //          featuresDF.select("gid_0").distinct().show()
-
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
             val featureRDD: RDD[Feature[Geometry, GADMFeatureId]] =
-              featuresDF.rdd.map { row: Row =>
-                val countryCode: String = row.getString(2)
-                val admin1: String = row.getString(3)
-                val admin2: String = row.getString(4)
-                val geom: Geometry = WKB.read(row.getString(5))
-                Feature(geom, GADMFeatureId(countryCode, admin1, admin2))
-              }
+              featuresDF.rdd.mapPartitions({
+                iter: Iterator[Row] =>
+                  for (i <- iter) yield {
+
+                    // We need to reduce geometry precision  a bit to avoid issues like reported here
+                    // https://github.com/locationtech/geotrellis/issues/2951
+                    //
+                    // Precision is set in src/main/resources/application.conf
+                    // Here we use a fixed precision type and scale 1e8
+                    // This is more than enough given that we work with 30 meter pixels
+                    // and geometries already simplified to 1e4
+
+                    val gpr = new GeometryPrecisionReducer(
+                      geotrellis.vector.GeomFactory.precisionModel
+                    )
+
+                    def reduce(
+                                gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
+                              )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
+                      geotrellis.vector.Geometry(gpr.reduce(g.jtsGeom))
+
+                    val countryCode: String = i.getString(1)
+                    val admin1: String = i.getString(2)
+                    val admin2: String = i.getString(3)
+                    val geom: Geometry = reduce(gpr)(WKB.read(i.getString(4)))
+                    Feature(geom, GADMFeatureId(countryCode, admin1, admin2))
+                  }
+              }, preservesPartitioning = true)
 
             val part = new HashPartitioner(
               partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
@@ -208,7 +228,8 @@ object GladAlertsSummaryMain
                             gladAlertsDataGroup.peruForestConcessions,
                             gladAlertsDataGroup.oilGas,
                             gladAlertsDataGroup.mangroves2016,
-                            gladAlertsDataGroup.intactForestLandscapes2016
+                            gladAlertsDataGroup.intactForestLandscapes2016,
+                            gladAlertsDataGroup.braBiomes
                           ),
                           gladAlertsData.totalAlerts,
                           gladAlertsData.totalArea,

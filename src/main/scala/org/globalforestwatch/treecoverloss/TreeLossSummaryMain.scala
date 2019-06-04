@@ -13,6 +13,7 @@ import cats.implicits._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
 import org.globalforestwatch.features.GADMFeatureId
+import org.locationtech.jts.precision.GeometryPrecisionReducer
 
 object TreeLossSummaryMain
   extends CommandApp(
@@ -146,13 +147,44 @@ object TreeLossSummaryMain
 
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
           val featureRDD: RDD[Feature[Geometry, GADMFeatureId]] =
-            featuresDF.rdd.map { row: Row =>
-              val countryCode: String = row.getString(1)
-              val admin1: String = row.getString(2)
-              val admin2: String = row.getString(3)
-              val geom: Geometry = WKB.read(row.getString(4))
-              Feature(geom, GADMFeatureId(countryCode, admin1, admin2))
-            }
+            featuresDF.rdd.mapPartitions({
+              iter: Iterator[Row] =>
+                for (i <- iter)
+                  yield {
+
+                    // We need to reduce geometry precision  a bit to avoid issues like reported here
+                    // https://github.com/locationtech/geotrellis/issues/2951
+                    //
+                    // Precision is set in src/main/resources/application.conf
+                    // Here we use a fixed precision type and scale 1e8
+                    // This is more than enough given that we work with 30 meter pixels
+                    // and geometries already simplified to 1e4
+
+                    val gpr = new GeometryPrecisionReducer(
+                      geotrellis.vector.GeomFactory.precisionModel
+                    )
+
+                    def reduce(
+                                gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
+                              )(
+                                g: geotrellis.vector.Geometry
+                              ): geotrellis.vector.Geometry =
+                      geotrellis.vector.Geometry(gpr.reduce(g.jtsGeom))
+
+                    val countryCode: String = i.getString(1)
+                    val admin1: String = i.getString(2)
+                    val admin2: String = i.getString(3)
+                    val geom: Geometry = try {
+                      reduce(gpr)(WKB.read(i.getString(4)))
+                    }
+                    catch {
+                      case ae: java.lang.AssertionError => println(s"There was an issue with Geometry {$countryCode} {$admin1} {$admin2}")
+                        throw ae
+                      case e: Throwable => throw e
+                    }
+                    Feature(geom, GADMFeatureId(countryCode, admin1, admin2))
+                  }
+            }, preservesPartitioning = true)
 
           val part = new HashPartitioner(
             partitions = featureRDD.getNumPartitions * inputPartitionMultiplier

@@ -56,6 +56,7 @@ object TreeLossRDD extends LazyLogging {
           // Doing things this way allows us to reuse resources and perform other optimizations
 
           // Grouping by spatial key allows us to minimize read thrashing from record to record
+
           val groupedByKey
           : Map[SpatialKey,
             Array[(SpatialKey, Feature[Geometry, GADMFeatureId])]] =
@@ -110,8 +111,12 @@ object TreeLossRDD extends LazyLogging {
                         )
                       } catch {
                         case ise: java.lang.IllegalStateException => {
-                          println(s"There are issue with geometry for ${feature.data.country} ${feature.data.admin1} ${feature.data.admin2}")
+                          println(s"There is an issue with geometry for ${feature.data.country} ${feature.data.admin1} ${feature.data.admin2}")
                           throw ise
+                        }
+                        case te: org.locationtech.jts.geom.TopologyException => {
+                          println(s"There is an issue with geometry Topology for ${feature.data.country} ${feature.data.admin1} ${feature.data.admin2}")
+                          throw te
                         }
                         case e: Throwable => throw e
 
