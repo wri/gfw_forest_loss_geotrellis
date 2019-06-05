@@ -146,24 +146,43 @@ object GladAlertsSummaryMain
             val featureRDD: RDD[Feature[Geometry, GADMFeatureId]] =
               featuresDF.rdd.mapPartitions({
                 iter: Iterator[Row] =>
-                  for (i <- iter) yield {
+                  // We need to reduce geometry precision  a bit to avoid issues like reported here
+                  // https://github.com/locationtech/geotrellis/issues/2951
+                  //
+                  // Precision is set in src/main/resources/application.conf
+                  // Here we use a fixed precision type and scale 1e8
+                  // This is more than enough given that we work with 30 meter pixels
+                  // and geometries already simplified to 1e11
 
-                    // We need to reduce geometry precision  a bit to avoid issues like reported here
-                    // https://github.com/locationtech/geotrellis/issues/2951
-                    //
-                    // Precision is set in src/main/resources/application.conf
-                    // Here we use a fixed precision type and scale 1e11
-                    // This is more than enough given that we work with 30 meter pixels
-                    // and geometries already simplified to 1e4
+                  val gpr = new GeometryPrecisionReducer(
+                    geotrellis.vector.GeomFactory.precisionModel
+                  )
 
-                    val gpr = new GeometryPrecisionReducer(
-                      geotrellis.vector.GeomFactory.precisionModel
-                    )
+                  def reduce(
+                              gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
+                            )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
+                    geotrellis.vector.Geometry(gpr.reduce(g.jtsGeom))
 
-                    def reduce(
-                                gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
-                              )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
-                      geotrellis.vector.Geometry(gpr.reduce(g.jtsGeom))
+                  def isValidGeom(wkb: String): Boolean = {
+                    val geom: Option[Geometry] = try {
+                      Some(reduce(gpr)(WKB.read(wkb)))
+                    } catch {
+                      case ae: java.lang.AssertionError =>
+                        println("There was an empty geometry")
+                        None
+                      case t: Throwable => throw t
+                    }
+
+                    geom match {
+                      case Some(g) => true
+                      case None => false
+                    }
+                  }
+
+                  for {
+                    i <- iter
+                    if isValidGeom(i.getString(4))
+                  } yield {
 
                     val countryCode: String = i.getString(1)
                     val admin1: String = i.getString(2)
