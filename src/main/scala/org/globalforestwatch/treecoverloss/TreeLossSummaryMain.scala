@@ -158,7 +158,7 @@ object TreeLossSummaryMain
                     // Precision is set in src/main/resources/application.conf
                     // Here we use a fixed precision type and scale 1e8
                     // This is more than enough given that we work with 30 meter pixels
-                    // and geometries already simplified to 1e4
+                    // and geometries already simplified to 1e11
 
                     val gpr = new GeometryPrecisionReducer(
                       geotrellis.vector.GeomFactory.precisionModel
