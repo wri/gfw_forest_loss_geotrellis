@@ -14,7 +14,7 @@ case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
   override def lookup(value: Int): (LocalDate, Boolean) = {
 
     val confidence = value >= 30000
-    val alertDate: LocalDate = {
+    val alertDate: Option[LocalDate] = {
 
       def isLeapYear(year: Int): Boolean = {
         implicit def int2boolRev(i: Int): Boolean = if (i > 0) false else true
@@ -30,13 +30,18 @@ case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
       val julianDate = DateTimeFormatter.ofPattern("yyyyDDD")
       val days: Int = if (confidence) value - 30000 else value - 20000
 
-      if (days < 0) null
-      else if (days == 0) LocalDate.parse(getDateString(365, 2014), julianDate)
-      else LocalDate.parse(getDateString(days, 2015), julianDate)
+      if (days < 0) None
+      else if (days == 0)
+        Some(LocalDate.parse(getDateString(365, 2014), julianDate))
+      else Some(LocalDate.parse(getDateString(days, 2015), julianDate))
 
     }
 
-    (alertDate, confidence)
+    alertDate match {
+      case Some(d: LocalDate) => (d, confidence)
+      case None => null
+    }
+
   }
 
 }
