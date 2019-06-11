@@ -149,7 +149,7 @@ sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-08458452c1d05713b")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 5
+sparkInstanceCount := 26
 sparkMasterType := "r5.12xlarge"
 sparkCoreType := "r5.12xlarge"
 sparkMasterEbsSize := Some(30)
@@ -163,7 +163,7 @@ sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
 sparkRunJobFlowRequest      := sparkRunJobFlowRequest.value.withTags(new Tag("Project", "Global Forest Watch"))
   .withTags(new Tag("Job", "Tree Cover Loss Analysis Geotrellis"))
                                                       .withTags(new Tag("Project Lead", "Thomas Maschler"))
-  .withTags(new Tag("Name", "geotrellis-treecoverloss-liz"))
+  .withTags(new Tag("Name", "geotrellis-treecoverloss"))
 sparkEmrConfigs             := List(
   EmrConfig("spark").withProperties(
     "maximizeResourceAllocation" -> "true"
@@ -197,9 +197,9 @@ sparkEmrConfigs             := List(
     "spark.yarn.executor.memoryOverhead" -> "5G",
     "spark.driver.cores" -> "5",
     "spark.driver.memory" -> "37G",
-    "spark.executor.instances" -> "44", //9 * 50 -1
-    "spark.default.parallelism" -> "440",
-    "spark.sql.shuffle.partitions" -> "440",
+    "spark.executor.instances" -> "224", //9 * 50 -1
+    "spark.default.parallelism" -> "2240",
+    "spark.sql.shuffle.partitions" -> "2240",
 
     "spark.driver.maxResultSize" -> "3G",
     "spark.shuffle.service.enabled" -> "true",
@@ -212,13 +212,15 @@ sparkEmrConfigs             := List(
     // TODO: bootstrap installation of gpl library to avoid
     //     ERROR GPLNativeCodeLoader: Could not load native gpl library
     //     java.lang.UnsatisfiedLinkError: no gplcompression in java.library.path
-    "spark.executor.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
-    "spark.driver.extraJavaOptions" -> "-Djava.library.path=/usr/local/lib -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
-    "spark.executorEnv.LD_LIBRARY_PATH" -> "/usr/local/lib"
+    //    -Djava.library.path=/usr/local/lib
+
+    "spark.executor.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
+    "spark.driver.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
+    //    "spark.executorEnv.LD_LIBRARY_PATH" -> "/usr/local/lib"
   ),
-  EmrConfig("spark-env").withProperties(
-    "LD_LIBRARY_PATH" -> "/usr/local/lib"
-  ),
+  //  EmrConfig("spark-env").withProperties(
+  //    "LD_LIBRARY_PATH" -> "/usr/local/lib"
+  //  ),
   EmrConfig("yarn-site").withProperties(
     //     Best practice 5: Always set the virtual and physical memory check flag to false.
     "yarn.resourcemanager.am.max-attempts" -> "1",

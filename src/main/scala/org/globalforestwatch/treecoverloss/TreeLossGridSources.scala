@@ -73,12 +73,10 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
       tcd2010Tile <- Either
         .catchNonFatal(treeCoverDensity2010.fetchWindow(window))
         .right
-      biomassTile <- Either
-        .catchNonFatal(biomassPerHectar.fetchWindow(window))
-        .right
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
+      val biomassTile = biomassPerHectar.fetchWindow(window)
       val mangroveBiomassTile = mangroveBiomass.fetchWindow(window)
       val driversTile = treeCoverLossDrivers.fetchWindow(window)
       val globalLandCoverTile = globalLandCover.fetchWindow(window)
