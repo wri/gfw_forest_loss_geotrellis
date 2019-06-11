@@ -10,7 +10,7 @@ import org.globalforestwatch.layers._
   */
 case class GladAlertsTile(
                            glad: GladAlerts#ITile,
-                           biomass: BiomassPerHectar#DTile,
+                           biomass: BiomassPerHectar#OptionalDTile,
                            climateMask: ClimateMask#OptionalITile,
                            primaryForest: PrimaryForest#OptionalITile,
                            protectedAreas: ProtectedAreas#OptionalITile,
