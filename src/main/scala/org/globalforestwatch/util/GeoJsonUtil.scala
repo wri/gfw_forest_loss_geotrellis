@@ -10,7 +10,7 @@ import java.net.URL
 import java.security.InvalidParameterException
 import java.util.zip.ZipInputStream
 
-import geotrellis.vector._
+import geotrellis.vector.io._
 import geotrellis.vector.{Feature, Geometry, Polygon}
 import org.apache.log4j.Logger
 

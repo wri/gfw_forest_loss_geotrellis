@@ -6,6 +6,6 @@ import geotrellis.vector.Extent
 
 trait GridSources extends LazyLogging {
 
-  def readWindow(window: Extent): Either[Throwable, Raster[CellGrid[Int]]]
+  def readWindow(window: Extent): Either[Throwable, Raster[CellGrid]]
 
 }

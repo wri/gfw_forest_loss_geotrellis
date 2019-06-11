@@ -10,7 +10,7 @@ import org.globalforestwatch.layers._
   */
 case class TreeLossTile(loss: TreeCoverLoss#ITile,
                         tcd2010: TreeCoverDensity2010_60#ITile)
-    extends CellGrid[Int] {
+  extends CellGrid {
   def cellType: CellType = loss.cellType
   def cols: Int = loss.cols
   def rows: Int = loss.rows

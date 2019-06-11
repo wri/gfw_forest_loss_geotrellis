@@ -13,6 +13,7 @@ import cats.implicits._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
 import org.globalforestwatch.features.GADMFeatureId
+import org.locationtech.jts.precision.GeometryPrecisionReducer
 
 object TreeLossSummaryMain
   extends CommandApp(
@@ -115,19 +116,19 @@ object TreeLossSummaryMain
 
           isoFirst.foreach { firstLetter =>
             featuresDF =
-              featuresDF.filter(substring($"gid_0", 0, 1) === firstLetter(0))
+              featuresDF.filter(substring($"iso", 0, 1) === firstLetter(0))
           }
 
           isoStart.foreach { startCode =>
-            featuresDF = featuresDF.filter($"gid_0" >= startCode)
+            featuresDF = featuresDF.filter($"iso" >= startCode)
           }
 
           isoEnd.foreach { endCode =>
-            featuresDF = featuresDF.filter($"gid_0" < endCode)
+            featuresDF = featuresDF.filter($"iso" < endCode)
           }
 
           iso.foreach { isoCode =>
-            featuresDF = featuresDF.filter($"gid_0" === isoCode)
+            featuresDF = featuresDF.filter($"iso" === isoCode)
           }
 
           admin1.foreach { admin1Code =>
@@ -146,13 +147,53 @@ object TreeLossSummaryMain
 
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
           val featureRDD: RDD[Feature[Geometry, GADMFeatureId]] =
-            featuresDF.rdd.map { row: Row =>
-              val countryCode: String = row.getString(2)
-              val admin1: String = row.getString(3)
-              val admin2: String = row.getString(4)
-              val geom: Geometry = WKB.read(row.getString(5))
-              Feature(geom, GADMFeatureId(countryCode, admin1, admin2))
-            }
+            featuresDF.rdd.mapPartitions({
+              iter: Iterator[Row] =>
+                // We need to reduce geometry precision  a bit to avoid issues like reported here
+                // https://github.com/locationtech/geotrellis/issues/2951
+                //
+                // Precision is set in src/main/resources/application.conf
+                // Here we use a fixed precision type and scale 1e8
+                // This is more than enough given that we work with 30 meter pixels
+                // and geometries already simplified to 1e11
+
+                val gpr = new GeometryPrecisionReducer(
+                  geotrellis.vector.GeomFactory.precisionModel
+                )
+
+                def reduce(
+                            gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
+                          )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
+                  geotrellis.vector.Geometry(gpr.reduce(g.jtsGeom))
+
+                def isValidGeom(wkb: String): Boolean = {
+                  val geom: Option[Geometry] = try {
+                    Some(reduce(gpr)(WKB.read(wkb)))
+                  } catch {
+                    case ae: java.lang.AssertionError =>
+                      println("There was an empty geometry")
+                      None
+                    case t: Throwable => throw t
+                  }
+
+                  geom match {
+                    case Some(g) => true
+                    case None => false
+                  }
+                }
+
+                for {
+                  i <- iter
+                  if isValidGeom(i.getString(4))
+                } yield {
+
+                    val countryCode: String = i.getString(1)
+                    val admin1: String = i.getString(2)
+                    val admin2: String = i.getString(3)
+                  val geom: Geometry = reduce(gpr)(WKB.read(i.getString(4)))
+                    Feature(geom, GADMFeatureId(countryCode, admin1, admin2))
+                  }
+            }, preservesPartitioning = true)
 
           val part = new HashPartitioner(
             partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
@@ -319,8 +360,8 @@ object TreeLossSummaryMain
           val apiDF = adm2DF
             .transform(ApiDF.setNull)
 
-          adm2DF.unpersist()
           apiDF.cache()
+          adm2DF.unpersist()
 
           val adm2ApiDF = apiDF
             .transform(Adm2ApiDF.nestYearData)
@@ -343,8 +384,8 @@ object TreeLossSummaryMain
           val tempApiDF = apiDF
             .transform(Adm1ApiDF.sumArea)
 
-          adm2DF.unpersist()
           tempApiDF.cache()
+          apiDF.unpersist()
 
           val adm1ApiDF = tempApiDF
             .transform(Adm1ApiDF.nestYearData)
@@ -368,6 +409,8 @@ object TreeLossSummaryMain
             .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
             .write
             .text(runOutputUrl + "/api/iso")
+
+          tempApiDF.unpersist()
 
           spark.stop
       }

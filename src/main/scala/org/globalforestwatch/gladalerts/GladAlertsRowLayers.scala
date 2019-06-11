@@ -18,4 +18,5 @@ case class GladAlertsRowLayers(climateMask: Boolean,
                                peruForestConcessions: String,
                                oilGas: Boolean,
                                mangroves2016: Boolean,
-                               intactForestLandscapes2016: Boolean)
+                               intactForestLandscapes2016: Boolean,
+                               braBiomes: String)

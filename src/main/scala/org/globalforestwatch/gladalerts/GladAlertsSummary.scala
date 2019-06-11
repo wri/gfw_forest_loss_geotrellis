@@ -62,6 +62,7 @@ object GladAlertsSummary {
             raster.tile.mangroves2016.getData(col, row)
           val intactForestLandscapes2016: Boolean =
             raster.tile.intactForestLandscapes2016.getData(col, row)
+          val braBiomes: String = raster.tile.brazilBiomes.getData(col, row)
 
           val cols: Int = raster.rasterExtent.cols
           val rows: Int = raster.rasterExtent.rows
@@ -105,7 +106,8 @@ object GladAlertsSummary {
                   peruForestConcessions,
                   oilGas,
                   mangroves2016,
-                  intactForestLandscapes2016
+                  intactForestLandscapes2016,
+                  braBiomes
                 )
 
               val summary: GladAlertsData =

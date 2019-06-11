@@ -59,10 +59,10 @@ object Adm2ApiDF {
       $"extent_2010",
       $"total_gain",
       $"total_biomass",
-      $"avg_biomass_per_ha",
+      $"avg_biomass_per_ha" * $"extent_2000" as "weighted_biomass_per_ha",
       $"total_co2",
       $"total_mangrove_biomass",
-      $"avg_mangrove_biomass_per_ha",
+      $"avg_mangrove_biomass_per_ha" * $"extent_2000" as "weighted_mangrove_biomass_per_ha",
       $"total_mangrove_co2",
       array(
         struct(

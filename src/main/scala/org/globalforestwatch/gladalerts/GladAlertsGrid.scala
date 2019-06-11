@@ -12,7 +12,7 @@ object GladAlertsGrid extends TenByTenGrid[GladAlertsGridSources] {
   def checkSources(gridId: String, windowExtent: Extent): GladAlertsGridSources = {
     val sources = getSources(gridId)
     checkRequired(sources.gladAlerts, windowExtent)
-    checkRequired(sources.biomassPerHectar, windowExtent)
+    checkOptional(sources.biomassPerHectar, windowExtent)
     checkOptional(sources.climateMask, windowExtent)
     checkOptional(sources.primaryForest, windowExtent)
     checkOptional(sources.protectedAreas, windowExtent)
@@ -32,6 +32,7 @@ object GladAlertsGrid extends TenByTenGrid[GladAlertsGridSources] {
     checkOptional(sources.oilPalm, windowExtent)
     checkOptional(sources.mangroves2016, windowExtent)
     checkOptional(sources.intactForestLandscapes2016, windowExtent)
+    checkOptional(sources.braBiomes, windowExtent)
 
     sources
   }

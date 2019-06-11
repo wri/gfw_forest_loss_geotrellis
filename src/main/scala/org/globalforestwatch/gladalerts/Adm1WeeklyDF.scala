@@ -38,6 +38,7 @@ object Adm1WeeklyDF {
         "oil_gas",
         "mangroves_2016",
         "ifl_2016",
+        "bra_biomes",
         "alert_count",
         "area_ha",
         "co2_emissions_Mt"
@@ -67,7 +68,8 @@ object Adm1WeeklyDF {
       $"per_forest_concession",
       $"oil_gas",
       $"mangroves_2016",
-      $"ifl_2016"
+      $"ifl_2016",
+      $"bra_biomes"
     )
       .agg(
         sum("alert_count") as "alert_count",

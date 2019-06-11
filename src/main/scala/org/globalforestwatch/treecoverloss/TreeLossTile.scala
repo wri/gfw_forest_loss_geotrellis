@@ -55,7 +55,7 @@ case class TreeLossTile(
                          resourceRights: ResourceRights#OptionalITile,
                          logging: Logging#OptionalITile,
                          oilGas: OilGas#OptionalITile
-                       ) extends CellGrid[Int] {
+                       ) extends CellGrid {
   def cellType: CellType = loss.cellType
 
   def cols: Int = loss.cols
