@@ -133,7 +133,7 @@ object CarbonFluxSummary {
                   0,
                   StreamingHistogram(size = 50),
                   0,
-                  StreamingHistogram(size = 250),
+                  StreamingHistogram(size = 275),
                   0,
                   StreamingHistogram(size = 5000),
                   0,
