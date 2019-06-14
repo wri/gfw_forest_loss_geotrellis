@@ -8,7 +8,6 @@ import geotrellis.vector._
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.util.AnalysisRDD
 
-
 object TreeLossRDD extends AnalysisRDD {
 
   type SOURCES = TreeLossGridSources
@@ -22,7 +21,7 @@ object TreeLossRDD extends AnalysisRDD {
     }
   }
 
-  def readWindow(rs: TreeLossGridSources,
+  def readWindow(rs: SOURCES,
                  window: Extent): Either[Throwable, Raster[TILE]] =
     rs.readWindow(window)
 
