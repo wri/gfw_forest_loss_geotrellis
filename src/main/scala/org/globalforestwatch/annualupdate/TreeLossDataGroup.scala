@@ -1,6 +1,7 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.annualupdate
 
-case class TreeLossRowLayers(drivers: String,
+case class TreeLossDataGroup(threshold: Integer,
+                             drivers: String,
                              globalLandCover: String,
                              primaryForest: Boolean,
                              idnPrimaryForest: Boolean,

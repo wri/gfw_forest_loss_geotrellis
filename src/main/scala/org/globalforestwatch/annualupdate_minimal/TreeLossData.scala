@@ -1,4 +1,4 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.annualupdate_minimal
 
 import cats.Semigroup
 import geotrellis.raster.histogram.StreamingHistogram
@@ -8,15 +8,18 @@ import geotrellis.raster.histogram.StreamingHistogram
   * Note: This case class contains mutable values
   */
 case class TreeLossData(
-                         var lossYear: scala.collection.mutable.Map[Int, TreeLossYearData],
-                         var extent2000: Double,
-                         var extent2010: Double,
-                         var totalArea: Double,
-                         var totalGainArea: Double,
-                         var totalBiomass: Double,
-                         var totalCo2: Double,
-                         var biomassHistogram: StreamingHistogram
-                       ) {
+  var lossYear: scala.collection.mutable.Map[Int, TreeLossYearData],
+  var extent2000: Double,
+  var extent2010: Double,
+  var totalArea: Double,
+  var totalGainArea: Double,
+  var totalBiomass: Double,
+  var totalCo2: Double,
+  var biomassHistogram: StreamingHistogram
+//                         var totalMangroveBiomass: Double,
+//                         var totalMangroveCo2: Double,
+//                         var mangroveBiomassHistogram: StreamingHistogram
+) {
   def merge(other: TreeLossData): TreeLossData = {
 
     TreeLossData(
@@ -27,6 +30,8 @@ case class TreeLossData(
           otherLoss.area_loss += loss.area_loss
           otherLoss.biomass_loss += loss.biomass_loss
           otherLoss.carbon_emissions += loss.carbon_emissions
+//          otherLoss.mangrove_biomass_loss += loss.mangrove_biomass_loss
+//          otherLoss.mangrove_carbon_emissions += loss.mangrove_carbon_emissions
           k -> otherLoss
         }
       },
@@ -37,6 +42,9 @@ case class TreeLossData(
       totalBiomass + other.totalBiomass,
       totalCo2 + other.totalCo2,
       biomassHistogram.merge(other.biomassHistogram)
+//      totalMangroveBiomass + other.totalMangroveBiomass,
+//      totalMangroveCo2 + other.totalMangroveBiomass,
+//      mangroveBiomassHistogram.merge(other.mangroveBiomassHistogram)
     )
   }
 }

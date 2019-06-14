@@ -1,4 +1,4 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.annualupdate
 
 
 import org.scalatest.FunSuite

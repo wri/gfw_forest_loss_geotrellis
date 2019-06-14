@@ -1,4 +1,4 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.annualupdate_minimal
 
 import scala.collection.mutable.Map
 

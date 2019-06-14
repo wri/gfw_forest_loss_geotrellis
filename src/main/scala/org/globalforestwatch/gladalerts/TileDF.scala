@@ -2,7 +2,7 @@ package org.globalforestwatch.gladalerts
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{SparkSession, _}
-import org.globalforestwatch.treecoverloss.TreeLossSparkSession
+import org.globalforestwatch.annualupdate.TreeLossSparkSession
 
 object TileDF {
 
