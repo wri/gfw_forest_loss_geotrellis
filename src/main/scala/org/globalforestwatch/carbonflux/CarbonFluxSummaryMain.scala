@@ -328,18 +328,28 @@ object CarbonFluxSummaryMain
 
             summaryDF.repartition($"feature_id", $"threshold")
 
+            val csvOptions = Map(
+              "header" -> "true",
+              "delimiter" -> "\t",
+              "quote" -> "\u0000",
+              "quoteMode" -> "NONE",
+              "nullValue" -> "\u0000"
+            )
+
             val apiDF = summaryDF
               .transform(ApiDF.unpackValues)
-              .transform(ApiDF.setNull)
-
-            val adm2ApiDF = apiDF
-              .transform(Adm2ApiDF.nestYearData)
-
-            adm2ApiDF
-            .toJSON
-              .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
+              //              .transform(ApiDF.setNull)
+              .coalesce(50)
+              .orderBy(
+                $"iso",
+                $"adm1",
+                $"adm2",
+                $"threshold"
+              )
               .write
-              .text(runOutputUrl + "/api/adm2")
+              .options(csvOptions)
+              .csv(path = runOutputUrl + "/summary/adm2")
+
 
             spark.stop
         }
