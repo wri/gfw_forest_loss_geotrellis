@@ -6,12 +6,13 @@ import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
 import org.apache.spark.rdd.RDD
+import org.globalforestwatch.features.SimpleFeatureId
 import org.globalforestwatch.util.AnalysisRDD
 
 object TreeLossRDD extends AnalysisRDD {
 
   type SOURCES = TreeLossGridSources
-  type FEATUREID = Int
+  type FEATUREID = SimpleFeatureId
   type SUMMARY = TreeLossSummary
   type TILE = TreeLossTile
 

@@ -11,7 +11,7 @@ import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.grids.GridSources
 
-trait AnalysisRDD extends LazyLogging {
+trait AnalysisRDD extends LazyLogging with java.io.Serializable {
 
   type SOURCES <: GridSources
   type FEATUREID

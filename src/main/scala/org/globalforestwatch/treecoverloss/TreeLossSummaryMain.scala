@@ -5,13 +5,13 @@ import java.time.format.DateTimeFormatter
 
 import cats.implicits._
 import com.monovore.decline.{CommandApp, Opts}
-import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
-import org.locationtech.jts.precision.GeometryPrecisionReducer
+import org.globalforestwatch.features.{SimpleFeature, SimpleFeatureFilter, SimpleFeatureId}
+
 
 object TreeLossSummaryMain
   extends CommandApp(
@@ -53,7 +53,7 @@ object TreeLossSummaryMain
 
       val idStartOpt =
         Opts
-          .option[String](
+          .option[Int](
           "id_start",
           help = "Filter by Feature IDs larger than or equal to given value"
         )
@@ -61,7 +61,7 @@ object TreeLossSummaryMain
 
       val idEndOpt =
         Opts
-          .option[String](
+          .option[Int](
           "id_end",
           help = "Filter by Feature IDs smaller than given value"
         )
@@ -97,6 +97,7 @@ object TreeLossSummaryMain
           var featuresDF: DataFrame = spark.read
             .options(Map("header" -> "true", "delimiter" -> "\t"))
             .csv(featureUris.toList: _*)
+            .transform(SimpleFeatureFilter.filter(idStart, idEnd, limit)(spark))
 
           idStart.foreach { startID =>
             featuresDF = featuresDF.filter($"fid" >= startID)
@@ -113,58 +114,21 @@ object TreeLossSummaryMain
           //          featuresDF.select("gid_0").distinct().show()
 
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
-          val featureRDD: RDD[Feature[Geometry, Int]] =
-            featuresDF.rdd.mapPartitions({
-              iter: Iterator[Row] =>
-                // We need to reduce geometry precision  a bit to avoid issues like reported here
-                // https://github.com/locationtech/geotrellis/issues/2951
-                //
-                // Precision is set in src/main/resources/application.conf
-                // Here we use a fixed precision type and scale 1e8
-                // This is more than enough given that we work with 30 meter pixels
-                // and geometries already simplified to 1e11
-
-                val gpr = new GeometryPrecisionReducer(
-                  geotrellis.vector.GeomFactory.precisionModel
-                )
-
-                def reduce(
-                            gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
-                          )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
-                  geotrellis.vector.Geometry(gpr.reduce(g.jtsGeom))
-
-                def isValidGeom(wkb: String): Boolean = {
-                  val geom: Option[Geometry] = try {
-                    Some(reduce(gpr)(WKB.read(wkb)))
-                  } catch {
-                    case ae: java.lang.AssertionError =>
-                      println("There was an empty geometry")
-                      None
-                    case t: Throwable => throw t
-                  }
-
-                  geom match {
-                    case Some(g) => true
-                    case None => false
-                  }
-                }
-
+          val featureRDD: RDD[Feature[Geometry, SimpleFeatureId]] =
+            featuresDF.rdd.mapPartitions({ iter: Iterator[Row] =>
                 for {
                   i <- iter
-                  if isValidGeom(i.getString(1))
+                  if SimpleFeature.isValidGeom(i)
                 } yield {
-
-                  val featureid: Int = i.getInt(0)
-                  val geom: Geometry = reduce(gpr)(WKB.read(i.getString(1)))
-                  Feature(geom, featureid)
-                  }
+                  SimpleFeature.getFeature(i)
+                }
             }, preservesPartitioning = true)
 
           val part = new HashPartitioner(
             partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
           )
 
-          val summaryRDD: RDD[(Int, TreeLossSummary)] =
+          val summaryRDD: RDD[(SimpleFeatureId, TreeLossSummary)] =
             TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, part)
 
           val summaryDF =
@@ -175,7 +139,7 @@ object TreeLossSummaryMain
                     case (lossDataGroup, lossData) => {
 
                       TreeLossRow(
-                        id,
+                        id.cell_id,
                         lossDataGroup.threshold,
                           lossDataGroup.primaryForest,
                         lossData.extent2000,

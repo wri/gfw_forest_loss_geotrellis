@@ -6,13 +6,12 @@ import org.apache.spark.sql.functions._
 
 object ApiDF {
 
-  val spark: SparkSession = CarbonFluxSparkSession()
-
-  import spark.implicits._
 
   private def setZeroNull(column: Column): Column = when(column =!= 0.0, column)
 
-  def unpackValues(df: DataFrame): DataFrame = {
+  def unpackValues(spark: SparkSession)(df: DataFrame): DataFrame = {
+
+    import spark.implicits._
 
     validatePresenceOfColumns(
       df,
@@ -256,8 +255,8 @@ object ApiDF {
     )
   }
 
-  def setNull(df: DataFrame): DataFrame = {
-
+  def setNull(spark: SparkSession)(df: DataFrame): DataFrame = {
+    import spark.implicits._
     val zeroColumns = df
       .select(
         "extent_2000",

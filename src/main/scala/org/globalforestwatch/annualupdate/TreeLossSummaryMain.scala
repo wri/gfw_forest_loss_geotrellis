@@ -12,7 +12,7 @@ import org.apache.spark.sql.functions._
 import cats.implicits._
 import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
-import org.globalforestwatch.features.GADMFeatureId
+import org.globalforestwatch.features.GadmFeatureId
 import org.locationtech.jts.precision.GeometryPrecisionReducer
 
 object TreeLossSummaryMain
@@ -146,7 +146,7 @@ object TreeLossSummaryMain
             //          featuresDF.select("gid_0").distinct().show()
 
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
-            val featureRDD: RDD[Feature[Geometry, GADMFeatureId]] =
+            val featureRDD: RDD[Feature[Geometry, GadmFeatureId]] =
               featuresDF.rdd.mapPartitions({
                 iter: Iterator[Row] =>
                   // We need to reduce geometry precision  a bit to avoid issues like reported here
@@ -191,7 +191,7 @@ object TreeLossSummaryMain
                     val admin1: String = i.getString(2)
                     val admin2: String = i.getString(3)
                     val geom: Geometry = reduce(gpr)(WKB.read(i.getString(4)))
-                    Feature(geom, GADMFeatureId(countryCode, admin1, admin2))
+                    Feature(geom, GadmFeatureId(countryCode, admin1, admin2))
                   }
               }, preservesPartitioning = true)
 
@@ -199,7 +199,7 @@ object TreeLossSummaryMain
               partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
             )
 
-            val summaryRDD: RDD[(GADMFeatureId, TreeLossSummary)] =
+            val summaryRDD: RDD[(GadmFeatureId, TreeLossSummary)] =
               TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, part)
 
             val summaryDF =

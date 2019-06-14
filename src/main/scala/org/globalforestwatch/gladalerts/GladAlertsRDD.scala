@@ -7,12 +7,12 @@ import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.util.AnalysisRDD
-import org.globalforestwatch.features.GADMFeatureId
+import org.globalforestwatch.features.GadmFeatureId
 
 object GladAlertsRDD extends AnalysisRDD {
 
   type SOURCES = GladAlertsGridSources
-  type FEATUREID = GADMFeatureId
+  type FEATUREID = GadmFeatureId
   type SUMMARY = GladAlertsSummary
   type TILE = GladAlertsTile
 
