@@ -108,11 +108,11 @@ object TreeLossRDD extends LazyLogging {
                         )
                       } catch {
                         case ise: java.lang.IllegalStateException => {
-                          println(s"There is an issue with geometry for ${feature.data.country} ${feature.data.admin1} ${feature.data.admin2}")
+                          println(s"There is an issue with geometry for ${feature.data}")
                           throw ise
                         }
                         case te: org.locationtech.jts.geom.TopologyException => {
-                          println(s"There is an issue with geometry Topology for ${feature.data.country} ${feature.data.admin1} ${feature.data.admin2}")
+                          println(s"There is an issue with geometry Topology for ${feature.data}")
                           throw te
                         }
                         case e: Throwable => throw e

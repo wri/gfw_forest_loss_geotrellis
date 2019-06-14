@@ -18,7 +18,7 @@ object TreeLossGrid extends TenByTenGrid[TreeLossGridSources] {
     checkRequired(sources.treeCoverGain, windowExtent)
     checkRequired(sources.treeCoverDensity2000, windowExtent)
     checkRequired(sources.treeCoverDensity2010, windowExtent)
-    checkRequired(sources.biomassPerHectar, windowExtent)
+    checkOptional(sources.biomassPerHectar, windowExtent)
 
     checkOptional(sources.mangroveBiomass, windowExtent)
     checkOptional(sources.treeCoverLossDrivers, windowExtent)
