@@ -338,8 +338,8 @@ object CarbonFluxSummaryMain
 
             val apiDF = summaryDF
               .transform(ApiDF.unpackValues)
-              //              .transform(ApiDF.setNull)
-              .coalesce(50)
+              //              //              .transform(ApiDF.setNull)
+              //              .coalesce(50)
               .orderBy(
                 $"iso",
                 $"adm1",
