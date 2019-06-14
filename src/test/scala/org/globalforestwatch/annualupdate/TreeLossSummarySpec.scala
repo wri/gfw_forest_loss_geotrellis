@@ -1,4 +1,4 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.annualupdate
 
 import geotrellis.contrib.polygonal._
 import geotrellis.contrib.vlm.geotiff._

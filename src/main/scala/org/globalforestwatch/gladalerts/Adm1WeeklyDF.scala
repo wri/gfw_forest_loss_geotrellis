@@ -3,7 +3,7 @@ package org.globalforestwatch.gladalerts
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{SparkSession, _}
-import org.globalforestwatch.treecoverloss.TreeLossSparkSession
+import org.globalforestwatch.annualupdate.TreeLossSparkSession
 
 object Adm1WeeklyDF {
 

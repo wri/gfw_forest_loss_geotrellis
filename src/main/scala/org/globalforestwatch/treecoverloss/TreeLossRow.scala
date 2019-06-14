@@ -1,9 +1,9 @@
 package org.globalforestwatch.treecoverloss
 
 case class TreeLossRow(
-                        lossRowFeatureId: TreeLossRowFeatureId,
-                        threshold: Integer,
-                        layers: TreeLossRowLayers,
+                        featureId: Int,
+                        threshold: Int,
+                        primaryForest: Boolean,
                         extent2000: Double,
                         extent2010: Double,
                         totalArea: Double,
@@ -11,7 +11,4 @@ case class TreeLossRow(
                         totalBiomass: Double,
                         totalCo2: Double,
                         meanBiomass: Option[Double],
-                        totalMangroveBiomass: Double,
-                        totalMangroveCo2: Double,
-                        meanMangroveBiomass: Option[Double],
                         yearData: List[TreeLossYearData])

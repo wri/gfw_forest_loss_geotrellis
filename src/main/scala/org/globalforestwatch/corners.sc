@@ -37,7 +37,7 @@ Array(left, bottom, right, top).mkString("_")
 
 import geotrellis.vector.Point
 import org.globalforestwatch.gladalerts.GladAlertsGrid
-import org.globalforestwatch.treecoverloss._
+import org.globalforestwatch.annualupdate._
 
 val a = myTest.testVal
 

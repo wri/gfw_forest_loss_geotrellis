@@ -1,4 +1,4 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.annualupdate
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._

@@ -1,9 +1,9 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.annualupdate
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
-object IsoSummaryDF {
+object Adm1SummaryDF {
 
   val spark: SparkSession = TreeLossSparkSession()
 
@@ -11,7 +11,7 @@ object IsoSummaryDF {
 
   def sumArea(df: DataFrame): DataFrame = {
 
-    df.groupBy($"iso", $"threshold")
+    df.groupBy($"iso", $"adm1", $"threshold")
       .agg(
         sum("area_ha") as "area_ha",
         sum("extent_2000_ha") as "extent_2000_ha",
@@ -82,6 +82,7 @@ object IsoSummaryDF {
   def roundValues(df: DataFrame): DataFrame = {
     df.select(
       $"iso" as "country",
+      $"adm1" as "subnational1",
       $"threshold",
       round($"area_ha") as "area_ha",
       round($"extent_2000_ha") as "extent_2000_ha",
