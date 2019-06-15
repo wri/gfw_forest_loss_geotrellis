@@ -20,7 +20,7 @@ object GadmFeature extends java.io.Serializable {
       GeometryReducer.reduce(GeometryReducer.gpr)(
         WKB.read(i.getString(geomPos))
       )
-    SimpleFeature(geom, GadmFeatureId(countryCode, admin1, admin2))
+    Feature(geom, GadmFeatureId(countryCode, admin1, admin2))
   }
 
   def isValidGeom(i: Row): Boolean = {

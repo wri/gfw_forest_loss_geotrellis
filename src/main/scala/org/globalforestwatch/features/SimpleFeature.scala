@@ -16,7 +16,7 @@ object SimpleFeature extends java.io.Serializable {
       GeometryReducer.reduce(GeometryReducer.gpr)(
         WKB.read(i.getString(geomPos))
       )
-    SimpleFeature(geom, SimpleFeatureId(feature_id))
+    Feature(geom, SimpleFeatureId(feature_id))
   }
 
   def isValidGeom(i: Row): Boolean = {
