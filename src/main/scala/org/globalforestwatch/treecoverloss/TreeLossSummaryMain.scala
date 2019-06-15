@@ -94,24 +94,10 @@ object TreeLossSummaryMain
           import spark.implicits._
 
           // ref: https://github.com/databricks/spark-csv
-          var featuresDF: DataFrame = spark.read
+          val featuresDF: DataFrame = spark.read
             .options(Map("header" -> "true", "delimiter" -> "\t"))
             .csv(featureUris.toList: _*)
             .transform(SimpleFeatureFilter.filter(idStart, idEnd, limit)(spark))
-
-          idStart.foreach { startID =>
-            featuresDF = featuresDF.filter($"fid" >= startID)
-          }
-
-          idEnd.foreach { endID =>
-            featuresDF = featuresDF.filter($"fid" < endID)
-          }
-
-          limit.foreach { n =>
-            featuresDF = featuresDF.limit(n)
-          }
-
-          //          featuresDF.select("gid_0").distinct().show()
 
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
           val featureRDD: RDD[Feature[Geometry, SimpleFeatureId]] =
