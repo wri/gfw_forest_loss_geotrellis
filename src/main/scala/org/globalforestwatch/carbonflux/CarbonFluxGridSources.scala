@@ -11,38 +11,38 @@ import org.globalforestwatch.layers._
   */
 case class CarbonFluxGridSources(gridId: String) extends GridSources {
 
-  lazy val treeCoverLoss = TreeCoverLoss(gridId)
-  lazy val treeCoverDensity2000 = TreeCoverDensity2000(gridId)
+  val treeCoverLoss = TreeCoverLoss(gridId)
+  val treeCoverDensity2000 = TreeCoverDensity2000(gridId)
 
-  lazy val biomassPerHectar = BiomassPerHectar(gridId)
-  lazy val grossAnnualRemovalsCarbon = GrossAnnualRemovalsCarbon(gridId)
-  lazy val grossCumulRemovalsCarbon = GrossCumulRemovalsCarbon(gridId)
-  lazy val netFluxCo2 = NetFluxCo2(gridId)
+  val biomassPerHectar = BiomassPerHectar(gridId)
+  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsCarbon(gridId)
+  val grossCumulRemovalsCarbon = GrossCumulRemovalsCarbon(gridId)
+  val netFluxCo2 = NetFluxCo2(gridId)
 
-  lazy val agcEmisYear = AgcEmisYear(gridId)
-  lazy val bgcEmisYear = BgcEmisYear(gridId)
-  lazy val deadwoodCarbonEmisYear = DeadwoodCarbonEmisYear(gridId)
-  lazy val litterCarbonEmisYear = LitterCarbonEmisYear(gridId)
-  lazy val soilCarbonEmisYear = SoilCarbonEmisYear(gridId)
-  lazy val totalCarbonEmisYear = TotalCarbonEmisYear(gridId)
+  val agcEmisYear = AgcEmisYear(gridId)
+  val bgcEmisYear = BgcEmisYear(gridId)
+  val deadwoodCarbonEmisYear = DeadwoodCarbonEmisYear(gridId)
+  val litterCarbonEmisYear = LitterCarbonEmisYear(gridId)
+  val soilCarbonEmisYear = SoilCarbonEmisYear(gridId)
+  val totalCarbonEmisYear = TotalCarbonEmisYear(gridId)
 
-  lazy val agc2000 = Agc2000(gridId)
-  lazy val bgc2000 = Bgc2000(gridId)
-  lazy val deadwoodCarbon2000 = DeadwoodCarbon2000(gridId)
-  lazy val litterCarbon2000 = LitterCarbon2000(gridId)
-  lazy val soilCarbon2000 = SoilCarbon2000(gridId)
-  lazy val totalCarbon2000 = TotalCarbon2000(gridId)
+  val agc2000 = Agc2000(gridId)
+  val bgc2000 = Bgc2000(gridId)
+  val deadwoodCarbon2000 = DeadwoodCarbon2000(gridId)
+  val litterCarbon2000 = LitterCarbon2000(gridId)
+  val soilCarbon2000 = SoilCarbon2000(gridId)
+  val totalCarbon2000 = TotalCarbon2000(gridId)
 
-  lazy val grossEmissionsCo2 = GrossEmissionsCo2(gridId)
+  val grossEmissionsCo2 = GrossEmissionsCo2(gridId)
 
-  lazy val treeCoverGain = TreeCoverGain(gridId)
-  lazy val mangroveBiomassExtent = MangroveBiomassExtent(gridId)
-  lazy val treeCoverLossDrivers = TreeCoverLossDrivers(gridId)
-  lazy val ecozones = Ecozones(gridId)
-  lazy val protectedAreas = ProtectedAreas(gridId)
-  lazy val landRights = LandRights(gridId)
-  lazy val intactForestLandscapes = IntactForestLandscapes(gridId)
-  lazy val plantations = Plantations(gridId)
+  val treeCoverGain = TreeCoverGain(gridId)
+  val mangroveBiomassExtent = MangroveBiomassExtent(gridId)
+  val treeCoverLossDrivers = TreeCoverLossDrivers(gridId)
+  val ecozones = Ecozones(gridId)
+  val protectedAreas = ProtectedAreas(gridId)
+  val landRights = LandRights(gridId)
+  val intactForestLandscapes = IntactForestLandscapes(gridId)
+  val plantations = Plantations(gridId)
 
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonFluxTile]] = {
 
@@ -128,9 +128,9 @@ object CarbonFluxGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, CarbonFluxGridSources]
 
-  def getCachedSources(grid: String): CarbonFluxGridSources = {
+  def getCachedSources(gridId: String): CarbonFluxGridSources = {
 
-    cache.getOrElseUpdate(grid, CarbonFluxGridSources(grid))
+    cache.getOrElseUpdate(gridId, CarbonFluxGridSources(gridId))
 
   }
 

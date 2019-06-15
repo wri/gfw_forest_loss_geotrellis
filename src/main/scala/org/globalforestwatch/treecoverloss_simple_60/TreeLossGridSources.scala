@@ -11,8 +11,8 @@ import org.globalforestwatch.layers._
   */
 case class TreeLossGridSources(grid: String) extends GridSources {
 
-  lazy val treeCoverLoss = TreeCoverLoss(grid)
-  lazy val treeCoverDensity2010_60 = TreeCoverDensity2010_60(grid)
+  val treeCoverLoss = TreeCoverLoss(grid)
+  val treeCoverDensity2010_60 = TreeCoverDensity2010_60(grid)
 
   def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
 
@@ -39,9 +39,9 @@ object TreeLossGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, TreeLossGridSources]
 
-  def getCachedSources(grid: String): TreeLossGridSources = {
+  def getCachedSources(gridId: String): TreeLossGridSources = {
 
-    cache.getOrElseUpdate(grid, TreeLossGridSources(grid))
+    cache.getOrElseUpdate(gridId, TreeLossGridSources(gridId))
 
   }
 

@@ -5,15 +5,13 @@ import java.time.format.DateTimeFormatter
 
 import cats.implicits._
 import com.monovore.decline.{CommandApp, Opts}
-import geotrellis.vector.io.wkb.WKB
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
-import org.globalforestwatch.features.GadmFeatureId
-import org.locationtech.jts.precision.GeometryPrecisionReducer
+import org.globalforestwatch.features.{GadmFeature, GadmFeatureFilter, GadmFeatureId}
+
 
 object GladAlertsSummaryMain
     extends CommandApp(
@@ -109,87 +107,30 @@ object GladAlertsSummaryMain
             import spark.implicits._
 
             // ref: https://github.com/databricks/spark-csv
-            var featuresDF: DataFrame = spark.read
+            val featuresDF: DataFrame = spark.read
               .options(Map("header" -> "true", "delimiter" -> "\t"))
               .csv(featureUris.toList: _*)
-
-            isoFirst.foreach { firstLetter =>
-              featuresDF =
-                featuresDF.filter(substring($"iso", 0, 1) === firstLetter(0))
-            }
-
-            isoStart.foreach { startCode =>
-              featuresDF = featuresDF.filter($"iso" >= startCode)
-            }
-
-            isoEnd.foreach { endCode =>
-              featuresDF = featuresDF.filter($"iso" < endCode)
-            }
-
-            iso.foreach { isoCode =>
-              featuresDF = featuresDF.filter($"iso" === isoCode)
-            }
-
-            admin1.foreach { admin1Code =>
-              featuresDF = featuresDF.filter($"gid_1" === admin1Code)
-            }
-
-            admin2.foreach { admin2Code =>
-              featuresDF = featuresDF.filter($"gid_2" === admin2Code)
-            }
-
-            limit.foreach { n =>
-              featuresDF = featuresDF.limit(n)
-            }
+              .transform(
+                GadmFeatureFilter.filter(
+                  isoFirst,
+                  isoStart,
+                  isoEnd,
+                  iso,
+                  admin1,
+                  admin2,
+                  limit
+                )(spark)
+              )
 
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
             val featureRDD: RDD[Feature[Geometry, GadmFeatureId]] =
-              featuresDF.rdd.mapPartitions({
-                iter: Iterator[Row] =>
-                  // We need to reduce geometry precision  a bit to avoid issues like reported here
-                  // https://github.com/locationtech/geotrellis/issues/2951
-                  //
-                  // Precision is set in src/main/resources/application.conf
-                  // Here we use a fixed precision type and scale 1e8
-                  // This is more than enough given that we work with 30 meter pixels
-                  // and geometries already simplified to 1e11
-
-                  val gpr = new GeometryPrecisionReducer(
-                    geotrellis.vector.GeomFactory.precisionModel
-                  )
-
-                  def reduce(
-                              gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
-                            )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
-                    geotrellis.vector.Geometry(gpr.reduce(g.jtsGeom))
-
-                  def isValidGeom(wkb: String): Boolean = {
-                    val geom: Option[Geometry] = try {
-                      Some(reduce(gpr)(WKB.read(wkb)))
-                    } catch {
-                      case ae: java.lang.AssertionError =>
-                        println("There was an empty geometry")
-                        None
-                      case t: Throwable => throw t
-                    }
-
-                    geom match {
-                      case Some(g) => true
-                      case None => false
-                    }
-                  }
-
-                  for {
-                    i <- iter
-                    if isValidGeom(i.getString(4))
-                  } yield {
-
-                    val countryCode: String = i.getString(1)
-                    val admin1: String = i.getString(2)
-                    val admin2: String = i.getString(3)
-                    val geom: Geometry = reduce(gpr)(WKB.read(i.getString(4)))
-                    Feature(geom, GadmFeatureId(countryCode, admin1, admin2))
-                  }
+              featuresDF.rdd.mapPartitions({ iter: Iterator[Row] =>
+                for {
+                  i <- iter
+                  if GadmFeature.isValidGeom(i)
+                } yield {
+                  GadmFeature.getFeature(i)
+                }
               }, preservesPartitioning = true)
 
             val part = new HashPartitioner(
@@ -202,21 +143,12 @@ object GladAlertsSummaryMain
             val summaryDF =
               summaryRDD
                 .flatMap {
-                  case (id, gladAlertsSummary) =>
-                    gladAlertsSummary.stats.map {
+                  case (id, gladAlertSummary) =>
+                    gladAlertSummary.stats.map {
                       case (gladAlertsDataGroup, gladAlertsData) => {
 
-                        val admin1: Integer = try {
-                          id.admin1.split("[.]")(1).split("[_]")(0).toInt
-                        } catch {
-                          case e: Exception => null
-                        }
-
-                        val admin2: Integer = try {
-                          id.admin2.split("[.]")(2).split("[_]")(0).toInt
-                        } catch {
-                          case e: Exception => null
-                        }
+                        val admin1: Integer = id.adm1ToInt
+                        val admin2: Integer = id.adm2ToInt
 
                         GladAlertsRow(
                           id.country,
