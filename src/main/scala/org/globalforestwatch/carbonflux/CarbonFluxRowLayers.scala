@@ -7,4 +7,5 @@ case class CarbonFluxRowLayers(gain: Integer,
                                landRights: Boolean,
                                wdpa: String,
                                intactForestLandscapes: String,
-                               plantations: String)
+                               plantations: String,
+                               primaryForest: Boolean)

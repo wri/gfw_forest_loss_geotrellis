@@ -160,7 +160,8 @@ object CarbonFluxSummaryMain
                             lossDataGroup.landRights,
                             lossDataGroup.wdpa,
                             lossDataGroup.intactForestLandscapes,
-                            lossDataGroup.plantations
+                            lossDataGroup.plantations,
+                            lossDataGroup.primaryForest
                           ),
                           lossData.extent2000,
                           lossData.totalArea,
@@ -267,7 +268,7 @@ object CarbonFluxSummaryMain
             summaryDF
               .transform(ApiDF.unpackValues(spark))
               // .transform(ApiDF.setNull)
-              .coalesce(1)
+              //              .coalesce(1)
               .orderBy($"iso", $"adm1", $"adm2", $"threshold")
               .write
               .options(csvOptions)

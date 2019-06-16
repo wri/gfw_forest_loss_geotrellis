@@ -11,8 +11,8 @@ import org.globalforestwatch.layers._
   */
 case class TreeLossGridSources(grid: String) extends GridSources {
 
-  val treeCoverLoss = TreeCoverLoss(grid)
-  val treeCoverDensity2010_60 = TreeCoverDensity2010_60(grid)
+  lazy val treeCoverLoss = TreeCoverLoss(grid)
+  lazy val treeCoverDensity2010_60 = TreeCoverDensity2010_60(grid)
 
   def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
 

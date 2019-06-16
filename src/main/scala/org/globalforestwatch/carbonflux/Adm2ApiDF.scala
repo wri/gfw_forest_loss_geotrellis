@@ -24,6 +24,7 @@ object Adm2ApiDF {
       $"wdpa",
       $"ifl",
       $"plantations",
+      $"primary_forest",
       $"extent_2000",
       $"total_area",
       $"total_biomass",

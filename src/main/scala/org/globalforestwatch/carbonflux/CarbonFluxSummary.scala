@@ -72,6 +72,7 @@ object CarbonFluxSummary {
         val intactForestLandscapes: String =
           raster.tile.intactForestLandscapes.getData(col, row)
         val landRights: Boolean = raster.tile.landRights.getData(col, row)
+        val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
 
         val cols: Int = raster.rasterExtent.cols
         val rows: Int = raster.rasterExtent.rows
@@ -118,7 +119,8 @@ object CarbonFluxSummary {
               landRights,
               wdpa,
               intactForestLandscapes,
-              plantations
+              plantations,
+              primaryForest
             )
 
             val summary: CarbonFluxData =

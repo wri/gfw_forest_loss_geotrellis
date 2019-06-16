@@ -142,21 +142,21 @@ import com.amazonaws.services.elasticmapreduce.model.Tag
 //  GFW subnet zone us-east-1e: subnet-037b97cff4493e3a1
 //  GFW subnet zone us-east-1f: subnet-0360516ee122586ff
 
-sparkEmrRelease := "emr-5.23.0"
+sparkEmrRelease := "emr-5.24.0"
 sparkAwsRegion              := "us-east-1"
 sparkEmrApplications        := Seq("Spark", "Zeppelin", "Ganglia")
 sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-08458452c1d05713b")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 26
+sparkInstanceCount := 51
 sparkMasterType := "r5.12xlarge"
 sparkCoreType := "r5.12xlarge"
 sparkMasterEbsSize := Some(30)
 sparkCoreEbsSize := Some(30)
 //sparkMasterPrice := Some(3.0320)
 sparkCorePrice := Some(3.0320)
-sparkClusterName            := s"geotrellis-treecoverloss"
+sparkClusterName := s"geotrellis-carbonflux"
 sparkEmrServiceRole         := "EMR_DefaultRole"
 sparkInstanceRole           := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName("tmaschler_wri2")
@@ -197,9 +197,9 @@ sparkEmrConfigs             := List(
     "spark.yarn.executor.memoryOverhead" -> "5G",
     "spark.driver.cores" -> "5",
     "spark.driver.memory" -> "37G",
-    "spark.executor.instances" -> "224", //9 * 50 -1
-    "spark.default.parallelism" -> "2240",
-    "spark.sql.shuffle.partitions" -> "2240",
+    "spark.executor.instances" -> "449", //9 * 50 -1
+    "spark.default.parallelism" -> "4490",
+    "spark.sql.shuffle.partitions" -> "4490",
 
     "spark.driver.maxResultSize" -> "3G",
     "spark.shuffle.service.enabled" -> "true",

@@ -72,6 +72,7 @@ object ApiDF {
       $"layers.wdpa" as "wdpa",
       $"layers.intactForestLandscapes" as "ifl",
       $"layers.plantations" as "plantations",
+      $"layers.primaryForest" as "primary_forest",
       $"extent_2000",
       $"total_area",
       $"total_biomass",

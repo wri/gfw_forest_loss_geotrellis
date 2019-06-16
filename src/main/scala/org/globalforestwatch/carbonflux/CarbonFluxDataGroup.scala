@@ -8,4 +8,5 @@ case class CarbonFluxDataGroup(threshold: Integer,
                                landRights: Boolean,
                                wdpa: String,
                                intactForestLandscapes: String,
-                               plantations: String)
+                               plantations: String,
+                               primaryForest: Boolean)

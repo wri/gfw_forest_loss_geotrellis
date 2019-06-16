@@ -43,6 +43,7 @@ object CarbonFluxGrid extends TenByTenGrid[CarbonFluxGridSources] {
     checkOptional(sources.ecozones, windowExtent)
     checkOptional(sources.intactForestLandscapes, windowExtent)
     checkOptional(sources.landRights, windowExtent)
+    checkOptional(sources.primaryForest, windowExtent)
 
     sources
 
