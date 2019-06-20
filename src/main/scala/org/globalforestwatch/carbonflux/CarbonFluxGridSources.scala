@@ -45,6 +45,7 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
   lazy val plantations = Plantations(gridId)
   lazy val primaryForest = PrimaryForest(gridId)
 
+
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonFluxTile]] = {
 
     for {

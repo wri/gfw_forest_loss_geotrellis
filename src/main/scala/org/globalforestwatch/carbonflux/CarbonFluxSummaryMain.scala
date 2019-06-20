@@ -166,39 +166,39 @@ object CarbonFluxSummaryMain
                           lossData.extent2000,
                           lossData.totalArea,
                           lossData.totalBiomass,
-                          lossData.biomassHistogram.mean(),
+                          lossData.avgBiomass,
                           lossData.totalGrossAnnualRemovalsCarbon,
-                          lossData.grossAnnualRemovalsCarbonHistogram.mean(),
+                          lossData.avgGrossAnnualRemovalsCarbon,
                           lossData.totalGrossCumulRemovalsCarbon,
-                          lossData.grossCumulRemovalsCarbonHistogram.mean(),
+                          lossData.avgGrossCumulRemovalsCarbon,
                           lossData.totalNetFluxCo2,
-                          lossData.netFluxCo2Histogram.mean(),
+                          lossData.avgNetFluxCo2,
                           lossData.totalAgcEmisYear,
-                          lossData.agcEmisYearHistogram.mean(),
+                          lossData.avgAgcEmisYear,
                           lossData.totalBgcEmisYear,
-                          lossData.bgcEmisYearHistogram.mean(),
+                          lossData.avgBgcEmisYear,
                           lossData.totalDeadwoodCarbonEmisYear,
-                          lossData.deadwoodCarbonEmisYearHistogram.mean(),
+                          lossData.avgDeadwoodCarbonEmisYear,
                           lossData.totalLitterCarbonEmisYear,
-                          lossData.litterCarbonEmisYearHistogram.mean(),
+                          lossData.avgLitterCarbonEmisYear,
                           lossData.totalSoilCarbonEmisYear,
-                          lossData.soilCarbonEmisYearHistogram.mean(),
+                          lossData.avgSoilCarbonEmisYear,
                           lossData.totalCarbonEmisYear,
-                          lossData.totalCarbonEmisYearHistogram.mean(),
+                          lossData.avgTotalCarbonEmisYear,
                           lossData.totalAgc2000,
-                          lossData.agc2000Histogram.mean(),
+                          lossData.avgAgc2000,
                           lossData.totalBgc2000,
-                          lossData.bgc2000Histogram.mean(),
+                          lossData.avgBgc2000,
                           lossData.totalDeadwoodCarbon2000,
-                          lossData.deadwoodCarbon2000Histogram.mean(),
+                          lossData.avgDeadwoodCarbon2000,
                           lossData.totalLitterCarbon2000,
-                          lossData.litterCarbon2000Histogram.mean(),
+                          lossData.avgLitterCarbon2000,
                           lossData.totalSoil2000Year,
-                          lossData.soilCarbon2000Histogram.mean(),
+                          lossData.avgSoilCarbon2000,
                           lossData.totalCarbon2000,
-                          lossData.totalCarbon2000Histogram.mean(),
+                          lossData.avgTotalCarbon2000,
                           lossData.totalGrossEmissionsCo2,
-                          lossData.grossEmissionsCo2Histogram.mean(),
+                          lossData.avgGrossEmissionsCo2,
                           CarbonFluxYearDataMap.toList(lossData.lossYear)
                         )
                       }
@@ -266,7 +266,7 @@ object CarbonFluxSummaryMain
             )
 
             summaryDF
-              .transform(ApiDF.unpackValues(spark))
+              .transform(ApiDF.unpackValues)
               // .transform(ApiDF.setNull)
               //              .coalesce(1)
               .orderBy($"iso", $"adm1", $"adm2", $"threshold")

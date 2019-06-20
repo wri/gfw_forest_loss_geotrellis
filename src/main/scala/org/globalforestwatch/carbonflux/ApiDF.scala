@@ -9,8 +9,9 @@ object ApiDF {
 
   private def setZeroNull(column: Column): Column = when(column =!= 0.0, column)
 
-  def unpackValues(spark: SparkSession)(df: DataFrame): DataFrame = {
+  def unpackValues(df: DataFrame): DataFrame = {
 
+    implicit val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
     validatePresenceOfColumns(
@@ -256,8 +257,8 @@ object ApiDF {
     )
   }
 
-  def setNull(spark: SparkSession)(df: DataFrame): DataFrame = {
-    import spark.implicits._
+  def setNull(df: DataFrame): DataFrame = {
+
     val zeroColumns = df
       .select(
         "extent_2000",

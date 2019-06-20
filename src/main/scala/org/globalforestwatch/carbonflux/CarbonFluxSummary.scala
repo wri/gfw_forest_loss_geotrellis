@@ -131,39 +131,40 @@ object CarbonFluxSummary {
                   0,
                   0,
                   0,
-                  StreamingHistogram(size = 1750),
                   0,
-                  StreamingHistogram(size = 50),
                   0,
-                  StreamingHistogram(size = 275),
                   0,
-                  StreamingHistogram(size = 5000),
                   0,
-                  StreamingHistogram(size = 900),
                   0,
-                  StreamingHistogram(size = 350),
                   0,
-                  StreamingHistogram(size = 100),
                   0,
-                  StreamingHistogram(size = 50),
                   0,
-                  StreamingHistogram(size = 1200),
                   0,
-                  StreamingHistogram(size = 1500),
                   0,
-                  StreamingHistogram(size = 900),
                   0,
-                  StreamingHistogram(size = 350),
                   0,
-                  StreamingHistogram(size = 100),
                   0,
-                  StreamingHistogram(size = 50),
                   0,
-                  StreamingHistogram(size = 1200),
                   0,
-                  StreamingHistogram(size = 1500),
                   0,
-                  StreamingHistogram(size = 4000)
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
                 )
               )
 
@@ -181,50 +182,47 @@ object CarbonFluxSummary {
 
               summary.extent2000 += areaHa
               summary.totalBiomass += biomassPixel
-              summary.biomassHistogram.countItem(biomass)
-
+              summary.avgBiomass = ((summary.avgBiomass * summary.count) + biomass) / (summary.count + 1)
               summary.totalGrossAnnualRemovalsCarbon += grossAnnualRemovalsCarbonPixel
-              summary.grossAnnualRemovalsCarbonHistogram.countItem(
-                grossAnnualRemovalsCarbon
-              )
+              summary.avgGrossAnnualRemovalsCarbon = ((summary.avgGrossAnnualRemovalsCarbon * summary.count) + grossAnnualRemovalsCarbon) / (summary.count + 1)
               summary.totalGrossCumulRemovalsCarbon += grossCumulRemovalsCarbonPixel
-              summary.grossCumulRemovalsCarbonHistogram.countItem(
-                grossCumulRemovalsCarbon
-              )
+              summary.avgGrossCumulRemovalsCarbon = ((summary.avgGrossCumulRemovalsCarbon * summary.count) + grossCumulRemovalsCarbon) / (summary.count + 1)
               summary.totalNetFluxCo2 += netFluxCo2Pixel
-              summary.netFluxCo2Histogram.countItem(netFluxCo2)
+              summary.avgNetFluxCo2 = ((summary.avgNetFluxCo2 * summary.count) + netFluxCo2) / (summary.count + 1)
+
               summary.totalAgcEmisYear += agcEmisYearPixel
-              summary.agcEmisYearHistogram.countItem(agcEmisYear)
+              summary.avgAgcEmisYear = ((summary.avgAgcEmisYear * summary.count) + agcEmisYear) / (summary.count + 1)
+
               summary.totalBgcEmisYear += bgcEmisYearPixel
-              summary.bgcEmisYearHistogram.countItem(bgcEmisYear)
+              summary.avgBgcEmisYear = ((summary.avgBgcEmisYear * summary.count) + bgcEmisYear) / (summary.count + 1)
+
               summary.totalDeadwoodCarbonEmisYear += deadwoodCarbonEmisYearPixel
-              summary.deadwoodCarbonEmisYearHistogram.countItem(
-                deadwoodCarbonEmisYear
-              )
+              summary.avgDeadwoodCarbonEmisYear = ((summary.avgDeadwoodCarbonEmisYear * summary.count) + deadwoodCarbonEmisYear) / (summary.count + 1)
+
               summary.totalLitterCarbonEmisYear += litterCarbonEmisYearPixel
-              summary.litterCarbonEmisYearHistogram.countItem(
-                litterCarbonEmisYear
-              )
+              summary.avgLitterCarbonEmisYear = ((summary.avgLitterCarbonEmisYear * summary.count) + litterCarbonEmisYear) / (summary.count + 1)
+
               summary.totalSoilCarbonEmisYear += soilCarbonEmisYearPixel
-              summary.soilCarbonEmisYearHistogram.countItem(soilCarbonEmisYear)
+              summary.avgSoilCarbonEmisYear = ((summary.avgSoilCarbonEmisYear * summary.count) + soilCarbonEmisYear) / (summary.count + 1)
+
               summary.totalCarbonEmisYear += totalCarbonEmisYearPixel
-              summary.totalCarbonEmisYearHistogram.countItem(
-                totalCarbonEmisYear
-              )
+              summary.avgTotalCarbonEmisYear = ((summary.avgTotalCarbonEmisYear * summary.count) + totalCarbonEmisYear) / (summary.count + 1)
+
               summary.totalAgc2000 += agc2000Pixel
-              summary.agc2000Histogram.countItem(agc2000)
+              summary.avgAgc2000 = ((summary.avgAgc2000 * summary.count) + agc2000) / (summary.count + 1)
               summary.totalBgc2000 += bgc2000Pixel
-              summary.bgc2000Histogram.countItem(bgc2000)
+              summary.avgBgc2000 = ((summary.avgBgc2000 * summary.count) + bgc2000) / (summary.count + 1)
               summary.totalDeadwoodCarbon2000 += deadwoodCarbon2000Pixel
-              summary.deadwoodCarbon2000Histogram.countItem(deadwoodCarbon2000)
+              summary.avgDeadwoodCarbon2000 = ((summary.avgDeadwoodCarbon2000 * summary.count) + deadwoodCarbon2000) / (summary.count + 1)
               summary.totalLitterCarbon2000 += litterCarbon2000Pixel
-              summary.litterCarbon2000Histogram.countItem(litterCarbon2000)
+              summary.avgLitterCarbon2000 = ((summary.avgLitterCarbon2000 * summary.count) + litterCarbon2000) / (summary.count + 1)
               summary.totalSoil2000Year += soilCarbon2000Pixel
-              summary.soilCarbon2000Histogram.countItem(soilCarbon2000)
+              summary.avgSoilCarbon2000 = ((summary.avgSoilCarbon2000 * summary.count) + soilCarbon2000) / (summary.count + 1)
               summary.totalCarbon2000 += totalCarbon2000Pixel
-              summary.totalCarbon2000Histogram.countItem(totalCarbon2000)
+              summary.avgTotalCarbon2000 = ((summary.avgTotalCarbon2000 * summary.count) + totalCarbon2000) / (summary.count + 1)
               summary.totalGrossEmissionsCo2 += grossEmissionsCo2Pixel
-              summary.grossEmissionsCo2Histogram.countItem(grossEmissionsCo2)
+              summary.avgGrossEmissionsCo2 = ((summary.avgGrossEmissionsCo2 * summary.count) + grossEmissionsCo2) / (summary.count + 1)
+              summary.count += 1
 
             }
 
