@@ -10,7 +10,7 @@ object GadmFeature extends java.io.Serializable {
   val countryPos = 1
   val adm1Pos = 2
   val adm2Pos = 3
-  val geomPos = 4
+  val geomPos = 7
 
   def getFeature(i: Row): Feature[Geometry, GadmFeatureId] = {
     val countryCode: String = i.getString(countryPos)

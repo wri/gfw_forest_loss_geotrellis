@@ -10,7 +10,11 @@ import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
-import org.globalforestwatch.features.{GadmFeature, GadmFeatureFilter, GadmFeatureId}
+import org.globalforestwatch.features.{
+  GadmFeature,
+  GadmFeatureFilter,
+  GadmFeatureId
+}
 
 object TreeLossSummaryMain
     extends CommandApp(
@@ -76,6 +80,10 @@ object TreeLossSummaryMain
           .option[String]("admin2", help = "Filter by country Admin2 code")
           .orNone
 
+        val tclOpt = Opts.flag("tcl", "TCL tile extent").orFalse
+
+        val gladOpt = Opts.flag("glad", "GLAD tile extent").orFalse
+
         val logger = Logger.getLogger("TreeLossSummaryMain")
 
         (
@@ -89,7 +97,9 @@ object TreeLossSummaryMain
           isoStartOpt,
           isoEndOpt,
           admin1Opt,
-          admin2Opt
+          admin2Opt,
+          tclOpt,
+          gladOpt
         ).mapN {
           (featureUris,
            outputUrl,
@@ -101,7 +111,9 @@ object TreeLossSummaryMain
            isoStart,
            isoEnd,
            admin1,
-           admin2) =>
+           admin2,
+           tcl,
+           glad) =>
             val spark: SparkSession = TreeLossSparkSession()
 
             import spark.implicits._
@@ -118,8 +130,10 @@ object TreeLossSummaryMain
                   iso,
                   admin1,
                   admin2,
-                  limit
-                )(spark)
+                  limit,
+                  tcl,
+                  glad
+                )
               )
 
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */

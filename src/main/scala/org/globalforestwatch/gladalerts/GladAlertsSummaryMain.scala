@@ -77,6 +77,10 @@ object GladAlertsSummaryMain
           .option[String]("admin2", help = "Filter by country Admin2 code")
           .orNone
 
+        val tclOpt = Opts.flag("tcl", "TCL tile extent").orFalse
+
+        val gladOpt = Opts.flag("glad", "GLAD tile extent").orFalse
+
         val logger = Logger.getLogger("TreeLossSummaryMain")
 
         (
@@ -90,7 +94,9 @@ object GladAlertsSummaryMain
           isoStartOpt,
           isoEndOpt,
           admin1Opt,
-          admin2Opt
+          admin2Opt,
+          tclOpt,
+          gladOpt
         ).mapN {
           (featureUris,
            outputUrl,
@@ -102,8 +108,11 @@ object GladAlertsSummaryMain
            isoStart,
            isoEnd,
            admin1,
-           admin2) =>
+           admin2,
+           tcl,
+           glad) =>
             val spark: SparkSession = GladAlertsSparkSession()
+
             import spark.implicits._
 
             // ref: https://github.com/databricks/spark-csv
@@ -118,8 +127,10 @@ object GladAlertsSummaryMain
                   iso,
                   admin1,
                   admin2,
-                  limit
-                )(spark)
+                  limit,
+                  tcl,
+                  glad
+                )
               )
 
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
