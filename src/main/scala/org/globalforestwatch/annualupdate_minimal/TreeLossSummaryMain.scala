@@ -253,52 +253,52 @@ object TreeLossSummaryMain
             val adm2DF = summaryDF
               .transform(Adm2DF.unpackValues)
 
-            //          adm2DF.repartition($"iso")
-//            adm2DF.cache()
+            adm2DF.repartition($"iso")
+            adm2DF.cache()
 
-//            val csvOptions = Map(
-//              "header" -> "true",
-//              "delimiter" -> "\t",
-//              "quote" -> "\u0000",
-//              "quoteMode" -> "NONE",
-//              "nullValue" -> "\u0000"
-//            )
-//
-//            val adm2SummaryDF = adm2DF
-//              .transform(Adm2SummaryDF.sumArea)
-//
-//            adm2SummaryDF
-//              .transform(Adm2SummaryDF.roundValues)
-//              .coalesce(1)
-//              .orderBy(
-//                $"country",
-//                $"subnational1",
-//                $"subnational2",
-//                $"threshold"
-//              )
-//              .write
-//              .options(csvOptions)
-//              .csv(path = runOutputUrl + "/summary/adm2")
-//
-//            val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
-//
-//            adm1SummaryDF
-//              .transform(Adm1SummaryDF.roundValues)
-//              .coalesce(1)
-//              .orderBy($"country", $"subnational1", $"threshold")
-//              .write
-//              .options(csvOptions)
-//              .csv(path = runOutputUrl + "/summary/adm1")
-//
-//            val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
-//
-//            isoSummaryDF
-//              .transform(IsoSummaryDF.roundValues)
-//              .coalesce(1)
-//              .orderBy($"iso", $"threshold")
-//              .write
-//              .options(csvOptions)
-//              .csv(path = runOutputUrl + "/summary/iso")
+            val csvOptions = Map(
+              "header" -> "true",
+              "delimiter" -> "\t",
+              "quote" -> "\u0000",
+              "quoteMode" -> "NONE",
+              "nullValue" -> "\u0000"
+            )
+
+            val adm2SummaryDF = adm2DF
+              .transform(Adm2SummaryDF.sumArea)
+
+            adm2SummaryDF
+              .transform(Adm2SummaryDF.roundValues)
+              .coalesce(1)
+              .orderBy(
+                $"country",
+                $"subnational1",
+                $"subnational2",
+                $"threshold"
+              )
+              .write
+              .options(csvOptions)
+              .csv(path = runOutputUrl + "/summary/adm2")
+
+            val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
+
+            adm1SummaryDF
+              .transform(Adm1SummaryDF.roundValues)
+              .coalesce(1)
+              .orderBy($"country", $"subnational1", $"threshold")
+              .write
+              .options(csvOptions)
+              .csv(path = runOutputUrl + "/summary/adm1")
+
+            val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
+
+            isoSummaryDF
+              .transform(IsoSummaryDF.roundValues)
+              .coalesce(1)
+              .orderBy($"iso", $"threshold")
+              .write
+              .options(csvOptions)
+              .csv(path = runOutputUrl + "/summary/iso")
 
             val apiDF = adm2DF
               .transform(ApiDF.setNull)
