@@ -1,14 +1,11 @@
 package org.globalforestwatch.treecoverloss
 
-import scala.collection.mutable.Map
-
 
 case class TreeLossYearData(year: Int,
                             var area_loss: Double,
                             var biomass_loss: Double,
-                            var carbon_emissions: Double,
-                            var mangrove_biomass_loss: Double,
-                            var mangrove_carbon_emissions: Double)
+                            var carbon_emissions: Double
+                           )
 
 object TreeLossYearData {
 

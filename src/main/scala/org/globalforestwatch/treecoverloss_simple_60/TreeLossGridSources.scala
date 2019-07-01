@@ -39,9 +39,9 @@ object TreeLossGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, TreeLossGridSources]
 
-  def getCachedSources(grid: String): TreeLossGridSources = {
+  def getCachedSources(gridId: String): TreeLossGridSources = {
 
-    cache.getOrElseUpdate(grid, TreeLossGridSources(grid))
+    cache.getOrElseUpdate(gridId, TreeLossGridSources(gridId))
 
   }
 

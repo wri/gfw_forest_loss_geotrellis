@@ -107,9 +107,9 @@ object GladAlertsGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, GladAlertsGridSources]
 
-  def getCachedSources(grid: String): GladAlertsGridSources = {
+  def getCachedSources(gridId: String): GladAlertsGridSources = {
 
-    cache.getOrElseUpdate(grid, GladAlertsGridSources(grid))
+    cache.getOrElseUpdate(gridId, GladAlertsGridSources(gridId))
 
   }
 
