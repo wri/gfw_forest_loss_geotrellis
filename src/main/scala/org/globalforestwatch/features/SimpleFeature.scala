@@ -11,7 +11,7 @@ object SimpleFeature extends java.io.Serializable {
   val geomPos = 1
 
   def getFeature(i: Row): Feature[Geometry, SimpleFeatureId] = {
-    val feature_id: Int = i.getInt(idPos)
+    val feature_id: Int = i.getString(idPos).toInt
     val geom: Geometry =
       GeometryReducer.reduce(GeometryReducer.gpr)(
         WKB.read(i.getString(geomPos))

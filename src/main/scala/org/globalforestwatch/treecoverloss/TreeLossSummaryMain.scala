@@ -40,7 +40,7 @@ object TreeLossSummaryMain
 
       val thresholdOpt = Opts
         .options[Int]("threshold", "Treecover threshold to apply")
-        .withDefault(List(30))
+        .orEmpty
 
       val primartyForestOpt = Opts
         .flag("primary-forests", "Include Primary Forests")
@@ -170,8 +170,10 @@ object TreeLossSummaryMain
             "nullValue" -> "\u0000"
           )
 
+          //          val tcdFilter: List[Int] = thresholdFilter
+
           summaryDF
-            .filter($"threshold" isin thresholdFilter)
+            .filter($"threshold".isin(thresholdFilter: _*))
             //              .repartition($"feature_id", $"threshold")
             .transform(DF.unpackValues)
             .transform(DF.primaryForestFilter(includePrimaryForest))
