@@ -149,14 +149,14 @@ sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-08458452c1d05713b")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 201
+sparkInstanceCount := 21
 sparkMasterType := "m3.2xlarge"
 sparkCoreType := "m3.2xlarge"
-sparkMasterEbsSize := Some(30)
+sparkMasterEbsSize := Some(10)
 sparkCoreEbsSize := Some(10)
 //sparkMasterPrice := Some(3.0320)
 sparkCorePrice := Some(0.532)
-sparkClusterName := s"geotrellis-carbonflux"
+sparkClusterName := s"geotrellis-treecoverloss"
 sparkEmrServiceRole         := "EMR_DefaultRole"
 sparkInstanceRole           := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName("tmaschler_wri2")
@@ -197,9 +197,9 @@ sparkEmrConfigs             := List(
     "spark.yarn.executor.memoryOverhead" -> "1G", //5G
     "spark.driver.cores" -> "1",
     "spark.driver.memory" -> "3G",
-    "spark.executor.instances" -> "1339", //7 * 200 -1 *  //9 * 50 -1
-    "spark.default.parallelism" -> "13390",
-    "spark.sql.shuffle.partitions" -> "13390",
+    "spark.executor.instances" -> "139", //7 * 200 -1 *  //9 * 50 -1
+    "spark.default.parallelism" -> "1390",
+    "spark.sql.shuffle.partitions" -> "1390",
 
     "spark.driver.maxResultSize" -> "3G",
     "spark.shuffle.service.enabled" -> "true",

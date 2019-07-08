@@ -31,8 +31,8 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
   //  lazy val riverBasins = RiverBasins(gridId)
   //  lazy val ecozones = Ecozones(gridId)
   //  lazy val urbanWatersheds = UrbanWatersheds(gridId)
-  //  lazy val mangroves1996 = Mangroves1996(gridId)
-  //  lazy val mangroves2016 = Mangroves2016(gridId)
+  lazy val mangroves1996 = Mangroves1996(gridId)
+  lazy val mangroves2016 = Mangroves2016(gridId)
   //  lazy val waterStress = WaterStress(gridId)
   lazy val intactForestLandscapes = IntactForestLandscapes(gridId)
   //  lazy val endemicBirdAreas = EndemicBirdAreas(gridId)
@@ -42,7 +42,7 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
   lazy val keyBiodiversityAreas = KeyBiodiversityAreas(gridId)
   lazy val mining = Mining(gridId)
   //  lazy val rspo = RSPO(gridId)
-  //  lazy val peatlands = Peatlands(gridId)
+  lazy val peatlands = Peatlands(gridId)
   lazy val oilPalm = OilPalm(gridId)
   lazy val indonesiaForestMoratorium = IndonesiaForestMoratorium(gridId)
   //  lazy val indonesiaLandCover = IndonesiaLandCover(gridId)
@@ -93,8 +93,8 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
 //      val riverBasinsTile = riverBasins.fetchWindow(window)
 //      val ecozonesTile = ecozones.fetchWindow(window)
 //      val urbanWatershedsTile = urbanWatersheds.fetchWindow(window)
-//      val mangroves1996Tile = mangroves1996.fetchWindow(window)
-//      val mangroves2016Tile = mangroves2016.fetchWindow(window)
+val mangroves1996Tile = mangroves1996.fetchWindow(window)
+      val mangroves2016Tile = mangroves2016.fetchWindow(window)
 //      val waterStressTile = waterStress.fetchWindow(window)
       val intactForestLandscapesTile =
         intactForestLandscapes.fetchWindow(window)
@@ -105,7 +105,7 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
       val keyBiodiversityAreasTile = keyBiodiversityAreas.fetchWindow(window)
       val miningTile = mining.fetchWindow(window)
 //      val rspoTile = rspo.fetchWindow(window)
-//      val peatlandsTile = peatlands.fetchWindow(window)
+val peatlandsTile = peatlands.fetchWindow(window)
       val oilPalmTile = oilPalm.fetchWindow(window)
       val idnForestMoratoriumTile =
         indonesiaForestMoratorium.fetchWindow(window)
@@ -144,8 +144,8 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
 //        riverBasinsTile,
 //        ecozonesTile,
 //        urbanWatershedsTile,
-//        mangroves1996Tile,
-//        mangroves2016Tile,
+        mangroves1996Tile,
+        mangroves2016Tile,
 //        waterStressTile,
         intactForestLandscapesTile,
 //        endemicBirdAreasTile,
@@ -155,7 +155,7 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
         keyBiodiversityAreasTile,
         miningTile,
 //        rspoTile,
-//        peatlandsTile,
+        peatlandsTile,
         oilPalmTile,
         idnForestMoratoriumTile,
 //        idnLandCoverTile,
