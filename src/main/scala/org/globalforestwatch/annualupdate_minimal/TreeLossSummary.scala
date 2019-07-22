@@ -55,8 +55,8 @@ object TreeLossSummary {
 //        val ecozones: String = raster.tile.ecozones.getData(col, row)
 //        val urbanWatersheds: Boolean =
 //          raster.tile.urbanWatersheds.getData(col, row)
-//        val mangroves1996: Boolean = raster.tile.mangroves1996.getData(col, row)
-//        val mangroves2016: Boolean = raster.tile.mangroves2016.getData(col, row)
+val mangroves1996: Boolean = raster.tile.mangroves1996.getData(col, row)
+        val mangroves2016: Boolean = raster.tile.mangroves2016.getData(col, row)
 //        val waterStress: String = raster.tile.waterStress.getData(col, row)
         val intactForestLandscapes: String =
           raster.tile.intactForestLandscapes.getData(col, row)
@@ -70,7 +70,7 @@ object TreeLossSummary {
           raster.tile.keyBiodiversityAreas.getData(col, row)
         val mining: Boolean = raster.tile.mining.getData(col, row)
 //        val rspo: String = raster.tile.rspo.getData(col, row)
-//        val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
+val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
         val oilPalm: Boolean = raster.tile.oilPalm.getData(col, row)
         val idnForestMoratorium: Boolean =
           raster.tile.idnForestMoratorium.getData(col, row)
@@ -136,8 +136,8 @@ object TreeLossSummary {
 //              riverBasins,
 //              ecozones,
 //              urbanWatersheds,
-//              mangroves1996,
-//              mangroves2016,
+              mangroves1996,
+              mangroves2016,
 //              waterStress,
               intactForestLandscapes,
 //              endemicBirdAreas,
@@ -147,7 +147,7 @@ object TreeLossSummary {
               keyBiodiversityAreas,
               mining,
 //              rspo,
-//              peatlands,
+              peatlands,
               oilPalm,
               idnForestMoratorium,
 //              idnLandCover,

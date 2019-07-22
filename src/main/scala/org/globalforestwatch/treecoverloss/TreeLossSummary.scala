@@ -6,14 +6,14 @@ import org.globalforestwatch.util.Geodesy
 import geotrellis.raster.histogram.StreamingHistogram
 
 /** LossData Summary by year */
-case class TreeLossSummary(
-                            stats: Map[TreeLossDataGroup, TreeLossData] = Map.empty
-                          ) {
+case class TreeLossSummary(tcdYear: Int,
+                           stats: Map[TreeLossDataGroup, TreeLossData] =
+                           Map.empty) {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: TreeLossSummary): TreeLossSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    TreeLossSummary(stats.combine(other.stats))
+    TreeLossSummary(tcdYear, stats.combine(other.stats))
   }
 }
 
@@ -28,6 +28,9 @@ object TreeLossSummary {
                    col: Int,
                    row: Int,
                    acc: TreeLossSummary): TreeLossSummary = {
+
+        val tcdYear = acc.tcdYear
+
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
         val gain: Integer = raster.tile.gain.getData(col, row)
@@ -61,10 +64,7 @@ object TreeLossSummary {
                          ): Map[TreeLossDataGroup, TreeLossData] = {
           if (thresholds == Nil) stats
           else {
-            val pKey = TreeLossDataGroup(
-              thresholds.head,
-              primaryForest
-            )
+            val pKey = TreeLossDataGroup(thresholds.head, primaryForest)
 
             val summary: TreeLossData =
               stats.getOrElse(
@@ -84,7 +84,7 @@ object TreeLossSummary {
             summary.totalArea += areaHa
             summary.totalGainArea += gainArea
 
-            if (tcd2000 >= thresholds.head) {
+            if ((tcd2000 >= thresholds.head && tcdYear == 2000) || (tcd2010 >= thresholds.head && tcdYear == 2010)) {
 
               if (loss != null) {
                 summary.lossYear(loss).area_loss += areaHa
@@ -92,15 +92,17 @@ object TreeLossSummary {
                 summary.lossYear(loss).carbon_emissions += co2Pixel
               }
 
-              summary.extent2000 += areaHa
+              if (tcdYear == 2000) summary.extent2000 += areaHa
+              else if (tcdYear == 2010) summary.extent2010 += areaHa
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
               summary.biomassHistogram.countItem(biomass)
             }
 
-            if (tcd2010 >= thresholds.head) {
+            if (tcd2010 >= thresholds.head && tcdYear == 2000)
               summary.extent2010 += areaHa
-            }
+            else if (tcd2000 >= thresholds.head && tcdYear == 2010)
+              summary.extent2000 += areaHa
 
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
           }
@@ -109,7 +111,7 @@ object TreeLossSummary {
         val updatedSummary: Map[TreeLossDataGroup, TreeLossData] =
           updateSummary(thresholds, acc.stats)
 
-        TreeLossSummary(updatedSummary)
+        TreeLossSummary(tcdYear, updatedSummary)
 
       }
     }

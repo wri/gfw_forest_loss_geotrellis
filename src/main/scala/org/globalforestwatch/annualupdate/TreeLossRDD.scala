@@ -28,7 +28,8 @@ object TreeLossRDD extends AnalysisRDD {
 
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
-                          options: Rasterizer.Options): SUMMARY = {
+                          options: Rasterizer.Options,
+                          tcdYear: Int = 2000): SUMMARY = {
     raster.polygonalSummary(
       geometry = geometry,
       emptyResult = new TreeLossSummary(),

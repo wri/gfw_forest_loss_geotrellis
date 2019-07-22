@@ -24,9 +24,11 @@ trait AnalysisRDD extends LazyLogging with java.io.Serializable {
     * @param windowLayout window layout used for distribution of IO, subdivision of 10x10 degree grid
     * @param partitioner how to partition keys from the windowLayout
     */
-  def apply(featureRDD: RDD[Feature[Geometry, FEATUREID]],
-            windowLayout: LayoutDefinition,
-            partitioner: Partitioner): RDD[(FEATUREID, SUMMARY)] = {
+  def apply(
+             featureRDD: RDD[Feature[Geometry, FEATUREID]],
+             windowLayout: LayoutDefinition,
+             partitioner: Partitioner,
+             tcdYear: Int = 2000): RDD[(FEATUREID, SUMMARY)] = {
 
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.
@@ -97,7 +99,8 @@ trait AnalysisRDD extends LazyLogging with java.io.Serializable {
                         runPolygonalSummary(
                           raster,
                           feature.geom,
-                          rasterizeOptions
+                          rasterizeOptions,
+                          tcdYear
                         )
 
                       } catch {
@@ -136,7 +139,8 @@ trait AnalysisRDD extends LazyLogging with java.io.Serializable {
 
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
-                          options: Rasterizer.Options): SUMMARY
+                          options: Rasterizer.Options,
+                          tcdYear: Int): SUMMARY
 
   def reduceSummarybyKey(
     featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]

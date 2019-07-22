@@ -10,8 +10,8 @@ import org.globalforestwatch.layers._
   */
 case class TreeLossTile(loss: TreeCoverLoss#ITile,
                         gain: TreeCoverGain#ITile,
-                        tcd2000: TreeCoverDensity#ITile,
-                        tcd2010: TreeCoverDensity#ITile,
+                        tcd2000: TreeCoverDensity2000#ITile,
+                        tcd2010: TreeCoverDensity2010#ITile,
                         biomass: BiomassPerHectar#OptionalDTile,
                         primaryForest: PrimaryForest#OptionalITile)
   extends CellGrid {

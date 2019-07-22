@@ -13,8 +13,8 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
 
   lazy val treeCoverLoss = TreeCoverLoss(gridId)
   lazy val treeCoverGain = TreeCoverGain(gridId)
-  lazy val treeCoverDensity2000 = TreeCoverDensity2000(gridId)
-  lazy val treeCoverDensity2010 = TreeCoverDensity2010(gridId)
+  lazy val treeCoverDensity2000 = TreeCoverDensityThresholds2000(gridId)
+  lazy val treeCoverDensity2010 = TreeCoverDensityThresholds2010(gridId)
   lazy val biomassPerHectar = BiomassPerHectar(gridId)
 
   lazy val mangroveBiomass = MangroveBiomass(gridId)

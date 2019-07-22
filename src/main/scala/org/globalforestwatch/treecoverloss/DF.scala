@@ -17,6 +17,7 @@ object DF {
       Seq(
         "feature_id",
         "threshold",
+        "tcd_year",
         "primary_forest",
         "extent_2000",
         "extent_2010",
@@ -32,6 +33,7 @@ object DF {
     df.select(
       $"feature_id",
       $"threshold",
+      $"tcd_year",
       $"primary_forest",
       $"extent_2000",
       $"extent_2010",
@@ -114,65 +116,65 @@ object DF {
         .getItem("biomass_loss") as "biomass_loss_2018",
       'year_data
         .getItem(0)
-        .getItem("carbon_emissions") as "carbon_emissions_2001",
+        .getItem("carbon_emissions") as "co2_emissions_2001",
       'year_data
         .getItem(1)
-        .getItem("carbon_emissions") as "carbon_emissions_2002",
+        .getItem("carbon_emissions") as "co2_emissions_2002",
       'year_data
         .getItem(2)
-        .getItem("carbon_emissions") as "carbon_emissions_2003",
+        .getItem("carbon_emissions") as "co2_emissions_2003",
       'year_data
         .getItem(3)
-        .getItem("carbon_emissions") as "carbon_emissions_2004",
+        .getItem("carbon_emissions") as "co2_emissions_2004",
       'year_data
         .getItem(4)
-        .getItem("carbon_emissions") as "carbon_emissions_2005",
+        .getItem("carbon_emissions") as "co2_emissions_2005",
       'year_data
         .getItem(5)
-        .getItem("carbon_emissions") as "carbon_emissions_2006",
+        .getItem("carbon_emissions") as "co2_emissions_2006",
       'year_data
         .getItem(6)
-        .getItem("carbon_emissions") as "carbon_emissions_2007",
+        .getItem("carbon_emissions") as "co2_emissions_2007",
       'year_data
         .getItem(7)
-        .getItem("carbon_emissions") as "carbon_emissions_2008",
+        .getItem("carbon_emissions") as "co2_emissions_2008",
       'year_data
         .getItem(8)
-        .getItem("carbon_emissions") as "carbon_emissions_2009",
+        .getItem("carbon_emissions") as "co2_emissions_2009",
       'year_data
         .getItem(9)
-        .getItem("carbon_emissions") as "carbon_emissions_2010",
+        .getItem("carbon_emissions") as "co2_emissions_2010",
       'year_data
         .getItem(10)
-        .getItem("carbon_emissions") as "carbon_emissions_2011",
+        .getItem("carbon_emissions") as "co2_emissions_2011",
       'year_data
         .getItem(11)
-        .getItem("carbon_emissions") as "carbon_emissions_2012",
+        .getItem("carbon_emissions") as "co2_emissions_2012",
       'year_data
         .getItem(12)
-        .getItem("carbon_emissions") as "carbon_emissions_2013",
+        .getItem("carbon_emissions") as "co2_emissions_2013",
       'year_data
         .getItem(13)
-        .getItem("carbon_emissions") as "carbon_emissions_2014",
+        .getItem("carbon_emissions") as "co2_emissions_2014",
       'year_data
         .getItem(14)
-        .getItem("carbon_emissions") as "carbon_emissions_2015",
+        .getItem("carbon_emissions") as "co2_emissions_2015",
       'year_data
         .getItem(15)
-        .getItem("carbon_emissions") as "carbon_emissions_2016",
+        .getItem("carbon_emissions") as "co2_emissions_2016",
       'year_data
         .getItem(16)
-        .getItem("carbon_emissions") as "carbon_emissions_2017",
+        .getItem("carbon_emissions") as "co2_emissions_2017",
       'year_data
         .getItem(17)
-        .getItem("carbon_emissions") as "carbon_emissions_2018"
+        .getItem("carbon_emissions") as "co2_emissions_2018"
     )
   }
 
   def primaryForestFilter(include: Boolean)(df: DataFrame): DataFrame = {
     if (include) df
     else {
-      df.groupBy($"feature_id", $"threshold")
+      df.groupBy($"feature_id", $"threshold", $"tcd_year")
         .agg(
           sum("total_area") as "total_area",
           sum("extent_2000") as "extent_2000",
@@ -217,24 +219,24 @@ object DF {
           sum("biomass_loss_2016") as "biomass_loss_2016",
           sum("biomass_loss_2017") as "biomass_loss_2017",
           sum("biomass_loss_2018") as "biomass_loss_2018",
-          sum("carbon_emissions_2001") as "carbon_emissions_2001",
-          sum("carbon_emissions_2002") as "carbon_emissions_2002",
-          sum("carbon_emissions_2003") as "carbon_emissions_2003",
-          sum("carbon_emissions_2004") as "carbon_emissions_2004",
-          sum("carbon_emissions_2005") as "carbon_emissions_2005",
-          sum("carbon_emissions_2006") as "carbon_emissions_2006",
-          sum("carbon_emissions_2007") as "carbon_emissions_2007",
-          sum("carbon_emissions_2008") as "carbon_emissions_2008",
-          sum("carbon_emissions_2009") as "carbon_emissions_2009",
-          sum("carbon_emissions_2010") as "carbon_emissions_2010",
-          sum("carbon_emissions_2011") as "carbon_emissions_2011",
-          sum("carbon_emissions_2012") as "carbon_emissions_2012",
-          sum("carbon_emissions_2013") as "carbon_emissions_2013",
-          sum("carbon_emissions_2014") as "carbon_emissions_2014",
-          sum("carbon_emissions_2015") as "carbon_emissions_2015",
-          sum("carbon_emissions_2016") as "carbon_emissions_2016",
-          sum("carbon_emissions_2017") as "carbon_emissions_2017",
-          sum("carbon_emissions_2018") as "carbon_emissions_2018"
+          sum("co2_emissions_2001") as "co2_emissions_2001",
+          sum("co2_emissions_2002") as "co2_emissions_2002",
+          sum("co2_emissions_2003") as "co2_emissions_2003",
+          sum("co2_emissions_2004") as "co2_emissions_2004",
+          sum("co2_emissions_2005") as "co2_emissions_2005",
+          sum("co2_emissions_2006") as "co2_emissions_2006",
+          sum("co2_emissions_2007") as "co2_emissions_2007",
+          sum("co2_emissions_2008") as "co2_emissions_2008",
+          sum("co2_emissions_2009") as "co2_emissions_2009",
+          sum("co2_emissions_2010") as "co2_emissions_2010",
+          sum("co2_emissions_2011") as "co2_emissions_2011",
+          sum("co2_emissions_2012") as "co2_emissions_2012",
+          sum("co2_emissions_2013") as "co2_emissions_2013",
+          sum("co2_emissions_2014") as "co2_emissions_2014",
+          sum("co2_emissions_2015") as "co2_emissions_2015",
+          sum("co2_emissions_2016") as "co2_emissions_2016",
+          sum("co2_emissions_2017") as "co2_emissions_2017",
+          sum("co2_emissions_2018") as "co2_emissions_2018"
         )
     }
   }

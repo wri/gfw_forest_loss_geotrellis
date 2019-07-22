@@ -15,6 +15,7 @@ object TreeLossSparkSession {
 
     val localConf: SparkConf = conf
       .setIfMissing("spark.master", "local[*]")
+    //      .set("spark.driver.bindAddress", "127.0.0.1")
 
     implicit val spark: SparkSession = try {
       SparkSession.builder.config(conf).getOrCreate

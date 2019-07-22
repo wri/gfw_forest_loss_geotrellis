@@ -12,7 +12,7 @@ import org.globalforestwatch.layers._
 case class CarbonFluxGridSources(gridId: String) extends GridSources {
 
   lazy val treeCoverLoss = TreeCoverLoss(gridId)
-  lazy val treeCoverDensity2000 = TreeCoverDensity2000(gridId)
+  lazy val treeCoverDensity2000 = TreeCoverDensityThresholds2000(gridId)
 
   lazy val biomassPerHectar = BiomassPerHectar(gridId)
   lazy val grossAnnualRemovalsCarbon = GrossAnnualRemovalsCarbon(gridId)
