@@ -32,7 +32,7 @@ object TreeLossRDD extends AnalysisRDD {
                           tcdYear: Int): SUMMARY = {
     raster.polygonalSummary(
       geometry = geometry,
-      emptyResult = new TreeLossSummary(),
+      emptyResult = new TreeLossSummary(tcdYear),
       options = options
     )
   }

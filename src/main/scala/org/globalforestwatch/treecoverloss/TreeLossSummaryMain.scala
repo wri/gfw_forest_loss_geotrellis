@@ -139,6 +139,7 @@ object TreeLossSummaryMain
                       TreeLossRow(
                         id.cell_id,
                         lossDataGroup.threshold,
+                        tcdYear,
                           lossDataGroup.primaryForest,
                         lossData.extent2000,
                         lossData.extent2010,
@@ -155,6 +156,7 @@ object TreeLossSummaryMain
               .toDF(
                 "feature_id",
                 "threshold",
+                "tcd_year",
                 "primary_forest",
                 "extent_2000",
                 "extent_2010",

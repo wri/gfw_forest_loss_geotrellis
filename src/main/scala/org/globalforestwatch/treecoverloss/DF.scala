@@ -17,6 +17,7 @@ object DF {
       Seq(
         "feature_id",
         "threshold",
+        "tcd_year",
         "primary_forest",
         "extent_2000",
         "extent_2010",
@@ -32,6 +33,7 @@ object DF {
     df.select(
       $"feature_id",
       $"threshold",
+      $"tcd_year",
       $"primary_forest",
       $"extent_2000",
       $"extent_2010",
@@ -172,7 +174,7 @@ object DF {
   def primaryForestFilter(include: Boolean)(df: DataFrame): DataFrame = {
     if (include) df
     else {
-      df.groupBy($"feature_id", $"threshold")
+      df.groupBy($"feature_id", $"threshold", $"tcd_year")
         .agg(
           sum("total_area") as "total_area",
           sum("extent_2000") as "extent_2000",

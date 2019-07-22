@@ -3,6 +3,7 @@ package org.globalforestwatch.treecoverloss
 case class TreeLossRow(
                         featureId: Int,
                         threshold: Int,
+                        tcdYear: Int,
                         primaryForest: Boolean,
                         extent2000: Double,
                         extent2010: Double,
