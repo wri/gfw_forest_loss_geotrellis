@@ -10,8 +10,11 @@ import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
-import org.globalforestwatch.features.{SimpleFeature, SimpleFeatureFilter, SimpleFeatureId}
-
+import org.globalforestwatch.features.{
+  SimpleFeature,
+  SimpleFeatureFilter,
+  SimpleFeatureId
+}
 
 object TreeLossSummaryMain
   extends CommandApp(
@@ -37,6 +40,11 @@ object TreeLossSummaryMain
         "Number of output partitions / files to be written"
       )
         .orNone
+
+      val tcdOpt =
+        Opts
+          .option[Int]("tcd", help = "Select tree cover density year")
+          .withDefault(2000)
 
       val thresholdOpt = Opts
         .options[Int]("threshold", "Treecover threshold to apply")
@@ -74,6 +82,7 @@ object TreeLossSummaryMain
         outputOpt,
         intputPartitionsOpt,
         outputPartitionsOpt,
+        tcdOpt,
         thresholdOpt,
         primartyForestOpt,
         limitOpt,
@@ -84,6 +93,7 @@ object TreeLossSummaryMain
          outputUrl,
          inputPartitionMultiplier,
          maybeOutputPartitions,
+         tcdYear,
          thresholdFilter,
          includePrimaryForest,
          limit,
@@ -97,7 +107,9 @@ object TreeLossSummaryMain
           val featuresDF: DataFrame = spark.read
             .options(Map("header" -> "true", "delimiter" -> "\t"))
             .csv(featureUris.toList: _*)
-            .transform(SimpleFeatureFilter.filter(idStart, idEnd, limit)(spark))
+            .transform(
+              SimpleFeatureFilter.filter(idStart, idEnd, limit)(spark)
+            )
 
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
           val featureRDD: RDD[Feature[Geometry, SimpleFeatureId]] =
@@ -115,7 +127,7 @@ object TreeLossSummaryMain
           )
 
           val summaryRDD: RDD[(SimpleFeatureId, TreeLossSummary)] =
-            TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, part)
+            TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, part, tcdYear)
 
           val summaryDF =
             summaryRDD
