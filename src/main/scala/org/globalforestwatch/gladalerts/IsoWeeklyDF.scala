@@ -2,15 +2,14 @@ package org.globalforestwatch.gladalerts
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{SparkSession, _}
-import org.globalforestwatch.annualupdate.TreeLossSparkSession
+import org.apache.spark.sql._
 
 object IsoWeeklyDF {
 
-  val spark: SparkSession = TreeLossSparkSession()
-  import spark.implicits._
-
   def sumAlerts(df: DataFrame): DataFrame = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
 
     validatePresenceOfColumns(
       df,
@@ -38,8 +37,9 @@ object IsoWeeklyDF {
         "ifl_2016",
         "bra_biomes",
         "alert_count",
-        "area_ha",
-        "co2_emissions_Mt"
+        "alert_area_ha",
+        "co2_emissions_Mt",
+        "total_area_ha"
       )
     )
 
@@ -70,8 +70,9 @@ object IsoWeeklyDF {
     )
       .agg(
         sum("alert_count") as "alert_count",
-        sum("area_ha") as "area_ha",
-        sum("co2_emissions_Mt") as "co2_emissions_Mt"
+        sum("alert_area_ha") as "alert_area_ha",
+        sum("co2_emissions_Mt") as "co2_emissions_Mt",
+        sum("total_area_ha") as "total_area_ha"
       )
   }
 }

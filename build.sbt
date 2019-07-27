@@ -150,8 +150,8 @@ sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-08458452c1d05713b")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
 sparkInstanceCount := 21
-sparkMasterType := "m3.2xlarge"
-sparkCoreType := "m3.2xlarge"
+sparkMasterType := "r3.2xlarge"
+sparkCoreType := "r3.2xlarge"
 sparkMasterEbsSize := Some(10)
 sparkCoreEbsSize := Some(10)
 //sparkMasterPrice := Some(3.0320)
@@ -193,10 +193,10 @@ sparkEmrConfigs             := List(
 
     "spark.dynamicAllocation.enabled" -> "false",
     "spark.executor.cores" -> "1", //5",
-    "spark.executor.memory" -> "3G", //37G
+    "spark.executor.memory" -> "6G", //37G
     "spark.yarn.executor.memoryOverhead" -> "1G", //5G
     "spark.driver.cores" -> "1",
-    "spark.driver.memory" -> "3G",
+    "spark.driver.memory" -> "6G",
     "spark.executor.instances" -> "139", //7 * 200 -1 *  //9 * 50 -1
     "spark.default.parallelism" -> "1390",
     "spark.sql.shuffle.partitions" -> "1390",

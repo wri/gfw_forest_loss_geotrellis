@@ -11,7 +11,7 @@ case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
   val uri: String =
     s"s3://gfw2-data/forest_change/umd_landsat_alerts/prod/analysis/$gladGrid.tif"
 
-  override def lookup(value: Int): (LocalDate, Boolean) = {
+  override def lookup(value: Int): Option[(LocalDate, Boolean)] = {
 
     val confidence = value >= 30000
     val alertDate: Option[LocalDate] = {
@@ -38,7 +38,7 @@ case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
     }
 
     alertDate match {
-      case Some(d: LocalDate) => (d, confidence)
+      case Some(d: LocalDate) => Some(d, confidence)
       case None => null
     }
 

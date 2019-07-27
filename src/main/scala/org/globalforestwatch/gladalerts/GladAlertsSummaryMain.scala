@@ -1,6 +1,7 @@
 package org.globalforestwatch.gladalerts
 
 import java.time.LocalDateTime
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import cats.implicits._
@@ -161,12 +162,18 @@ object GladAlertsSummaryMain
                         val admin1: Integer = id.adm1ToInt
                         val admin2: Integer = id.adm2ToInt
 
+                        val alertDate: String = {
+                          gladAlertsDataGroup.alertDate match {
+                            case Some(d: LocalDate) => d.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                            case _ => null
+                          }
+                        }
+
                         GladAlertsRow(
                           id.country,
                           admin1,
                           admin2,
-                          gladAlertsDataGroup.alertDate
-                            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                          alertDate,
                           gladAlertsDataGroup.isConfirmed,
                           gladAlertsDataGroup.tile.x,
                           gladAlertsDataGroup.tile.y,
@@ -194,8 +201,9 @@ object GladAlertsSummaryMain
                             gladAlertsDataGroup.braBiomes
                           ),
                           gladAlertsData.totalAlerts,
-                          gladAlertsData.totalArea,
-                          gladAlertsData.totalCo2
+                          gladAlertsData.alertArea,
+                          gladAlertsData.co2Emissions,
+                          gladAlertsData.totalArea
                         )
                       }
                     }
@@ -211,11 +219,10 @@ object GladAlertsSummaryMain
                   "z",
                   "layers",
                   "alert_count",
-                  "area_ha",
-                  "co2_emissions_Mt"
+                  "alert_area_ha",
+                  "co2_emissions_Mt",
+                  "total_area_ha"
                 )
-
-            summaryDF.cache()
 
             val csvOptions = Map(
               "header" -> "true",
@@ -233,11 +240,15 @@ object GladAlertsSummaryMain
             val outputPartitionCount =
               maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
+            summaryDF.repartition(partitionExprs = $"iso", $"adm1", $"adm2")
+
+            summaryDF.cache()
+
             val tileDF = summaryDF
               .transform(TileDF.sumAlerts)
 
             tileDF
-              .coalesce(1)
+              //              .coalesce(1)
               .write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/tiles")
@@ -249,7 +260,7 @@ object GladAlertsSummaryMain
             summaryDF.unpersist()
 
             adm2DailyDF
-              .coalesce(1)
+              //              .coalesce(1)
               .write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/adm2_daily")
@@ -257,7 +268,7 @@ object GladAlertsSummaryMain
             val adm2WeeklyDF = adm2DailyDF.transform(Adm2WeeklyDF.sumAlerts)
 
             adm2WeeklyDF
-              .coalesce(1)
+              //              .coalesce(1)
               .write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/adm2_weekly")
@@ -266,7 +277,7 @@ object GladAlertsSummaryMain
               .transform(Adm1WeeklyDF.sumAlerts)
 
             adm1WeeklyDF
-              .coalesce(1)
+              //              .coalesce(1)
               .write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/adm1_weekly")
@@ -275,7 +286,7 @@ object GladAlertsSummaryMain
               .transform(IsoWeeklyDF.sumAlerts)
 
             isoWeeklyDF
-              .coalesce(1)
+              //              .coalesce(1)
               .write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/iso_weekly")

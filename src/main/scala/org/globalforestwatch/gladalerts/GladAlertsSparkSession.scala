@@ -15,11 +15,16 @@ object GladAlertsSparkSession {
     val localConf: SparkConf = conf
       .setIfMissing("spark.master", "local[*]")
 
+    //    val localConf2: SparkConf = localConf
+    //      .set("spark.driver.bindAddress", "127.0.0.1")
+
     implicit val spark: SparkSession = try {
       SparkSession.builder.config(conf).getOrCreate
     } catch {
       case i: java.lang.ExceptionInInitializerError =>
         SparkSession.builder.config(localConf).getOrCreate
+      //      case b: java.net.BindException =>
+      //        SparkSession.builder.config(localConf2).getOrCreate
       case e: Throwable => throw e
     }
     spark

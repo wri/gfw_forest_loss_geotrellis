@@ -3,14 +3,14 @@ package org.globalforestwatch.gladalerts
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.SparkSession
 
 object Adm2DailyDF {
 
-  val spark: SparkSession = GladAlertsSparkSession()
-  import spark.implicits._
-
   def unpackValues(df: DataFrame): DataFrame = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
+
     validatePresenceOfColumns(
       df,
       Seq(
@@ -21,8 +21,9 @@ object Adm2DailyDF {
         "is_confirmed",
         "layers",
         "alert_count",
-        "area_ha",
-        "co2_emissions_Mt"
+        "alert_area_ha",
+        "co2_emissions_Mt",
+        "total_area_ha"
       )
     )
 
@@ -53,12 +54,16 @@ object Adm2DailyDF {
         $"layers.intactForestLandscapes2016" as "ifl_2016",
         $"layers.braBiomes" as "bra_biomes",
         $"alert_count",
-        $"area_ha",
-        $"co2_emissions_Mt"
+        $"alert_area_ha",
+        $"co2_emissions_Mt",
+        $"total_area_ha"
       )
   }
 
   def sumAlerts(df: DataFrame): DataFrame = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
 
     validatePresenceOfColumns(
       df,
@@ -88,8 +93,9 @@ object Adm2DailyDF {
         "ifl_2016",
         "bra_biomes",
         "alert_count",
-        "area_ha",
-        "co2_emissions_Mt"
+        "alert_area_ha",
+        "co2_emissions_Mt",
+        "total_area_ha"
       )
     )
 
@@ -121,8 +127,9 @@ object Adm2DailyDF {
     )
       .agg(
         sum("alert_count") as "alert_count",
-        sum("area_ha") as "area_ha",
-        sum("co2_emissions_Mt") as "co2_emissions_Mt"
+        sum("alert_area_ha") as "alert_area_ha",
+        sum("co2_emissions_Mt") as "co2_emissions_Mt",
+        sum("total_area_ha") as "total_area_ha"
       )
   }
 }
