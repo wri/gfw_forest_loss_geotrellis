@@ -226,7 +226,7 @@ object GladAlertsSummaryMain
 
             val csvOptions = Map(
               "header" -> "true",
-              "delimiter" -> "\t",
+              "delimiter" -> ",",
               "quote" -> "\u0000",
               "quoteMode" -> "NONE",
               "nullValue" -> "\u0000"
