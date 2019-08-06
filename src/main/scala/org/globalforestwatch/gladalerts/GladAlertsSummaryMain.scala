@@ -248,7 +248,6 @@ object GladAlertsSummaryMain
               .transform(TileDF.sumAlerts)
 
             tileDF
-              //              .coalesce(1)
               .write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/tiles")
@@ -260,7 +259,6 @@ object GladAlertsSummaryMain
             summaryDF.unpersist()
 
             adm2DailyDF
-              //              .coalesce(1)
               .write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/adm2_daily")
@@ -268,7 +266,6 @@ object GladAlertsSummaryMain
             val adm2WeeklyDF = adm2DailyDF.transform(Adm2WeeklyDF.sumAlerts)
 
             adm2WeeklyDF
-              //              .coalesce(1)
               .write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/adm2_weekly")
@@ -277,7 +274,6 @@ object GladAlertsSummaryMain
               .transform(Adm1WeeklyDF.sumAlerts)
 
             adm1WeeklyDF
-              //              .coalesce(1)
               .write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/adm1_weekly")
@@ -286,7 +282,6 @@ object GladAlertsSummaryMain
               .transform(IsoWeeklyDF.sumAlerts)
 
             isoWeeklyDF
-              //              .coalesce(1)
               .write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/iso_weekly")
