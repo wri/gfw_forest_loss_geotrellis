@@ -3,7 +3,7 @@ package org.globalforestwatch.features
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.substring
 
-object SimpleFeatureFilter {
+object SimpleFeatureFilter extends FeatureFilter {
 
   def filter(idStart: Option[Int], idEnd: Option[Int], limit: Option[Int])(
     spark: SparkSession

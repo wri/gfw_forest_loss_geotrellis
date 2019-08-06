@@ -3,7 +3,7 @@ package org.globalforestwatch.features
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.substring
 
-object GadmFeatureFilter {
+object GadmFeatureFilter extends FeatureFilter {
 
   def filter(isoFirst: Option[String],
              isoStart: Option[String],
