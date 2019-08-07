@@ -9,12 +9,13 @@ import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.vector._
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
+import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
 
 trait AnalysisRDD extends LazyLogging with java.io.Serializable {
 
   type SOURCES <: GridSources
-  type FEATUREID
+  //  type FEATUREID <: FeatureId
   type SUMMARY
   type TILE <: CellGrid
 
@@ -24,7 +25,7 @@ trait AnalysisRDD extends LazyLogging with java.io.Serializable {
     * @param windowLayout window layout used for distribution of IO, subdivision of 10x10 degree grid
     * @param partitioner how to partition keys from the windowLayout
     */
-  def apply(
+  def apply[FEATUREID <: FeatureId](
              featureRDD: RDD[Feature[Geometry, FEATUREID]],
              windowLayout: LayoutDefinition,
              partitioner: Partitioner,
@@ -129,7 +130,7 @@ trait AnalysisRDD extends LazyLogging with java.io.Serializable {
      * The features may have intersected multiple grid blocks
      */
     val featuresGroupedWithSummaries: RDD[(FEATUREID, SUMMARY)] =
-      reduceSummarybyKey(featuresWithSummaries): RDD[(FEATUREID, SUMMARY)]
+      reduceSummarybyKey[FEATUREID](featuresWithSummaries): RDD[(FEATUREID, SUMMARY)]
     featuresGroupedWithSummaries
   }
 
@@ -142,7 +143,7 @@ trait AnalysisRDD extends LazyLogging with java.io.Serializable {
                           options: Rasterizer.Options,
                           tcdYear: Int): SUMMARY
 
-  def reduceSummarybyKey(
+  def reduceSummarybyKey[FEATUREID <: FeatureId](
     featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
   ): RDD[(FEATUREID, SUMMARY)]
 }

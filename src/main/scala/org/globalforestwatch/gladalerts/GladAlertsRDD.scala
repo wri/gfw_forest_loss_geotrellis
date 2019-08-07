@@ -7,12 +7,11 @@ import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.util.AnalysisRDD
-import org.globalforestwatch.features.GadmFeatureId
+import org.globalforestwatch.features.FeatureId
 
 object GladAlertsRDD extends AnalysisRDD {
 
   type SOURCES = GladAlertsGridSources
-  type FEATUREID = GadmFeatureId
   type SUMMARY = GladAlertsSummary
   type TILE = GladAlertsTile
 
@@ -37,7 +36,7 @@ object GladAlertsRDD extends AnalysisRDD {
     )
   }
 
-  def reduceSummarybyKey(
+  def reduceSummarybyKey[FEATUREID <: FeatureId](
                           featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
                         ): RDD[(FEATUREID, SUMMARY)] = {
     featuresWithSummaries.reduceByKey {

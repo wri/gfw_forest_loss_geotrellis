@@ -1,16 +1,16 @@
 package org.globalforestwatch.gladalerts
 
 import java.time.LocalDate
+
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import cats.implicits._
-import org.globalforestwatch.util.Geodesy
-import org.globalforestwatch.util.Mercantile
+import org.globalforestwatch.util.{Geodesy, Mercantile, Summary}
 
 /** LossData Summary by year */
 case class GladAlertsSummary(
   stats: Map[GladAlertsDataGroup, GladAlertsData] = Map.empty
-) {
+                            ) extends Summary[GladAlertsSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: GladAlertsSummary): GladAlertsSummary = {

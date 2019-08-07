@@ -11,8 +11,7 @@ import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
-import org.globalforestwatch.features.{GadmFeature, GadmFeatureFilter, GadmFeatureId}
-
+import org.globalforestwatch.features._
 
 object GladAlertsSummaryMain
     extends CommandApp(
@@ -38,6 +37,13 @@ object GladAlertsSummaryMain
             "Number of output partitions / files to be written"
           )
           .orNone
+
+        val featureTypeOpt = Opts
+          .option[String](
+          "feature_type",
+          help = "Feature type: Simple feature or GADM"
+        )
+          .withDefault("feature")
 
         val limitOpt = Opts
           .option[Int]("limit", help = "Limit number of records processed")
@@ -89,6 +95,7 @@ object GladAlertsSummaryMain
           outputOpt,
           intputPartitionsOpt,
           outputPartitionsOpt,
+          featureTypeOpt,
           limitOpt,
           isoOpt,
           isoFirstOpt,
@@ -103,6 +110,7 @@ object GladAlertsSummaryMain
            outputUrl,
            inputPartitionMultiplier,
            maybeOutputPartitions,
+           featureType,
            limit,
            iso,
            isoFirst,
@@ -113,7 +121,6 @@ object GladAlertsSummaryMain
            tcl,
            glad) =>
             val spark: SparkSession = GladAlertsSparkSession()
-
             import spark.implicits._
 
             // ref: https://github.com/databricks/spark-csv
@@ -134,14 +141,15 @@ object GladAlertsSummaryMain
                 )
               )
 
+
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
-            val featureRDD: RDD[Feature[Geometry, GadmFeatureId]] =
+            val featureRDD: RDD[Feature[Geometry, FeatureId]] =
               featuresDF.rdd.mapPartitions({ iter: Iterator[Row] =>
                 for {
                   i <- iter
-                  if GadmFeature.isValidGeom(i)
+                  if FeatureFactory.isValidGeom(featureType, i)
                 } yield {
-                  GadmFeature.getFeature(i)
+                  FeatureFactory.getFeature(featureType, i)
                 }
               }, preservesPartitioning = true)
 
@@ -149,7 +157,7 @@ object GladAlertsSummaryMain
               partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
             )
 
-            val summaryRDD: RDD[(GadmFeatureId, GladAlertsSummary)] =
+            val summaryRDD: RDD[(FeatureId, GladAlertsSummary)] =
               GladAlertsRDD(featureRDD, GladAlertsGrid.blockTileGrid, part)
 
             val summaryDF =
@@ -158,21 +166,22 @@ object GladAlertsSummaryMain
                   case (id, gladAlertSummary) =>
                     gladAlertSummary.stats.map {
                       case (gladAlertsDataGroup, gladAlertsData) => {
-
-                        val admin1: Integer = id.adm1ToInt
-                        val admin2: Integer = id.adm2ToInt
+                        //
+                        //                        val admin1: Integer = id.adm1ToInt
+                        //                        val admin2: Integer = id.adm2ToInt
 
                         val alertDate: String = {
                           gladAlertsDataGroup.alertDate match {
-                            case Some(d: LocalDate) => d.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                            case Some(d: LocalDate) =>
+                              d.format(
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                              )
                             case _ => null
                           }
                         }
 
                         GladAlertsRow(
-                          id.country,
-                          admin1,
-                          admin2,
+                          id,
                           alertDate,
                           gladAlertsDataGroup.isConfirmed,
                           gladAlertsDataGroup.tile.x,
@@ -209,9 +218,7 @@ object GladAlertsSummaryMain
                     }
                 }
                 .toDF(
-                  "iso",
-                  "adm1",
-                  "adm2",
+                  "id",
                   "alert_date",
                   "is_confirmed",
                   "x",
@@ -240,15 +247,16 @@ object GladAlertsSummaryMain
             val outputPartitionCount =
               maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
-            summaryDF.repartition(partitionExprs = $"iso", $"adm1", $"adm2")
+            summaryDF.repartition(partitionExprs = $"id")
 
             summaryDF.cache()
+
+            // TODO: From here on, unpack feature Id and change fields accordingly
 
             val tileDF = summaryDF
               .transform(TileDF.sumAlerts)
 
-            tileDF
-              .write
+            tileDF.write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/tiles")
 
@@ -258,31 +266,27 @@ object GladAlertsSummaryMain
 
             summaryDF.unpersist()
 
-            adm2DailyDF
-              .write
+            adm2DailyDF.write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/adm2_daily")
 
             val adm2WeeklyDF = adm2DailyDF.transform(Adm2WeeklyDF.sumAlerts)
 
-            adm2WeeklyDF
-              .write
+            adm2WeeklyDF.write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/adm2_weekly")
 
             val adm1WeeklyDF = adm2WeeklyDF
               .transform(Adm1WeeklyDF.sumAlerts)
 
-            adm1WeeklyDF
-              .write
+            adm1WeeklyDF.write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/adm1_weekly")
 
             val isoWeeklyDF = adm1WeeklyDF
               .transform(IsoWeeklyDF.sumAlerts)
 
-            isoWeeklyDF
-              .write
+            isoWeeklyDF.write
               .options(csvOptions)
               .csv(path = runOutputUrl + "/iso_weekly")
 

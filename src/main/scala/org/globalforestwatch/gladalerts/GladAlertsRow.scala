@@ -1,8 +1,8 @@
 package org.globalforestwatch.gladalerts
 
-case class GladAlertsRow(iso: String,
-                         adm1: Integer,
-                         adm2: Integer,
+import org.globalforestwatch.features.FeatureId
+
+case class GladAlertsRow(id: FeatureId,
                          alertDate: String,
                          isConfirmed: Option[Boolean],
                          x: Int,
