@@ -141,15 +141,16 @@ object GladAlertsSummaryMain
                 )
               )
 
+            val featureObj = FeatureFactory(featureType)
 
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
             val featureRDD: RDD[Feature[Geometry, FeatureId]] =
               featuresDF.rdd.mapPartitions({ iter: Iterator[Row] =>
                 for {
                   i <- iter
-                  if FeatureFactory.isValidGeom(featureType, i)
+                  if featureObj.isValidGeom(i)
                 } yield {
-                  FeatureFactory.getFeature(featureType, i)
+                  featureObj.getFeature(i)
                 }
               }, preservesPartitioning = true)
 
