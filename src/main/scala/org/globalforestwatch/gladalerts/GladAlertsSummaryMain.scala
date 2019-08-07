@@ -231,18 +231,6 @@ object GladAlertsSummaryMain
                   "total_area_ha"
                 )
 
-            val csvOptions = Map(
-              "header" -> "true",
-              "delimiter" -> ",",
-              "quote" -> "\u0000",
-              "quoteMode" -> "NONE",
-              "nullValue" -> "\u0000"
-            )
-
-            val runOutputUrl = outputUrl +
-              "/gladAlerts_" + DateTimeFormatter
-              .ofPattern("yyyyMMdd_HHmm")
-              .format(LocalDateTime.now)
 
             val outputPartitionCount =
               maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
@@ -251,44 +239,7 @@ object GladAlertsSummaryMain
 
             summaryDF.cache()
 
-            // TODO: From here on, unpack feature Id and change fields accordingly
-
-            val tileDF = summaryDF
-              .transform(TileDF.sumAlerts)
-
-            tileDF.write
-              .options(csvOptions)
-              .csv(path = runOutputUrl + "/tiles")
-
-            val adm2DailyDF = summaryDF
-              .transform(Adm2DailyDF.unpackValues)
-              .transform(Adm2DailyDF.sumAlerts)
-
-            summaryDF.unpersist()
-
-            adm2DailyDF.write
-              .options(csvOptions)
-              .csv(path = runOutputUrl + "/adm2_daily")
-
-            val adm2WeeklyDF = adm2DailyDF.transform(Adm2WeeklyDF.sumAlerts)
-
-            adm2WeeklyDF.write
-              .options(csvOptions)
-              .csv(path = runOutputUrl + "/adm2_weekly")
-
-            val adm1WeeklyDF = adm2WeeklyDF
-              .transform(Adm1WeeklyDF.sumAlerts)
-
-            adm1WeeklyDF.write
-              .options(csvOptions)
-              .csv(path = runOutputUrl + "/adm1_weekly")
-
-            val isoWeeklyDF = adm1WeeklyDF
-              .transform(IsoWeeklyDF.sumAlerts)
-
-            isoWeeklyDF.write
-              .options(csvOptions)
-              .csv(path = runOutputUrl + "/iso_weekly")
+            Export.export(featureType, summaryDF, outputUrl)
 
             spark.stop
         }

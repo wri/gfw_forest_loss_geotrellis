@@ -14,9 +14,7 @@ object Adm2DailyDF {
     validatePresenceOfColumns(
       df,
       Seq(
-        "iso",
-        "adm1",
-        "adm2",
+        "id",
         "alert_date",
         "is_confirmed",
         "layers",
@@ -29,9 +27,9 @@ object Adm2DailyDF {
 
     df.filter($"z" === 0)
       .select(
-        $"iso",
-        $"adm1",
-        $"adm2",
+        $"id.country" as "iso",
+        $"id.admin1" as "adm1",
+        $"id.admin2" as "adm2",
         $"alert_date",
         $"is_confirmed",
         $"layers.primaryForest" as "primary_forest",
