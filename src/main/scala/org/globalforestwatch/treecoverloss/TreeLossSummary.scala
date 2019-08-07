@@ -2,13 +2,13 @@ package org.globalforestwatch.treecoverloss
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import cats.implicits._
-import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.util.{Geodesy, Summary}
 import geotrellis.raster.histogram.StreamingHistogram
 
 /** LossData Summary by year */
 case class TreeLossSummary(tcdYear: Int,
                            stats: Map[TreeLossDataGroup, TreeLossData] =
-                           Map.empty) {
+                           Map.empty) extends Summary[TreeLossSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: TreeLossSummary): TreeLossSummary = {

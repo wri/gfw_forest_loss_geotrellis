@@ -1,18 +1,11 @@
-package org.globalforestwatch.features
+package org.globalforestwatch.gladalerts
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import org.apache.spark.sql.DataFrame
-import org.globalforestwatch.gladalerts.{
-  Adm1WeeklyDF,
-  Adm2DailyDF,
-  Adm2WeeklyDF,
-  IsoWeeklyDF,
-  TileDF
-}
 
-object Export {
+object GladAlertsExport {
 
   val csvOptions: Map[String, String] = Map(
     "header" -> "true",

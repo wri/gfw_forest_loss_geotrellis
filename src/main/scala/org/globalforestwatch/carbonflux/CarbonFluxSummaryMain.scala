@@ -156,12 +156,12 @@ object CarbonFluxSummaryMain
                   case (id, treeLossSummary) =>
                     treeLossSummary.stats.map {
                       case (lossDataGroup, lossData) => {
-
-                        val admin1: Integer = id.adm1ToInt
-                        val admin2: Integer = id.adm2ToInt
+                        //
+                        //                        val admin1: Integer = id.adm1ToInt
+                        //                        val admin2: Integer = id.adm2ToInt
 
                         CarbonFluxRow(
-                          CarbonFluxRowFeatureId(id.country, admin1, admin2),
+                          CarbonFluxRowFeatureId(id.country, id.admin1, id.admin2),
                           lossDataGroup.threshold,
                           CarbonFluxRowLayers(
                             lossDataGroup.gain,

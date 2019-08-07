@@ -12,7 +12,7 @@ import org.globalforestwatch.util.AnalysisRDD
 object TreeLossRDD extends AnalysisRDD {
 
   type SOURCES = TreeLossGridSources
-  type FEATUREID = SimpleFeatureId
+  //  type FEATUREID = SimpleFeatureId
   type SUMMARY = TreeLossSummary
   type TILE = TreeLossTile
 
@@ -37,14 +37,14 @@ object TreeLossRDD extends AnalysisRDD {
     )
   }
 
-  def reduceSummarybyKey(
-                          featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
-                        ): RDD[(FEATUREID, SUMMARY)] = {
-    featuresWithSummaries.reduceByKey {
-      case (summary1, summary2) =>
-        summary1.merge(summary2)
-    }
-
-  }
+  //  def reduceSummarybyKey(
+  //                          featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
+  //                        ): RDD[(FEATUREID, SUMMARY)] = {
+  //    featuresWithSummaries.reduceByKey {
+  //      case (summary1, summary2) =>
+  //        summary1.merge(summary2)
+  //    }
+  //
+  //  }
 
 }

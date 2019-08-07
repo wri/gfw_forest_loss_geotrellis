@@ -12,7 +12,7 @@ import org.globalforestwatch.features.GadmFeatureId
 object CarbonFluxRDD extends AnalysisRDD {
 
   type SOURCES = CarbonFluxGridSources
-  type FEATUREID = GadmFeatureId
+  //  type FEATUREID = GadmFeatureId
   type SUMMARY = CarbonFluxSummary
   type TILE = CarbonFluxTile
 
@@ -37,14 +37,14 @@ object CarbonFluxRDD extends AnalysisRDD {
     )
   }
 
-  def reduceSummarybyKey(
-                          featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
-                        ): RDD[(FEATUREID, SUMMARY)] = {
-    featuresWithSummaries.reduceByKey {
-      case (summary1, summary2) =>
-        summary1.merge(summary2)
-    }
-
-  }
+  //  def reduceSummarybyKey(
+  //                          featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
+  //                        ): RDD[(FEATUREID, SUMMARY)] = {
+  //    featuresWithSummaries.reduceByKey {
+  //      case (summary1, summary2) =>
+  //        summary1.merge(summary2)
+  //    }
+  //
+  //  }
 
 }

@@ -36,14 +36,14 @@ object GladAlertsRDD extends AnalysisRDD {
     )
   }
 
-  def reduceSummarybyKey[FEATUREID <: FeatureId](
-                          featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
-                        ): RDD[(FEATUREID, SUMMARY)] = {
-    featuresWithSummaries.reduceByKey {
-      case (summary1, summary2) =>
-        summary1.merge(summary2)
-    }
-
-  }
+  //  def reduceSummarybyKey[FEATUREID <: FeatureId](
+  //                          featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
+  //                        ): RDD[(FEATUREID, SUMMARY)] = {
+  //    featuresWithSummaries.reduceByKey {
+  //      case (summary1, summary2) =>
+  //        summary1.merge(summary2)
+  //    }
+  //
+  //  }
 
 }

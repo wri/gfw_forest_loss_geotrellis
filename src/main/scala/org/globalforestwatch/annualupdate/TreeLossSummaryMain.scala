@@ -157,11 +157,11 @@ object TreeLossSummaryMain
                     treeLossSummary.stats.map {
                       case (lossDataGroup, lossData) => {
 
-                        val admin1: Integer = id.adm1ToInt
-                        val admin2: Integer = id.adm2ToInt
+                        //                        val admin1: Integer = id.adm1ToInt
+                        //                        val admin2: Integer = id.adm2ToInt
 
                         TreeLossRow(
-                          TreeLossRowFeatureId(id.country, admin1, admin2),
+                          TreeLossRowFeatureId(id.country, id.admin1, id.admin2),
                           lossDataGroup.threshold,
                           TreeLossRowLayers(
                             lossDataGroup.drivers,

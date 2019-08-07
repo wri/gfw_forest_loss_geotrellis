@@ -3,13 +3,13 @@ package org.globalforestwatch.carbonflux
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import cats.implicits._
-import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.util.{Geodesy, Summary}
 import geotrellis.raster.histogram.StreamingHistogram
 
 /** LossData Summary by year */
 case class CarbonFluxSummary(
   stats: Map[CarbonFluxDataGroup, CarbonFluxData] = Map.empty
-) {
+                            ) extends Summary[CarbonFluxSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: CarbonFluxSummary): CarbonFluxSummary = {

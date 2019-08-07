@@ -239,7 +239,7 @@ object GladAlertsSummaryMain
 
             summaryDF.cache()
 
-            Export.export(featureType, summaryDF, outputUrl)
+            GladAlertsExport.export(featureType, summaryDF, outputUrl)
 
             spark.stop
         }

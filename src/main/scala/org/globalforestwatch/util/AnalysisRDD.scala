@@ -11,12 +11,16 @@ import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
+import org.apache.spark._
+import org.apache.spark.SparkContext._
+
+import scala.reflect.ClassTag
 
 trait AnalysisRDD extends LazyLogging with java.io.Serializable {
 
   type SOURCES <: GridSources
   //  type FEATUREID <: FeatureId
-  type SUMMARY
+  type SUMMARY <: Summary[SUMMARY]
   type TILE <: CellGrid
 
   /** Produce RDD of tree cover loss from RDD of areas of interest*
@@ -26,10 +30,10 @@ trait AnalysisRDD extends LazyLogging with java.io.Serializable {
     * @param partitioner how to partition keys from the windowLayout
     */
   def apply[FEATUREID <: FeatureId](
-             featureRDD: RDD[Feature[Geometry, FEATUREID]],
-             windowLayout: LayoutDefinition,
-             partitioner: Partitioner,
-             tcdYear: Int = 2000): RDD[(FEATUREID, SUMMARY)] = {
+                                     featureRDD: RDD[Feature[Geometry, FEATUREID]],
+                                     windowLayout: LayoutDefinition,
+                                     partitioner: Partitioner,
+                                     tcdYear: Int = 2000)(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
 
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.
@@ -145,5 +149,11 @@ trait AnalysisRDD extends LazyLogging with java.io.Serializable {
 
   def reduceSummarybyKey[FEATUREID <: FeatureId](
     featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
-  ): RDD[(FEATUREID, SUMMARY)]
+                                                )(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
+    featuresWithSummaries.reduceByKey {
+      case (summary1, summary2) =>
+        summary1.merge(summary2)
+    }
+
+  }
 }
