@@ -12,7 +12,6 @@ import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.globalforestwatch.features.{
   SimpleFeature,
-  SimpleFeatureFilter,
   SimpleFeatureId
 }
 
@@ -46,7 +45,7 @@ object TreeLossSummaryMain
           .option[Int]("tcd", help = "Select tree cover density year")
           .withDefault(2000)
 
-      val thresholdOpt = Opts
+      val thresholdOpts = Opts
         .options[Int]("threshold", "Treecover threshold to apply")
         .orEmpty
 
@@ -75,6 +74,11 @@ object TreeLossSummaryMain
         )
           .orNone
 
+
+      val tclOpt = Opts.flag("tcl", "TCL tile extent").orFalse
+
+      val gladOpt = Opts.flag("glad", "GLAD tile extent").orFalse
+
       val logger = Logger.getLogger("TreeLossSummaryMain")
 
       (
@@ -83,11 +87,13 @@ object TreeLossSummaryMain
         intputPartitionsOpt,
         outputPartitionsOpt,
         tcdOpt,
-        thresholdOpt,
+        thresholdOpts,
         primartyForestOpt,
         limitOpt,
         idStartOpt,
-        idEndOpt
+        idEndOpt,
+        tclOpt,
+        gladOpt
       ).mapN {
         (featureUris,
          outputUrl,
@@ -98,17 +104,26 @@ object TreeLossSummaryMain
          includePrimaryForest,
          limit,
          idStart,
-         idEnd) =>
+         idEnd,
+         tcl,
+         glad) =>
           val spark: SparkSession = TreeLossSparkSession()
-
           import spark.implicits._
+
+          val filters = Map(
+            "limit" -> limit,
+            "idStart" -> idStart,
+            "idEnd" -> idEnd,
+            "tcl" -> tcl,
+            "glad" -> glad
+          )
 
           // ref: https://github.com/databricks/spark-csv
           val featuresDF: DataFrame = spark.read
             .options(Map("header" -> "true", "delimiter" -> "\t"))
             .csv(featureUris.toList: _*)
             .transform(
-              SimpleFeatureFilter.filter(idStart, idEnd, limit)(spark)
+              SimpleFeature.filter(filters)
             )
 
           /* Transition from DataFrame to RDD in order to work with GeoTrellis features */

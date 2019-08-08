@@ -84,6 +84,32 @@ object GladAlertsSummaryMain
           .option[String]("admin2", help = "Filter by country Admin2 code")
           .orNone
 
+        val wdpaIdStartOpt =
+          Opts
+            .option[Int](
+            "wdpaid_start",
+            help = "Filter by WDPA IDs larger than or equal to given value"
+          )
+            .orNone
+
+        val wdpaIdEndOpt =
+          Opts
+            .option[Int](
+            "wdpaid_end",
+            help = "Filter by WDPA IDs smaller than given value"
+          )
+            .orNone
+
+        val iucnCatOpts =
+          Opts
+            .options[String]("iucn_cat", help = "Filter by IUCN Category")
+            .orNone
+
+        val wdpaStatusOpts =
+          Opts
+            .options[String]("wdpa_status", help = "Filter by WDPA Status")
+            .orNone
+
         val tclOpt = Opts.flag("tcl", "TCL tile extent").orFalse
 
         val gladOpt = Opts.flag("glad", "GLAD tile extent").orFalse
@@ -103,6 +129,10 @@ object GladAlertsSummaryMain
           isoEndOpt,
           admin1Opt,
           admin2Opt,
+          wdpaIdStartOpt,
+          wdpaIdEndOpt,
+          iucnCatOpts,
+          wdpaStatusOpts,
           tclOpt,
           gladOpt
         ).mapN {
@@ -118,30 +148,42 @@ object GladAlertsSummaryMain
            isoEnd,
            admin1,
            admin2,
+           wdpaIdStart,
+           wdpaIdEnd,
+           iucnCat,
+           wdpaStatus,
            tcl,
            glad) =>
             val spark: SparkSession = GladAlertsSparkSession()
             import spark.implicits._
+
+            val filters = Map(
+              "limit" -> limit,
+              "iso" -> iso,
+              "isoFirst" -> isoFirst,
+              "isoStart" -> isoStart,
+              "isoEnd" -> isoEnd,
+              "admin1" -> admin1,
+              "admin2" -> admin2,
+              "wdpaIdStart" -> wdpaIdStart,
+              "wdpaIdEnd" -> wdpaIdEnd,
+              "iucnCat" -> iucnCat,
+              "wdpaStatus" -> wdpaStatus,
+              "tcl" -> tcl,
+              "glad" -> glad
+            )
+
+            val featureObj = FeatureFactory(featureType).featureObj
 
             // ref: https://github.com/databricks/spark-csv
             val featuresDF: DataFrame = spark.read
               .options(Map("header" -> "true", "delimiter" -> "\t"))
               .csv(featureUris.toList: _*)
               .transform(
-                GadmFeatureFilter.filter(
-                  isoFirst,
-                  isoStart,
-                  isoEnd,
-                  iso,
-                  admin1,
-                  admin2,
-                  limit,
-                  tcl,
-                  glad
+                featureObj.filter(
+                  filters
                 )
               )
-
-            val featureObj = FeatureFactory(featureType)
 
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
             val featureRDD: RDD[Feature[Geometry, FeatureId]] =
@@ -231,7 +273,6 @@ object GladAlertsSummaryMain
                   "co2_emissions_Mt",
                   "total_area_ha"
                 )
-
 
             val outputPartitionCount =
               maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)

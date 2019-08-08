@@ -12,7 +12,6 @@ import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.globalforestwatch.features.{
   GadmFeature,
-  GadmFeatureFilter,
   GadmFeatureId
 }
 
@@ -115,24 +114,27 @@ object TreeLossSummaryMain
            tcl,
            glad) =>
             val spark: SparkSession = TreeLossSparkSession()
-
             import spark.implicits._
+
+            val filters = Map(
+              "limit" -> limit,
+              "iso" -> iso,
+              "isoFirst" -> isoFirst,
+              "isoStart" -> isoStart,
+              "isoEnd" -> isoEnd,
+              "admin1" -> admin1,
+              "admin2" -> admin2,
+              "tcl" -> tcl,
+              "glad" -> glad
+            )
 
             // ref: https://github.com/databricks/spark-csv
             val featuresDF: DataFrame = spark.read
               .options(Map("header" -> "true", "delimiter" -> "\t"))
               .csv(featureUris.toList: _*)
               .transform(
-                GadmFeatureFilter.filter(
-                  isoFirst,
-                  isoStart,
-                  isoEnd,
-                  iso,
-                  admin1,
-                  admin2,
-                  limit,
-                  tcl,
-                  glad
+                GadmFeature.filter(
+                  filters
                 )
               )
 
