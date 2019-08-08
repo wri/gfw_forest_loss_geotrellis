@@ -11,6 +11,7 @@ import org.apache.spark.sql._
 import cats.implicits._
 import geotrellis.vector.{Feature, Geometry}
 import org.globalforestwatch.features.{GadmFeature, GadmFeatureId}
+import org.globalforestwatch.util.SummarySparkSession
 
 object CarbonFluxSummaryMain
     extends CommandApp(
@@ -110,7 +111,7 @@ object CarbonFluxSummaryMain
            admin2,
            tcl,
            glad) =>
-            val spark: SparkSession = CarbonFluxSparkSession()
+            val spark: SparkSession = SummarySparkSession("Carbon Flux Summary Analysis Spark Session")
             import spark.implicits._
 
             val filters = Map(

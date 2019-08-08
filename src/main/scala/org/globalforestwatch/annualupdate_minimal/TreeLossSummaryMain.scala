@@ -10,10 +10,8 @@ import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
-import org.globalforestwatch.features.{
-  GadmFeature,
-  GadmFeatureId
-}
+import org.globalforestwatch.features.{GadmFeature, GadmFeatureId}
+import org.globalforestwatch.util.SummarySparkSession
 
 object TreeLossSummaryMain
     extends CommandApp(
@@ -113,7 +111,7 @@ object TreeLossSummaryMain
            admin2,
            tcl,
            glad) =>
-            val spark: SparkSession = TreeLossSparkSession()
+            val spark: SparkSession = SummarySparkSession("Minimal Annual Update Summay Analysis Spark Session")
             import spark.implicits._
 
             val filters = Map(

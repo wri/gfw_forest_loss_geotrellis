@@ -10,10 +10,8 @@ import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
-import org.globalforestwatch.features.{
-  SimpleFeature,
-  SimpleFeatureId
-}
+import org.globalforestwatch.features.{SimpleFeature, SimpleFeatureId}
+import org.globalforestwatch.util.SummarySparkSession
 
 object TreeLossSummaryMain
   extends CommandApp(
@@ -107,7 +105,7 @@ object TreeLossSummaryMain
          idEnd,
          tcl,
          glad) =>
-          val spark: SparkSession = TreeLossSparkSession()
+          val spark: SparkSession = SummarySparkSession("Tree Cover Loss Anlaysis Spark Session")
           import spark.implicits._
 
           val filters = Map(

@@ -11,6 +11,7 @@ import org.apache.spark.sql._
 import cats.implicits._
 import geotrellis.vector.{Feature, Geometry}
 import org.globalforestwatch.features.{GadmFeature, GadmFeatureId}
+import org.globalforestwatch.util.SummarySparkSession
 
 object TreeLossSummaryMain
     extends CommandApp(
@@ -110,7 +111,7 @@ object TreeLossSummaryMain
            admin2,
            tcl,
            glad) =>
-            val spark: SparkSession = TreeLossSparkSession()
+            val spark: SparkSession = SummarySparkSession("Annual Update Summary Spark Session")
             import spark.implicits._
 
             val filters = Map(

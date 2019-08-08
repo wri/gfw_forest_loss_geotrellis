@@ -1,6 +1,5 @@
 package org.globalforestwatch.gladalerts
 
-import java.time.LocalDateTime
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -12,6 +11,7 @@ import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.globalforestwatch.features._
+import org.globalforestwatch.util.SummarySparkSession
 
 object GladAlertsSummaryMain
     extends CommandApp(
@@ -154,7 +154,7 @@ object GladAlertsSummaryMain
            wdpaStatus,
            tcl,
            glad) =>
-            val spark: SparkSession = GladAlertsSparkSession()
+            val spark: SparkSession = SummarySparkSession("Glad Alerts Analysis Spark Session")
             import spark.implicits._
 
             val filters = Map(
