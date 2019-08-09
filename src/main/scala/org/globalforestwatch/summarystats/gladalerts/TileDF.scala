@@ -1,4 +1,4 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.summarystats.gladalerts
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql._

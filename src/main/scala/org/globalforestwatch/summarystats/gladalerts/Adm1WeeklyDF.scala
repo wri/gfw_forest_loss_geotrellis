@@ -1,4 +1,4 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.summarystats.gladalerts
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
 import org.apache.spark.sql.functions._

@@ -5,7 +5,7 @@ import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.gladalerts.GladAlertsSummaryAnalysis
+import org.globalforestwatch.summarystats.gladalerts.GladAlertsSummaryAnalysis
 
 case class SummaryAnalysisFactory(analysis: String,
                                   featureRDD: RDD[Feature[Geometry, FeatureId]],

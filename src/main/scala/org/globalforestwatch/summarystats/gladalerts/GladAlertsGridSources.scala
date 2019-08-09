@@ -1,4 +1,4 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.summarystats.gladalerts
 
 import cats.implicits._
 import geotrellis.raster.Raster

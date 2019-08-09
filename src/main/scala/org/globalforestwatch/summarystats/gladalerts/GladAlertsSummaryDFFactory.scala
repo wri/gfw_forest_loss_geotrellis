@@ -1,4 +1,4 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.summarystats.gladalerts
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}

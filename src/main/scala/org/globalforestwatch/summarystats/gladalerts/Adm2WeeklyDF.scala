@@ -1,10 +1,10 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.summarystats.gladalerts
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql.functions._
 import org.apache.spark.sql._
+import org.apache.spark.sql.functions._
 
-object IsoWeeklyDF {
+object Adm2WeeklyDF {
 
   def sumAlerts(df: DataFrame): DataFrame = {
 
@@ -15,8 +15,10 @@ object IsoWeeklyDF {
       df,
       Seq(
         "iso",
-        "year",
-        "week",
+        "adm1",
+        "adm2",
+        "alert_date",
+        "is_confirmed",
         "primary_forest",
         "wdpa",
         "aze",
@@ -43,11 +45,13 @@ object IsoWeeklyDF {
       )
     )
 
-    df.groupBy(
-      $"iso",
-      $"year",
-      $"week",
-      $"is_confirmed",
+    df.select(
+        $"iso",
+        $"adm1",
+        $"adm2",
+        year($"alert_date") as "year",
+        weekofyear($"alert_date") as "week",
+        $"is_confirmed",
       $"primary_forest",
       $"wdpa",
       $"aze",
@@ -66,8 +70,39 @@ object IsoWeeklyDF {
       $"oil_gas",
       $"mangroves_2016",
       $"ifl_2016",
-      $"bra_biomes"
-    )
+      $"bra_biomes",
+      $"alert_count",
+      $"alert_area_ha",
+      $"co2_emissions_Mt",
+      $"total_area_ha"
+      )
+      .groupBy(
+        $"iso",
+        $"adm1",
+        $"adm2",
+        $"year",
+        $"week",
+        $"is_confirmed",
+        $"primary_forest",
+        $"wdpa",
+        $"aze",
+        $"kba",
+        $"landmark",
+        $"plantations",
+        $"mining",
+        $"managed_forests",
+        $"rspo",
+        $"wood_fiber",
+        $"peatlands",
+        $"idn_forest_moratorium",
+        $"oil_palm",
+        $"idn_forest_area",
+        $"per_forest_concession",
+        $"oil_gas",
+        $"mangroves_2016",
+        $"ifl_2016",
+        $"bra_biomes"
+      )
       .agg(
         sum("alert_count") as "alert_count",
         sum("alert_area_ha") as "alert_area_ha",

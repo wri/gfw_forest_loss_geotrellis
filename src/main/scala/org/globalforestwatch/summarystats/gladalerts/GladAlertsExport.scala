@@ -1,4 +1,4 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.summarystats.gladalerts
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

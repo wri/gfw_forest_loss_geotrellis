@@ -1,4 +1,4 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.summarystats.gladalerts
 
 import geotrellis.raster.{CellGrid, CellType}
 import org.globalforestwatch.layers._

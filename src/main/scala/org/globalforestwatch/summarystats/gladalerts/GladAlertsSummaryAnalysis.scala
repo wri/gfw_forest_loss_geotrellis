@@ -1,4 +1,4 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.summarystats.gladalerts
 
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.HashPartitioner

@@ -1,4 +1,4 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.summarystats.gladalerts
 
 import geotrellis.vector.Extent
 import org.globalforestwatch.grids.{GridId, TenByTenGrid}
