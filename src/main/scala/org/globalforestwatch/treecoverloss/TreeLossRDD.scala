@@ -5,14 +5,11 @@ import geotrellis.contrib.polygonal._
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
-import org.apache.spark.rdd.RDD
-import org.globalforestwatch.features.SimpleFeatureId
 import org.globalforestwatch.summarystats.SummaryRDD
 
 object TreeLossRDD extends SummaryRDD {
 
   type SOURCES = TreeLossGridSources
-  //  type FEATUREID = SimpleFeatureId
   type SUMMARY = TreeLossSummary
   type TILE = TreeLossTile
 
@@ -36,15 +33,5 @@ object TreeLossRDD extends SummaryRDD {
       options = options
     )
   }
-
-  //  def reduceSummarybyKey(
-  //                          featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
-  //                        ): RDD[(FEATUREID, SUMMARY)] = {
-  //    featuresWithSummaries.reduceByKey {
-  //      case (summary1, summary2) =>
-  //        summary1.merge(summary2)
-  //    }
-  //
-  //  }
 
 }

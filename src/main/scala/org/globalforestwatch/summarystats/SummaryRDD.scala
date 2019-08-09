@@ -17,7 +17,6 @@ import scala.reflect.ClassTag
 trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
   type SOURCES <: GridSources
-  //  type FEATUREID <: FeatureId
   type SUMMARY <: Summary[SUMMARY]
   type TILE <: CellGrid
 
