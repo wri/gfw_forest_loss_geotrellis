@@ -6,7 +6,8 @@ import java.time.format.DateTimeFormatter
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import cats.implicits._
-import org.globalforestwatch.util.{Geodesy, Mercantile, Summary}
+import org.globalforestwatch.summarystats.Summary
+import org.globalforestwatch.util.{Geodesy, Mercantile}
 
 /** LossData Summary by year */
 case class GladAlertsSummary(

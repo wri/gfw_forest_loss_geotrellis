@@ -11,7 +11,7 @@ import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.globalforestwatch.features._
-import org.globalforestwatch.util.SummarySparkSession
+import org.globalforestwatch.summarystats.SummarySparkSession
 
 object GladAlertsSummaryMain
     extends CommandApp(
@@ -154,6 +154,7 @@ object GladAlertsSummaryMain
            wdpaStatus,
            tcl,
            glad) =>
+
             val spark: SparkSession =
               SummarySparkSession("Glad Alerts Analysis Spark Session")
             import spark.implicits._
@@ -175,7 +176,6 @@ object GladAlertsSummaryMain
             )
 
             val featureObj = FeatureFactory(featureType).featureObj
-            //            type featureId = FeatureIdFactory(featureType)
 
             // ref: https://github.com/databricks/spark-csv
             val featuresDF: DataFrame = spark.read

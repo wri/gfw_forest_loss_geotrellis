@@ -1,7 +1,7 @@
-package org.globalforestwatch.util
+package org.globalforestwatch.summarystats
 
 import org.apache.spark.SparkConf
-import org.apache.spark.sql._
+import org.apache.spark.sql.SparkSession
 
 object SummarySparkSession {
 

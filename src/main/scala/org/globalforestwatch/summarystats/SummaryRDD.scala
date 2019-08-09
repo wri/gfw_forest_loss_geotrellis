@@ -1,4 +1,4 @@
-package org.globalforestwatch.util
+package org.globalforestwatch.summarystats
 
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
@@ -11,12 +11,10 @@ import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
-import org.apache.spark._
-import org.apache.spark.SparkContext._
 
 import scala.reflect.ClassTag
 
-trait AnalysisRDD extends LazyLogging with java.io.Serializable {
+trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
   type SOURCES <: GridSources
   //  type FEATUREID <: FeatureId

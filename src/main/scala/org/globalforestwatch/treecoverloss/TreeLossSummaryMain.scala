@@ -11,7 +11,7 @@ import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.globalforestwatch.features.{SimpleFeature, SimpleFeatureId}
-import org.globalforestwatch.util.SummarySparkSession
+import org.globalforestwatch.summarystats.SummarySparkSession
 
 object TreeLossSummaryMain
   extends CommandApp(

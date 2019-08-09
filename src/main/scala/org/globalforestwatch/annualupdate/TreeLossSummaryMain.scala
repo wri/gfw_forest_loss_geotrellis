@@ -11,7 +11,7 @@ import org.apache.spark.sql._
 import cats.implicits._
 import geotrellis.vector.{Feature, Geometry}
 import org.globalforestwatch.features.{GadmFeature, GadmFeatureId}
-import org.globalforestwatch.util.SummarySparkSession
+import org.globalforestwatch.summarystats.SummarySparkSession
 
 object TreeLossSummaryMain
     extends CommandApp(

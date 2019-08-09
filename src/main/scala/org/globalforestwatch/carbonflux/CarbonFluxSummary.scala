@@ -3,8 +3,9 @@ package org.globalforestwatch.carbonflux
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import cats.implicits._
-import org.globalforestwatch.util.{Geodesy, Summary}
+import org.globalforestwatch.util.Geodesy
 import geotrellis.raster.histogram.StreamingHistogram
+import org.globalforestwatch.summarystats.Summary
 
 /** LossData Summary by year */
 case class CarbonFluxSummary(

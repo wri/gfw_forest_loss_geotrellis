@@ -6,10 +6,10 @@ import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
 import org.apache.spark.rdd.RDD
-import org.globalforestwatch.util.AnalysisRDD
+import org.globalforestwatch.summarystats.SummaryRDD
 import org.globalforestwatch.features.GadmFeatureId
 
-object TreeLossRDD extends AnalysisRDD {
+object TreeLossRDD extends SummaryRDD {
 
   type SOURCES = TreeLossGridSources
   //  type FEATUREID = GadmFeatureId
