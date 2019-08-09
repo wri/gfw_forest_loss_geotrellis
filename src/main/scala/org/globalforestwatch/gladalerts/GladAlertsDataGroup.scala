@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 import org.globalforestwatch.util.Mercantile
 
-case class GladAlertsDataGroup(alertDate: Option[LocalDate],
+case class GladAlertsDataGroup(alertDate: String,
                                isConfirmed: Option[Boolean],
                                tile: Mercantile.Tile,
                                climateMask: Boolean,

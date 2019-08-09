@@ -154,7 +154,8 @@ object GladAlertsSummaryMain
            wdpaStatus,
            tcl,
            glad) =>
-            val spark: SparkSession = SummarySparkSession("Glad Alerts Analysis Spark Session")
+            val spark: SparkSession =
+              SummarySparkSession("Glad Alerts Analysis Spark Session")
             import spark.implicits._
 
             val filters = Map(
@@ -174,16 +175,13 @@ object GladAlertsSummaryMain
             )
 
             val featureObj = FeatureFactory(featureType).featureObj
+            //            type featureId = FeatureIdFactory(featureType)
 
             // ref: https://github.com/databricks/spark-csv
             val featuresDF: DataFrame = spark.read
               .options(Map("header" -> "true", "delimiter" -> "\t"))
               .csv(featureUris.toList: _*)
-              .transform(
-                featureObj.filter(
-                  filters
-                )
-              )
+              .transform(featureObj.filter(filters))
 
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
             val featureRDD: RDD[Feature[Geometry, FeatureId]] =
@@ -210,65 +208,68 @@ object GladAlertsSummaryMain
                     gladAlertSummary.stats.map {
                       case (gladAlertsDataGroup, gladAlertsData) => {
 
-                        val alertDate: String = {
-                          gladAlertsDataGroup.alertDate match {
-                            case Some(d: LocalDate) =>
-                              d.format(
-                                DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                              )
-                            case _ => null
-                          }
+                        // TODO: need different row definitions for each feature type :(
+                        val wdpaId: WdpaFeatureId = id match {
+                          case i: WdpaFeatureId => i
+                          case _ =>
+                            throw new IllegalArgumentException(
+                              "Not a WDPAFeatureId"
+                            )
                         }
 
-                        GladAlertsRow(
-                          id,
-                          alertDate,
-                          gladAlertsDataGroup.isConfirmed,
-                          gladAlertsDataGroup.tile.x,
-                          gladAlertsDataGroup.tile.y,
-                          gladAlertsDataGroup.tile.z,
-                          GladAlertsRowLayers(
-                            gladAlertsDataGroup.climateMask,
-                            gladAlertsDataGroup.primaryForest,
-                            gladAlertsDataGroup.protectedAreas,
-                            gladAlertsDataGroup.aze,
-                            gladAlertsDataGroup.keyBiodiversityAreas,
-                            gladAlertsDataGroup.landmark,
-                            gladAlertsDataGroup.plantations,
-                            gladAlertsDataGroup.mining,
-                            gladAlertsDataGroup.logging,
-                            gladAlertsDataGroup.rspo,
-                            gladAlertsDataGroup.woodFiber,
-                            gladAlertsDataGroup.peatlands,
-                            gladAlertsDataGroup.indonesiaForestMoratorium,
-                            gladAlertsDataGroup.oilPalm,
-                            gladAlertsDataGroup.indonesiaForestArea,
-                            gladAlertsDataGroup.peruForestConcessions,
-                            gladAlertsDataGroup.oilGas,
-                            gladAlertsDataGroup.mangroves2016,
-                            gladAlertsDataGroup.intactForestLandscapes2016,
-                            gladAlertsDataGroup.braBiomes
-                          ),
-                          gladAlertsData.totalAlerts,
-                          gladAlertsData.alertArea,
-                          gladAlertsData.co2Emissions,
-                          gladAlertsData.totalArea
+                        GladAlertsRowWdpa(
+                          wdpaId,
+                          gladAlertsDataGroup,
+                          gladAlertsData
+                          //                          alertDate,
+                          //                          gladAlertsDataGroup.isConfirmed,
+                          //                          gladAlertsDataGroup.tile.x,
+                          //                          gladAlertsDataGroup.tile.y,
+                          //                          gladAlertsDataGroup.tile.z,
+                          //                          GladAlertsRowLayers(
+                          //                            gladAlertsDataGroup.climateMask,
+                          //                            gladAlertsDataGroup.primaryForest,
+                          //                            gladAlertsDataGroup.protectedAreas,
+                          //                            gladAlertsDataGroup.aze,
+                          //                            gladAlertsDataGroup.keyBiodiversityAreas,
+                          //                            gladAlertsDataGroup.landmark,
+                          //                            gladAlertsDataGroup.plantations,
+                          //                            gladAlertsDataGroup.mining,
+                          //                            gladAlertsDataGroup.logging,
+                          //                            gladAlertsDataGroup.rspo,
+                          //                            gladAlertsDataGroup.woodFiber,
+                          //                            gladAlertsDataGroup.peatlands,
+                          //                            gladAlertsDataGroup.indonesiaForestMoratorium,
+                          //                            gladAlertsDataGroup.oilPalm,
+                          //                            gladAlertsDataGroup.indonesiaForestArea,
+                          //                            gladAlertsDataGroup.peruForestConcessions,
+                          //                            gladAlertsDataGroup.oilGas,
+                          //                            gladAlertsDataGroup.mangroves2016,
+                          //                            gladAlertsDataGroup.intactForestLandscapes2016,
+                          //                            gladAlertsDataGroup.braBiomes
+                          //                          ),
+                          //                          gladAlertsData.totalAlerts,
+                          //                          gladAlertsData.alertArea,
+                          //                          gladAlertsData.co2Emissions,
+                          //                          gladAlertsData.totalArea
                         )
                       }
                     }
                 }
                 .toDF(
                   "id",
-                  "alert_date",
-                  "is_confirmed",
-                  "x",
-                  "y",
-                  "z",
-                  "layers",
-                  "alert_count",
-                  "alert_area_ha",
-                  "co2_emissions_Mt",
-                  "total_area_ha"
+                  "data_group",
+                  "data"
+                  //                  "alert_date",
+                  //                  "is_confirmed",
+                  //                  "x",
+                  //                  "y",
+                  //                  "z",
+                  //                  "layers",
+                  //                  "alert_count",
+                  //                  "alert_area_ha",
+                  //                  "co2_emissions_Mt",
+                  //                  "total_area_ha"
                 )
 
             val outputPartitionCount =
