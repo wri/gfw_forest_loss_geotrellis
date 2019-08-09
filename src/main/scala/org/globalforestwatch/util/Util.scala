@@ -40,4 +40,10 @@ object Util {
       zindex(feature.geom.envelope.northWest)
     }
   }
+
+  def getAnyMapValue[T: Manifest](map: Map[String, Any], key: String): T =
+    map(key) match {
+      case v: T => v
+      case _ => throw new IllegalArgumentException("Wrong type")
+    }
 }

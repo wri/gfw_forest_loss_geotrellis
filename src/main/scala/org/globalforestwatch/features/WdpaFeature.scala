@@ -5,7 +5,7 @@ import geotrellis.vector.io.wkb.WKB
 import org.apache.spark.sql.functions.substring
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.globalforestwatch.util.GeometryReducer
-import scala.util.Try
+import org.globalforestwatch.util.Util._
 
 object WdpaFeature extends Feature {
 
@@ -35,17 +35,17 @@ object WdpaFeature extends Feature {
     import spark.implicits._
 
 
-    val isoFirst: Option[String] = getMapValue[Option[String]](filters, "isoFirst")
-    val isoStart: Option[String] = getMapValue[Option[String]](filters, "isoStart")
-    val isoEnd: Option[String] = getMapValue[Option[String]](filters, "isoEnd")
-    val iso: Option[String] = getMapValue[Option[String]](filters, "iso")
-    val wdpaIdStart: Option[Int] = getMapValue[Option[Int]](filters, "wdpaIdStart")
-    val wdpaIdEnd: Option[Int] = getMapValue[Option[Int]](filters, "wdpaIdEnd")
-    val iucnCat: Option[String] = getMapValue[Option[String]](filters, "iucnCat")
-    val wdpaStatus: Option[String] = getMapValue[Option[String]](filters, "wdpaStatus")
-    val limit: Option[Int] = getMapValue[Option[Int]](filters, "limit")
-    val tcl: Boolean = getMapValue[Boolean](filters, "tcl")
-    val glad: Boolean = getMapValue[Boolean](filters, "glad")
+    val isoFirst: Option[String] = getAnyMapValue[Option[String]](filters, "isoFirst")
+    val isoStart: Option[String] = getAnyMapValue[Option[String]](filters, "isoStart")
+    val isoEnd: Option[String] = getAnyMapValue[Option[String]](filters, "isoEnd")
+    val iso: Option[String] = getAnyMapValue[Option[String]](filters, "iso")
+    val wdpaIdStart: Option[Int] = getAnyMapValue[Option[Int]](filters, "idStart")
+    val wdpaIdEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
+    val iucnCat: Option[String] = getAnyMapValue[Option[String]](filters, "iucnCat")
+    val wdpaStatus: Option[String] = getAnyMapValue[Option[String]](filters, "wdpaStatus")
+    val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
+    val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")
+    val glad: Boolean = getAnyMapValue[Boolean](filters, "glad")
 
     var newDF = df
 

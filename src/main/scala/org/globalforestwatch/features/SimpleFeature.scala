@@ -4,6 +4,7 @@ import geotrellis.vector.Geometry
 import geotrellis.vector.io.wkb.WKB
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.globalforestwatch.util.GeometryReducer
+import org.globalforestwatch.util.Util._
 
 object SimpleFeature extends Feature {
 
@@ -28,9 +29,9 @@ object SimpleFeature extends Feature {
 
     var newDF = df
 
-    val idStart: Option[Int] = getMapValue(filters, "idStart")
-    val idEnd: Option[Int] = getMapValue(filters, "idEnd")
-    val limit: Option[Int] = getMapValue(filters, "limit")
+    val idStart: Option[Int] = getAnyMapValue(filters, "idStart")
+    val idEnd: Option[Int] = getAnyMapValue(filters, "idEnd")
+    val limit: Option[Int] = getAnyMapValue(filters, "limit")
 
     idStart.foreach { startId =>
       newDF = newDF.filter($"fid" >= startId)

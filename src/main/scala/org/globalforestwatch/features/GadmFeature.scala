@@ -5,6 +5,7 @@ import geotrellis.vector.io.wkb.WKB
 import org.apache.spark.sql.functions.substring
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.globalforestwatch.util.GeometryReducer
+import org.globalforestwatch.util.Util._
 
 object GadmFeature extends Feature {
 
@@ -41,15 +42,15 @@ object GadmFeature extends Feature {
 
     var newDF = df
 
-    val isoFirst: Option[String] = getMapValue(filters, "isoFirst")
-    val isoStart: Option[String] = getMapValue(filters, "isoStart")
-    val isoEnd: Option[String] = getMapValue(filters, "isoEnd")
-    val iso: Option[String] = getMapValue(filters, "iso")
-    val admin1: Option[String] = getMapValue(filters, "admin1")
-    val admin2: Option[String] = getMapValue(filters, "admin2")
-    val limit: Option[Int] = getMapValue(filters, "limit")
-    val tcl: Boolean = getMapValue(filters, "tcl")
-    val glad: Boolean = getMapValue(filters, "glad")
+    val isoFirst: Option[String] = getAnyMapValue(filters, "isoFirst")
+    val isoStart: Option[String] = getAnyMapValue(filters, "isoStart")
+    val isoEnd: Option[String] = getAnyMapValue(filters, "isoEnd")
+    val iso: Option[String] = getAnyMapValue(filters, "iso")
+    val admin1: Option[String] = getAnyMapValue(filters, "admin1")
+    val admin2: Option[String] = getAnyMapValue(filters, "admin2")
+    val limit: Option[Int] = getAnyMapValue(filters, "limit")
+    val tcl: Boolean = getAnyMapValue(filters, "tcl")
+    val glad: Boolean = getAnyMapValue(filters, "glad")
 
     if (glad) newDF = newDF.filter($"glad" === "t")
 
