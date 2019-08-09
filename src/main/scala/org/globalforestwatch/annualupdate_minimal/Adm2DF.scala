@@ -5,11 +5,10 @@ import org.apache.spark.sql._
 
 object Adm2DF {
 
-  val spark: SparkSession = TreeLossSparkSession()
-
-  import spark.implicits._
-
   def unpackValues(df: DataFrame): DataFrame = {
+
+    val spark: SparkSession = df.sparkSession
+    import spark.implicits._
 
     validatePresenceOfColumns(
       df,

@@ -209,9 +209,6 @@ object GladAlertsSummaryMain
                   case (id, gladAlertSummary) =>
                     gladAlertSummary.stats.map {
                       case (gladAlertsDataGroup, gladAlertsData) => {
-                        //
-                        //                        val admin1: Integer = id.adm1ToInt
-                        //                        val admin2: Integer = id.adm2ToInt
 
                         val alertDate: String = {
                           gladAlertsDataGroup.alertDate match {
@@ -278,8 +275,6 @@ object GladAlertsSummaryMain
               maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
             summaryDF.repartition(partitionExprs = $"id")
-
-            summaryDF.cache()
 
             GladAlertsExport.export(featureType, summaryDF, outputUrl)
 

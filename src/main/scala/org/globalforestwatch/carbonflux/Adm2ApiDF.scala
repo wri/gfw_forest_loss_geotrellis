@@ -5,11 +5,10 @@ import org.apache.spark.sql.functions._
 
 object Adm2ApiDF {
 
-  val spark: SparkSession = CarbonFluxSparkSession()
-
-  import spark.implicits._
-
   def nestYearData(df: DataFrame): DataFrame = {
+
+    val spark: SparkSession = df.sparkSession
+    import spark.implicits._
 
     df.select(
       $"iso",

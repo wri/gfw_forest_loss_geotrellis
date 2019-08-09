@@ -5,11 +5,10 @@ import org.apache.spark.sql.functions._
 
 object IsoSummaryDF {
 
-  val spark: SparkSession = TreeLossSparkSession()
-
-  import spark.implicits._
-
   def sumArea(df: DataFrame): DataFrame = {
+
+    val spark: SparkSession = df.sparkSession
+    import spark.implicits._
 
     df.groupBy($"iso", $"threshold")
       .agg(
@@ -80,6 +79,10 @@ object IsoSummaryDF {
   }
 
   def roundValues(df: DataFrame): DataFrame = {
+
+    val spark: SparkSession = df.sparkSession
+    import spark.implicits._
+
     df.select(
       $"iso" as "country",
       $"threshold",

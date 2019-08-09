@@ -18,9 +18,16 @@ object GladAlertsExport {
   def export(featureType: String,
              summaryDF: DataFrame,
              outputUrl: String): Unit = {
+
+    val runOutputUrl: String = outputUrl +
+      "/gladAlerts_" + DateTimeFormatter
+      .ofPattern("yyyyMMdd_HHmm")
+      .format(LocalDateTime.now)
+
     featureType match {
-      case "gadm"    => exportGadm(summaryDF, outputUrl)
-      case "feature" => exportFeature(summaryDF, outputUrl)
+      case "gadm" => exportGadm(summaryDF, runOutputUrl)
+      case "feature" => exportFeature(summaryDF, runOutputUrl)
+      case "wdpa" => exportWdpa(summaryDF, runOutputUrl)
       case _ =>
         throw new IllegalArgumentException(
           "Feature type must be one of 'gadm' and 'feature'"
@@ -28,12 +35,9 @@ object GladAlertsExport {
     }
   }
 
-  private def exportGadm(summaryDF: DataFrame, outputUrl: String): Unit = {
+  private def exportGadm(summaryDF: DataFrame, runOutputUrl: String): Unit = {
 
-    val runOutputUrl: String = outputUrl +
-      "/gladAlerts_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
+    summaryDF.cache()
 
     val tileDF = summaryDF
       .transform(TileDF.sumAlerts)
@@ -73,6 +77,22 @@ object GladAlertsExport {
       .csv(path = runOutputUrl + "/iso_weekly")
   }
 
-  private def exportFeature(summaryDF: DataFrame, outputUrl: String): Unit = {}
+  private def exportFeature(summaryDF: DataFrame,
+                            runOutputUrl: String): Unit = {}
 
+  private def exportWdpa(summaryDF: DataFrame, runOutputUrl: String): Unit = {
+    val wdpaDailyDF = summaryDF
+      .transform(WdpaDailyDF.unpackValues)
+      .transform(WdpaDailyDF.sumAlerts)
+
+    wdpaDailyDF.write
+      .options(csvOptions)
+      .csv(path = runOutputUrl + "/wdpa_daily")
+
+    val wdpaWeeklyDF = wdpaDailyDF.transform(WdpaWeeklyDF.sumAlerts)
+
+    wdpaWeeklyDF.write
+      .options(csvOptions)
+      .csv(path = runOutputUrl + "/wdpa_weekly")
+  }
 }

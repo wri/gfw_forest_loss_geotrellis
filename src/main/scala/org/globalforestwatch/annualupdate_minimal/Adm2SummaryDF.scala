@@ -5,11 +5,10 @@ import org.apache.spark.sql.functions._
 
 object Adm2SummaryDF {
 
-  val spark: SparkSession = TreeLossSparkSession()
-
-  import spark.implicits._
-
   def sumArea(df: DataFrame): DataFrame = {
+
+    val spark: SparkSession = df.sparkSession
+    import spark.implicits._
 
     df.groupBy($"iso", $"adm1", $"adm2", $"threshold")
       .agg(
@@ -78,6 +77,10 @@ object Adm2SummaryDF {
   }
 
   def roundValues(df: DataFrame): DataFrame = {
+
+    val spark: SparkSession = df.sparkSession
+    import spark.implicits._
+
     df.select(
       $"iso" as "country",
       $"adm1" as "subnational1",

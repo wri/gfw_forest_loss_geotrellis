@@ -6,11 +6,12 @@ import org.apache.spark.sql.functions.sum
 
 object DF {
 
-  val spark: SparkSession = TreeLossSparkSession()
 
-  import spark.implicits._
 
   def unpackValues(df: DataFrame): DataFrame = {
+
+    val spark: SparkSession = df.sparkSession
+    import spark.implicits._
 
     validatePresenceOfColumns(
       df,
@@ -172,6 +173,10 @@ object DF {
   }
 
   def primaryForestFilter(include: Boolean)(df: DataFrame): DataFrame = {
+
+    val spark: SparkSession = df.sparkSession
+    import spark.implicits._
+
     if (include) df
     else {
       df.groupBy($"feature_id", $"threshold", $"tcd_year")
