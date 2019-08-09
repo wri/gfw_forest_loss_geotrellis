@@ -1,7 +1,7 @@
 package org.globalforestwatch.gladalerts
 
-import org.globalforestwatch.features.WdpaFeatureId
+import org.globalforestwatch.features.GadmFeatureId
 
-case class GladAlertsRowWdpa(id: WdpaFeatureId,
+case class GladAlertsRowGadm(id: GadmFeatureId,
                              dataGroup: GladAlertsDataGroup,
                              data: GladAlertsData)

@@ -201,76 +201,7 @@ object GladAlertsSummaryMain
             val summaryRDD: RDD[(FeatureId, GladAlertsSummary)] =
               GladAlertsRDD(featureRDD, GladAlertsGrid.blockTileGrid, part)
 
-            val summaryDF =
-              summaryRDD
-                .flatMap {
-                  case (id, gladAlertSummary) =>
-                    gladAlertSummary.stats.map {
-                      case (gladAlertsDataGroup, gladAlertsData) => {
-
-                        // TODO: need different row definitions for each feature type :(
-                        val wdpaId: WdpaFeatureId = id match {
-                          case i: WdpaFeatureId => i
-                          case _ =>
-                            throw new IllegalArgumentException(
-                              "Not a WDPAFeatureId"
-                            )
-                        }
-
-                        GladAlertsRowWdpa(
-                          wdpaId,
-                          gladAlertsDataGroup,
-                          gladAlertsData
-                          //                          alertDate,
-                          //                          gladAlertsDataGroup.isConfirmed,
-                          //                          gladAlertsDataGroup.tile.x,
-                          //                          gladAlertsDataGroup.tile.y,
-                          //                          gladAlertsDataGroup.tile.z,
-                          //                          GladAlertsRowLayers(
-                          //                            gladAlertsDataGroup.climateMask,
-                          //                            gladAlertsDataGroup.primaryForest,
-                          //                            gladAlertsDataGroup.protectedAreas,
-                          //                            gladAlertsDataGroup.aze,
-                          //                            gladAlertsDataGroup.keyBiodiversityAreas,
-                          //                            gladAlertsDataGroup.landmark,
-                          //                            gladAlertsDataGroup.plantations,
-                          //                            gladAlertsDataGroup.mining,
-                          //                            gladAlertsDataGroup.logging,
-                          //                            gladAlertsDataGroup.rspo,
-                          //                            gladAlertsDataGroup.woodFiber,
-                          //                            gladAlertsDataGroup.peatlands,
-                          //                            gladAlertsDataGroup.indonesiaForestMoratorium,
-                          //                            gladAlertsDataGroup.oilPalm,
-                          //                            gladAlertsDataGroup.indonesiaForestArea,
-                          //                            gladAlertsDataGroup.peruForestConcessions,
-                          //                            gladAlertsDataGroup.oilGas,
-                          //                            gladAlertsDataGroup.mangroves2016,
-                          //                            gladAlertsDataGroup.intactForestLandscapes2016,
-                          //                            gladAlertsDataGroup.braBiomes
-                          //                          ),
-                          //                          gladAlertsData.totalAlerts,
-                          //                          gladAlertsData.alertArea,
-                          //                          gladAlertsData.co2Emissions,
-                          //                          gladAlertsData.totalArea
-                        )
-                      }
-                    }
-                }
-                .toDF(
-                  "id",
-                  "data_group",
-                  "data"
-                  //                  "alert_date",
-                  //                  "is_confirmed",
-                  //                  "x",
-                  //                  "y",
-                  //                  "z",
-                  //                  "layers",
-                  //                  "alert_count",
-                  //                  "alert_area_ha",
-                  //                  "co2_emissions_Mt",
-                  //                  "total_area_ha"
-                )
+            val summaryDF = GladAlertsSummaryDFFactory(featureType, summaryRDD, spark).getDataFrame
 
             val outputPartitionCount =
               maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
