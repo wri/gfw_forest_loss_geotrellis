@@ -1,5 +1,5 @@
 package org.globalforestwatch.features
 
-case class SimpleFeatureId(cell_id: Int) extends FeatureId {
-  override def toString: String = s"$cell_id"
+case class SimpleFeatureId(featureId: Int) extends FeatureId {
+  override def toString: String = s"$featureId"
 }

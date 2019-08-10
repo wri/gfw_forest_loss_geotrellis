@@ -1,41 +1,13 @@
 package org.globalforestwatch.summarystats.gladalerts
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
 import org.apache.spark.sql.DataFrame
+import org.globalforestwatch.summarystats.SummaryExport
 
-object GladAlertsExport {
+object GladAlertsExport extends SummaryExport {
 
-  val csvOptions: Map[String, String] = Map(
-    "header" -> "true",
-    "delimiter" -> ",",
-    "quote" -> "\u0000",
-    "quoteMode" -> "NONE",
-    "nullValue" -> "\u0000"
-  )
-
-  def export(featureType: String,
-             summaryDF: DataFrame,
-             outputUrl: String): Unit = {
-
-    val runOutputUrl: String = outputUrl +
-      "/gladAlerts_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
-
-    featureType match {
-      case "gadm" => exportGadm(summaryDF, runOutputUrl)
-      case "feature" => exportFeature(summaryDF, runOutputUrl)
-      case "wdpa" => exportWdpa(summaryDF, runOutputUrl)
-      case _ =>
-        throw new IllegalArgumentException(
-          "Feature type must be one of 'gadm' and 'feature'"
-        )
-    }
-  }
-
-  private def exportGadm(summaryDF: DataFrame, runOutputUrl: String): Unit = {
+  override protected def exportGadm(summaryDF: DataFrame,
+                                    outputUrl: String,
+                                    kwargs: Map[String, Any]): Unit = {
 
     summaryDF.cache()
 
@@ -44,7 +16,7 @@ object GladAlertsExport {
 
     tileDF.write
       .options(csvOptions)
-      .csv(path = runOutputUrl + "/tiles")
+      .csv(path = outputUrl + "/tiles")
 
     val adm2DailyDF = summaryDF
       .transform(Adm2DailyDF.unpackValues)
@@ -54,45 +26,44 @@ object GladAlertsExport {
 
     adm2DailyDF.write
       .options(csvOptions)
-      .csv(path = runOutputUrl + "/adm2_daily")
+      .csv(path = outputUrl + "/adm2_daily")
 
     val adm2WeeklyDF = adm2DailyDF.transform(Adm2WeeklyDF.sumAlerts)
 
     adm2WeeklyDF.write
       .options(csvOptions)
-      .csv(path = runOutputUrl + "/adm2_weekly")
+      .csv(path = outputUrl + "/adm2_weekly")
 
     val adm1WeeklyDF = adm2WeeklyDF
       .transform(Adm1WeeklyDF.sumAlerts)
 
     adm1WeeklyDF.write
       .options(csvOptions)
-      .csv(path = runOutputUrl + "/adm1_weekly")
+      .csv(path = outputUrl + "/adm1_weekly")
 
     val isoWeeklyDF = adm1WeeklyDF
       .transform(IsoWeeklyDF.sumAlerts)
 
     isoWeeklyDF.write
       .options(csvOptions)
-      .csv(path = runOutputUrl + "/iso_weekly")
+      .csv(path = outputUrl + "/iso_weekly")
   }
 
-  private def exportFeature(summaryDF: DataFrame,
-                            runOutputUrl: String): Unit = {}
-
-  private def exportWdpa(summaryDF: DataFrame, runOutputUrl: String): Unit = {
+  override protected def exportWdpa(summaryDF: DataFrame,
+                                    outputUrl: String,
+                                    kwargs: Map[String, Any]): Unit = {
     val wdpaDailyDF = summaryDF
       .transform(WdpaDailyDF.unpackValues)
       .transform(WdpaDailyDF.sumAlerts)
 
     wdpaDailyDF.write
       .options(csvOptions)
-      .csv(path = runOutputUrl + "/wdpa_daily")
+      .csv(path = outputUrl + "/wdpa_daily")
 
     val wdpaWeeklyDF = wdpaDailyDF.transform(WdpaWeeklyDF.sumAlerts)
 
     wdpaWeeklyDF.write
       .options(csvOptions)
-      .csv(path = runOutputUrl + "/wdpa_weekly")
+      .csv(path = outputUrl + "/wdpa_weekly")
   }
 }

@@ -1,4 +1,4 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.summarystats.treecoverloss
 
 import geotrellis.raster.{CellGrid, CellType}
 import org.globalforestwatch.layers._

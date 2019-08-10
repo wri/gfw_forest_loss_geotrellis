@@ -1,4 +1,4 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.summarystats.treecoverloss
 
 case class TreeLossRow(
                         featureId: Int,

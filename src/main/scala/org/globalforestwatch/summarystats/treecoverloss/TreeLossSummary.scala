@@ -1,4 +1,4 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.summarystats.treecoverloss
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import cats.implicits._
@@ -65,7 +65,7 @@ object TreeLossSummary {
                          ): Map[TreeLossDataGroup, TreeLossData] = {
           if (thresholds == Nil) stats
           else {
-            val pKey = TreeLossDataGroup(thresholds.head, primaryForest)
+            val pKey = TreeLossDataGroup(thresholds.head, tcdYear, primaryForest)
 
             val summary: TreeLossData =
               stats.getOrElse(
@@ -78,7 +78,7 @@ object TreeLossSummary {
                   0,
                   0,
                   0,
-                  StreamingHistogram(size = 1750)
+                  0
                 )
               )
 
@@ -93,11 +93,12 @@ object TreeLossSummary {
                 summary.lossYear(loss).carbon_emissions += co2Pixel
               }
 
+              // TODO: use extent2010 to calculate avg biomass incase year is selected
+              summary.avgBiomass = ((summary.avgBiomass * summary.extent2000) + (biomass * areaHa)) / (summary.extent2000 + areaHa)
               if (tcdYear == 2000) summary.extent2000 += areaHa
               else if (tcdYear == 2010) summary.extent2010 += areaHa
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
-              summary.biomassHistogram.countItem(biomass)
             }
 
             if (tcd2010 >= thresholds.head && tcdYear == 2000)

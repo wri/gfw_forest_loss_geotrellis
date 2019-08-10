@@ -1,12 +1,10 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.summarystats.treecoverloss
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions.sum
 
-object DF {
-
-
+object TreeLossDF {
 
   def unpackValues(df: DataFrame): DataFrame = {
 
@@ -16,157 +14,148 @@ object DF {
     validatePresenceOfColumns(
       df,
       Seq(
-        "feature_id",
-        "threshold",
-        "tcd_year",
-        "primary_forest",
-        "extent_2000",
-        "extent_2010",
-        "total_area",
-        "total_gain",
-        "total_biomass",
-        "avg_biomass_per_ha",
-        "total_co2",
-        "year_data"
+        "id",
+        "data_group",
+        "data"
       )
     )
 
     df.select(
-      $"feature_id",
-      $"threshold",
-      $"tcd_year",
-      $"primary_forest",
-      $"extent_2000",
-      $"extent_2010",
-      $"total_area",
-      $"total_gain",
-      $"total_biomass",
-      $"avg_biomass_per_ha",
-      $"total_co2",
-      'year_data.getItem(0).getItem("area_loss") as "area_loss_2001",
-      'year_data.getItem(1).getItem("area_loss") as "area_loss_2002",
-      'year_data.getItem(2).getItem("area_loss") as "area_loss_2003",
-      'year_data.getItem(3).getItem("area_loss") as "area_loss_2004",
-      'year_data.getItem(4).getItem("area_loss") as "area_loss_2005",
-      'year_data.getItem(5).getItem("area_loss") as "area_loss_2006",
-      'year_data.getItem(6).getItem("area_loss") as "area_loss_2007",
-      'year_data.getItem(7).getItem("area_loss") as "area_loss_2008",
-      'year_data.getItem(8).getItem("area_loss") as "area_loss_2009",
-      'year_data.getItem(9).getItem("area_loss") as "area_loss_2010",
-      'year_data.getItem(10).getItem("area_loss") as "area_loss_2011",
-      'year_data.getItem(11).getItem("area_loss") as "area_loss_2012",
-      'year_data.getItem(12).getItem("area_loss") as "area_loss_2013",
-      'year_data.getItem(13).getItem("area_loss") as "area_loss_2014",
-      'year_data.getItem(14).getItem("area_loss") as "area_loss_2015",
-      'year_data.getItem(15).getItem("area_loss") as "area_loss_2016",
-      'year_data.getItem(16).getItem("area_loss") as "area_loss_2017",
-      'year_data.getItem(17).getItem("area_loss") as "area_loss_2018",
-      'year_data
+      $"id.featureId" as "feature_id",
+      $"data_group.threshold" as "threshold",
+      $"data_group.tcdYear" as "tcd_year",
+      $"data_group.primaryForest" as "primary_forest",
+      $"data.extent2000" as "extent_2000",
+      $"data.extent2010" as "extent_2010",
+      $"data.totalArea" as "total_area",
+      $"data.totalGainArea" as "total_gain",
+      $"data.totalBiomass" as "total_biomass",
+      $"data.avgBiomass" as "avg_biomass_per_ha",
+      $"data.totalCo2" as "total_co2",
+      $"data.lossYear".getItem(0).getItem("area_loss") as "area_loss_2001",
+      $"data.lossYear".getItem(1).getItem("area_loss") as "area_loss_2002",
+      $"data.lossYear".getItem(2).getItem("area_loss") as "area_loss_2003",
+      $"data.lossYear".getItem(3).getItem("area_loss") as "area_loss_2004",
+      $"data.lossYear".getItem(4).getItem("area_loss") as "area_loss_2005",
+      $"data.lossYear".getItem(5).getItem("area_loss") as "area_loss_2006",
+      $"data.lossYear".getItem(6).getItem("area_loss") as "area_loss_2007",
+      $"data.lossYear".getItem(7).getItem("area_loss") as "area_loss_2008",
+      $"data.lossYear".getItem(8).getItem("area_loss") as "area_loss_2009",
+      $"data.lossYear".getItem(9).getItem("area_loss") as "area_loss_2010",
+      $"data.lossYear".getItem(10).getItem("area_loss") as "area_loss_2011",
+      $"data.lossYear".getItem(11).getItem("area_loss") as "area_loss_2012",
+      $"data.lossYear".getItem(12).getItem("area_loss") as "area_loss_2013",
+      $"data.lossYear".getItem(13).getItem("area_loss") as "area_loss_2014",
+      $"data.lossYear".getItem(14).getItem("area_loss") as "area_loss_2015",
+      $"data.lossYear".getItem(15).getItem("area_loss") as "area_loss_2016",
+      $"data.lossYear".getItem(16).getItem("area_loss") as "area_loss_2017",
+      $"data.lossYear".getItem(17).getItem("area_loss") as "area_loss_2018",
+      $"data.lossYear"
         .getItem(0)
         .getItem("biomass_loss") as "biomass_loss_2001",
-      'year_data
+      $"data.lossYear"
         .getItem(1)
         .getItem("biomass_loss") as "biomass_loss_2002",
-      'year_data
+      $"data.lossYear"
         .getItem(2)
         .getItem("biomass_loss") as "biomass_loss_2003",
-      'year_data
+      $"data.lossYear"
         .getItem(3)
         .getItem("biomass_loss") as "biomass_loss_2004",
-      'year_data
+      $"data.lossYear"
         .getItem(4)
         .getItem("biomass_loss") as "biomass_loss_2005",
-      'year_data
+      $"data.lossYear"
         .getItem(5)
         .getItem("biomass_loss") as "biomass_loss_2006",
-      'year_data
+      $"data.lossYear"
         .getItem(6)
         .getItem("biomass_loss") as "biomass_loss_2007",
-      'year_data
+      $"data.lossYear"
         .getItem(7)
         .getItem("biomass_loss") as "biomass_loss_2008",
-      'year_data
+      $"data.lossYear"
         .getItem(8)
         .getItem("biomass_loss") as "biomass_loss_2009",
-      'year_data
+      $"data.lossYear"
         .getItem(9)
         .getItem("biomass_loss") as "biomass_loss_2010",
-      'year_data
+      $"data.lossYear"
         .getItem(10)
         .getItem("biomass_loss") as "biomass_loss_2011",
-      'year_data
+      $"data.lossYear"
         .getItem(11)
         .getItem("biomass_loss") as "biomass_loss_2012",
-      'year_data
+      $"data.lossYear"
         .getItem(12)
         .getItem("biomass_loss") as "biomass_loss_2013",
-      'year_data
+      $"data.lossYear"
         .getItem(13)
         .getItem("biomass_loss") as "biomass_loss_2014",
-      'year_data
+      $"data.lossYear"
         .getItem(14)
         .getItem("biomass_loss") as "biomass_loss_2015",
-      'year_data
+      $"data.lossYear"
         .getItem(15)
         .getItem("biomass_loss") as "biomass_loss_2016",
-      'year_data
+      $"data.lossYear"
         .getItem(16)
         .getItem("biomass_loss") as "biomass_loss_2017",
-      'year_data
+      $"data.lossYear"
         .getItem(17)
         .getItem("biomass_loss") as "biomass_loss_2018",
-      'year_data
+      $"data.lossYear"
         .getItem(0)
         .getItem("carbon_emissions") as "co2_emissions_2001",
-      'year_data
+      $"data.lossYear"
         .getItem(1)
         .getItem("carbon_emissions") as "co2_emissions_2002",
-      'year_data
+      $"data.lossYear"
         .getItem(2)
         .getItem("carbon_emissions") as "co2_emissions_2003",
-      'year_data
+      $"data.lossYear"
         .getItem(3)
         .getItem("carbon_emissions") as "co2_emissions_2004",
-      'year_data
+      $"data.lossYear"
         .getItem(4)
         .getItem("carbon_emissions") as "co2_emissions_2005",
-      'year_data
+      $"data.lossYear"
         .getItem(5)
         .getItem("carbon_emissions") as "co2_emissions_2006",
-      'year_data
+      $"data.lossYear"
         .getItem(6)
         .getItem("carbon_emissions") as "co2_emissions_2007",
-      'year_data
+      $"data.lossYear"
         .getItem(7)
         .getItem("carbon_emissions") as "co2_emissions_2008",
-      'year_data
+      $"data.lossYear"
         .getItem(8)
         .getItem("carbon_emissions") as "co2_emissions_2009",
-      'year_data
+      $"data.lossYear"
         .getItem(9)
         .getItem("carbon_emissions") as "co2_emissions_2010",
-      'year_data
+      $"data.lossYear"
         .getItem(10)
         .getItem("carbon_emissions") as "co2_emissions_2011",
-      'year_data
+      $"data.lossYear"
         .getItem(11)
         .getItem("carbon_emissions") as "co2_emissions_2012",
-      'year_data
+      $"data.lossYear"
         .getItem(12)
         .getItem("carbon_emissions") as "co2_emissions_2013",
-      'year_data
+      $"data.lossYear"
         .getItem(13)
         .getItem("carbon_emissions") as "co2_emissions_2014",
-      'year_data
+      $"data.lossYear"
         .getItem(14)
         .getItem("carbon_emissions") as "co2_emissions_2015",
-      'year_data
+      $"data.lossYear"
         .getItem(15)
         .getItem("carbon_emissions") as "co2_emissions_2016",
-      'year_data
+      $"data.lossYear"
         .getItem(16)
         .getItem("carbon_emissions") as "co2_emissions_2017",
-      'year_data
+      $"data.lossYear"
         .getItem(17)
         .getItem("carbon_emissions") as "co2_emissions_2018"
     )

@@ -1,4 +1,4 @@
-package org.globalforestwatch.treecoverloss
+package org.globalforestwatch.summarystats.treecoverloss
 
 import cats.Semigroup
 import geotrellis.raster.histogram.StreamingHistogram
@@ -15,7 +15,7 @@ case class TreeLossData(
                          var totalGainArea: Double,
                          var totalBiomass: Double,
                          var totalCo2: Double,
-                         var biomassHistogram: StreamingHistogram
+                         var avgBiomass: Double
                        ) {
   def merge(other: TreeLossData): TreeLossData = {
 
@@ -36,7 +36,8 @@ case class TreeLossData(
       totalGainArea + other.totalGainArea,
       totalBiomass + other.totalBiomass,
       totalCo2 + other.totalCo2,
-      biomassHistogram.merge(other.biomassHistogram)
+      // TODO: use extent2010 to calculate avg biomass incase year is selected
+      ((avgBiomass * extent2000) + (other.avgBiomass * other.extent2000)) / (extent2000 + other.extent2000)
     )
   }
 }

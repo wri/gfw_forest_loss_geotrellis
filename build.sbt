@@ -84,7 +84,7 @@ import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.apache.spark.{SparkConf, SparkContext}
 
-import org.globalforestwatch.treecoverloss._
+import org.globalforestwatch.summarystats.treecoverloss._
 import org.globalforestwatch.util._
 
 

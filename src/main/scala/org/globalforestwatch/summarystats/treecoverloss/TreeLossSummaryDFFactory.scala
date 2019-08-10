@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.gladalerts
+package org.globalforestwatch.summarystats.treecoverloss
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -9,9 +9,9 @@ import org.globalforestwatch.features.{
   WdpaFeatureId
 }
 
-case class GladAlertsSummaryDFFactory(
+case class TreeLossSummaryDFFactory(
   featureType: String,
-  summaryRDD: RDD[(FeatureId, GladAlertsSummary)],
+  summaryRDD: RDD[(FeatureId, TreeLossSummary)],
   spark: SparkSession
 ) {
 
@@ -35,7 +35,7 @@ case class GladAlertsSummaryDFFactory(
             case (dataGroup, data) => {
               id match {
                 case gadmId: GadmFeatureId =>
-                  GladAlertsRowGadm(gadmId, dataGroup, data)
+                  TreeLossRowGadm(gadmId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a GadmFeatureId")
               }
@@ -47,12 +47,12 @@ case class GladAlertsSummaryDFFactory(
   private def getFeatureDataFrame: DataFrame = {
     summaryRDD
       .flatMap {
-        case (id, summary) =>
-          summary.stats.map {
+        case (id, gladAlertSummary) =>
+          gladAlertSummary.stats.map {
             case (dataGroup, data) => {
               id match {
                 case simpleId: SimpleFeatureId =>
-                  GladAlertsRowSimple(simpleId, dataGroup, data)
+                  TreeLossRowSimple(simpleId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a WdpaFeatureId")
               }
@@ -64,12 +64,12 @@ case class GladAlertsSummaryDFFactory(
   private def getWdpaDataFrame: DataFrame = {
     summaryRDD
       .flatMap {
-        case (id, summary) =>
-          summary.stats.map {
+        case (id, gladAlertSummary) =>
+          gladAlertSummary.stats.map {
             case (dataGroup, data) => {
               id match {
                 case wdpaId: WdpaFeatureId =>
-                  GladAlertsRowWdpa(wdpaId, dataGroup, data)
+                  TreeLossRowWdpa(wdpaId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a SimpleFeatureId")
               }
@@ -78,5 +78,4 @@ case class GladAlertsSummaryDFFactory(
       }
       .toDF("id", "data_group", "data")
   }
-
 }

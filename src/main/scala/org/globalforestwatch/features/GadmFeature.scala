@@ -42,15 +42,15 @@ object GadmFeature extends Feature {
 
     var newDF = df
 
-    val isoFirst: Option[String] = getAnyMapValue(filters, "isoFirst")
-    val isoStart: Option[String] = getAnyMapValue(filters, "isoStart")
-    val isoEnd: Option[String] = getAnyMapValue(filters, "isoEnd")
-    val iso: Option[String] = getAnyMapValue(filters, "iso")
-    val admin1: Option[String] = getAnyMapValue(filters, "admin1")
-    val admin2: Option[String] = getAnyMapValue(filters, "admin2")
-    val limit: Option[Int] = getAnyMapValue(filters, "limit")
-    val tcl: Boolean = getAnyMapValue(filters, "tcl")
-    val glad: Boolean = getAnyMapValue(filters, "glad")
+    val isoFirst: Option[String] = getAnyMapValue[Option[String]](filters, "isoFirst")
+    val isoStart: Option[String] = getAnyMapValue[Option[String]](filters, "isoStart")
+    val isoEnd: Option[String] = getAnyMapValue[Option[String]](filters, "isoEnd")
+    val iso: Option[String] = getAnyMapValue[Option[String]](filters, "iso")
+    val admin1: Option[String] = getAnyMapValue[Option[String]](filters, "admin1")
+    val admin2: Option[String] = getAnyMapValue[Option[String]](filters, "admin2")
+    val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
+    val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")
+    val glad: Boolean = getAnyMapValue[Boolean](filters, "glad")
 
     if (glad) newDF = newDF.filter($"glad" === "t")
 

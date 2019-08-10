@@ -29,9 +29,9 @@ object SimpleFeature extends Feature {
 
     var newDF = df
 
-    val idStart: Option[Int] = getAnyMapValue(filters, "idStart")
-    val idEnd: Option[Int] = getAnyMapValue(filters, "idEnd")
-    val limit: Option[Int] = getAnyMapValue(filters, "limit")
+    val idStart: Option[Int] = getAnyMapValue[Option[Int]](filters, "idStart")
+    val idEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
+    val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
 
     idStart.foreach { startId =>
       newDF = newDF.filter($"fid" >= startId)
