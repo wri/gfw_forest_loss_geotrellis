@@ -58,7 +58,29 @@ trait Grid[T <: GridSources] {
 
   def getSources(gridId: String): T
 
-  def checkSources(gridId: String, windowExtent: Extent): T
+  def checkSources(gridId: String, windowExtent: Extent): T = {
+
+    def ccToMap(cc: AnyRef): Map[String, Any] =
+      (Map[String, Any]() /: cc.getClass.getDeclaredFields) { (a, f) =>
+        f.setAccessible(true)
+        a + (f.getName -> f.get(cc))
+      }
+
+    val sources: T = getSources(gridId)
+
+    val sourceMap = ccToMap(sources)
+
+    for ((k, v) <- sourceMap) {
+
+      v match {
+        case s: RequiredLayer => checkRequired(s, windowExtent)
+        case s: OptionalLayer => checkOptional(s, windowExtent)
+        case _ => Unit
+      }
+    }
+
+    sources
+  }
 
   // NOTE: This check will cause an eager fetch of raster metadata
   def checkRequired(layer: RequiredLayer, windowExtent: Extent): Unit = {
