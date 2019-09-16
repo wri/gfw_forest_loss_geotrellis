@@ -6,7 +6,7 @@ import geotrellis.vector.Point
 import org.globalforestwatch.grids.GridId._
 
 
-class TreeLossGridSuits extends FunSuite {
+class AnnualUpdateGridSuits extends FunSuite {
 
   test("pointGridId")  {
 
