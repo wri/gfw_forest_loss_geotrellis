@@ -57,19 +57,19 @@ object GadmFeature extends Feature {
     if (tcl) newDF = newDF.filter($"tcl" === "t")
 
     isoFirst.foreach { firstLetter =>
-      newDF = newDF.filter(substring($"iso", 0, 1) === firstLetter(0))
+      newDF = newDF.filter(substring($"gid_0", 0, 1) === firstLetter(0))
     }
 
     isoStart.foreach { startCode =>
-      newDF = newDF.filter($"iso" >= startCode)
+      newDF = newDF.filter($"gid_0" >= startCode)
     }
 
     isoEnd.foreach { endCode =>
-      newDF = newDF.filter($"iso" < endCode)
+      newDF = newDF.filter($"gid_0" < endCode)
     }
 
     iso.foreach { isoCode =>
-      newDF = newDF.filter($"iso" === isoCode)
+      newDF = newDF.filter($"gid_0" === isoCode)
     }
 
     admin1.foreach { admin1Code =>

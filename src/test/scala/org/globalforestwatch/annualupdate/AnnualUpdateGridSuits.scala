@@ -4,13 +4,14 @@ package org.globalforestwatch.annualupdate
 import org.scalatest.FunSuite
 import geotrellis.vector.Point
 import org.globalforestwatch.grids.GridId._
+import org.globalforestwatch.summarystats.annualupdate.AnnualUpdateGrid
 
 
 class AnnualUpdateGridSuits extends FunSuite {
 
   test("pointGridId")  {
 
-    val gridSize = TreeLossGrid.gridSize
+    val gridSize = AnnualUpdateGrid.gridSize
 
     assert(pointGridId(Point(14, 1), gridSize) === "10N_010E")
 

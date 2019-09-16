@@ -5,9 +5,9 @@ import org.globalforestwatch.summarystats.SummaryExport
 
 object AnnualUpdateMinimalExport extends SummaryExport {
 
-  override protected def exportFeature(summaryDF: DataFrame,
-                                       outputUrl: String,
-                                       kwargs: Map[String, Any]): Unit = {
+  override protected def exportGadm(summaryDF: DataFrame,
+                                    outputUrl: String,
+                                    kwargs: Map[String, Any]): Unit = {
 
     val spark = summaryDF.sparkSession
     import spark.implicits._

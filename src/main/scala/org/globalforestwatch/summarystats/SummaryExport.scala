@@ -30,22 +30,13 @@ trait SummaryExport {
 
   protected def exportGadm(summaryDF: DataFrame,
                            outputUrl: String,
-                           kwargs: Map[String, Any]): Unit =
-    throw new UnsupportedOperationException(
-      "This feature type is not yet implemented"
-    )
+                           kwargs: Map[String, Any]): Unit = ???
 
   protected def exportFeature(summaryDF: DataFrame,
                               outputUrl: String,
-                              kwargs: Map[String, Any]): Unit =
-    throw new UnsupportedOperationException(
-      "This feature type is not yet implemented"
-    )
+                              kwargs: Map[String, Any]): Unit = ???
 
   protected def exportWdpa(summaryDF: DataFrame,
                            outputUrl: String,
-                           kwargs: Map[String, Any]): Unit =
-    throw new UnsupportedOperationException(
-      "This feature type is not yet implemented"
-    )
+                           kwargs: Map[String, Any]): Unit = ???
 }
