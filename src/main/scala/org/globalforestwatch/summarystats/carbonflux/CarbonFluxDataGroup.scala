@@ -1,6 +1,7 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
-case class CarbonFluxRowLayers(gain: Integer,
+case class CarbonFluxDataGroup(threshold: Integer,
+                               gain: Integer,
                                mangroveBiomassExtent: Boolean,
                                drivers: String,
                                ecozones: String,

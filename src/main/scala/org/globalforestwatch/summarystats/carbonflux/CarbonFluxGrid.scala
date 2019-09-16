@@ -1,7 +1,7 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
 import geotrellis.vector.Extent
-import org.globalforestwatch.grids.{TenByTenGrid, GridId}
+import org.globalforestwatch.grids.TenByTenGrid
 
 object CarbonFluxGrid extends TenByTenGrid[CarbonFluxGridSources] {
 

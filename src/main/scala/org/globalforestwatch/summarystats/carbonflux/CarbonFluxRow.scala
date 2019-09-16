@@ -1,8 +1,9 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
-case class CarbonFluxRow(lossRowFeatureId: CarbonFluxRowFeatureId,
-                         threshold: Integer,
-                         layers: CarbonFluxRowLayers,
+import org.globalforestwatch.features.GadmFeatureId
+
+case class CarbonFluxRow(lossRowFeatureId: GadmFeatureId,
+                         layers: CarbonFluxDataGroup,
                          extent2000: Double,
                          totalArea: Double,
                          totalBiomass: Double,

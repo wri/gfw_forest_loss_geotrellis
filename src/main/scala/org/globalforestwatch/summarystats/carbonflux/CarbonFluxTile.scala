@@ -1,6 +1,6 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
-import geotrellis.raster.{CellGrid, CellType, Tile}
+import geotrellis.raster.{CellGrid, CellType}
 import org.globalforestwatch.layers._
 
 /**

@@ -1,4 +1,4 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
 import org.apache.spark.sql._
@@ -17,9 +17,8 @@ object ApiDF {
     validatePresenceOfColumns(
       df,
       Seq(
-        "feature_id",
-        "threshold",
-        "layers",
+        "id",
+        "data_group",
         "extent_2000",
         "total_area",
         "total_biomass",
@@ -61,19 +60,19 @@ object ApiDF {
     )
 
     df.select(
-      $"feature_id.iso" as "iso",
-      $"feature_id.adm1" as "adm1",
-      $"feature_id.adm2" as "adm2",
-      $"threshold",
-      $"layers.gain" as "gain",
-      $"layers.mangroveBiomassExtent" as "mangroves",
-      $"layers.drivers" as "tcs",
-      $"layers.ecozones" as "ecozone",
-      $"layers.landRights" as "land_right",
-      $"layers.wdpa" as "wdpa",
-      $"layers.intactForestLandscapes" as "ifl",
-      $"layers.plantations" as "plantations",
-      $"layers.primaryForest" as "primary_forest",
+      $"id.iso" as "iso",
+      $"id.adm1" as "adm1",
+      $"id.adm2" as "adm2",
+      $"data_group.threshold" as "threshold",
+      $"data_group.gain" as "gain",
+      $"data_group.mangroveBiomassExtent" as "mangroves",
+      $"data_group.drivers" as "tcs",
+      $"data_group.ecozones" as "ecozone",
+      $"data_group.landRights" as "land_right",
+      $"data_group.wdpa" as "wdpa",
+      $"data_group.intactForestLandscapes" as "ifl",
+      $"data_group.plantations" as "plantations",
+      $"data_group.primaryForest" as "primary_forest",
       $"extent_2000",
       $"total_area",
       $"total_biomass",

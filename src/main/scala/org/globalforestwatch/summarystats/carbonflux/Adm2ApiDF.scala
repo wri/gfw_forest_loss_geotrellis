@@ -1,4 +1,4 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._

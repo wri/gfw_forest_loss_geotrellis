@@ -1,7 +1,6 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
 import cats.Semigroup
-import geotrellis.raster.histogram.StreamingHistogram
 
 /** Summary data per class
   *

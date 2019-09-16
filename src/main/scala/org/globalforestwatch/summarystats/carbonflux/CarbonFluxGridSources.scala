@@ -1,8 +1,8 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
+import cats.implicits._
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
-import cats.implicits._
 import org.globalforestwatch.grids.GridSources
 import org.globalforestwatch.layers._
 

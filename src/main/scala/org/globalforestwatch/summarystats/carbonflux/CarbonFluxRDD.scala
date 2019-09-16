@@ -1,4 +1,4 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
 import cats.implicits._
 import geotrellis.contrib.polygonal._

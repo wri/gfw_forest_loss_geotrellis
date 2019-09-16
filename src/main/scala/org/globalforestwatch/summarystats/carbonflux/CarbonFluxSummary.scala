@@ -1,11 +1,10 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
+import cats.implicits._
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
-import cats.implicits._
-import org.globalforestwatch.util.Geodesy
-import geotrellis.raster.histogram.StreamingHistogram
 import org.globalforestwatch.summarystats.Summary
+import org.globalforestwatch.util.Geodesy
 
 /** LossData Summary by year */
 case class CarbonFluxSummary(

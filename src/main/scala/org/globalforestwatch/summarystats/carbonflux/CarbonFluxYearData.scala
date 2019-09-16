@@ -1,4 +1,4 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
 case class CarbonFluxYearData(year: Int,
                               var area_loss: Double,

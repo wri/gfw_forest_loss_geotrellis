@@ -1,4 +1,4 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
 import scala.collection.mutable.Map
 

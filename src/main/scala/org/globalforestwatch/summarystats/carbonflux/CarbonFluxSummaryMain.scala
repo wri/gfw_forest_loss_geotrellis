@@ -1,15 +1,15 @@
-package org.globalforestwatch.carbonflux
+package org.globalforestwatch.summarystats.carbonflux
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import cats.implicits._
 import com.monovore.decline.{CommandApp, Opts}
+import geotrellis.vector.{Feature, Geometry}
 import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
-import cats.implicits._
-import geotrellis.vector.{Feature, Geometry}
 import org.globalforestwatch.features.{GadmFeature, GadmFeatureId}
 import org.globalforestwatch.summarystats.SummarySparkSession
 
