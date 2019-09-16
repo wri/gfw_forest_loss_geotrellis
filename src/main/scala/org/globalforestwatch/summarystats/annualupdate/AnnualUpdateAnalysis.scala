@@ -37,4 +37,5 @@ object AnnualUpdateAnalysis {
       .format(LocalDateTime.now)
 
     AnnualUpdateExport.export(featureType, summaryDF, runOutputUrl, kwargs)
+  }
 }
