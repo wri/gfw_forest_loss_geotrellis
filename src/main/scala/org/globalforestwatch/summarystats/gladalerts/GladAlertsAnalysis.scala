@@ -10,7 +10,7 @@ import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.util.Util._
 
-object GladAlertsSummaryAnalysis {
+object GladAlertsAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             part: HashPartitioner,
@@ -22,7 +22,7 @@ object GladAlertsSummaryAnalysis {
       GladAlertsRDD(featureRDD, GladAlertsGrid.blockTileGrid, part)
 
     val summaryDF =
-      GladAlertsSummaryDFFactory(featureType, summaryRDD, spark).getDataFrame
+      GladAlertsDFFactory(featureType, summaryRDD, spark).getDataFrame
 
 //    val maybeOutputPartitions:Option[Int] = getAnyMapValue(kwargs,"maybeOutputPartitions")
 //    val outputPartitionCount =

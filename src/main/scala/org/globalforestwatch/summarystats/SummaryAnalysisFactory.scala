@@ -6,7 +6,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.summarystats.annualupdate.AnnualUpdateAnalysis
-import org.globalforestwatch.summarystats.gladalerts.GladAlertsSummaryAnalysis
+import org.globalforestwatch.summarystats.gladalerts.GladAlertsAnalysis
 import org.globalforestwatch.summarystats.treecoverloss.TreeLossAnalysis
 
 case class SummaryAnalysisFactory(analysis: String,
@@ -29,7 +29,7 @@ case class SummaryAnalysisFactory(analysis: String,
       case "annualupdate_minimal" => ???
       case "carbonflux"           => ???
       case "gladalerts" =>
-        GladAlertsSummaryAnalysis(
+        GladAlertsAnalysis(
           featureRDD: RDD[Feature[Geometry, FeatureId]],
           featureType: String,
           part: HashPartitioner,

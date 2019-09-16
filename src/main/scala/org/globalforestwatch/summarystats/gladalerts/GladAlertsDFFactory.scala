@@ -9,7 +9,7 @@ import org.globalforestwatch.features.{
   WdpaFeatureId
 }
 
-case class GladAlertsSummaryDFFactory(
+case class GladAlertsDFFactory(
   featureType: String,
   summaryRDD: RDD[(FeatureId, GladAlertsSummary)],
   spark: SparkSession

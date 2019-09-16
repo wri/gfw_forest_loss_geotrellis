@@ -21,7 +21,7 @@ object TreeLossAnalysis {
       TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, part)
 
     val summaryDF =
-      TreeLossSummaryDFFactory(featureType, summaryRDD, spark).getDataFrame
+      TreeLossDFFactory(featureType, summaryRDD, spark).getDataFrame
 
     //    val maybeOutputPartitions:Option[Int] = getAnyMapValue(kwargs,"maybeOutputPartitions")
     //    val outputPartitionCount =

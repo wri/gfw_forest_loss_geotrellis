@@ -9,7 +9,7 @@ import org.globalforestwatch.features.{
   WdpaFeatureId
 }
 
-case class TreeLossSummaryDFFactory(
+case class TreeLossDFFactory(
   featureType: String,
   summaryRDD: RDD[(FeatureId, TreeLossSummary)],
   spark: SparkSession

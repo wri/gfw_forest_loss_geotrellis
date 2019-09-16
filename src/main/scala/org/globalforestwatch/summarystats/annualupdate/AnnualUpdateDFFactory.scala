@@ -4,7 +4,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{FeatureId, GadmFeatureId}
 
-case class AnnualUpdateSummaryDFFactory(
+case class AnnualUpdateDFFactory(
   featureType: String,
   summaryRDD: RDD[(FeatureId, AnnualUpdateSummary)],
   spark: SparkSession

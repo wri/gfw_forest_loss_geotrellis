@@ -23,7 +23,7 @@ object AnnualUpdateAnalysis {
       AnnualUpdateRDD(featureRDD, AnnualUpdateGrid.blockTileGrid, part)
 
     val summaryDF =
-      AnnualUpdateSummaryDFFactory(featureType, summaryRDD, spark).getDataFrame
+      AnnualUpdateDFFactory(featureType, summaryRDD, spark).getDataFrame
 
     //    val maybeOutputPartitions:Option[Int] = getAnyMapValue(kwargs,"maybeOutputPartitions")
     //    val outputPartitionCount =
