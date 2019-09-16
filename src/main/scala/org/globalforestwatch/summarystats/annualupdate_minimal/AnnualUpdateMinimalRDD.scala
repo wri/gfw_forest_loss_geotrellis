@@ -1,4 +1,4 @@
-package org.globalforestwatch.annualupdate_minimal
+package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import cats.implicits._
 import geotrellis.contrib.polygonal._
@@ -7,15 +7,15 @@ import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
 import org.globalforestwatch.summarystats.SummaryRDD
 
-object TreeLossRDD extends SummaryRDD {
+object AnnualUpdateMinimalRDD extends SummaryRDD {
 
   type SOURCES = TreeLossGridSources
-  type SUMMARY = TreeLossSummary
-  type TILE = TreeLossTile
+  type SUMMARY = AnnualUpdateMinimalSummary
+  type TILE = AnnualUpdateMinimalTile
 
   def getSources(window: Extent): Either[Throwable, SOURCES] = {
     Either.catchNonFatal {
-      TreeLossGrid.getRasterSource(window)
+      AnnualUpdateMinimalGrid.getRasterSource(window)
     }
   }
 
@@ -28,7 +28,7 @@ object TreeLossRDD extends SummaryRDD {
                           tcdYear: Int): SUMMARY = {
     raster.polygonalSummary(
       geometry = geometry,
-      emptyResult = new TreeLossSummary(),
+      emptyResult = new AnnualUpdateMinimalSummary(),
       options = options
     )
   }

@@ -1,4 +1,4 @@
-package org.globalforestwatch.annualupdate_minimal
+package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import geotrellis.raster.{CellGrid, CellType}
 import org.globalforestwatch.layers._
@@ -8,7 +8,7 @@ import org.globalforestwatch.layers._
   * Tile-like structure to hold tiles from datasets required for our summary.
   * We can not use GeoTrellis MultibandTile because it requires all bands share a CellType.
   */
-case class TreeLossTile(
+case class AnnualUpdateMinimalTile(
                          loss: TreeCoverLoss#ITile,
                          gain: TreeCoverGain#ITile,
                          tcd2000: TreeCoverDensity#ITile,

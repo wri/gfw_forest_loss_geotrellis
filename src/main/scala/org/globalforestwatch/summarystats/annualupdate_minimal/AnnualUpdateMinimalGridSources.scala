@@ -1,8 +1,8 @@
-package org.globalforestwatch.annualupdate_minimal
+package org.globalforestwatch.summarystats.annualupdate_minimal
 
+import cats.implicits._
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
-import cats.implicits._
 import org.globalforestwatch.grids.GridSources
 import org.globalforestwatch.layers._
 
@@ -60,7 +60,7 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
   val logging = Logging(gridId)
   //  val oilGas = OilGas(gridId)
 
-  def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
+  def readWindow(window: Extent): Either[Throwable, Raster[AnnualUpdateMinimalTile]] = {
 
     for {
       // Failure for any of these reads will result in function returning Left[Throwable]
@@ -124,7 +124,7 @@ val peatlandsTile = peatlands.fetchWindow(window)
       val loggingTile = logging.fetchWindow(window)
 //      val oilGasTile = oilGas.fetchWindow(window)
 
-      val tile = TreeLossTile(
+      val tile = AnnualUpdateMinimalTile(
         lossTile,
         gainTile,
         tcd2000Tile,

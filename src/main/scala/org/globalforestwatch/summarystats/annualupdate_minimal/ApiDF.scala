@@ -1,4 +1,4 @@
-package org.globalforestwatch.annualupdate_minimal
+package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._

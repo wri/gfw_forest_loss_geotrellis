@@ -1,35 +1,35 @@
-package org.globalforestwatch.annualupdate_minimal
+package org.globalforestwatch.summarystats.annualupdate_minimal
 
+import cats.implicits._
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
-import cats.implicits._
-import org.globalforestwatch.util.Geodesy
 import geotrellis.raster.histogram.StreamingHistogram
 import org.globalforestwatch.summarystats.Summary
+import org.globalforestwatch.util.Geodesy
 
 /** LossData Summary by year */
-case class TreeLossSummary(
-  stats: Map[TreeLossDataGroup, TreeLossData] = Map.empty
-                          ) extends Summary[TreeLossSummary] {
+case class AnnualUpdateMinimalSummary(
+                                       stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = Map.empty
+                                     ) extends Summary[AnnualUpdateMinimalSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
-  def merge(other: TreeLossSummary): TreeLossSummary = {
+  def merge(other: AnnualUpdateMinimalSummary): AnnualUpdateMinimalSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    TreeLossSummary(stats.combine(other.stats))
+    AnnualUpdateMinimalSummary(stats.combine(other.stats))
   }
 }
 
-object TreeLossSummary {
+object AnnualUpdateMinimalSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
 
   implicit val mdhCellRegisterForTreeLossRaster1
-    : CellVisitor[Raster[TreeLossTile], TreeLossSummary] =
-    new CellVisitor[Raster[TreeLossTile], TreeLossSummary] {
+  : CellVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary] =
+    new CellVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary] {
 
-      def register(raster: Raster[TreeLossTile],
+      def register(raster: Raster[AnnualUpdateMinimalTile],
                    col: Int,
                    row: Int,
-                   acc: TreeLossSummary): TreeLossSummary = {
+                   acc: AnnualUpdateMinimalSummary): AnnualUpdateMinimalSummary = {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
         val gain: Integer = raster.tile.gain.getData(col, row)
@@ -117,12 +117,12 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
         val thresholds = List(10, 15, 20, 25, 30, 50, 75)
 
         def updateSummary(
-          thresholds: List[Int],
-          stats: Map[TreeLossDataGroup, TreeLossData]
-        ): Map[TreeLossDataGroup, TreeLossData] = {
+                           thresholds: List[Int],
+                           stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData]
+                         ): Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = {
           if (thresholds == Nil) stats
           else {
-            val pKey = TreeLossDataGroup(
+            val pKey = AnnualUpdateMinimalDataGroup(
               thresholds.head,
               drivers,
               globalLandCover,
@@ -165,11 +165,11 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
 //              oilGas
             )
 
-            val summary: TreeLossData =
+            val summary: AnnualUpdateMinimalData =
               stats.getOrElse(
                 key = pKey,
-                default = TreeLossData(
-                  TreeLossYearDataMap.empty,
+                default = AnnualUpdateMinimalData(
+                  AnnualUpdateMinimalYearDataMap.empty,
                   0,
                   0,
                   0,
@@ -217,10 +217,10 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
           }
         }
 
-        val updatedSummary: Map[TreeLossDataGroup, TreeLossData] =
+        val updatedSummary: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
           updateSummary(thresholds, acc.stats)
 
-        TreeLossSummary(updatedSummary)
+        AnnualUpdateMinimalSummary(updatedSummary)
       }
     }
 }

@@ -1,9 +1,9 @@
-package org.globalforestwatch.annualupdate_minimal
+package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
-object IsoApiDF {
+object Adm1ApiDF {
 
   def sumArea(df: DataFrame): DataFrame = {
 
@@ -12,6 +12,7 @@ object IsoApiDF {
 
     df.groupBy(
         $"iso",
+        $"adm1",
         $"threshold",
         $"tcs",
         $"global_land_cover",
@@ -77,10 +78,10 @@ object IsoApiDF {
         sum("extent_2010") as "extent_2010",
         sum("total_gain") as "total_gain",
         sum("total_biomass") as "total_biomass",
-        sum("weighted_biomass_per_ha") as "weighted_biomass_per_ha",
+        sum($"avg_biomass_per_ha" * $"extent_2000") as "weighted_biomass_per_ha",
         sum("total_co2") as "total_co2",
 //        sum("total_mangrove_biomass") as "total_mangrove_biomass",
-//        sum("weighted_mangrove_biomass_per_ha") as "weighted_mangrove_biomass_per_ha",
+//        sum($"avg_mangrove_biomass_per_ha" * $"extent_2000") as "weighted_mangrove_biomass_per_ha",
 //        sum("total_mangrove_co2") as "total_mangrove_co2",
         sum("area_loss_2001") as "area_loss_2001",
         sum("area_loss_2002") as "area_loss_2002",
@@ -182,6 +183,7 @@ object IsoApiDF {
 
     df.select(
       $"iso",
+      $"adm1",
       $"threshold",
       $"tcs",
       $"global_land_cover",
@@ -238,8 +240,8 @@ object IsoApiDF {
           $"area_loss_2001" as "area_loss",
           $"biomass_loss_2001" as "biomass_loss",
           $"carbon_emissions_2001" as "carbon_emissions"
-//          $"mangrove_biomass_loss_2001" as "mangrove_biomass_loss",
-//          $"mangrove_carbon_emissions_2001" as "mangrove_carbon_emissions"
+          // $"mangrove_biomass_loss_2001" as "mangrove_biomass_loss",
+          // $"mangrove_carbon_emissions_2001" as "mangrove_carbon_emissions"
         ),
         struct(
           $"year_2002" as "year",

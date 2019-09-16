@@ -1,9 +1,9 @@
-package org.globalforestwatch.annualupdate_minimal
+package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
-object Adm1SummaryDF {
+object IsoSummaryDF {
 
 
   def sumArea(df: DataFrame): DataFrame = {
@@ -11,7 +11,7 @@ object Adm1SummaryDF {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    df.groupBy($"iso", $"adm1", $"threshold")
+    df.groupBy($"iso", $"threshold")
       .agg(
         sum("area_ha") as "area_ha",
         sum("extent_2000_ha") as "extent_2000_ha",
@@ -80,13 +80,11 @@ object Adm1SummaryDF {
   }
 
   def roundValues(df: DataFrame): DataFrame = {
-
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
     df.select(
       $"iso" as "country",
-      $"adm1" as "subnational1",
       $"threshold",
       round($"area_ha") as "area_ha",
       round($"extent_2000_ha") as "extent_2000_ha",
