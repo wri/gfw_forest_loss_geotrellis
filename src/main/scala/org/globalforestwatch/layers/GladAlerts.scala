@@ -48,7 +48,7 @@ case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
 
     alertDate match {
       case Some(d) => Some(d, confidence)
-      case None => null
+      case None => None
     }
 
   }

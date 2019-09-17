@@ -279,7 +279,7 @@ trait DateConfLayer extends ILayer {
   type B = Option[(String, Boolean)]
 
   val internalNoDataValue: Int = 0
-  val externalNoDataValue: B = null
+  val externalNoDataValue: B = None
 
 }
 
