@@ -1,20 +1,22 @@
 package org.globalforestwatch.summarystats.treecoverloss
+
+import cats.implicits._
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
-import cats.implicits._
-import org.globalforestwatch.util.Geodesy
-import geotrellis.raster.histogram.StreamingHistogram
 import org.globalforestwatch.summarystats.Summary
+import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 /** LossData Summary by year */
-case class TreeLossSummary(tcdYear: Int,
-                           stats: Map[TreeLossDataGroup, TreeLossData] =
-                           Map.empty) extends Summary[TreeLossSummary] {
+case class TreeLossSummary(stats: Map[TreeLossDataGroup, TreeLossData] =
+                           Map.empty,
+                           kwargs: Map[String, Any])
+  extends Summary[TreeLossSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: TreeLossSummary): TreeLossSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    TreeLossSummary(tcdYear, stats.combine(other.stats))
+    TreeLossSummary(stats.combine(other.stats), kwargs)
   }
 }
 
@@ -30,7 +32,7 @@ object TreeLossSummary {
                    row: Int,
                    acc: TreeLossSummary): TreeLossSummary = {
 
-        val tcdYear = acc.tcdYear
+        val tcdYear: Int = getAnyMapValue[Int](acc.kwargs, "tcdYear")
 
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
@@ -65,21 +67,14 @@ object TreeLossSummary {
                          ): Map[TreeLossDataGroup, TreeLossData] = {
           if (thresholds == Nil) stats
           else {
-            val pKey = TreeLossDataGroup(thresholds.head, tcdYear, primaryForest)
+            val pKey =
+              TreeLossDataGroup(thresholds.head, tcdYear, primaryForest)
 
             val summary: TreeLossData =
               stats.getOrElse(
                 key = pKey,
-                default = TreeLossData(
-                  TreeLossYearDataMap.empty,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                )
+                default =
+                  TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -113,7 +108,7 @@ object TreeLossSummary {
         val updatedSummary: Map[TreeLossDataGroup, TreeLossData] =
           updateSummary(thresholds, acc.stats)
 
-        TreeLossSummary(tcdYear, updatedSummary)
+        TreeLossSummary(updatedSummary, acc.kwargs)
 
       }
     }

@@ -28,7 +28,7 @@ object GladAlertsRDD extends SummaryRDD {
                           kwargs: Map[String, Any]): SUMMARY = {
     raster.polygonalSummary(
       geometry = geometry,
-      emptyResult = new GladAlertsSummary(),
+      emptyResult = new GladAlertsSummary(kwargs = kwargs),
       options = options
     )
   }

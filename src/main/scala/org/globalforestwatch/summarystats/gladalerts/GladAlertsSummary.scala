@@ -4,18 +4,19 @@ import cats.implicits._
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
+import org.globalforestwatch.util.Util.getAnyMapValue
 import org.globalforestwatch.util.{Geodesy, Mercantile}
 
 /** LossData Summary by year */
-case class GladAlertsSummary(changeOnly: Boolean = false,
-                             stats: Map[GladAlertsDataGroup, GladAlertsData] =
-                             Map.empty)
+case class GladAlertsSummary(stats: Map[GladAlertsDataGroup, GladAlertsData] =
+                             Map.empty,
+                             kwargs: Map[String, Any])
   extends Summary[GladAlertsSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: GladAlertsSummary): GladAlertsSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    GladAlertsSummary(changeOnly, stats.combine(other.stats))
+    GladAlertsSummary(stats.combine(other.stats), kwargs)
   }
 }
 
@@ -31,7 +32,8 @@ object GladAlertsSummary {
                    row: Int,
                    acc: GladAlertsSummary): GladAlertsSummary = {
 
-        val changeOnly = acc.changeOnly
+        val changeOnly: Boolean =
+          getAnyMapValue[Boolean](acc.kwargs, "changeOnly")
 
         // This is a pixel by pixel operation
         val glad: Option[(String, Boolean)] =
@@ -155,7 +157,7 @@ object GladAlertsSummary {
           val updatedSummary: Map[GladAlertsDataGroup, GladAlertsData] =
             updateSummary(tile, acc.stats)
 
-          GladAlertsSummary(changeOnly, updatedSummary)
+          GladAlertsSummary(updatedSummary, acc.kwargs)
 
         } else acc
       }
