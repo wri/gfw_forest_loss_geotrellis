@@ -140,4 +140,46 @@ object GladAlertsExport extends SummaryExport {
 
     wdpaDF.unpersist()
   }
+
+  override protected def exportFeature(summaryDF: DataFrame,
+                                       outputUrl: String,
+                                       kwargs: Map[String, Any]): Unit = {
+
+    val changeOnly: Boolean =
+      getAnyMapValue[Boolean](kwargs, "changeOnly")
+
+    val buildDataCube: Boolean =
+      getAnyMapValue[Boolean](kwargs, "buildDataCube")
+
+    val minZoom: Int = {
+      if (buildDataCube) 0 else 12
+    } // TODO: remove magic numbers. maxZoom=12 should be in kwargs
+
+    val featureDF = summaryDF
+      .transform(SimpleFeatureDailyDF.unpackValues(minZoom))
+
+    featureDF.cache()
+
+    if (!changeOnly) {
+      featureDF
+        .transform(SimpleFeatureDailyDF.sumArea)
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/feature/area")
+    }
+
+    featureDF
+      .transform(SimpleFeatureDailyDF.sumAlerts)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/feature/daily_alerts")
+
+    featureDF
+      .transform(SimpleFeatureWeeklyDF.sumAlerts)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/feature/weekly_alerts")
+
+    featureDF.unpersist()
+  }
 }
