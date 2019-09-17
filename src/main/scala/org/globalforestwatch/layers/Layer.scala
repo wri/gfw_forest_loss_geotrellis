@@ -1,15 +1,13 @@
 package org.globalforestwatch.layers
 
 import java.io.FileNotFoundException
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
-import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
-import geotrellis.raster.{CellType, Tile, isNoData}
-import geotrellis.vector.Extent
-import geotrellis.raster.crop._
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3URI
+import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
+import geotrellis.raster.crop._
+import geotrellis.raster.{CellType, Tile, isNoData}
+import geotrellis.vector.Extent
 
 trait Layer {
 
@@ -278,7 +276,7 @@ trait DateConfLayer extends ILayer {
     * Layers which return an Integer type
     * (use java.lang.Integer to be able to use null)
     */
-  type B = Option[(LocalDate, Boolean)]
+  type B = Option[(String, Boolean)]
 
   val internalNoDataValue: Int = 0
   val externalNoDataValue: B = null

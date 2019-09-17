@@ -12,6 +12,7 @@ object GladAlertsExport extends SummaryExport {
     summaryDF.cache()
 
     val tileDF = summaryDF
+      .transform(TileDF.unpackValues)
       .transform(TileDF.sumAlerts)
 
     tileDF.write

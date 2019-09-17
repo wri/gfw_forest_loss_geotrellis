@@ -1,11 +1,8 @@
 package org.globalforestwatch.summarystats.gladalerts
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
+import cats.implicits._
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
-import cats.implicits._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.{Geodesy, Mercantile}
 
@@ -33,7 +30,7 @@ object GladAlertsSummary {
                    row: Int,
                    acc: GladAlertsSummary): GladAlertsSummary = {
         // This is a pixel by pixel operation
-        val glad: Option[(LocalDate, Boolean)] =
+        val glad: Option[(String, Boolean)] =
           raster.tile.glad.getData(col, row)
 
         val biomass: Double = raster.tile.biomass.getData(col, row)
@@ -87,8 +84,7 @@ object GladAlertsSummary {
           else {
             val alertDate: String = {
               glad match {
-                case g: (LocalDate, Boolean) =>
-                  g._1.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                case Some(g: (String, Boolean)) => g._1
                 case _ => null
               }
             }
@@ -96,7 +92,7 @@ object GladAlertsSummary {
 
             val confidence: Option[Boolean] = {
               glad match {
-                case Some(g: (LocalDate, Boolean)) => Some(g._2)
+                case Some(g: (String, Boolean)) => Some(g._2)
                 case _ => null
               }
             }
