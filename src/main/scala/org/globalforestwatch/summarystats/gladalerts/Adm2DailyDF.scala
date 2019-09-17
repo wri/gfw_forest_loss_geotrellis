@@ -6,7 +6,7 @@ import org.apache.spark.sql.functions._
 
 object Adm2DailyDF {
 
-  def unpackValues(df: DataFrame): DataFrame = {
+  def unpackValues(minZoom: Int = 0)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
@@ -20,7 +20,7 @@ object Adm2DailyDF {
       )
     )
 
-    df.filter($"data_group.tile.z" === 0)
+    df.filter($"data_group.tile.z" === minZoom)
       .select(
         $"id.country" as "iso",
         $"id.admin1" as "adm1",
@@ -87,7 +87,75 @@ object Adm2DailyDF {
         "bra_biomes",
         "alert_count",
         "alert_area_ha",
-        "co2_emissions_Mt",
+        "co2_emissions_Mt"
+      )
+    )
+
+    df
+      .filter($"alert_date".isNotNull)
+      .groupBy(
+        $"iso",
+        $"adm1",
+        $"adm2",
+        $"alert_date",
+        $"is_confirmed",
+        $"primary_forest",
+        $"wdpa",
+        $"aze",
+        $"kba",
+        $"landmark",
+        $"plantations",
+        $"mining",
+        $"managed_forests",
+        $"rspo",
+        $"wood_fiber",
+        $"peatlands",
+        $"idn_forest_moratorium",
+        $"oil_palm",
+        $"idn_forest_area",
+        $"per_forest_concession",
+        $"oil_gas",
+        $"mangroves_2016",
+        $"ifl_2016",
+        $"bra_biomes"
+      )
+      .agg(
+        sum("alert_count") as "alert_count",
+        sum("alert_area_ha") as "alert_area_ha",
+        sum("co2_emissions_Mt") as "co2_emissions_Mt"
+      )
+  }
+
+  def sumArea(df: DataFrame): DataFrame = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
+
+    validatePresenceOfColumns(
+      df,
+      Seq(
+        "iso",
+        "adm1",
+        "adm2",
+        "primary_forest",
+        "wdpa",
+        "aze",
+        "kba",
+        "landmark",
+        "plantations",
+        "mining",
+        "managed_forests",
+        "rspo",
+        "wood_fiber",
+        "peatlands",
+        "idn_forest_moratorium",
+        "oil_palm",
+        "idn_forest_area",
+        "per_forest_concession",
+        "oil_gas",
+        "mangroves_2016",
+        "ifl_2016",
+        "bra_biomes",
         "total_area_ha"
       )
     )
@@ -96,8 +164,6 @@ object Adm2DailyDF {
       $"iso",
       $"adm1",
       $"adm2",
-      $"alert_date",
-      $"is_confirmed",
       $"primary_forest",
       $"wdpa",
       $"aze",
@@ -119,9 +185,6 @@ object Adm2DailyDF {
       $"bra_biomes"
     )
       .agg(
-        sum("alert_count") as "alert_count",
-        sum("alert_area_ha") as "alert_area_ha",
-        sum("co2_emissions_Mt") as "co2_emissions_Mt",
         sum("total_area_ha") as "total_area_ha"
       )
   }

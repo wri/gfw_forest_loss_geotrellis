@@ -6,21 +6,14 @@ import org.apache.spark.sql.functions._
 
 object WdpaDailyDF {
 
-  def unpackValues(df: DataFrame): DataFrame = {
+  def unpackValues(minZoom: Int)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
 
-    validatePresenceOfColumns(
-      df,
-      Seq(
-        "id",
-        "data_group",
-        "data"
-      )
-    )
+    validatePresenceOfColumns(df, Seq("id", "data_group", "data"))
 
-    df.filter($"data_group.tile.z" === 0)
+    df.filter($"data_group.tile.z" === minZoom)
       .select(
         $"id.wdpa_id" as "wdpa_id",
         $"id.name" as "name",
@@ -89,12 +82,12 @@ object WdpaDailyDF {
         "bra_biomes",
         "alert_count",
         "alert_area_ha",
-        "co2_emissions_Mt",
-        "total_area_ha"
+        "co2_emissions_Mt"
       )
     )
 
-    df.groupBy(
+    df.filter($"alert_date".isNotNull)
+      .groupBy(
         $"wdpa_id",
         $"name",
         $"iucn_cat",
@@ -124,8 +117,70 @@ object WdpaDailyDF {
       .agg(
         sum("alert_count") as "alert_count",
         sum("alert_area_ha") as "alert_area_ha",
-        sum("co2_emissions_Mt") as "co2_emissions_Mt",
-        sum("total_area_ha") as "total_area_ha"
+        sum("co2_emissions_Mt") as "co2_emissions_Mt"
       )
+  }
+
+  def sumArea(df: DataFrame): DataFrame = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
+
+    validatePresenceOfColumns(
+      df,
+      Seq(
+        "wdpa_id",
+        "name",
+        "iucn_cat",
+        "iso",
+        "status",
+        "primary_forest",
+        "aze",
+        "kba",
+        "landmark",
+        "plantations",
+        "mining",
+        "managed_forests",
+        "rspo",
+        "wood_fiber",
+        "peatlands",
+        "idn_forest_moratorium",
+        "oil_palm",
+        "idn_forest_area",
+        "per_forest_concession",
+        "oil_gas",
+        "mangroves_2016",
+        "ifl_2016",
+        "bra_biomes",
+        "total_area_ha"
+      )
+    )
+
+    df.groupBy(
+      $"wdpa_id",
+      $"name",
+      $"iucn_cat",
+      $"iso",
+      $"status",
+      $"primary_forest",
+      $"aze",
+      $"kba",
+      $"landmark",
+      $"plantations",
+      $"mining",
+      $"managed_forests",
+      $"rspo",
+      $"wood_fiber",
+      $"peatlands",
+      $"idn_forest_moratorium",
+      $"oil_palm",
+      $"idn_forest_area",
+      $"per_forest_concession",
+      $"oil_gas",
+      $"mangroves_2016",
+      $"ifl_2016",
+      $"bra_biomes"
+    )
+      .agg(sum("total_area_ha") as "total_area_ha")
   }
 }

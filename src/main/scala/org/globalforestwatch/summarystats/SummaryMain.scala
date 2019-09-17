@@ -24,18 +24,18 @@ object SummaryMain
         val outputOpt =
           Opts.option[String]("output", "URI of output dir for CSV files")
 
-        // Can be used to increase the level of job parallelism
-        val intputPartitionsOpt = Opts
-          .option[Int]("input-partitions", "Partition multiplier for input")
-          .withDefault(16)
-
-        // Can be used to consolidate output into fewer files
-        val outputPartitionsOpt = Opts
-          .option[Int](
-            "output-partitions",
-            "Number of output partitions / files to be written"
-          )
-          .orNone
+        //        // Can be used to increase the level of job parallelism
+        //        val intputPartitionsOpt = Opts
+        //          .option[Int]("input-partitions", "Partition multiplier for input")
+        //          .withDefault(16)
+        //
+        //        // Can be used to consolidate output into fewer files
+        //        val outputPartitionsOpt = Opts
+        //          .option[Int](
+        //            "output-partitions",
+        //            "Number of output partitions / files to be written"
+        //          )
+        //          .orNone
 
         val featureTypeOpt = Opts
           .option[String](
@@ -127,7 +127,11 @@ object SummaryMain
 
         val gladOpt = Opts.flag("glad", "GLAD tile extent").orFalse
 
-        val changeOnlyOpt = Opts.flag("changeOnly", "only process change data").orFalse
+        val changeOnlyOpt =
+          Opts.flag("change_only", "Process change only").orFalse
+
+        val buildDataCubeOpt =
+          Opts.flag("build_data_cube", "Build XYZ data cube").orFalse
 
         val logger = Logger.getLogger("SummaryMain")
 
@@ -135,8 +139,6 @@ object SummaryMain
           analysisOpt,
           featuresOpt,
           outputOpt,
-          intputPartitionsOpt,
-          outputPartitionsOpt,
           featureTypeOpt,
           limitOpt,
           isoOpt,
@@ -154,13 +156,12 @@ object SummaryMain
           primartyForestOpt,
           tclOpt,
           gladOpt,
-          changeOnlyOpt
+          changeOnlyOpt,
+          buildDataCubeOpt
         ).mapN {
           (analysis,
            featureUris,
            outputUrl,
-           inputPartitionMultiplier,
-           maybeOutputPartitions,
            featureType,
            limit,
            iso,
@@ -178,10 +179,9 @@ object SummaryMain
            includePrimaryForest,
            tcl,
            glad,
-           changeOnly) =>
+           changeOnly,
+           buildDataCube) =>
             val kwargs = Map(
-              "inputPartitionMultiplier" -> inputPartitionMultiplier,
-              "maybeOutputPartitions" -> maybeOutputPartitions,
               "outputUrl" -> outputUrl,
               "limit" -> limit,
               "iso" -> iso,
@@ -199,7 +199,8 @@ object SummaryMain
               "includePrimaryForest" -> includePrimaryForest,
               "tcl" -> tcl,
               "glad" -> glad,
-              "changeOnly" -> changeOnly
+              "changeOnly" -> changeOnly,
+              "buildDataCube" -> buildDataCube
             )
 
             val featureObj = FeatureFactory(featureType).featureObj
@@ -215,6 +216,8 @@ object SummaryMain
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
             val featureRDD: RDD[Feature[Geometry, FeatureId]] =
               FeatureRDD(featuresDF, featureObj)
+
+            val inputPartitionMultiplier = 16
 
             val part = new HashPartitioner(
               partitions = featureRDD.getNumPartitions * inputPartitionMultiplier

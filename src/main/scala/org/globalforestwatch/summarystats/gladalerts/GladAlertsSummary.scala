@@ -35,6 +35,10 @@ object GladAlertsSummary {
         val changeOnly: Boolean =
           getAnyMapValue[Boolean](acc.kwargs, "changeOnly")
 
+        val buildDataCube: Boolean = getAnyMapValue[Boolean](acc.kwargs, "buildDataCube")
+
+        val maxZoom = 12
+
         // This is a pixel by pixel operation
         val glad: Option[(String, Boolean)] =
           raster.tile.glad.getData(col, row)
@@ -87,7 +91,12 @@ object GladAlertsSummary {
                              tile: Mercantile.Tile,
                              stats: Map[GladAlertsDataGroup, GladAlertsData]
                            ): Map[GladAlertsDataGroup, GladAlertsData] = {
-            if (tile.z < 0) stats
+            val cutOff: Int = {
+              if (buildDataCube) 0
+              else maxZoom
+            }
+
+            if (tile.z < cutOff) stats
             else {
               val alertDate: String = {
                 glad match {
@@ -153,7 +162,7 @@ object GladAlertsSummary {
 
           }
 
-          val tile: Mercantile.Tile = Mercantile.tile(lng, lat, 12)
+          val tile: Mercantile.Tile = Mercantile.tile(lng, lat, maxZoom)
           val updatedSummary: Map[GladAlertsDataGroup, GladAlertsData] =
             updateSummary(tile, acc.stats)
 

@@ -41,12 +41,12 @@ object WdpaWeeklyDF {
         "bra_biomes",
         "alert_count",
         "alert_area_ha",
-        "co2_emissions_Mt",
-        "total_area_ha"
+        "co2_emissions_Mt"
       )
     )
 
-    df.select(
+    df.filter($"alert_date".isNotNull)
+      .select(
         $"wdpa_id",
         $"name",
         $"iucn_cat",
@@ -75,8 +75,7 @@ object WdpaWeeklyDF {
         $"bra_biomes",
         $"alert_count",
         $"alert_area_ha",
-        $"co2_emissions_Mt",
-        $"total_area_ha"
+        $"co2_emissions_Mt"
       )
       .groupBy(
         $"wdpa_id",
@@ -109,8 +108,7 @@ object WdpaWeeklyDF {
       .agg(
         sum("alert_count") as "alert_count",
         sum("alert_area_ha") as "alert_area_ha",
-        sum("co2_emissions_Mt") as "co2_emissions_Mt",
-        sum("total_area_ha") as "total_area_ha"
+        sum("co2_emissions_Mt") as "co2_emissions_Mt"
       )
   }
 }
