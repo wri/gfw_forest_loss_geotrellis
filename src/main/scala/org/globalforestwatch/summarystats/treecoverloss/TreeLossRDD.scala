@@ -6,6 +6,7 @@ import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
 import org.globalforestwatch.summarystats.SummaryRDD
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 object TreeLossRDD extends SummaryRDD {
 
@@ -26,7 +27,8 @@ object TreeLossRDD extends SummaryRDD {
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,
-                          tcdYear: Int): SUMMARY = {
+                          kwargs: Map[String, Any]): SUMMARY = {
+    val tcdYear: Int = getAnyMapValue[Int](kwargs, "tcdYear")
     raster.polygonalSummary(
       geometry = geometry,
       emptyResult = new TreeLossSummary(tcdYear),

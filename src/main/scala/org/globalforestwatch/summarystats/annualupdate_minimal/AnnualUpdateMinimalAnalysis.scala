@@ -23,7 +23,8 @@ object AnnualUpdateMinimalAnalysis {
       AnnualUpdateMinimalRDD(
         featureRDD,
         AnnualUpdateMinimalGrid.blockTileGrid,
-        part
+        part,
+        kwargs
       )
 
     val summaryDF =

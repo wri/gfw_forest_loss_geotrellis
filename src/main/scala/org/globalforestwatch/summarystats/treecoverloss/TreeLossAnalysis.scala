@@ -18,7 +18,7 @@ object TreeLossAnalysis {
             kwargs: Map[String, Any]): Unit = {
     import spark.implicits._
     val summaryRDD: RDD[(FeatureId, TreeLossSummary)] =
-      TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, part)
+      TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
       TreeLossDFFactory(featureType, summaryRDD, spark).getDataFrame

@@ -127,6 +127,8 @@ object SummaryMain
 
         val gladOpt = Opts.flag("glad", "GLAD tile extent").orFalse
 
+        val changeOnlyOpt = Opts.flag("changeOnly", "only process change data").orFalse
+
         val logger = Logger.getLogger("SummaryMain")
 
         (
@@ -151,7 +153,8 @@ object SummaryMain
           thresholdOpts,
           primartyForestOpt,
           tclOpt,
-          gladOpt
+          gladOpt,
+          changeOnlyOpt
         ).mapN {
           (analysis,
            featureUris,
@@ -174,7 +177,8 @@ object SummaryMain
            thresholdFilter,
            includePrimaryForest,
            tcl,
-           glad) =>
+           glad,
+           changeOnly) =>
             val kwargs = Map(
               "inputPartitionMultiplier" -> inputPartitionMultiplier,
               "maybeOutputPartitions" -> maybeOutputPartitions,
@@ -194,7 +198,8 @@ object SummaryMain
               "thresholdFilter" -> thresholdFilter,
               "includePrimaryForest" -> includePrimaryForest,
               "tcl" -> tcl,
-              "glad" -> glad
+              "glad" -> glad,
+              "changeOnly" -> changeOnly
             )
 
             val featureObj = FeatureFactory(featureType).featureObj

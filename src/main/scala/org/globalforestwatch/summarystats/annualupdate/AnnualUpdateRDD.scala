@@ -25,7 +25,7 @@ object AnnualUpdateRDD extends SummaryRDD {
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,
-                          tcdYear: Int = 2000): SUMMARY = {
+                          kwargs: Map[String, Any]): SUMMARY = {
     raster.polygonalSummary(
       geometry = geometry,
       emptyResult = new AnnualUpdateSummary(),

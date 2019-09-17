@@ -30,7 +30,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                                      featureRDD: RDD[Feature[Geometry, FEATUREID]],
                                      windowLayout: LayoutDefinition,
                                      partitioner: Partitioner,
-                                     tcdYear: Int = 2000)(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
+                                     kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
 
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.
@@ -102,7 +102,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                           raster,
                           feature.geom,
                           rasterizeOptions,
-                          tcdYear
+                          kwargs
                         )
 
                       } catch {
@@ -142,7 +142,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,
-                          tcdYear: Int): SUMMARY
+                          kwargs: Map[String, Any]): SUMMARY
 
   def reduceSummarybyKey[FEATUREID <: FeatureId](
     featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]

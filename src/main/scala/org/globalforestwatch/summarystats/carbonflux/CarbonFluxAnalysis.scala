@@ -20,7 +20,7 @@ object CarbonFluxAnalysis {
     import spark.implicits._
 
     val summaryRDD: RDD[(FeatureId, CarbonFluxSummary)] =
-      CarbonFluxRDD(featureRDD, CarbonFluxGrid.blockTileGrid, part)
+      CarbonFluxRDD(featureRDD, CarbonFluxGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
       CarbonFluxDFFactory(featureType, summaryRDD, spark).getDataFrame
