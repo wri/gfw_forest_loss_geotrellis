@@ -12,14 +12,6 @@ object CarbonFluxExport extends SummaryExport {
     val spark = summaryDF.sparkSession
     import spark.implicits._
 
-    val csvOptions = Map(
-      "header" -> "true",
-      "delimiter" -> "\t",
-      "quote" -> "\u0000",
-      "quoteMode" -> "NONE",
-      "nullValue" -> "\u0000"
-    )
-
     summaryDF
       .transform(ApiDF.unpackValues)
       // .transform(ApiDF.setNull)

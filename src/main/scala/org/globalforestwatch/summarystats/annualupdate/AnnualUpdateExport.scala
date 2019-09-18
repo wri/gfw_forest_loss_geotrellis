@@ -18,14 +18,6 @@ object AnnualUpdateExport extends SummaryExport {
     //          adm2DF.repartition($"iso")
     adm2DF.cache()
 
-    val csvOptions = Map(
-      "header" -> "true",
-      "delimiter" -> "\t",
-      "quote" -> "\u0000",
-      "quoteMode" -> "NONE",
-      "nullValue" -> "\u0000"
-    )
-
     val adm2SummaryDF = adm2DF
       .transform(Adm2SummaryDF.sumArea)
 
