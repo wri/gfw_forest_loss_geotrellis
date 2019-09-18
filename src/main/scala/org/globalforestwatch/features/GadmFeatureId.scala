@@ -1,6 +1,6 @@
 package org.globalforestwatch.features
 
-case class GadmFeatureId(country: String, admin1: Integer, admin2: Integer) extends FeatureId {
-  override def toString: String = s"$country - $admin1 - $admin2"
+case class GadmFeatureId(iso: String, adm1: Integer, adm2: Integer) extends FeatureId {
+  override def toString: String = s"$iso - $adm1 - $adm2"
 
 }

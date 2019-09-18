@@ -1,59 +1,58 @@
 package org.globalforestwatch.summarystats.annualupdate
 
 import cats.Semigroup
-import geotrellis.raster.histogram.StreamingHistogram
 
 /** Summary data per class
   *
   * Note: This case class contains mutable values
   *
+  * @param areaLoss
+  * @param biomassLoss
+  * @param co2Emissions
+  * @param mangroveBiomassLoss
+  * @param mangroveCo2Emissions
   * @param totalArea
   * @param totalGainArea
   * @param totalBiomass
   * @param totalCo2
-  * @param biomassHistogram
+  * @param weightedBiomass
   * @param totalMangroveBiomass
   * @param totalMangroveCo2
-  * @param mangroveBiomassHistogram
+  * @param weightedMangroveBiomass
   */
-case class AnnualUpdateData(
-  var lossYear: scala.collection.mutable.Map[Int, AnnualUpdateYearData],
-  var extent2000: Double,
-  var extent2010: Double,
-  var totalArea: Double,
-  var totalGainArea: Double,
-  var totalBiomass: Double,
-  var totalCo2: Double,
-  var biomassHistogram: StreamingHistogram,
-  var totalMangroveBiomass: Double,
-  var totalMangroveCo2: Double,
-  var mangroveBiomassHistogram: StreamingHistogram
-) {
+case class AnnualUpdateData(var areaLoss: Double,
+                            var biomassLoss: Double,
+                            var co2Emissions: Double,
+                            var mangroveBiomassLoss: Double,
+                            var mangroveCo2Emissions: Double,
+                            var extent2000: Double,
+                            var extent2010: Double,
+                            var totalArea: Double,
+                            var totalGainArea: Double,
+                            var totalBiomass: Double,
+                            var totalCo2: Double,
+                            var weightedBiomass: Double,
+                            var totalMangroveBiomass: Double,
+                            var totalMangroveCo2: Double,
+                            var weightedMangroveBiomass: Double) {
   def merge(other: AnnualUpdateData): AnnualUpdateData = {
 
     AnnualUpdateData(
-      lossYear ++ other.lossYear.map {
-        case (k, v) => {
-          val loss: AnnualUpdateYearData = lossYear(k)
-          var otherLoss: AnnualUpdateYearData = v
-          otherLoss.area_loss += loss.area_loss
-          otherLoss.biomass_loss += loss.biomass_loss
-          otherLoss.carbon_emissions += loss.carbon_emissions
-          otherLoss.mangrove_biomass_loss += loss.mangrove_biomass_loss
-          otherLoss.mangrove_carbon_emissions += loss.mangrove_carbon_emissions
-          k -> otherLoss
-        }
-      },
+      areaLoss + other.areaLoss,
+      biomassLoss + other.biomassLoss,
+      co2Emissions + other.co2Emissions,
+      mangroveBiomassLoss + other.mangroveBiomassLoss,
+      mangroveCo2Emissions + other.mangroveCo2Emissions,
       extent2000 + other.extent2000,
       extent2010 + other.extent2010,
       totalArea + other.totalArea,
       totalGainArea + other.totalGainArea,
       totalBiomass + other.totalBiomass,
       totalCo2 + other.totalCo2,
-      biomassHistogram.merge(other.biomassHistogram),
+      weightedBiomass + other.weightedBiomass,
       totalMangroveBiomass + other.totalMangroveBiomass,
       totalMangroveCo2 + other.totalMangroveBiomass,
-      mangroveBiomassHistogram.merge(other.mangroveBiomassHistogram)
+      weightedMangroveBiomass + other.weightedMangroveBiomass
     )
   }
 }

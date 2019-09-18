@@ -7,8 +7,8 @@ trait SummaryExport {
   val csvOptions: Map[String, String] = Map(
     "header" -> "true",
     "delimiter" -> ",",
-    "quote" -> "\u0000",
-    "quoteMode" -> "NONE",
+    //    "quote" -> "\u0000",
+    //    "quoteMode" -> "NONE",
     "nullValue" -> "\u0000"
   )
 

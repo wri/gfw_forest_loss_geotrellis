@@ -3,7 +3,6 @@ package org.globalforestwatch.summarystats.annualupdate
 import cats.implicits._
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
-import geotrellis.raster.histogram.StreamingHistogram
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 
@@ -123,6 +122,7 @@ object AnnualUpdateSummary {
           if (thresholds == Nil) stats
           else {
             val pKey = AnnualUpdateDataGroup(
+              loss,
               thresholds.head,
               drivers,
               globalLandCover,
@@ -168,19 +168,8 @@ object AnnualUpdateSummary {
             val summary: AnnualUpdateData =
               stats.getOrElse(
                 key = pKey,
-                default = AnnualUpdateData(
-                  AnnualUpdateYearDataMap.empty,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  StreamingHistogram(size = 1750),
-                  0,
-                  0,
-                  StreamingHistogram(size = 1000)
-                )
+                default =
+                  AnnualUpdateData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -189,24 +178,20 @@ object AnnualUpdateSummary {
             if (tcd2000 >= thresholds.head) {
 
               if (loss != null) {
-                summary.lossYear(loss).area_loss += areaHa
-                summary.lossYear(loss).biomass_loss += biomassPixel
-                summary.lossYear(loss).carbon_emissions += co2Pixel
-                summary
-                  .lossYear(loss)
-                  .mangrove_biomass_loss += mangroveBiomassPixel
-                summary
-                  .lossYear(loss)
-                  .mangrove_carbon_emissions += mangroveCo2Pixel
+                summary.areaLoss += areaHa
+                summary.biomassLoss += biomassPixel
+                summary.co2Emissions += co2Pixel
+                summary.mangroveBiomassLoss += mangroveBiomassPixel
+                summary.mangroveCo2Emissions += mangroveCo2Pixel
               }
 
               summary.extent2000 += areaHa
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
-              summary.biomassHistogram.countItem(biomass)
+              summary.weightedBiomass += biomass * areaHa
               summary.totalMangroveBiomass += mangroveBiomassPixel
               summary.totalMangroveCo2 += mangroveCo2Pixel
-              summary.mangroveBiomassHistogram.countItem(mangroveBiomass)
+              summary.weightedMangroveBiomass += mangroveBiomass * areaHa
             }
 
             if (tcd2010 >= thresholds.head) {

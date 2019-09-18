@@ -5,7 +5,7 @@ case class IndonesiaLandCover(grid: String) extends StringLayer with OptionalILa
   val uri: String =
     s"$basePath/idn_land_cover/$grid.tif"
 
-  override val externalNoDataValue: String = null
+  override val externalNoDataValue: String = ""
 
   def lookup(value: Int): String = value match {
 
@@ -15,15 +15,15 @@ case class IndonesiaLandCover(grid: String) extends StringLayer with OptionalILa
     case 2005  => "Primary Swamp Forest"
     case 2006  => "Plantation Forest"
     case 2007  => "Bush / Shrub"
-    case 2008  => null
+    case 2008 => ""
     case 2010  => "Estate Crop Plantation"
-    case 2011  => null
+    case 2011 => ""
     case 2012  => "Settlement Area"
     case 2014  => "Bare Land"
-    case 2020  => null
-    case 2092  => null
+    case 2020 => ""
+    case 2092 => ""
     case 3000  => "Savannah"
-    case 20021 => null
+    case 20021 => ""
     case 20041 => "Secondary Mangrove Forest"
     case 20051 => "Secondary Swamp Forest"
     case 20071 => "Swamp Shrub"
@@ -31,13 +31,13 @@ case class IndonesiaLandCover(grid: String) extends StringLayer with OptionalILa
     case 20092 => "Shrub-Mixed Dryland Farm"
     case 20093 => "Rice Field"
     case 20094 => "Fish Pond"
-    case 20102 => null
+    case 20102 => ""
     case 20121 => "Airport	/ Harbour"
     case 20122 => "Transmigration Area"
     case 20141 => "Mining Area"
-    case 20191 => null
+    case 20191 => ""
     case 5001  => "Bodies of Water"
     case 50011 => "Swamp"
-    case _ => null
+    case _ => ""
   }
 }

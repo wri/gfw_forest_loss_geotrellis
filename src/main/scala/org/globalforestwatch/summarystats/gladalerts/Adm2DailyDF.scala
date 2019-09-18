@@ -22,9 +22,9 @@ object Adm2DailyDF {
 
     df.filter($"data_group.tile.z" === minZoom)
       .select(
-        $"id.country" as "iso",
-        $"id.admin1" as "adm1",
-        $"id.admin2" as "adm2",
+        $"id.iso" as "iso",
+        $"id.adm1" as "adm1",
+        $"id.adm2" as "adm2",
         $"data_group.alertDate" as "alert_date",
         $"data_group.isConfirmed" as "is_confirmed",
         $"data_group.primaryForest" as "primary_forest",
