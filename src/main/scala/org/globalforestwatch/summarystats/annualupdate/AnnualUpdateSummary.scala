@@ -169,7 +169,7 @@ object AnnualUpdateSummary {
               stats.getOrElse(
                 key = pKey,
                 default =
-                  AnnualUpdateData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                  AnnualUpdateData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -188,10 +188,8 @@ object AnnualUpdateSummary {
               summary.extent2000 += areaHa
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
-              summary.weightedBiomass += biomass * areaHa
               summary.totalMangroveBiomass += mangroveBiomassPixel
               summary.totalMangroveCo2 += mangroveCo2Pixel
-              summary.weightedMangroveBiomass += mangroveBiomass * areaHa
             }
 
             if (tcd2010 >= thresholds.head) {

@@ -3,18 +3,16 @@ package org.globalforestwatch.summarystats.carbonflux
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
-object Adm2ApiDF {
+object Adm1ApiDF {
 
   def sumChange(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    df.filter($"loss_year".isNotNull)
-      .groupBy(
+    df.groupBy(
         $"iso",
         $"adm1",
-        $"adm2",
         $"threshold",
         $"gain",
         $"mangroves",
@@ -48,22 +46,21 @@ object Adm2ApiDF {
     import spark.implicits._
 
     df.groupBy(
-      $"iso",
-      $"adm1",
-      $"adm2",
-      $"loss_year",
-      $"threshold",
-      $"gain",
-      $"mangroves",
-      $"tcs",
-      $"ecozone",
-      $"land_right",
-      $"wdpa",
-      $"ifl",
-      $"plantations",
-      $"intact_primary_forest",
-      $"peatlands_flux"
-    )
+        $"iso",
+        $"adm1",
+        $"loss_year",
+        $"threshold",
+        $"gain",
+        $"mangroves",
+        $"tcs",
+        $"ecozone",
+        $"land_right",
+        $"wdpa",
+        $"ifl",
+        $"plantations",
+        $"intact_primary_forest",
+        $"peatlands_flux"
+      )
       .agg(
         sum("total_extent_2000_ha") as "total_extent_2000_ha",
         sum("total_area_ha") as "total_area_ha",

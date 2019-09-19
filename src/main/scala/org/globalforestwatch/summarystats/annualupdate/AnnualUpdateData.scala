@@ -15,10 +15,8 @@ import cats.Semigroup
   * @param totalGainArea
   * @param totalBiomass
   * @param totalCo2
-  * @param weightedBiomass
   * @param totalMangroveBiomass
   * @param totalMangroveCo2
-  * @param weightedMangroveBiomass
   */
 case class AnnualUpdateData(var areaLoss: Double,
                             var biomassLoss: Double,
@@ -31,10 +29,8 @@ case class AnnualUpdateData(var areaLoss: Double,
                             var totalGainArea: Double,
                             var totalBiomass: Double,
                             var totalCo2: Double,
-                            var weightedBiomass: Double,
                             var totalMangroveBiomass: Double,
-                            var totalMangroveCo2: Double,
-                            var weightedMangroveBiomass: Double) {
+                            var totalMangroveCo2: Double) {
   def merge(other: AnnualUpdateData): AnnualUpdateData = {
 
     AnnualUpdateData(
@@ -49,10 +45,8 @@ case class AnnualUpdateData(var areaLoss: Double,
       totalGainArea + other.totalGainArea,
       totalBiomass + other.totalBiomass,
       totalCo2 + other.totalCo2,
-      weightedBiomass + other.weightedBiomass,
       totalMangroveBiomass + other.totalMangroveBiomass,
-      totalMangroveCo2 + other.totalMangroveBiomass,
-      weightedMangroveBiomass + other.weightedMangroveBiomass
+      totalMangroveCo2 + other.totalMangroveBiomass
     )
   }
 }

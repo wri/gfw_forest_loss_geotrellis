@@ -33,7 +33,8 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
   val soilCarbon2000 = SoilCarbon2000(gridId)
   val totalCarbon2000 = TotalCarbon2000(gridId)
 
-  val grossEmissionsCo2 = GrossEmissionsCo2(gridId)
+  val grossEmissionsCo2eNoneCo2 = GrossEmissionsCo2eNoneCo2(gridId)
+  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2eCo2Only(gridId)
 
   val treeCoverGain = TreeCoverGain(gridId)
   val mangroveBiomassExtent = MangroveBiomassExtent(gridId)
@@ -43,8 +44,8 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
   val landRights = LandRights(gridId)
   val intactForestLandscapes = IntactForestLandscapes(gridId)
   val plantations = Plantations(gridId)
-  val primaryForest = PrimaryForest(gridId)
-
+  val intactPrimaryForest = IntactPrimaryForest(gridId)
+  val peatlandsFlux = PeatlandsFlux(gridId)
 
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonFluxTile]] = {
 
@@ -78,7 +79,10 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
       val litterCarbon2000Tile = litterCarbon2000.fetchWindow(window)
       val soilCarbon2000Tile = soilCarbon2000.fetchWindow(window)
       val totalCarbon2000Tile = totalCarbon2000.fetchWindow(window)
-      val grossEmissionsCo2Tile = grossEmissionsCo2.fetchWindow(window)
+      val grossEmissionsCo2eNoneCo2Tile =
+        grossEmissionsCo2eNoneCo2.fetchWindow(window)
+      val grossEmissionsCo2eCo2OnlyTile =
+        grossEmissionsCo2eCo2Only.fetchWindow(window)
 
       val mangroveBiomassExtentTile = mangroveBiomassExtent.fetchWindow(window)
       val driversTile = treeCoverLossDrivers.fetchWindow(window)
@@ -88,7 +92,8 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
       val intactForestLandscapesTile =
         intactForestLandscapes.fetchWindow(window)
       val plantationsTile = plantations.fetchWindow(window)
-      val primaryForestTile = primaryForest.fetchWindow(window)
+      val intactPrimaryForestTile = intactPrimaryForest.fetchWindow(window)
+      val peatlandFluxTile = peatlandsFlux.fetchWindow(window)
 
       val tile = CarbonFluxTile(
         lossTile,
@@ -110,7 +115,8 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
         litterCarbon2000Tile,
         soilCarbon2000Tile,
         totalCarbon2000Tile,
-        grossEmissionsCo2Tile,
+        grossEmissionsCo2eNoneCo2Tile,
+        grossEmissionsCo2eCo2OnlyTile,
         mangroveBiomassExtentTile,
         driversTile,
         ecozonesTile,
@@ -118,7 +124,8 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
         wdpaTile,
         intactForestLandscapesTile,
         plantationsTile,
-        primaryForestTile
+        intactPrimaryForestTile,
+        peatlandFluxTile
       )
 
       Raster(tile, window)

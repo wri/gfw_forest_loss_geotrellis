@@ -59,8 +59,10 @@ object CarbonFluxSummary {
           raster.tile.soilCarbon2000.getData(col, row)
         val totalCarbon2000: Double =
           raster.tile.totalCarbon2000.getData(col, row)
-        val grossEmissionsCo2: Double =
-          raster.tile.grossEmissionsCo2.getData(col, row)
+        val grossEmissionsCo2eNoneCo2: Double =
+          raster.tile.grossEmissionsCo2eNoneCo2.getData(col, row)
+        val grossEmissionsCo2eCo2Only: Double =
+          raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
 
         val gain: Integer = raster.tile.gain.getData(col, row)
         val mangroveBiomassExtent: Boolean =
@@ -72,12 +74,14 @@ object CarbonFluxSummary {
         val intactForestLandscapes: String =
           raster.tile.intactForestLandscapes.getData(col, row)
         val landRights: Boolean = raster.tile.landRights.getData(col, row)
-        val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
+        val intactPrimaryForest: Boolean =
+          raster.tile.intactPrimaryForest.getData(col, row)
+        val peatlandsFlux: Boolean = raster.tile.peatlandsFlux.getData(col, row)
 
-        val cols: Int = raster.rasterExtent.cols
-        val rows: Int = raster.rasterExtent.rows
-        val ext = raster.rasterExtent.extent
-        val cellSize = raster.cellSize
+        //        val cols: Int = raster.rasterExtent.cols
+        //        val rows: Int = raster.rasterExtent.rows
+        //        val ext = raster.rasterExtent.extent
+        //        val cellSize = raster.cellSize
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -100,7 +104,11 @@ object CarbonFluxSummary {
         val litterCarbon2000Pixel = litterCarbon2000 * areaHa
         val soilCarbon2000Pixel = soilCarbon2000 * areaHa
         val totalCarbon2000Pixel = totalCarbon2000 * areaHa
-        val grossEmissionsCo2Pixel = grossEmissionsCo2 * areaHa
+        val grossEmissionsCo2eNoneCo2Pixel = grossEmissionsCo2eNoneCo2 * areaHa
+        val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
+
+        val grossEmissionsCo2e = grossEmissionsCo2eNoneCo2 + grossEmissionsCo2eCo2Only
+        val grossEmissionsCo2ePixel = grossEmissionsCo2e * areaHa
 
         val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
 
@@ -111,6 +119,7 @@ object CarbonFluxSummary {
           if (thresholds == Nil) stats
           else {
             val pKey = CarbonFluxDataGroup(
+              loss,
               thresholds.head,
               gain,
               mangroveBiomassExtent,
@@ -120,52 +129,15 @@ object CarbonFluxSummary {
               wdpa,
               intactForestLandscapes,
               plantations,
-              primaryForest
+              intactPrimaryForest,
+              peatlandsFlux
             )
 
             val summary: CarbonFluxData =
               stats.getOrElse(
                 key = pKey,
-                default = CarbonFluxData(
-                  CarbonFluxYearDataMap.empty,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0
-                )
+                default = CarbonFluxData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -173,59 +145,33 @@ object CarbonFluxSummary {
             if (tcd2000 >= thresholds.head) {
 
               if (loss != null) {
-                summary.lossYear(loss).area_loss += areaHa
-                summary.lossYear(loss).biomass_loss += biomassPixel
-                summary
-                  .lossYear(loss)
-                  .gross_emissions_co2 += grossEmissionsCo2Pixel
+                summary.areaLoss += areaHa
+                summary.biomassLoss += biomassPixel
+                summary.grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+                summary.grossEmissionsCo2eNoneCo2 += grossEmissionsCo2eNoneCo2Pixel
+                summary.grossEmissionsCo2e += grossEmissionsCo2ePixel
+                summary.agcEmisYear += agcEmisYearPixel
+                summary.agcEmisYear += bgcEmisYearPixel
+                summary.deadwoodCarbonEmisYear += deadwoodCarbonEmisYearPixel
+                summary.litterCarbonEmisYear += litterCarbonEmisYearPixel
+                summary.soilCarbonEmisYear += soilCarbonEmisYearPixel
+                summary.carbonEmisYear += totalCarbonEmisYearPixel
               }
-
-              summary.extent2000 += areaHa
+              summary.totalExtent2000 += areaHa
               summary.totalBiomass += biomassPixel
-              summary.avgBiomass = ((summary.avgBiomass * summary.count) + biomass) / (summary.count + 1)
-              summary.totalGrossAnnualRemovalsCarbon += grossAnnualRemovalsCarbonPixel
-              summary.avgGrossAnnualRemovalsCarbon = ((summary.avgGrossAnnualRemovalsCarbon * summary.count) + grossAnnualRemovalsCarbon) / (summary.count + 1)
+              summary.totalGrossAnnualRemovalsCarbon += grossAnnualRemovalsCarbonPixel // TODO: Clarify if this should be in the annual section
               summary.totalGrossCumulRemovalsCarbon += grossCumulRemovalsCarbonPixel
-              summary.avgGrossCumulRemovalsCarbon = ((summary.avgGrossCumulRemovalsCarbon * summary.count) + grossCumulRemovalsCarbon) / (summary.count + 1)
               summary.totalNetFluxCo2 += netFluxCo2Pixel
-              summary.avgNetFluxCo2 = ((summary.avgNetFluxCo2 * summary.count) + netFluxCo2) / (summary.count + 1)
-
-              summary.totalAgcEmisYear += agcEmisYearPixel
-              summary.avgAgcEmisYear = ((summary.avgAgcEmisYear * summary.count) + agcEmisYear) / (summary.count + 1)
-
-              summary.totalBgcEmisYear += bgcEmisYearPixel
-              summary.avgBgcEmisYear = ((summary.avgBgcEmisYear * summary.count) + bgcEmisYear) / (summary.count + 1)
-
-              summary.totalDeadwoodCarbonEmisYear += deadwoodCarbonEmisYearPixel
-              summary.avgDeadwoodCarbonEmisYear = ((summary.avgDeadwoodCarbonEmisYear * summary.count) + deadwoodCarbonEmisYear) / (summary.count + 1)
-
-              summary.totalLitterCarbonEmisYear += litterCarbonEmisYearPixel
-              summary.avgLitterCarbonEmisYear = ((summary.avgLitterCarbonEmisYear * summary.count) + litterCarbonEmisYear) / (summary.count + 1)
-
-              summary.totalSoilCarbonEmisYear += soilCarbonEmisYearPixel
-              summary.avgSoilCarbonEmisYear = ((summary.avgSoilCarbonEmisYear * summary.count) + soilCarbonEmisYear) / (summary.count + 1)
-
-              summary.totalCarbonEmisYear += totalCarbonEmisYearPixel
-              summary.avgTotalCarbonEmisYear = ((summary.avgTotalCarbonEmisYear * summary.count) + totalCarbonEmisYear) / (summary.count + 1)
-
               summary.totalAgc2000 += agc2000Pixel
-              summary.avgAgc2000 = ((summary.avgAgc2000 * summary.count) + agc2000) / (summary.count + 1)
               summary.totalBgc2000 += bgc2000Pixel
-              summary.avgBgc2000 = ((summary.avgBgc2000 * summary.count) + bgc2000) / (summary.count + 1)
               summary.totalDeadwoodCarbon2000 += deadwoodCarbon2000Pixel
-              summary.avgDeadwoodCarbon2000 = ((summary.avgDeadwoodCarbon2000 * summary.count) + deadwoodCarbon2000) / (summary.count + 1)
               summary.totalLitterCarbon2000 += litterCarbon2000Pixel
-              summary.avgLitterCarbon2000 = ((summary.avgLitterCarbon2000 * summary.count) + litterCarbon2000) / (summary.count + 1)
-              summary.totalSoil2000Year += soilCarbon2000Pixel
-              summary.avgSoilCarbon2000 = ((summary.avgSoilCarbon2000 * summary.count) + soilCarbon2000) / (summary.count + 1)
+              summary.totalSoil2000 += soilCarbon2000Pixel
               summary.totalCarbon2000 += totalCarbon2000Pixel
-              summary.avgTotalCarbon2000 = ((summary.avgTotalCarbon2000 * summary.count) + totalCarbon2000) / (summary.count + 1)
-              summary.totalGrossEmissionsCo2 += grossEmissionsCo2Pixel
-              summary.avgGrossEmissionsCo2 = ((summary.avgGrossEmissionsCo2 * summary.count) + grossEmissionsCo2) / (summary.count + 1)
-              summary.count += 1
-
+              //              summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel //TODO: clarify if this should be also here
+              //              summary.totalGrossEmissionsCo2eNoneCo2 += grossEmissionsCo2eNoneCo2Pixel //TODO: clarify if this should be also here
+              //              summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel //TODO: clarify if this should be also here
             }
-
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
           }
         }

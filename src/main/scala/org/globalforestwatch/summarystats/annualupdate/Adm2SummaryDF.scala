@@ -30,7 +30,7 @@ object Adm2SummaryDF {
         sum("total_area_ha") as "total_area_ha",
         sum("total_gain_2000-2012_ha") as "total_gain_2000-2012_ha",
         sum("total_biomass_stock_2000_Mt") as "total_biomass_stock_2000_Mt",
-        sum("weighted_biomass_2000_Mt_ha-1") / sum("treecover_extent_2000_ha") as "avg_biomass_2000_Mt_ha-1",
+        sum("total_biomass_stock_2000_Mt") / sum("treecover_extent_2000_ha") as "avg_biomass_2000_Mt_ha-1",
         sum("total_co2_stock_Mt") as "total_co2_stock_Mt"
       )
       .as("total")

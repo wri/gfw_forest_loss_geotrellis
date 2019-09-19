@@ -170,7 +170,7 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
             val summary: AnnualUpdateMinimalData =
               stats.getOrElse(
                 key = pKey,
-                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -189,10 +189,8 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
               summary.extent2000 += areaHa
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
-              summary.weightedBiomass += biomass * areaHa
 //              summary.totalMangroveBiomass += mangroveBiomassPixel
 //              summary.totalMangroveCo2 += mangroveCo2Pixel
-              //              summary.weightedMangroveBiomass += mangroveBiomass * areaHa
             }
 
             if (tcd2010 >= thresholds.head) {

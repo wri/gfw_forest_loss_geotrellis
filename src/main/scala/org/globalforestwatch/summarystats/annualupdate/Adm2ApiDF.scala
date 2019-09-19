@@ -122,10 +122,8 @@ object Adm2ApiDF {
         sum("total_area_ha") as "total_area_ha",
         sum("total_gain_2000-2012_ha") as "total_gain_2000-2012_ha",
         sum("total_biomass_stock_2000_Mt") as "total_biomass_stock_2000_Mt",
-        sum("weighted_biomass_2000_Mt_ha-1") as "weighted_biomass_2000_Mt_ha-1",
         sum("total_co2_stock_Mt") as "total_co2_stock_Mt",
         sum("total_mangrove_biomass_stock_Mt") as "total_mangrove_biomass_stock_Mt",
-        sum("weighted_mangrove_biomass_Mt_ha-1") as "weighted_mangrove_biomass_Mt_ha-1",
         sum("total_mangrove_co2_stock_Mt") as "total_mangrove_co2_stock_Mt"
       )
   }

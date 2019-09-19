@@ -16,8 +16,7 @@ case class AnnualUpdateMinimalData(var areaLoss: Double,
                                    var totalArea: Double,
                                    var totalGainArea: Double,
                                    var totalBiomass: Double,
-                                   var totalCo2: Double,
-                                   var weightedBiomass: Double
+                                   var totalCo2: Double
                                    //                                   var totalMangroveBiomass: Double,
                                    //                                   var totalMangroveCo2: Double,
                                    //                                   var weightedMangroveBiomass: Double
@@ -35,8 +34,7 @@ case class AnnualUpdateMinimalData(var areaLoss: Double,
       totalArea + other.totalArea,
       totalGainArea + other.totalGainArea,
       totalBiomass + other.totalBiomass,
-      totalCo2 + other.totalCo2,
-      weightedBiomass + other.weightedBiomass
+      totalCo2 + other.totalCo2
 //      totalMangroveBiomass + other.totalMangroveBiomass,
 //      totalMangroveCo2 + other.totalMangroveBiomass,
 //      mangroveBiomassHistogram.merge(other.mangroveBiomassHistogram)
