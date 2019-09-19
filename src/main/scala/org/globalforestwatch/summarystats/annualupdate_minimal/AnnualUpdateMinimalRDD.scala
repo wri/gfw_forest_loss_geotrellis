@@ -9,7 +9,7 @@ import org.globalforestwatch.summarystats.SummaryRDD
 
 object AnnualUpdateMinimalRDD extends SummaryRDD {
 
-  type SOURCES = TreeLossGridSources
+  type SOURCES = AnnualUpdateMinimalGridSources
   type SUMMARY = AnnualUpdateMinimalSummary
   type TILE = AnnualUpdateMinimalTile
 

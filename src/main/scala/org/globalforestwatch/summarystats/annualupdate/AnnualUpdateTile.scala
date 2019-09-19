@@ -56,8 +56,6 @@ case class AnnualUpdateTile(
   oilGas: OilGas#OptionalITile
 ) extends CellGrid {
   def cellType: CellType = loss.cellType
-
   def cols: Int = loss.cols
-
   def rows: Int = loss.rows
 }

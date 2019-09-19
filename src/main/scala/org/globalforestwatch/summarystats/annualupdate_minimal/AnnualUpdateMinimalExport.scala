@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import org.apache.spark.sql.DataFrame
 import org.globalforestwatch.summarystats.SummaryExport
+import org.globalforestwatch.summarystats.annualupdate.AnnualUpdateExport
 
 object AnnualUpdateMinimalExport extends SummaryExport {
 
@@ -9,99 +10,57 @@ object AnnualUpdateMinimalExport extends SummaryExport {
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
 
-    val spark = summaryDF.sparkSession
-    import spark.implicits._
-    val adm2DF = summaryDF
-      .transform(Adm2DF.unpackValues)
 
-    adm2DF.repartition($"iso")
-    adm2DF.cache()
+    def exportArea(df: DataFrame): Unit = {
 
-    val adm2SummaryDF = adm2DF
-      .transform(Adm2SummaryDF.sumArea)
+      val adm2ApiDF = df.transform(Adm2ApiDF.sumArea)
+      adm2ApiDF.write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/adm2/area")
 
-    adm2SummaryDF
-      .transform(Adm2SummaryDF.roundValues)
-      .coalesce(1)
-      .orderBy($"country", $"subnational1", $"subnational2", $"threshold")
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/summary/adm2")
+      val adm1ApiDF = adm2ApiDF.transform(Adm1ApiDF.sumArea)
+      adm1ApiDF.write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/adm1/area")
 
-    val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
+      val isoApiDF = adm1ApiDF.transform(IsoApiDF.sumArea)
+      isoApiDF.write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/iso/area")
 
-    adm1SummaryDF
-      .transform(Adm1SummaryDF.roundValues)
-      .coalesce(1)
-      .orderBy($"country", $"subnational1", $"threshold")
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/summary/adm1")
+    }
 
-    val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
+    def exportChange(df: DataFrame): Unit = {
+      val adm2ApiDF = df.transform(Adm2ApiDF.sumChange)
+      adm2ApiDF.write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/adm2/change")
 
-    isoSummaryDF
-      .transform(IsoSummaryDF.roundValues)
-      .coalesce(1)
-      .orderBy($"iso", $"threshold")
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/summary/iso")
+      val adm1ApiDF = adm2ApiDF.transform(Adm1ApiDF.sumChange)
+      adm1ApiDF.write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/adm1/change")
 
-    val apiDF = adm2DF
-      .transform(ApiDF.setNull)
+      val isoApiDF = adm1ApiDF.transform(IsoApiDF.sumChange)
+      isoApiDF.write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/iso/change")
+    }
 
-    apiDF.cache()
-    //            adm2DF.unpersist()
+    val exportDF = summaryDF
+      .transform(ApiDF.unpackValues)
+    //          apiDF.repartition($"iso")
+    //    val apiDF =
+    //    adm2DF
+    //      .transform(ApiDF.setNull)
+    exportDF.cache()
 
-    val adm2ApiDF = apiDF
-      .transform(Adm2ApiDF.nestYearData)
+    exportArea(exportDF)
+    exportChange(exportDF)
+    AnnualUpdateExport.exportSummary(exportDF, outputUrl)
 
-    adm2ApiDF
-    //.coalesce(1)
-    //            .repartition(
-    //            outputPartitionCount,
-    //            $"iso",
-    //            $"adm1",
-    //            $"adm2",
-    //            $"threshold"
-    //          )
-    //            .orderBy($"iso", $"adm1", $"adm2", $"threshold")
-    .toJSON
-      .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
-      .write
-      .text(outputUrl + "/api/adm2")
+    exportDF.unpersist()
 
-    val tempApiDF = apiDF
-      .transform(Adm1ApiDF.sumArea)
-
-    tempApiDF.cache()
-    apiDF.unpersist()
-
-    val adm1ApiDF = tempApiDF
-      .transform(Adm1ApiDF.nestYearData)
-
-    adm1ApiDF
-    //            .repartition(outputPartitionCount, $"iso", $"adm1", $"threshold")
-    //            .orderBy($"iso", $"adm1", $"threshold")
-    .toJSON
-      .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
-      .write
-      .text(outputUrl + "/api/adm1")
-
-    val isoApiDF = tempApiDF
-      .transform(IsoApiDF.sumArea)
-      .transform(IsoApiDF.nestYearData)
-
-    isoApiDF
-    //            .repartition(outputPartitionCount, $"iso", $"threshold")
-    //            .orderBy($"iso", $"threshold")
-    .toJSON
-      .mapPartitions(vals => Iterator("[" + vals.mkString(",") + "]"))
-      .write
-      .text(outputUrl + "/api/iso")
-
-    tempApiDF.unpersist()
 
   }
 

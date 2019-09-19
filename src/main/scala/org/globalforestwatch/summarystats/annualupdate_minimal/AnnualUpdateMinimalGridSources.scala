@@ -9,7 +9,7 @@ import org.globalforestwatch.layers._
 /**
   * @param gridId top left corner, padded from east ex: "10N_010E"
   */
-case class TreeLossGridSources(gridId: String) extends GridSources {
+case class AnnualUpdateMinimalGridSources(gridId: String) extends GridSources {
 
   val treeCoverLoss = TreeCoverLoss(gridId)
   val treeCoverGain = TreeCoverGain(gridId)
@@ -60,7 +60,9 @@ case class TreeLossGridSources(gridId: String) extends GridSources {
   val logging = Logging(gridId)
   //  val oilGas = OilGas(gridId)
 
-  def readWindow(window: Extent): Either[Throwable, Raster[AnnualUpdateMinimalTile]] = {
+  def readWindow(
+                  window: Extent
+                ): Either[Throwable, Raster[AnnualUpdateMinimalTile]] = {
 
     for {
       // Failure for any of these reads will result in function returning Left[Throwable]
@@ -177,15 +179,16 @@ val peatlandsTile = peatlands.fetchWindow(window)
   }
 }
 
-object TreeLossGridSources {
+object AnnualUpdateMinimalGridSources {
 
   @transient
   private lazy val cache =
-    scala.collection.concurrent.TrieMap.empty[String, TreeLossGridSources]
+    scala.collection.concurrent.TrieMap
+      .empty[String, AnnualUpdateMinimalGridSources]
 
-  def getCachedSources(gridId: String): TreeLossGridSources = {
+  def getCachedSources(gridId: String): AnnualUpdateMinimalGridSources = {
 
-    cache.getOrElseUpdate(gridId, TreeLossGridSources(gridId))
+    cache.getOrElseUpdate(gridId, AnnualUpdateMinimalGridSources(gridId))
 
   }
 

@@ -5,48 +5,47 @@ import org.globalforestwatch.summarystats.SummaryExport
 
 object AnnualUpdateExport extends SummaryExport {
 
+  def exportSummary(df: DataFrame, outputUrl: String): Unit = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
+
+    val adm2SummaryDF = df
+      .transform(Adm2SummaryDF.sumArea)
+
+    adm2SummaryDF
+      .transform(Adm2SummaryDF.roundValues)
+      .coalesce(1)
+      .orderBy($"country", $"subnational1", $"subnational2", $"threshold")
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/summary")
+
+    val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
+
+    adm1SummaryDF
+      .transform(Adm1SummaryDF.roundValues)
+      .coalesce(1)
+      .orderBy($"country", $"subnational1", $"threshold")
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/summary")
+
+    val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
+
+    isoSummaryDF
+      .transform(IsoSummaryDF.roundValues)
+      .coalesce(1)
+      .orderBy($"country", $"threshold")
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/summary")
+
+  }
+
   override protected def exportGadm(summaryDF: DataFrame,
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
-
-    val spark = summaryDF.sparkSession
-    import spark.implicits._
-
-    def exportSummary(df: DataFrame): Unit = {
-
-      val adm2SummaryDF = df
-        .transform(Adm2SummaryDF.sumArea)
-
-      adm2SummaryDF
-        .transform(Adm2SummaryDF.roundValues)
-        .coalesce(1)
-        .orderBy($"country", $"subnational1", $"subnational2", $"threshold")
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/summary")
-
-      val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
-
-      adm1SummaryDF
-        .transform(Adm1SummaryDF.roundValues)
-        .coalesce(1)
-        .orderBy($"country", $"subnational1", $"threshold")
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm1/summary")
-
-      val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
-
-      isoSummaryDF
-        .transform(IsoSummaryDF.roundValues)
-        .coalesce(1)
-        .orderBy($"country", $"threshold")
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/iso/summary")
-
-
-    }
 
     def exportArea(df: DataFrame): Unit = {
 
@@ -94,10 +93,9 @@ object AnnualUpdateExport extends SummaryExport {
 
     exportArea(exportDF)
     exportChange(exportDF)
-    exportSummary(exportDF)
+    exportSummary(exportDF, outputUrl)
 
     exportDF.unpersist()
-
 
   }
 

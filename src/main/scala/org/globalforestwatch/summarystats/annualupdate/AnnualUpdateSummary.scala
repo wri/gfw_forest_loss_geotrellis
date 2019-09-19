@@ -94,10 +94,10 @@ object AnnualUpdateSummary {
         val logging: Boolean = raster.tile.logging.getData(col, row)
         val oilGas: Boolean = raster.tile.oilGas.getData(col, row)
 
-        val cols: Int = raster.rasterExtent.cols
-        val rows: Int = raster.rasterExtent.rows
-        val ext = raster.rasterExtent.extent
-        val cellSize = raster.cellSize
+        //        val cols: Int = raster.rasterExtent.cols
+        //        val rows: Int = raster.rasterExtent.rows
+        //        val ext = raster.rasterExtent.extent
+        //        val cellSize = raster.cellSize
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference

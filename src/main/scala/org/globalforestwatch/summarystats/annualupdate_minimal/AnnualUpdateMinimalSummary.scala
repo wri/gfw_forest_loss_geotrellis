@@ -3,7 +3,6 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 import cats.implicits._
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
-import geotrellis.raster.histogram.StreamingHistogram
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 
@@ -26,10 +25,12 @@ object AnnualUpdateMinimalSummary {
   : CellVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary] =
     new CellVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary] {
 
-      def register(raster: Raster[AnnualUpdateMinimalTile],
-                   col: Int,
-                   row: Int,
-                   acc: AnnualUpdateMinimalSummary): AnnualUpdateMinimalSummary = {
+      def register(
+                    raster: Raster[AnnualUpdateMinimalTile],
+                    col: Int,
+                    row: Int,
+                    acc: AnnualUpdateMinimalSummary
+                  ): AnnualUpdateMinimalSummary = {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
         val gain: Integer = raster.tile.gain.getData(col, row)
@@ -95,10 +96,10 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
         val logging: Boolean = raster.tile.logging.getData(col, row)
 //        val oilGas: Boolean = raster.tile.oilGas.getData(col, row)
 
-        val cols: Int = raster.rasterExtent.cols
-        val rows: Int = raster.rasterExtent.rows
-        val ext = raster.rasterExtent.extent
-        val cellSize = raster.cellSize
+        //        val cols: Int = raster.rasterExtent.cols
+        //        val rows: Int = raster.rasterExtent.rows
+        //        val ext = raster.rasterExtent.extent
+        //        val cellSize = raster.cellSize
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -123,6 +124,7 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
           if (thresholds == Nil) stats
           else {
             val pKey = AnnualUpdateMinimalDataGroup(
+              loss,
               thresholds.head,
               drivers,
               globalLandCover,
@@ -168,19 +170,7 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
             val summary: AnnualUpdateMinimalData =
               stats.getOrElse(
                 key = pKey,
-                default = AnnualUpdateMinimalData(
-                  AnnualUpdateMinimalYearDataMap.empty,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  0,
-                  StreamingHistogram(size = 1750)
-//                  0,
-//                  0,
-//                  StreamingHistogram(size = 1000)
-                )
+                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -189,24 +179,20 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
             if (tcd2000 >= thresholds.head) {
 
               if (loss != null) {
-                summary.lossYear(loss).area_loss += areaHa
-                summary.lossYear(loss).biomass_loss += biomassPixel
-                summary.lossYear(loss).carbon_emissions += co2Pixel
-//                summary
-//                  .lossYear(loss)
-//                  .mangrove_biomass_loss += mangroveBiomassPixel
-//                summary
-//                  .lossYear(loss)
-//                  .mangrove_carbon_emissions += mangroveCo2Pixel
+                summary.areaLoss += areaHa
+                summary.biomassLoss += biomassPixel
+                summary.co2Emissions += co2Pixel
+                //                summary.mangroveBiomassLoss += mangroveBiomassPixel
+                //                summary.mangroveCo2Emissions += mangroveCo2Pixel
               }
 
               summary.extent2000 += areaHa
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
-              summary.biomassHistogram.countItem(biomass)
+              summary.weightedBiomass += biomass * areaHa
 //              summary.totalMangroveBiomass += mangroveBiomassPixel
 //              summary.totalMangroveCo2 += mangroveCo2Pixel
-//              summary.mangroveBiomassHistogram.countItem(mangroveBiomass)
+              //              summary.weightedMangroveBiomass += mangroveBiomass * areaHa
             }
 
             if (tcd2010 >= thresholds.head) {
@@ -217,7 +203,8 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
           }
         }
 
-        val updatedSummary: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
+        val updatedSummary
+        : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
           updateSummary(thresholds, acc.stats)
 
         AnnualUpdateMinimalSummary(updatedSummary)

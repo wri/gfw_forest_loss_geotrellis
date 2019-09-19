@@ -27,35 +27,13 @@ case class AnnualUpdateMinimalDFFactory(
             case (dataGroup, data) => {
               id match {
                 case gadmId: GadmFeatureId =>
-                  AnnualUpdateMinimalRow(
-                    gadmId,
-                    dataGroup,
-                    data.extent2000,
-                    data.extent2010,
-                    data.totalArea,
-                    data.totalGainArea,
-                    data.totalBiomass,
-                    data.totalCo2,
-                    data.biomassHistogram.mean(),
-                    AnnualUpdateMinimalYearDataMap.toList(data.lossYear)
-                  )
+                  AnnualUpdateMinimalRow(gadmId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a GadmFeatureId")
               }
             }
           }
       }
-      .toDF(
-        "id",
-        "data_group",
-        "extent_2000",
-        "extent_2010",
-        "total_area",
-        "total_gain",
-        "total_biomass",
-        "total_co2",
-        "avg_biomass_per_ha",
-        "year_data"
-      )
+      .toDF("id", "data_group", "data")
   }
 }
