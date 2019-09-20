@@ -35,7 +35,8 @@ object Adm2SummaryDF {
       )
       .as("total")
 
-    totalDF.join(annualDF, Seq("iso", "adm1", "adm2", "threshold"), "inner")
+    totalDF.join(annualDF, Seq("iso", "adm1", "adm2", "threshold"), "inner").transform(setNullZero)
+
   }
 
   def roundValues(df: DataFrame): DataFrame = {
@@ -109,5 +110,77 @@ object Adm2SummaryDF {
       round($"2017_co2_emissions_Mt") as "co2_emissions_2017_Mt",
       round($"2018_co2_emissions_Mt") as "co2_emissions_2018_Mt"
     )
+  }
+
+  private def setNullZero(df: DataFrame): DataFrame = {
+
+    def setZero(column: Column): Column = when(column.isNull, 0).otherwise(column)
+
+    val nullColumns = df
+      .select(
+        "2001_area_loss_ha",
+        "2002_area_loss_ha",
+        "2003_area_loss_ha",
+        "2004_area_loss_ha",
+        "2005_area_loss_ha",
+        "2006_area_loss_ha",
+        "2007_area_loss_ha",
+        "2008_area_loss_ha",
+        "2009_area_loss_ha",
+        "2010_area_loss_ha",
+        "2011_area_loss_ha",
+        "2012_area_loss_ha",
+        "2013_area_loss_ha",
+        "2014_area_loss_ha",
+        "2015_area_loss_ha",
+        "2016_area_loss_ha",
+        "2017_area_loss_ha",
+        "2018_area_loss_ha",
+        "2001_biomass_loss_Mt",
+        "2002_biomass_loss_Mt",
+        "2003_biomass_loss_Mt",
+        "2004_biomass_loss_Mt",
+        "2005_biomass_loss_Mt",
+        "2006_biomass_loss_Mt",
+        "2007_biomass_loss_Mt",
+        "2008_biomass_loss_Mt",
+        "2009_biomass_loss_Mt",
+        "2010_biomass_loss_Mt",
+        "2011_biomass_loss_Mt",
+        "2012_biomass_loss_Mt",
+        "2013_biomass_loss_Mt",
+        "2014_biomass_loss_Mt",
+        "2015_biomass_loss_Mt",
+        "2016_biomass_loss_Mt",
+        "2017_biomass_loss_Mt",
+        "2018_biomass_loss_Mt",
+        "2001_co2_emissions_Mt",
+        "2002_co2_emissions_Mt",
+        "2003_co2_emissions_Mt",
+        "2004_co2_emissions_Mt",
+        "2005_co2_emissions_Mt",
+        "2006_co2_emissions_Mt",
+        "2007_co2_emissions_Mt",
+        "2008_co2_emissions_Mt",
+        "2009_co2_emissions_Mt",
+        "2010_co2_emissions_Mt",
+        "2011_co2_emissions_Mt",
+        "2012_co2_emissions_Mt",
+        "2013_co2_emissions_Mt",
+        "2014_co2_emissions_Mt",
+        "2015_co2_emissions_Mt",
+        "2016_co2_emissions_Mt",
+        "2017_co2_emissions_Mt",
+        "2018_co2_emissions_Mt"
+      )
+      .columns
+
+    var zeroDF = df
+
+    nullColumns.foreach(column => {
+      zeroDF = zeroDF.withColumn(column, setZero(col(column)))
+    })
+
+    zeroDF
   }
 }

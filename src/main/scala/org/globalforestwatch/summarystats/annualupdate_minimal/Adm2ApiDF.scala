@@ -10,7 +10,7 @@ object Adm2ApiDF {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    df.filter($"loss_year".isNotNull)
+    df.filter($"loss_year".isNotNull && $"area_loss_ha" > 0)
       .groupBy(
         $"iso",
         $"adm1",

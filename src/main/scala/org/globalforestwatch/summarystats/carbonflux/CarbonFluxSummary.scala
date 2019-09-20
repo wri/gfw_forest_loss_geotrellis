@@ -159,7 +159,7 @@ object CarbonFluxSummary {
               }
               summary.totalExtent2000 += areaHa
               summary.totalBiomass += biomassPixel
-              summary.totalGrossAnnualRemovalsCarbon += grossAnnualRemovalsCarbonPixel // TODO: Clarify if this should be in the annual section
+              summary.totalGrossAnnualRemovalsCarbon += grossAnnualRemovalsCarbonPixel
               summary.totalGrossCumulRemovalsCarbon += grossCumulRemovalsCarbonPixel
               summary.totalNetFluxCo2 += netFluxCo2Pixel
               summary.totalAgc2000 += agc2000Pixel
@@ -168,9 +168,6 @@ object CarbonFluxSummary {
               summary.totalLitterCarbon2000 += litterCarbon2000Pixel
               summary.totalSoil2000 += soilCarbon2000Pixel
               summary.totalCarbon2000 += totalCarbon2000Pixel
-              //              summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel //TODO: clarify if this should be also here
-              //              summary.totalGrossEmissionsCo2eNoneCo2 += grossEmissionsCo2eNoneCo2Pixel //TODO: clarify if this should be also here
-              //              summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel //TODO: clarify if this should be also here
             }
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
           }
