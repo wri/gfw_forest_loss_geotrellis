@@ -10,35 +10,36 @@ object Adm2ApiDF {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    df.filter($"loss_year".isNotNull && $"area_loss_ha" > 0)
+    df.filter($"loss_year".isNotNull && $"treecover_loss__ha" > 0)
       .groupBy(
         $"iso",
         $"adm1",
         $"adm2",
         $"threshold",
+        $"loss_year",
         $"gain",
         $"mangroves",
-        $"tcs",
-        $"ecozone",
-        $"land_right",
-        $"wdpa",
-        $"ifl",
-        $"plantations",
+        $"tcs_drivers",
+        $"ecozones",
+        $"gfw_land_rights",
+        $"wdpa_protected_areas",
+        $"intact_forest_landscapes",
+        $"gfw_plantations",
         $"intact_primary_forest",
         $"peatlands_flux"
       )
       .agg(
-        sum("area_loss_ha") as "area_loss_ha",
-        sum("biomass_loss_Mt") as "biomass_loss_Mt",
-        sum("gross_emissions_co2e_co2_only_Mt") as "gross_emissions_co2e_co2_only_Mt",
-        sum("gross_emissions_co2e_none_co2_Mt") as "gross_emissions_co2e_none_co2_Mt",
-        sum("gross_emissions_co2e_Mt") as "gross_emissions_co2e_Mt",
-        sum("agc_emissions_Mt") as "agc_emissions_Mt",
-        sum("bgc_emissions_Mt") as "bgc_emissions_Mt",
-        sum("deadwood_wood_carbon_emissions_Mt") as "deadwood_wood_carbon_emissions_Mt",
-        sum("litter_carbon_emissions_Mt") as "litter_carbon_emissions_Mt",
-        sum("soil_carbon_emissions_Mt") as "soil_carbon_emissions_Mt",
-        sum("carbon_emissions_Mt") as "carbon_emissions_Mt"
+        sum("treecover_loss__ha") as "treecover_loss__ha",
+        sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss__Mg",
+        sum("gross_emissions_co2e_co2_only__Mg") as "gross_emissions_co2e_co2_only__Mg",
+        sum("gross_emissions_co2e_none_co2__Mg") as "gross_emissions_co2e_none_co2__Mg",
+        sum("gross_emissions_co2e__Mg") as "gross_emissions_co2e__Mg",
+        sum("aboveground_carbon_emissions__Mg") as "aboveground_carbon_emissions__Mg",
+        sum("belowground_carbon_emissions__Mg") as "belowground_carbon_emissions__Mg",
+        sum("deadwood_wood_carbon_emissions__Mg") as "deadwood_wood_carbon_emissions__Mg",
+        sum("litter_carbon_emissions__Mg") as "litter_carbon_emissions__Mg",
+        sum("soil_carbon_emissions__Mg") as "soil_carbon_emissions__Mg",
+        sum("total_carbon_emissions__Mg") as "total_carbon_emissions__Mg"
       )
   }
 
@@ -51,32 +52,32 @@ object Adm2ApiDF {
       $"iso",
       $"adm1",
       $"adm2",
-      $"loss_year",
       $"threshold",
+      $"loss",
       $"gain",
       $"mangroves",
-      $"tcs",
-      $"ecozone",
-      $"land_right",
-      $"wdpa",
-      $"ifl",
-      $"plantations",
+      $"tcs_drivers",
+      $"ecozones",
+      $"gfw_land_rights",
+      $"wdpa_protected_areas",
+      $"intact_forest_landscapes",
+      $"gfw_plantations",
       $"intact_primary_forest",
       $"peatlands_flux"
     )
       .agg(
-        sum("total_extent_2000_ha") as "total_extent_2000_ha",
-        sum("total_area_ha") as "total_area_ha",
-        sum("total_biomass_Mt") as "total_biomass_Mt",
-        sum("total_gross_annual_removals_carbon_Mt") as "total_gross_annual_removals_carbon_Mt",
-        sum("total_gross_annual_cumulative_removals_carbon_Mt") as "total_gross_annual_cumulative_removals_carbon_Mt",
-        sum("total_net_flux_co2_Mt") as "total_net_flux_co2_Mt",
-        sum("total_agc_2000_Mt") as "total_agc_2000_Mt",
-        sum("total_bgc_2000_Mt") as "total_bgc_2000_Mt",
-        sum("total_deadwood_carbon_2000_Mt") as "total_deadwood_carbon_2000_Mt",
-        sum("total_littler_carbon_2000_Mt") as "total_littler_carbon_2000_Mt",
-        sum("total_soil_2000_Mt") as "total_soil_2000_Mt",
-        sum("total_carbon_2000_Mt") as "total_carbon_2000_Mt"
+        sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",
+        sum("area__ha") as "area__ha",
+        sum("aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
+        sum("gross_annual_removals_carbon__Mg") as "gross_annual_removals_carbon__Mg",
+        sum("gross_annual_cumulative_removals_carbon__Mg") as "gross_annual_cumulative_removals_carbon__Mg",
+        sum("net_flux_co2__Mg") as "net_flux_co2__Mg",
+        sum("aboveground_carbon_stock_2000__Mg") as "aboveground_carbon_stock_2000__Mg",
+        sum("belowground_carbon_stock_2000__Mg") as "belowground_carbon_stock_2000__Mg",
+        sum("deadwood_carbon_stock_2000__Mg") as "deadwood_carbon_stock_2000__Mg",
+        sum("littler_carbon_stock_2000__Mg") as "littler_carbon_stock_2000__Mg",
+        sum("soil_carbon_stock_2000__Mg") as "soil_carbon_stock_2000__Mg",
+        sum("total_carbon_stock_2000__Mg") as "total_carbon_stock_2000__Mg"
       )
   }
 }

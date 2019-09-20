@@ -1,7 +1,6 @@
 package org.globalforestwatch.summarystats.treecoverloss
 
 import cats.Semigroup
-import geotrellis.raster.histogram.StreamingHistogram
 
 /** Summary data per class
   *
@@ -9,8 +8,8 @@ import geotrellis.raster.histogram.StreamingHistogram
   */
 case class TreeLossData(
                          var lossYear: scala.collection.mutable.Map[Int, TreeLossYearData],
-                         var extent2000: Double,
-                         var extent2010: Double,
+                         var treecoverExtent2000: Double,
+                         var treecoverExtent2010: Double,
                          var totalArea: Double,
                          var totalGainArea: Double,
                          var totalBiomass: Double,
@@ -24,20 +23,20 @@ case class TreeLossData(
         case (k, v) => {
           val loss: TreeLossYearData = lossYear(k)
           var otherLoss: TreeLossYearData = v
-          otherLoss.area_loss += loss.area_loss
-          otherLoss.biomass_loss += loss.biomass_loss
-          otherLoss.carbon_emissions += loss.carbon_emissions
+          otherLoss.treecoverLoss += loss.treecoverLoss
+          otherLoss.biomassLoss += loss.biomassLoss
+          otherLoss.carbonEmissions += loss.carbonEmissions
           k -> otherLoss
         }
       },
-      extent2000 + other.extent2000,
-      extent2010 + other.extent2010,
+      treecoverExtent2000 + other.treecoverExtent2000,
+      treecoverExtent2010 + other.treecoverExtent2010,
       totalArea + other.totalArea,
       totalGainArea + other.totalGainArea,
       totalBiomass + other.totalBiomass,
       totalCo2 + other.totalCo2,
       // TODO: use extent2010 to calculate avg biomass incase year is selected
-      ((avgBiomass * extent2000) + (other.avgBiomass * other.extent2000)) / (extent2000 + other.extent2000)
+      ((avgBiomass * treecoverExtent2000) + (other.avgBiomass * other.treecoverExtent2000)) / (treecoverExtent2000 + other.treecoverExtent2000)
     )
   }
 }

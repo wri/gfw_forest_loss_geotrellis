@@ -2,7 +2,8 @@ package org.globalforestwatch.summarystats.carbonflux
 
 case class CarbonFluxDataGroup(lossYear: Integer,
                                threshold: Integer,
-                               gain: Integer,
+                               isGain: Boolean,
+                               isLoss: Boolean,
                                mangroveBiomassExtent: Boolean,
                                drivers: String,
                                ecozones: String,

@@ -5,6 +5,7 @@ import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.util.Implicits._
 
 /** LossData Summary by year */
 case class AnnualUpdateSummary(
@@ -31,7 +32,7 @@ object AnnualUpdateSummary {
                    acc: AnnualUpdateSummary): AnnualUpdateSummary = {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
-        val gain: Integer = raster.tile.gain.getData(col, row)
+        val gain: Boolean = raster.tile.gain.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
@@ -178,14 +179,14 @@ object AnnualUpdateSummary {
             if (tcd2000 >= thresholds.head) {
 
               if (loss != null) {
-                summary.areaLoss += areaHa
+                summary.treecoverLoss += areaHa
                 summary.biomassLoss += biomassPixel
                 summary.co2Emissions += co2Pixel
                 summary.mangroveBiomassLoss += mangroveBiomassPixel
                 summary.mangroveCo2Emissions += mangroveCo2Pixel
               }
 
-              summary.extent2000 += areaHa
+              summary.treecoverExtent2000 += areaHa
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
               summary.totalMangroveBiomass += mangroveBiomassPixel
@@ -193,7 +194,7 @@ object AnnualUpdateSummary {
             }
 
             if (tcd2010 >= thresholds.head) {
-              summary.extent2010 += areaHa
+              summary.treecoverExtent2010 += areaHa
             }
 
             updateSummary(thresholds.tail, stats.updated(pKey, summary))

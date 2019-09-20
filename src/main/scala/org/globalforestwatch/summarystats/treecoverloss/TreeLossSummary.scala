@@ -6,6 +6,7 @@ import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import org.globalforestwatch.util.Util.getAnyMapValue
+import org.globalforestwatch.util.Implicits._
 
 /** LossData Summary by year */
 case class TreeLossSummary(stats: Map[TreeLossDataGroup, TreeLossData] =
@@ -36,16 +37,16 @@ object TreeLossSummary {
 
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
-        val gain: Integer = raster.tile.gain.getData(col, row)
+        val gain: Boolean = raster.tile.gain.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
         val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
 
-        val cols: Int = raster.rasterExtent.cols
-        val rows: Int = raster.rasterExtent.rows
-        val ext = raster.rasterExtent.extent
-        val cellSize = raster.cellSize
+        //        val cols: Int = raster.rasterExtent.cols
+        //        val rows: Int = raster.rasterExtent.rows
+        //        val ext = raster.rasterExtent.extent
+        //        val cellSize = raster.cellSize
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -83,23 +84,23 @@ object TreeLossSummary {
             if ((tcd2000 >= thresholds.head && tcdYear == 2000) || (tcd2010 >= thresholds.head && tcdYear == 2010)) {
 
               if (loss != null) {
-                summary.lossYear(loss).area_loss += areaHa
-                summary.lossYear(loss).biomass_loss += biomassPixel
-                summary.lossYear(loss).carbon_emissions += co2Pixel
+                summary.lossYear(loss).treecoverLoss += areaHa
+                summary.lossYear(loss).biomassLoss += biomassPixel
+                summary.lossYear(loss).carbonEmissions += co2Pixel
               }
 
               // TODO: use extent2010 to calculate avg biomass incase year is selected
-              summary.avgBiomass = ((summary.avgBiomass * summary.extent2000) + (biomass * areaHa)) / (summary.extent2000 + areaHa)
-              if (tcdYear == 2000) summary.extent2000 += areaHa
-              else if (tcdYear == 2010) summary.extent2010 += areaHa
+              summary.avgBiomass = ((summary.avgBiomass * summary.treecoverExtent2000) + (biomass * areaHa)) / (summary.treecoverExtent2000 + areaHa)
+              if (tcdYear == 2000) summary.treecoverExtent2000 += areaHa
+              else if (tcdYear == 2010) summary.treecoverExtent2010 += areaHa
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
             }
 
             if (tcd2010 >= thresholds.head && tcdYear == 2000)
-              summary.extent2010 += areaHa
+              summary.treecoverExtent2010 += areaHa
             else if (tcd2000 >= thresholds.head && tcdYear == 2010)
-              summary.extent2000 += areaHa
+              summary.treecoverExtent2000 += areaHa
 
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
           }
