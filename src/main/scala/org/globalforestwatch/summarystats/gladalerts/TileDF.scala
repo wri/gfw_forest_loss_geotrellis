@@ -24,8 +24,8 @@ object TileDF {
       $"data_group.tile.x" as "x",
       $"data_group.tile.y" as "y",
       $"data_group.tile.z" as "z",
-      $"data_group.alertDate" as "alert_date",
-      $"data_group.isConfirmed" as "alert_confirmation_status",
+      $"data_group.alertDate" as "alert__date",
+      $"data_group.isConfirmed" as "is__confirmed_alert",
       $"data.totalAlerts" as "alert_count"
 
     )
@@ -42,13 +42,13 @@ object TileDF {
         "x",
         "y",
         "z",
-        "alert_date",
-        "alert_confirmation_status",
+        "alert__date",
+        "is__confirmed_alert",
         "alert_count"
       )
     )
 
-    df.groupBy($"x", $"y", $"z", $"alert_date", $"alert_confirmation_status")
+    df.groupBy($"x", $"y", $"z", $"alert__date", $"is__confirmed_alert")
       .agg(sum($"alert_count") as "alert_count")
   }
 }

@@ -10,22 +10,22 @@ object Adm2ApiDF {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    df.filter($"loss_year".isNotNull && $"treecover_loss__ha" > 0)
+    df.filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
       .groupBy(
         $"iso",
         $"adm1",
         $"adm2",
-        $"threshold",
-        $"loss_year",
-        $"gain",
-        $"mangroves",
-        $"tcs_drivers",
-        $"ecozones",
-        $"gfw_land_rights",
-        $"wdpa_protected_areas",
-        $"intact_forest_landscapes",
-        $"gfw_plantations",
-        $"intact_primary_forest",
+        $"treecover_density__threshold",
+        $"treecover_loss__year",
+        $"is__treecover_gain",
+        $"is__mangrove",
+        $"tcs_driver__type",
+        $"ecozone__name",
+        $"is__gfw_land_right",
+        $"wdpa_protected_area__iucn_cat",
+        $"is__intact_forest_landscape",
+        $"is__gfw_plantation",
+        $"is__intact_primary_forest",
         $"peatlands_flux"
       )
       .agg(
@@ -52,17 +52,17 @@ object Adm2ApiDF {
       $"iso",
       $"adm1",
       $"adm2",
-      $"threshold",
-      $"loss",
-      $"gain",
-      $"mangroves",
-      $"tcs_drivers",
-      $"ecozones",
-      $"gfw_land_rights",
-      $"wdpa_protected_areas",
-      $"intact_forest_landscapes",
-      $"gfw_plantations",
-      $"intact_primary_forest",
+      $"treecover_density__threshold",
+      $"is__treecover_loss",
+      $"is__treecover_gain",
+      $"is__mangrove",
+      $"tcs_driver__type",
+      $"ecozone__name",
+      $"is__gfw_land_right",
+      $"wdpa_protected_area__iucn_cat",
+      $"is__intact_forest_landscape",
+      $"is__gfw_plantation",
+      $"is__intact_primary_forest",
       $"peatlands_flux"
     )
       .agg(

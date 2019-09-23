@@ -16,7 +16,7 @@ object AnnualUpdateExport extends SummaryExport {
     adm2SummaryDF
       .transform(Adm2SummaryDF.roundValues)
       .coalesce(1)
-      .orderBy($"country", $"subnational1", $"subnational2", $"threshold")
+      .orderBy($"country", $"subnational1", $"subnational2", $"treecover_density__threshold")
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/summary")
@@ -26,7 +26,7 @@ object AnnualUpdateExport extends SummaryExport {
     adm1SummaryDF
       .transform(Adm1SummaryDF.roundValues)
       .coalesce(1)
-      .orderBy($"country", $"subnational1", $"threshold")
+      .orderBy($"country", $"subnational1", $"treecover_density__threshold")
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/summary")
@@ -36,7 +36,7 @@ object AnnualUpdateExport extends SummaryExport {
     isoSummaryDF
       .transform(IsoSummaryDF.roundValues)
       .coalesce(1)
-      .orderBy($"country", $"threshold")
+      .orderBy($"country", $"treecover_density__threshold")
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/summary")

@@ -21,10 +21,10 @@ object TreeLossDF {
     )
 
     df.select(
-      $"id.featureId" as "feature_id",
-      $"data_group.threshold" as "threshold",
-      $"data_group.tcdYear" as "treecover_density_year",
-      $"data_group.primaryForest" as "regional_primary_forests",
+      $"id.featureId" as "feature__id",
+      $"data_group.threshold" as "treecover_density__threshold",
+      $"data_group.tcdYear" as "treecover_density__year",
+      $"data_group.primaryForest" as "is__regional_primary_forest",
       $"data.treecoverExtent2000" as "treecover_extent_2000__ha",
       $"data.treecoverExtent2010" as "treecover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
@@ -168,7 +168,7 @@ object TreeLossDF {
 
     if (include) df
     else {
-      df.groupBy($"feature_id", $"threshold", $"tcd_year")
+      df.groupBy($"feature__id", $"treecover_density__threshold", $"tcd_year")
         .agg(
           sum("area__ha") as "area__ha",
           sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",

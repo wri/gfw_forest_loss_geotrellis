@@ -23,7 +23,7 @@ object TreeLossExport extends SummaryExport {
       .transform(TreeLossDF.unpackValues)
       .transform(TreeLossDF.primaryForestFilter(includePrimaryForest))
       .coalesce(1)
-      .orderBy($"feature_id", $"threshold")
+      .orderBy($"feature__id", $"treecover_density__threshold")
       .write
       .options(csvOptions)
       .csv(path = outputUrl)

@@ -13,8 +13,8 @@ object Adm2SummaryDF {
     val year_range = 2001 to 2018
 
     val annualDF = df
-      .groupBy($"iso", $"adm1", $"adm2", $"threshold")
-      .pivot("loss_year", year_range)
+      .groupBy($"iso", $"adm1", $"adm2", $"treecover_density__threshold")
+      .pivot("treecover_loss__year", year_range)
       .agg(
         sum("treecover_loss__ha") as "treecover_loss__ha",
         sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss__Mg",
@@ -23,7 +23,7 @@ object Adm2SummaryDF {
       .as("annual")
 
     val totalDF = df
-      .groupBy($"iso", $"adm1", $"adm2", $"threshold")
+      .groupBy($"iso", $"adm1", $"adm2", $"treecover_density__threshold")
       .agg(
         sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",
         sum("treecover_extent_2010__ha") as "treecover_extent_2010__ha",
@@ -38,7 +38,7 @@ object Adm2SummaryDF {
       .as("total")
 
     totalDF
-      .join(annualDF, Seq("iso", "adm1", "adm2", "threshold"), "inner")
+      .join(annualDF, Seq("iso", "adm1", "adm2", "treecover_density__threshold"), "inner")
       .transform(setNullZero)
 
   }
@@ -51,7 +51,7 @@ object Adm2SummaryDF {
       $"iso" as "country",
       $"adm1" as "subnational1",
       $"adm2" as "subnational2",
-      $"threshold",
+      $"treecover_density__threshold",
       round($"treecover_extent_2000__ha") as "treecover_extent_2000__ha",
       round($"treecover_extent_2010__ha") as "treecover_extent_2010__ha",
       round($"area__ha") as "area__ha",

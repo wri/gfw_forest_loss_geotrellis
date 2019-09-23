@@ -10,7 +10,7 @@ object IsoSummaryDF {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    df.groupBy($"iso", $"threshold")
+    df.groupBy($"iso", $"treecover_density__threshold")
       .agg(
         sum($"treecover_extent_2000__ha") as "treecover_extent_2000__ha",
         sum($"treecover_extent_2010__ha") as "treecover_extent_2010__ha",
@@ -83,7 +83,7 @@ object IsoSummaryDF {
 
     df.select(
       $"iso" as "country",
-      $"threshold",
+      $"treecover_density__threshold",
       round($"treecover_extent_2000__ha") as "treecover_extent_2000__ha",
       round($"treecover_extent_2010__ha") as "treecover_extent_2010__ha",
       round($"area__ha") as "area__ha",
