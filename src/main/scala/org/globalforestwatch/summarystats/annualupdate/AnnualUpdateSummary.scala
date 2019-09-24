@@ -7,6 +7,8 @@ import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import org.globalforestwatch.util.Implicits._
 
+import scala.annotation.tailrec
+
 /** LossData Summary by year */
 case class AnnualUpdateSummary(
   stats: Map[AnnualUpdateDataGroup, AnnualUpdateData] = Map.empty
@@ -117,6 +119,7 @@ object AnnualUpdateSummary {
 
         val thresholds = List(10, 15, 20, 25, 30, 50, 75)
 
+        @tailrec
         def updateSummary(
           thresholds: List[Int],
           stats: Map[AnnualUpdateDataGroup, AnnualUpdateData]

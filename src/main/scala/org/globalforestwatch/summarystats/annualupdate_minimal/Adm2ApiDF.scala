@@ -127,9 +127,9 @@ object Adm2ApiDF {
         //        sum("mangrove_aboveground_co2_stock_2000__Mg") as "mangrove_aboveground_co2_stock_2000__Mg",
         sum("treecover_loss__ha") as "treecover_loss_2001-2018__ha",
         sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss_2001-2018__Mg",
-        sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2001-2018__Mg",
-        sum("mangrove_aboveground_biomass_loss__Mg") as "mangrove_aboveground_biomass_loss_2001-2018__Mg",
-        sum("mangrove_aboveground_co2_emissions__Mg") as "mangrove_co2_emissions_2001-2018__Mg"
+        sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2001-2018__Mg"
+        //        sum("mangrove_aboveground_biomass_loss__Mg") as "mangrove_aboveground_biomass_loss_2001-2018__Mg",
+        //        sum("mangrove_aboveground_co2_emissions__Mg") as "mangrove_co2_emissions_2001-2018__Mg"
       )
   }
 }

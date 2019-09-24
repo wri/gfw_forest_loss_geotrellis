@@ -28,7 +28,7 @@ object GladAlertsAnalysis {
 //    val outputPartitionCount =
 //      maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
-    summaryDF.repartition(partitionExprs = $"id")
+    summaryDF.repartition($"id", $"data_group")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
       "/gladAlerts_" + DateTimeFormatter

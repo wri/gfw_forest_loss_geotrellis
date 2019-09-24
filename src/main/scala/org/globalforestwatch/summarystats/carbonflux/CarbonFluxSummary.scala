@@ -6,6 +6,8 @@ import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 
+import scala.annotation.tailrec
+
 /** LossData Summary by year */
 case class CarbonFluxSummary(
   stats: Map[CarbonFluxDataGroup, CarbonFluxData] = Map.empty
@@ -89,7 +91,7 @@ object CarbonFluxSummary {
 
         val areaHa = area / 10000.0
 
-        val carbonfluxLossYear: Integer = if (lossYear >= 2001 && lossYear <= 2015) lossYear else null
+        val carbonfluxLossYear: Integer = if (lossYear != null && lossYear >= 2001 && lossYear <= 2015) lossYear else null
         val isLoss: Boolean = carbonfluxLossYear != null
 
         val biomassPixel = biomass * areaHa
@@ -118,6 +120,8 @@ object CarbonFluxSummary {
 
         val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
 
+
+        @tailrec
         def updateSummary(
           thresholds: List[Int],
           stats: Map[CarbonFluxDataGroup, CarbonFluxData]

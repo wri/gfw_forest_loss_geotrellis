@@ -39,21 +39,21 @@ object GladAlertsExport extends SummaryExport {
 
         adm2DF.write
           .options(csvOptions)
-          .csv(path = outputUrl + "/adm2/area")
+          .csv(path = outputUrl + "/adm2/summary")
 
         val adm1DF = adm2DF
           .transform(Adm1WeeklyDF.sumArea)
 
         adm1DF.write
           .options(csvOptions)
-          .csv(path = outputUrl + "/adm1/area")
+          .csv(path = outputUrl + "/adm1/summary")
 
         val isoDF = adm1DF
           .transform(IsoWeeklyDF.sumArea)
 
         isoDF.write
           .options(csvOptions)
-          .csv(path = outputUrl + "/iso/area")
+          .csv(path = outputUrl + "/iso/summary")
       }
     }
 
@@ -123,7 +123,7 @@ object GladAlertsExport extends SummaryExport {
         .transform(WdpaDailyDF.sumArea)
         .write
         .options(csvOptions)
-        .csv(path = outputUrl + "/wdpa/area")
+        .csv(path = outputUrl + "/wdpa/summary")
     }
 
     wdpaDF
@@ -165,7 +165,7 @@ object GladAlertsExport extends SummaryExport {
         .transform(SimpleFeatureDailyDF.sumArea)
         .write
         .options(csvOptions)
-        .csv(path = outputUrl + "/feature/area")
+        .csv(path = outputUrl + "/feature/summary")
     }
 
     featureDF

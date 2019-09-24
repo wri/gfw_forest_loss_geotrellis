@@ -7,6 +7,8 @@ import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import org.globalforestwatch.util.Implicits._
 
+import scala.annotation.tailrec
+
 /** LossData Summary by year */
 case class AnnualUpdateMinimalSummary(
                                        stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = Map.empty
@@ -118,6 +120,7 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
 
         val thresholds = List(10, 15, 20, 25, 30, 50, 75)
 
+        @tailrec
         def updateSummary(
                            thresholds: List[Int],
                            stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData]

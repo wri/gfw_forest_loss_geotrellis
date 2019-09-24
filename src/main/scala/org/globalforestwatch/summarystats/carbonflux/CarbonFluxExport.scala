@@ -15,17 +15,17 @@ object CarbonFluxExport extends SummaryExport {
       val adm2ApiDF = df.transform(Adm2ApiDF.sumArea)
       adm2ApiDF.write
         .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/area")
+        .csv(path = outputUrl + "/adm2/summary")
 
       val adm1ApiDF = adm2ApiDF.transform(Adm1ApiDF.sumArea)
       adm1ApiDF.write
         .options(csvOptions)
-        .csv(path = outputUrl + "/adm1/area")
+        .csv(path = outputUrl + "/adm1/summary")
 
       val isoApiDF = adm1ApiDF.transform(IsoApiDF.sumArea)
       isoApiDF.write
         .options(csvOptions)
-        .csv(path = outputUrl + "/iso/area")
+        .csv(path = outputUrl + "/iso/summary")
 
     }
 
