@@ -30,7 +30,7 @@ object IsoApiDF {
         sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss__Mg",
         sum("gross_emissions_co2e_co2_only__Mg") as "gross_emissions_co2e_co2_only__Mg",
         sum("gross_emissions_co2e_non_co2__Mg") as "gross_emissions_co2e_non_co2__Mg",
-        sum("gross_emissions_co2e_all_gasses__Mg") as "gross_emissions_co2e_all_gasses__Mg",
+        sum("gross_emissions_co2e_all_gases__Mg") as "gross_emissions_co2e_all_gases__Mg",
         sum("aboveground_carbon_stock_in_emissions_year__Mg") as "aboveground_carbon_stock_in_emissions_year__Mg",
         sum("belowground_carbon_stock_in_emissions_year__Mg") as "belowground_carbon_stock_in_emissions_year__Mg",
         sum("deadwood_carbon_stock_in_emissions_year__Mg") as "deadwood_carbon_stock_in_emissions_year__Mg",
@@ -70,14 +70,14 @@ object IsoApiDF {
         sum("aboveground_carbon_stock_2000__Mg") as "aboveground_carbon_stock_2000__Mg",
         sum("belowground_carbon_stock_2000__Mg") as "belowground_carbon_stock_2000__Mg",
         sum("deadwood_carbon_stock_2000__Mg") as "deadwood_carbon_stock_2000__Mg",
-        sum("littler_carbon_stock_2000__Mg") as "littler_carbon_stock_2000__Mg",
+        sum("litter_carbon_stock_2000__Mg") as "litter_carbon_stock_2000__Mg",
         sum("soil_carbon_stock_2000__Mg") as "soil_carbon_stock_2000__Mg",
         sum("total_carbon_stock_2000__Mg") as "total_carbon_stock_2000__Mg",
         sum("treecover_loss_2001-2015__ha") as "treecover_loss_2001-2015__ha",
         sum("aboveground_biomass_loss_2001-2015__Mg") as "aboveground_biomass_loss_2001-2015__Mg",
         sum("gross_emissions_co2e_co2_only_2001-2015__Mg") as "gross_emissions_co2e_co2_only_2001-2015__Mg",
         sum("gross_emissions_co2e_non_co2_2001-2015__Mg") as "gross_emissions_co2e_non_co2_2001-2015__Mg",
-        sum("gross_emissions_co2e_all_gasses_2001-2015__Mg") as "gross_emissions_co2e_all_gasses_2001-2015__Mg"
+        sum("gross_emissions_co2e_all_gases_2001-2015__Mg") as "gross_emissions_co2e_all_gases_2001-2015__Mg"
       )
   }
 }

@@ -36,7 +36,7 @@ object ApiDF {
       $"data.biomassLoss" as "aboveground_biomass_loss__Mg",
       $"data.grossEmissionsCo2eCo2Only" as "gross_emissions_co2e_co2_only__Mg",
       $"data.grossEmissionsCo2eNoneCo2" as "gross_emissions_co2e_non_co2__Mg",
-      $"data.grossEmissionsCo2e" as "gross_emissions_co2e_all_gasses__Mg",
+      $"data.grossEmissionsCo2e" as "gross_emissions_co2e_all_gases__Mg",
       $"data.agcEmisYear" as "aboveground_carbon_stock_in_emissions_year__Mg",
       $"data.bgcEmisYear" as "belowground_carbon_stock_in_emissions_year__Mg",
       $"data.deadwoodCarbonEmisYear" as "deadwood_carbon_stock_in_emissions_year__Mg",
@@ -52,7 +52,7 @@ object ApiDF {
       $"data.totalAgc2000" as "aboveground_carbon_stock_2000__Mg",
       $"data.totalBgc2000" as "belowground_carbon_stock_2000__Mg",
       $"data.totalDeadwoodCarbon2000" as "deadwood_carbon_stock_2000__Mg",
-      $"data.totalLitterCarbon2000" as "littler_carbon_stock_2000__Mg",
+      $"data.totalLitterCarbon2000" as "litter_carbon_stock_2000__Mg",
       $"data.totalSoil2000" as "soil_carbon_stock_2000__Mg",
       $"data.totalCarbon2000" as "total_carbon_stock_2000__Mg"
     )
