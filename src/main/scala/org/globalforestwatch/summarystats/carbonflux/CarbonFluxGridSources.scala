@@ -15,9 +15,9 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
   val treeCoverDensity2000 = TreeCoverDensityThresholds2000(gridId)
 
   val biomassPerHectar = BiomassPerHectar(gridId)
-  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsCarbon(gridId)
-  val grossCumulRemovalsCarbon = GrossCumulRemovalsCarbon(gridId)
-  val netFluxCo2 = NetFluxCo2(gridId)
+  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridId)
+  val grossCumulRemovalsCarbon = GrossCumulRemovalsCo2(gridId)
+  val netFluxCo2 = NetFluxCo2e(gridId)
 
   val agcEmisYear = AgcEmisYear(gridId)
   val bgcEmisYear = BgcEmisYear(gridId)
@@ -33,8 +33,8 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
   val soilCarbon2000 = SoilCarbon2000(gridId)
   val totalCarbon2000 = TotalCarbon2000(gridId)
 
-  val grossEmissionsCo2eNoneCo2 = GrossEmissionsCo2eNoneCo2(gridId)
-  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2eCo2Only(gridId)
+  val grossEmissionsCo2eNoneCo2 = GrossEmissionsNonCo2Co2e(gridId)
+  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridId)
 
   val treeCoverGain = TreeCoverGain(gridId)
   val mangroveBiomassExtent = MangroveBiomassExtent(gridId)
