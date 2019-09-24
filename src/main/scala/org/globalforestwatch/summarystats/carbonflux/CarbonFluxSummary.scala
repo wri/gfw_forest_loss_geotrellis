@@ -89,7 +89,8 @@ object CarbonFluxSummary {
 
         val areaHa = area / 10000.0
 
-        val isLoss: Boolean = lossYear != null
+        val carbonfluxLossYear: Integer = if (lossYear >= 2001 && lossYear <= 2015) lossYear else null
+        val isLoss: Boolean = carbonfluxLossYear != null
 
         val biomassPixel = biomass * areaHa
         val grossAnnualRemovalsCarbonPixel = grossAnnualRemovalsCarbon * areaHa
@@ -124,7 +125,7 @@ object CarbonFluxSummary {
           if (thresholds == Nil) stats
           else {
             val pKey = CarbonFluxDataGroup(
-              lossYear,
+              carbonfluxLossYear,
               thresholds.head,
               isGain,
               isLoss,
@@ -150,7 +151,7 @@ object CarbonFluxSummary {
 
             if (tcd2000 >= thresholds.head) {
 
-              if (lossYear != null) {
+              if (carbonfluxLossYear != null) {
                 summary.treecoverLoss += areaHa
                 summary.biomassLoss += biomassPixel
                 summary.grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel

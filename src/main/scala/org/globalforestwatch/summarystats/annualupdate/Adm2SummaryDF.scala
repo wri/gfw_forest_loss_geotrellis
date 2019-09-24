@@ -18,7 +18,7 @@ object Adm2SummaryDF {
       .agg(
         sum("treecover_loss__ha") as "treecover_loss__ha",
         sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss__Mg",
-        sum("co2_emissions__Mg") as "co2_emissions__Mg"
+        sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions__Mg"
       )
       .as("annual")
 
@@ -33,7 +33,7 @@ object Adm2SummaryDF {
         sum("aboveground_biomass_stock_2000__Mg") / sum(
           "treecover_extent_2000__ha"
         ) as "avg_aboveground_biomass_2000_Mt_ha-1",
-        sum("co2_stock__Mg") as "co2_stock__Mg"
+        sum("aboveground_co2_stock_2000__Mg") as "aboveground_co2_stock_2000__Mg"
       )
       .as("total")
 
@@ -58,7 +58,7 @@ object Adm2SummaryDF {
       round($"treecover_gain_2000-2012__ha") as "treecover_gain_2000-2012__ha",
       round($"aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
       round($"avg_aboveground_biomass_2000_Mt_ha-1") as "avg_aboveground_biomass_2000_Mt_ha-1",
-      round($"co2_stock__Mg") as "co2_stock__Mg",
+      round($"aboveground_co2_stock_2000__Mg") as "aboveground_co2_stock_2000__Mg",
       round($"2001_treecover_loss__ha") as "treecover_loss_2001__ha",
       round($"2002_treecover_loss__ha") as "treecover_loss_2002__ha",
       round($"2003_treecover_loss__ha") as "treecover_loss_2003__ha",
@@ -95,24 +95,24 @@ object Adm2SummaryDF {
       round($"2016_aboveground_biomass_loss__Mg") as "aboveground_biomass_loss_2016__Mg",
       round($"2017_aboveground_biomass_loss__Mg") as "aboveground_biomass_loss_2017__Mg",
       round($"2018_aboveground_biomass_loss__Mg") as "aboveground_biomass_loss_2018__Mg",
-      round($"2001_co2_emissions__Mg") as "co2_emissions_2001__Mg",
-      round($"2002_co2_emissions__Mg") as "co2_emissions_2002__Mg",
-      round($"2003_co2_emissions__Mg") as "co2_emissions_2003__Mg",
-      round($"2004_co2_emissions__Mg") as "co2_emissions_2004__Mg",
-      round($"2005_co2_emissions__Mg") as "co2_emissions_2005__Mg",
-      round($"2006_co2_emissions__Mg") as "co2_emissions_2006__Mg",
-      round($"2007_co2_emissions__Mg") as "co2_emissions_2007__Mg",
-      round($"2008_co2_emissions__Mg") as "co2_emissions_2008__Mg",
-      round($"2009_co2_emissions__Mg") as "co2_emissions_2009__Mg",
-      round($"2010_co2_emissions__Mg") as "co2_emissions_2010__Mg",
-      round($"2011_co2_emissions__Mg") as "co2_emissions_2011__Mg",
-      round($"2012_co2_emissions__Mg") as "co2_emissions_2012__Mg",
-      round($"2013_co2_emissions__Mg") as "co2_emissions_2013__Mg",
-      round($"2014_co2_emissions__Mg") as "co2_emissions_2014__Mg",
-      round($"2015_co2_emissions__Mg") as "co2_emissions_2015__Mg",
-      round($"2016_co2_emissions__Mg") as "co2_emissions_2016__Mg",
-      round($"2017_co2_emissions__Mg") as "co2_emissions_2017__Mg",
-      round($"2018_co2_emissions__Mg") as "co2_emissions_2018__Mg"
+      round($"2001_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2001__Mg",
+      round($"2002_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2002__Mg",
+      round($"2003_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2003__Mg",
+      round($"2004_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2004__Mg",
+      round($"2005_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2005__Mg",
+      round($"2006_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2006__Mg",
+      round($"2007_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2007__Mg",
+      round($"2008_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2008__Mg",
+      round($"2009_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2009__Mg",
+      round($"2010_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2010__Mg",
+      round($"2011_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2011__Mg",
+      round($"2012_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2012__Mg",
+      round($"2013_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2013__Mg",
+      round($"2014_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2014__Mg",
+      round($"2015_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2015__Mg",
+      round($"2016_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2016__Mg",
+      round($"2017_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2017__Mg",
+      round($"2018_aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2018__Mg"
     )
   }
 
@@ -159,24 +159,24 @@ object Adm2SummaryDF {
         "2016_aboveground_biomass_loss__Mg",
         "2017_aboveground_biomass_loss__Mg",
         "2018_aboveground_biomass_loss__Mg",
-        "2001_co2_emissions__Mg",
-        "2002_co2_emissions__Mg",
-        "2003_co2_emissions__Mg",
-        "2004_co2_emissions__Mg",
-        "2005_co2_emissions__Mg",
-        "2006_co2_emissions__Mg",
-        "2007_co2_emissions__Mg",
-        "2008_co2_emissions__Mg",
-        "2009_co2_emissions__Mg",
-        "2010_co2_emissions__Mg",
-        "2011_co2_emissions__Mg",
-        "2012_co2_emissions__Mg",
-        "2013_co2_emissions__Mg",
-        "2014_co2_emissions__Mg",
-        "2015_co2_emissions__Mg",
-        "2016_co2_emissions__Mg",
-        "2017_co2_emissions__Mg",
-        "2018_co2_emissions__Mg"
+        "2001_aboveground_co2_emissions__Mg",
+        "2002_aboveground_co2_emissions__Mg",
+        "2003_aboveground_co2_emissions__Mg",
+        "2004_aboveground_co2_emissions__Mg",
+        "2005_aboveground_co2_emissions__Mg",
+        "2006_aboveground_co2_emissions__Mg",
+        "2007_aboveground_co2_emissions__Mg",
+        "2008_aboveground_co2_emissions__Mg",
+        "2009_aboveground_co2_emissions__Mg",
+        "2010_aboveground_co2_emissions__Mg",
+        "2011_aboveground_co2_emissions__Mg",
+        "2012_aboveground_co2_emissions__Mg",
+        "2013_aboveground_co2_emissions__Mg",
+        "2014_aboveground_co2_emissions__Mg",
+        "2015_aboveground_co2_emissions__Mg",
+        "2016_aboveground_co2_emissions__Mg",
+        "2017_aboveground_co2_emissions__Mg",
+        "2018_aboveground_co2_emissions__Mg"
       )
       .columns
 

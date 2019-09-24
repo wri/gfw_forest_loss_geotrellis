@@ -10,8 +10,8 @@ object Adm1ApiDF {
     import spark.implicits._
 
     df.groupBy(
-        $"iso",
-        $"adm1",
+      $"iso",
+      $"adm1",
       $"treecover_loss__year",
       $"treecover_density__threshold",
       $"tcs_driver__type",
@@ -23,7 +23,7 @@ object Adm1ApiDF {
       //      $"is__biodiversity_intactness_top_10_perc",
       $"wdpa_protected_area__iucn_cat",
       $"is__alliance_for_zero_extinction_site",
-      $"is__gfw_plantation",
+      $"gfw_plantation__type",
       //      $"river_basin__name",
       //      $"ecozone__name",
       //      $"is__urban_water_intake",
@@ -44,7 +44,7 @@ object Adm1ApiDF {
       //      $"idn_land_cover__class",
       //      $"is__mex_protected_areas",
       //      $"is__mex_psa",
-      //      $"mex_forest_zoning",
+      //      $"mex_forest_zoning__zone",
       //      $"is__per_permanent_production_forest",
       //      $"is__per_protected_area",
       //      $"per_forest_concession__type",
@@ -53,13 +53,13 @@ object Adm1ApiDF {
       $"is__gfw_resource_right",
       $"is__gfw_logging"
       //      $"is__gfw_oil_gas",
-      )
+    )
       .agg(
         sum("treecover_loss__ha") as "treecover_loss__ha",
         sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss__Mg",
-        sum("co2_emissions__Mg") as "co2_emissions__Mg"
+        sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions__Mg"
         //        sum("mangrove_aboveground_biomass_loss__Mg") as "mangrove_aboveground_biomass_loss__Mg",
-        //        sum("mangrove_co2_emissions__Mg") as "mangrove_co2_emissions__Mg"
+        //        sum("mangrove_aboveground_co2_emissions__Mg") as "mangrove_aboveground_co2_emissions__Mg"
       )
   }
 
@@ -81,7 +81,7 @@ object Adm1ApiDF {
       //      $"is__biodiversity_intactness_top_10_perc",
       $"wdpa_protected_area__iucn_cat",
       $"is__alliance_for_zero_extinction_site",
-      $"is__gfw_plantation",
+      $"gfw_plantation__type",
       //      $"river_basin__name",
       //      $"ecozone__name",
       //      $"is__urban_water_intake",
@@ -102,7 +102,7 @@ object Adm1ApiDF {
       //      $"idn_land_cover__class",
       //      $"is__mex_protected_areas",
       //      $"is__mex_psa",
-      //      $"mex_forest_zoning",
+      //      $"mex_forest_zoning__zone",
       //      $"is__per_permanent_production_forest",
       //      $"is__per_protected_area",
       //      $"per_forest_concession__type",
@@ -118,9 +118,14 @@ object Adm1ApiDF {
         sum("area__ha") as "area__ha",
         sum("treecover_gain_2000-2012__ha") as "treecover_gain_2000-2012__ha",
         sum("aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
-        sum("co2_stock__Mg") as "co2_stock__Mg"
-        //        sum("mangrove_aboveground_biomass_stock__Mg") as "mangrove_aboveground_biomass_stock__Mg",
-        //        sum("mangrove_co2_stock__Mg") as "mangrove_co2_stock__Mg"
+        sum("aboveground_co2_stock_2000__Mg") as "aboveground_co2_stock_2000__Mg",
+        //        sum("mangrove_aboveground_biomass_stock_2000__Mg") as "mangrove_aboveground_biomass_stock_2000__Mg",
+        //        sum("mangrove_aboveground_co2_stock_2000__Mg") as "mangrove_aboveground_co2_stock_2000__Mg",
+        sum("treecover_loss_2001-2018__ha") as "treecover_loss_2001-2018__ha",
+        sum("aboveground_biomass_loss_2001-2018__Mg") as "aboveground_biomass_loss_2001-2018__Mg",
+        sum("aboveground_co2_emissions_2001-2018__Mg") as "aboveground_co2_emissions_2001-2018__Mg",
+        sum("mangrove_aboveground_biomass_loss_2001-2018__Mg") as "mangrove_aboveground_biomass_loss_2001-2018__Mg",
+        sum("mangrove_co2_emissions_2001-2018__Mg") as "mangrove_co2_emissions_2001-2018__Mg"
       )
   }
 }

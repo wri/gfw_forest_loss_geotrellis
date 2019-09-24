@@ -108,11 +108,12 @@ object AnnualUpdateSummary {
         val gainArea: Double = gain * areaHa
 
         val co2Factor = 0.5 * 44 / 12
+        val mangroveCo2Factor = 0.45 * 44 / 12
 
         val biomassPixel = biomass * areaHa
         val co2Pixel = biomassPixel * co2Factor
         val mangroveBiomassPixel = mangroveBiomass * areaHa
-        val mangroveCo2Pixel = mangroveBiomassPixel * co2Factor
+        val mangroveCo2Pixel = mangroveBiomassPixel * mangroveCo2Factor
 
         val thresholds = List(10, 15, 20, 25, 30, 50, 75)
 

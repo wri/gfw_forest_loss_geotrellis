@@ -23,7 +23,7 @@ object TreeLossDF {
     df.select(
       $"id.featureId" as "feature__id",
       $"data_group.threshold" as "treecover_density__threshold",
-      $"data_group.tcdYear" as "treecover_density__year",
+      $"data_group.tcdYear" as "treecover_extent__year",
       $"data_group.primaryForest" as "is__regional_primary_forest",
       $"data.treecoverExtent2000" as "treecover_extent_2000__ha",
       $"data.treecoverExtent2010" as "treecover_extent_2010__ha",

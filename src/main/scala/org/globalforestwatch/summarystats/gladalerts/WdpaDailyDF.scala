@@ -26,7 +26,7 @@ object WdpaDailyDF {
         $"data_group.aze" as "is__alliance_for_zero_extinction_site",
         $"data_group.keyBiodiversityAreas" as "is__key_biodiversity_area",
         $"data_group.landmark" as "is__landmark",
-        $"data_group.plantations" as "is__gfw_plantation",
+        $"data_group.plantations" as "gfw_plantation__type",
         $"data_group.mining" as "is__gfw_mining",
         $"data_group.logging" as "is__gfw_logging",
         $"data_group.rspo" as "rspo_oil_palm__certification_status",
@@ -42,7 +42,7 @@ object WdpaDailyDF {
         $"data_group.braBiomes" as "bra_biome__name",
         $"data.totalAlerts" as "alert_count",
         $"data.alertArea" as "alert_area__ha",
-        $"data.co2Emissions" as "co2_emissions__Mg",
+        $"data.co2Emissions" as "aboveground_co2_emissions__Mg",
         $"data.totalArea" as "area__ha"
       )
   }
@@ -66,7 +66,7 @@ object WdpaDailyDF {
         "is__alliance_for_zero_extinction_site",
         "is__key_biodiversity_area",
         "is__landmark",
-        "is__gfw_plantation",
+        "gfw_plantation__type",
         "is__gfw_mining",
         "is__gfw_logging",
         "rspo_oil_palm__certification_status",
@@ -82,7 +82,7 @@ object WdpaDailyDF {
         "bra_biome__name",
         "alert_count",
         "alert_area__ha",
-        "co2_emissions__Mg"
+        "aboveground_co2_emissions__Mg"
       )
     )
 
@@ -99,7 +99,7 @@ object WdpaDailyDF {
         $"is__alliance_for_zero_extinction_site",
         $"is__key_biodiversity_area",
         $"is__landmark",
-        $"is__gfw_plantation",
+        $"gfw_plantation__type",
         $"is__gfw_mining",
         $"is__gfw_logging",
         $"rspo_oil_palm__certification_status",
@@ -117,7 +117,7 @@ object WdpaDailyDF {
       .agg(
         sum("alert_count") as "alert_count",
         sum("alert_area__ha") as "alert_area__ha",
-        sum("co2_emissions__Mg") as "co2_emissions__Mg"
+        sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions__Mg"
       )
   }
 
@@ -138,7 +138,7 @@ object WdpaDailyDF {
         "is__alliance_for_zero_extinction_site",
         "is__key_biodiversity_area",
         "is__landmark",
-        "is__gfw_plantation",
+        "gfw_plantation__type",
         "is__gfw_mining",
         "is__gfw_logging",
         "rspo_oil_palm__certification_status",
@@ -166,7 +166,7 @@ object WdpaDailyDF {
       $"is__alliance_for_zero_extinction_site",
       $"is__key_biodiversity_area",
       $"is__landmark",
-      $"is__gfw_plantation",
+      $"gfw_plantation__type",
       $"is__gfw_mining",
       $"is__gfw_logging",
       $"rspo_oil_palm__certification_status",

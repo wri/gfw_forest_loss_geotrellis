@@ -21,7 +21,7 @@ object SimpleFeatureWeeklyDF {
         "is__alliance_for_zero_extinction_site",
         "is__key_biodiversity_area",
         "is__landmark",
-        "is__gfw_plantation",
+        "gfw_plantation__type",
         "is__gfw_mining",
         "is__gfw_logging",
         "rspo_oil_palm__certification_status",
@@ -37,7 +37,7 @@ object SimpleFeatureWeeklyDF {
         "bra_biome__name",
         "alert_count",
         "alert_area__ha",
-        "co2_emissions__Mg"
+        "aboveground_co2_emissions__Mg"
       )
     )
 
@@ -51,7 +51,7 @@ object SimpleFeatureWeeklyDF {
         $"is__alliance_for_zero_extinction_site",
         $"is__key_biodiversity_area",
         $"is__landmark",
-        $"is__gfw_plantation",
+        $"gfw_plantation__type",
         $"is__gfw_mining",
         $"is__gfw_logging",
         $"rspo_oil_palm__certification_status",
@@ -67,7 +67,7 @@ object SimpleFeatureWeeklyDF {
         $"bra_biome__name",
         $"alert_count",
         $"alert_area__ha",
-        $"co2_emissions__Mg"
+        $"aboveground_co2_emissions__Mg"
       )
       .groupBy(
         $"feature__id",
@@ -78,7 +78,7 @@ object SimpleFeatureWeeklyDF {
         $"is__alliance_for_zero_extinction_site",
         $"is__key_biodiversity_area",
         $"is__landmark",
-        $"is__gfw_plantation",
+        $"gfw_plantation__type",
         $"is__gfw_mining",
         $"is__gfw_logging",
         $"rspo_oil_palm__certification_status",
@@ -96,7 +96,7 @@ object SimpleFeatureWeeklyDF {
       .agg(
         sum("alert_count") as "alert_count",
         sum("alert_area__ha") as "alert_area__ha",
-        sum("co2_emissions__Mg") as "co2_emissions__Mg"
+        sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions__Mg"
       )
   }
 }

@@ -27,7 +27,7 @@ object ApiDF {
       //      $"data_group.biodiversityIntactness" as "is__biodiversity_intactness_top_10_perc",
       $"data_group.wdpa" as "wdpa_protected_area__iucn_cat",
       $"data_group.aze" as "is__alliance_for_zero_extinction_site",
-      $"data_group.plantations" as "is__gfw_plantation",
+      $"data_group.plantations" as "gfw_plantation__type",
       //      $"data_group.riverBasins" as "river_basin__name",
       //      $"data_group.ecozones" as "ecozone__name",
       //      $"data_group.urbanWatersheds" as "is__urban_water_intake",
@@ -48,7 +48,7 @@ object ApiDF {
       //      $"data_group.idnLandCover" as "idn_land_cover__class",
       //      $"data_group.mexProtectedAreas" as "is__mex_protected_areas",
       //      $"data_group.mexPaymentForEcosystemServices" as "is__mex_psa",
-      //      $"data_group.mexForestZoning" as "mex_forest_zoning",
+      //      $"data_group.mexForestZoning" as "mex_forest_zoning__zone",
       //      $"data_group.perProductionForest" as "is__per_permanent_production_forest",
       //      $"data_group.perProtectedAreas" as "is__per_protected_area",
       //      $"data_group.perForestConcessions" as "per_forest_concession__type",
@@ -62,14 +62,14 @@ object ApiDF {
       $"data.totalArea" as "area__ha",
       $"data.totalGainArea" as "treecover_gain_2000-2012__ha",
       $"data.totalBiomass" as "aboveground_biomass_stock_2000__Mg",
-      $"data.totalCo2" as "co2_stock__Mg",
-      //      $"data.totalMangroveBiomass" as "mangrove_aboveground_biomass_stock__Mg",
-      //      $"data.totalMangroveCo2" as "mangrove_co2_stock__Mg",
+      $"data.totalCo2" as "aboveground_co2_stock_2000__Mg",
+      //      $"data.totalMangroveBiomass" as "mangrove_aboveground_biomass_stock_2000__Mg",
+      //      $"data.totalMangroveCo2" as "mangrove_aboveground_co2_stock_2000__Mg",
       $"data.treecoverLoss" as "treecover_loss__ha",
       $"data.biomassLoss" as "aboveground_biomass_loss__Mg",
-      $"data.co2Emissions" as "co2_emissions__Mg"
+      $"data.co2Emissions" as "aboveground_co2_emissions__Mg"
       //      $"data.mangroveBiomassLoss" as "mangrove_aboveground_biomass_loss__Mg",
-      //      $"data.mangroveCo2Emissions" as "mangrove_co2_emissions__Mg"
+      //      $"data.mangroveCo2Emissions" as "mangrove_aboveground_co2_emissions__Mg"
     )
   }
 }
