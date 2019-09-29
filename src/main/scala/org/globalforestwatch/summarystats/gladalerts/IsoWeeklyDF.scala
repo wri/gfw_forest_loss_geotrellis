@@ -62,7 +62,7 @@ object IsoWeeklyDF {
         $"is__peat_land",
         $"is__idn_forest_moratorium",
         $"is__gfw_oil_palm",
-      $"idn_forest_area",
+        $"idn_forest_area",
         $"per_forest_concession__type",
         $"is__gfw_oil_gas",
         $"is__mangroves_2016",

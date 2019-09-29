@@ -5,49 +5,11 @@ import org.globalforestwatch.summarystats.SummaryExport
 
 object AnnualUpdateExport extends SummaryExport {
 
-  def exportSummary(df: DataFrame, outputUrl: String): Unit = {
-
-    val spark = df.sparkSession
-    import spark.implicits._
-
-    val adm2SummaryDF = df
-      .transform(Adm2SummaryDF.sumArea)
-
-    adm2SummaryDF
-      .transform(Adm2SummaryDF.roundValues)
-      .coalesce(1)
-      .orderBy($"country", $"subnational1", $"subnational2", $"treecover_density__threshold")
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/adm2/download")
-
-    val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
-
-    adm1SummaryDF
-      .transform(Adm1SummaryDF.roundValues)
-      .coalesce(1)
-      .orderBy($"country", $"subnational1", $"treecover_density__threshold")
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/adm1/download")
-
-    val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
-
-    isoSummaryDF
-      .transform(IsoSummaryDF.roundValues)
-      .coalesce(1)
-      .orderBy($"country", $"treecover_density__threshold")
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/iso/download")
-
-  }
-
   override protected def exportGadm(summaryDF: DataFrame,
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
 
-    def exportArea(df: DataFrame): Unit = {
+    def exportSummary(df: DataFrame): Unit = {
 
       val adm2ApiDF = df.transform(Adm2ApiDF.sumArea)
       adm2ApiDF.write
@@ -85,15 +47,11 @@ object AnnualUpdateExport extends SummaryExport {
 
     val exportDF = summaryDF
       .transform(ApiDF.unpackValues)
-    //          apiDF.repartition($"iso")
-    //    val apiDF =
-    //    adm2DF
-    //      .transform(ApiDF.setNull)
+
     exportDF.cache()
 
-    exportArea(exportDF)
+    exportSummary(exportDF)
     exportChange(exportDF)
-    exportSummary(exportDF, outputUrl)
 
     exportDF.unpersist()
 

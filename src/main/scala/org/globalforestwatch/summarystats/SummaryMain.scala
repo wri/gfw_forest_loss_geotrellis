@@ -217,7 +217,7 @@ object SummaryMain
             val featureRDD: RDD[Feature[Geometry, FeatureId]] =
               FeatureRDD(featuresDF, featureObj)
 
-            val inputPartitionMultiplier = 16
+            val inputPartitionMultiplier = 64
 
             val part = new HashPartitioner(
               partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
