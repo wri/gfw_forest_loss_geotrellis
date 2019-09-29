@@ -160,7 +160,7 @@ sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-116d9a4a")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 21
+sparkInstanceCount := 201
 sparkMasterType := "r4.2xlarge"
 sparkCoreType := "r4.2xlarge"
 sparkMasterEbsSize := Some(10)
@@ -207,9 +207,9 @@ sparkEmrConfigs := List(
     "spark.executor.memoryOverhead" -> "1g", //5G
     "spark.driver.cores" -> "1",
     "spark.driver.memory" -> "6652m",
-    "spark.executor.instances" -> "159", //7 * 200 -1 *  //9 * 50 -1
-    "spark.default.parallelism" -> "1590",
-    "spark.sql.shuffle.partitions" -> "1590",
+    "spark.executor.instances" -> "1339", //7 * 200 -1 *  //9 * 50 -1
+    "spark.default.parallelism" -> "26790",
+    "spark.sql.shuffle.partitions" -> "26790",
     "spark.driver.maxResultSize" -> "3g",
     "spark.shuffle.service.enabled" -> "true",
     "spark.shuffle.compress" -> "true",
@@ -218,17 +218,15 @@ sparkEmrConfigs := List(
     //    "spark.kryoserializer.buffer.max" -> "2047m",
 
     //     Best practice 4: Always set up a garbage collector when handling large volume of data through Spark.
-    // TODO: bootstrap installation of gpl library to avoid
-    //     ERROR GPLNativeCodeLoader: Could not load native gpl library
-    //     java.lang.UnsatisfiedLinkError: no gplcompression in java.library.path
-    //    -Djava.library.path=/usr/local/lib
-    //    "spark.executor.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
-    //    "spark.driver.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'"
 
-    "spark.driver.extraJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
-    "spark.executor.extraJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'"
+    // Use these GC strategy to avoid java.lang.OutOfMemoryError: GC overhead limit exceeded
+    "spark.executor.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
+    "spark.driver.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'"
 
-    //    "spark.executorEnv.LD_LIBRARY_PATH" -> "/usr/local/lib"
+    // Use these GC strategy as default
+    //    "spark.driver.extraJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
+    //    "spark.executor.extraJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'"
+
   ),
   //  EmrConfig("spark-env").withProperties(
   //    "LD_LIBRARY_PATH" -> "/usr/local/lib"
