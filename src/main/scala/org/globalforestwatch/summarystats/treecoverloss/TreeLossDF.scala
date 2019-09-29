@@ -32,132 +32,132 @@ object TreeLossDF {
       $"data.totalBiomass" as "aboveground_biomass_stock_2000__Mg",
       $"data.avgBiomass" as "avg_aboveground_biomass_stock_2000__Mg_ha-1",
       $"data.totalCo2" as "co2_stock_2000__Mt",
-      $"data.lossYear".getItem(0).getItem("treecover_loss") as "treecover_loss_2001__ha",
-      $"data.lossYear".getItem(1).getItem("treecover_loss") as "treecover_loss_2002__ha",
-      $"data.lossYear".getItem(2).getItem("treecover_loss") as "treecover_loss_2003__ha",
-      $"data.lossYear".getItem(3).getItem("treecover_loss") as "treecover_loss_2004__ha",
-      $"data.lossYear".getItem(4).getItem("treecover_loss") as "treecover_loss_2005__ha",
-      $"data.lossYear".getItem(5).getItem("treecover_loss") as "treecover_loss_2006__ha",
-      $"data.lossYear".getItem(6).getItem("treecover_loss") as "treecover_loss_2007__ha",
-      $"data.lossYear".getItem(7).getItem("treecover_loss") as "treecover_loss_2008__ha",
-      $"data.lossYear".getItem(8).getItem("treecover_loss") as "treecover_loss_2009__ha",
-      $"data.lossYear".getItem(9).getItem("treecover_loss") as "treecover_loss_2010__ha",
-      $"data.lossYear".getItem(10).getItem("treecover_loss") as "treecover_loss_2011__ha",
-      $"data.lossYear".getItem(11).getItem("treecover_loss") as "treecover_loss_2012__ha",
-      $"data.lossYear".getItem(12).getItem("treecover_loss") as "treecover_loss_2013__ha",
-      $"data.lossYear".getItem(13).getItem("treecover_loss") as "treecover_loss_2014__ha",
-      $"data.lossYear".getItem(14).getItem("treecover_loss") as "treecover_loss_2015__ha",
-      $"data.lossYear".getItem(15).getItem("treecover_loss") as "treecover_loss_2016__ha",
-      $"data.lossYear".getItem(16).getItem("treecover_loss") as "treecover_loss_2017__ha",
-      $"data.lossYear".getItem(17).getItem("treecover_loss") as "treecover_loss_2018__ha",
+      $"data.lossYear".getItem(0).getItem("treecoverLoss") as "treecover_loss_2001__ha",
+      $"data.lossYear".getItem(1).getItem("treecoverLoss") as "treecover_loss_2002__ha",
+      $"data.lossYear".getItem(2).getItem("treecoverLoss") as "treecover_loss_2003__ha",
+      $"data.lossYear".getItem(3).getItem("treecoverLoss") as "treecover_loss_2004__ha",
+      $"data.lossYear".getItem(4).getItem("treecoverLoss") as "treecover_loss_2005__ha",
+      $"data.lossYear".getItem(5).getItem("treecoverLoss") as "treecover_loss_2006__ha",
+      $"data.lossYear".getItem(6).getItem("treecoverLoss") as "treecover_loss_2007__ha",
+      $"data.lossYear".getItem(7).getItem("treecoverLoss") as "treecover_loss_2008__ha",
+      $"data.lossYear".getItem(8).getItem("treecoverLoss") as "treecover_loss_2009__ha",
+      $"data.lossYear".getItem(9).getItem("treecoverLoss") as "treecover_loss_2010__ha",
+      $"data.lossYear".getItem(10).getItem("treecoverLoss") as "treecover_loss_2011__ha",
+      $"data.lossYear".getItem(11).getItem("treecoverLoss") as "treecover_loss_2012__ha",
+      $"data.lossYear".getItem(12).getItem("treecoverLoss") as "treecover_loss_2013__ha",
+      $"data.lossYear".getItem(13).getItem("treecoverLoss") as "treecover_loss_2014__ha",
+      $"data.lossYear".getItem(14).getItem("treecoverLoss") as "treecover_loss_2015__ha",
+      $"data.lossYear".getItem(15).getItem("treecoverLoss") as "treecover_loss_2016__ha",
+      $"data.lossYear".getItem(16).getItem("treecoverLoss") as "treecover_loss_2017__ha",
+      $"data.lossYear".getItem(17).getItem("treecoverLoss") as "treecover_loss_2018__ha",
       $"data.lossYear"
         .getItem(0)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2001__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2001__Mg",
       $"data.lossYear"
         .getItem(1)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2002__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2002__Mg",
       $"data.lossYear"
         .getItem(2)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2003__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2003__Mg",
       $"data.lossYear"
         .getItem(3)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2004__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2004__Mg",
       $"data.lossYear"
         .getItem(4)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2005__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2005__Mg",
       $"data.lossYear"
         .getItem(5)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2006__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2006__Mg",
       $"data.lossYear"
         .getItem(6)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2007__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2007__Mg",
       $"data.lossYear"
         .getItem(7)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2008__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2008__Mg",
       $"data.lossYear"
         .getItem(8)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2009__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2009__Mg",
       $"data.lossYear"
         .getItem(9)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2010__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2010__Mg",
       $"data.lossYear"
         .getItem(10)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2011__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2011__Mg",
       $"data.lossYear"
         .getItem(11)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2012__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2012__Mg",
       $"data.lossYear"
         .getItem(12)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2013__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2013__Mg",
       $"data.lossYear"
         .getItem(13)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2014__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2014__Mg",
       $"data.lossYear"
         .getItem(14)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2015__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2015__Mg",
       $"data.lossYear"
         .getItem(15)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2016__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2016__Mg",
       $"data.lossYear"
         .getItem(16)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2017__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2017__Mg",
       $"data.lossYear"
         .getItem(17)
-        .getItem("biomass_loss") as "aboveground_biomass_loss_2018__Mg",
+        .getItem("biomassLoss") as "aboveground_biomass_loss_2018__Mg",
       $"data.lossYear"
         .getItem(0)
-        .getItem("carbon_emissions") as "co2_emissions_2001__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2001__Mg",
       $"data.lossYear"
         .getItem(1)
-        .getItem("carbon_emissions") as "co2_emissions_2002__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2002__Mg",
       $"data.lossYear"
         .getItem(2)
-        .getItem("carbon_emissions") as "co2_emissions_2003__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2003__Mg",
       $"data.lossYear"
         .getItem(3)
-        .getItem("carbon_emissions") as "co2_emissions_2004__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2004__Mg",
       $"data.lossYear"
         .getItem(4)
-        .getItem("carbon_emissions") as "co2_emissions_2005__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2005__Mg",
       $"data.lossYear"
         .getItem(5)
-        .getItem("carbon_emissions") as "co2_emissions_2006__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2006__Mg",
       $"data.lossYear"
         .getItem(6)
-        .getItem("carbon_emissions") as "co2_emissions_2007__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2007__Mg",
       $"data.lossYear"
         .getItem(7)
-        .getItem("carbon_emissions") as "co2_emissions_2008__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2008__Mg",
       $"data.lossYear"
         .getItem(8)
-        .getItem("carbon_emissions") as "co2_emissions_2009__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2009__Mg",
       $"data.lossYear"
         .getItem(9)
-        .getItem("carbon_emissions") as "co2_emissions_2010__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2010__Mg",
       $"data.lossYear"
         .getItem(10)
-        .getItem("carbon_emissions") as "co2_emissions_2011__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2011__Mg",
       $"data.lossYear"
         .getItem(11)
-        .getItem("carbon_emissions") as "co2_emissions_2012__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2012__Mg",
       $"data.lossYear"
         .getItem(12)
-        .getItem("carbon_emissions") as "co2_emissions_2013__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2013__Mg",
       $"data.lossYear"
         .getItem(13)
-        .getItem("carbon_emissions") as "co2_emissions_2014__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2014__Mg",
       $"data.lossYear"
         .getItem(14)
-        .getItem("carbon_emissions") as "co2_emissions_2015__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2015__Mg",
       $"data.lossYear"
         .getItem(15)
-        .getItem("carbon_emissions") as "co2_emissions_2016__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2016__Mg",
       $"data.lossYear"
         .getItem(16)
-        .getItem("carbon_emissions") as "co2_emissions_2017__Mg",
+        .getItem("carbonEmissions") as "co2_emissions_2017__Mg",
       $"data.lossYear"
         .getItem(17)
-        .getItem("carbon_emissions") as "co2_emissions_2018__Mg"
+        .getItem("carbonEmissions") as "co2_emissions_2018__Mg"
     )
   }
 
@@ -168,7 +168,7 @@ object TreeLossDF {
 
     if (include) df
     else {
-      df.groupBy($"feature__id", $"treecover_density__threshold", $"tcd_year")
+      df.groupBy($"feature__id", $"treecover_density__threshold", $"treecover_extent__year")
         .agg(
           sum("area__ha") as "area__ha",
           sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",
