@@ -37,21 +37,27 @@ object GladAlertsExport extends SummaryExport {
         val adm2DF = df
           .transform(Adm2DailyDF.sumArea)
 
-        adm2DF.write
+        adm2DF
+          .coalesce(1)
+          .write
           .options(csvOptions)
           .csv(path = outputUrl + "/adm2/summary")
 
         val adm1DF = adm2DF
           .transform(Adm1WeeklyDF.sumArea)
 
-        adm1DF.write
+        adm1DF
+          .coalesce(1)
+          .write
           .options(csvOptions)
           .csv(path = outputUrl + "/adm1/summary")
 
         val isoDF = adm1DF
           .transform(IsoWeeklyDF.sumArea)
 
-        isoDF.write
+        isoDF
+          .coalesce(1)
+          .write
           .options(csvOptions)
           .csv(path = outputUrl + "/iso/summary")
       }
@@ -62,28 +68,36 @@ object GladAlertsExport extends SummaryExport {
       val adm2DailyDF = df
         .transform(Adm2DailyDF.sumAlerts)
 
-      adm2DailyDF.write
+      adm2DailyDF
+        .coalesce(1)
+        .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/daily_alerts")
 
       val adm2DF = adm2DailyDF
         .transform(Adm2WeeklyDF.sumAlerts)
 
-      adm2DF.write
+      adm2DF
+        .coalesce(1)
+        .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/weekly_alerts")
 
       val adm1DF = adm2DF
         .transform(Adm1WeeklyDF.sumAlerts)
 
-      adm1DF.write
+      adm1DF
+        .coalesce(1)
+        .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/weekly_alerts")
 
       val isoDF = adm1DF
         .transform(IsoWeeklyDF.sumAlerts)
 
-      isoDF.write
+      isoDF
+        .coalesce(1)
+        .write
         .options(csvOptions)
         .csv(path = outputUrl + "/iso/weekly_alerts")
     }
@@ -121,6 +135,7 @@ object GladAlertsExport extends SummaryExport {
     if (!changeOnly) {
       wdpaDF
         .transform(WdpaDailyDF.sumArea)
+        .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/wdpa/summary")
@@ -128,12 +143,14 @@ object GladAlertsExport extends SummaryExport {
 
     wdpaDF
       .transform(WdpaDailyDF.sumAlerts)
+      .coalesce(1)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/wdpa/daily_alerts")
 
     wdpaDF
       .transform(WdpaWeeklyDF.sumAlerts)
+      .coalesce(1)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/wdpa/weekly_alerts")
@@ -163,6 +180,7 @@ object GladAlertsExport extends SummaryExport {
     if (!changeOnly) {
       featureDF
         .transform(SimpleFeatureDailyDF.sumArea)
+        .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/feature/summary")
@@ -170,12 +188,14 @@ object GladAlertsExport extends SummaryExport {
 
     featureDF
       .transform(SimpleFeatureDailyDF.sumAlerts)
+      .coalesce(1)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/feature/daily_alerts")
 
     featureDF
       .transform(SimpleFeatureWeeklyDF.sumAlerts)
+      .coalesce(1)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/feature/weekly_alerts")

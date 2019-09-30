@@ -10,20 +10,26 @@ object CarbonFluxExport extends SummaryExport {
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
 
-    def exportArea(df: DataFrame): Unit = {
+    def exportSummary(df: DataFrame): Unit = {
 
       val adm2ApiDF = df.transform(Adm2ApiDF.sumArea)
-      adm2ApiDF.write
+      adm2ApiDF
+        .coalesce(40) // this should result in an avg file size of 100MB
+        .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/summary")
 
       val adm1ApiDF = adm2ApiDF.transform(Adm1ApiDF.sumArea)
-      adm1ApiDF.write
+      adm1ApiDF
+        .coalesce(12) // this should result in an avg file size of 100MB
+        .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/summary")
 
       val isoApiDF = adm1ApiDF.transform(IsoApiDF.sumArea)
-      isoApiDF.write
+      isoApiDF
+        .coalesce(4) // this should result in an avg file size of 100MB
+        .write
         .options(csvOptions)
         .csv(path = outputUrl + "/iso/summary")
 
@@ -31,17 +37,23 @@ object CarbonFluxExport extends SummaryExport {
 
     def exportChange(df: DataFrame): Unit = {
       val adm2ApiDF = df.transform(Adm2ApiDF.sumChange)
-      adm2ApiDF.write
+      adm2ApiDF
+        .coalesce(100) // this should result in an avg file size of 100MB
+        .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/change")
 
       val adm1ApiDF = adm2ApiDF.transform(Adm1ApiDF.sumChange)
-      adm1ApiDF.write
+      adm1ApiDF
+        .coalesce(30) // this should result in an avg file size of 100MB
+        .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/change")
 
       val isoApiDF = adm1ApiDF.transform(IsoApiDF.sumChange)
-      isoApiDF.write
+      isoApiDF
+        .coalesce(10) // this should result in an avg file size of 100MB
+        .write
         .options(csvOptions)
         .csv(path = outputUrl + "/iso/change")
     }
@@ -51,7 +63,7 @@ object CarbonFluxExport extends SummaryExport {
 
     exportDF.cache()
 
-    exportArea(exportDF)
+    exportSummary(exportDF)
     exportChange(exportDF)
 
     exportDF.unpersist()
