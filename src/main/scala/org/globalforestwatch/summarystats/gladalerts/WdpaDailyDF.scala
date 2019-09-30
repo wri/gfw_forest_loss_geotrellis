@@ -34,13 +34,13 @@ object WdpaDailyDF {
         $"data_group.peatlands" as "is__peat_land",
         $"data_group.indonesiaForestMoratorium" as "is__idn_forest_moratorium",
         $"data_group.oilPalm" as "is__gfw_oil_palm",
-        $"data_group.indonesiaForestArea" as "idn_forest_area",
+        $"data_group.indonesiaForestArea" as "idn_forest_area__type",
         $"data_group.peruForestConcessions" as "per_forest_concession__type",
         $"data_group.oilGas" as "is__gfw_oil_gas",
         $"data_group.mangroves2016" as "is__mangroves_2016",
         $"data_group.intactForestLandscapes2016" as "intact_forest_landscapes_2016",
         $"data_group.braBiomes" as "bra_biome__name",
-        $"data.totalAlerts" as "alert_count",
+        $"data.totalAlerts" as "alert__count",
         $"data.alertArea" as "alert_area__ha",
         $"data.co2Emissions" as "aboveground_co2_emissions__Mg",
         $"data.totalArea" as "area__ha"
@@ -74,13 +74,13 @@ object WdpaDailyDF {
         "is__peat_land",
         "is__idn_forest_moratorium",
         "is__gfw_oil_palm",
-        "idn_forest_area",
+        "idn_forest_area__type",
         "per_forest_concession__type",
         "is__gfw_oil_gas",
         "is__mangroves_2016",
         "intact_forest_landscapes_2016",
         "bra_biome__name",
-        "alert_count",
+        "alert__count",
         "alert_area__ha",
         "aboveground_co2_emissions__Mg"
       )
@@ -107,7 +107,7 @@ object WdpaDailyDF {
         $"is__peat_land",
         $"is__idn_forest_moratorium",
         $"is__gfw_oil_palm",
-        $"idn_forest_area",
+        $"idn_forest_area__type",
         $"per_forest_concession__type",
         $"is__gfw_oil_gas",
         $"is__mangroves_2016",
@@ -115,7 +115,7 @@ object WdpaDailyDF {
         $"bra_biome__name"
       )
       .agg(
-        sum("alert_count") as "alert_count",
+        sum("alert__count") as "alert__count",
         sum("alert_area__ha") as "alert_area__ha",
         sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions__Mg"
       )
@@ -146,7 +146,7 @@ object WdpaDailyDF {
         "is__peat_land",
         "is__idn_forest_moratorium",
         "is__gfw_oil_palm",
-        "idn_forest_area",
+        "idn_forest_area__type",
         "per_forest_concession__type",
         "is__gfw_oil_gas",
         "is__mangroves_2016",
@@ -174,7 +174,7 @@ object WdpaDailyDF {
       $"is__peat_land",
       $"is__idn_forest_moratorium",
       $"is__gfw_oil_palm",
-      $"idn_forest_area",
+      $"idn_forest_area__type",
       $"per_forest_concession__type",
       $"is__gfw_oil_gas",
       $"is__mangroves_2016",

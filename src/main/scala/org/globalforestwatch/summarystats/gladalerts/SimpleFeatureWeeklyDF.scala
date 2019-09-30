@@ -29,13 +29,13 @@ object SimpleFeatureWeeklyDF {
         "is__peat_land",
         "is__idn_forest_moratorium",
         "is__gfw_oil_palm",
-        "idn_forest_area",
+        "idn_forest_area__type",
         "per_forest_concession__type",
         "is__gfw_oil_gas",
         "is__mangroves_2016",
         "intact_forest_landscapes_2016",
         "bra_biome__name",
-        "alert_count",
+        "alert__count",
         "alert_area__ha",
         "aboveground_co2_emissions__Mg"
       )
@@ -59,13 +59,13 @@ object SimpleFeatureWeeklyDF {
         $"is__peat_land",
         $"is__idn_forest_moratorium",
         $"is__gfw_oil_palm",
-        $"idn_forest_area",
+        $"idn_forest_area__type",
         $"per_forest_concession__type",
         $"is__gfw_oil_gas",
         $"is__mangroves_2016",
         $"intact_forest_landscapes_2016",
         $"bra_biome__name",
-        $"alert_count",
+        $"alert__count",
         $"alert_area__ha",
         $"aboveground_co2_emissions__Mg"
       )
@@ -86,7 +86,7 @@ object SimpleFeatureWeeklyDF {
         $"is__peat_land",
         $"is__idn_forest_moratorium",
         $"is__gfw_oil_palm",
-        $"idn_forest_area",
+        $"idn_forest_area__type",
         $"per_forest_concession__type",
         $"is__gfw_oil_gas",
         $"is__mangroves_2016",
@@ -94,7 +94,7 @@ object SimpleFeatureWeeklyDF {
         $"bra_biome__name"
       )
       .agg(
-        sum("alert_count") as "alert_count",
+        sum("alert__count") as "alert__count",
         sum("alert_area__ha") as "alert_area__ha",
         sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions__Mg"
       )
