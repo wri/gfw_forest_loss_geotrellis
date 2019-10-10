@@ -21,7 +21,7 @@ object Adm1ApiDF {
       $"ecozone__name",
       $"is__gfw_land_right",
       $"wdpa_protected_area__iucn_cat",
-      $"is__intact_forest_landscape",
+      $"intact_forest_landscape__year",
       $"gfw_plantation__type",
       $"is__intact_primary_forest",
       $"is__peatlands_flux"
@@ -57,7 +57,7 @@ object Adm1ApiDF {
       $"ecozone__name",
       $"is__gfw_land_right",
       $"wdpa_protected_area__iucn_cat",
-      $"is__intact_forest_landscape",
+      $"intact_forest_landscape__year",
       $"gfw_plantation__type",
       $"is__intact_primary_forest",
       $"is__peatlands_flux"

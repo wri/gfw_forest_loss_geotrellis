@@ -28,7 +28,7 @@ object ApiDF {
       $"data_group.ecozones" as "ecozone__name",
       $"data_group.landRights" as "is__gfw_land_right",
       $"data_group.wdpa" as "wdpa_protected_area__iucn_cat",
-      $"data_group.intactForestLandscapes" as "is__intact_forest_landscape",
+      $"data_group.intactForestLandscapes" as "intact_forest_landscape__year",
       $"data_group.plantations" as "gfw_plantation__type",
       $"data_group.intactPrimaryForest" as "is__intact_primary_forest",
       $"data_group.peatlandsFlux" as "is__peatlands_flux",

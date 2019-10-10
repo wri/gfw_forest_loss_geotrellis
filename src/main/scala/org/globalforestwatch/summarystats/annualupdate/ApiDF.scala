@@ -34,7 +34,7 @@ object ApiDF {
       $"data_group.mangroves1996" as "is__mangroves_1996",
       $"data_group.mangroves2016" as "is__mangroves_2016",
       $"data_group.waterStress" as "baseline_water_stress__level",
-      $"data_group.intactForestLandscapes" as "is__intact_forest_landscape",
+      $"data_group.intactForestLandscapes" as "intact_forest_landscape__year",
       $"data_group.endemicBirdAreas" as "is__endemic_bird_area",
       $"data_group.tigerLandscapes" as "is__tiger_conservation_landscape",
       $"data_group.landmark" as "is__landmark",
