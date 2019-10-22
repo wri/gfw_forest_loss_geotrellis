@@ -1,8 +1,8 @@
-package org.globalforestwatch.summarystats.carbonflux
+package org.globalforestwatch.summarystats.carbonflux.dataframes
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.when
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 object ApiDF {
 

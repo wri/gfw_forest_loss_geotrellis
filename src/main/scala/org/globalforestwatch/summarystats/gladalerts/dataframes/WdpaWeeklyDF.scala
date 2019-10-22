@@ -1,10 +1,10 @@
-package org.globalforestwatch.summarystats.gladalerts
+package org.globalforestwatch.summarystats.gladalerts.dataframes
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions.{sum, weekofyear, year}
 
-object Adm2WeeklyDF {
+object WdpaWeeklyDF {
 
   def sumAlerts(df: DataFrame): DataFrame = {
 
@@ -14,13 +14,14 @@ object Adm2WeeklyDF {
     validatePresenceOfColumns(
       df,
       Seq(
+        "wdpa_id",
+        "name",
+        "iucn_cat",
         "iso",
-        "adm1",
-        "adm2",
+        "status",
         "alert__date",
         "is__confirmed_alert",
         "is__regional_primary_forest",
-        "wdpa_protected_area__iucn_cat",
         "is__alliance_for_zero_extinction_site",
         "is__key_biodiversity_area",
         "is__landmark",
@@ -44,16 +45,17 @@ object Adm2WeeklyDF {
       )
     )
 
-    df
+    df.filter($"alert__date".isNotNull)
       .select(
+        $"wdpa_id",
+        $"name",
+        $"iucn_cat",
         $"iso",
-        $"adm1",
-        $"adm2",
+        $"status",
         year($"alert__date") as "alert__year",
         weekofyear($"alert__date") as "alert__week",
         $"is__confirmed_alert",
         $"is__regional_primary_forest",
-        $"wdpa_protected_area__iucn_cat",
         $"is__alliance_for_zero_extinction_site",
         $"is__key_biodiversity_area",
         $"is__landmark",
@@ -76,14 +78,15 @@ object Adm2WeeklyDF {
         $"aboveground_co2_emissions__Mg"
       )
       .groupBy(
+        $"wdpa_id",
+        $"name",
+        $"iucn_cat",
         $"iso",
-        $"adm1",
-        $"adm2",
+        $"status",
         $"alert__year",
         $"alert__week",
         $"is__confirmed_alert",
         $"is__regional_primary_forest",
-        $"wdpa_protected_area__iucn_cat",
         $"is__alliance_for_zero_extinction_site",
         $"is__key_biodiversity_area",
         $"is__landmark",

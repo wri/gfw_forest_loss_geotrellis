@@ -1,10 +1,10 @@
-package org.globalforestwatch.summarystats.gladalerts
+package org.globalforestwatch.summarystats.gladalerts.dataframes
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions.{sum, weekofyear, year}
 
-object SimpleFeatureWeeklyDF {
+object Adm2WeeklyDF {
 
   def sumAlerts(df: DataFrame): DataFrame = {
 
@@ -14,10 +14,13 @@ object SimpleFeatureWeeklyDF {
     validatePresenceOfColumns(
       df,
       Seq(
-        "feature__id",
+        "iso",
+        "adm1",
+        "adm2",
         "alert__date",
         "is__confirmed_alert",
         "is__regional_primary_forest",
+        "wdpa_protected_area__iucn_cat",
         "is__alliance_for_zero_extinction_site",
         "is__key_biodiversity_area",
         "is__landmark",
@@ -41,13 +44,16 @@ object SimpleFeatureWeeklyDF {
       )
     )
 
-    df.filter($"alert__date".isNotNull)
+    df
       .select(
-        $"feature__id",
+        $"iso",
+        $"adm1",
+        $"adm2",
         year($"alert__date") as "alert__year",
         weekofyear($"alert__date") as "alert__week",
         $"is__confirmed_alert",
         $"is__regional_primary_forest",
+        $"wdpa_protected_area__iucn_cat",
         $"is__alliance_for_zero_extinction_site",
         $"is__key_biodiversity_area",
         $"is__landmark",
@@ -70,11 +76,14 @@ object SimpleFeatureWeeklyDF {
         $"aboveground_co2_emissions__Mg"
       )
       .groupBy(
-        $"feature__id",
+        $"iso",
+        $"adm1",
+        $"adm2",
         $"alert__year",
         $"alert__week",
         $"is__confirmed_alert",
         $"is__regional_primary_forest",
+        $"wdpa_protected_area__iucn_cat",
         $"is__alliance_for_zero_extinction_site",
         $"is__key_biodiversity_area",
         $"is__landmark",

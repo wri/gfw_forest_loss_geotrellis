@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import org.apache.spark.sql.DataFrame
 import org.globalforestwatch.summarystats.SummaryExport
+import org.globalforestwatch.summarystats.annualupdate_minimal.dataframes._
 
 object AnnualUpdateMinimalExport extends SummaryExport {
 

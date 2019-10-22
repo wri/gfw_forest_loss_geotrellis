@@ -1,8 +1,8 @@
-package org.globalforestwatch.summarystats.gladalerts
+package org.globalforestwatch.summarystats.gladalerts.dataframes
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions.sum
 
 object Adm2DailyDF {
 

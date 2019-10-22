@@ -18,12 +18,13 @@ trait SummaryExport {
              kwargs: Map[String, Any]): Unit = {
 
     featureType match {
-      case "gadm"    => exportGadm(summaryDF, outputUrl, kwargs)
+      case "gadm" => exportGadm(summaryDF, outputUrl, kwargs)
       case "feature" => exportFeature(summaryDF, outputUrl, kwargs)
-      case "wdpa"    => exportWdpa(summaryDF, outputUrl, kwargs)
+      case "wdpa" => exportWdpa(summaryDF, outputUrl, kwargs)
+      case "geostore" => exportGeostore(summaryDF, outputUrl, kwargs)
       case _ =>
         throw new IllegalArgumentException(
-          "Feature type must be one of 'gadm' and 'feature'"
+          "Feature type must be one of 'gadm', 'wdpa', 'geostore' or 'feature'"
         )
     }
   }
@@ -39,4 +40,8 @@ trait SummaryExport {
   protected def exportWdpa(summaryDF: DataFrame,
                            outputUrl: String,
                            kwargs: Map[String, Any]): Unit = ???
+
+  protected def exportGeostore(summaryDF: DataFrame,
+                               outputUrl: String,
+                               kwargs: Map[String, Any]): Unit = ???
 }

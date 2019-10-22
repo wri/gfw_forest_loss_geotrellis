@@ -1,8 +1,8 @@
-package org.globalforestwatch.summarystats.treecoverloss
+package org.globalforestwatch.summarystats.treecoverloss.dataframes
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql._
 import org.apache.spark.sql.functions.sum
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object TreeLossDF {
 

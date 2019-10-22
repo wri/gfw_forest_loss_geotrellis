@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats.gladalerts
 
 import org.apache.spark.sql.DataFrame
 import org.globalforestwatch.summarystats.SummaryExport
+import org.globalforestwatch.summarystats.gladalerts.dataframes._
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 object GladAlertsExport extends SummaryExport {
@@ -199,6 +200,51 @@ object GladAlertsExport extends SummaryExport {
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/feature/weekly_alerts")
+
+    featureDF.unpersist()
+  }
+
+  override protected def exportGeostore(summaryDF: DataFrame,
+                                        outputUrl: String,
+                                        kwargs: Map[String, Any]): Unit = {
+
+    val changeOnly: Boolean =
+      getAnyMapValue[Boolean](kwargs, "changeOnly")
+
+    val buildDataCube: Boolean =
+      getAnyMapValue[Boolean](kwargs, "buildDataCube")
+
+    val minZoom: Int = {
+      if (buildDataCube) 0 else 12
+    } // TODO: remove magic numbers. maxZoom=12 should be in kwargs
+
+    val featureDF = summaryDF
+      .transform(GeostoreFeatureDailyDF.unpackValues(minZoom))
+
+    featureDF.cache()
+
+    if (!changeOnly) {
+      featureDF
+        .transform(GeostoreFeatureDailyDF.sumArea)
+        .coalesce(1)
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/geostore/summary")
+    }
+
+    featureDF
+      .transform(GeostoreFeatureDailyDF.sumAlerts)
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/geostore/daily_alerts")
+
+    featureDF
+      .transform(GeostoreFeatureWeeklyDF.sumAlerts)
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/geostore/weekly_alerts")
 
     featureDF.unpersist()
   }

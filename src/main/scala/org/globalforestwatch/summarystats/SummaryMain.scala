@@ -40,7 +40,7 @@ object SummaryMain
         val featureTypeOpt = Opts
           .option[String](
             "feature_type",
-            help = "Feature type: Simple feature or GADM"
+            help = "Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature'"
           )
           .withDefault("feature")
 

@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats.carbonflux
 
 import org.apache.spark.sql.DataFrame
 import org.globalforestwatch.summarystats.SummaryExport
+import org.globalforestwatch.summarystats.carbonflux.dataframes._
 
 object CarbonFluxExport extends SummaryExport {
 

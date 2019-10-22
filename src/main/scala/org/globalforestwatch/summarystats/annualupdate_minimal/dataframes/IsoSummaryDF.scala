@@ -1,7 +1,7 @@
-package org.globalforestwatch.summarystats.annualupdate_minimal
+package org.globalforestwatch.summarystats.annualupdate_minimal.dataframes
 
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{round, sum}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object IsoSummaryDF {
 

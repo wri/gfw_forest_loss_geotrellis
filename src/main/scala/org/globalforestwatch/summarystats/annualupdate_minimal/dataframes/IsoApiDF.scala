@@ -1,9 +1,10 @@
-package org.globalforestwatch.summarystats.annualupdate_minimal
+package org.globalforestwatch.summarystats.annualupdate_minimal.dataframes
 
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.sum
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
-object Adm1ApiDF {
+object IsoApiDF {
+
   def sumChange(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
@@ -11,7 +12,6 @@ object Adm1ApiDF {
 
     df.groupBy(
       $"iso",
-      $"adm1",
       $"treecover_loss__year",
       $"treecover_density__threshold",
       $"tcs_driver__type",
@@ -58,8 +58,8 @@ object Adm1ApiDF {
         sum("treecover_loss__ha") as "treecover_loss__ha",
         sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss__Mg",
         sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions__Mg"
-        //        sum("mangrove_aboveground_biomass_loss__Mg") as "mangrove_aboveground_biomass_loss__Mg",
-        //        sum("mangrove_aboveground_co2_emissions__Mg") as "mangrove_aboveground_co2_emissions__Mg"
+        //          sum("mangrove_aboveground_biomass_loss__Mg") as "mangrove_aboveground_biomass_loss__Mg",
+        //          sum("mangrove_aboveground_co2_emissions__Mg") as "mangrove_aboveground_co2_emissions__Mg"
       )
   }
 
@@ -70,7 +70,6 @@ object Adm1ApiDF {
 
     df.groupBy(
       $"iso",
-      $"adm1",
       $"treecover_density__threshold",
       $"tcs_driver__type",
       $"global_land_cover__class",
@@ -119,8 +118,8 @@ object Adm1ApiDF {
         sum("treecover_gain_2000-2012__ha") as "treecover_gain_2000-2012__ha",
         sum("aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
         sum("aboveground_co2_stock_2000__Mg") as "aboveground_co2_stock_2000__Mg",
-        //        sum("mangrove_aboveground_biomass_stock_2000__Mg") as "mangrove_aboveground_biomass_stock_2000__Mg",
-        //        sum("mangrove_aboveground_co2_stock_2000__Mg") as "mangrove_aboveground_co2_stock_2000__Mg",
+        //          sum("mangrove_aboveground_biomass_stock_2000__Mg") as "mangrove_aboveground_biomass_stock_2000__Mg",
+        //          sum("mangrove_aboveground_co2_stock_2000__Mg") as "mangrove_aboveground_co2_stock_2000__Mg",
         sum("treecover_loss_2001-2018__ha") as "treecover_loss_2001-2018__ha",
         sum("aboveground_biomass_loss_2001-2018__Mg") as "aboveground_biomass_loss_2001-2018__Mg",
         sum("aboveground_co2_emissions_2001-2018__Mg") as "aboveground_co2_emissions_2001-2018__Mg"

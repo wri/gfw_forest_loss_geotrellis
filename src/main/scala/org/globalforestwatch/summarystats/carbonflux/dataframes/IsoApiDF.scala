@@ -1,9 +1,9 @@
-package org.globalforestwatch.summarystats.carbonflux
+package org.globalforestwatch.summarystats.carbonflux.dataframes
 
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.sum
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
-object Adm1ApiDF {
+object IsoApiDF {
 
   def sumChange(df: DataFrame): DataFrame = {
 
@@ -12,7 +12,6 @@ object Adm1ApiDF {
 
     df.groupBy(
         $"iso",
-        $"adm1",
       $"treecover_density__threshold",
       $"treecover_loss__year",
       $"is__treecover_gain_2000-2012",
@@ -48,7 +47,6 @@ object Adm1ApiDF {
 
     df.groupBy(
         $"iso",
-        $"adm1",
       $"treecover_density__threshold",
       $"is__treecover_loss_2000-2015",
       $"is__treecover_gain_2000-2012",

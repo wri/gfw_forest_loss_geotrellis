@@ -1,10 +1,10 @@
-package org.globalforestwatch.summarystats.gladalerts
+package org.globalforestwatch.summarystats.gladalerts.dataframes
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions.sum
 
-object SimpleFeatureDailyDF {
+object WdpaDailyDF {
 
   def unpackValues(minZoom: Int)(df: DataFrame): DataFrame = {
 
@@ -15,7 +15,11 @@ object SimpleFeatureDailyDF {
 
     df.filter($"data_group.tile.z" === minZoom)
       .select(
-        $"id.featureId" as "feature__id",
+        $"id.wdpa_id" as "wdpa_id",
+        $"id.name" as "name",
+        $"id.iucn_cat" as "iucn_cat",
+        $"id.iso" as "iso",
+        $"id.status" as "status",
         $"data_group.alertDate" as "alert__date",
         $"data_group.isConfirmed" as "is__confirmed_alert",
         $"data_group.primaryForest" as "is__regional_primary_forest",
@@ -51,7 +55,11 @@ object SimpleFeatureDailyDF {
     validatePresenceOfColumns(
       df,
       Seq(
-        "feature__id",
+        "wdpa_id",
+        "name",
+        "iucn_cat",
+        "iso",
+        "status",
         "alert__date",
         "is__confirmed_alert",
         "is__regional_primary_forest",
@@ -80,7 +88,11 @@ object SimpleFeatureDailyDF {
 
     df.filter($"alert__date".isNotNull)
       .groupBy(
-        $"feature__id",
+        $"wdpa_id",
+        $"name",
+        $"iucn_cat",
+        $"iso",
+        $"status",
         $"alert__date",
         $"is__confirmed_alert",
         $"is__regional_primary_forest",
@@ -117,7 +129,11 @@ object SimpleFeatureDailyDF {
     validatePresenceOfColumns(
       df,
       Seq(
-        "feature__id",
+        "wdpa_id",
+        "name",
+        "iucn_cat",
+        "iso",
+        "status",
         "is__regional_primary_forest",
         "is__alliance_for_zero_extinction_site",
         "is__key_biodiversity_area",
@@ -141,7 +157,11 @@ object SimpleFeatureDailyDF {
     )
 
     df.groupBy(
-      $"feature__id",
+      $"wdpa_id",
+      $"name",
+      $"iucn_cat",
+      $"iso",
+      $"status",
       $"is__regional_primary_forest",
       $"is__alliance_for_zero_extinction_site",
       $"is__key_biodiversity_area",
@@ -160,7 +180,7 @@ object SimpleFeatureDailyDF {
       $"is__mangroves_2016",
       $"intact_forest_landscapes_2016",
       $"bra_biome__name"
-      )
+    )
       .agg(sum("area__ha") as "area__ha")
   }
 }
