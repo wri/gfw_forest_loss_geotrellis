@@ -36,23 +36,29 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     }
 
     def exportChange(df: DataFrame): Unit = {
-      val adm2ApiDF = df.transform(Adm2ApiDF.sumChange)
-      adm2ApiDF
+      val adm2ApiDF = df
+        .transform(Adm2ApiDF.sumChange)
         .coalesce(133) // this should result in an avg file size of 100MB
+
+      adm2ApiDF
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/change")
 
-      val adm1ApiDF = adm2ApiDF.transform(Adm1ApiDF.sumChange)
-      adm1ApiDF
+      val adm1ApiDF = adm2ApiDF
+        .transform(Adm1ApiDF.sumChange)
         .coalesce(45) // this should result in an avg file size of 100MB
+
+      adm1ApiDF
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/change")
 
-      val isoApiDF = adm1ApiDF.transform(IsoApiDF.sumChange)
-      isoApiDF
+      val isoApiDF = adm1ApiDF
+        .transform(IsoApiDF.sumChange)
         .coalesce(14) // this should result in an avg file size of 100MB
+
+      isoApiDF
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/iso/change")
