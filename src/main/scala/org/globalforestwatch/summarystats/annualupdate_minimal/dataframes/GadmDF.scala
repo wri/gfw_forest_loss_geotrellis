@@ -3,7 +3,7 @@ package org.globalforestwatch.summarystats.annualupdate_minimal.dataframes
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-object ApiDF {
+object GadmDF {
 
   def unpackValues(df: DataFrame): DataFrame = {
 

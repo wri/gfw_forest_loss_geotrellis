@@ -3,7 +3,7 @@ package org.globalforestwatch.summarystats.annualupdate_minimal.dataframes
 import org.apache.spark.sql.functions.{round, sum}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-object IsoSummaryDF {
+object IsoDownloadDF {
 
   def sumArea(df: DataFrame): DataFrame = {
 

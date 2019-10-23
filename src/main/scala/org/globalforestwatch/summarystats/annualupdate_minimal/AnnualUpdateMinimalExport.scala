@@ -10,7 +10,6 @@ object AnnualUpdateMinimalExport extends SummaryExport {
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
 
-
     def exportSummary(df: DataFrame): Unit = {
 
       val adm2ApiDF = df.transform(Adm2ApiDF.sumArea)
@@ -41,8 +40,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .transform(Adm2ApiDF.sumChange)
         .coalesce(133) // this should result in an avg file size of 100MB
 
-      adm2ApiDF
-        .write
+      adm2ApiDF.write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/change")
 
@@ -50,8 +48,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .transform(Adm1ApiDF.sumChange)
         .coalesce(45) // this should result in an avg file size of 100MB
 
-      adm1ApiDF
-        .write
+      adm1ApiDF.write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/change")
 
@@ -59,8 +56,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .transform(IsoApiDF.sumChange)
         .coalesce(14) // this should result in an avg file size of 100MB
 
-      isoApiDF
-        .write
+      isoApiDF.write
         .options(csvOptions)
         .csv(path = outputUrl + "/iso/change")
     }
@@ -71,30 +67,35 @@ object AnnualUpdateMinimalExport extends SummaryExport {
       import spark.implicits._
 
       val adm2SummaryDF = df
-        .transform(Adm2SummaryDF.sumArea)
+        .transform(Adm2DownloadDF.sumArea)
 
       adm2SummaryDF
-        .transform(Adm2SummaryDF.roundValues)
+        .transform(Adm2DownloadDF.roundValues)
         .coalesce(1)
-        .orderBy($"country", $"subnational1", $"subnational2", $"treecover_density__threshold")
+        .orderBy(
+          $"country",
+          $"subnational1",
+          $"subnational2",
+          $"treecover_density__threshold"
+        )
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/download")
 
-      val adm1SummaryDF = adm2SummaryDF.transform(Adm1SummaryDF.sumArea)
+      val adm1SummaryDF = adm2SummaryDF.transform(Adm1DownloadDF.sumArea)
 
       adm1SummaryDF
-        .transform(Adm1SummaryDF.roundValues)
+        .transform(Adm1DownloadDF.roundValues)
         .coalesce(1)
         .orderBy($"country", $"subnational1", $"treecover_density__threshold")
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/download")
 
-      val isoSummaryDF = adm1SummaryDF.transform(IsoSummaryDF.sumArea)
+      val isoSummaryDF = adm1SummaryDF.transform(IsoDownloadDF.sumArea)
 
       isoSummaryDF
-        .transform(IsoSummaryDF.roundValues)
+        .transform(IsoDownloadDF.roundValues)
         .coalesce(1)
         .orderBy($"country", $"treecover_density__threshold")
         .write
@@ -104,7 +105,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     }
 
     val exportDF = summaryDF
-      .transform(ApiDF.unpackValues)
+      .transform(GadmDF.unpackValues)
 
     exportDF.cache()
 
@@ -114,7 +115,57 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
     exportDF.unpersist()
 
-
   }
 
+  override protected def exportWdpa(summaryDF: DataFrame,
+                                    outputUrl: String,
+                                    kwargs: Map[String, Any]): Unit = {
+
+    val exportDF = summaryDF
+      .transform(WdpaDF.unpackValues)
+
+    exportDF.cache()
+
+    exportDF
+      .transform(WdpaDF.sumArea)
+      .coalesce(40) // this should result in an avg file size of 100MB
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/wdpa/summary")
+
+    exportDF
+      .transform(WdpaDF.sumChange)
+      .coalesce(133) // this should result in an avg file size of 100MB
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/wdpa/change")
+
+    exportDF.unpersist()
+  }
+
+  override protected def exportGeostore(summaryDF: DataFrame,
+                                        outputUrl: String,
+                                        kwargs: Map[String, Any]): Unit = {
+
+    val exportDF = summaryDF
+      .transform(GeostoreDF.unpackValues)
+
+    exportDF.cache()
+
+    exportDF
+      .transform(GeostoreDF.sumArea)
+      .coalesce(40) // this should result in an avg file size of 100MB
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/geostore/summary")
+
+    exportDF
+      .transform(GeostoreDF.sumChange)
+      .coalesce(133) // this should result in an avg file size of 100MB
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/geostore/change")
+
+    exportDF.unpersist()
+  }
 }
