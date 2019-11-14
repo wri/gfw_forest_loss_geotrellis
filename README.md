@@ -39,7 +39,7 @@ JSON:
 For local testing input should be limited with `--limit` flag to minimize the time.
 
 ```
-sbt:geotrellis-wri> test:runMain org.globalforestwatch.treecoverloss.TreeLossSummaryMain --features file:/Users/input/ten-by-ten-gadm36/wdpa__10N_010E.tsv --output file:/User/out/summary --limit 10
+sbt:geotrellis-wri> test:runMain org.globalforestwatch.summarystats.SummaryMain --features file:/Users/input/ten-by-ten-gadm36/wdpa__10N_010E.tsv --output file:/User/out/summary --limit 10
 ```
 
 ### EMR
@@ -49,9 +49,7 @@ Before running review `sbtlighter` configuration in `build.sbt`, `reload` SBT se
 ```
 sbt:geotrellis-wri> sparkCreateCluster
 
-sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.treecoverloss.TreeLossSummaryMain --features --features s3://gfw-files/2018_update/tsv/gadm36_1_1.csv --output s3://gfw-files/2018_update/results/summary
+sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --features s3://gfw-files/2018_update/tsv/gadm36_1_1.csv --output s3://gfw-files/2018_update/results/summary --feature_type gadm --analysis annualupdate_minimal --tcl
 
-sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.treecoverloss.TreeLossSummaryMain --features --features s3://gfw-files/2018_update/tsv/gadm36_1_1.csv --output s3://gfw-files/2018_update/results/summary --iso BRA
-
-sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.treecoverloss.TreeLossSummaryMain --features s3://gfw2-data/alerts-tsv/country-pages/ten-by-ten-gadm36/wdpa__*.tsv --output s3://geotrellis-test/wri/out/gobal-summary
+sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain  --features s3://gfw-files/2018_update/tsv/wdpa__*.tsv --output s3://gfw-files/2018_update/results/summary  --feature_type wdpa --analysis gladalerts --tcl --iso BRA
 ```
