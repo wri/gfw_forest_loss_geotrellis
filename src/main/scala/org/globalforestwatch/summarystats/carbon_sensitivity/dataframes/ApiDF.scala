@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.carbonflux.dataframes
+package org.globalforestwatch.summarystats.carbon_sensitivity.dataframes
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
 import org.apache.spark.sql.functions.when
@@ -39,23 +39,23 @@ object ApiDF {
       $"data.grossEmissionsCo2eNoneCo2" as "gross_emissions_co2e_non_co2__Mg",
       $"data.grossEmissionsCo2e" as "gross_emissions_co2e_all_gases__Mg",
       $"data.agcEmisYear" as "aboveground_carbon_stock_in_emissions_year__Mg",
-      $"data.bgcEmisYear" as "belowground_carbon_stock_in_emissions_year__Mg",
-      $"data.deadwoodCarbonEmisYear" as "deadwood_carbon_stock_in_emissions_year__Mg",
-      $"data.litterCarbonEmisYear" as "litter_carbon_stock_in_emissions_year__Mg",
+//      $"data.bgcEmisYear" as "belowground_carbon_stock_in_emissions_year__Mg",
+//      $"data.deadwoodCarbonEmisYear" as "deadwood_carbon_stock_in_emissions_year__Mg",
+//      $"data.litterCarbonEmisYear" as "litter_carbon_stock_in_emissions_year__Mg",
       $"data.soilCarbonEmisYear" as "soil_carbon_stock_in_emissions_year__Mg",
-      $"data.carbonEmisYear" as "total_carbon_stock_in_emissions_year__Mg",
+//      $"data.carbonEmisYear" as "total_carbon_stock_in_emissions_year__Mg",
       $"data.treecoverExtent2000" as "treecover_extent_2000__ha",
       $"data.totalArea" as "area__ha",
       $"data.totalBiomass" as "aboveground_biomass_stock_2000__Mg",
-      $"data.totalGrossAnnualRemovalsCarbon" as "gross_annual_biomass_removals_2001-2015__Mg",
+//      $"data.totalGrossAnnualRemovalsCarbon" as "gross_annual_biomass_removals_2001-2015__Mg",
       $"data.totalGrossCumulRemovalsCarbon" as "gross_cumulative_co2_removals_2001-2015__Mg",
       $"data.totalNetFluxCo2" as "net_flux_co2_2001-2015__Mg",
       $"data.totalAgc2000" as "aboveground_carbon_stock_2000__Mg",
-      $"data.totalBgc2000" as "belowground_carbon_stock_2000__Mg",
-      $"data.totalDeadwoodCarbon2000" as "deadwood_carbon_stock_2000__Mg",
-      $"data.totalLitterCarbon2000" as "litter_carbon_stock_2000__Mg",
-      $"data.totalSoil2000" as "soil_carbon_stock_2000__Mg",
-      $"data.totalCarbon2000" as "total_carbon_stock_2000__Mg"
+//      $"data.totalBgc2000" as "belowground_carbon_stock_2000__Mg",
+//      $"data.totalDeadwoodCarbon2000" as "deadwood_carbon_stock_2000__Mg",
+//      $"data.totalLitterCarbon2000" as "litter_carbon_stock_2000__Mg",
+      $"data.totalSoil2000" as "soil_carbon_stock_2000__Mg"
+//      $"data.totalCarbon2000" as "total_carbon_stock_2000__Mg"
     )
   }
 

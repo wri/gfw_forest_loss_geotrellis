@@ -73,7 +73,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
             case (windowKey, keysAndFeatures) =>
               val window: Extent = windowKey.extent(windowLayout)
               val maybeRasterSource: Either[Throwable, SOURCES] =
-                getSources(window)
+                getSources(window, kwargs)
 
               val features = keysAndFeatures.map(_._2)
 
@@ -135,7 +135,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
     featuresGroupedWithSummaries
   }
 
-  def getSources(window: Extent): Either[Throwable, SOURCES]
+  def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES]
 
   def readWindow(rs: SOURCES, window: Extent): Either[Throwable, Raster[TILE]]
 

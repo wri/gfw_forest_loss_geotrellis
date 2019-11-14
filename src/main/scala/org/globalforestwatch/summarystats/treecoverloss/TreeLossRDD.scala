@@ -13,9 +13,9 @@ object TreeLossRDD extends SummaryRDD {
   type SUMMARY = TreeLossSummary
   type TILE = TreeLossTile
 
-  def getSources(window: Extent): Either[Throwable, SOURCES] = {
+  def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES] = {
     Either.catchNonFatal {
-      TreeLossGrid.getRasterSource(window)
+      TreeLossGrid.getRasterSource(window, kwargs)
     }
   }
 

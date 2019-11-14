@@ -1,6 +1,6 @@
-package org.globalforestwatch.summarystats.carbonflux
+package org.globalforestwatch.summarystats.carbon_sensitivity
 
-case class CarbonFluxDataGroup(lossYear: Integer,
+case class CarbonSensitivityDataGroup(lossYear: Integer,
                                threshold: Integer,
                                isGain: Boolean,
                                isLoss: Boolean,

@@ -23,7 +23,8 @@ object IsoApiDF {
       $"intact_forest_landscape__year",
       $"gfw_plantation__type",
       $"is__intact_primary_forest",
-      $"is__peatlands_flux"
+      $"is__peatlands_flux",
+      $"forest_age_category__cat"
       )
       .agg(
         sum("treecover_loss__ha") as "treecover_loss__ha",
@@ -58,7 +59,8 @@ object IsoApiDF {
       $"intact_forest_landscape__year",
       $"gfw_plantation__type",
       $"is__intact_primary_forest",
-      $"is__peatlands_flux"
+      $"is__peatlands_flux",
+      $"forest_age_category__cat"
       )
       .agg(
         sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",

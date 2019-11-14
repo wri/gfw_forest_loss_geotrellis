@@ -7,9 +7,7 @@ object GladAlertsGrid extends TenByTenGrid[GladAlertsGridSources] {
 
   val gridExtent = Extent(-180.0000, -30.0000, 180.0000, 30.0000)
 
-  def getSources(gridId: String): GladAlertsGridSources = GladAlertsGridSources.getCachedSources(gridId)
-
-
+  def getSources(gridId: String, kwargs: Map[String, Any]): GladAlertsGridSources = GladAlertsGridSources.getCachedSources(gridId)
 
 
 }

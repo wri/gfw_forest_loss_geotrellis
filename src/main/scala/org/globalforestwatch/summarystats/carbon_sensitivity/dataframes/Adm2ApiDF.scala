@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.carbonflux.dataframes
+package org.globalforestwatch.summarystats.carbon_sensitivity.dataframes
 
 import org.apache.spark.sql.functions.sum
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -36,11 +36,11 @@ object Adm2ApiDF {
         sum("gross_emissions_co2e_non_co2__Mg") as "gross_emissions_co2e_non_co2__Mg",
         sum("gross_emissions_co2e_all_gases__Mg") as "gross_emissions_co2e_all_gases__Mg",
         sum("aboveground_carbon_stock_in_emissions_year__Mg") as "aboveground_carbon_stock_in_emissions_year__Mg",
-        sum("belowground_carbon_stock_in_emissions_year__Mg") as "belowground_carbon_stock_in_emissions_year__Mg",
-        sum("deadwood_carbon_stock_in_emissions_year__Mg") as "deadwood_carbon_stock_in_emissions_year__Mg",
-        sum("litter_carbon_stock_in_emissions_year__Mg") as "litter_carbon_stock_in_emissions_year__Mg",
-        sum("soil_carbon_stock_in_emissions_year__Mg") as "soil_carbon_stock_in_emissions_year__Mg",
-        sum("total_carbon_stock_in_emissions_year__Mg") as "total_carbon_stock_in_emissions_year__Mg"
+//        sum("belowground_carbon_stock_in_emissions_year__Mg") as "belowground_carbon_stock_in_emissions_year__Mg",
+//        sum("deadwood_carbon_stock_in_emissions_year__Mg") as "deadwood_carbon_stock_in_emissions_year__Mg",
+//        sum("litter_carbon_stock_in_emissions_year__Mg") as "litter_carbon_stock_in_emissions_year__Mg",
+        sum("soil_carbon_stock_in_emissions_year__Mg") as "soil_carbon_stock_in_emissions_year__Mg"
+//        sum("total_carbon_stock_in_emissions_year__Mg") as "total_carbon_stock_in_emissions_year__Mg"
       )
   }
 
@@ -71,15 +71,15 @@ object Adm2ApiDF {
         sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",
         sum("area__ha") as "area__ha",
         sum("aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
-        sum("gross_annual_biomass_removals_2001-2015__Mg") as "gross_annual_biomass_removals_2001-2015__Mg",
+//        sum("gross_annual_biomass_removals_2001-2015__Mg") as "gross_annual_biomass_removals_2001-2015__Mg",
         sum("gross_cumulative_co2_removals_2001-2015__Mg") as "gross_cumulative_co2_removals_2001-2015__Mg",
         sum("net_flux_co2_2001-2015__Mg") as "net_flux_co2_2001-2015__Mg",
         sum("aboveground_carbon_stock_2000__Mg") as "aboveground_carbon_stock_2000__Mg",
-        sum("belowground_carbon_stock_2000__Mg") as "belowground_carbon_stock_2000__Mg",
-        sum("deadwood_carbon_stock_2000__Mg") as "deadwood_carbon_stock_2000__Mg",
-        sum("litter_carbon_stock_2000__Mg") as "litter_carbon_stock_2000__Mg",
+//        sum("belowground_carbon_stock_2000__Mg") as "belowground_carbon_stock_2000__Mg",
+//        sum("deadwood_carbon_stock_2000__Mg") as "deadwood_carbon_stock_2000__Mg",
+//        sum("litter_carbon_stock_2000__Mg") as "litter_carbon_stock_2000__Mg",
         sum("soil_carbon_stock_2000__Mg") as "soil_carbon_stock_2000__Mg",
-        sum("total_carbon_stock_2000__Mg") as "total_carbon_stock_2000__Mg",
+//        sum("total_carbon_stock_2000__Mg") as "total_carbon_stock_2000__Mg",
         sum("treecover_loss__ha") as "treecover_loss_2001-2015__ha",
         sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss_2001-2015__Mg",
         sum("gross_emissions_co2e_co2_only__Mg") as "gross_emissions_co2e_co2_only_2001-2015__Mg",
