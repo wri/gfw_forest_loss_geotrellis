@@ -15,7 +15,6 @@ object GeostoreDF {
 
     df.select(
       $"id.geostoreId" as "geostore__id",
-      $"id.status" as "status",
       $"data_group.lossYear" as "treecover_loss__year",
       $"data_group.threshold" as "treecover_density__threshold",
       $"data_group.drivers" as "tcs_driver__type",
