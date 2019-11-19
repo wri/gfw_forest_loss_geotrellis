@@ -6,9 +6,10 @@ case class FeatureFactory(featureName: String) {
     case "gadm" => GadmFeature
     case "feature" => SimpleFeature
     case "wdpa" => WdpaFeature
+    case "geostore" => GeostoreFeature
     case _ =>
       throw new IllegalArgumentException(
-        "Feature type must be one of 'gadm' and 'feature'"
+        "Feature type must be one of 'gadm', 'wdpa' 'geostore' and 'feature'"
       )
   }
 }
