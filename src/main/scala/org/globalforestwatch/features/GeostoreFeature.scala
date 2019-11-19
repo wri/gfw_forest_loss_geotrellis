@@ -29,13 +29,14 @@ object GeostoreFeature extends Feature {
 
     var newDF = df
 
-    val geostoreId: Option[String] =
-      getAnyMapValue[Option[String]](filters, "geostoreId")
+    //  TODO possible future option
+    //  val geostoreId: Option[String] =
+    //    getAnyMapValue[Option[String]](filters, "geostoreId")
     val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
 
-    geostoreId.foreach { id =>
-      newDF = newDF.filter($"geostore_id" === id)
-    }
+    //  geostoreId.foreach { id =>
+    //    newDF = newDF.filter($"geostore_id" === id)
+    //  }
 
     limit.foreach { n =>
       newDF = newDF.limit(n)

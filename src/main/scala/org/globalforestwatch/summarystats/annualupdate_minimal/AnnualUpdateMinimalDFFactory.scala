@@ -2,7 +2,7 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{FeatureId, GadmFeatureId}
+import org.globalforestwatch.features.{FeatureId, GadmFeatureId, GeostoreFeatureId}
 
 case class AnnualUpdateMinimalDFFactory(
   featureType: String,
@@ -13,7 +13,8 @@ case class AnnualUpdateMinimalDFFactory(
 
   def getDataFrame: DataFrame = {
     featureType match {
-      case "gadm" => getGadmDataFrame
+      case "gadm"     => getGadmDataFrame
+      case "geostore" => getGeostoreDataFrame
       case _ =>
         throw new IllegalArgumentException("Not a valid FeatureId")
     }
@@ -27,9 +28,27 @@ case class AnnualUpdateMinimalDFFactory(
             case (dataGroup, data) => {
               id match {
                 case gadmId: GadmFeatureId =>
-                  AnnualUpdateMinimalRow(gadmId, dataGroup, data)
+                  AnnualUpdateMinimalRowGadm(gadmId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a GadmFeatureId")
+              }
+            }
+          }
+      }
+      .toDF("id", "data_group", "data")
+  }
+
+  private def getGeostoreDataFrame: DataFrame = {
+    summaryRDD
+      .flatMap {
+        case (id, summary) =>
+          summary.stats.map {
+            case (dataGroup, data) => {
+              id match {
+                case geostoreId: GeostoreFeatureId =>
+                  AnnualUpdateMinimalRowGeostore(geostoreId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a GeostoreFeatureId")
               }
             }
           }
