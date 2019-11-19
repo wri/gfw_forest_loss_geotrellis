@@ -164,7 +164,7 @@ object CarbonFluxSummary {
                 summary.grossEmissionsCo2eNoneCo2 += grossEmissionsCo2eNoneCo2Pixel
                 summary.grossEmissionsCo2e += grossEmissionsCo2ePixel
                 summary.agcEmisYear += agcEmisYearPixel
-                summary.agcEmisYear += bgcEmisYearPixel
+                summary.bgcEmisYear += bgcEmisYearPixel
                 summary.deadwoodCarbonEmisYear += deadwoodCarbonEmisYearPixel
                 summary.litterCarbonEmisYear += litterCarbonEmisYearPixel
                 summary.soilCarbonEmisYear += soilCarbonEmisYearPixel
