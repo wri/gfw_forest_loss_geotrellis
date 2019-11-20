@@ -121,6 +121,11 @@ object CarbonSensitivitySummary {
 
         val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
 
+        if (isLoss && (grossEmissionsCo2eNoneCo2Pixel == 0 || grossEmissionsCo2eCo2Only == 0)) {
+          val lat: Double = raster.rasterExtent.gridRowToMap(row)
+          val lng: Double = raster.rasterExtent.gridColToMap(col)
+          println(lat, lng)
+        }
 
         @tailrec
         def updateSummary(
