@@ -42,7 +42,7 @@ object CarbonSensitivitySummary {
         val grossCumulRemovalsCarbon: Double =
           raster.tile.grossCumulRemovalsCarbon.getData(col, row)
         val netFluxCo2: Double = raster.tile.netFluxCo2.getData(col, row)
-        val agcEmisYear: Double = raster.tile.agcEmisYear.getData(col, row)
+        val agcEmisYear: Float = raster.tile.agcEmisYear.getData(col, row)
 //        val bgcEmisYear: Double = raster.tile.bgcEmisYear.getData(col, row)
 //        val deadwoodCarbonEmisYear: Double =
 //          raster.tile.deadwoodCarbonEmisYear.getData(col, row)
@@ -52,7 +52,7 @@ object CarbonSensitivitySummary {
           raster.tile.soilCarbonEmisYear.getData(col, row)
         //        val totalCarbonEmisYear: Double =
         //          raster.tile.totalCarbonEmisYear.getData(col, row)
-        val agc2000: Double = raster.tile.agc2000.getData(col, row)
+        val agc2000: Float = raster.tile.agc2000.getData(col, row)
 //        val bgc2000: Double = raster.tile.bgc2000.getData(col, row)
 //        val deadwoodCarbon2000: Double =
 //          raster.tile.deadwoodCarbon2000.getData(col, row)
