@@ -44,7 +44,7 @@ object Adm2DailyDF {
         $"data_group.peruForestConcessions" as "per_forest_concession__type",
         $"data_group.oilGas" as "is__gfw_oil_gas",
         $"data_group.mangroves2016" as "is__mangroves_2016",
-        $"data_group.intactForestLandscapes2016" as "intact_forest_landscapes_2016",
+        $"data_group.intactForestLandscapes2016" as "is__intact_forest_landscapes_2016",
         $"data_group.braBiomes" as "bra_biome__name",
         $"data.totalAlerts" as "alert__count",
         $"data.alertArea" as "alert_area__ha",
@@ -83,7 +83,7 @@ object Adm2DailyDF {
         "per_forest_concession__type",
         "is__gfw_oil_gas",
         "is__mangroves_2016",
-        "intact_forest_landscapes_2016",
+        "is__intact_forest_landscapes_2016",
         "bra_biome__name",
         "alert__count",
         "alert_area__ha",
@@ -116,7 +116,7 @@ object Adm2DailyDF {
         $"per_forest_concession__type",
         $"is__gfw_oil_gas",
         $"is__mangroves_2016",
-        $"intact_forest_landscapes_2016",
+        $"is__intact_forest_landscapes_2016",
         $"bra_biome__name"
       )
       .agg(
@@ -154,7 +154,7 @@ object Adm2DailyDF {
         "per_forest_concession__type",
         "is__gfw_oil_gas",
         "is__mangroves_2016",
-        "intact_forest_landscapes_2016",
+        "is__intact_forest_landscapes_2016",
         "bra_biome__name",
         "area__ha"
       )
@@ -181,7 +181,7 @@ object Adm2DailyDF {
       $"per_forest_concession__type",
       $"is__gfw_oil_gas",
       $"is__mangroves_2016",
-      $"intact_forest_landscapes_2016",
+      $"is__intact_forest_landscapes_2016",
       $"bra_biome__name"
     )
       .agg(
