@@ -36,7 +36,7 @@ object Adm2WeeklyDF {
         "per_forest_concession__type",
         "is__gfw_oil_gas",
         "is__mangroves_2016",
-        "intact_forest_landscapes_2016",
+        "is__intact_forest_landscapes_2016",
         "bra_biome__name",
         "alert__count",
         "alert_area__ha",
@@ -69,7 +69,7 @@ object Adm2WeeklyDF {
         $"per_forest_concession__type",
         $"is__gfw_oil_gas",
         $"is__mangroves_2016",
-        $"intact_forest_landscapes_2016",
+        $"is__intact_forest_landscapes_2016",
         $"bra_biome__name",
         $"alert__count",
         $"alert_area__ha",
@@ -99,7 +99,7 @@ object Adm2WeeklyDF {
         $"per_forest_concession__type",
         $"is__gfw_oil_gas",
         $"is__mangroves_2016",
-        $"intact_forest_landscapes_2016",
+        $"is__intact_forest_landscapes_2016",
         $"bra_biome__name"
       )
       .agg(
