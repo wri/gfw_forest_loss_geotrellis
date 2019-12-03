@@ -32,7 +32,14 @@ object GeostoreFeature extends Feature {
     //  TODO possible future option
     //  val geostoreId: Option[String] =
     //    getAnyMapValue[Option[String]](filters, "geostoreId")
+
     val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
+    val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")
+    val glad: Boolean = getAnyMapValue[Boolean](filters, "glad")
+
+    if (glad) newDF = newDF.filter($"glad" === "t")
+
+    if (tcl) newDF = newDF.filter($"tcl" === "t")
 
     //  geostoreId.foreach { id =>
     //    newDF = newDF.filter($"geostore_id" === id)
