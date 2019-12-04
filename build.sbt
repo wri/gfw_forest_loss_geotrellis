@@ -114,6 +114,7 @@ Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m")
 
 // Settings for sbt-assembly plugin which builds fat jars for use by spark jobs
 test in assembly := {}
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(appendContentHash = true)
 assemblyMergeStrategy in assembly := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat

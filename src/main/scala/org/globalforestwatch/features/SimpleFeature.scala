@@ -1,26 +1,46 @@
 package org.globalforestwatch.features
 
-import geotrellis.vector.{Feature, Geometry}
+import geotrellis.vector.Geometry
 import geotrellis.vector.io.wkb.WKB
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.globalforestwatch.util.GeometryReducer
+import org.globalforestwatch.util.Util._
 
-object SimpleFeature extends java.io.Serializable {
+object SimpleFeature extends Feature {
 
   val idPos = 0
   val geomPos = 1
 
-  def getFeature(i: Row): Feature[Geometry, SimpleFeatureId] = {
+  def getFeature(
+                  i: Row
+                ): geotrellis.vector.Feature[Geometry, SimpleFeatureId] = {
     val feature_id: Int = i.getString(idPos).toInt
     val geom: Geometry =
       GeometryReducer.reduce(GeometryReducer.gpr)(
         WKB.read(i.getString(geomPos))
       )
-    Feature(geom, SimpleFeatureId(feature_id))
+    geotrellis.vector.Feature(geom, SimpleFeatureId(feature_id))
   }
 
-  def isValidGeom(i: Row): Boolean = {
-    GeometryReducer.isValidGeom(i.getString(geomPos))
-  }
+  override def custom_filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
 
+    val spark: SparkSession = df.sparkSession
+    import spark.implicits._
+
+    var newDF = df
+
+    val idStart: Option[Int] = getAnyMapValue[Option[Int]](filters, "idStart")
+    val idEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
+
+    idStart.foreach { startId =>
+      newDF = newDF.filter($"fid" >= startId)
+    }
+
+    idEnd.foreach { endId =>
+      newDF = newDF.filter($"fid" < endId)
+    }
+
+
+    newDF
+  }
 }

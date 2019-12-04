@@ -2,9 +2,8 @@ package org.globalforestwatch.features
 
 import geotrellis.vector.Geometry
 import geotrellis.vector.io.wkb.WKB
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.sql.Row
 import org.globalforestwatch.util.GeometryReducer
-import org.globalforestwatch.util.Util._
 
 object GeostoreFeature extends Feature {
 
@@ -22,33 +21,4 @@ object GeostoreFeature extends Feature {
     geotrellis.vector.Feature(geom, GeostoreFeatureId(geostore_id))
   }
 
-  def filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
-
-    val spark: SparkSession = df.sparkSession
-    import spark.implicits._
-
-    var newDF = df
-
-    //  TODO possible future option
-    //  val geostoreId: Option[String] =
-    //    getAnyMapValue[Option[String]](filters, "geostoreId")
-
-    val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
-    val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")
-    val glad: Boolean = getAnyMapValue[Boolean](filters, "glad")
-
-    if (glad) newDF = newDF.filter($"glad" === "t")
-
-    if (tcl) newDF = newDF.filter($"tcl" === "t")
-
-    //  geostoreId.foreach { id =>
-    //    newDF = newDF.filter($"geostore_id" === id)
-    //  }
-
-    limit.foreach { n =>
-      newDF = newDF.limit(n)
-    }
-
-    newDF
-  }
 }
