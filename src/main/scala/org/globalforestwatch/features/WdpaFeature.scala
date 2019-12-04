@@ -30,10 +30,9 @@ object WdpaFeature extends Feature {
       .Feature(geom, WdpaFeatureId(wdpa_id, name, iucn_cat, iso, status))
   }
 
-  def filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
+  override def custom_filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
-
 
     val isoFirst: Option[String] = getAnyMapValue[Option[String]](filters, "isoFirst")
     val isoStart: Option[String] = getAnyMapValue[Option[String]](filters, "isoStart")
@@ -43,15 +42,8 @@ object WdpaFeature extends Feature {
     val wdpaIdEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
     val iucnCat: Option[String] = getAnyMapValue[Option[String]](filters, "iucnCat")
     val wdpaStatus: Option[String] = getAnyMapValue[Option[String]](filters, "wdpaStatus")
-    val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
-    val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")
-    val glad: Boolean = getAnyMapValue[Boolean](filters, "glad")
 
     var newDF = df
-
-    if (glad) newDF = newDF.filter($"glad" === "t")
-
-    if (tcl) newDF = newDF.filter($"tcl" === "t")
 
     isoFirst.foreach { firstLetter =>
       newDF = newDF.filter(substring($"iso", 0, 1) === firstLetter(0))
@@ -83,10 +75,6 @@ object WdpaFeature extends Feature {
 
     wdpaStatus.foreach { status =>
       newDF = newDF.filter($"status" === status)
-    }
-
-    limit.foreach { n =>
-      newDF = newDF.limit(n)
     }
 
     newDF

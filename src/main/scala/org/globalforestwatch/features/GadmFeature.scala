@@ -35,26 +35,26 @@ object GadmFeature extends Feature {
     geotrellis.vector.Feature(geom, GadmFeatureId(countryCode, admin1, admin2))
   }
 
-  def filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
+  override def custom_filter(
+                              filters: Map[String, Any]
+                            )(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
     var newDF = df
 
-    val isoFirst: Option[String] = getAnyMapValue[Option[String]](filters, "isoFirst")
-    val isoStart: Option[String] = getAnyMapValue[Option[String]](filters, "isoStart")
-    val isoEnd: Option[String] = getAnyMapValue[Option[String]](filters, "isoEnd")
+    val isoFirst: Option[String] =
+      getAnyMapValue[Option[String]](filters, "isoFirst")
+    val isoStart: Option[String] =
+      getAnyMapValue[Option[String]](filters, "isoStart")
+    val isoEnd: Option[String] =
+      getAnyMapValue[Option[String]](filters, "isoEnd")
     val iso: Option[String] = getAnyMapValue[Option[String]](filters, "iso")
-    val admin1: Option[String] = getAnyMapValue[Option[String]](filters, "admin1")
-    val admin2: Option[String] = getAnyMapValue[Option[String]](filters, "admin2")
-    val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
-    val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")
-    val glad: Boolean = getAnyMapValue[Boolean](filters, "glad")
-
-    if (glad) newDF = newDF.filter($"glad" === "t")
-
-    if (tcl) newDF = newDF.filter($"tcl" === "t")
+    val admin1: Option[String] =
+      getAnyMapValue[Option[String]](filters, "admin1")
+    val admin2: Option[String] =
+      getAnyMapValue[Option[String]](filters, "admin2")
 
     isoFirst.foreach { firstLetter =>
       newDF = newDF.filter(substring($"gid_0", 0, 1) === firstLetter(0))
@@ -78,10 +78,6 @@ object GadmFeature extends Feature {
 
     admin2.foreach { admin2Code =>
       newDF = newDF.filter($"gid_2" === admin2Code)
-    }
-
-    limit.foreach { n =>
-      newDF = newDF.limit(n)
     }
 
     newDF
