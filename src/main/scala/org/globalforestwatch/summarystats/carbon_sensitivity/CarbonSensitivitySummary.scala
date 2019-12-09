@@ -10,8 +10,8 @@ import scala.annotation.tailrec
 
 /** LossData Summary by year */
 case class CarbonSensitivitySummary(
-  stats: Map[CarbonSensitivityDataGroup, CarbonSensitivityData] = Map.empty
-                            ) extends Summary[CarbonSensitivitySummary] {
+                                     stats: Map[CarbonSensitivityDataGroup, CarbonSensitivityData] = Map.empty
+                                   ) extends Summary[CarbonSensitivitySummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: CarbonSensitivitySummary): CarbonSensitivitySummary = {
@@ -37,34 +37,34 @@ object CarbonSensitivitySummary {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
-//        val grossAnnualRemovalsCarbon: Double =
-//          raster.tile.grossAnnualRemovalsCarbon.getData(col, row)
-        val grossCumulRemovalsCarbon: Double =
-          raster.tile.grossCumulRemovalsCarbon.getData(col, row)
-        val netFluxCo2: Double = raster.tile.netFluxCo2.getData(col, row)
-        val agcEmisYear: Double = raster.tile.agcEmisYear.getData(col, row)
-//        val bgcEmisYear: Double = raster.tile.bgcEmisYear.getData(col, row)
-//        val deadwoodCarbonEmisYear: Double =
-//          raster.tile.deadwoodCarbonEmisYear.getData(col, row)
-//        val litterCarbonEmisYear: Double =
-//          raster.tile.litterCarbonEmisYear.getData(col, row)
-        val soilCarbonEmisYear: Double =
-          raster.tile.soilCarbonEmisYear.getData(col, row)
-        //        val totalCarbonEmisYear: Double =
+        //        val grossAnnualRemovalsCarbon: Float =
+        //          raster.tile.grossAnnualRemovalsCarbon.getData(col, row)
+        val grossCumulRemovalsCarbon: Float =
+        raster.tile.grossCumulRemovalsCarbon.getData(col, row)
+        val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
+        val agcEmisYear: Float = raster.tile.agcEmisYear.getData(col, row)
+        //        val bgcEmisYear: Float = raster.tile.bgcEmisYear.getData(col, row)
+        //        val deadwoodCarbonEmisYear: Float =
+        //          raster.tile.deadwoodCarbonEmisYear.getData(col, row)
+        //        val litterCarbonEmisYear: Float =
+        //          raster.tile.litterCarbonEmisYear.getData(col, row)
+        val soilCarbonEmisYear: Float =
+        raster.tile.soilCarbonEmisYear.getData(col, row)
+        //        val totalCarbonEmisYear: Float =
         //          raster.tile.totalCarbonEmisYear.getData(col, row)
-        val agc2000: Double = raster.tile.agc2000.getData(col, row)
-//        val bgc2000: Double = raster.tile.bgc2000.getData(col, row)
-//        val deadwoodCarbon2000: Double =
-//          raster.tile.deadwoodCarbon2000.getData(col, row)
-//        val litterCarbon2000: Double =
-//          raster.tile.litterCarbon2000.getData(col, row)
-        val soilCarbon2000: Double =
-          raster.tile.soilCarbon2000.getData(col, row)
-        //        val totalCarbon2000: Double =
+        val agc2000: Float = raster.tile.agc2000.getData(col, row)
+        //        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
+        //        val deadwoodCarbon2000: Float =
+        //          raster.tile.deadwoodCarbon2000.getData(col, row)
+        //        val litterCarbon2000: Float =
+        //          raster.tile.litterCarbon2000.getData(col, row)
+        val soilCarbon2000: Float =
+        raster.tile.soilCarbon2000.getData(col, row)
+        //        val totalCarbon2000: Float =
         //          raster.tile.totalCarbon2000.getData(col, row)
-        val grossEmissionsCo2eNoneCo2: Double =
-          raster.tile.grossEmissionsCo2eNoneCo2.getData(col, row)
-        val grossEmissionsCo2eCo2Only: Double =
+        val grossEmissionsCo2eNoneCo2: Float =
+        raster.tile.grossEmissionsCo2eNoneCo2.getData(col, row)
+        val grossEmissionsCo2eCo2Only: Float =
           raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
 
         val isGain: Boolean = raster.tile.gain.getData(col, row)
@@ -96,23 +96,23 @@ object CarbonSensitivitySummary {
         val isLoss: Boolean = carbonfluxLossYear != null
 
         val biomassPixel = biomass * areaHa
-//        val grossAnnualRemovalsCarbonPixel = grossAnnualRemovalsCarbon * areaHa
+        //        val grossAnnualRemovalsCarbonPixel = grossAnnualRemovalsCarbon * areaHa
         val grossCumulRemovalsCarbonPixel = grossCumulRemovalsCarbon * areaHa
         val netFluxCo2Pixel = netFluxCo2 * areaHa
         val agcEmisYearPixel = agcEmisYear * areaHa
-//        val bgcEmisYearPixel = bgcEmisYear * areaHa
-//        val deadwoodCarbonEmisYearPixel = deadwoodCarbonEmisYear * areaHa
-//        val litterCarbonEmisYearPixel = litterCarbonEmisYear * areaHa
+        //        val bgcEmisYearPixel = bgcEmisYear * areaHa
+        //        val deadwoodCarbonEmisYearPixel = deadwoodCarbonEmisYear * areaHa
+        //        val litterCarbonEmisYearPixel = litterCarbonEmisYear * areaHa
         val soilCarbonEmisYearPixel = soilCarbonEmisYear * areaHa
-//        val totalCarbonEmisYear = agcEmisYear + bgcEmisYear + deadwoodCarbonEmisYear + litterCarbonEmisYear + soilCarbonEmisYear
-//        val totalCarbonEmisYearPixel = totalCarbonEmisYear * areaHa
+        //        val totalCarbonEmisYear = agcEmisYear + bgcEmisYear + deadwoodCarbonEmisYear + litterCarbonEmisYear + soilCarbonEmisYear
+        //        val totalCarbonEmisYearPixel = totalCarbonEmisYear * areaHa
         val agc2000Pixel = agc2000 * areaHa
-//        val bgc2000Pixel = bgc2000 * areaHa
-//        val deadwoodCarbon2000Pixel = deadwoodCarbon2000 * areaHa
-//        val litterCarbon2000Pixel = litterCarbon2000 * areaHa
+        //        val bgc2000Pixel = bgc2000 * areaHa
+        //        val deadwoodCarbon2000Pixel = deadwoodCarbon2000 * areaHa
+        //        val litterCarbon2000Pixel = litterCarbon2000 * areaHa
         val soilCarbon2000Pixel = soilCarbon2000 * areaHa
-//        val totalCarbon2000 = agc2000 + bgc2000 + deadwoodCarbon2000 + litterCarbon2000 + soilCarbon2000
-//        val totalCarbon2000Pixel = totalCarbon2000 * areaHa
+        //        val totalCarbon2000 = agc2000 + bgc2000 + deadwoodCarbon2000 + litterCarbon2000 + soilCarbon2000
+        //        val totalCarbon2000Pixel = totalCarbon2000 * areaHa
         val grossEmissionsCo2eNoneCo2Pixel = grossEmissionsCo2eNoneCo2 * areaHa
         val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
 
@@ -124,9 +124,9 @@ object CarbonSensitivitySummary {
 
         @tailrec
         def updateSummary(
-          thresholds: List[Int],
-          stats: Map[CarbonSensitivityDataGroup, CarbonSensitivityData]
-        ): Map[CarbonSensitivityDataGroup, CarbonSensitivityData] = {
+                           thresholds: List[Int],
+                           stats: Map[CarbonSensitivityDataGroup, CarbonSensitivityData]
+                         ): Map[CarbonSensitivityDataGroup, CarbonSensitivityData] = {
           if (thresholds == Nil) stats
           else {
             val pKey = CarbonSensitivityDataGroup(
@@ -150,8 +150,8 @@ object CarbonSensitivitySummary {
               stats.getOrElse(
                 key = pKey,
                 default = CarbonSensitivityData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-//                  default = CarbonSensitivityData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-//                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                //                  default = CarbonSensitivityData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                //                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -165,23 +165,23 @@ object CarbonSensitivitySummary {
                 summary.grossEmissionsCo2eNoneCo2 += grossEmissionsCo2eNoneCo2Pixel
                 summary.grossEmissionsCo2e += grossEmissionsCo2ePixel
                 summary.agcEmisYear += agcEmisYearPixel
-//                summary.agcEmisYear += bgcEmisYearPixel
-//                summary.deadwoodCarbonEmisYear += deadwoodCarbonEmisYearPixel
-//                summary.litterCarbonEmisYear += litterCarbonEmisYearPixel
+                //                summary.agcEmisYear += bgcEmisYearPixel
+                //                summary.deadwoodCarbonEmisYear += deadwoodCarbonEmisYearPixel
+                //                summary.litterCarbonEmisYear += litterCarbonEmisYearPixel
                 summary.soilCarbonEmisYear += soilCarbonEmisYearPixel
-//                summary.carbonEmisYear += totalCarbonEmisYearPixel
+                //                summary.carbonEmisYear += totalCarbonEmisYearPixel
               }
               summary.treecoverExtent2000 += areaHa
               summary.totalBiomass += biomassPixel
-//              summary.totalGrossAnnualRemovalsCarbon += grossAnnualRemovalsCarbonPixel
+              //              summary.totalGrossAnnualRemovalsCarbon += grossAnnualRemovalsCarbonPixel
               summary.totalGrossCumulRemovalsCarbon += grossCumulRemovalsCarbonPixel
               summary.totalNetFluxCo2 += netFluxCo2Pixel
               summary.totalAgc2000 += agc2000Pixel
-//              summary.totalBgc2000 += bgc2000Pixel
-//              summary.totalDeadwoodCarbon2000 += deadwoodCarbon2000Pixel
-//              summary.totalLitterCarbon2000 += litterCarbon2000Pixel
+              //              summary.totalBgc2000 += bgc2000Pixel
+              //              summary.totalDeadwoodCarbon2000 += deadwoodCarbon2000Pixel
+              //              summary.totalLitterCarbon2000 += litterCarbon2000Pixel
               summary.totalSoil2000 += soilCarbon2000Pixel
-//              summary.totalCarbon2000 += totalCarbon2000Pixel
+              //              summary.totalCarbon2000 += totalCarbon2000Pixel
             }
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
           }

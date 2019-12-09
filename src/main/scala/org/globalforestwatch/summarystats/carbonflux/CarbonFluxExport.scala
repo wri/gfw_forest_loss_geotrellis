@@ -15,7 +15,7 @@ object CarbonFluxExport extends SummaryExport {
 
       val adm2ApiDF = df
         .transform(Adm2ApiDF.sumArea)
-        .coalesce(40) // this should result in an avg file size of 100MB
+        .coalesce(80) // this should result in an avg file size of 100MB
 
       adm2ApiDF
         .write
@@ -24,7 +24,7 @@ object CarbonFluxExport extends SummaryExport {
 
       val adm1ApiDF = adm2ApiDF
         .transform(Adm1ApiDF.sumArea)
-        .coalesce(12) // this should result in an avg file size of 100MB
+        .coalesce(24) // this should result in an avg file size of 100MB
 
       adm1ApiDF
         .write
@@ -33,7 +33,7 @@ object CarbonFluxExport extends SummaryExport {
 
       val isoApiDF = adm1ApiDF
         .transform(IsoApiDF.sumArea)
-        .coalesce(4) // this should result in an avg file size of 100MB
+        .coalesce(8) // this should result in an avg file size of 100MB
 
       isoApiDF
         .write
@@ -45,7 +45,7 @@ object CarbonFluxExport extends SummaryExport {
     def exportChange(df: DataFrame): Unit = {
       val adm2ApiDF = df
         .transform(Adm2ApiDF.sumChange)
-        .coalesce(100) // this should result in an avg file size of 100MB
+        .coalesce(200) // this should result in an avg file size of 100MB
 
       adm2ApiDF
         .write
@@ -54,7 +54,7 @@ object CarbonFluxExport extends SummaryExport {
 
       val adm1ApiDF = adm2ApiDF
         .transform(Adm1ApiDF.sumChange)
-        .coalesce(30) // this should result in an avg file size of 100MB
+        .coalesce(60) // this should result in an avg file size of 100MB
 
       adm1ApiDF
         .write
@@ -63,7 +63,7 @@ object CarbonFluxExport extends SummaryExport {
 
       val isoApiDF = adm1ApiDF
         .transform(IsoApiDF.sumChange)
-        .coalesce(10) // this should result in an avg file size of 100MB
+        .coalesce(20) // this should result in an avg file size of 100MB
 
       isoApiDF
         .write

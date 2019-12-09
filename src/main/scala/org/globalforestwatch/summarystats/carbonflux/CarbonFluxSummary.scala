@@ -37,34 +37,34 @@ object CarbonFluxSummary {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
-        val grossAnnualRemovalsCarbon: Double =
+        val grossAnnualRemovalsCarbon: Float =
           raster.tile.grossAnnualRemovalsCarbon.getData(col, row)
-        val grossCumulRemovalsCarbon: Double =
+        val grossCumulRemovalsCarbon: Float =
           raster.tile.grossCumulRemovalsCarbon.getData(col, row)
-        val netFluxCo2: Double = raster.tile.netFluxCo2.getData(col, row)
-        val agcEmisYear: Double = raster.tile.agcEmisYear.getData(col, row)
-        val bgcEmisYear: Double = raster.tile.bgcEmisYear.getData(col, row)
-        val deadwoodCarbonEmisYear: Double =
+        val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
+        val agcEmisYear: Float = raster.tile.agcEmisYear.getData(col, row)
+        val bgcEmisYear: Float = raster.tile.bgcEmisYear.getData(col, row)
+        val deadwoodCarbonEmisYear: Float =
           raster.tile.deadwoodCarbonEmisYear.getData(col, row)
-        val litterCarbonEmisYear: Double =
+        val litterCarbonEmisYear: Float =
           raster.tile.litterCarbonEmisYear.getData(col, row)
-        val soilCarbonEmisYear: Double =
+        val soilCarbonEmisYear: Float =
           raster.tile.soilCarbonEmisYear.getData(col, row)
         //        val totalCarbonEmisYear: Double =
         //          raster.tile.totalCarbonEmisYear.getData(col, row)
-        val agc2000: Double = raster.tile.agc2000.getData(col, row)
-        val bgc2000: Double = raster.tile.bgc2000.getData(col, row)
-        val deadwoodCarbon2000: Double =
+        val agc2000: Float = raster.tile.agc2000.getData(col, row)
+        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
+        val deadwoodCarbon2000: Float =
           raster.tile.deadwoodCarbon2000.getData(col, row)
-        val litterCarbon2000: Double =
+        val litterCarbon2000: Float =
           raster.tile.litterCarbon2000.getData(col, row)
-        val soilCarbon2000: Double =
+        val soilCarbon2000: Float =
           raster.tile.soilCarbon2000.getData(col, row)
         //        val totalCarbon2000: Double =
         //          raster.tile.totalCarbon2000.getData(col, row)
-        val grossEmissionsCo2eNoneCo2: Double =
+        val grossEmissionsCo2eNoneCo2: Float =
         raster.tile.grossEmissionsCo2eNoneCo2.getData(col, row)
-        val grossEmissionsCo2eCo2Only: Double =
+        val grossEmissionsCo2eCo2Only: Float =
           raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
 
         val isGain: Boolean = raster.tile.gain.getData(col, row)
