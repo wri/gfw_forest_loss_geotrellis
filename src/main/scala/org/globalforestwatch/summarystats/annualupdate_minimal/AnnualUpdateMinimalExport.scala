@@ -3,12 +3,38 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 import org.apache.spark.sql.DataFrame
 import org.globalforestwatch.summarystats.SummaryExport
 import org.globalforestwatch.summarystats.annualupdate_minimal.dataframes._
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 object AnnualUpdateMinimalExport extends SummaryExport {
 
   override protected def exportGadm(summaryDF: DataFrame,
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
+
+    def exportWhitelist(df: DataFrame): Unit = {
+
+      val adm2ApiDF = df.transform(Adm2ApiDF.whitelist)
+      adm2ApiDF
+        .coalesce(40) // TODO: optimize size so that tables have an avg file size of 100MB
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/adm2/whitelist")
+
+      val adm1ApiDF = adm2ApiDF.transform(Adm1ApiDF.whitelist)
+      adm1ApiDF
+        .coalesce(12) // TODO: optimize size so that tables have an avg file size of 100MB
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/adm1/whitelist")
+
+      val isoApiDF = adm1ApiDF.transform(IsoApiDF.whitelist)
+      isoApiDF
+        .coalesce(3) // TODO: optimize size so that tables have an avg file size of 100MB
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/iso/whitelist")
+
+    }
 
     def exportSummary(df: DataFrame): Unit = {
 
@@ -104,15 +130,19 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
     }
 
+    val changeOnly: Boolean =
+      getAnyMapValue[Boolean](kwargs, "changeOnly")
+
     val exportDF = summaryDF
       .transform(GadmDF.unpackValues)
 
     exportDF.cache()
-
-    exportSummary(exportDF)
+    if (!changeOnly) {
+      exportWhitelist(exportDF)
+      exportSummary(exportDF)
+      exportDownload(exportDF, outputUrl)
+    }
     exportChange(exportDF)
-    exportDownload(exportDF, outputUrl)
-
     exportDF.unpersist()
 
   }
@@ -121,18 +151,28 @@ object AnnualUpdateMinimalExport extends SummaryExport {
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
 
+    val changeOnly: Boolean =
+      getAnyMapValue[Boolean](kwargs, "changeOnly")
+
     val exportDF = summaryDF
       .transform(WdpaDF.unpackValues)
 
     exportDF.cache()
+    if (!changeOnly) {
+      exportDF
+        .transform(WdpaDF.whitelist)
+        .coalesce(40) // TODO: optimize size so that tables have an avg file size of 100MB
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/wdpa/whitelist")
 
-    exportDF
-      .transform(WdpaDF.sumArea)
-      .coalesce(40) // this should result in an avg file size of 100MB
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/wdpa/summary")
-
+      exportDF
+        .transform(WdpaDF.sumArea)
+        .coalesce(40) // this should result in an avg file size of 100MB
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/wdpa/summary")
+    }
     exportDF
       .transform(WdpaDF.sumChange)
       .coalesce(133) // this should result in an avg file size of 100MB
@@ -147,18 +187,29 @@ object AnnualUpdateMinimalExport extends SummaryExport {
                                         outputUrl: String,
                                         kwargs: Map[String, Any]): Unit = {
 
+    val changeOnly: Boolean =
+      getAnyMapValue[Boolean](kwargs, "changeOnly")
+
     val exportDF = summaryDF
       .transform(GeostoreDF.unpackValues)
 
     exportDF.cache()
+    if (!changeOnly) {
 
-    exportDF
-      .transform(GeostoreDF.sumArea)
-      .coalesce(40) // this should result in an avg file size of 100MB
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/geostore/summary")
+      exportDF
+        .transform(GeostoreDF.whitelist)
+        .coalesce(40) // TODO: optimize size so that tables have an avg file size of 100MB
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/geostore/whitelist")
 
+      exportDF
+        .transform(GeostoreDF.sumArea)
+        .coalesce(40) // this should result in an avg file size of 100MB
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/geostore/summary")
+    }
     exportDF
       .transform(GeostoreDF.sumChange)
       .coalesce(133) // this should result in an avg file size of 100MB

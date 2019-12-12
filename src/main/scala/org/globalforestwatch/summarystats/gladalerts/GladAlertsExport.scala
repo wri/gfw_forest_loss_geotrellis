@@ -34,7 +34,7 @@ object GladAlertsExport extends SummaryExport {
     }
 
     def exportArea(df: DataFrame): Unit = {
-      if (!changeOnly) {
+
         val adm2DF = df
           .transform(Adm2DailyDF.sumArea)
 
@@ -61,12 +61,12 @@ object GladAlertsExport extends SummaryExport {
           .write
           .options(csvOptions)
           .csv(path = outputUrl + "/iso/summary")
-      }
+
     }
 
 
     def exportWhitelist(df: DataFrame): Unit = {
-      if (!changeOnly) {
+
         val adm2DF = df
           .transform(GadmWhitelistDF.whitelistAdm2)
 
@@ -93,7 +93,7 @@ object GladAlertsExport extends SummaryExport {
           .write
           .options(csvOptions)
           .csv(path = outputUrl + "/iso/whitelist")
-      }
+
     }
 
     def exportAlerts(df: DataFrame): Unit = {
@@ -141,8 +141,10 @@ object GladAlertsExport extends SummaryExport {
     summaryDF.unpersist()
 
     gadmDF.cache()
-    exportWhitelist(gadmDF)
-    exportArea(gadmDF)
+    if (!changeOnly) {
+      exportWhitelist(gadmDF)
+      exportArea(gadmDF)
+    }
     exportAlerts(gadmDF)
     gadmDF.unpersist()
   }
@@ -168,7 +170,7 @@ object GladAlertsExport extends SummaryExport {
 
     if (!changeOnly) {
       wdpaDF
-        .transform(WdpaWhitelistDF.whitelistWdpa)
+        .transform(WdpaWhitelistDF.whitelist)
         .coalesce(1)
         .write
         .options(csvOptions)
@@ -221,7 +223,7 @@ object GladAlertsExport extends SummaryExport {
     if (!changeOnly) {
 
       featureDF
-        .transform(SimpleFeatureWhitelistDF.whitelistSimpleFeature)
+        .transform(SimpleFeatureWhitelistDF.whitelist)
         .coalesce(1)
         .write
         .options(csvOptions)
@@ -274,7 +276,7 @@ object GladAlertsExport extends SummaryExport {
     if (!changeOnly) {
 
       featureDF
-        .transform(GeostoreWhitelistDF.whitelistGeostore)
+        .transform(GeostoreWhitelistDF.whitelist)
         .coalesce(1)
         .write
         .options(csvOptions)

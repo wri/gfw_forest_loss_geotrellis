@@ -1,6 +1,6 @@
 package org.globalforestwatch.summarystats.carbonflux.dataframes
 
-import org.apache.spark.sql.functions.sum
+import org.apache.spark.sql.functions.{length, max, sum}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object IsoApiDF {
@@ -84,6 +84,31 @@ object IsoApiDF {
         sum("gross_emissions_co2e_co2_only_2001-2015__Mg") as "gross_emissions_co2e_co2_only_2001-2015__Mg",
         sum("gross_emissions_co2e_non_co2_2001-2015__Mg") as "gross_emissions_co2e_non_co2_2001-2015__Mg",
         sum("gross_emissions_co2e_all_gases_2001-2015__Mg") as "gross_emissions_co2e_all_gases_2001-2015__Mg"
+      )
+  }
+
+  def whitelist(df: DataFrame): DataFrame = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
+
+    df.groupBy($"iso")
+      .agg(
+        max(length($"tcs_driver__type")).cast("boolean") as "tcs_driver__type",
+        max($"is__treecover_loss_2000-2015") as "is__treecover_loss_2000-2015",
+        max($"is__treecover_gain_2000-2012") as "is__treecover_gain_2000-2012",
+        max($"is__mangrove") as "is__mangrove",
+        max(length($"tcs_driver__type")).cast("boolean") as "tcs_driver__type",
+        max(length($"ecozone__name")).cast("boolean") as "ecozone__name",
+        max($"is__gfw_land_right") as "is__gfw_land_right",
+        max(length($"wdpa_protected_area__iucn_cat"))
+          .cast("boolean") as "wdpa_protected_area__iucn_cat",
+        max(length($"intact_forest_landscape__year"))
+          .cast("boolean") as "intact_forest_landscape__year",
+        max(length($"gfw_plantation__type"))
+          .cast("boolean") as "gfw_plantation__type",
+        max($"is__intact_primary_forest") as "is__intact_primary_forest",
+        max($"is__peatlands_flux") as "is__peatlands_flux"
       )
   }
 }
