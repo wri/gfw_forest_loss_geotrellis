@@ -5,7 +5,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{length, max}
 
 object WdpaWhitelistDF {
-  def whitelistWdpa(df: DataFrame): DataFrame = {
+  def whitelist(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._

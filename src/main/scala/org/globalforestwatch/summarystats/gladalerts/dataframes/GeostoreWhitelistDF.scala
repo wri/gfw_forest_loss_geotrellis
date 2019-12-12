@@ -5,7 +5,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{length, max}
 
 object GeostoreWhitelistDF {
-  def whitelistGeostore(df: DataFrame): DataFrame = {
+  def whitelist(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
