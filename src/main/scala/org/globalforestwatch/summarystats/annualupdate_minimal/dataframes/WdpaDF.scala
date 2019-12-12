@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.annualupdate_minimal.dataframes
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql.functions.sum
+import org.apache.spark.sql.functions.{length, max, sum, when}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object WdpaDF {
@@ -14,11 +14,11 @@ object WdpaDF {
     validatePresenceOfColumns(df, Seq("id", "data_group", "data"))
 
     df.select(
-      $"id.wdpa_id" as "wdpa_id",
-      $"id.name" as "name",
-      $"id.iucn_cat" as "iucn_cat",
-      $"id.iso" as "iso",
-      $"id.status" as "status",
+      $"id.wdpa_id" as "wdpa_protected_area__id",
+      $"id.name" as "wdpa_protected_area__name",
+      $"id.iucn_cat" as "wdpa_protected_area__iucn_cat",
+      $"id.iso" as "wdpa_protected_area__iso",
+      $"id.status" as "wdpa_protected_area__status",
       $"data_group.lossYear" as "treecover_loss__year",
       $"data_group.threshold" as "treecover_density__threshold",
       $"data_group.drivers" as "tcs_driver__type",
@@ -28,7 +28,7 @@ object WdpaDF {
       //      $"data_group.erosion" as "erosion_risk__level",
       //      $"data_group.biodiversitySignificance" as "is__biodiversity_significance_top_10_perc",
       //      $"data_group.biodiversityIntactness" as "is__biodiversity_intactness_top_10_perc",
-      $"data_group.wdpa" as "wdpa_protected_area__iucn_cat",
+      //      $"data_group.wdpa" as "wdpa_protected_area__iucn_cat",
       $"data_group.aze" as "is__alliance_for_zero_extinction_site",
       $"data_group.plantations" as "gfw_plantation__type",
       //      $"data_group.riverBasins" as "river_basin__name",
@@ -83,11 +83,11 @@ object WdpaDF {
 
     df.filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
       .groupBy(
-        $"wdpa_id",
-        $"name",
-        $"iucn_cat",
-        $"iso",
-        $"status",
+        $"wdpa_protected_area__id",
+        $"wdpa_protected_area__name",
+        $"wdpa_protected_area__iucn_cat",
+        $"wdpa_protected_area__iso",
+        $"wdpa_protected_area__status",
         $"treecover_loss__year",
         $"treecover_density__threshold",
         $"tcs_driver__type",
@@ -97,7 +97,7 @@ object WdpaDF {
         //      $"erosion_risk__level",
         //      $"is__biodiversity_significance_top_10_perc",
         //      $"is__biodiversity_intactness_top_10_perc",
-        $"wdpa_protected_area__iucn_cat",
+        //        $"wdpa_protected_area__iucn_cat",
         $"is__alliance_for_zero_extinction_site",
         $"gfw_plantation__type",
         //      $"river_basin__name",
@@ -145,11 +145,11 @@ object WdpaDF {
     import spark.implicits._
 
     df.groupBy(
-        $"wdpa_id",
-        $"name",
-        $"iucn_cat",
-        $"iso",
-        $"status",
+      $"wdpa_protected_area__id",
+      $"wdpa_protected_area__name",
+      $"wdpa_protected_area__iucn_cat",
+      $"wdpa_protected_area__iso",
+      $"wdpa_protected_area__status",
         $"treecover_density__threshold",
         $"tcs_driver__type",
         $"global_land_cover__class",
@@ -158,7 +158,7 @@ object WdpaDF {
         //      $"erosion_risk__level",
         //      $"is__biodiversity_significance_top_10_perc",
         //      $"is__biodiversity_intactness_top_10_perc",
-        $"wdpa_protected_area__iucn_cat",
+      //        $"wdpa_protected_area__iucn_cat",
         $"is__alliance_for_zero_extinction_site",
         $"gfw_plantation__type",
         //      $"river_basin__name",
@@ -205,6 +205,64 @@ object WdpaDF {
         sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2001-2018__Mg"
         //        sum("mangrove_aboveground_biomass_loss__Mg") as "mangrove_aboveground_biomass_loss_2001-2018__Mg",
         //        sum("mangrove_aboveground_co2_emissions__Mg") as "mangrove_co2_emissions_2001-2018__Mg"
+      )
+  }
+
+  def whitelist(df: DataFrame): DataFrame = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
+
+    df.groupBy(
+      $"wdpa_protected_area__id",
+      $"wdpa_protected_area__name",
+      $"wdpa_protected_area__iucn_cat",
+      $"wdpa_protected_area__iso",
+      $"wdpa_protected_area__status"
+    )
+      .agg(
+        max(length($"tcs_driver__type")).cast("boolean") as "tcs_driver__type",
+        max(length($"global_land_cover__class"))
+          .cast("boolean") as "global_land_cover__class",
+        max($"is__regional_primary_forest") as "is__regional_primary_forest",
+        //      $"is__idn_primary_forest",
+        //      $"erosion_risk__level",
+        //      $"is__biodiversity_significance_top_10_perc",
+        //      $"is__biodiversity_intactness_top_10_perc",
+        //        max(length($"wdpa_protected_area__iucn_cat")).cast("boolean") as "wdpa_protected_area__iucn_cat",
+        max($"is__alliance_for_zero_extinction_site") as "is__alliance_for_zero_extinction_site",
+        max(length($"gfw_plantation__type"))
+          .cast("boolean") as "gfw_plantation__type",
+        //      $"river_basin__name",
+        //      $"ecozone__name",
+        //      $"is__urban_water_intake",
+        max($"is__mangroves_1996") as "is__mangroves_1996",
+        max($"is__mangroves_2016") as "is__mangroves_2016",
+        //      $"baseline_water_stress__level",
+        max(length($"intact_forest_landscape__year"))
+          .cast("boolean") as "intact_forest_landscape__year",
+        //      $"is__endemic_bird_area",
+        max($"is__tiger_conservation_landscape") as "is__tiger_conservation_landscape",
+        max($"is__landmark") as "is__landmark",
+        max($"is__gfw_land_right") as "is__gfw_land_right",
+        max($"is__key_biodiversity_area") as "is__key_biodiversity_area",
+        max($"is__gfw_mining") as "is__gfw_mining",
+        //      $"rspo_oil_palm__certification_status",
+        max($"is__peat_land") as "is__peat_land",
+        max($"is__gfw_oil_palm") as "is__gfw_oil_palm",
+        max($"is__idn_forest_moratorium") as "is__idn_forest_moratorium",
+        //      $"idn_land_cover__class",
+        //      $"is__mex_protected_areas",
+        //      $"is__mex_psa",
+        //      $"mex_forest_zoning__zone",
+        //      $"is__per_permanent_production_forest",
+        //      $"is__per_protected_area",
+        //      $"per_forest_concession__type",
+        //      $"bra_biome__name",
+        max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
+        max($"is__gfw_resource_right") as "is__gfw_resource_right",
+        max($"is__gfw_logging") as "is__gfw_logging"
+        //      $"is__gfw_oil_gas",
       )
   }
 }
