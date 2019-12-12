@@ -64,6 +64,38 @@ object GladAlertsExport extends SummaryExport {
       }
     }
 
+
+    def exportWhitelist(df: DataFrame): Unit = {
+      if (!changeOnly) {
+        val adm2DF = df
+          .transform(GadmWhitelistDF.whitelistAdm2)
+
+        adm2DF
+          .coalesce(1)
+          .write
+          .options(csvOptions)
+          .csv(path = outputUrl + "/adm2/whitelist")
+
+        val adm1DF = adm2DF
+          .transform(GadmWhitelistDF.whitelistAdm1)
+
+        adm1DF
+          .coalesce(1)
+          .write
+          .options(csvOptions)
+          .csv(path = outputUrl + "/adm1/whitelist")
+
+        val isoDF = adm1DF
+          .transform(GadmWhitelistDF.whitelistIso)
+
+        isoDF
+          .coalesce(1)
+          .write
+          .options(csvOptions)
+          .csv(path = outputUrl + "/iso/whitelist")
+      }
+    }
+
     def exportAlerts(df: DataFrame): Unit = {
 
       val adm2DailyDF = df
@@ -109,6 +141,7 @@ object GladAlertsExport extends SummaryExport {
     summaryDF.unpersist()
 
     gadmDF.cache()
+    exportWhitelist(gadmDF)
     exportArea(gadmDF)
     exportAlerts(gadmDF)
     gadmDF.unpersist()
@@ -134,6 +167,13 @@ object GladAlertsExport extends SummaryExport {
     wdpaDF.cache()
 
     if (!changeOnly) {
+      wdpaDF
+        .transform(WdpaWhitelistDF.whitelistWdpa)
+        .coalesce(1)
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/wdpa/whitelist")
+
       wdpaDF
         .transform(WdpaDailyDF.sumArea)
         .coalesce(1)
@@ -179,6 +219,14 @@ object GladAlertsExport extends SummaryExport {
     featureDF.cache()
 
     if (!changeOnly) {
+
+      featureDF
+        .transform(SimpleFeatureWhitelistDF.whitelistSimpleFeature)
+        .coalesce(1)
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/feature/whitelist")
+
       featureDF
         .transform(SimpleFeatureDailyDF.sumArea)
         .coalesce(1)
@@ -224,6 +272,14 @@ object GladAlertsExport extends SummaryExport {
     featureDF.cache()
 
     if (!changeOnly) {
+
+      featureDF
+        .transform(GeostoreWhitelistDF.whitelistGeostore)
+        .coalesce(1)
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/geostore/whitelist")
+
       featureDF
         .transform(GeostoreFeatureDailyDF.sumArea)
         .coalesce(1)

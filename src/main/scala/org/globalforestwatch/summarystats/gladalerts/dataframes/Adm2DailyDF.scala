@@ -11,14 +11,7 @@ object Adm2DailyDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    validatePresenceOfColumns(
-      df,
-      Seq(
-        "id",
-        "data_group",
-        "data"
-      )
-    )
+    validatePresenceOfColumns(df, Seq("id", "data_group", "data"))
 
     df.filter($"data_group.tile.z" === minZoom)
       .select(
@@ -91,8 +84,7 @@ object Adm2DailyDF {
       )
     )
 
-    df
-      .filter($"alert__date".isNotNull)
+    df.filter($"alert__date".isNotNull)
       .groupBy(
         $"iso",
         $"adm1",
@@ -184,8 +176,6 @@ object Adm2DailyDF {
       $"is__intact_forest_landscapes_2016",
       $"bra_biome__name"
     )
-      .agg(
-        sum("area__ha") as "area__ha"
-      )
+      .agg(sum("area__ha") as "area__ha")
   }
 }

@@ -14,11 +14,11 @@ object WdpaWeeklyDF {
     validatePresenceOfColumns(
       df,
       Seq(
-        "wdpa_id",
-        "name",
-        "iucn_cat",
-        "iso",
-        "status",
+        "wdpa_protected_area__id",
+        "wdpa_protected_area__name",
+        "wdpa_protected_area__iucn_cat",
+        "wdpa_protected_area__iso",
+        "wdpa_protected_area__status",
         "alert__date",
         "is__confirmed_alert",
         "is__regional_primary_forest",
@@ -47,11 +47,11 @@ object WdpaWeeklyDF {
 
     df.filter($"alert__date".isNotNull)
       .select(
-        $"wdpa_id",
-        $"name",
-        $"iucn_cat",
-        $"iso",
-        $"status",
+        $"wdpa_protected_area__id",
+        $"wdpa_protected_area__name",
+        $"wdpa_protected_area__iucn_cat",
+        $"wdpa_protected_area__iso",
+        $"wdpa_protected_area__status",
         year($"alert__date") as "alert__year",
         weekofyear($"alert__date") as "alert__week",
         $"is__confirmed_alert",
@@ -78,11 +78,11 @@ object WdpaWeeklyDF {
         $"aboveground_co2_emissions__Mg"
       )
       .groupBy(
-        $"wdpa_id",
-        $"name",
-        $"iucn_cat",
-        $"iso",
-        $"status",
+        $"wdpa_protected_area__id",
+        $"wdpa_protected_area__name",
+        $"wdpa_protected_area__iucn_cat",
+        $"wdpa_protected_area__iso",
+        $"wdpa_protected_area__status",
         $"alert__year",
         $"alert__week",
         $"is__confirmed_alert",
