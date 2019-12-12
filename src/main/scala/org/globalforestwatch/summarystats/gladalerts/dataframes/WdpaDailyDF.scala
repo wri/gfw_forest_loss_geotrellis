@@ -15,11 +15,11 @@ object WdpaDailyDF {
 
     df.filter($"data_group.tile.z" === minZoom)
       .select(
-        $"id.wdpa_id" as "wdpa_id",
-        $"id.name" as "name",
-        $"id.iucn_cat" as "iucn_cat",
-        $"id.iso" as "iso",
-        $"id.status" as "status",
+        $"id.wdpa_id" as "wdpa_protected_area__id",
+        $"id.name" as "wdpa_protected_area__name",
+        $"id.iucn_cat" as "wdpa_protected_area__iucn_cat",
+        $"id.iso" as "wdpa_protected_area__iso",
+        $"id.status" as "wdpa_protected_area__status",
         $"data_group.alertDate" as "alert__date",
         $"data_group.isConfirmed" as "is__confirmed_alert",
         $"data_group.primaryForest" as "is__regional_primary_forest",
@@ -55,11 +55,11 @@ object WdpaDailyDF {
     validatePresenceOfColumns(
       df,
       Seq(
-        "wdpa_id",
-        "name",
-        "iucn_cat",
-        "iso",
-        "status",
+        "wdpa_protected_area__id",
+        "wdpa_protected_area__name",
+        "wdpa_protected_area__iucn_cat",
+        "wdpa_protected_area__iso",
+        "wdpa_protected_area__status",
         "alert__date",
         "is__confirmed_alert",
         "is__regional_primary_forest",
@@ -88,11 +88,11 @@ object WdpaDailyDF {
 
     df.filter($"alert__date".isNotNull)
       .groupBy(
-        $"wdpa_id",
-        $"name",
-        $"iucn_cat",
-        $"iso",
-        $"status",
+        $"wdpa_protected_area__id",
+        $"wdpa_protected_area__name",
+        $"wdpa_protected_area__iucn_cat",
+        $"wdpa_protected_area__iso",
+        $"wdpa_protected_area__status",
         $"alert__date",
         $"is__confirmed_alert",
         $"is__regional_primary_forest",
@@ -129,11 +129,11 @@ object WdpaDailyDF {
     validatePresenceOfColumns(
       df,
       Seq(
-        "wdpa_id",
-        "name",
-        "iucn_cat",
-        "iso",
-        "status",
+        "wdpa_protected_area__id",
+        "wdpa_protected_area__name",
+        "wdpa_protected_area__iucn_cat",
+        "wdpa_protected_area__iso",
+        "wdpa_protected_area__status",
         "is__regional_primary_forest",
         "is__alliance_for_zero_extinction_site",
         "is__key_biodiversity_area",
@@ -157,11 +157,11 @@ object WdpaDailyDF {
     )
 
     df.groupBy(
-      $"wdpa_id",
-      $"name",
-      $"iucn_cat",
-      $"iso",
-      $"status",
+      $"wdpa_protected_area__id",
+      $"wdpa_protected_area__name",
+      $"wdpa_protected_area__iucn_cat",
+      $"wdpa_protected_area__iso",
+      $"wdpa_protected_area__status",
       $"is__regional_primary_forest",
       $"is__alliance_for_zero_extinction_site",
       $"is__key_biodiversity_area",
