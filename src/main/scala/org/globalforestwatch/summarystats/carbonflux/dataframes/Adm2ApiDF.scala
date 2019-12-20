@@ -1,6 +1,6 @@
 package org.globalforestwatch.summarystats.carbonflux.dataframes
 
-import org.apache.spark.sql.functions.{length, max, sum, when}
+import org.apache.spark.sql.functions.{length, max, sum}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object Adm2ApiDF {
@@ -99,7 +99,6 @@ object Adm2ApiDF {
 
     df.groupBy($"iso", $"adm1", $"adm2")
       .agg(
-        max(length($"tcs_driver__type")).cast("boolean") as "tcs_driver__type",
         max($"is__treecover_loss_2000-2015") as "is__treecover_loss_2000-2015",
         max($"is__treecover_gain_2000-2012") as "is__treecover_gain_2000-2012",
         max($"is__mangrove") as "is__mangrove",

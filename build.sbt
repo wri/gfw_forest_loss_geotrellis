@@ -161,7 +161,7 @@ sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-116d9a4a")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 5
+sparkInstanceCount := 101
 sparkMasterType := "r4.2xlarge"
 sparkCoreType := "r4.2xlarge"
 sparkMasterEbsSize := Some(10)
@@ -208,9 +208,9 @@ sparkEmrConfigs := List(
     "spark.executor.memoryOverhead" -> "1g", //5G
     "spark.driver.cores" -> "1",
     "spark.driver.memory" -> "6652m",
-    "spark.executor.instances" -> "31", // 1339",
-    "spark.default.parallelism" -> "310", // "26790",
-    "spark.sql.shuffle.partitions" -> "310", //"26790",
+    "spark.executor.instances" -> "799", // 1339",
+    "spark.default.parallelism" -> "7990", // "26790",
+    "spark.sql.shuffle.partitions" -> "7990", //"26790",
     "spark.driver.maxResultSize" -> "3g",
     "spark.shuffle.service.enabled" -> "true",
     "spark.shuffle.compress" -> "true",

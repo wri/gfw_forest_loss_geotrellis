@@ -19,7 +19,7 @@ object WdpaWhitelistDF {
         "wdpa_protected_area__iso",
         "wdpa_protected_area__status",
         "is__regional_primary_forest",
-        "wdpa_protected_area__iucn_cat",
+        //        "wdpa_protected_area__iucn_cat",
         "is__alliance_for_zero_extinction_site",
         "is__key_biodiversity_area",
         "is__landmark",
@@ -49,8 +49,8 @@ object WdpaWhitelistDF {
       )
       .agg(
         max("is__regional_primary_forest") as "is__regional_primary_forest",
-        max(length($"wdpa_protected_area__iucn_cat"))
-          .cast("boolean") as "wdpa_protected_area__iucn_cat",
+        //        max(length($"wdpa_protected_area__iucn_cat"))
+        //          .cast("boolean") as "wdpa_protected_area__iucn_cat",
         max("is__alliance_for_zero_extinction_site") as "is__alliance_for_zero_extinction_site",
         max("is__key_biodiversity_area") as "is__key_biodiversity_area",
         max("is__landmark") as "is__landmark",
