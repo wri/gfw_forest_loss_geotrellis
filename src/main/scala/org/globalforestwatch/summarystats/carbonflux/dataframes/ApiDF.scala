@@ -33,6 +33,8 @@ object ApiDF {
       $"data_group.intactPrimaryForest" as "is__intact_primary_forest",
       $"data_group.peatlandsFlux" as "is__peatlands_flux",
       $"data_group.forestAgeCategory" as "forest_age_category__cat",
+      $"data_group.jplAGBextent" as "is__jplAGBextent",
+      $"data_group.FIAregionsUSextent" as "FIAregionsUSextent__region",
       $"data.treecoverLoss" as "treecover_loss__ha",
       $"data.biomassLoss" as "aboveground_biomass_loss__Mg",
       $"data.grossEmissionsCo2eCo2Only" as "gross_emissions_co2e_co2_only__Mg",

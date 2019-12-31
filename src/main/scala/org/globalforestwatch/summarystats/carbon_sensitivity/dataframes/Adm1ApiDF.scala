@@ -25,7 +25,9 @@ object Adm1ApiDF {
       $"gfw_plantation__type",
       $"is__intact_primary_forest",
       $"is__peatlands_flux",
-      $"forest_age_category__cat"
+      $"forest_age_category__cat",
+      $"is__jplAGBextent",
+      $"FIAregionsUSextent__region"
       )
       .agg(
         sum("treecover_loss__ha") as "treecover_loss__ha",
@@ -62,7 +64,9 @@ object Adm1ApiDF {
       $"gfw_plantation__type",
       $"is__intact_primary_forest",
       $"is__peatlands_flux",
-      $"forest_age_category__cat"
+      $"forest_age_category__cat",
+      $"is__jplAGBextent",
+      $"FIAregionsUSextent__region"
       )
       .agg(
         sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",

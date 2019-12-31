@@ -47,6 +47,8 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
   val intactPrimaryForest = IntactPrimaryForest(gridId)
   val peatlandsFlux = PeatlandsFlux(gridId)
   val forestAgeCategory = ForestAgeCategory(gridId)
+  val jplAGBExtent = jplAGBextent(gridId)
+  val FIAregionsUSExtent = FIAregionsUSextent(gridId)
 
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonFluxTile]] = {
 
@@ -96,6 +98,8 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
       val intactPrimaryForestTile = intactPrimaryForest.fetchWindow(window)
       val peatlandFluxTile = peatlandsFlux.fetchWindow(window)
       val forestAgeCategoryTile = forestAgeCategory.fetchWindow(window)
+      val jplAGBextentTile = jplAGBExtent.fetchWindow(window)
+      val FIAregionsUSextentTile = FIAregionsUSExtent.fetchWindow(window)
 
       val tile = CarbonFluxTile(
         lossTile,
@@ -128,7 +132,9 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
         plantationsTile,
         intactPrimaryForestTile,
         peatlandFluxTile,
-        forestAgeCategoryTile
+        forestAgeCategoryTile,
+        jplAGBextentTile,
+        FIAregionsUSextentTile
       )
 
       Raster(tile, window)

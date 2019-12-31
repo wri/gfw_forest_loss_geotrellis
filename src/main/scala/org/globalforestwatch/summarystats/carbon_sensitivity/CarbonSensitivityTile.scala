@@ -39,7 +39,9 @@ case class CarbonSensitivityTile(
                                   plantations: Plantations#OptionalITile,
                                   intactPrimaryForest: IntactPrimaryForest#OptionalITile,
                                   peatlandsFlux: PeatlandsFlux#OptionalITile,
-                                  forestAgeCategory: ForestAgeCategory#OptionalITile
+                                  forestAgeCategory: ForestAgeCategory#OptionalITile,
+                                  jplAGBextent: jplAGBextent#OptionalITile,
+                                  FIAregionsUSextent: FIAregionsUSextent#OptionalITile
                                 ) extends CellGrid {
   def cellType: CellType = loss.cellType
 

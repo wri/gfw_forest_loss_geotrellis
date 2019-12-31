@@ -81,6 +81,8 @@ object CarbonSensitivitySummary {
           raster.tile.intactPrimaryForest.getData(col, row)
         val peatlandsFlux: Boolean = raster.tile.peatlandsFlux.getData(col, row)
         val forestAgeCategory: String = raster.tile.forestAgeCategory.getData(col, row)
+        val jplAGBextent: Boolean = raster.tile.jplAGBextent.getData(col, row)
+        val FIAregionsUSextent: String = raster.tile.FIAregionsUSextent.getData(col, row)
 
         //        val cols: Int = raster.rasterExtent.cols
         //        val rows: Int = raster.rasterExtent.rows
@@ -143,7 +145,9 @@ object CarbonSensitivitySummary {
               plantations,
               intactPrimaryForest,
               peatlandsFlux,
-              forestAgeCategory
+              forestAgeCategory,
+              jplAGBextent,
+              FIAregionsUSextent
             )
 
             val summary: CarbonSensitivityData =

@@ -13,4 +13,6 @@ case class CarbonFluxDataGroup(lossYear: Integer,
                                plantations: String,
                                intactPrimaryForest: Boolean,
                                peatlandsFlux: Boolean,
-                               forestAgeCategory: String)
+                               forestAgeCategory: String,
+                               jplAGBextent: Boolean,
+                               FIAregionsUSextent: String)
