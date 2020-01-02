@@ -67,7 +67,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
       val adm2ApiDF = df
         .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
         .transform(
-          AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2", "treecover_loss__year"))
+          AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2"))
         )
         .coalesce(133) // this should result in an avg file size of 100MB
 
@@ -76,7 +76,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .csv(path = outputUrl + "/adm2/change")
 
       val adm1ApiDF = adm2ApiDF
-        .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "treecover_loss__year")))
+        .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1")))
         .coalesce(45) // this should result in an avg file size of 100MB
 
       adm1ApiDF.write
@@ -84,7 +84,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .csv(path = outputUrl + "/adm1/change")
 
       val isoApiDF = adm1ApiDF
-        .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "treecover_loss__year")))
+        .transform(AnnualUpdateMinimalDF.aggChange(List("iso")))
         .coalesce(14) // this should result in an avg file size of 100MB
 
       isoApiDF.write
@@ -193,28 +193,28 @@ object AnnualUpdateMinimalExport extends SummaryExport {
             $"id.iucn_cat" as "wdpa_protected_area__iucn_cat",
             $"id.iso" as "wdpa_protected_area__iso",
             $"id.status" as "wdpa_protected_area__status"
-          )
+          ), wdpa = true
         )
       )
 
     exportDF.cache()
     if (!changeOnly) {
       exportDF
-        .transform(AnnualUpdateMinimalDF.whitelist(idCols))
+        .transform(AnnualUpdateMinimalDF.whitelist(idCols, wdpa = true))
         .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/wdpa/whitelist")
 
       exportDF
-        .transform(AnnualUpdateMinimalDF.aggSummary(idCols))
+        .transform(AnnualUpdateMinimalDF.aggSummary(idCols, wdpa = true))
         .coalesce(33) // this should result in an avg file size of 100MB
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/wdpa/summary")
     }
     exportDF
-      .transform(AnnualUpdateMinimalDF.aggChange(idCols ::: List("treecover_loss__year")))
+      .transform(AnnualUpdateMinimalDF.aggChange(idCols, wdpa = true))
       .coalesce(50) // this should result in an avg file size of 100MB
       .write
       .options(csvOptions)
@@ -255,7 +255,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .csv(path = outputUrl + "/geostore/summary")
     }
     exportDF
-      .transform(AnnualUpdateMinimalDF.aggChange(idCols ::: List("treecover_loss__year")))
+      .transform(AnnualUpdateMinimalDF.aggChange(idCols))
       .coalesce(10) // this should result in an avg file size of 100MB
       .write
       .options(csvOptions)

@@ -134,10 +134,10 @@ object AnnualUpdateMinimalDF {
 
     val cols =
       if (!wdpa)
-        groupByCols ::: contextualLayers ::: List(
+        groupByCols ::: List("treecover_loss__year") ::: contextualLayers ::: List(
           "wdpa_protected_area__iucn_cat"
         )
-      else groupByCols ::: contextualLayers
+      else groupByCols ::: List("treecover_loss__year") ::: contextualLayers
 
     df.groupBy(cols.head, cols.tail: _*)
       .agg(

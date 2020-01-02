@@ -46,7 +46,7 @@ object AnnualUpdateExport extends SummaryExport {
       val adm2ApiDF = df
         .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
         .transform(
-          AnnualUpdateDF.aggChange(List("iso", "adm1", "adm2", "treecover_loss__year"))
+          AnnualUpdateDF.aggChange(List("iso", "adm1", "adm2"))
         )
         .coalesce(670) // this should result in an avg file size of 100MB
 
@@ -55,7 +55,7 @@ object AnnualUpdateExport extends SummaryExport {
         .csv(path = outputUrl + "/adm2/change")
 
       val adm1ApiDF = adm2ApiDF
-        .transform(AnnualUpdateDF.aggChange(List("iso", "adm1", "treecover_loss__year")))
+        .transform(AnnualUpdateDF.aggChange(List("iso", "adm1")))
         .coalesce(390) // this should result in an avg file size of 100MB
 
       adm1ApiDF.write
@@ -63,7 +63,7 @@ object AnnualUpdateExport extends SummaryExport {
         .csv(path = outputUrl + "/adm1/change")
 
       val isoApiDF = adm1ApiDF
-        .transform(AnnualUpdateDF.aggChange(List("iso", "treecover_loss__year")))
+        .transform(AnnualUpdateDF.aggChange(List("iso")))
         .coalesce(270) // this should result in an avg file size of 100MB
 
       isoApiDF.write
