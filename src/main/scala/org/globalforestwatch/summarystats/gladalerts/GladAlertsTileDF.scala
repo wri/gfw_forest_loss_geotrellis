@@ -1,10 +1,10 @@
-package org.globalforestwatch.summarystats.gladalerts.dataframes
+package org.globalforestwatch.summarystats.gladalerts
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
 import org.apache.spark.sql.functions.sum
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-object TileDF {
+object GladAlertsTileDF {
 
   def unpackValues(df: DataFrame): DataFrame = {
 

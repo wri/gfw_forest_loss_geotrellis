@@ -46,7 +46,8 @@ object AnnualUpdateDF {
     "is__gfw_wood_fiber",
     "is__gfw_resource_right",
     "is__gfw_logging",
-    "is__gfw_oil_gas")
+    "is__gfw_oil_gas"
+  )
 
   def unpackValues(df: DataFrame): DataFrame = {
 
@@ -116,68 +117,61 @@ object AnnualUpdateDF {
     )
   }
 
-
   def aggSummary(groupByCols: List[String])(df: DataFrame): DataFrame = {
 
     val cols = groupByCols ::: contextualLayers
 
-    df.groupBy(
-      cols.head,
-      cols.tail: _*
-    ).agg(
-      sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",
-      sum("treecover_extent_2010__ha") as "treecover_extent_2010__ha",
-      sum("area__ha") as "area__ha",
-      sum("treecover_gain_2000-2012__ha") as "treecover_gain_2000-2012__ha",
-      sum("aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
-      sum("aboveground_co2_stock_2000__Mg") as "aboveground_co2_stock_2000__Mg",
-      sum("mangrove_aboveground_biomass_stock_2000__Mg") as "mangrove_aboveground_biomass_stock_2000__Mg",
-      sum("mangrove_aboveground_co2_stock_2000__Mg") as "mangrove_aboveground_co2_stock_2000__Mg",
-      sum("treecover_loss__ha") as "treecover_loss_2001-2018__ha",
-      sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss_2001-2018__Mg",
-      sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2001-2018__Mg",
-      sum("mangrove_aboveground_biomass_loss__Mg") as "mangrove_aboveground_biomass_loss_2001-2018__Mg",
-      sum("mangrove_aboveground_co2_emissions__Mg") as "mangrove_co2_emissions_2001-2018__Mg"
-    )
+    df.groupBy(cols.head, cols.tail: _*)
+      .agg(
+        sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",
+        sum("treecover_extent_2010__ha") as "treecover_extent_2010__ha",
+        sum("area__ha") as "area__ha",
+        sum("treecover_gain_2000-2012__ha") as "treecover_gain_2000-2012__ha",
+        sum("aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
+        sum("aboveground_co2_stock_2000__Mg") as "aboveground_co2_stock_2000__Mg",
+        sum("mangrove_aboveground_biomass_stock_2000__Mg") as "mangrove_aboveground_biomass_stock_2000__Mg",
+        sum("mangrove_aboveground_co2_stock_2000__Mg") as "mangrove_aboveground_co2_stock_2000__Mg",
+        sum("treecover_loss__ha") as "treecover_loss_2001-2018__ha",
+        sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss_2001-2018__Mg",
+        sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions_2001-2018__Mg",
+        sum("mangrove_aboveground_biomass_loss__Mg") as "mangrove_aboveground_biomass_loss_2001-2018__Mg",
+        sum("mangrove_aboveground_co2_emissions__Mg") as "mangrove_co2_emissions_2001-2018__Mg"
+      )
   }
 
   def aggSummary2(groupByCols: List[String])(df: DataFrame): DataFrame = {
 
     val cols = groupByCols ::: contextualLayers
 
-    df.groupBy(
-      cols.head,
-      cols.tail: _*
-    ).agg(
-      sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",
-      sum("treecover_extent_2010__ha") as "treecover_extent_2010__ha",
-      sum("area__ha") as "area__ha",
-      sum("treecover_gain_2000-2012__ha") as "treecover_gain_2000-2012__ha",
-      sum("aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
-      sum("aboveground_co2_stock_2000__Mg") as "aboveground_co2_stock_2000__Mg",
-      sum("mangrove_aboveground_biomass_stock_2000__Mg") as "mangrove_aboveground_biomass_stock_2000__Mg",
-      sum("mangrove_aboveground_co2_stock_2000__Mg") as "mangrove_aboveground_co2_stock_2000__Mg",
-      sum("treecover_loss_2001-2018__ha") as "treecover_loss_2001-2018__ha",
-      sum("aboveground_biomass_loss_2001-2018__Mg") as "aboveground_biomass_loss_2001-2018__Mg",
-      sum("aboveground_co2_emissions_2001-2018__Mg") as "aboveground_co2_emissions_2001-2018__Mg",
-      sum("mangrove_aboveground_biomass_loss_2001-2018__Mg") as "mangrove_aboveground_biomass_loss_2001-2018__Mg",
-      sum("mangrove_aboveground_co2_emissions_2001-2018__Mg") as "mangrove_co2_emissions_2001-2018__Mg"
-    )
+    df.groupBy(cols.head, cols.tail: _*)
+      .agg(
+        sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",
+        sum("treecover_extent_2010__ha") as "treecover_extent_2010__ha",
+        sum("area__ha") as "area__ha",
+        sum("treecover_gain_2000-2012__ha") as "treecover_gain_2000-2012__ha",
+        sum("aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
+        sum("aboveground_co2_stock_2000__Mg") as "aboveground_co2_stock_2000__Mg",
+        sum("mangrove_aboveground_biomass_stock_2000__Mg") as "mangrove_aboveground_biomass_stock_2000__Mg",
+        sum("mangrove_aboveground_co2_stock_2000__Mg") as "mangrove_aboveground_co2_stock_2000__Mg",
+        sum("treecover_loss_2001-2018__ha") as "treecover_loss_2001-2018__ha",
+        sum("aboveground_biomass_loss_2001-2018__Mg") as "aboveground_biomass_loss_2001-2018__Mg",
+        sum("aboveground_co2_emissions_2001-2018__Mg") as "aboveground_co2_emissions_2001-2018__Mg",
+        sum("mangrove_aboveground_biomass_loss_2001-2018__Mg") as "mangrove_aboveground_biomass_loss_2001-2018__Mg",
+        sum("mangrove_aboveground_co2_emissions_2001-2018__Mg") as "mangrove_co2_emissions_2001-2018__Mg"
+      )
   }
 
   def aggChange(groupByCols: List[String])(df: DataFrame): DataFrame = {
 
-    val cols = groupByCols ::: contextualLayers
+    val cols = groupByCols ::: List("treecover_loss__year") ::: contextualLayers
 
-    df.groupBy(
-      cols.head,
-      cols.tail: _*
-    ).agg(
-      sum("treecover_loss__ha") as "treecover_loss__ha",
-      sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss__Mg",
-      sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions__Mg",
-      sum("mangrove_aboveground_biomass_loss__Mg") as "mangrove_aboveground_biomass_loss__Mg",
-      sum("mangrove_aboveground_co2_emissions__Mg") as "mangrove_aboveground_co2_emissions__Mg"
-    )
+    df.groupBy(cols.head, cols.tail: _*)
+      .agg(
+        sum("treecover_loss__ha") as "treecover_loss__ha",
+        sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss__Mg",
+        sum("aboveground_co2_emissions__Mg") as "aboveground_co2_emissions__Mg",
+        sum("mangrove_aboveground_biomass_loss__Mg") as "mangrove_aboveground_biomass_loss__Mg",
+        sum("mangrove_aboveground_co2_emissions__Mg") as "mangrove_aboveground_co2_emissions__Mg"
+      )
   }
 }
