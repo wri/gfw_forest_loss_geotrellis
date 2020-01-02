@@ -20,8 +20,7 @@ trait Feature extends java.io.Serializable {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    var newDF = df
-    newDF.transform(custom_filter(filters))
+    var newDF = df.transform(custom_filter(filters))
 
     val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
     val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")

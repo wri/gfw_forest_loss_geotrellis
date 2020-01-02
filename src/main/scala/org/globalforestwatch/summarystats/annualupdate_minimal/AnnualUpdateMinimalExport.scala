@@ -1,8 +1,7 @@
 package org.globalforestwatch.summarystats.annualupdate_minimal
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.summarystats.SummaryExport
-import org.globalforestwatch.summarystats.annualupdate_minimal.dataframes._
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 object AnnualUpdateMinimalExport extends SummaryExport {
@@ -13,23 +12,23 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
     def exportWhitelist(df: DataFrame): Unit = {
 
-      val adm2ApiDF = df.transform(Adm2ApiDF.whitelist)
+      val adm2ApiDF = df.transform(AnnualUpdateMinimalDF.whitelist(List("iso", "adm1", "adm2")))
       adm2ApiDF
-        .coalesce(40) // TODO: optimize size so that tables have an avg file size of 100MB
+        .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/whitelist")
 
-      val adm1ApiDF = adm2ApiDF.transform(Adm1ApiDF.whitelist)
+      val adm1ApiDF = adm2ApiDF.transform(AnnualUpdateMinimalDF.whitelist2(List("iso", "adm1")))
       adm1ApiDF
-        .coalesce(12) // TODO: optimize size so that tables have an avg file size of 100MB
+        .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/whitelist")
 
-      val isoApiDF = adm1ApiDF.transform(IsoApiDF.whitelist)
+      val isoApiDF = adm1ApiDF.transform(AnnualUpdateMinimalDF.whitelist2(List("iso")))
       isoApiDF
-        .coalesce(3) // TODO: optimize size so that tables have an avg file size of 100MB
+        .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/iso/whitelist")
@@ -38,21 +37,21 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
     def exportSummary(df: DataFrame): Unit = {
 
-      val adm2ApiDF = df.transform(Adm2ApiDF.sumArea)
+      val adm2ApiDF = df.transform(AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2")))
       adm2ApiDF
         .coalesce(40) // this should result in an avg file size of 100MB
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/summary")
 
-      val adm1ApiDF = adm2ApiDF.transform(Adm1ApiDF.sumArea)
+      val adm1ApiDF = adm2ApiDF.transform(AnnualUpdateMinimalDF.aggSummary2(List("iso", "adm1")))
       adm1ApiDF
         .coalesce(12) // this should result in an avg file size of 100MB
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/summary")
 
-      val isoApiDF = adm1ApiDF.transform(IsoApiDF.sumArea)
+      val isoApiDF = adm1ApiDF.transform(AnnualUpdateMinimalDF.aggSummary2(List("iso")))
       isoApiDF
         .coalesce(3) // this should result in an avg file size of 100MB
         .write
@@ -62,8 +61,14 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     }
 
     def exportChange(df: DataFrame): Unit = {
+      val spark: SparkSession = df.sparkSession
+      import spark.implicits._
+
       val adm2ApiDF = df
-        .transform(Adm2ApiDF.sumChange)
+        .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
+        .transform(
+          AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2", "treecover_loss__year"))
+        )
         .coalesce(133) // this should result in an avg file size of 100MB
 
       adm2ApiDF.write
@@ -71,7 +76,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .csv(path = outputUrl + "/adm2/change")
 
       val adm1ApiDF = adm2ApiDF
-        .transform(Adm1ApiDF.sumChange)
+        .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "treecover_loss__year")))
         .coalesce(45) // this should result in an avg file size of 100MB
 
       adm1ApiDF.write
@@ -79,7 +84,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .csv(path = outputUrl + "/adm1/change")
 
       val isoApiDF = adm1ApiDF
-        .transform(IsoApiDF.sumChange)
+        .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "treecover_loss__year")))
         .coalesce(14) // this should result in an avg file size of 100MB
 
       isoApiDF.write
@@ -93,10 +98,12 @@ object AnnualUpdateMinimalExport extends SummaryExport {
       import spark.implicits._
 
       val adm2SummaryDF = df
-        .transform(Adm2DownloadDF.sumArea)
+        .transform(AnnualUpdateMinimalDownloadDF.sumDownload)
 
       adm2SummaryDF
-        .transform(Adm2DownloadDF.roundValues)
+        .transform(
+          AnnualUpdateMinimalDownloadDF.roundDownload
+        )
         .coalesce(1)
         .orderBy(
           $"country",
@@ -108,20 +115,25 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/download")
 
-      val adm1SummaryDF = adm2SummaryDF.transform(Adm1DownloadDF.sumArea)
+      val adm1SummaryDF =
+        adm2SummaryDF.transform(AnnualUpdateMinimalDownloadDF.sumDownload(List("iso", "adm1")))
 
       adm1SummaryDF
-        .transform(Adm1DownloadDF.roundValues)
+        .transform(
+          AnnualUpdateMinimalDownloadDF
+            .roundDownload2(List($"iso" as "country", $"adm1" as "subnational1"))
+        )
         .coalesce(1)
         .orderBy($"country", $"subnational1", $"treecover_density__threshold")
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/download")
 
-      val isoSummaryDF = adm1SummaryDF.transform(IsoDownloadDF.sumArea)
+      val isoSummaryDF =
+        adm1SummaryDF.transform(AnnualUpdateMinimalDownloadDF.sumDownload2(List("iso")))
 
       isoSummaryDF
-        .transform(IsoDownloadDF.roundValues)
+        .transform(AnnualUpdateMinimalDownloadDF.roundDownload2(List($"iso" as "country")))
         .coalesce(1)
         .orderBy($"country", $"treecover_density__threshold")
         .write
@@ -133,8 +145,15 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     val changeOnly: Boolean =
       getAnyMapValue[Boolean](kwargs, "changeOnly")
 
+    val spark: SparkSession = summaryDF.sparkSession
+    import spark.implicits._
+
     val exportDF = summaryDF
-      .transform(GadmDF.unpackValues)
+      .transform(
+        AnnualUpdateMinimalDF.unpackValues(
+          List($"id.iso" as "iso", $"id.adm1" as "adm1", $"id.adm2" as "adm2")
+        )
+      )
 
     exportDF.cache()
     if (!changeOnly) {
@@ -151,31 +170,52 @@ object AnnualUpdateMinimalExport extends SummaryExport {
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
 
+    val spark: SparkSession = summaryDF.sparkSession
+    import spark.implicits._
+
+    val idCols: List[String] = List(
+      "wdpa_protected_area__id",
+      "wdpa_protected_area__name",
+      "wdpa_protected_area__iucn_cat",
+      "wdpa_protected_area__iso",
+      "wdpa_protected_area__status"
+    )
+
     val changeOnly: Boolean =
       getAnyMapValue[Boolean](kwargs, "changeOnly")
 
     val exportDF = summaryDF
-      .transform(WdpaDF.unpackValues)
+      .transform(
+        AnnualUpdateMinimalDF.unpackValues(
+          List(
+            $"id.wdpa_id" as "wdpa_protected_area__id",
+            $"id.name" as "wdpa_protected_area__name",
+            $"id.iucn_cat" as "wdpa_protected_area__iucn_cat",
+            $"id.iso" as "wdpa_protected_area__iso",
+            $"id.status" as "wdpa_protected_area__status"
+          )
+        )
+      )
 
     exportDF.cache()
     if (!changeOnly) {
       exportDF
-        .transform(WdpaDF.whitelist)
-        .coalesce(40) // TODO: optimize size so that tables have an avg file size of 100MB
+        .transform(AnnualUpdateMinimalDF.whitelist(idCols))
+        .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/wdpa/whitelist")
 
       exportDF
-        .transform(WdpaDF.sumArea)
-        .coalesce(40) // this should result in an avg file size of 100MB
+        .transform(AnnualUpdateMinimalDF.aggSummary(idCols))
+        .coalesce(33) // this should result in an avg file size of 100MB
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/wdpa/summary")
     }
     exportDF
-      .transform(WdpaDF.sumChange)
-      .coalesce(133) // this should result in an avg file size of 100MB
+      .transform(AnnualUpdateMinimalDF.aggChange(idCols ::: List("treecover_loss__year")))
+      .coalesce(50) // this should result in an avg file size of 100MB
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/wdpa/change")
@@ -187,32 +227,36 @@ object AnnualUpdateMinimalExport extends SummaryExport {
                                         outputUrl: String,
                                         kwargs: Map[String, Any]): Unit = {
 
-    val changeOnly: Boolean =
-      getAnyMapValue[Boolean](kwargs, "changeOnly")
+    val spark: SparkSession = summaryDF.sparkSession
+    import spark.implicits._
+
+    val idCols: List[String] = List("geostore__id")
+
+    val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
     val exportDF = summaryDF
-      .transform(GeostoreDF.unpackValues)
+      .transform(AnnualUpdateMinimalDF.unpackValues(List($"id.geostoreId" as "geostore__id")))
 
     exportDF.cache()
     if (!changeOnly) {
 
       exportDF
-        .transform(GeostoreDF.whitelist)
-        .coalesce(40) // TODO: optimize size so that tables have an avg file size of 100MB
+        .transform(AnnualUpdateMinimalDF.whitelist(idCols))
+        .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/geostore/whitelist")
 
       exportDF
-        .transform(GeostoreDF.sumArea)
-        .coalesce(40) // this should result in an avg file size of 100MB
+        .transform(AnnualUpdateMinimalDF.aggSummary(idCols))
+        .coalesce(4) // this should result in an avg file size of 100MB
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/geostore/summary")
     }
     exportDF
-      .transform(GeostoreDF.sumChange)
-      .coalesce(133) // this should result in an avg file size of 100MB
+      .transform(AnnualUpdateMinimalDF.aggChange(idCols ::: List("treecover_loss__year")))
+      .coalesce(10) // this should result in an avg file size of 100MB
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/geostore/change")
