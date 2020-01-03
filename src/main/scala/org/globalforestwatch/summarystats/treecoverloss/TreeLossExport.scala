@@ -16,8 +16,6 @@ object TreeLossExport extends SummaryExport {
     val includePrimaryForest: Boolean =
       getAnyMapValue[Boolean](kwargs, "includePrimaryForest")
 
-    summaryDF.show(truncate = false)
-
     summaryDF
       .transform(TreeLossDF.unpackValues)
       .transform(TreeLossDF.primaryForestFilter(includePrimaryForest))
