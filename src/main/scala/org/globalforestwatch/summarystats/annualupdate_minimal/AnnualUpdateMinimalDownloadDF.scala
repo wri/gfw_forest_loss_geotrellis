@@ -13,11 +13,11 @@ object AnnualUpdateMinimalDownloadDF {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    val year_range = treecoverLossMinYear to treecoverLossMaxYear
+    val yearRange = treecoverLossMinYear to treecoverLossMaxYear
 
     val annualDF = df
       .groupBy($"iso", $"adm1", $"adm2", $"treecover_density__threshold")
-      .pivot("treecover_loss__year", year_range)
+      .pivot("treecover_loss__year", yearRange)
       .agg(
         sum("treecover_loss__ha") as "treecover_loss__ha",
         sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss__Mg",
