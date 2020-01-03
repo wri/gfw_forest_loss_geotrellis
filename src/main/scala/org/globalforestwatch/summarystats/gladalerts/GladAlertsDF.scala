@@ -107,7 +107,7 @@ object GladAlertsDF {
       weekofyear($"alert__date") as "alert__week",
       $"is__confirmed_alert"
     )
-    aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, gladCols, wdpa)
+    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, gladCols, wdpa)
   }
 
   def aggChangeWeekly2(cols: List[String],
@@ -117,13 +117,13 @@ object GladAlertsDF {
     import spark.implicits._
 
     val gladCols = List($"alert__year", $"alert__week", $"is__confirmed_alert")
-    aggChangeWeekly(df, cols, gladCols, wdpa)
+    _aggChangeWeekly(df, cols, gladCols, wdpa)
   }
 
-  private def aggChangeWeekly(df: DataFrame,
-                              cols: List[String],
-                              gladCols: List[Column],
-                              wdpa: Boolean = false): DataFrame = {
+  private def _aggChangeWeekly(df: DataFrame,
+                               cols: List[String],
+                               gladCols: List[Column],
+                               wdpa: Boolean = false): DataFrame = {
     val spark = df.sparkSession
     import spark.implicits._
 
