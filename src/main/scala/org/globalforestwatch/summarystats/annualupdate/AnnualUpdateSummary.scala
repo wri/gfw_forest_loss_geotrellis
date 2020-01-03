@@ -5,6 +5,9 @@ import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.util.Implicits._
+
+import scala.annotation.tailrec
 
 /** LossData Summary by year */
 case class AnnualUpdateSummary(
@@ -31,7 +34,7 @@ object AnnualUpdateSummary {
                    acc: AnnualUpdateSummary): AnnualUpdateSummary = {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
-        val gain: Integer = raster.tile.gain.getData(col, row)
+        val gain: Boolean = raster.tile.gain.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
@@ -107,14 +110,16 @@ object AnnualUpdateSummary {
         val gainArea: Double = gain * areaHa
 
         val co2Factor = 0.5 * 44 / 12
+        val mangroveCo2Factor = 0.45 * 44 / 12
 
         val biomassPixel = biomass * areaHa
         val co2Pixel = biomassPixel * co2Factor
         val mangroveBiomassPixel = mangroveBiomass * areaHa
-        val mangroveCo2Pixel = mangroveBiomassPixel * co2Factor
+        val mangroveCo2Pixel = mangroveBiomassPixel * mangroveCo2Factor
 
         val thresholds = List(10, 15, 20, 25, 30, 50, 75)
 
+        @tailrec
         def updateSummary(
           thresholds: List[Int],
           stats: Map[AnnualUpdateDataGroup, AnnualUpdateData]
@@ -178,14 +183,14 @@ object AnnualUpdateSummary {
             if (tcd2000 >= thresholds.head) {
 
               if (loss != null) {
-                summary.areaLoss += areaHa
+                summary.treecoverLoss += areaHa
                 summary.biomassLoss += biomassPixel
                 summary.co2Emissions += co2Pixel
                 summary.mangroveBiomassLoss += mangroveBiomassPixel
                 summary.mangroveCo2Emissions += mangroveCo2Pixel
               }
 
-              summary.extent2000 += areaHa
+              summary.treecoverExtent2000 += areaHa
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
               summary.totalMangroveBiomass += mangroveBiomassPixel
@@ -193,7 +198,7 @@ object AnnualUpdateSummary {
             }
 
             if (tcd2010 >= thresholds.head) {
-              summary.extent2010 += areaHa
+              summary.treecoverExtent2010 += areaHa
             }
 
             updateSummary(thresholds.tail, stats.updated(pKey, summary))

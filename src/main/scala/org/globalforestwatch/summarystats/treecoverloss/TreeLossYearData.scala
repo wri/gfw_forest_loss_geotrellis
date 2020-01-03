@@ -2,9 +2,9 @@ package org.globalforestwatch.summarystats.treecoverloss
 
 
 case class TreeLossYearData(year: Int,
-                            var area_loss: Double,
-                            var biomass_loss: Double,
-                            var carbon_emissions: Double
+                            var treecoverLoss: Double,
+                            var biomassLoss: Double,
+                            var carbonEmissions: Double
                            )
 
 object TreeLossYearData {

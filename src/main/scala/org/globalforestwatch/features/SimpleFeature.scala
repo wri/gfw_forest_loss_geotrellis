@@ -22,29 +22,20 @@ object SimpleFeature extends Feature {
     geotrellis.vector.Feature(geom, SimpleFeatureId(feature_id))
   }
 
-  def filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
+  override def custom_filter(
+                              filters: Map[String, Any]
+                            )(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    var newDF = df
-
     val idStart: Option[Int] = getAnyMapValue[Option[Int]](filters, "idStart")
     val idEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
-    val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
 
-    idStart.foreach { startId =>
-      newDF = newDF.filter($"fid" >= startId)
-    }
+    val idStartDF: DataFrame =
+      idStart.foldLeft(df)((acc, i) => acc.filter($"fid" >= i))
 
-    idEnd.foreach { endId =>
-      newDF = newDF.filter($"fid" < endId)
-    }
+    idEnd.foldLeft(idStartDF)((acc, i) => acc.filter($"fid" < i))
 
-    limit.foreach { n =>
-      newDF = newDF.limit(n)
-    }
-
-    newDF
   }
 }

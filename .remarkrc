@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "bullet": "*",
+    "ruleRepetition": 3,
+    "fences": true,
+    "spacedTable": false
+  },
+  "plugins": [
+    "remark-preset-lint-recommended"
+  ]
+}

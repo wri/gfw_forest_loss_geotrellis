@@ -5,6 +5,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{
   FeatureId,
   GadmFeatureId,
+  GeostoreFeatureId,
   SimpleFeatureId,
   WdpaFeatureId
 }
@@ -19,9 +20,10 @@ case class GladAlertsDFFactory(
 
   def getDataFrame: DataFrame = {
     featureType match {
-      case "gadm"    => getGadmDataFrame
+      case "gadm" => getGadmDataFrame
       case "feature" => getFeatureDataFrame
-      case "wdpa"    => getWdpaDataFrame
+      case "wdpa" => getWdpaDataFrame
+      case "geostore" => getGeostoreDataFrame
       case _ =>
         throw new IllegalArgumentException("Not a valid FeatureId")
     }
@@ -44,6 +46,7 @@ case class GladAlertsDFFactory(
       }
       .toDF("id", "data_group", "data")
   }
+
   private def getFeatureDataFrame: DataFrame = {
     summaryRDD
       .flatMap {
@@ -61,6 +64,7 @@ case class GladAlertsDFFactory(
       }
       .toDF("id", "data_group", "data")
   }
+
   private def getWdpaDataFrame: DataFrame = {
     summaryRDD
       .flatMap {
@@ -79,4 +83,21 @@ case class GladAlertsDFFactory(
       .toDF("id", "data_group", "data")
   }
 
+  private def getGeostoreDataFrame: DataFrame = {
+    summaryRDD
+      .flatMap {
+        case (id, summary) =>
+          summary.stats.map {
+            case (dataGroup, data) => {
+              id match {
+                case geostoreId: GeostoreFeatureId =>
+                  GladAlertsRowGeostore(geostoreId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a GeostoreFeatureId")
+              }
+            }
+          }
+      }
+      .toDF("id", "data_group", "data")
+  }
 }

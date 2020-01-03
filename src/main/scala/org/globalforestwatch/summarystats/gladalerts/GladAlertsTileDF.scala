@@ -1,10 +1,10 @@
 package org.globalforestwatch.summarystats.gladalerts
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql._
+import org.apache.spark.sql.functions.sum
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
-object TileDF {
+object GladAlertsTileDF {
 
   def unpackValues(df: DataFrame): DataFrame = {
 
@@ -24,9 +24,9 @@ object TileDF {
       $"data_group.tile.x" as "x",
       $"data_group.tile.y" as "y",
       $"data_group.tile.z" as "z",
-      $"data_group.alertDate" as "alert_date",
-      $"data_group.isConfirmed" as "is_confirmed",
-      $"data.totalAlerts" as "alert_count"
+      $"data_group.alertDate" as "alert__date",
+      $"data_group.isConfirmed" as "is__confirmed_alert",
+      $"data.totalAlerts" as "alert__count"
 
     )
   }
@@ -42,13 +42,13 @@ object TileDF {
         "x",
         "y",
         "z",
-        "alert_date",
-        "is_confirmed",
-        "alert_count"
+        "alert__date",
+        "is__confirmed_alert",
+        "alert__count"
       )
     )
 
-    df.groupBy($"x", $"y", $"z", $"alert_date", $"is_confirmed")
-      .agg(sum($"alert_count") as "alert_count")
+    df.groupBy($"x", $"y", $"z", $"alert__date", $"is__confirmed_alert")
+      .agg(sum($"alert__count") as "alert__count")
   }
 }

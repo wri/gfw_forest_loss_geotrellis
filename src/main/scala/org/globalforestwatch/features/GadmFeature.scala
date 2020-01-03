@@ -35,55 +35,37 @@ object GadmFeature extends Feature {
     geotrellis.vector.Feature(geom, GadmFeatureId(countryCode, admin1, admin2))
   }
 
-  def filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
+  override def custom_filter(
+                              filters: Map[String, Any]
+                            )(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    var newDF = df
-
-    val isoFirst: Option[String] = getAnyMapValue[Option[String]](filters, "isoFirst")
-    val isoStart: Option[String] = getAnyMapValue[Option[String]](filters, "isoStart")
-    val isoEnd: Option[String] = getAnyMapValue[Option[String]](filters, "isoEnd")
+    val isoFirst: Option[String] =
+      getAnyMapValue[Option[String]](filters, "isoFirst")
+    val isoStart: Option[String] =
+      getAnyMapValue[Option[String]](filters, "isoStart")
+    val isoEnd: Option[String] =
+      getAnyMapValue[Option[String]](filters, "isoEnd")
     val iso: Option[String] = getAnyMapValue[Option[String]](filters, "iso")
-    val admin1: Option[String] = getAnyMapValue[Option[String]](filters, "admin1")
-    val admin2: Option[String] = getAnyMapValue[Option[String]](filters, "admin2")
-    val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
-    val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")
-    val glad: Boolean = getAnyMapValue[Boolean](filters, "glad")
+    val admin1: Option[String] =
+      getAnyMapValue[Option[String]](filters, "admin1")
+    val admin2: Option[String] =
+      getAnyMapValue[Option[String]](filters, "admin2")
 
-    if (glad) newDF = newDF.filter($"glad" === "t")
+    val isoFirstDF: DataFrame = isoFirst.foldLeft(df)(
+      (acc, i) => acc.filter(substring($"gid_0", 0, 1) === i(0))
+    )
+    val isoStartDF: DataFrame =
+      isoStart.foldLeft(isoFirstDF)((acc, i) => acc.filter($"gid_0" >= i))
+    val isoEndDF: DataFrame =
+      isoEnd.foldLeft(isoStartDF)((acc, i) => acc.filter($"gid_0" < i))
+    val isoDF: DataFrame =
+      iso.foldLeft(isoEndDF)((acc, i) => acc.filter($"gid_0" === i))
+    val admin1DF: DataFrame =
+      admin1.foldRight(isoDF)((i, acc) => acc.filter($"gid_1" === i))
+    admin2.foldRight(admin1DF)((i, acc) => acc.filter($"gid_2" === i))
 
-    if (tcl) newDF = newDF.filter($"tcl" === "t")
-
-    isoFirst.foreach { firstLetter =>
-      newDF = newDF.filter(substring($"gid_0", 0, 1) === firstLetter(0))
-    }
-
-    isoStart.foreach { startCode =>
-      newDF = newDF.filter($"gid_0" >= startCode)
-    }
-
-    isoEnd.foreach { endCode =>
-      newDF = newDF.filter($"gid_0" < endCode)
-    }
-
-    iso.foreach { isoCode =>
-      newDF = newDF.filter($"gid_0" === isoCode)
-    }
-
-    admin1.foreach { admin1Code =>
-      newDF = newDF.filter($"gid_1" === admin1Code)
-    }
-
-    admin2.foreach { admin2Code =>
-      newDF = newDF.filter($"gid_2" === admin2Code)
-    }
-
-    limit.foreach { n =>
-      newDF = newDF.limit(n)
-    }
-
-    newDF
   }
 }

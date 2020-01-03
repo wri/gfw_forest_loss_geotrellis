@@ -30,65 +30,49 @@ object WdpaFeature extends Feature {
       .Feature(geom, WdpaFeatureId(wdpa_id, name, iucn_cat, iso, status))
   }
 
-  def filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
+  override def custom_filter(
+                              filters: Map[String, Any]
+                            )(df: DataFrame): DataFrame = {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-
-    val isoFirst: Option[String] = getAnyMapValue[Option[String]](filters, "isoFirst")
-    val isoStart: Option[String] = getAnyMapValue[Option[String]](filters, "isoStart")
-    val isoEnd: Option[String] = getAnyMapValue[Option[String]](filters, "isoEnd")
+    val isoFirst: Option[String] =
+      getAnyMapValue[Option[String]](filters, "isoFirst")
+    val isoStart: Option[String] =
+      getAnyMapValue[Option[String]](filters, "isoStart")
+    val isoEnd: Option[String] =
+      getAnyMapValue[Option[String]](filters, "isoEnd")
     val iso: Option[String] = getAnyMapValue[Option[String]](filters, "iso")
-    val wdpaIdStart: Option[Int] = getAnyMapValue[Option[Int]](filters, "idStart")
+    val wdpaIdStart: Option[Int] =
+      getAnyMapValue[Option[Int]](filters, "idStart")
     val wdpaIdEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
-    val iucnCat: Option[String] = getAnyMapValue[Option[String]](filters, "iucnCat")
-    val wdpaStatus: Option[String] = getAnyMapValue[Option[String]](filters, "wdpaStatus")
-    val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
-    val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")
-    val glad: Boolean = getAnyMapValue[Boolean](filters, "glad")
+    val iucnCat: Option[String] =
+      getAnyMapValue[Option[String]](filters, "iucnCat")
+    val wdpaStatus: Option[String] =
+      getAnyMapValue[Option[String]](filters, "wdpaStatus")
 
-    var newDF = df
+    val isoFirstDF: DataFrame = isoFirst.foldLeft(df)(
+      (acc, i) => acc.filter(substring($"gid_0", 0, 1) === i(0))
+    )
+    val isoStartDF: DataFrame =
+      isoStart.foldLeft(isoFirstDF)((acc, i) => acc.filter($"gid_0" >= i))
+    val isoEndDF: DataFrame =
+      isoEnd.foldLeft(isoStartDF)((acc, i) => acc.filter($"gid_0" < i))
+    val isoDF: DataFrame =
+      iso.foldLeft(isoEndDF)((acc, i) => acc.filter($"gid_0" === i))
 
-    if (glad) newDF = newDF.filter($"glad" === "t")
+    val wdpaIdStartDF =
+      wdpaIdStart.foldLeft(isoDF)((acc, i) => acc.filter($"wdpaid" >= i))
 
-    if (tcl) newDF = newDF.filter($"tcl" === "t")
+    val wdpaIdEndtDF =
+      wdpaIdEnd.foldLeft(wdpaIdStartDF)((acc, i) => acc.filter($"wdpaid" < i))
 
-    isoFirst.foreach { firstLetter =>
-      newDF = newDF.filter(substring($"iso", 0, 1) === firstLetter(0))
-    }
+    val iucnCatDF =
+      wdpaIdEnd.foldLeft(wdpaIdEndtDF)(
+        (acc, i) => acc.filter($"iucn_cat" === i)
+      )
 
-    isoStart.foreach { startCode =>
-      newDF = newDF.filter($"iso" >= startCode)
-    }
+    wdpaStatus.foldLeft(iucnCatDF)((acc, i) => acc.filter($"status" === i))
 
-    isoEnd.foreach { endCode =>
-      newDF = newDF.filter($"iso" < endCode)
-    }
-
-    iso.foreach { isoCode =>
-      newDF = newDF.filter($"iso" === isoCode)
-    }
-
-    wdpaIdStart.foreach { startId =>
-      newDF = newDF.filter($"wdpaid" >= startId)
-    }
-
-    wdpaIdEnd.foreach { endId =>
-      newDF = newDF.filter($"wdpaid" < endId)
-    }
-
-    iucnCat.foreach { category =>
-      newDF = newDF.filter($"iucn_cat" === category)
-    }
-
-    wdpaStatus.foreach { status =>
-      newDF = newDF.filter($"status" === status)
-    }
-
-    limit.foreach { n =>
-      newDF = newDF.limit(n)
-    }
-
-    newDF
   }
 }

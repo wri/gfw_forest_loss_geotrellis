@@ -40,7 +40,7 @@ object SummaryMain
         val featureTypeOpt = Opts
           .option[String](
             "feature_type",
-            help = "Feature type: Simple feature or GADM"
+            help = "Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature'"
           )
           .withDefault("feature")
 
@@ -116,7 +116,7 @@ object SummaryMain
 
         val thresholdOpts = Opts
           .options[Int]("threshold", "Treecover threshold to apply")
-          .orEmpty
+          .withDefault(List(30))
 
         val primartyForestOpt = Opts
           .flag("primary-forests", "Include Primary Forests")
@@ -217,7 +217,7 @@ object SummaryMain
             val featureRDD: RDD[Feature[Geometry, FeatureId]] =
               FeatureRDD(featuresDF, featureObj)
 
-            val inputPartitionMultiplier = 16
+            val inputPartitionMultiplier = 64
 
             val part = new HashPartitioner(
               partitions = featureRDD.getNumPartitions * inputPartitionMultiplier

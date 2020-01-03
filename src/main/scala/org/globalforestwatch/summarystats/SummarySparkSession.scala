@@ -10,10 +10,12 @@ object SummarySparkSession {
       .setAppName(name)
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
+      .set("spark.debug.maxToStringFields", "255")
     //    .set("spark.sql.crossJoin.enabled", "true")
 
     val localConf: SparkConf = conf
       .setIfMissing("spark.master", "local[*]")
+
 
     implicit val spark: SparkSession = try {
       SparkSession.builder.config(conf).getOrCreate

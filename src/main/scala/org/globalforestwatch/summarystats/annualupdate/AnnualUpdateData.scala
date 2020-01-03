@@ -6,7 +6,7 @@ import cats.Semigroup
   *
   * Note: This case class contains mutable values
   *
-  * @param areaLoss
+  * @param treecoverLoss
   * @param biomassLoss
   * @param co2Emissions
   * @param mangroveBiomassLoss
@@ -18,13 +18,13 @@ import cats.Semigroup
   * @param totalMangroveBiomass
   * @param totalMangroveCo2
   */
-case class AnnualUpdateData(var areaLoss: Double,
+case class AnnualUpdateData(var treecoverLoss: Double,
                             var biomassLoss: Double,
                             var co2Emissions: Double,
                             var mangroveBiomassLoss: Double,
                             var mangroveCo2Emissions: Double,
-                            var extent2000: Double,
-                            var extent2010: Double,
+                            var treecoverExtent2000: Double,
+                            var treecoverExtent2010: Double,
                             var totalArea: Double,
                             var totalGainArea: Double,
                             var totalBiomass: Double,
@@ -34,13 +34,13 @@ case class AnnualUpdateData(var areaLoss: Double,
   def merge(other: AnnualUpdateData): AnnualUpdateData = {
 
     AnnualUpdateData(
-      areaLoss + other.areaLoss,
+      treecoverLoss + other.treecoverLoss,
       biomassLoss + other.biomassLoss,
       co2Emissions + other.co2Emissions,
       mangroveBiomassLoss + other.mangroveBiomassLoss,
       mangroveCo2Emissions + other.mangroveCo2Emissions,
-      extent2000 + other.extent2000,
-      extent2010 + other.extent2010,
+      treecoverExtent2000 + other.treecoverExtent2000,
+      treecoverExtent2010 + other.treecoverExtent2010,
       totalArea + other.totalArea,
       totalGainArea + other.totalGainArea,
       totalBiomass + other.totalBiomass,

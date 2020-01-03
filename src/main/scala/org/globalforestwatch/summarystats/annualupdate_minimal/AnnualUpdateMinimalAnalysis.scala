@@ -34,7 +34,7 @@ object AnnualUpdateMinimalAnalysis {
     //    val outputPartitionCount =
     //      maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
-    summaryDF.repartition($"id", $"data_group.threshold")
+    summaryDF.repartition($"id", $"data_group")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
       "/annualupdate_minimal_" + DateTimeFormatter

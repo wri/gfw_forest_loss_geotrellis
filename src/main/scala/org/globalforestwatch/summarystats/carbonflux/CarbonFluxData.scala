@@ -7,7 +7,7 @@ import cats.Semigroup
   * Note: This case class contains mutable values
   *
   */
-case class CarbonFluxData(var areaLoss: Double,
+case class CarbonFluxData(var treecoverLoss: Double,
                           var biomassLoss: Double,
                           var grossEmissionsCo2eCo2Only: Double,
                           var grossEmissionsCo2eNoneCo2: Double,
@@ -18,7 +18,7 @@ case class CarbonFluxData(var areaLoss: Double,
                           var litterCarbonEmisYear: Double,
                           var soilCarbonEmisYear: Double,
                           var carbonEmisYear: Double,
-                          var totalExtent2000: Double,
+                          var treecoverExtent2000: Double,
                           var totalArea: Double,
                           var totalBiomass: Double,
                           var totalGrossAnnualRemovalsCarbon: Double,
@@ -36,7 +36,7 @@ case class CarbonFluxData(var areaLoss: Double,
 ) {
   def merge(other: CarbonFluxData): CarbonFluxData = {
     CarbonFluxData(
-      areaLoss + other.areaLoss,
+      treecoverLoss + other.treecoverLoss,
       biomassLoss + other.biomassLoss,
       grossEmissionsCo2eCo2Only + other.grossEmissionsCo2eCo2Only,
       grossEmissionsCo2eNoneCo2 + other.grossEmissionsCo2eNoneCo2,
@@ -47,7 +47,7 @@ case class CarbonFluxData(var areaLoss: Double,
       litterCarbonEmisYear + other.litterCarbonEmisYear,
       soilCarbonEmisYear + other.soilCarbonEmisYear,
       carbonEmisYear + other.carbonEmisYear,
-      totalExtent2000 + other.totalExtent2000,
+      treecoverExtent2000 + other.treecoverExtent2000,
       totalArea + other.totalArea,
       totalBiomass + other.totalBiomass,
       totalGrossAnnualRemovalsCarbon + other.totalGrossAnnualRemovalsCarbon,

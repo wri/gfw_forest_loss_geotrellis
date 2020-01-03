@@ -7,6 +7,8 @@ import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Util.getAnyMapValue
 import org.globalforestwatch.util.{Geodesy, Mercantile}
 
+import scala.annotation.tailrec
+
 /** LossData Summary by year */
 case class GladAlertsSummary(stats: Map[GladAlertsDataGroup, GladAlertsData] =
                              Map.empty,
@@ -87,6 +89,7 @@ object GladAlertsSummary {
           val areaHa = area / 10000.0
           val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
 
+          @tailrec
           def updateSummary(
                              tile: Mercantile.Tile,
                              stats: Map[GladAlertsDataGroup, GladAlertsData]
@@ -100,15 +103,14 @@ object GladAlertsSummary {
             else {
               val alertDate: String = {
                 glad match {
-                  case Some(g: (String, Boolean)) => g._1
+                  case Some((date, _)) => date
                   case _ => null
                 }
               }
-              //
 
               val confidence: Option[Boolean] = {
                 glad match {
-                  case Some(g: (String, Boolean)) => Some(g._2)
+                  case Some((_, conf)) => Some(conf)
                   case _ => null
                 }
               }

@@ -1,10 +1,13 @@
 package org.globalforestwatch.summarystats.gladalerts
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{Column, DataFrame}
 import org.globalforestwatch.summarystats.SummaryExport
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 object GladAlertsExport extends SummaryExport {
+
+  val minZoomValue = 0
+  val maxZoomValue = 12
 
   override protected def exportGadm(summaryDF: DataFrame,
                                     outputUrl: String,
@@ -16,170 +19,248 @@ object GladAlertsExport extends SummaryExport {
     val buildDataCube: Boolean =
       getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
-    val minZoom: Int = {
-      if (buildDataCube) 0 else 12
-    } // TODO: remove magic numbers. maxZoom=12 should be in kwargs
+    val minZoom: Int = if (buildDataCube) minZoomValue else maxZoomValue
 
-    def exportTiles(tileDF: DataFrame): Unit = {
-
-      if (buildDataCube) {
-        tileDF
-          .transform(TileDF.unpackValues)
-          .transform(TileDF.sumAlerts)
-          .write
-          .options(csvOptions)
-          .csv(path = outputUrl + "/tiles")
-      }
-    }
-
-    def exportArea(df: DataFrame): Unit = {
-      if (!changeOnly) {
-        val adm2DF = df
-          .transform(Adm2DailyDF.sumArea)
-
-        adm2DF.write
-          .options(csvOptions)
-          .csv(path = outputUrl + "/adm2/area")
-
-        val adm1DF = adm2DF
-          .transform(Adm1WeeklyDF.sumArea)
-
-        adm1DF.write
-          .options(csvOptions)
-          .csv(path = outputUrl + "/adm1/area")
-
-        val isoDF = adm1DF
-          .transform(IsoWeeklyDF.sumArea)
-
-        isoDF.write
-          .options(csvOptions)
-          .csv(path = outputUrl + "/iso/area")
-      }
-    }
-
-    def exportAlerts(df: DataFrame): Unit = {
-
-      val adm2DailyDF = df
-        .transform(Adm2DailyDF.sumAlerts)
-
-      adm2DailyDF.write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/daily_alerts")
-
-      val adm2DF = adm2DailyDF
-        .transform(Adm2WeeklyDF.sumAlerts)
-
-      adm2DF.write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/weekly_alerts")
-
-      val adm1DF = adm2DF
-        .transform(Adm1WeeklyDF.sumAlerts)
-
-      adm1DF.write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm1/weekly_alerts")
-
-      val isoDF = adm1DF
-        .transform(IsoWeeklyDF.sumAlerts)
-
-      isoDF.write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/iso/weekly_alerts")
-    }
 
     summaryDF.cache()
-    exportTiles(summaryDF)
-    val gadmDF = summaryDF.transform(Adm2DailyDF.unpackValues(minZoom))
+    exportTiles(summaryDF, outputUrl, buildDataCube)
+
+    val spark = summaryDF.sparkSession
+    import spark.implicits._
+
+    val cols =
+      List($"id.iso" as "iso", $"id.adm1" as "adm1", $"id.adm2" as "adm2")
+
+    val gadmDF =
+      summaryDF.transform(GladAlertsDF.unpackValues(cols, minZoom = minZoom))
     summaryDF.unpersist()
 
     gadmDF.cache()
-    exportArea(gadmDF)
-    exportAlerts(gadmDF)
+    if (!changeOnly) {
+      exportWhitelist(gadmDF, outputUrl)
+      exportSummary(gadmDF, outputUrl)
+    }
+    exportChange(gadmDF, outputUrl)
     gadmDF.unpersist()
+  }
+
+  private def exportTiles(tileDF: DataFrame,
+                          outputUrl: String,
+                          buildDataCube: Boolean): Unit = {
+
+    if (buildDataCube) {
+      tileDF
+        .transform(GladAlertsTileDF.unpackValues)
+        .transform(GladAlertsTileDF.sumAlerts)
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/tiles")
+    }
+  }
+
+  private def exportSummary(df: DataFrame, outputUrl: String): Unit = {
+
+    val adm2DF = df
+      .transform(GladAlertsDF.aggSummary(List("iso", "adm1", "adm2")))
+
+    adm2DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/summary")
+
+    val adm1DF = adm2DF
+      .transform(GladAlertsDF.aggSummary(List("iso", "adm1")))
+
+    adm1DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/summary")
+
+    val isoDF = adm1DF
+      .transform(GladAlertsDF.aggSummary(List("iso")))
+
+    isoDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/summary")
+
+  }
+
+  private def exportWhitelist(df: DataFrame, outputUrl: String): Unit = {
+
+    val adm2DF = df
+      .transform(GladAlertsDF.whitelist(List("iso", "adm1", "adm2")))
+
+    adm2DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/whitelist")
+
+    val adm1DF = adm2DF
+      .transform(GladAlertsDF.whitelist2(List("iso", "adm1")))
+
+    adm1DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/whitelist")
+
+    val isoDF = adm1DF
+      .transform(GladAlertsDF.whitelist2(List("iso")))
+
+    isoDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/whitelist")
+
+  }
+
+  private def exportChange(df: DataFrame, outputUrl: String): Unit = {
+
+    val adm2DailyDF = df
+      .transform(GladAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
+
+    adm2DailyDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/daily_alerts")
+
+    val adm2DF = adm2DailyDF
+      .transform(GladAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2")))
+
+    adm2DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/weekly_alerts")
+
+    val adm1DF = adm2DF
+      .transform(GladAlertsDF.aggChangeWeekly2(List("iso", "adm1")))
+
+    adm1DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/weekly_alerts")
+
+    val isoDF = adm1DF
+      .transform(GladAlertsDF.aggChangeWeekly2(List("iso")))
+
+    isoDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/weekly_alerts")
   }
 
   override protected def exportWdpa(summaryDF: DataFrame,
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
 
-    val changeOnly: Boolean =
-      getAnyMapValue[Boolean](kwargs, "changeOnly")
+    val spark = summaryDF.sparkSession
+    import spark.implicits._
 
-    val buildDataCube: Boolean =
-      getAnyMapValue[Boolean](kwargs, "buildDataCube")
+    val groupByCols = List(
+      "wdpa_protected_area__id",
+      "wdpa_protected_area__name",
+      "wdpa_protected_area__iucn_cat",
+      "wdpa_protected_area__iso",
+      "wdpa_protected_area__status"
+    )
+    val unpackCols = List(
+      $"id.wdpa_id" as "wdpa_protected_area__id",
+      $"id.name" as "wdpa_protected_area__name",
+      $"id.iucn_cat" as "wdpa_protected_area__iucn_cat",
+      $"id.iso" as "wdpa_protected_area__iso",
+      $"id.status" as "wdpa_protected_area__status"
+    )
 
-    val minZoom: Int = {
-      if (buildDataCube) 0 else 12
-    } // TODO: remove magic numbers. maxZoom=12 should be in kwargs
-
-    val wdpaDF = summaryDF
-      .transform(WdpaDailyDF.unpackValues(minZoom))
-
-    wdpaDF.cache()
-
-    if (!changeOnly) {
-      wdpaDF
-        .transform(WdpaDailyDF.sumArea)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/wdpa/area")
-    }
-
-    wdpaDF
-      .transform(WdpaDailyDF.sumAlerts)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/wdpa/daily_alerts")
-
-    wdpaDF
-      .transform(WdpaWeeklyDF.sumAlerts)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/wdpa/weekly_alerts")
-
-    wdpaDF.unpersist()
+    _export(summaryDF, outputUrl + "/wdpa", kwargs, groupByCols, unpackCols, wdpa = true)
   }
 
   override protected def exportFeature(summaryDF: DataFrame,
                                        outputUrl: String,
                                        kwargs: Map[String, Any]): Unit = {
 
-    val changeOnly: Boolean =
-      getAnyMapValue[Boolean](kwargs, "changeOnly")
+    val spark = summaryDF.sparkSession
+    import spark.implicits._
+
+    val groupByCols = List("feature__id")
+    val unpackCols = List($"id.featureId" as "feature__id")
+
+    _export(summaryDF, outputUrl + "/feature", kwargs, groupByCols, unpackCols)
+  }
+
+  override protected def exportGeostore(summaryDF: DataFrame,
+                                        outputUrl: String,
+                                        kwargs: Map[String, Any]): Unit = {
+
+    val spark = summaryDF.sparkSession
+    import spark.implicits._
+
+    val groupByCols = List("geostore__id")
+    val unpackCols = List($"id.geostoreId" as "geostore__id")
+
+    _export(summaryDF, outputUrl + "/geostore", kwargs, groupByCols, unpackCols)
+
+  }
+
+  private def _export(summaryDF: DataFrame,
+                      outputUrl: String,
+                      kwargs: Map[String, Any],
+                      groupByCols: List[String],
+                      unpackCols: List[Column],
+                      wdpa: Boolean = false): Unit = {
+
+    val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
     val buildDataCube: Boolean =
       getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
-    val minZoom: Int = {
-      if (buildDataCube) 0 else 12
-    } // TODO: remove magic numbers. maxZoom=12 should be in kwargs
+    val minZoom: Int = if (buildDataCube) minZoomValue else maxZoomValue
 
-    val featureDF = summaryDF
-      .transform(SimpleFeatureDailyDF.unpackValues(minZoom))
+    val cols = groupByCols
 
-    featureDF.cache()
+    val df = summaryDF.transform(
+      GladAlertsDF.unpackValues(unpackCols, minZoom = minZoom, wdpa = wdpa)
+    )
+
+    df.cache()
 
     if (!changeOnly) {
-      featureDF
-        .transform(SimpleFeatureDailyDF.sumArea)
+
+      df.transform(GladAlertsDF.whitelist(cols, wdpa = wdpa))
+        .coalesce(1)
         .write
         .options(csvOptions)
-        .csv(path = outputUrl + "/feature/area")
+        .csv(path = outputUrl + "/whitelist")
+
+      df.transform(GladAlertsDF.aggSummary(cols, wdpa = wdpa))
+        .coalesce(1)
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/summary")
     }
 
-    featureDF
-      .transform(SimpleFeatureDailyDF.sumAlerts)
+    df.transform(GladAlertsDF.aggChangeDaily(cols, wdpa = wdpa))
+      .coalesce(1)
       .write
       .options(csvOptions)
-      .csv(path = outputUrl + "/feature/daily_alerts")
+      .csv(path = outputUrl + "/daily_alerts")
 
-    featureDF
-      .transform(SimpleFeatureWeeklyDF.sumAlerts)
+    df.transform(GladAlertsDF.aggChangeWeekly(cols, wdpa = wdpa))
+      .coalesce(1)
       .write
       .options(csvOptions)
-      .csv(path = outputUrl + "/feature/weekly_alerts")
+      .csv(path = outputUrl + "/weekly_alerts")
 
-    featureDF.unpersist()
+    df.unpersist()
+    ()
   }
 }

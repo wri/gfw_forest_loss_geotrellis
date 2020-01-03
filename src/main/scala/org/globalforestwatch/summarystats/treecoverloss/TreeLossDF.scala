@@ -1,164 +1,59 @@
 package org.globalforestwatch.summarystats.treecoverloss
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql._
 import org.apache.spark.sql.functions.sum
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object TreeLossDF {
+
+  val treecoverLossMinYear = 2001
+  val treecoverLossMaxYear = 2018
 
   def unpackValues(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    validatePresenceOfColumns(
-      df,
-      Seq(
-        "id",
-        "data_group",
-        "data"
-      )
+    validatePresenceOfColumns(df, Seq("id", "data_group", "data"))
+
+    val treecoverLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        $"data.lossYear"
+          .getItem(i)
+          .getItem("treecoverLoss") as s"treecover_loss_${i}__ha"
+      }).toList
+    val abovegroundBiomassLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        $"data.lossYear"
+          .getItem(i)
+          .getItem("biomassLoss") as s"aboveground_biomass_loss_${i}__Mg"
+      }).toList
+
+    val co2EmissionsCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        $"data.lossYear"
+          .getItem(i)
+          .getItem("carbonEmissions") as s"co2_emissions_${i}__Mg"
+      }).toList
+
+    val cols = List(
+      $"id.featureId" as "feature__id",
+      $"data_group.threshold" as "treecover_density__threshold",
+      $"data_group.tcdYear" as "treecover_extent__year",
+      $"data_group.primaryForest" as "is__regional_primary_forest",
+      $"data.treecoverExtent2000" as "treecover_extent_2000__ha",
+      $"data.treecoverExtent2010" as "treecover_extent_2010__ha",
+      $"data.totalArea" as "area__ha",
+      $"data.totalGainArea" as "treecover_gain_2000-2012__ha",
+      $"data.totalBiomass" as "aboveground_biomass_stock_2000__Mg",
+      $"data.avgBiomass" as "avg_aboveground_biomass_stock_2000__Mg_ha-1",
+      $"data.totalCo2" as "co2_stock_2000__Mt"
     )
 
     df.select(
-      $"id.featureId" as "feature_id",
-      $"data_group.threshold" as "threshold",
-      $"data_group.tcdYear" as "tcd_year",
-      $"data_group.primaryForest" as "primary_forest",
-      $"data.extent2000" as "extent_2000",
-      $"data.extent2010" as "extent_2010",
-      $"data.totalArea" as "total_area",
-      $"data.totalGainArea" as "total_gain",
-      $"data.totalBiomass" as "total_biomass",
-      $"data.avgBiomass" as "avg_biomass_per_ha",
-      $"data.totalCo2" as "total_co2",
-      $"data.lossYear".getItem(0).getItem("area_loss") as "area_loss_2001",
-      $"data.lossYear".getItem(1).getItem("area_loss") as "area_loss_2002",
-      $"data.lossYear".getItem(2).getItem("area_loss") as "area_loss_2003",
-      $"data.lossYear".getItem(3).getItem("area_loss") as "area_loss_2004",
-      $"data.lossYear".getItem(4).getItem("area_loss") as "area_loss_2005",
-      $"data.lossYear".getItem(5).getItem("area_loss") as "area_loss_2006",
-      $"data.lossYear".getItem(6).getItem("area_loss") as "area_loss_2007",
-      $"data.lossYear".getItem(7).getItem("area_loss") as "area_loss_2008",
-      $"data.lossYear".getItem(8).getItem("area_loss") as "area_loss_2009",
-      $"data.lossYear".getItem(9).getItem("area_loss") as "area_loss_2010",
-      $"data.lossYear".getItem(10).getItem("area_loss") as "area_loss_2011",
-      $"data.lossYear".getItem(11).getItem("area_loss") as "area_loss_2012",
-      $"data.lossYear".getItem(12).getItem("area_loss") as "area_loss_2013",
-      $"data.lossYear".getItem(13).getItem("area_loss") as "area_loss_2014",
-      $"data.lossYear".getItem(14).getItem("area_loss") as "area_loss_2015",
-      $"data.lossYear".getItem(15).getItem("area_loss") as "area_loss_2016",
-      $"data.lossYear".getItem(16).getItem("area_loss") as "area_loss_2017",
-      $"data.lossYear".getItem(17).getItem("area_loss") as "area_loss_2018",
-      $"data.lossYear"
-        .getItem(0)
-        .getItem("biomass_loss") as "biomass_loss_2001",
-      $"data.lossYear"
-        .getItem(1)
-        .getItem("biomass_loss") as "biomass_loss_2002",
-      $"data.lossYear"
-        .getItem(2)
-        .getItem("biomass_loss") as "biomass_loss_2003",
-      $"data.lossYear"
-        .getItem(3)
-        .getItem("biomass_loss") as "biomass_loss_2004",
-      $"data.lossYear"
-        .getItem(4)
-        .getItem("biomass_loss") as "biomass_loss_2005",
-      $"data.lossYear"
-        .getItem(5)
-        .getItem("biomass_loss") as "biomass_loss_2006",
-      $"data.lossYear"
-        .getItem(6)
-        .getItem("biomass_loss") as "biomass_loss_2007",
-      $"data.lossYear"
-        .getItem(7)
-        .getItem("biomass_loss") as "biomass_loss_2008",
-      $"data.lossYear"
-        .getItem(8)
-        .getItem("biomass_loss") as "biomass_loss_2009",
-      $"data.lossYear"
-        .getItem(9)
-        .getItem("biomass_loss") as "biomass_loss_2010",
-      $"data.lossYear"
-        .getItem(10)
-        .getItem("biomass_loss") as "biomass_loss_2011",
-      $"data.lossYear"
-        .getItem(11)
-        .getItem("biomass_loss") as "biomass_loss_2012",
-      $"data.lossYear"
-        .getItem(12)
-        .getItem("biomass_loss") as "biomass_loss_2013",
-      $"data.lossYear"
-        .getItem(13)
-        .getItem("biomass_loss") as "biomass_loss_2014",
-      $"data.lossYear"
-        .getItem(14)
-        .getItem("biomass_loss") as "biomass_loss_2015",
-      $"data.lossYear"
-        .getItem(15)
-        .getItem("biomass_loss") as "biomass_loss_2016",
-      $"data.lossYear"
-        .getItem(16)
-        .getItem("biomass_loss") as "biomass_loss_2017",
-      $"data.lossYear"
-        .getItem(17)
-        .getItem("biomass_loss") as "biomass_loss_2018",
-      $"data.lossYear"
-        .getItem(0)
-        .getItem("carbon_emissions") as "co2_emissions_2001",
-      $"data.lossYear"
-        .getItem(1)
-        .getItem("carbon_emissions") as "co2_emissions_2002",
-      $"data.lossYear"
-        .getItem(2)
-        .getItem("carbon_emissions") as "co2_emissions_2003",
-      $"data.lossYear"
-        .getItem(3)
-        .getItem("carbon_emissions") as "co2_emissions_2004",
-      $"data.lossYear"
-        .getItem(4)
-        .getItem("carbon_emissions") as "co2_emissions_2005",
-      $"data.lossYear"
-        .getItem(5)
-        .getItem("carbon_emissions") as "co2_emissions_2006",
-      $"data.lossYear"
-        .getItem(6)
-        .getItem("carbon_emissions") as "co2_emissions_2007",
-      $"data.lossYear"
-        .getItem(7)
-        .getItem("carbon_emissions") as "co2_emissions_2008",
-      $"data.lossYear"
-        .getItem(8)
-        .getItem("carbon_emissions") as "co2_emissions_2009",
-      $"data.lossYear"
-        .getItem(9)
-        .getItem("carbon_emissions") as "co2_emissions_2010",
-      $"data.lossYear"
-        .getItem(10)
-        .getItem("carbon_emissions") as "co2_emissions_2011",
-      $"data.lossYear"
-        .getItem(11)
-        .getItem("carbon_emissions") as "co2_emissions_2012",
-      $"data.lossYear"
-        .getItem(12)
-        .getItem("carbon_emissions") as "co2_emissions_2013",
-      $"data.lossYear"
-        .getItem(13)
-        .getItem("carbon_emissions") as "co2_emissions_2014",
-      $"data.lossYear"
-        .getItem(14)
-        .getItem("carbon_emissions") as "co2_emissions_2015",
-      $"data.lossYear"
-        .getItem(15)
-        .getItem("carbon_emissions") as "co2_emissions_2016",
-      $"data.lossYear"
-        .getItem(16)
-        .getItem("carbon_emissions") as "co2_emissions_2017",
-      $"data.lossYear"
-        .getItem(17)
-        .getItem("carbon_emissions") as "co2_emissions_2018"
+      cols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
     )
+
   }
 
   def primaryForestFilter(include: Boolean)(df: DataFrame): DataFrame = {
@@ -166,71 +61,42 @@ object TreeLossDF {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
+    val treecoverLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        sum(s"treecover_loss_${i}__ha") as s"treecover_loss_${i}__ha"
+      }).toList
+    val abovegroundBiomassLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        sum(s"aboveground_biomass_loss_${i}__Mg") as s"aboveground_biomass_loss_${i}__Mg"
+      }).toList
+
+    val co2EmissionsCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        sum(s"co2_emissions_${i}__Mg") as s"co2_emissions_${i}__Mg"
+      }).toList
+
+    val cols = List(
+      sum("area__ha") as "area__ha",
+      sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",
+      sum("treecover_extent_2010__ha") as "treecover_extent_2010__ha",
+      sum("treecover_gain_2000-2012__ha") as "treecover_gain_2000-2012__ha",
+      sum("aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
+      sum(
+        $"avg_aboveground_biomass_stock_2000__Mg_ha-1" * $"treecover_extent_2000__ha"
+      ) / sum($"treecover_extent_2000__ha") as "avg_aboveground_biomass_stock_2000__Mg_ha-1",
+      sum("co2_stock_2000__Mt") as "co2_stock_2000__Mt"
+    )
+
     if (include) df
     else {
-      df.groupBy($"feature_id", $"threshold", $"tcd_year")
+      df.groupBy(
+          $"feature__id",
+          $"treecover_density__threshold",
+          $"treecover_extent__year"
+        )
         .agg(
-          sum("total_area") as "total_area",
-          sum("extent_2000") as "extent_2000",
-          sum("extent_2010") as "extent_2010",
-          sum("total_gain") as "total_gain",
-          sum("total_biomass") as "total_biomass",
-          sum($"avg_biomass_per_ha" * $"extent_2000") / sum($"extent_2000") as "avg_biomass_per_ha",
-          sum("total_co2") as "total_co2",
-          sum("area_loss_2001") as "area_loss_2001",
-          sum("area_loss_2002") as "area_loss_2002",
-          sum("area_loss_2003") as "area_loss_2003",
-          sum("area_loss_2004") as "area_loss_2004",
-          sum("area_loss_2005") as "area_loss_2005",
-          sum("area_loss_2006") as "area_loss_2006",
-          sum("area_loss_2007") as "area_loss_2007",
-          sum("area_loss_2008") as "area_loss_2008",
-          sum("area_loss_2009") as "area_loss_2009",
-          sum("area_loss_2010") as "area_loss_2010",
-          sum("area_loss_2011") as "area_loss_2011",
-          sum("area_loss_2012") as "area_loss_2012",
-          sum("area_loss_2013") as "area_loss_2013",
-          sum("area_loss_2014") as "area_loss_2014",
-          sum("area_loss_2015") as "area_loss_2015",
-          sum("area_loss_2016") as "area_loss_2016",
-          sum("area_loss_2017") as "area_loss_2017",
-          sum("area_loss_2018") as "area_loss_2018",
-          sum("biomass_loss_2001") as "biomass_loss_2001",
-          sum("biomass_loss_2002") as "biomass_loss_2002",
-          sum("biomass_loss_2003") as "biomass_loss_2003",
-          sum("biomass_loss_2004") as "biomass_loss_2004",
-          sum("biomass_loss_2005") as "biomass_loss_2005",
-          sum("biomass_loss_2006") as "biomass_loss_2006",
-          sum("biomass_loss_2007") as "biomass_loss_2007",
-          sum("biomass_loss_2008") as "biomass_loss_2008",
-          sum("biomass_loss_2009") as "biomass_loss_2009",
-          sum("biomass_loss_2010") as "biomass_loss_2010",
-          sum("biomass_loss_2011") as "biomass_loss_2011",
-          sum("biomass_loss_2012") as "biomass_loss_2012",
-          sum("biomass_loss_2013") as "biomass_loss_2013",
-          sum("biomass_loss_2014") as "biomass_loss_2014",
-          sum("biomass_loss_2015") as "biomass_loss_2015",
-          sum("biomass_loss_2016") as "biomass_loss_2016",
-          sum("biomass_loss_2017") as "biomass_loss_2017",
-          sum("biomass_loss_2018") as "biomass_loss_2018",
-          sum("co2_emissions_2001") as "co2_emissions_2001",
-          sum("co2_emissions_2002") as "co2_emissions_2002",
-          sum("co2_emissions_2003") as "co2_emissions_2003",
-          sum("co2_emissions_2004") as "co2_emissions_2004",
-          sum("co2_emissions_2005") as "co2_emissions_2005",
-          sum("co2_emissions_2006") as "co2_emissions_2006",
-          sum("co2_emissions_2007") as "co2_emissions_2007",
-          sum("co2_emissions_2008") as "co2_emissions_2008",
-          sum("co2_emissions_2009") as "co2_emissions_2009",
-          sum("co2_emissions_2010") as "co2_emissions_2010",
-          sum("co2_emissions_2011") as "co2_emissions_2011",
-          sum("co2_emissions_2012") as "co2_emissions_2012",
-          sum("co2_emissions_2013") as "co2_emissions_2013",
-          sum("co2_emissions_2014") as "co2_emissions_2014",
-          sum("co2_emissions_2015") as "co2_emissions_2015",
-          sum("co2_emissions_2016") as "co2_emissions_2016",
-          sum("co2_emissions_2017") as "co2_emissions_2017",
-          sum("co2_emissions_2018") as "co2_emissions_2018"
+          cols.head,
+          cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
         )
     }
   }
