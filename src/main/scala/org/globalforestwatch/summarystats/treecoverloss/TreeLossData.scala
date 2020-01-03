@@ -22,7 +22,7 @@ case class TreeLossData(
       lossYear ++ other.lossYear.map {
         case (k, v) => {
           val loss: TreeLossYearData = lossYear(k)
-          var otherLoss: TreeLossYearData = v
+          val otherLoss: TreeLossYearData = v
           otherLoss.treecoverLoss += loss.treecoverLoss
           otherLoss.biomassLoss += loss.biomassLoss
           otherLoss.carbonEmissions += loss.carbonEmissions

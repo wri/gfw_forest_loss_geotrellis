@@ -116,7 +116,7 @@ object SummaryMain
 
         val thresholdOpts = Opts
           .options[Int]("threshold", "Treecover threshold to apply")
-          .orEmpty
+          .withDefault(List(30))
 
         val primartyForestOpt = Opts
           .flag("primary-forests", "Include Primary Forests")
