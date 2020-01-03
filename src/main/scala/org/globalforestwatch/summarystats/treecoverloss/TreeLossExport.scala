@@ -13,13 +13,12 @@ object TreeLossExport extends SummaryExport {
     val spark = summaryDF.sparkSession
     import spark.implicits._
 
-    val thresholdFilter: Seq[Int] =
-      getAnyMapValue[Seq[Int]](kwargs, "thresholdFilter")
     val includePrimaryForest: Boolean =
       getAnyMapValue[Boolean](kwargs, "includePrimaryForest")
 
+    summaryDF.show(truncate = false)
+
     summaryDF
-      .filter($"data_group.threshold".isin(thresholdFilter: _*))
       .transform(TreeLossDF.unpackValues)
       .transform(TreeLossDF.primaryForestFilter(includePrimaryForest))
       .coalesce(1)

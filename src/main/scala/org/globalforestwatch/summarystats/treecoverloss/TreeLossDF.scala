@@ -19,21 +19,21 @@ object TreeLossDF {
     val treecoverLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
-          .getItem(i - treecoverLossMinYear)
+          .getItem(i)
           .getItem("treecoverLoss") as s"treecover_loss_${i}__ha"
       }).toList
     val abovegroundBiomassLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
-          .getItem(i - treecoverLossMinYear)
+          .getItem(i)
           .getItem("biomassLoss") as s"aboveground_biomass_loss_${i}__Mg"
       }).toList
 
     val co2EmissionsCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
-          .getItem(i - treecoverLossMinYear)
-          .getItem("carbonEmissions") as "co2_emissions_2001__Mg"
+          .getItem(i)
+          .getItem("carbonEmissions") as s"co2_emissions_${i}__Mg"
       }).toList
 
     val cols = List(
@@ -50,9 +50,11 @@ object TreeLossDF {
       $"data.totalCo2" as "co2_stock_2000__Mt"
     )
 
-    df.select(
+    val newDF = df.select(
       cols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
     )
+    newDF.show(truncate = false)
+    newDF
 
   }
 
