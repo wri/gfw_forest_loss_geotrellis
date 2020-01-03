@@ -20,24 +20,20 @@ trait Feature extends java.io.Serializable {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    var newDF = df.transform(custom_filter(filters))
-
+    val trueValues: List[String] =
+      List("t", "T", "true", "True", "TRUE", "1", "Yes", "yes", "YES")
     val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
     val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")
     val glad: Boolean = getAnyMapValue[Boolean](filters, "glad")
 
-    val trueValues: List[String] =
-      List("t", "T", "true", "True", "TRUE", "1", "Yes", "yes", "YES")
+    val customFilterDF = df.transform(custom_filter(filters))
 
-    if (glad) newDF = newDF.filter($"glad".isin(trueValues: _*))
+    val gladDF = if (glad) customFilterDF.filter($"glad".isin(trueValues: _*)) else customFilterDF
 
-    if (tcl) newDF = newDF.filter($"tcl".isin(trueValues: _*))
+    val tclDF = if (tcl) gladDF.filter($"tcl".isin(trueValues: _*)) else gladDF
 
-    limit.foreach { n =>
-      newDF = newDF.limit(n)
-    }
+    limit.foldLeft(tclDF)(_.limit(_))
 
-    newDF
   }
 
   def custom_filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
