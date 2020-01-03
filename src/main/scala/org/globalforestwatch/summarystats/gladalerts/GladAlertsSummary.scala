@@ -103,15 +103,14 @@ object GladAlertsSummary {
             else {
               val alertDate: String = {
                 glad match {
-                  case Some(g: (String, Boolean)) => g._1
+                  case Some((date, _)) => date
                   case _ => null
                 }
               }
-              //
 
               val confidence: Option[Boolean] = {
                 glad match {
-                  case Some(g: (String, Boolean)) => Some(g._2)
+                  case Some((_, conf)) => Some(conf)
                   case _ => null
                 }
               }
