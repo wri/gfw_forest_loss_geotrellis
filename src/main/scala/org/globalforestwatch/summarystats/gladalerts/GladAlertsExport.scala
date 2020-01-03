@@ -174,9 +174,9 @@ object GladAlertsExport extends SummaryExport {
       "wdpa_protected_area__status"
     )
     val unpackCols = List(
-      $"id.wdpa_id" as "wdpa_protected_area__id",
+      $"id.wdpaId" as "wdpa_protected_area__id",
       $"id.name" as "wdpa_protected_area__name",
-      $"id.iucn_cat" as "wdpa_protected_area__iucn_cat",
+      $"id.iucnCat" as "wdpa_protected_area__iucn_cat",
       $"id.iso" as "wdpa_protected_area__iso",
       $"id.status" as "wdpa_protected_area__status"
     )

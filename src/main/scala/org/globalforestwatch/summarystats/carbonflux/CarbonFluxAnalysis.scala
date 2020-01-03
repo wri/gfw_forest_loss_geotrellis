@@ -29,7 +29,7 @@ object CarbonFluxAnalysis {
     //    val outputPartitionCount =
     //      maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
-    summaryDF.repartition($"id", $"data_group")
+    summaryDF.repartition($"id", $"dataGroup")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
       "/carbonflux_" + DateTimeFormatter

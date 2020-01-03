@@ -75,7 +75,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
               val maybeRasterSource: Either[Throwable, SOURCES] =
                 getSources(window, kwargs)
 
-              val features = keysAndFeatures.map(_._2)
+              val features = keysAndFeatures map { case (_, feature) => feature }
 
               val maybeRaster: Either[Throwable, Raster[TILE]] =
                 maybeRasterSource.flatMap { rs: SOURCES =>
