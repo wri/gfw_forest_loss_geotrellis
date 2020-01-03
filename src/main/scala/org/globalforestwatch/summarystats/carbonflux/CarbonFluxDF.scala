@@ -28,25 +28,25 @@ object CarbonFluxDF {
     implicit val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    validatePresenceOfColumns(df, Seq("id", "data_group", "data"))
+    validatePresenceOfColumns(df, Seq("id", "dataGroup", "data"))
 
     df.select(
       $"id.iso" as "iso",
       $"id.adm1" as "adm1",
       $"id.adm2" as "adm2",
-      $"data_group.lossYear" as "treecover_loss__year",
-      $"data_group.threshold" as "treecover_density__threshold",
-      $"data_group.isGain" as "is__treecover_gain_2000-2012",
-      $"data_group.isLoss" as "is__treecover_loss_2000-2015",
-      $"data_group.mangroveBiomassExtent" as "is__mangrove",
-      $"data_group.drivers" as "tcs_driver__type",
-      $"data_group.ecozones" as "ecozone__name",
-      $"data_group.landRights" as "is__gfw_land_right",
-      $"data_group.wdpa" as "wdpa_protected_area__iucn_cat",
-      $"data_group.intactForestLandscapes" as "intact_forest_landscape__year",
-      $"data_group.plantations" as "gfw_plantation__type",
-      $"data_group.intactPrimaryForest" as "is__intact_primary_forest",
-      $"data_group.peatlandsFlux" as "is__peatlands_flux",
+      $"dataGroup.lossYear" as "treecover_loss__year",
+      $"dataGroup.threshold" as "treecover_density__threshold",
+      $"dataGroup.isGain" as "is__treecover_gain_2000-2012",
+      $"dataGroup.isLoss" as "is__treecover_loss_2000-2015",
+      $"dataGroup.mangroveBiomassExtent" as "is__mangrove",
+      $"dataGroup.drivers" as "tcs_driver__type",
+      $"dataGroup.ecozones" as "ecozone__name",
+      $"dataGroup.landRights" as "is__gfw_land_right",
+      $"dataGroup.wdpa" as "wdpa_protected_area__iucn_cat",
+      $"dataGroup.intactForestLandscapes" as "intact_forest_landscape__year",
+      $"dataGroup.plantations" as "gfw_plantation__type",
+      $"dataGroup.intactPrimaryForest" as "is__intact_primary_forest",
+      $"dataGroup.peatlandsFlux" as "is__peatlands_flux",
       $"data.treecoverLoss" as "treecover_loss__ha",
       $"data.biomassLoss" as "aboveground_biomass_loss__Mg",
       $"data.grossEmissionsCo2eCo2Only" as "gross_emissions_co2e_co2_only__Mg",
@@ -89,11 +89,11 @@ object CarbonFluxDF {
         sum("litter_carbon_stock_2000__Mg") as "litter_carbon_stock_2000__Mg",
         sum("soil_carbon_stock_2000__Mg") as "soil_carbon_stock_2000__Mg",
         sum("total_carbon_stock_2000__Mg") as "total_carbon_stock_2000__Mg",
-        sum("treecover_loss_2001-2015__ha") as "treecover_loss_2001-2015__ha",
-        sum("aboveground_biomass_loss_2001-2015__Mg") as "aboveground_biomass_loss_2001-2015__Mg",
-        sum("gross_emissions_co2e_co2_only_2001-2015__Mg") as "gross_emissions_co2e_co2_only_2001-2015__Mg",
-        sum("gross_emissions_co2e_non_co2_2001-2015__Mg") as "gross_emissions_co2e_non_co2_2001-2015__Mg",
-        sum("gross_emissions_co2e_all_gases_2001-2015__Mg") as "gross_emissions_co2e_all_gases_2001-2015__Mg"
+        sum("treecover_loss__ha") as "treecover_loss_2001-2015__ha",
+        sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss_2001-2015__Mg",
+        sum("gross_emissions_co2e_co2_only__Mg") as "gross_emissions_co2e_co2_only_2001-2015__Mg",
+        sum("gross_emissions_co2e_non_co2__Mg") as "gross_emissions_co2e_non_co2_2001-2015__Mg",
+        sum("gross_emissions_co2e_all_gases__Mg") as "gross_emissions_co2e_all_gases_2001-2015__Mg"
       )
   }
 
@@ -113,11 +113,11 @@ object CarbonFluxDF {
         sum("litter_carbon_stock_2000__Mg") as "litter_carbon_stock_2000__Mg",
         sum("soil_carbon_stock_2000__Mg") as "soil_carbon_stock_2000__Mg",
         sum("total_carbon_stock_2000__Mg") as "total_carbon_stock_2000__Mg",
-        sum("treecover_loss__ha") as "treecover_loss_2001-2015__ha",
-        sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss_2001-2015__Mg",
-        sum("gross_emissions_co2e_co2_only__Mg") as "gross_emissions_co2e_co2_only_2001-2015__Mg",
-        sum("gross_emissions_co2e_non_co2__Mg") as "gross_emissions_co2e_non_co2_2001-2015__Mg",
-        sum("gross_emissions_co2e_all_gases__Mg") as "gross_emissions_co2e_all_gases_2001-2015__Mg"
+        sum("treecover_loss_2001-2015__ha") as "treecover_loss_2001-2015__ha",
+        sum("aboveground_biomass_loss_2001-2015__Mg") as "aboveground_biomass_loss_2001-2015__Mg",
+        sum("gross_emissions_co2e_co2_only_2001-2015__Mg") as "gross_emissions_co2e_co2_only_2001-2015__Mg",
+        sum("gross_emissions_co2e_non_co2_2001-2015__Mg") as "gross_emissions_co2e_non_co2_2001-2015__Mg",
+        sum("gross_emissions_co2e_all_gases_2001-2015__Mg") as "gross_emissions_co2e_all_gases_2001-2015__Mg"
       )
   }
 

@@ -33,6 +33,6 @@ case class CarbonFluxDFFactory(featureType: String,
             }
           }
       }
-      .toDF("id", "data_group", "data")
+      .toDF("id", "dataGroup", "data")
   }
 }

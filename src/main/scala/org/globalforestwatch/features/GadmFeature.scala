@@ -14,7 +14,7 @@ object GadmFeature extends Feature {
   val adm2Pos = 3
   val geomPos = 7
 
-  def getFeature(i: Row): geotrellis.vector.Feature[Geometry, GadmFeatureId] = {
+  def get(i: Row): geotrellis.vector.Feature[Geometry, GadmFeatureId] = {
     val countryCode: String = i.getString(countryPos)
     val admin1: Integer = try {
       i.getString(adm1Pos).split("[.]")(1).split("[_]")(0).toInt
