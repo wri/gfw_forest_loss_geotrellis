@@ -105,30 +105,30 @@ If you are not sure how to best approach this, simply use the [ArcPY Client](htt
 
 The following options are supported:
 
-|Option         |Type  |Analysis or Feature Type |Description                                                                                     |
-|---------------|------|-------------------------|------------------------------------------------------------------------------------------------|
-|analysis       |string|                         |Type of analysis to run [annualupdate, annualupdate_minimal,carbonflux,gladalerts,treecoverloss]|
-|features       |string|all (required)           |URI of features in TSV format                                                                   |
-|output         |string|all (required)           |URI of output dir for CSV files                                                                 |
-|feature_type   |string|all (required)           |Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature                                     |
-|limit          |int   |all                      |Limit number of records processed                                                               |
-|iso_first      |string|`gadm` or `wdpa` features|Filter by first letter of ISO code                                                              |
-|iso_start      |string|`gadm` or `wdpa` features|Filter by ISO code larger than or equal to given value                                          |
-|iso_end        |string|`gadm` or `wdpa` features|Filter by ISO code smaller than given value                                                     |
-|iso            |string|`gadm` or `wdpa` features|Filter by country ISO code                                                                      |
-|admin1         |string|`gadm` features          |Filter by country Admin1 code                                                                   |
-|admin2         |string|`gadm` features          |Filter by country Admin2 code                                                                   |
-|id_start       |int   |`feature` analysis       |Filter by IDs larger than or equal to given value                                               |
-|id_end         |int   |`feature` analysis       |Filter by IDs smaller than given value                                                          |
-|iucn_cat       |string|`wdpa` features          |Filter by IUCN Category                                                                         |
-|wdpa_status    |string|`wdpa` features          |Filter by WDPA Status                                                                           |
-|tcd            |int   |`treecover` analysis     |Select tree cover density year                                                                  |
-|threshold      |int   |`treecover` analysis     |Treecover threshold to apply                                                                    |
-|primary-forests|flag  |`treecover` analysis     |Include Primary Forests                                                                         |
-|tcl            |flag  |all                      |Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class    |
-|glad           |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class  |
-|change_only    |flag  |all except `treecover`   |Process change only                                                                             |
-|build_data_cube|flag  |`glad` analysis          |Build XYZ data cube                                                                             |
+|Option         |Type  |Analysis or Feature Type |Description                                                                                                |
+|---------------|------|-------------------------|-----------------------------------------------------------------------------------------------------------|
+|analysis       |string|                         |Type of analysis to run `annualupdate`, `annualupdate_minimal`, `carbonflux`, `gladalerts`, `treecoverloss`|
+|features       |string|all (required)           |URI of features in TSV format                                                                              |
+|output         |string|all (required)           |URI of output dir for CSV files                                                                            |
+|feature_type   |string|all (required)           |Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature                                                |
+|limit          |int   |all                      |Limit number of records processed                                                                          |
+|iso_first      |string|`gadm` or `wdpa` features|Filter by first letter of ISO code                                                                         |
+|iso_start      |string|`gadm` or `wdpa` features|Filter by ISO code larger than or equal to given value                                                     |
+|iso_end        |string|`gadm` or `wdpa` features|Filter by ISO code smaller than given value                                                                |
+|iso            |string|`gadm` or `wdpa` features|Filter by country ISO code                                                                                 |
+|admin1         |string|`gadm` features          |Filter by country Admin1 code                                                                              |
+|admin2         |string|`gadm` features          |Filter by country Admin2 code                                                                              |
+|id_start       |int   |`feature` analysis       |Filter by IDs larger than or equal to given value                                                          |
+|id_end         |int   |`feature` analysis       |Filter by IDs smaller than given value                                                                     |
+|iucn_cat       |string|`wdpa` features          |Filter by IUCN Category                                                                                    |
+|wdpa_status    |string|`wdpa` features          |Filter by WDPA Status                                                                                      |
+|tcd            |int   |`treecover` analysis     |Select tree cover density year                                                                             |
+|threshold      |int   |`treecover` analysis     |Treecover threshold to apply                                                                               |
+|primary-forests|flag  |`treecover` analysis     |Include Primary Forests                                                                                    |
+|tcl            |flag  |all                      |Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class               |
+|glad           |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class             |
+|change_only    |flag  |all except `treecover`   |Process change only                                                                                        |
+|build_data_cube|flag  |`glad` analysis          |Build XYZ data cube                                                                                        |
 
 ## Inventory
 
@@ -265,30 +265,30 @@ If you are not sure how to best approach this, simply use the [ArcPY Client](htt
 
 The following options are supported:
 
-|Option         |Type  |Analysis or Feature Type |Description                                                                                     |
-|---------------|------|-------------------------|------------------------------------------------------------------------------------------------|
-|analysis       |string|                         |Type of analysis to run [annualupdate, annualupdate_minimal,carbonflux,gladalerts,treecoverloss]|
-|features       |string|all (required)           |URI of features in TSV format                                                                   |
-|output         |string|all (required)           |URI of output dir for CSV files                                                                 |
-|feature_type   |string|all (required)           |Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature                                     |
-|limit          |int   |all                      |Limit number of records processed                                                               |
-|iso_first      |string|`gadm` or `wdpa` features|Filter by first letter of ISO code                                                              |
-|iso_start      |string|`gadm` or `wdpa` features|Filter by ISO code larger than or equal to given value                                          |
-|iso_end        |string|`gadm` or `wdpa` features|Filter by ISO code smaller than given value                                                     |
-|iso            |string|`gadm` or `wdpa` features|Filter by country ISO code                                                                      |
-|admin1         |string|`gadm` features          |Filter by country Admin1 code                                                                   |
-|admin2         |string|`gadm` features          |Filter by country Admin2 code                                                                   |
-|id_start       |int   |`feature` analysis       |Filter by IDs larger than or equal to given value                                               |
-|id_end         |int   |`feature` analysis       |Filter by IDs smaller than given value                                                          |
-|iucn_cat       |string|`wdpa` features          |Filter by IUCN Category                                                                         |
-|wdpa_status    |string|`wdpa` features          |Filter by WDPA Status                                                                           |
-|tcd            |int   |`treecover` analysis     |Select tree cover density year                                                                  |
-|threshold      |int   |`treecover` analysis     |Treecover threshold to apply                                                                    |
-|primary-forests|flag  |`treecover` analysis     |Include Primary Forests                                                                         |
-|tcl            |flag  |all                      |Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class    |
-|glad           |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class  |
-|change_only    |flag  |all except `treecover`   |Process change only                                                                             |
-|build_data_cube|flag  |`glad` analysis          |Build XYZ data cube                                                                             |
+|Option         |Type  |Analysis or Feature Type |Description                                                                                                |
+|---------------|------|-------------------------|-----------------------------------------------------------------------------------------------------------|
+|analysis       |string|                         |Type of analysis to run `annualupdate`, `annualupdate_minimal`, `carbonflux`, `gladalerts`, `treecoverloss`|
+|features       |string|all (required)           |URI of features in TSV format                                                                              |
+|output         |string|all (required)           |URI of output dir for CSV files                                                                            |
+|feature_type   |string|all (required)           |Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature                                                |
+|limit          |int   |all                      |Limit number of records processed                                                                          |
+|iso_first      |string|`gadm` or `wdpa` features|Filter by first letter of ISO code                                                                         |
+|iso_start      |string|`gadm` or `wdpa` features|Filter by ISO code larger than or equal to given value                                                     |
+|iso_end        |string|`gadm` or `wdpa` features|Filter by ISO code smaller than given value                                                                |
+|iso            |string|`gadm` or `wdpa` features|Filter by country ISO code                                                                                 |
+|admin1         |string|`gadm` features          |Filter by country Admin1 code                                                                              |
+|admin2         |string|`gadm` features          |Filter by country Admin2 code                                                                              |
+|id_start       |int   |`feature` analysis       |Filter by IDs larger than or equal to given value                                                          |
+|id_end         |int   |`feature` analysis       |Filter by IDs smaller than given value                                                                     |
+|iucn_cat       |string|`wdpa` features          |Filter by IUCN Category                                                                                    |
+|wdpa_status    |string|`wdpa` features          |Filter by WDPA Status                                                                                      |
+|tcd            |int   |`treecover` analysis     |Select tree cover density year                                                                             |
+|threshold      |int   |`treecover` analysis     |Treecover threshold to apply                                                                               |
+|primary-forests|flag  |`treecover` analysis     |Include Primary Forests                                                                                    |
+|tcl            |flag  |all                      |Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class               |
+|glad           |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class             |
+|change_only    |flag  |all except `treecover`   |Process change only                                                                                        |
+|build_data_cube|flag  |`glad` analysis          |Build XYZ data cube                                                                                        |
 
 ## Inventory
 

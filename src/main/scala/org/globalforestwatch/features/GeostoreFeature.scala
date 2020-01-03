@@ -13,12 +13,12 @@ object GeostoreFeature extends Feature {
   def getFeature(
     i: Row
   ): geotrellis.vector.Feature[Geometry, GeostoreFeatureId] = {
-    val geostore_id: String = i.getString(idPos)
+    val geostoreId: String = i.getString(idPos)
     val geom: Geometry =
       GeometryReducer.reduce(GeometryReducer.gpr)(
         WKB.read(i.getString(geomPos))
       )
-    geotrellis.vector.Feature(geom, GeostoreFeatureId(geostore_id))
+    geotrellis.vector.Feature(geom, GeostoreFeatureId(geostoreId))
   }
 
 }
