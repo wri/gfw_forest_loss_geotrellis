@@ -40,8 +40,8 @@ case class CarbonFluxTile(
                            intactPrimaryForest: IntactPrimaryForest#OptionalITile,
                            peatlandsFlux: PeatlandsFlux#OptionalITile,
                            forestAgeCategory: ForestAgeCategory#OptionalITile,
-                           jplAGBextent: jplAGBextent#OptionalITile,
-                           FIAregionsUSextent: FIAregionsUSextent#OptionalITile
+                           jplAGBextent: JplAGBextent#OptionalITile,
+                           fiaRegionsUsExtent: FiaRegionsUsExtent#OptionalITile
                          ) extends CellGrid {
   def cellType: CellType = loss.cellType
 

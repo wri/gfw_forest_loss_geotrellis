@@ -16,8 +16,8 @@ object GladAlertsExport extends SummaryExport {
     val changeOnly: Boolean =
       getAnyMapValue[Boolean](kwargs, "changeOnly")
 
-    val buildDataCube: Boolean =
-      getAnyMapValue[Boolean](kwargs, "buildDataCube")
+    val buildDataCube: Boolean = false
+    //      getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
     val minZoom: Int = if (buildDataCube) minZoomValue else maxZoomValue
 
@@ -220,8 +220,8 @@ object GladAlertsExport extends SummaryExport {
 
     val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
-    val buildDataCube: Boolean =
-      getAnyMapValue[Boolean](kwargs, "buildDataCube")
+    val buildDataCube: Boolean = false
+    //      getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
     val minZoom: Int = if (buildDataCube) minZoomValue else maxZoomValue
 

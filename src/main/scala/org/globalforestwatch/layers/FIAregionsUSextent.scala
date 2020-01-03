@@ -1,6 +1,6 @@
 package org.globalforestwatch.layers
 
-case class FIAregionsUSextent(grid: String) extends StringLayer with OptionalILayer {
+case class FiaRegionsUsExtent(grid: String) extends StringLayer with OptionalILayer {
 
   val uri: String = s"$basePath/FIA_regions_US_extent/$grid.tif"
   override val externalNoDataValue = "Unknown"

@@ -50,7 +50,7 @@ object CarbonFluxDF {
       $"dataGroup.peatlandsFlux" as "is__peatlands_flux",
       $"dataGroup.forestAgeCategory" as "forest_age_category__cat",
       $"dataGroup.jplAGBextent" as "is__jpl_aboveground_biomass_extent",
-      $"dataGroup.FIAregionsUSextent" as "fia_usa_extent__region",
+      $"dataGroup.fiaRegionsUsExtent" as "fia_usa_extent__region",
       $"data.treecoverLoss" as "treecover_loss__ha",
       $"data.biomassLoss" as "aboveground_biomass_loss__Mg",
       $"data.grossEmissionsCo2eCo2Only" as "gross_emissions_co2e_co2_only__Mg",
