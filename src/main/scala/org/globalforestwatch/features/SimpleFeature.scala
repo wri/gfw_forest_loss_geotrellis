@@ -11,7 +11,7 @@ object SimpleFeature extends Feature {
   val idPos = 0
   val geomPos = 1
 
-  def getFeature(
+  def get(
                   i: Row
                 ): geotrellis.vector.Feature[Geometry, SimpleFeatureId] = {
     val feature_id: Int = i.getString(idPos).toInt
