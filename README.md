@@ -11,7 +11,6 @@ Currently the following analysis are implemented
 -   Carbon Flux
 -   Glad Alerts
 
-
 ### Tree Cover Loss
 A simple analysis which only looks at Tree Cover Loss, Tree Cover Density (2000 or 2010) and optionally Primary Forest.
 Users can select one or many tree cover thresholds. Output will be a flat file, with one row per input feature and three cover density threshold.
@@ -19,8 +18,7 @@ Users can select one or many tree cover thresholds. Output will be a flat file, 
 This type of analysis only supports simple features as input. Best used together with the [ArcPY Client](https://github.com/wri/gfw_forest_loss_geotrellis_arcpy_client).
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis treecoverloss --feature_type simple --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis treecoverloss --feature_type feature --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
 ``` 
 
 ### Annual Update
@@ -29,7 +27,6 @@ Output are Summary and Change tables for ISO, ADM1 and ADM2 areas.
 
 ```sbt
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-
 ```
 
 ### Annual Update minimal
@@ -46,13 +43,11 @@ Output are Whitelist, Summary and Change tables for input features. For GADM, th
 For GADM there will also be summary tables with one row per ISO, ADM1, ADM2 and Tree Cover Density, which is used for to prepare the Download Spreatsheets on the GFW country pages.
 To produce final spreadsheets you will need to add another [post processing step](https://github.com/wri/write_country_stats).
 
-
 ```sbt
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type wdpa --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type geostore --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type simple --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type feature --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
 ```
 
 ### Carbon Flux
@@ -76,13 +71,11 @@ Supported input features are
 -   WDPA
 -   Simple Feature
 
-
 ```sbt
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type simple --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
 ```
 
 ## Inputs
@@ -102,30 +95,30 @@ If you are not sure how to best approach this, simply use the [ArcPY Client](htt
 ## Options
 The following options are supported:
 
-|Option| Type | Analysis or Feature Type | Description|
-|-------|------|---------|------------|
-|analysis| string | |Type of analysis to run [annualupdate, annualupdate_minimal,carbonflux,gladalerts,treecoverloss]|
-|features| string | all (required) | URI of features in TSV format|
-|output| string | all (required) | URI of output dir for CSV files|
-|feature_type| string | all (required) | Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature|
-|limit| int | all | Limit number of records processed|
-|iso_first| string | for `gadm` or `wdpa` feature types | Filter by first letter of ISO code|
-|iso_start| string | for `gadm` or `wdpa` feature types | Filter by ISO code larger than or equal to given value|
-|iso_end| string | for `gadm` or `wdpa` feature types | Filter by ISO code smaller than given value|
-|iso| string | for `gadm` or `wdpa` feature types | Filter by country ISO code|
-|admin1| string | for `gadm` feature types | Filter by country Admin1 code|
-|admin2| string | for `gadm` feature types | Filter by country Admin2 code|
-|id_start| int | for `feature` feature types | Filter by IDs larger than or equal to given value|
-|id_end| int | for `feature` feature types | Filter by IDs smaller than given value|
-|iucn_cat| string | for `wdpa` feature types |Filter by IUCN Category|
-|wdpa_status| string | for `wdpa` feature types |Filter by WDPA Status"|
-|tcd| int | for `treecover` analysis |Select tree cover density year|
-|threshold| int | for `treecover` analysis |Treecover threshold to apply|
-|primary-forests| flag | for `treecover` analysis|Include Primary Forests|
-|tcl| flag | all, requires boolean `tcl` field in input feature class |Filter input feature by TCL tile extent|
-|glad| flag | all, requires boolean `glad` field in input feature class|GLAD tile extent|
-|change_only| flag | all except `treecover loss |Process change only|
-|build_data_cube| flag | `glad` |Build XYZ data cube|
+|Option           | Type   | Analysis or Feature Type  | Description
+|---              |---     |---                        |---
+| analysis        | string |                           | Type of analysis to run [annualupdate, annualupdate_minimal,carbonflux,gladalerts,treecoverloss]
+| features        | string | all (required)            | URI of features in TSV format
+| output          | string | all (required)            | URI of output dir for CSV files
+| feature_type    | string | all (required)            | Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature
+| limit           | int    | all                       | Limit number of records processed
+| iso_first       | string | `gadm` or `wdpa` features | Filter by first letter of ISO code
+| iso_start       | string | `gadm` or `wdpa` features | Filter by ISO code larger than or equal to given value
+| iso_end         | string | `gadm` or `wdpa` features | Filter by ISO code smaller than given value
+| iso             | string | `gadm` or `wdpa` features | Filter by country ISO code
+| admin1          | string | `gadm` features           |  Filter by country Admin1 code
+| admin2          | string | `gadm` features           | Filter by country Admin2 code
+| id_start        | int    | `feature` analysis        | Filter by IDs larger than or equal to given value
+| id_end          | int    | `feature` analysis        | Filter by IDs smaller than given value
+| iucn_cat        | string | `wdpa` features           | Filter by IUCN Category
+| wdpa_status     | string | `wdpa` features           | Filter by WDPA Status
+| tcd             | int    | `treecover` analysis      | Select tree cover density year
+| threshold       | int    | `treecover` analysis      | Treecover threshold to apply
+| primary-forests | flag   | `treecover` analysis      | Include Primary Forests
+| tcl             | flag   | all                       | Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class
+| glad            | flag   | all                       | Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class
+| change_only     | flag   | all except `treecover`    | Process change only
+| build_data_cube | flag   | `glad` analysis           | Build XYZ data cube
 
 ## Inventory
 
@@ -151,8 +144,6 @@ Before running review `sbtlighter` configuration in `build.sbt`, `reload` SBT se
 
 ```sbt
 sbt:geotrellis-wri> sparkCreateCluster
-
 sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --features s3://gfw-files/2018_update/tsv/gadm36_1_1.csv --output s3://gfw-files/2018_update/results/summary --feature_type gadm --analysis annualupdate_minimal --tcl
-
 sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain  --features s3://gfw-files/2018_update/tsv/wdpa__*.tsv --output s3://gfw-files/2018_update/results/summary  --feature_type wdpa --analysis gladalerts --tcl --iso BRA
 ```

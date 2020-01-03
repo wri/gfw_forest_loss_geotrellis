@@ -1,5 +1,6 @@
 package org.globalforestwatch.summarystats.treecoverloss
 
+import cats.data.NonEmptyList
 import cats.implicits._
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
@@ -62,7 +63,8 @@ object TreeLossSummary {
         val biomassPixel = biomass * areaHa
         val co2Pixel = biomassPixel * co2Factor
 
-        val thresholds = (0 until 100 by 5).toList
+        val thresholds: List[Int] =
+          getAnyMapValue[NonEmptyList[Int]](acc.kwargs, "thresholdFilter").toList
 
         @tailrec
         def updateSummary(
