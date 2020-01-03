@@ -12,21 +12,26 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
     def exportWhitelist(df: DataFrame): Unit = {
 
-      val adm2ApiDF = df.transform(AnnualUpdateMinimalDF.whitelist(List("iso", "adm1", "adm2")))
+      val adm2ApiDF = df.transform(
+        AnnualUpdateMinimalDF.whitelist(List("iso", "adm1", "adm2"))
+      )
       adm2ApiDF
         .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/whitelist")
 
-      val adm1ApiDF = adm2ApiDF.transform(AnnualUpdateMinimalDF.whitelist2(List("iso", "adm1")))
+      val adm1ApiDF = adm2ApiDF.transform(
+        AnnualUpdateMinimalDF.whitelist2(List("iso", "adm1"))
+      )
       adm1ApiDF
         .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/whitelist")
 
-      val isoApiDF = adm1ApiDF.transform(AnnualUpdateMinimalDF.whitelist2(List("iso")))
+      val isoApiDF =
+        adm1ApiDF.transform(AnnualUpdateMinimalDF.whitelist2(List("iso")))
       isoApiDF
         .coalesce(1)
         .write
@@ -37,21 +42,26 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
     def exportSummary(df: DataFrame): Unit = {
 
-      val adm2ApiDF = df.transform(AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2")))
+      val adm2ApiDF = df.transform(
+        AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2"))
+      )
       adm2ApiDF
         .coalesce(40) // this should result in an avg file size of 100MB
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm2/summary")
 
-      val adm1ApiDF = adm2ApiDF.transform(AnnualUpdateMinimalDF.aggSummary2(List("iso", "adm1")))
+      val adm1ApiDF = adm2ApiDF.transform(
+        AnnualUpdateMinimalDF.aggSummary2(List("iso", "adm1"))
+      )
       adm1ApiDF
         .coalesce(12) // this should result in an avg file size of 100MB
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/adm1/summary")
 
-      val isoApiDF = adm1ApiDF.transform(AnnualUpdateMinimalDF.aggSummary2(List("iso")))
+      val isoApiDF =
+        adm1ApiDF.transform(AnnualUpdateMinimalDF.aggSummary2(List("iso")))
       isoApiDF
         .coalesce(3) // this should result in an avg file size of 100MB
         .write
@@ -66,9 +76,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
       val adm2ApiDF = df
         .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
-        .transform(
-          AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2"))
-        )
+        .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2")))
         .coalesce(133) // this should result in an avg file size of 100MB
 
       adm2ApiDF.write
@@ -102,7 +110,13 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
       adm2SummaryDF
         .transform(
-          AnnualUpdateMinimalDownloadDF.roundDownload
+          AnnualUpdateMinimalDownloadDF.roundDownload(
+            List(
+              $"iso" as "country",
+              $"adm1" as "subnational1",
+              $"adm2" as "subnational2"
+            )
+          )
         )
         .coalesce(1)
         .orderBy(
@@ -116,12 +130,16 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .csv(path = outputUrl + "/adm2/download")
 
       val adm1SummaryDF =
-        adm2SummaryDF.transform(AnnualUpdateMinimalDownloadDF.sumDownload(List("iso", "adm1")))
+        adm2SummaryDF.transform(
+          AnnualUpdateMinimalDownloadDF.sumDownload(List("iso", "adm1"))
+        )
 
       adm1SummaryDF
         .transform(
           AnnualUpdateMinimalDownloadDF
-            .roundDownload2(List($"iso" as "country", $"adm1" as "subnational1"))
+            .roundDownload2(
+              List($"iso" as "country", $"adm1" as "subnational1")
+            )
         )
         .coalesce(1)
         .orderBy($"country", $"subnational1", $"treecover_density__threshold")
@@ -130,10 +148,15 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .csv(path = outputUrl + "/adm1/download")
 
       val isoSummaryDF =
-        adm1SummaryDF.transform(AnnualUpdateMinimalDownloadDF.sumDownload2(List("iso")))
+        adm1SummaryDF.transform(
+          AnnualUpdateMinimalDownloadDF.sumDownload2(List("iso"))
+        )
 
       isoSummaryDF
-        .transform(AnnualUpdateMinimalDownloadDF.roundDownload2(List($"iso" as "country")))
+        .transform(
+          AnnualUpdateMinimalDownloadDF
+            .roundDownload2(List($"iso" as "country"))
+        )
         .coalesce(1)
         .orderBy($"country", $"treecover_density__threshold")
         .write
@@ -193,7 +216,8 @@ object AnnualUpdateMinimalExport extends SummaryExport {
             $"id.iucn_cat" as "wdpa_protected_area__iucn_cat",
             $"id.iso" as "wdpa_protected_area__iso",
             $"id.status" as "wdpa_protected_area__status"
-          ), wdpa = true
+          ),
+          wdpa = true
         )
       )
 
@@ -235,7 +259,10 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
     val exportDF = summaryDF
-      .transform(AnnualUpdateMinimalDF.unpackValues(List($"id.geostoreId" as "geostore__id")))
+      .transform(
+        AnnualUpdateMinimalDF
+          .unpackValues(List($"id.geostoreId" as "geostore__id"))
+      )
 
     exportDF.cache()
     if (!changeOnly) {
