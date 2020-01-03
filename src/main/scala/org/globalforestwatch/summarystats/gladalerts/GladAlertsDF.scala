@@ -36,7 +36,7 @@ object GladAlertsDF {
 
     validatePresenceOfColumns(df, Seq("id", "data_group", "data"))
 
-    def _cols =
+    def defaultCols =
       List(
         $"data_group.alertDate" as "alert__date",
         $"data_group.isConfirmed" as "is__confirmed_alert",
@@ -66,8 +66,8 @@ object GladAlertsDF {
 
     val cols =
       if (!wdpa)
-        unpackCols ::: ($"data_group.protectedAreas" as "wdpa_protected_area__iucn_cat") :: _cols
-      else unpackCols ::: _cols
+        unpackCols ::: ($"data_group.protectedAreas" as "wdpa_protected_area__iucn_cat") :: defaultCols
+      else unpackCols ::: defaultCols
 
     df.filter($"data_group.tile.z" === minZoom)
       .select(cols: _*)
@@ -107,7 +107,7 @@ object GladAlertsDF {
       weekofyear($"alert__date") as "alert__week",
       $"is__confirmed_alert"
     )
-    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, gladCols, wdpa)
+    aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, gladCols, wdpa)
   }
 
   def aggChangeWeekly2(cols: List[String],
@@ -117,13 +117,13 @@ object GladAlertsDF {
     import spark.implicits._
 
     val gladCols = List($"alert__year", $"alert__week", $"is__confirmed_alert")
-    _aggChangeWeekly(df, cols, gladCols, wdpa)
+    aggChangeWeekly(df, cols, gladCols, wdpa)
   }
 
-  private def _aggChangeWeekly(df: DataFrame,
-                               cols: List[String],
-                               gladCols: List[Column],
-                               wdpa: Boolean = false): DataFrame = {
+  private def aggChangeWeekly(df: DataFrame,
+                              cols: List[String],
+                              gladCols: List[Column],
+                              wdpa: Boolean = false): DataFrame = {
     val spark = df.sparkSession
     import spark.implicits._
 

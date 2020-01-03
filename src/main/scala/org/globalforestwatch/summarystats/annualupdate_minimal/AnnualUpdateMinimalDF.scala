@@ -34,7 +34,7 @@ object AnnualUpdateMinimalDF {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    def _unpackCols =
+    def defaultUnpackCols =
       List(
         $"data_group.lossYear" as "treecover_loss__year",
         $"data_group.threshold" as "treecover_density__threshold",
@@ -70,10 +70,10 @@ object AnnualUpdateMinimalDF {
 
     val unpackCols = {
       if (!wdpa) {
-        _unpackCols ::: List(
+        defaultUnpackCols ::: List(
           $"data_group.wdpa" as "wdpa_protected_area__iucn_cat"
         )
-      } else _unpackCols
+      } else defaultUnpackCols
     }
 
     validatePresenceOfColumns(df, Seq("id", "data_group", "data"))
@@ -153,7 +153,7 @@ object AnnualUpdateMinimalDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val _aggCols = List(
+    val defaultAggCols = List(
       max(length($"tcs_driver__type")).cast("boolean") as "tcs_driver__type",
       max(length($"global_land_cover__class"))
         .cast("boolean") as "global_land_cover__class",
@@ -180,11 +180,11 @@ object AnnualUpdateMinimalDF {
 
     val aggCols =
       if (!wdpa)
-        _aggCols ::: List(
+        defaultAggCols ::: List(
           max(length($"wdpa_protected_area__iucn_cat"))
             .cast("boolean") as "wdpa_protected_area__iucn_cat"
         )
-      else _aggCols
+      else defaultAggCols
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)
       .agg(aggCols.head, aggCols.tail: _*)
@@ -197,7 +197,7 @@ object AnnualUpdateMinimalDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val _aggCols: List[Column] = List(
+    val defaultAggCols: List[Column] = List(
       max($"tcs_driver__type") as "tcs_driver__type",
       max($"global_land_cover__class") as "global_land_cover__class",
       max($"is__regional_primary_forest") as "is__regional_primary_forest",
@@ -220,10 +220,10 @@ object AnnualUpdateMinimalDF {
     )
 
     val aggCols = if (!wdpa)
-      _aggCols ::: List(
+      defaultAggCols ::: List(
         max($"wdpa_protected_area__iucn_cat") as "wdpa_protected_area__iucn_cat"
       )
-    else _aggCols
+    else defaultAggCols
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)
       .agg(aggCols.head, aggCols.tail: _*)
