@@ -1,21 +1,24 @@
-package org.globalforestwatch.gladalerts
+package org.globalforestwatch.summarystats.gladalerts
 
-import java.time.LocalDate
+import cats.implicits._
 import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
-import cats.implicits._
-import org.globalforestwatch.util.Geodesy
-import org.globalforestwatch.util.Mercantile
+import org.globalforestwatch.summarystats.Summary
+import org.globalforestwatch.util.Util.getAnyMapValue
+import org.globalforestwatch.util.{Geodesy, Mercantile}
+
+import scala.annotation.tailrec
 
 /** LossData Summary by year */
-case class GladAlertsSummary(
-  stats: Map[GladAlertsDataGroup, GladAlertsData] = Map.empty
-) {
+case class GladAlertsSummary(stats: Map[GladAlertsDataGroup, GladAlertsData] =
+                             Map.empty,
+                             kwargs: Map[String, Any])
+  extends Summary[GladAlertsSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: GladAlertsSummary): GladAlertsSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    GladAlertsSummary(stats.combine(other.stats))
+    GladAlertsSummary(stats.combine(other.stats), kwargs)
   }
 }
 
@@ -30,10 +33,19 @@ object GladAlertsSummary {
                    col: Int,
                    row: Int,
                    acc: GladAlertsSummary): GladAlertsSummary = {
-        // This is a pixel by pixel operation
-        val glad: (LocalDate, Boolean) = raster.tile.glad.getData(col, row)
 
-        if (glad != null) {
+        val changeOnly: Boolean =
+          getAnyMapValue[Boolean](acc.kwargs, "changeOnly")
+
+        val buildDataCube: Boolean = getAnyMapValue[Boolean](acc.kwargs, "buildDataCube")
+
+        val maxZoom = 12
+
+        // This is a pixel by pixel operation
+        val glad: Option[(String, Boolean)] =
+          raster.tile.glad.getData(col, row)
+
+        if (!(changeOnly && glad.isEmpty)) {
           val biomass: Double = raster.tile.biomass.getData(col, row)
           val climateMask: Boolean = raster.tile.climateMask.getData(col, row)
           val primaryForest: Boolean =
@@ -77,16 +89,36 @@ object GladAlertsSummary {
           val areaHa = area / 10000.0
           val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
 
+          @tailrec
           def updateSummary(
                              tile: Mercantile.Tile,
                              stats: Map[GladAlertsDataGroup, GladAlertsData]
                            ): Map[GladAlertsDataGroup, GladAlertsData] = {
-            if (tile.z < 0) stats
+            val cutOff: Int = {
+              if (buildDataCube) 0
+              else maxZoom
+            }
+
+            if (tile.z < cutOff) stats
             else {
+              val alertDate: String = {
+                glad match {
+                  case Some((date, _)) => date
+                  case _ => null
+                }
+              }
+
+              val confidence: Option[Boolean] = {
+                glad match {
+                  case Some((_, conf)) => Some(conf)
+                  case _ => null
+                }
+              }
+
               val pKey =
                 GladAlertsDataGroup(
-                  glad._1,
-                  glad._2,
+                  alertDate,
+                  confidence,
                   tile,
                   climateMask,
                   primaryForest,
@@ -111,11 +143,19 @@ object GladAlertsSummary {
                 )
 
               val summary: GladAlertsData =
-                stats.getOrElse(key = pKey, default = GladAlertsData(0, 0, 0))
+                stats.getOrElse(
+                  key = pKey,
+                  default = GladAlertsData(0, 0, 0, 0)
+                )
 
-              summary.totalAlerts += 1
               summary.totalArea += areaHa
-              summary.totalCo2 += co2Pixel
+
+              if (glad != null) {
+                summary.totalAlerts += 1
+                summary.alertArea += areaHa
+                summary.co2Emissions += co2Pixel
+              }
+
               updateSummary(
                 Mercantile.parent(tile),
                 stats.updated(pKey, summary)
@@ -124,15 +164,13 @@ object GladAlertsSummary {
 
           }
 
-          val tile: Mercantile.Tile = Mercantile.tile(lng, lat, 12)
+          val tile: Mercantile.Tile = Mercantile.tile(lng, lat, maxZoom)
           val updatedSummary: Map[GladAlertsDataGroup, GladAlertsData] =
             updateSummary(tile, acc.stats)
 
-          GladAlertsSummary(updatedSummary)
+          GladAlertsSummary(updatedSummary, acc.kwargs)
 
-        } else {
-          acc
-        }
+        } else acc
       }
     }
 }
