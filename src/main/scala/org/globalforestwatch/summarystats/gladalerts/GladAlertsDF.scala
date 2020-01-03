@@ -171,7 +171,7 @@ object GladAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val _aggCols = List(
+    val defaultAggCols = List(
       max("is__regional_primary_forest") as "is__regional_primary_forest",
       max("is__alliance_for_zero_extinction_site") as "is__alliance_for_zero_extinction_site",
       max("is__key_biodiversity_area") as "is__key_biodiversity_area",
@@ -199,8 +199,8 @@ object GladAlertsDF {
     val aggCols =
       if (!wdpa)
         (max(length($"wdpa_protected_area__iucn_cat"))
-          .cast("boolean") as "wdpa_protected_area__iucn_cat") :: _aggCols
-      else _aggCols
+          .cast("boolean") as "wdpa_protected_area__iucn_cat") :: defaultAggCols
+      else defaultAggCols
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)
       .agg(aggCols.head, aggCols.tail: _*)
@@ -209,7 +209,7 @@ object GladAlertsDF {
   def whitelist2(groupByCols: List[String],
                  wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
-    val _aggCols = List(
+    val defaultAggCols = List(
       max("is__regional_primary_forest") as "is__regional_primary_forest",
       max("is__alliance_for_zero_extinction_site") as "is__alliance_for_zero_extinction_site",
       max("is__key_biodiversity_area") as "is__key_biodiversity_area",
@@ -232,8 +232,8 @@ object GladAlertsDF {
 
     val aggCols =
       if (!wdpa)
-        (max("wdpa_protected_area__iucn_cat") as "wdpa_protected_area__iucn_cat") :: _aggCols
-      else _aggCols
+        (max("wdpa_protected_area__iucn_cat") as "wdpa_protected_area__iucn_cat") :: defaultAggCols
+      else defaultAggCols
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)
       .agg(aggCols.head, aggCols.tail: _*)
