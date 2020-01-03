@@ -6,6 +6,9 @@ import org.globalforestwatch.util.Util.getAnyMapValue
 
 object GladAlertsExport extends SummaryExport {
 
+  val minZoom = 0
+  val maxZoom = 12
+
   override protected def exportGadm(summaryDF: DataFrame,
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
@@ -16,125 +19,11 @@ object GladAlertsExport extends SummaryExport {
     val buildDataCube: Boolean =
       getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
-    val minZoom: Int = {
-      if (buildDataCube) 0 else 12
-    } // TODO: remove magic numbers. maxZoom=12 should be in kwargs
+    val minZoom: Int = if (buildDataCube) minZoom else maxZoom
 
-    def exportTiles(tileDF: DataFrame): Unit = {
-
-      if (buildDataCube) {
-        tileDF
-          .transform(GladAlertsTileDF.unpackValues)
-          .transform(GladAlertsTileDF.sumAlerts)
-          .write
-          .options(csvOptions)
-          .csv(path = outputUrl + "/tiles")
-      }
-    }
-
-    def exportSummary(df: DataFrame): Unit = {
-
-      val adm2DF = df
-        .transform(GladAlertsDF.aggSummary(List("iso", "adm1", "adm2")))
-
-      adm2DF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/summary")
-
-      val adm1DF = adm2DF
-        .transform(GladAlertsDF.aggSummary(List("iso", "adm1")))
-
-      adm1DF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm1/summary")
-
-      val isoDF = adm1DF
-        .transform(GladAlertsDF.aggSummary(List("iso")))
-
-      isoDF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/iso/summary")
-
-    }
-
-    def exportWhitelist(df: DataFrame): Unit = {
-
-      val adm2DF = df
-        .transform(GladAlertsDF.whitelist(List("iso", "adm1", "adm2")))
-
-      adm2DF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/whitelist")
-
-      val adm1DF = adm2DF
-        .transform(GladAlertsDF.whitelist2(List("iso", "adm1")))
-
-      adm1DF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm1/whitelist")
-
-      val isoDF = adm1DF
-        .transform(GladAlertsDF.whitelist2(List("iso")))
-
-      isoDF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/iso/whitelist")
-
-    }
-
-    def exportChange(df: DataFrame): Unit = {
-
-      val adm2DailyDF = df
-        .transform(GladAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
-
-      adm2DailyDF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/daily_alerts")
-
-      val adm2DF = adm2DailyDF
-        .transform(GladAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2")))
-
-      adm2DF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/weekly_alerts")
-
-      val adm1DF = adm2DF
-        .transform(GladAlertsDF.aggChangeWeekly(List("iso", "adm1")))
-
-      adm1DF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm1/weekly_alerts")
-
-      val isoDF = adm1DF
-        .transform(GladAlertsDF.aggChangeWeekly(List("iso")))
-
-      isoDF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/iso/weekly_alerts")
-    }
 
     summaryDF.cache()
-    exportTiles(summaryDF)
+    exportTiles(summaryDF, outputUrl, buildDataCube)
 
     val spark = summaryDF.sparkSession
     import spark.implicits._
@@ -148,11 +37,126 @@ object GladAlertsExport extends SummaryExport {
 
     gadmDF.cache()
     if (!changeOnly) {
-      exportWhitelist(gadmDF)
-      exportSummary(gadmDF)
+      exportWhitelist(gadmDF, outputUrl)
+      exportSummary(gadmDF, outputUrl)
     }
-    exportChange(gadmDF)
+    exportChange(gadmDF, outputUrl)
     gadmDF.unpersist()
+  }
+
+  private def exportTiles(tileDF: DataFrame,
+                          outputUrl: String,
+                          buildDataCube: Boolean): Unit = {
+
+    if (buildDataCube) {
+      tileDF
+        .transform(GladAlertsTileDF.unpackValues)
+        .transform(GladAlertsTileDF.sumAlerts)
+        .write
+        .options(csvOptions)
+        .csv(path = outputUrl + "/tiles")
+    }
+  }
+
+  private def exportSummary(df: DataFrame, outputUrl: String): Unit = {
+
+    val adm2DF = df
+      .transform(GladAlertsDF.aggSummary(List("iso", "adm1", "adm2")))
+
+    adm2DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/summary")
+
+    val adm1DF = adm2DF
+      .transform(GladAlertsDF.aggSummary(List("iso", "adm1")))
+
+    adm1DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/summary")
+
+    val isoDF = adm1DF
+      .transform(GladAlertsDF.aggSummary(List("iso")))
+
+    isoDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/summary")
+
+  }
+
+  private def exportWhitelist(df: DataFrame, outputUrl: String): Unit = {
+
+    val adm2DF = df
+      .transform(GladAlertsDF.whitelist(List("iso", "adm1", "adm2")))
+
+    adm2DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/whitelist")
+
+    val adm1DF = adm2DF
+      .transform(GladAlertsDF.whitelist2(List("iso", "adm1")))
+
+    adm1DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/whitelist")
+
+    val isoDF = adm1DF
+      .transform(GladAlertsDF.whitelist2(List("iso")))
+
+    isoDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/whitelist")
+
+  }
+
+  private def exportChange(df: DataFrame, outputUrl: String): Unit = {
+
+    val adm2DailyDF = df
+      .transform(GladAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
+
+    adm2DailyDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/daily_alerts")
+
+    val adm2DF = adm2DailyDF
+      .transform(GladAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2")))
+
+    adm2DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/weekly_alerts")
+
+    val adm1DF = adm2DF
+      .transform(GladAlertsDF.aggChangeWeekly(List("iso", "adm1")))
+
+    adm1DF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/weekly_alerts")
+
+    val isoDF = adm1DF
+      .transform(GladAlertsDF.aggChangeWeekly(List("iso")))
+
+    isoDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/weekly_alerts")
   }
 
   override protected def exportWdpa(summaryDF: DataFrame,
@@ -213,20 +217,18 @@ object GladAlertsExport extends SummaryExport {
                       groupByCols: List[String],
                       unpackCols: List[Column]): Unit = {
 
-    val changeOnly: Boolean =
-      getAnyMapValue[Boolean](kwargs, "changeOnly")
+    val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
     val buildDataCube: Boolean =
       getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
-    val minZoom: Int = {
-      if (buildDataCube) 0 else 12
-    } // TODO: remove magic numbers. maxZoom=12 should be in kwargs
+    val minZoom: Int = if (buildDataCube) minZoom else maxZoom
 
     val cols = groupByCols
 
-    val df = summaryDF
-      .transform(GladAlertsDF.unpackValues(unpackCols, minZoom = minZoom))
+    val df = summaryDF.transform(
+      GladAlertsDF.unpackValues(unpackCols, minZoom = minZoom)
+    )
 
     df.cache()
 
