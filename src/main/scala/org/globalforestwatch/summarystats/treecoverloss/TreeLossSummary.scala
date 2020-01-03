@@ -94,16 +94,22 @@ object TreeLossSummary {
 
               // TODO: use extent2010 to calculate avg biomass incase year is selected
               summary.avgBiomass = ((summary.avgBiomass * summary.treecoverExtent2000) + (biomass * areaHa)) / (summary.treecoverExtent2000 + areaHa)
-              if (tcdYear == 2000) summary.treecoverExtent2000 += areaHa
-              else if (tcdYear == 2010) summary.treecoverExtent2010 += areaHa
+              tcdYear match {
+                case 2000 => summary.treecoverExtent2000 += areaHa
+                case 2010 => summary.treecoverExtent2010 += areaHa
+              }
               summary.totalBiomass += biomassPixel
               summary.totalCo2 += co2Pixel
             }
 
-            if (tcd2010 >= thresholds.head && tcdYear == 2000)
-              summary.treecoverExtent2010 += areaHa
-            else if (tcd2000 >= thresholds.head && tcdYear == 2010)
-              summary.treecoverExtent2000 += areaHa
+            tcdYear match {
+              case 2000 =>
+                if (tcd2010 >= thresholds.head)
+                  summary.treecoverExtent2010 += areaHa
+              case 2010 =>
+                if (tcd2000 >= thresholds.head)
+                  summary.treecoverExtent2000 += areaHa
+            }
 
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
           }
