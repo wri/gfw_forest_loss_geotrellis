@@ -5,6 +5,12 @@ This project performs a polygonal summary on tree cover loss and intersecting la
 ## Analysis
 
 Currently the following analysis are implemented
+-   Tree Cover Loss
+-   Annual Update
+-   Annual Update minimal
+-   Carbon Flux
+-   Glad Alerts
+
 
 ### Tree Cover Loss
 A simple analysis which only looks at Tree Cover Loss, Tree Cover Density (2000 or 2010) and optionally Primary Forest.
@@ -51,39 +57,75 @@ sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annual
 
 ### Carbon Flux
 Carbon Flux analysis is used to produce statistics for GFW climate topic pages.
-It uses same approach as the annual update analysis, but with fewer and different input layers.
- 
+It uses same approach as the annual update analysis, but with fewer and different input layers. It currently only works with GADM features.
 
+```sbt
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis carbonflux --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+ ```
 
 ### Glad Alerts
+Glad alert analysis computes whitelist, summary, daily and weekly change data for given input features and intersects areas with the same contextual layers as in annual update minimal.
+It is used to update the country and user dashboards for the GFW website.
 
+Users can select, if they want to run the full analysis, or only look at change data. Computing only change data makes sense, if neither input features, nor contextual layers have changed, but only glad alerts.
+In that case, only the daily and weekly change tables will be updated. 
+
+Supported input features are
+-   GADM
+-   Geostore
+-   WDPA
+-   Simple Feature
+
+
+```sbt
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type simple --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+
+```
 
 ## Inputs
 
-USe Polygon Features encoded in TSV format. Geometries must be encoded in WKB. You can specify one or many input files using wildcards:
+Use Polygon Features encoded in TSV format. Geometries must be encoded in WKB. You can specify one or many input files using wildcards:
 
 ex: 
 -   `s3://bucket/prefix/gadm36_1_1.tsv`
 -   `s3://bucket/prefix/geostore_*.tsv`
 
+Make sure features are sufficiently small to assure a well balanced partition size and workload.
+Larger features should be split into smaller features, prior to running the analysis. 
+Also make sure, that features do not overlap with tile boundaries (we use 10x10 degree tiles). 
+For best performance, intersect input features with a 1x1 degree grid.
+If you are not sure how to best approach this, simply use the [ArcPY Client](https://github.com/wri/gfw_forest_loss_geotrellis_arcpy_client)
 
-These features are intersected against rasters stored in a 10x10 degree grid schema on S3 (ex: `s3://gfw-files/2018_update/loss/${grid}.tif`)
+## Options
+The following options are supported:
 
-
-
-## Output
-
-Output are various `.csv` and `.json` files used on Global Forest Watch Website and API
-
-CSV:
--   Tree Cover Loss Summary Statistics aggregated to Country level and Tree Cover Density Threshold for download from GFW country pages
--   Tree Cover Loss Summary Statistics aggregated to ADM1 level and Tree Cover Density Threshold for download from GFW country pages
--   Tree Cover Loss Summary Statistics aggregated to ADM2 level and Tree Cover Density Threshold for download from GFW country pages
-
-JSON:
--   Tree Cover Loss Statistics aggregated to Country level and Tree Cover Density Threshold for injection into API
--   Tree Cover Loss Statistics aggregated to ADM1 level and Tree Cover Density Threshold for injection into API
--   Tree Cover Loss Statistics aggregated to ADM2 level and Tree Cover Density Threshold for injection into API
+|Option| Type | Analysis or Feature Type | Description|
+|-------|------|---------|------------|
+|analysis| string | |Type of analysis to run [annualupdate, annualupdate_minimal,carbonflux,gladalerts,treecoverloss]|
+|features| string | all (required) | URI of features in TSV format|
+|output| string | all (required) | URI of output dir for CSV files|
+|feature_type| string | all (required) | Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature|
+|limit| int | all | Limit number of records processed|
+|iso_first| string | for `gadm` or `wdpa` feature types | Filter by first letter of ISO code|
+|iso_start| string | for `gadm` or `wdpa` feature types | Filter by ISO code larger than or equal to given value|
+|iso_end| string | for `gadm` or `wdpa` feature types | Filter by ISO code smaller than given value|
+|iso| string | for `gadm` or `wdpa` feature types | Filter by country ISO code|
+|admin1| string | for `gadm` feature types | Filter by country Admin1 code|
+|admin2| string | for `gadm` feature types | Filter by country Admin2 code|
+|id_start| int | for `feature` feature types | Filter by IDs larger than or equal to given value|
+|id_end| int | for `feature` feature types | Filter by IDs smaller than given value|
+|iucn_cat| string | for `wdpa` feature types |Filter by IUCN Category|
+|wdpa_status| string | for `wdpa` feature types |Filter by WDPA Status"|
+|tcd| int | for `treecover` analysis |Select tree cover density year|
+|threshold| int | for `treecover` analysis |Treecover threshold to apply|
+|primary-forests| flag | for `treecover` analysis|Include Primary Forests|
+|tcl| flag | all, requires boolean `tcl` field in input feature class |Filter input feature by TCL tile extent|
+|glad| flag | all, requires boolean `glad` field in input feature class|GLAD tile extent|
+|change_only| flag | all except `treecover loss |Process change only|
+|build_data_cube| flag | `glad` |Build XYZ data cube|
 
 ## Inventory
 
