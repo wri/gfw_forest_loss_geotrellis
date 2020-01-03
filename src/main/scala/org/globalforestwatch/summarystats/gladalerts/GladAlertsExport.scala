@@ -6,8 +6,8 @@ import org.globalforestwatch.util.Util.getAnyMapValue
 
 object GladAlertsExport extends SummaryExport {
 
-  val minZoom = 0
-  val maxZoom = 12
+  val minZoomValue = 0
+  val maxZoomValue = 12
 
   override protected def exportGadm(summaryDF: DataFrame,
                                     outputUrl: String,
@@ -19,7 +19,7 @@ object GladAlertsExport extends SummaryExport {
     val buildDataCube: Boolean =
       getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
-    val minZoom: Int = if (buildDataCube) minZoom else maxZoom
+    val minZoom: Int = if (buildDataCube) minZoomValue else maxZoomValue
 
 
     summaryDF.cache()
@@ -222,7 +222,7 @@ object GladAlertsExport extends SummaryExport {
     val buildDataCube: Boolean =
       getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
-    val minZoom: Int = if (buildDataCube) minZoom else maxZoom
+    val minZoom: Int = if (buildDataCube) minZoomValue else maxZoomValue
 
     val cols = groupByCols
 
