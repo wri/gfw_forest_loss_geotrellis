@@ -10,161 +10,6 @@ object AnnualUpdateMinimalExport extends SummaryExport {
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
 
-    def exportWhitelist(df: DataFrame): Unit = {
-
-      val adm2ApiDF = df.transform(
-        AnnualUpdateMinimalDF.whitelist(List("iso", "adm1", "adm2"))
-      )
-      adm2ApiDF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/whitelist")
-
-      val adm1ApiDF = adm2ApiDF.transform(
-        AnnualUpdateMinimalDF.whitelist2(List("iso", "adm1"))
-      )
-      adm1ApiDF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm1/whitelist")
-
-      val isoApiDF =
-        adm1ApiDF.transform(AnnualUpdateMinimalDF.whitelist2(List("iso")))
-      isoApiDF
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/iso/whitelist")
-
-    }
-
-    def exportSummary(df: DataFrame): Unit = {
-
-      val adm2ApiDF = df.transform(
-        AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2"))
-      )
-      adm2ApiDF
-        .coalesce(40) // this should result in an avg file size of 100MB
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/summary")
-
-      val adm1ApiDF = adm2ApiDF.transform(
-        AnnualUpdateMinimalDF.aggSummary2(List("iso", "adm1"))
-      )
-      adm1ApiDF
-        .coalesce(12) // this should result in an avg file size of 100MB
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm1/summary")
-
-      val isoApiDF =
-        adm1ApiDF.transform(AnnualUpdateMinimalDF.aggSummary2(List("iso")))
-      isoApiDF
-        .coalesce(3) // this should result in an avg file size of 100MB
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/iso/summary")
-
-    }
-
-    def exportChange(df: DataFrame): Unit = {
-      val spark: SparkSession = df.sparkSession
-      import spark.implicits._
-
-      val adm2ApiDF = df
-        .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
-        .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2")))
-        .coalesce(133) // this should result in an avg file size of 100MB
-
-      adm2ApiDF.write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/change")
-
-      val adm1ApiDF = adm2ApiDF
-        .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1")))
-        .coalesce(45) // this should result in an avg file size of 100MB
-
-      adm1ApiDF.write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm1/change")
-
-      val isoApiDF = adm1ApiDF
-        .transform(AnnualUpdateMinimalDF.aggChange(List("iso")))
-        .coalesce(14) // this should result in an avg file size of 100MB
-
-      isoApiDF.write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/iso/change")
-    }
-
-    def exportDownload(df: DataFrame, outputUrl: String): Unit = {
-
-      val spark = df.sparkSession
-      import spark.implicits._
-
-      val adm2SummaryDF = df
-        .transform(AnnualUpdateMinimalDownloadDF.sumDownload)
-
-      adm2SummaryDF
-        .transform(
-          AnnualUpdateMinimalDownloadDF.roundDownload(
-            List(
-              $"iso" as "country",
-              $"adm1" as "subnational1",
-              $"adm2" as "subnational2"
-            )
-          )
-        )
-        .coalesce(1)
-        .orderBy(
-          $"country",
-          $"subnational1",
-          $"subnational2",
-          $"treecover_density__threshold"
-        )
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm2/download")
-
-      val adm1SummaryDF =
-        adm2SummaryDF.transform(
-          AnnualUpdateMinimalDownloadDF.sumDownload(List("iso", "adm1"))
-        )
-
-      adm1SummaryDF
-        .transform(
-          AnnualUpdateMinimalDownloadDF
-            .roundDownload2(
-              List($"iso" as "country", $"adm1" as "subnational1")
-            )
-        )
-        .coalesce(1)
-        .orderBy($"country", $"subnational1", $"treecover_density__threshold")
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/adm1/download")
-
-      val isoSummaryDF =
-        adm1SummaryDF.transform(
-          AnnualUpdateMinimalDownloadDF.sumDownload2(List("iso"))
-        )
-
-      isoSummaryDF
-        .transform(
-          AnnualUpdateMinimalDownloadDF
-            .roundDownload2(List($"iso" as "country"))
-        )
-        .coalesce(1)
-        .orderBy($"country", $"treecover_density__threshold")
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/iso/download")
-
-    }
-
     val changeOnly: Boolean =
       getAnyMapValue[Boolean](kwargs, "changeOnly")
 
@@ -180,12 +25,163 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
     exportDF.cache()
     if (!changeOnly) {
-      exportWhitelist(exportDF)
-      exportSummary(exportDF)
+      exportWhitelist(exportDF, outputUrl)
+      exportSummary(exportDF, outputUrl)
       exportDownload(exportDF, outputUrl)
     }
-    exportChange(exportDF)
+    exportChange(exportDF, outputUrl)
     exportDF.unpersist()
+
+  }
+
+  private def exportWhitelist(df: DataFrame, outputUrl: String): Unit = {
+
+    val adm2ApiDF =
+      df.transform(AnnualUpdateMinimalDF.whitelist(List("iso", "adm1", "adm2")))
+    adm2ApiDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/whitelist")
+
+    val adm1ApiDF =
+      adm2ApiDF.transform(AnnualUpdateMinimalDF.whitelist2(List("iso", "adm1")))
+    adm1ApiDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/whitelist")
+
+    val isoApiDF =
+      adm1ApiDF.transform(AnnualUpdateMinimalDF.whitelist2(List("iso")))
+    isoApiDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/whitelist")
+
+  }
+
+  private def exportSummary(df: DataFrame, outputUrl: String): Unit = {
+
+    val adm2ApiDF = df.transform(
+      AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2"))
+    )
+    adm2ApiDF
+      .coalesce(40) // this should result in an avg file size of 100MB
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/summary")
+
+    val adm1ApiDF = adm2ApiDF.transform(
+      AnnualUpdateMinimalDF.aggSummary2(List("iso", "adm1"))
+    )
+    adm1ApiDF
+      .coalesce(12) // this should result in an avg file size of 100MB
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/summary")
+
+    val isoApiDF =
+      adm1ApiDF.transform(AnnualUpdateMinimalDF.aggSummary2(List("iso")))
+    isoApiDF
+      .coalesce(3) // this should result in an avg file size of 100MB
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/summary")
+
+  }
+
+  private def exportChange(df: DataFrame, outputUrl: String): Unit = {
+    val spark: SparkSession = df.sparkSession
+    import spark.implicits._
+
+    val adm2ApiDF = df
+      .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
+      .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2")))
+      .coalesce(133) // this should result in an avg file size of 100MB
+
+    adm2ApiDF.write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/change")
+
+    val adm1ApiDF = adm2ApiDF
+      .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1")))
+      .coalesce(45) // this should result in an avg file size of 100MB
+
+    adm1ApiDF.write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/change")
+
+    val isoApiDF = adm1ApiDF
+      .transform(AnnualUpdateMinimalDF.aggChange(List("iso")))
+      .coalesce(14) // this should result in an avg file size of 100MB
+
+    isoApiDF.write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/change")
+  }
+
+  private def exportDownload(df: DataFrame, outputUrl: String): Unit = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
+
+    val adm2SummaryDF = df
+      .transform(AnnualUpdateMinimalDownloadDF.sumDownload)
+
+    adm2SummaryDF
+      .transform(
+        AnnualUpdateMinimalDownloadDF.roundDownload(
+          List(
+            $"iso" as "country",
+            $"adm1" as "subnational1",
+            $"adm2" as "subnational2"
+          )
+        )
+      )
+      .coalesce(1)
+      .orderBy(
+        $"country",
+        $"subnational1",
+        $"subnational2",
+        $"treecover_density__threshold"
+      )
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm2/download")
+
+    val adm1SummaryDF =
+      adm2SummaryDF.transform(
+        AnnualUpdateMinimalDownloadDF.sumDownload(List("iso", "adm1"))
+      )
+
+    adm1SummaryDF
+      .transform(
+        AnnualUpdateMinimalDownloadDF
+          .roundDownload2(List($"iso" as "country", $"adm1" as "subnational1"))
+      )
+      .coalesce(1)
+      .orderBy($"country", $"subnational1", $"treecover_density__threshold")
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/download")
+
+    val isoSummaryDF =
+      adm1SummaryDF.transform(
+        AnnualUpdateMinimalDownloadDF.sumDownload2(List("iso"))
+      )
+
+    isoSummaryDF
+      .transform(
+        AnnualUpdateMinimalDownloadDF
+          .roundDownload2(List($"iso" as "country"))
+      )
+      .coalesce(1)
+      .orderBy($"country", $"treecover_density__threshold")
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/download")
 
   }
 
