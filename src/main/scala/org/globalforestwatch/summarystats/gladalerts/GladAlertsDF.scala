@@ -107,24 +107,41 @@ object GladAlertsDF {
       weekofyear($"alert__date") as "alert__week",
       $"is__confirmed_alert"
     )
+    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, gladCols, wdpa)
+  }
+
+  def aggChangeWeekly2(cols: List[String],
+                       wdpa: Boolean = false)(df: DataFrame): DataFrame = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
+
+    val gladCols = List($"alert__year", $"alert__week", $"is__confirmed_alert")
+    _aggChangeWeekly(df, cols, gladCols, wdpa)
+  }
+
+  private def _aggChangeWeekly(df: DataFrame,
+                               cols: List[String],
+                               gladCols: List[Column],
+                               wdpa: Boolean = false): DataFrame = {
+    val spark = df.sparkSession
+    import spark.implicits._
 
     val gladCols2 = List("alert__year", "alert__week", "is__confirmed_alert")
 
     val aggCols =
       List($"alert__count", $"alert_area__ha", $"aboveground_co2_emissions__Mg")
 
-    val selectCols: List[Column] =
-      if (!wdpa)
-        cols
-          .foldRight(Nil: List[Column])(col(_) :: _) ::: gladCols ::: $"wdpa_protected_area__iucn_cat" :: contextualLayers
-          .foldRight(Nil: List[Column])(col(_) :: _) ::: aggCols
-      else
-        cols.foldRight(Nil: List[Column])(col(_) :: _) ::: gladCols ::: contextualLayers
-          .foldRight(Nil: List[Column])(col(_) :: _) ::: aggCols
+    val contextLayers: List[String] =
+      if (!wdpa) "wdpa_protected_area__iucn_cat" :: contextualLayers
+      else contextualLayers
 
-    val groupByCols = if (!wdpa)
-      cols ::: gladCols2 ::: "wdpa_protected_area__iucn_cat" :: contextualLayers
-    else cols ::: gladCols2 ::: contextualLayers
+    val selectCols: List[Column] = cols.foldRight(Nil: List[Column])(
+      col(_) :: _
+    ) ::: gladCols ::: contextLayers
+      .foldRight(Nil: List[Column])(col(_) :: _) ::: aggCols
+
+    val groupByCols = cols ::: gladCols2 ::: contextLayers
 
     df.select(selectCols: _*)
       .groupBy(groupByCols.head, groupByCols.tail: _*)
