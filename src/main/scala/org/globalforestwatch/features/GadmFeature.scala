@@ -42,8 +42,6 @@ object GadmFeature extends Feature {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    var newDF = df
-
     val isoFirst: Option[String] =
       getAnyMapValue[Option[String]](filters, "isoFirst")
     val isoStart: Option[String] =
@@ -56,30 +54,18 @@ object GadmFeature extends Feature {
     val admin2: Option[String] =
       getAnyMapValue[Option[String]](filters, "admin2")
 
-    isoFirst.foreach { firstLetter =>
-      newDF = newDF.filter(substring($"gid_0", 0, 1) === firstLetter(0))
-    }
+    val isoFirstDF: DataFrame = isoFirst.foldLeft(df)(
+      (acc, i) => acc.filter(substring($"gid_0", 0, 1) === i(0))
+    )
+    val isoStartDF: DataFrame =
+      isoStart.foldLeft(isoFirstDF)((acc, i) => acc.filter($"gid_0" >= i))
+    val isoEndDF: DataFrame =
+      isoEnd.foldLeft(isoStartDF)((acc, i) => acc.filter($"gid_0" < i))
+    val isoDF: DataFrame =
+      iso.foldLeft(isoEndDF)((acc, i) => acc.filter($"gid_0" === i))
+    val admin1DF: DataFrame =
+      admin1.foldRight(isoDF)((i, acc) => acc.filter($"gid_1" === i))
+    admin2.foldRight(admin1DF)((i, acc) => acc.filter($"gid_2" === i))
 
-    isoStart.foreach { startCode =>
-      newDF = newDF.filter($"gid_0" >= startCode)
-    }
-
-    isoEnd.foreach { endCode =>
-      newDF = newDF.filter($"gid_0" < endCode)
-    }
-
-    iso.foreach { isoCode =>
-      newDF = newDF.filter($"gid_0" === isoCode)
-    }
-
-    admin1.foreach { admin1Code =>
-      newDF = newDF.filter($"gid_1" === admin1Code)
-    }
-
-    admin2.foreach { admin2Code =>
-      newDF = newDF.filter($"gid_2" === admin2Code)
-    }
-
-    newDF
   }
 }
