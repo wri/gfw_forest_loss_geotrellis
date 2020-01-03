@@ -50,11 +50,9 @@ object TreeLossDF {
       $"data.totalCo2" as "co2_stock_2000__Mt"
     )
 
-    val newDF = df.select(
+    df.select(
       cols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
     )
-    newDF.show(truncate = false)
-    newDF
 
   }
 
