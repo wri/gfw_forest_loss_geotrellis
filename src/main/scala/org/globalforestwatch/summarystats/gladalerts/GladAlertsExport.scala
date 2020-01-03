@@ -141,7 +141,7 @@ object GladAlertsExport extends SummaryExport {
       .csv(path = outputUrl + "/adm2/weekly_alerts")
 
     val adm1DF = adm2DF
-      .transform(GladAlertsDF.aggChangeWeekly(List("iso", "adm1")))
+      .transform(GladAlertsDF.aggChangeWeekly2(List("iso", "adm1")))
 
     adm1DF
       .coalesce(1)
@@ -150,7 +150,7 @@ object GladAlertsExport extends SummaryExport {
       .csv(path = outputUrl + "/adm1/weekly_alerts")
 
     val isoDF = adm1DF
-      .transform(GladAlertsDF.aggChangeWeekly(List("iso")))
+      .transform(GladAlertsDF.aggChangeWeekly2(List("iso")))
 
     isoDF
       .coalesce(1)
@@ -181,7 +181,7 @@ object GladAlertsExport extends SummaryExport {
       $"id.status" as "wdpa_protected_area__status"
     )
 
-    _export(summaryDF, outputUrl + "/wdpa", kwargs, groupByCols, unpackCols)
+    _export(summaryDF, outputUrl + "/wdpa", kwargs, groupByCols, unpackCols, wdpa = true)
   }
 
   override protected def exportFeature(summaryDF: DataFrame,
@@ -215,7 +215,8 @@ object GladAlertsExport extends SummaryExport {
                       outputUrl: String,
                       kwargs: Map[String, Any],
                       groupByCols: List[String],
-                      unpackCols: List[Column]): Unit = {
+                      unpackCols: List[Column],
+                      wdpa: Boolean = false): Unit = {
 
     val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
@@ -227,33 +228,33 @@ object GladAlertsExport extends SummaryExport {
     val cols = groupByCols
 
     val df = summaryDF.transform(
-      GladAlertsDF.unpackValues(unpackCols, minZoom = minZoom)
+      GladAlertsDF.unpackValues(unpackCols, minZoom = minZoom, wdpa = wdpa)
     )
 
     df.cache()
 
     if (!changeOnly) {
 
-      df.transform(GladAlertsDF.whitelist(cols))
+      df.transform(GladAlertsDF.whitelist(cols, wdpa = wdpa))
         .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/whitelist")
 
-      df.transform(GladAlertsDF.aggSummary(cols))
+      df.transform(GladAlertsDF.aggSummary(cols, wdpa = wdpa))
         .coalesce(1)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/summary")
     }
 
-    df.transform(GladAlertsDF.aggChangeDaily(cols))
+    df.transform(GladAlertsDF.aggChangeDaily(cols, wdpa = wdpa))
       .coalesce(1)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
 
-    df.transform(GladAlertsDF.aggChangeWeekly(cols))
+    df.transform(GladAlertsDF.aggChangeWeekly(cols, wdpa = wdpa))
       .coalesce(1)
       .write
       .options(csvOptions)

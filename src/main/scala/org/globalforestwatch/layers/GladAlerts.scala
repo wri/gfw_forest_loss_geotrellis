@@ -17,7 +17,7 @@ case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
     val alertDate: Option[String] = {
 
       def isLeapYear(year: Int): Boolean = {
-        implicit def int2boolRev(i: Int): Boolean = if (i > 0) false else true
+        implicit def int2boolRev(i: Int): Boolean = i <= 0
         year % 4
       }
 
