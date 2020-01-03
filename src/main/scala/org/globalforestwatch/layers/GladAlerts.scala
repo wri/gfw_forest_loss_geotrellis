@@ -30,19 +30,21 @@ case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
       val julianDate = DateTimeFormatter.ofPattern("yyyyDDD")
       val days: Int = if (confidence) value - 30000 else value - 20000
 
-      if (days < 0) None
-      else if (days == 0)
-        Some(
-          LocalDate
-            .parse(getDateString(365, 2014), julianDate)
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        )
-      else
-        Some(
-          LocalDate
-            .parse(getDateString(days, 2015), julianDate)
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        )
+      days match {
+        case d if d < 0 => None
+        case d if d == 0 =>
+          Some(
+            LocalDate
+              .parse(getDateString(365, 2014), julianDate)
+              .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+          )
+        case _ =>
+          Some(
+            LocalDate
+              .parse(getDateString(days, 2015), julianDate)
+              .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+          )
+      }
 
     }
 
