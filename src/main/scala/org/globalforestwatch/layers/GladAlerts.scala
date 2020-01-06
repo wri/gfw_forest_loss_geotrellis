@@ -11,13 +11,13 @@ case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
   val uri: String =
     s"s3://gfw2-data/forest_change/umd_landsat_alerts/prod/analysis/$gladGrid.tif"
 
-  override def lookup(value: Int): Option[(String, Boolean)] = {
+  override def lookup(value: Int): (LocalDate, Boolean) = {
 
     val confidence = value >= 30000
-    val alertDate: Option[String] = {
+    val alertDate: Option[LocalDate] = {
 
       def isLeapYear(year: Int): Boolean = {
-        implicit def int2boolRev(i: Int): Boolean = i <= 0
+        implicit def int2boolRev(i: Int): Boolean = if (i > 0) false else true
         year % 4
       }
 
@@ -30,27 +30,16 @@ case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
       val julianDate = DateTimeFormatter.ofPattern("yyyyDDD")
       val days: Int = if (confidence) value - 30000 else value - 20000
 
-      days match {
-        case d if d < 0 => None
-        case d if d == 0 =>
-          Some(
-            LocalDate
-              .parse(getDateString(365, 2014), julianDate)
-              .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-          )
-        case _ =>
-          Some(
-            LocalDate
-              .parse(getDateString(days, 2015), julianDate)
-              .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-          )
-      }
+      if (days < 0) None
+      else if (days == 0)
+        Some(LocalDate.parse(getDateString(365, 2014), julianDate))
+      else Some(LocalDate.parse(getDateString(days, 2015), julianDate))
 
     }
 
     alertDate match {
-      case Some(d) => Some(d, confidence)
-      case None => None
+      case Some(d: LocalDate) => (d, confidence)
+      case None => null
     }
 
   }

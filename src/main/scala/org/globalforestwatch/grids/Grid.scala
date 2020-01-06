@@ -56,31 +56,9 @@ trait Grid[T <: GridSources] {
     LayoutDefinition(gridExtent, tileLayout)
   }
 
-  def getSources(gridId: String, kwargs:  Map[String, Any]): T
+  def getSources(gridId: String): T
 
-  def checkSources(gridId: String, windowExtent: Extent, kwargs:  Map[String, Any]): T = {
-
-    def ccToMap(cc: AnyRef): Map[String, Any] =
-      (Map[String, Any]() /: cc.getClass.getDeclaredFields) { (a, f) =>
-        f.setAccessible(true)
-        a + (f.getName -> f.get(cc))
-      }
-
-    val sources: T = getSources(gridId, kwargs)
-
-    val sourceMap = ccToMap(sources)
-
-    for ((k, v) <- sourceMap) {
-
-      v match {
-        case s: RequiredLayer => checkRequired(s, windowExtent)
-        case s: OptionalLayer => checkOptional(s, windowExtent)
-        case _ => Unit
-      }
-    }
-
-    sources
-  }
+  def checkSources(gridId: String, windowExtent: Extent): T
 
   // NOTE: This check will cause an eager fetch of raster metadata
   def checkRequired(layer: RequiredLayer, windowExtent: Extent): Unit = {
@@ -100,8 +78,8 @@ trait Grid[T <: GridSources] {
     }
   }
 
-  def getRasterSource(windowExtent: Extent, kwargs:  Map[String, Any]): T = {
+  def getRasterSource(windowExtent: Extent): T = {
     val gridId = GridId.pointGridId(windowExtent.center, gridSize)
-    checkSources(gridId, windowExtent: Extent, kwargs:  Map[String, Any])
+    checkSources(gridId, windowExtent: Extent)
   }
 }

@@ -5,7 +5,7 @@ case class MexicoForestZoning(grid: String) extends StringLayer with OptionalILa
   val uri: String =
     s"$basePath/mex_forest_zoning/$grid.tif"
 
-  override val externalNoDataValue: String = ""
+  override val externalNoDataValue: String = null
 
   def lookup(value: Int): String = value match {
     case 1 | 2 | 3 | 4 | 5 | 6 | 7 => "Zonas de conservación y aprovechamiento restringido o prohibido"
@@ -16,6 +16,6 @@ case class MexicoForestZoning(grid: String) extends StringLayer with OptionalILa
 
     case 19 => "No aplica"
 
-    case _ => ""
+    case _ => null
   }
 }
