@@ -1,10 +1,10 @@
 package org.globalforestwatch.layers
 
-case class TreeCoverGain(grid: String) extends IntegerLayer with RequiredILayer {
+case class TreeCoverGain(grid: String) extends BooleanLayer with RequiredILayer {
   val uri: String = s"$basePath/gain/$grid.tif"
 
   override val internalNoDataValue: Int = 0
-  override val externalNoDataValue: Integer = 0
+  override val externalNoDataValue: Boolean = false
 
-  override def lookup(value: Int): Integer = if (value == 0) 0 else 1
+  override def lookup(value: Int): Boolean = !(value == 0)
 }

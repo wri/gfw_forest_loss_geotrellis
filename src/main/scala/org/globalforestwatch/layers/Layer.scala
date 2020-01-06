@@ -1,13 +1,13 @@
 package org.globalforestwatch.layers
 
 import java.io.FileNotFoundException
-import java.time.LocalDate
-import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
-import geotrellis.raster.{CellType, Tile, isNoData}
-import geotrellis.vector.Extent
-import geotrellis.raster.crop._
+
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3URI
+import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
+import geotrellis.raster.crop._
+import geotrellis.raster.{CellType, Tile, isNoData}
+import geotrellis.vector.Extent
 
 trait Layer {
 
@@ -96,6 +96,47 @@ trait DLayer extends Layer {
 
 }
 
+trait FLayer extends Layer {
+
+  /**
+    * Wrapper for double rasters to assure that data according to layer specifications are returned
+    */
+  type A = Float
+
+  implicit class FTile(val t: Tile) {
+    def getData(col: Int, row: Int): B = {
+      val value: Float = t.getDouble(col, row).toFloat
+      if (isNoData(value)) externalNoDataValue else lookup(value)
+    }
+
+    def cellType: CellType = t.cellType
+
+    def cols: Int = t.cols
+
+    def rows: Int = t.rows
+
+    val noDataValue: B = externalNoDataValue
+  }
+
+  implicit class OptionalFTile(val t: Option[Tile]) {
+    def getData(col: Int, row: Int): B = {
+      val value: Float =
+        t.map(_.getDouble(col, row).toFloat).getOrElse(internalNoDataValue)
+      if (isNoData(value) || value == internalNoDataValue) externalNoDataValue
+      else lookup(value)
+    }
+
+    def cellType: CellType = t.cellType
+
+    def cols: Int = t.cols
+
+    def rows: Int = t.rows
+
+    val noDataValue: B = externalNoDataValue
+  }
+
+}
+
 trait RequiredLayer extends Layer {
 
   /**
@@ -157,6 +198,21 @@ trait RequiredDLayer extends RequiredLayer with DLayer {
       source.read(window).get.tile.band(0)
     }
     new DTile(cropWindow(tile))
+  }
+
+}
+
+
+trait RequiredFLayer extends RequiredLayer with FLayer {
+
+  /**
+    * Define how to fetch data for required Double rasters
+    */
+  def fetchWindow(window: Extent): FTile = {
+    val tile = source.synchronized {
+      source.read(window).get.tile.band(0)
+    }
+    new FTile(cropWindow(tile))
   }
 
 }
@@ -243,6 +299,22 @@ trait OptionalDLayer extends OptionalLayer with DLayer {
     } yield raster))
 }
 
+trait OptionalFLayer extends OptionalLayer with FLayer {
+
+  /**
+    * Define how to fetch data for optional double rasters
+    */
+  def fetchWindow(window: Extent): OptionalFTile =
+    new OptionalFTile(cropWindow(for {
+      source <- source
+      raster <- Either
+        .catchNonFatal(source.synchronized {
+          source.read(window).get.tile.band(0)
+        })
+        .toOption
+    } yield raster))
+}
+
 trait BooleanLayer extends ILayer {
 
   /**
@@ -276,10 +348,10 @@ trait DateConfLayer extends ILayer {
     * Layers which return an Integer type
     * (use java.lang.Integer to be able to use null)
     */
-  type B = (LocalDate, Boolean)
+  type B = Option[(String, Boolean)]
 
   val internalNoDataValue: Int = 0
-  val externalNoDataValue: B = null
+  val externalNoDataValue: B = None
 
 }
 
@@ -296,6 +368,20 @@ trait DIntegerLayer extends DLayer {
 
 }
 
+trait FIntegerLayer extends FLayer {
+
+  /**
+    * Layers which return an Integer type
+    * (use java.lang.Integer to be able to use null)
+    */
+  type B = Integer
+
+  val internalNoDataValue: Float = 0
+  val externalNoDataValue: Integer = null
+
+}
+
+
 trait DBooleanLayer extends DLayer {
 
   /**
@@ -305,6 +391,19 @@ trait DBooleanLayer extends DLayer {
   type B = Boolean
 
   val internalNoDataValue: Double = 0
+  val externalNoDataValue: Boolean = false
+
+}
+
+trait FBooleanLayer extends FLayer {
+
+  /**
+    * Layers which return an Integer type
+    * (use java.lang.Integer to be able to use null)
+    */
+  type B = Boolean
+
+  val internalNoDataValue: Float = 0
   val externalNoDataValue: Boolean = false
 
 }
@@ -320,6 +419,19 @@ trait DoubleLayer extends DLayer {
   val externalNoDataValue: Double = 0
 
   def lookup(value: Double): Double = value
+}
+
+trait FloatLayer extends FLayer {
+
+  /**
+    * Layers which return a Double type
+    */
+  type B = Float
+
+  val internalNoDataValue: Float = 0
+  val externalNoDataValue: Float = 0
+
+  def lookup(value: Float): Float = value
 }
 
 trait StringLayer extends ILayer {
