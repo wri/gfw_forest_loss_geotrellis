@@ -56,9 +56,9 @@ trait Grid[T <: GridSources] {
     LayoutDefinition(gridExtent, tileLayout)
   }
 
-  def getSources(gridId: String): T
+  def getSources(gridId: String, kwargs:  Map[String, Any]): T
 
-  def checkSources(gridId: String, windowExtent: Extent): T = {
+  def checkSources(gridId: String, windowExtent: Extent, kwargs:  Map[String, Any]): T = {
 
     def ccToMap(cc: AnyRef): Map[String, Any] =
       (Map[String, Any]() /: cc.getClass.getDeclaredFields) { (a, f) =>
@@ -66,7 +66,7 @@ trait Grid[T <: GridSources] {
         a + (f.getName -> f.get(cc))
       }
 
-    val sources: T = getSources(gridId)
+    val sources: T = getSources(gridId, kwargs)
 
     val sourceMap = ccToMap(sources)
 
@@ -100,8 +100,8 @@ trait Grid[T <: GridSources] {
     }
   }
 
-  def getRasterSource(windowExtent: Extent): T = {
+  def getRasterSource(windowExtent: Extent, kwargs:  Map[String, Any]): T = {
     val gridId = GridId.pointGridId(windowExtent.center, gridSize)
-    checkSources(gridId, windowExtent: Extent)
+    checkSources(gridId, windowExtent: Extent, kwargs:  Map[String, Any])
   }
 }
