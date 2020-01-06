@@ -14,18 +14,18 @@ object Geodesy {
 
     val pi: Double = Math.PI
 
-    val dLng: Double = cellSize.width
-    val dLat: Double = cellSize.height
+    val d_lon: Double = cellSize.width
+    val d_lat: Double = cellSize.height
 
-    val q: Double = dLng / 360
+    val q: Double = d_lon / 360
     val e: Double = sqrt(1 - pow((b / a), 2))
 
     val area: Double = Math.abs(
-      (pi * pow(b, 2) * (2 * atanh(e * sin(toRadians(lat + dLat))) /
+      (pi * pow(b, 2) * (2 * atanh(e * sin(toRadians(lat + d_lat))) /
         (2 * e) +
-        sin(toRadians(lat + dLat)) /
-          ((1 + e * sin(toRadians(lat + dLat))) * (1 - e * sin(
-            toRadians(lat + dLat)
+        sin(toRadians(lat + d_lat)) /
+          ((1 + e * sin(toRadians(lat + d_lat))) * (1 - e * sin(
+            toRadians(lat + d_lat)
           ))))) -
         (pi * pow(b, 2) * (2 * atanh(e * sin(toRadians(lat))) / (2 * e) +
           sin(toRadians(lat)) / ((1 + e * sin(toRadians(lat))) * (1 - e * sin(
