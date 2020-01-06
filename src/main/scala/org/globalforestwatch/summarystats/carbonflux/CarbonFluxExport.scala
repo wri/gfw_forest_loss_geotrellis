@@ -64,6 +64,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggSummary(List("iso", "adm1", "adm2")))
       .coalesce(80) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
 
+
     adm2ApiDF.write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/summary")
@@ -72,6 +73,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggSummary2(List("iso", "adm1")))
       .coalesce(24) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
 
+
     adm1ApiDF.write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/summary")
@@ -79,6 +81,7 @@ object CarbonFluxExport extends SummaryExport {
     val isoApiDF = adm1ApiDF
       .transform(CarbonFluxDF.aggSummary2(List("iso")))
       .coalesce(8) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
+
 
     isoApiDF.write
       .options(csvOptions)
@@ -95,6 +98,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggChange(List("iso", "adm1", "adm2")))
       .coalesce(200) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
 
+
     adm2ApiDF.write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/change")
@@ -102,6 +106,7 @@ object CarbonFluxExport extends SummaryExport {
     val adm1ApiDF = adm2ApiDF
       .transform(CarbonFluxDF.aggChange(List("iso", "adm1")))
       .coalesce(60) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
+    
 
     adm1ApiDF.write
       .options(csvOptions)
@@ -111,6 +116,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggChange(List("iso")))
       .coalesce(20) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
 
+    
     isoApiDF.write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/change")

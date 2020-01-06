@@ -1,8 +1,9 @@
 package org.globalforestwatch.summarystats.carbonflux
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
-import org.apache.spark.sql.functions.{length, max, sum}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.{length, max, sum, when}
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
+
 
 object CarbonFluxDF {
 
@@ -18,11 +19,13 @@ object CarbonFluxDF {
     "intact_forest_landscape__year",
     "gfw_plantation__type",
     "is__intact_primary_forest",
+
     "is__peatlands_flux",
     "forest_age_category__cat",
     "is__jpl_aboveground_biomass_extent",
     "fia_usa_extent__region"
   )
+
 
   def unpackValues(df: DataFrame): DataFrame = {
 
@@ -198,5 +201,6 @@ object CarbonFluxDF {
         max($"fia_usa_extent__region") as "fia_usa_extent__region"
       )
   }
+
 
 }

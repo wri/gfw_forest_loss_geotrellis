@@ -149,8 +149,10 @@ object GladAlertsExport extends SummaryExport {
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/weekly_alerts")
 
+
     val isoDF = adm1DF
       .transform(GladAlertsDF.aggChangeWeekly2(List("iso")))
+
 
     isoDF
       .coalesce(1)
@@ -203,6 +205,7 @@ object GladAlertsExport extends SummaryExport {
 
     val spark = summaryDF.sparkSession
     import spark.implicits._
+
 
     val groupByCols = List("geostore__id")
     val unpackCols = List($"id.geostoreId" as "geostore__id")
