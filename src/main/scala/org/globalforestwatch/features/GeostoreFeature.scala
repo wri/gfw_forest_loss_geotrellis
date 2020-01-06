@@ -10,7 +10,7 @@ object GeostoreFeature extends Feature {
   val idPos = 0
   val geomPos = 1
 
-  def getFeature(
+  def get(
     i: Row
   ): geotrellis.vector.Feature[Geometry, GeostoreFeatureId] = {
     val geostoreId: String = i.getString(idPos)

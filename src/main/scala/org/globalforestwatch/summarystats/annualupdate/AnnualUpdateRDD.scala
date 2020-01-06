@@ -13,9 +13,9 @@ object AnnualUpdateRDD extends SummaryRDD {
   type SUMMARY = AnnualUpdateSummary
   type TILE = AnnualUpdateTile
 
-  def getSources(window: Extent): Either[Throwable, SOURCES] = {
+  def getSources(window: Extent, kwargs:Map[String, Any]): Either[Throwable, SOURCES] = {
     Either.catchNonFatal {
-      AnnualUpdateGrid.getRasterSource(window)
+      AnnualUpdateGrid.getRasterSource(window, kwargs)
     }
   }
 

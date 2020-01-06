@@ -1,10 +1,10 @@
 package org.globalforestwatch.features
 
-case class WdpaFeatureId(wdpa_id: Int,
+case class WdpaFeatureId(wdpaId: Int,
                          name: String,
-                         iucn_cat: String,
+                         iucnCat: String,
                          iso: String,
                          status: String)
     extends FeatureId {
-  override def toString: String = s"$wdpa_id"
+  override def toString: String = s"$wdpaId"
 }

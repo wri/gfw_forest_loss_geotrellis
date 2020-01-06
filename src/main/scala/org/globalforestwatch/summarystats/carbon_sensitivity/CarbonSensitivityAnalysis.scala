@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.carbonflux
+package org.globalforestwatch.summarystats.carbon_sensitivity
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -10,7 +10,7 @@ import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.util.Util.getAnyMapValue
 
-object CarbonFluxAnalysis {
+object CarbonSensitivityAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             part: HashPartitioner,
@@ -19,11 +19,13 @@ object CarbonFluxAnalysis {
 
     import spark.implicits._
 
-    val summaryRDD: RDD[(FeatureId, CarbonFluxSummary)] =
-      CarbonFluxRDD(featureRDD, CarbonFluxGrid.blockTileGrid, part, kwargs)
+    val model:String = getAnyMapValue[String](kwargs,"sensitivityType")
+
+    val summaryRDD: RDD[(FeatureId, CarbonSensitivitySummary)] =
+      CarbonSensitivityRDD(featureRDD, CarbonSensitivityGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
-      CarbonFluxDFFactory(featureType, summaryRDD, spark).getDataFrame
+      CarbonSensitivityDFFactory(featureType, summaryRDD, spark).getDataFrame
 
     //    val maybeOutputPartitions:Option[Int] = getAnyMapValue(kwargs,"maybeOutputPartitions")
     //    val outputPartitionCount =
@@ -32,10 +34,10 @@ object CarbonFluxAnalysis {
     summaryDF.repartition($"id", $"dataGroup")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      "/carbonflux_" + DateTimeFormatter
+      s"/carbon_sensitivity_${model}_" + DateTimeFormatter
       .ofPattern("yyyyMMdd_HHmm")
       .format(LocalDateTime.now)
 
-    CarbonFluxExport.export(featureType, summaryDF, runOutputUrl, kwargs)
+    CarbonSensitivityExport.export(featureType, summaryDF, runOutputUrl, kwargs)
   }
 }

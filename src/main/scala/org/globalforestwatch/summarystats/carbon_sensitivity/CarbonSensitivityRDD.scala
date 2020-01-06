@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.carbonflux
+package org.globalforestwatch.summarystats.carbon_sensitivity
 
 import cats.implicits._
 import geotrellis.contrib.polygonal._
@@ -7,15 +7,15 @@ import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
 import org.globalforestwatch.summarystats.SummaryRDD
 
-object CarbonFluxRDD extends SummaryRDD {
+object CarbonSensitivityRDD extends SummaryRDD {
 
-  type SOURCES = CarbonFluxGridSources
-  type SUMMARY = CarbonFluxSummary
-  type TILE = CarbonFluxTile
+  type SOURCES = CarbonSensitivityGridSources
+  type SUMMARY = CarbonSensitivitySummary
+  type TILE = CarbonSensitivityTile
 
   def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES] = {
     Either.catchNonFatal {
-      CarbonFluxGrid.getRasterSource(window, kwargs)
+      CarbonSensitivityGrid.getRasterSource(window, kwargs)
     }
   }
 
@@ -28,7 +28,7 @@ object CarbonFluxRDD extends SummaryRDD {
                           kwargs: Map[String, Any]): SUMMARY = {
     raster.polygonalSummary(
       geometry = geometry,
-      emptyResult = new CarbonFluxSummary(),
+      emptyResult = new CarbonSensitivitySummary(),
       options = options
     )
   }

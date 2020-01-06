@@ -14,7 +14,7 @@ object FeatureRDD {
         i <- iter
         if featureObj.isValidGeom(i)
       } yield {
-        featureObj.getFeature(i)
+        featureObj.get(i)
       }
     }, preservesPartitioning = true)
   }

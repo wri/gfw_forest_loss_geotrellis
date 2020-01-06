@@ -16,8 +16,8 @@ object GladAlertsExport extends SummaryExport {
     val changeOnly: Boolean =
       getAnyMapValue[Boolean](kwargs, "changeOnly")
 
-    val buildDataCube: Boolean =
-      getAnyMapValue[Boolean](kwargs, "buildDataCube")
+    val buildDataCube: Boolean = false
+    //      getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
     val minZoom: Int = if (buildDataCube) minZoomValue else maxZoomValue
 
@@ -149,8 +149,10 @@ object GladAlertsExport extends SummaryExport {
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/weekly_alerts")
 
+
     val isoDF = adm1DF
       .transform(GladAlertsDF.aggChangeWeekly2(List("iso")))
+
 
     isoDF
       .coalesce(1)
@@ -174,9 +176,9 @@ object GladAlertsExport extends SummaryExport {
       "wdpa_protected_area__status"
     )
     val unpackCols = List(
-      $"id.wdpa_id" as "wdpa_protected_area__id",
+      $"id.wdpaId" as "wdpa_protected_area__id",
       $"id.name" as "wdpa_protected_area__name",
-      $"id.iucn_cat" as "wdpa_protected_area__iucn_cat",
+      $"id.iucnCat" as "wdpa_protected_area__iucn_cat",
       $"id.iso" as "wdpa_protected_area__iso",
       $"id.status" as "wdpa_protected_area__status"
     )
@@ -204,6 +206,7 @@ object GladAlertsExport extends SummaryExport {
     val spark = summaryDF.sparkSession
     import spark.implicits._
 
+
     val groupByCols = List("geostore__id")
     val unpackCols = List($"id.geostoreId" as "geostore__id")
 
@@ -220,8 +223,8 @@ object GladAlertsExport extends SummaryExport {
 
     val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
-    val buildDataCube: Boolean =
-      getAnyMapValue[Boolean](kwargs, "buildDataCube")
+    val buildDataCube: Boolean = false
+    //      getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
     val minZoom: Int = if (buildDataCube) minZoomValue else maxZoomValue
 

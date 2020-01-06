@@ -7,8 +7,7 @@ object TreeLossGrid extends TenByTenGrid[TreeLossGridSources] {
 
   val gridExtent: Extent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
 
-  def getSources(gridId: String): TreeLossGridSources = TreeLossGridSources.getCachedSources(gridId)
-
+  def getSources(gridId: String, kwargs: Map[String, Any]): TreeLossGridSources = TreeLossGridSources.getCachedSources(gridId)
 
 
 }

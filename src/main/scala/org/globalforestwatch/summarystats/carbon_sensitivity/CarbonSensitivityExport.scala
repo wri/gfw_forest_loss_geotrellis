@@ -1,22 +1,20 @@
-package org.globalforestwatch.summarystats.carbonflux
+package org.globalforestwatch.summarystats.carbon_sensitivity
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.summarystats.SummaryExport
 import org.globalforestwatch.util.Util.getAnyMapValue
 
-object CarbonFluxExport extends SummaryExport {
-
+object CarbonSensitivityExport extends SummaryExport {
   override protected def exportGadm(df: DataFrame,
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
-
 
 
     val changeOnly: Boolean =
       getAnyMapValue[Boolean](kwargs, "changeOnly")
 
     val exportDF = df
-      .transform(CarbonFluxDF.unpackValues)
+      .transform(CarbonSensitivityDF.unpackValues)
 
     exportDF.cache()
 
@@ -33,7 +31,7 @@ object CarbonFluxExport extends SummaryExport {
   private def exportWhitelist(df: DataFrame, outputUrl: String): Unit = {
 
     val adm2ApiDF = df
-      .transform(CarbonFluxDF.whitelist(List("iso", "adm1", "adm2")))
+      .transform(CarbonSensitivityDF.whitelist(List("iso", "adm1", "adm2")))
       .coalesce(1)
 
     adm2ApiDF.write
@@ -41,7 +39,7 @@ object CarbonFluxExport extends SummaryExport {
       .csv(path = outputUrl + "/adm2/whitelist")
 
     val adm1ApiDF = adm2ApiDF
-      .transform(CarbonFluxDF.whitelist2(List("iso", "adm1")))
+      .transform(CarbonSensitivityDF.whitelist2(List("iso", "adm1")))
       .coalesce(1)
 
     adm1ApiDF.write
@@ -49,7 +47,7 @@ object CarbonFluxExport extends SummaryExport {
       .csv(path = outputUrl + "/adm1/whitelist")
 
     val isoApiDF = adm1ApiDF
-      .transform(CarbonFluxDF.whitelist2(List("iso")))
+      .transform(CarbonSensitivityDF.whitelist2(List("iso")))
       .coalesce(1)
 
     isoApiDF.write
@@ -61,27 +59,24 @@ object CarbonFluxExport extends SummaryExport {
   private def exportSummary(df: DataFrame, outputUrl: String): Unit = {
 
     val adm2ApiDF = df
-      .transform(CarbonFluxDF.aggSummary(List("iso", "adm1", "adm2")))
-      .coalesce(80) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-
+      .transform(CarbonSensitivityDF.aggSummary(List("iso", "adm1", "adm2")))
+      .coalesce(40) // this should result in an avg file size of 100MB.
 
     adm2ApiDF.write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/summary")
 
     val adm1ApiDF = adm2ApiDF
-      .transform(CarbonFluxDF.aggSummary2(List("iso", "adm1")))
-      .coalesce(24) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-
+      .transform(CarbonSensitivityDF.aggSummary2(List("iso", "adm1")))
+      .coalesce(12) // this should result in an avg file size of 100MB.
 
     adm1ApiDF.write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/summary")
 
     val isoApiDF = adm1ApiDF
-      .transform(CarbonFluxDF.aggSummary2(List("iso")))
-      .coalesce(8) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-
+      .transform(CarbonSensitivityDF.aggSummary2(List("iso")))
+      .coalesce(4) // this should result in an avg file size of 100MB.
 
     isoApiDF.write
       .options(csvOptions)
@@ -95,28 +90,25 @@ object CarbonFluxExport extends SummaryExport {
 
     val adm2ApiDF = df
       .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
-      .transform(CarbonFluxDF.aggChange(List("iso", "adm1", "adm2")))
-      .coalesce(200) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-
+      .transform(CarbonSensitivityDF.aggChange(List("iso", "adm1", "adm2")))
+      .coalesce(100) // this should result in an avg file size of 100MB.
 
     adm2ApiDF.write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/change")
 
     val adm1ApiDF = adm2ApiDF
-      .transform(CarbonFluxDF.aggChange(List("iso", "adm1")))
-      .coalesce(60) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-    
+      .transform(CarbonSensitivityDF.aggChange(List("iso", "adm1")))
+      .coalesce(30) // this should result in an avg file size of 100MB.
 
     adm1ApiDF.write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/change")
 
     val isoApiDF = adm1ApiDF
-      .transform(CarbonFluxDF.aggChange(List("iso")))
-      .coalesce(20) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
+      .transform(CarbonSensitivityDF.aggChange(List("iso")))
+      .coalesce(10) // this should result in an avg file size of 100MB.
 
-    
     isoApiDF.write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/change")

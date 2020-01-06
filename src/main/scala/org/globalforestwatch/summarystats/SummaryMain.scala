@@ -133,6 +133,10 @@ object SummaryMain
         val buildDataCubeOpt =
           Opts.flag("build_data_cube", "Build XYZ data cube").orFalse
 
+        val sensitivityTypeOpt = Opts
+          .option[String]("sensitivity_type", help = "Sensitivity type for carbon flux model")
+          .withDefault("standard")
+
         val logger = Logger.getLogger("SummaryMain")
 
         (
@@ -157,7 +161,8 @@ object SummaryMain
           tclOpt,
           gladOpt,
           changeOnlyOpt,
-          buildDataCubeOpt
+          sensitivityTypeOpt
+//          buildDataCubeOpt
         ).mapN {
           (analysis,
            featureUris,
@@ -180,7 +185,9 @@ object SummaryMain
            tcl,
            glad,
            changeOnly,
-           buildDataCube) =>
+           sensitivityType) =>
+//           buildDataCube) =>
+
             val kwargs = Map(
               "outputUrl" -> outputUrl,
               "limit" -> limit,
@@ -200,7 +207,8 @@ object SummaryMain
               "tcl" -> tcl,
               "glad" -> glad,
               "changeOnly" -> changeOnly,
-              "buildDataCube" -> buildDataCube
+//              "buildDataCube" -> buildDataCube
+              "sensitivityType" -> sensitivityType
             )
 
             val featureObj = FeatureFactory(featureType).featureObj

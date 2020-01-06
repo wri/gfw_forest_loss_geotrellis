@@ -13,9 +13,9 @@ object GladAlertsRDD extends SummaryRDD {
   type SUMMARY = GladAlertsSummary
   type TILE = GladAlertsTile
 
-  def getSources(window: Extent): Either[Throwable, SOURCES] = {
+  def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES] = {
     Either.catchNonFatal {
-      GladAlertsGrid.getRasterSource(window)
+      GladAlertsGrid.getRasterSource(window, kwargs)
     }
   }
 

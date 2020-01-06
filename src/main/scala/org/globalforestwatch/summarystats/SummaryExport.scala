@@ -31,17 +31,17 @@ trait SummaryExport {
 
   protected def exportGadm(summaryDF: DataFrame,
                            outputUrl: String,
-                           kwargs: Map[String, Any]): Unit = ???
+                           kwargs: Map[String, Any]): Unit = throw new NotImplementedError("GADM feature analysis not implemented")
 
   protected def exportFeature(summaryDF: DataFrame,
                               outputUrl: String,
-                              kwargs: Map[String, Any]): Unit = ???
+                              kwargs: Map[String, Any]): Unit = throw new NotImplementedError("Simple feature analysis not implemented")
 
   protected def exportWdpa(summaryDF: DataFrame,
                            outputUrl: String,
-                           kwargs: Map[String, Any]): Unit = ???
+                           kwargs: Map[String, Any]): Unit = throw new NotImplementedError("WDPA feature analysis not implemented")
 
   protected def exportGeostore(summaryDF: DataFrame,
                                outputUrl: String,
-                               kwargs: Map[String, Any]): Unit = ???
+                               kwargs: Map[String, Any]): Unit = throw new NotImplementedError("Geostore feature analysis not implemented")
 }

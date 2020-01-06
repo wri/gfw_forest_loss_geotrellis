@@ -37,7 +37,7 @@ object GladAlertsSummary {
         val changeOnly: Boolean =
           getAnyMapValue[Boolean](acc.kwargs, "changeOnly")
 
-        val buildDataCube: Boolean = getAnyMapValue[Boolean](acc.kwargs, "buildDataCube")
+        val buildDataCube: Boolean = false //getAnyMapValue[Boolean](acc.kwargs, "buildDataCube")
 
         val maxZoom = 12
 
