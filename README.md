@@ -1,5 +1,7 @@
 # Tree Cover Loss Analysis
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d2ccce68bf9f462bae80f5c576a28b24)](https://www.codacy.com/manual/thomas-maschler/gfw_forest_loss_geotrellis?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wri/gfw_forest_loss_geotrellis&amp;utm_campaign=Badge_Grade)
+
 This project performs a polygonal summary on tree cover loss and intersecting layers for a given input feature using SPARK and Geotrellis.
 
 ## Analysis
@@ -78,61 +80,6 @@ It currently only works with GADM features.
 ```sbt
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis carbon_sensitivity --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --sensitivity_type sensitivity_analysis_type
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis carbon_sensitivity --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --sensitivity_type standard
-```
-
-### Glad Alerts
-
-Glad alert analysis computes whitelist, summary, daily and weekly change data for given input features and intersects areas with the same contextual layers as in annual update minimal.
-It is used to update the country and user dashboards for the GFW website.
-
-Users can select, if they want to run the full analysis, or only look at change data. Computing only change data makes sense, if neither input features, nor contextual layers have changed, but only glad alerts.
-In that case, only the daily and weekly change tables will be updated. 
-
-Supported input features are
-
-*   GADM
-*   Geostore
-*   WDPA
-*   Simple Feature
-
-```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-```
-
-## Inputs
-
-Use Polygon Features encoded in TSV format. Geometries must be encoded in WKB. You can specify one or many input files using wildcards:
-
-ex: 
-
-*   `s3://bucket/prefix/gadm36_1_1.tsv`
-*   `s3://bucket/prefix/geostore_*.tsv`
-
-Make sure features are sufficiently small to assure a well balanced partition size and workload.
-Larger features should be split into smaller features, prior to running the analysis. 
-Also make sure, that features do not overlap with tile boundaries (we use 10x10 degree tiles). 
-For best performance, intersect input features with a 1x1 degree grid.
-If you are not sure how to best approach this, simply use the [ArcPY Client](https://github.com/wri/gfw_forest_loss_geotrellis_arcpy_client)
-
-=======
-
-```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type wdpa --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type geostore --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type feature --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-```
-
-### Carbon Flux
-
-Carbon Flux analysis is used to produce statistics for GFW climate topic pages.
-It uses same approach as the annual update analysis, but with fewer and different input layers. It currently only works with GADM features.
-
-```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis carbonflux --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
 ```
 
 ### Glad Alerts
