@@ -18,26 +18,28 @@ case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any
   val treeCoverDensity2000 = TreeCoverDensityThresholds2000(gridId)
 
   val biomassPerHectar = BiomassPerHectar(gridId)
-//  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridId)
+  //  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridId)
   val grossCumulRemovalsCarbon = GrossCumulRemovalsCo2(gridId, model)
   val netFluxCo2 = NetFluxCo2e(gridId, model)
 
   val agcEmisYear = AgcEmisYear(gridId, model)
-//  val bgcEmisYear = BgcEmisYear(gridId)
-//  val deadwoodCarbonEmisYear = DeadwoodCarbonEmisYear(gridId)
-//  val litterCarbonEmisYear = LitterCarbonEmisYear(gridId)
+  //  val bgcEmisYear = BgcEmisYear(gridId)
+  //  val deadwoodCarbonEmisYear = DeadwoodCarbonEmisYear(gridId)
+  //  val litterCarbonEmisYear = LitterCarbonEmisYear(gridId)
   val soilCarbonEmisYear = SoilCarbonEmisYear(gridId, model)
-//  val totalCarbonEmisYear = TotalCarbonEmisYear(gridId)
+  //  val totalCarbonEmisYear = TotalCarbonEmisYear(gridId)
 
   val agc2000 = Agc2000(gridId, model)
-//  val bgc2000 = Bgc2000(gridId)
-//  val deadwoodCarbon2000 = DeadwoodCarbon2000(gridId)
-//  val litterCarbon2000 = LitterCarbon2000(gridId)
+  //  val bgc2000 = Bgc2000(gridId)
+  //  val deadwoodCarbon2000 = DeadwoodCarbon2000(gridId)
+  //  val litterCarbon2000 = LitterCarbon2000(gridId)
   val soilCarbon2000 = SoilCarbon2000(gridId, model)
-//  val totalCarbon2000 = TotalCarbon2000(gridId)
+  //  val totalCarbon2000 = TotalCarbon2000(gridId)
 
   val grossEmissionsCo2eNoneCo2 = GrossEmissionsNonCo2Co2e(gridId, model)
   val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridId, model)
+
+  val jplTropicsAbovegroundBiomassDensity2000 = JplTropicsAbovegroundBiomassDensity2000(gridId)
 
   val treeCoverGain = TreeCoverGain(gridId)
   val mangroveBiomassExtent = MangroveBiomassExtent(gridId)
@@ -50,8 +52,13 @@ case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any
   val intactPrimaryForest = IntactPrimaryForest(gridId)
   val peatlandsFlux = PeatlandsFlux(gridId)
   val forestAgeCategory = ForestAgeCategory(gridId)
-  val jplAGBExtent = JplAGBextent(gridId)
+  val jplTropicsAbovegroundBiomassExtent2000 = JplTropicsAbovegroundBiomassExtent2000(gridId)
   val fiaRegionsUsExtent = FiaRegionsUsExtent(gridId)
+  val brazilBiomes = BrazilBiomes(gridId)
+  val riverBasins = RiverBasins(gridId)
+  val primaryForest = PrimaryForest(gridId)
+  val treeCoverLossLegalAmazon = TreeCoverLossLegalAmazon(gridId)
+  val prodesLegalAmazonExtent2000 = ProdesLegalAmazonExtent2000(gridId)
 
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonSensitivityTile]] = {
 
@@ -67,28 +74,30 @@ case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
       val biomassTile = biomassPerHectar.fetchWindow(window)
-//      val grossAnnualRemovalsCarbonTile =
-//        grossAnnualRemovalsCarbon.fetchWindow(window)
+      //      val grossAnnualRemovalsCarbonTile =
+      //        grossAnnualRemovalsCarbon.fetchWindow(window)
       val grossCumulRemovalsCarbonTile =
-        grossCumulRemovalsCarbon.fetchWindow(window)
+      grossCumulRemovalsCarbon.fetchWindow(window)
       val netFluxCo2Tile = netFluxCo2.fetchWindow(window)
       val agcEmisYearTile = agcEmisYear.fetchWindow(window)
-//      val bgcEmisYearTile = bgcEmisYear.fetchWindow(window)
-//      val deadwoodCarbonEmisYearTile =
-//        deadwoodCarbonEmisYear.fetchWindow(window)
-//      val litterCarbonEmisYearTile = litterCarbonEmisYear.fetchWindow(window)
+      //      val bgcEmisYearTile = bgcEmisYear.fetchWindow(window)
+      //      val deadwoodCarbonEmisYearTile =
+      //        deadwoodCarbonEmisYear.fetchWindow(window)
+      //      val litterCarbonEmisYearTile = litterCarbonEmisYear.fetchWindow(window)
       val soilCarbonEmisYearTile = soilCarbonEmisYear.fetchWindow(window)
-//      val totalCarbonEmisYearTile = totalCarbonEmisYear.fetchWindow(window)
+      //      val totalCarbonEmisYearTile = totalCarbonEmisYear.fetchWindow(window)
       val agc2000Tile = agc2000.fetchWindow(window)
-//      val bgc2000Tile = bgc2000.fetchWindow(window)
-//      val deadwoodCarbon2000Tile = deadwoodCarbon2000.fetchWindow(window)
-//      val litterCarbon2000Tile = litterCarbon2000.fetchWindow(window)
+      //      val bgc2000Tile = bgc2000.fetchWindow(window)
+      //      val deadwoodCarbon2000Tile = deadwoodCarbon2000.fetchWindow(window)
+      //      val litterCarbon2000Tile = litterCarbon2000.fetchWindow(window)
       val soilCarbon2000Tile = soilCarbon2000.fetchWindow(window)
-//      val totalCarbon2000Tile = totalCarbon2000.fetchWindow(window)
+      //      val totalCarbon2000Tile = totalCarbon2000.fetchWindow(window)
       val grossEmissionsCo2eNoneCo2Tile =
         grossEmissionsCo2eNoneCo2.fetchWindow(window)
       val grossEmissionsCo2eCo2OnlyTile =
         grossEmissionsCo2eCo2Only.fetchWindow(window)
+      val jplTropicsAbovegroundBiomassDensity2000Tile =
+        jplTropicsAbovegroundBiomassDensity2000.fetchWindow(window)
 
       val mangroveBiomassExtentTile = mangroveBiomassExtent.fetchWindow(window)
       val driversTile = treeCoverLossDrivers.fetchWindow(window)
@@ -101,31 +110,37 @@ case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any
       val intactPrimaryForestTile = intactPrimaryForest.fetchWindow(window)
       val peatlandFluxTile = peatlandsFlux.fetchWindow(window)
       val forestAgeCategoryTile = forestAgeCategory.fetchWindow(window)
-      val jplAGBextentTile = jplAGBExtent.fetchWindow(window)
+      val jplTropicsAbovegroundBiomassExtent2000Tile = jplTropicsAbovegroundBiomassExtent2000.fetchWindow(window)
       val fiaRegionsUsExtentTile = fiaRegionsUsExtent.fetchWindow(window)
+      val braBiomesTile = brazilBiomes.fetchWindow(window)
+      val riverBasinsTile = riverBasins.fetchWindow(window)
+      val primaryForestTile = primaryForest.fetchWindow(window)
+      val treeCoverLossLegalAmazonTile = treeCoverLossLegalAmazon.fetchWindow(window)
+      val prodesLegalAmazonExtent2000Tile = prodesLegalAmazonExtent2000.fetchWindow(window)
 
       val tile = CarbonSensitivityTile(
         lossTile,
         gainTile,
         tcd2000Tile,
         biomassTile,
-//        grossAnnualRemovalsCarbonTile,
+        //        grossAnnualRemovalsCarbonTile,
         grossCumulRemovalsCarbonTile,
         netFluxCo2Tile,
         agcEmisYearTile,
-//        bgcEmisYearTile,
-//        deadwoodCarbonEmisYearTile,
-//        litterCarbonEmisYearTile,
+        //        bgcEmisYearTile,
+        //        deadwoodCarbonEmisYearTile,
+        //        litterCarbonEmisYearTile,
         soilCarbonEmisYearTile,
-//        totalCarbonEmisYearTile,
+        //        totalCarbonEmisYearTile,
         agc2000Tile,
-//        bgc2000Tile,
-//        deadwoodCarbon2000Tile,
-//        litterCarbon2000Tile,
+        //        bgc2000Tile,
+        //        deadwoodCarbon2000Tile,
+        //        litterCarbon2000Tile,
         soilCarbon2000Tile,
-//        totalCarbon2000Tile,
+        //        totalCarbon2000Tile,
         grossEmissionsCo2eNoneCo2Tile,
         grossEmissionsCo2eCo2OnlyTile,
+        jplTropicsAbovegroundBiomassDensity2000Tile,
         mangroveBiomassExtentTile,
         driversTile,
         ecozonesTile,
@@ -136,8 +151,13 @@ case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any
         intactPrimaryForestTile,
         peatlandFluxTile,
         forestAgeCategoryTile,
-        jplAGBextentTile,
-        fiaRegionsUsExtentTile
+        jplTropicsAbovegroundBiomassExtent2000Tile,
+        fiaRegionsUsExtentTile,
+        braBiomesTile,
+        riverBasinsTile,
+        primaryForestTile,
+        treeCoverLossLegalAmazonTile,
+        prodesLegalAmazonExtent2000Tile
       )
 
       Raster(tile, window)

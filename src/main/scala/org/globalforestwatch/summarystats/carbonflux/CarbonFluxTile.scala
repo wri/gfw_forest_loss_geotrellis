@@ -30,6 +30,7 @@ case class CarbonFluxTile(
                            totalCarbon2000: TotalCarbon2000#OptionalFTile,
                            grossEmissionsCo2eNoneCo2: GrossEmissionsNonCo2Co2e#OptionalFTile,
                            grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e#OptionalFTile,
+                           jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000#OptionalFTile,
                            mangroveBiomassExtent: MangroveBiomassExtent#OptionalDTile,
                            drivers: TreeCoverLossDrivers#OptionalITile,
                            ecozones: Ecozones#OptionalITile,
@@ -40,8 +41,13 @@ case class CarbonFluxTile(
                            intactPrimaryForest: IntactPrimaryForest#OptionalITile,
                            peatlandsFlux: PeatlandsFlux#OptionalITile,
                            forestAgeCategory: ForestAgeCategory#OptionalITile,
-                           jplAGBextent: JplAGBextent#OptionalITile,
-                           fiaRegionsUsExtent: FiaRegionsUsExtent#OptionalITile
+                           jplTropicsAbovegroundBiomassExtent2000: JplTropicsAbovegroundBiomassExtent2000#OptionalITile,
+                           fiaRegionsUsExtent: FiaRegionsUsExtent#OptionalITile,
+                           braBiomes: BrazilBiomes#OptionalITile,
+                           riverBasins: RiverBasins#OptionalITile,
+                           primaryForest: PrimaryForest#OptionalITile,
+                           lossLegalAmazon: TreeCoverLossLegalAmazon#OptionalITile,
+                           prodesLegalAmazonExtent2000: ProdesLegalAmazonExtent2000#OptionalITile
                          ) extends CellGrid {
   def cellType: CellType = loss.cellType
 

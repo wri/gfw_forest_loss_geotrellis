@@ -16,6 +16,6 @@ case class FiaRegionsUsExtent(grid: String) extends StringLayer with OptionalILa
     case 8  => "RMS"
     case 9  => "SC"
     case 10 => "SE"
-    case _ => "Unknown"
+    case _ => ""
   }
 }

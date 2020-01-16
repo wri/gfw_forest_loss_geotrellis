@@ -36,6 +36,8 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
   val grossEmissionsCo2eNoneCo2 = GrossEmissionsNonCo2Co2e(gridId)
   val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridId)
 
+  val jplTropicsAbovegroundBiomassDensity2000 = JplTropicsAbovegroundBiomassDensity2000(gridId)
+
   val treeCoverGain = TreeCoverGain(gridId)
   val mangroveBiomassExtent = MangroveBiomassExtent(gridId)
   val treeCoverLossDrivers = TreeCoverLossDrivers(gridId)
@@ -47,8 +49,13 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
   val intactPrimaryForest = IntactPrimaryForest(gridId)
   val peatlandsFlux = PeatlandsFlux(gridId)
   val forestAgeCategory = ForestAgeCategory(gridId)
-  val jplAGBExtent = JplAGBextent(gridId)
+  val jplTropicsAbovegroundBiomassExtent2000 = JplTropicsAbovegroundBiomassExtent2000(gridId)
   val fiaRegionsUsExtent = FiaRegionsUsExtent(gridId)
+  val brazilBiomes = BrazilBiomes(gridId)
+  val riverBasins = RiverBasins(gridId)
+  val primaryForest = PrimaryForest(gridId)
+  val treeCoverLossLegalAmazon = TreeCoverLossLegalAmazon(gridId)
+  val prodesLegalAmazonExtent2000 = ProdesLegalAmazonExtent2000(gridId)
 
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonFluxTile]] = {
 
@@ -86,6 +93,8 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
         grossEmissionsCo2eNoneCo2.fetchWindow(window)
       val grossEmissionsCo2eCo2OnlyTile =
         grossEmissionsCo2eCo2Only.fetchWindow(window)
+      val jplTropicsAbovegroundBiomassDensity2000Tile =
+        jplTropicsAbovegroundBiomassDensity2000.fetchWindow(window)
 
       val mangroveBiomassExtentTile = mangroveBiomassExtent.fetchWindow(window)
       val driversTile = treeCoverLossDrivers.fetchWindow(window)
@@ -98,8 +107,13 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
       val intactPrimaryForestTile = intactPrimaryForest.fetchWindow(window)
       val peatlandFluxTile = peatlandsFlux.fetchWindow(window)
       val forestAgeCategoryTile = forestAgeCategory.fetchWindow(window)
-      val jplAGBextentTile = jplAGBExtent.fetchWindow(window)
+      val jplTropicsAbovegroundBiomassExtent2000Tile = jplTropicsAbovegroundBiomassExtent2000.fetchWindow(window)
       val fiaRegionsUsExtentTile = fiaRegionsUsExtent.fetchWindow(window)
+      val braBiomesTile = brazilBiomes.fetchWindow(window)
+      val riverBasinsTile = riverBasins.fetchWindow(window)
+      val primaryForestTile = primaryForest.fetchWindow(window)
+      val treeCoverLossLegalAmazonTile = treeCoverLossLegalAmazon.fetchWindow(window)
+      val prodesLegalAmazonExtent2000Tile = prodesLegalAmazonExtent2000.fetchWindow(window)
 
       val tile = CarbonFluxTile(
         lossTile,
@@ -123,6 +137,7 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
         totalCarbon2000Tile,
         grossEmissionsCo2eNoneCo2Tile,
         grossEmissionsCo2eCo2OnlyTile,
+        jplTropicsAbovegroundBiomassDensity2000Tile,
         mangroveBiomassExtentTile,
         driversTile,
         ecozonesTile,
@@ -133,8 +148,13 @@ case class CarbonFluxGridSources(gridId: String) extends GridSources {
         intactPrimaryForestTile,
         peatlandFluxTile,
         forestAgeCategoryTile,
-        jplAGBextentTile,
-        fiaRegionsUsExtentTile
+        jplTropicsAbovegroundBiomassExtent2000Tile,
+        fiaRegionsUsExtentTile,
+        braBiomesTile,
+        riverBasinsTile,
+        primaryForestTile,
+        treeCoverLossLegalAmazonTile,
+        prodesLegalAmazonExtent2000Tile
       )
 
       Raster(tile, window)

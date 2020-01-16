@@ -66,6 +66,8 @@ object CarbonFluxSummary {
         raster.tile.grossEmissionsCo2eNoneCo2.getData(col, row)
         val grossEmissionsCo2eCo2Only: Float =
           raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
+        val jplTropicsAbovegroundBiomassDensity2000: Float =
+          raster.tile.jplTropicsAbovegroundBiomassDensity2000.getData(col, row)
 
         val isGain: Boolean = raster.tile.gain.getData(col, row)
         val mangroveBiomassExtent: Boolean =
@@ -81,8 +83,13 @@ object CarbonFluxSummary {
           raster.tile.intactPrimaryForest.getData(col, row)
         val peatlandsFlux: Boolean = raster.tile.peatlandsFlux.getData(col, row)
         val forestAgeCategory: String = raster.tile.forestAgeCategory.getData(col, row)
-        val jplAGBextent: Boolean = raster.tile.jplAGBextent.getData(col, row)
+        val jplTropicsAbovegroundBiomassExtent2000: Boolean = raster.tile.jplTropicsAbovegroundBiomassExtent2000.getData(col, row)
         val fiaRegionsUsExtent: String = raster.tile.fiaRegionsUsExtent.getData(col, row)
+        val braBiomes: String = raster.tile.braBiomes.getData(col, row)
+        val riverBasins: String = raster.tile.riverBasins.getData(col, row)
+        val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
+        val lossYearLegalAmazon: Integer = raster.tile.lossLegalAmazon.getData(col, row)
+        val prodesLegalAmazonExtent2000: Boolean = raster.tile.prodesLegalAmazonExtent2000.getData(col, row)
 
         //        val cols: Int = raster.rasterExtent.cols
         //        val rows: Int = raster.rasterExtent.rows
@@ -96,6 +103,10 @@ object CarbonFluxSummary {
 
         val carbonfluxLossYear: Integer = if (lossYear != null && lossYear >= 2001 && lossYear <= 2015) lossYear else null
         val isLoss: Boolean = carbonfluxLossYear != null
+
+        val carbonfluxLossYearLegalAmazon: Integer = if (lossYearLegalAmazon != null
+          && lossYearLegalAmazon >= 2001 && lossYearLegalAmazon <= 2015) lossYearLegalAmazon else null
+        val isLossLegalAmazon: Boolean = carbonfluxLossYearLegalAmazon != null
 
         val biomassPixel = biomass * areaHa
         val grossAnnualRemovalsCarbonPixel = grossAnnualRemovalsCarbon * areaHa
@@ -120,6 +131,8 @@ object CarbonFluxSummary {
 
         val grossEmissionsCo2e = grossEmissionsCo2eNoneCo2 + grossEmissionsCo2eCo2Only
         val grossEmissionsCo2ePixel = grossEmissionsCo2e * areaHa
+
+        val jplTropicsAbovegroundBiomassDensity2000Pixel = jplTropicsAbovegroundBiomassDensity2000 * areaHa
 
         val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
 
@@ -146,15 +159,20 @@ object CarbonFluxSummary {
               intactPrimaryForest,
               peatlandsFlux,
               forestAgeCategory,
-              jplAGBextent,
-              fiaRegionsUsExtent
+              jplTropicsAbovegroundBiomassExtent2000,
+              fiaRegionsUsExtent,
+              braBiomes,
+              riverBasins,
+              primaryForest,
+              isLossLegalAmazon,
+              prodesLegalAmazonExtent2000
             )
 
             val summary: CarbonFluxData =
               stats.getOrElse(
                 key = pKey,
                 default = CarbonFluxData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -162,19 +180,21 @@ object CarbonFluxSummary {
             if (tcd2000 >= thresholds.head) {
 
               if (carbonfluxLossYear != null) {
-                summary.treecoverLoss += areaHa
-                summary.biomassLoss += biomassPixel
-                summary.grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-                summary.grossEmissionsCo2eNoneCo2 += grossEmissionsCo2eNoneCo2Pixel
-                summary.grossEmissionsCo2e += grossEmissionsCo2ePixel
-                summary.agcEmisYear += agcEmisYearPixel
-                summary.bgcEmisYear += bgcEmisYearPixel
-                summary.deadwoodCarbonEmisYear += deadwoodCarbonEmisYearPixel
-                summary.litterCarbonEmisYear += litterCarbonEmisYearPixel
-                summary.soilCarbonEmisYear += soilCarbonEmisYearPixel
-                summary.carbonEmisYear += totalCarbonEmisYearPixel
+                summary.totalTreecoverLoss += areaHa
+                summary.totalBiomassLoss += biomassPixel
+                summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+                summary.totalGrossEmissionsCo2eNoneCo2 += grossEmissionsCo2eNoneCo2Pixel
+                summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
+                summary.totalAgcEmisYear += agcEmisYearPixel
+                summary.totalBgcEmisYear += bgcEmisYearPixel
+                summary.totalDeadwoodCarbonEmisYear += deadwoodCarbonEmisYearPixel
+                summary.totalLitterCarbonEmisYear += litterCarbonEmisYearPixel
+                summary.totalSoilCarbonEmisYear += soilCarbonEmisYearPixel
+                summary.totalCarbonEmisYear += totalCarbonEmisYearPixel
               }
-              summary.treecoverExtent2000 += areaHa
+              if (isLossLegalAmazon) summary.totalTreecoverLossLegalAmazon += areaHa
+
+              summary.totalTreecoverExtent2000 += areaHa
               summary.totalBiomass += biomassPixel
               summary.totalGrossAnnualRemovalsCarbon += grossAnnualRemovalsCarbonPixel
               summary.totalGrossCumulRemovalsCarbon += grossCumulRemovalsCarbonPixel
@@ -185,6 +205,7 @@ object CarbonFluxSummary {
               summary.totalLitterCarbon2000 += litterCarbon2000Pixel
               summary.totalSoil2000 += soilCarbon2000Pixel
               summary.totalCarbon2000 += totalCarbon2000Pixel
+              summary.totalJplTropicsAbovegroundBiomassDensity2000 += jplTropicsAbovegroundBiomassDensity2000Pixel
             }
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
           }
