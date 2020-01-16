@@ -1,6 +1,7 @@
 # Tree Cover Loss Analysis
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d2ccce68bf9f462bae80f5c576a28b24)](https://www.codacy.com/manual/thomas-maschler/gfw_forest_loss_geotrellis?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wri/gfw_forest_loss_geotrellis&amp;utm_campaign=Badge_Grade)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fwri%2Fgfw_forest_loss_geotrellis.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fwri%2Fgfw_forest_loss_geotrellis?ref=badge_shield)
 
 This project performs a polygonal summary on tree cover loss and intersecting layers for a given input feature using SPARK and Geotrellis.
 
@@ -175,3 +176,7 @@ sbt:geotrellis-wri> sparkCreateCluster
 sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --features s3://gfw-files/2018_update/tsv/gadm36_1_1.csv --output s3://gfw-files/2018_update/results/summary --feature_type gadm --analysis annualupdate_minimal --tcl
 sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain  --features s3://gfw-files/2018_update/tsv/wdpa__*.tsv --output s3://gfw-files/2018_update/results/summary  --feature_type wdpa --analysis gladalerts --tcl --iso BRA
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fwri%2Fgfw_forest_loss_geotrellis.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fwri%2Fgfw_forest_loss_geotrellis?ref=badge_large)
