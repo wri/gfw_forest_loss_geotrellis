@@ -28,7 +28,7 @@ object CarbonSensitivityRDD extends SummaryRDD {
                           kwargs: Map[String, Any]): SUMMARY = {
     raster.polygonalSummary(
       geometry = geometry,
-      emptyResult = new CarbonSensitivitySummary(),
+      emptyResult = new CarbonSensitivitySummary(kwargs = kwargs),
       options = options
     )
   }

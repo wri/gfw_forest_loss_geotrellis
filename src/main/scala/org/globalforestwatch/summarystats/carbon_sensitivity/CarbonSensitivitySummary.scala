@@ -5,18 +5,20 @@ import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 import scala.annotation.tailrec
 
 /** LossData Summary by year */
-case class CarbonSensitivitySummary(
-                                     stats: Map[CarbonSensitivityDataGroup, CarbonSensitivityData] = Map.empty
-                                   ) extends Summary[CarbonSensitivitySummary] {
+case class CarbonSensitivitySummary(stats: Map[CarbonSensitivityDataGroup, CarbonSensitivityData] =
+                                    Map.empty,
+                                    kwargs: Map[String, Any])
+  extends Summary[CarbonSensitivitySummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: CarbonSensitivitySummary): CarbonSensitivitySummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    CarbonSensitivitySummary(stats.combine(other.stats))
+    CarbonSensitivitySummary(stats.combine(other.stats), kwargs)
   }
 }
 
@@ -32,8 +34,16 @@ object CarbonSensitivitySummary {
                     row: Int,
                     acc: CarbonSensitivitySummary
                   ): CarbonSensitivitySummary = {
+
+        // Changes the lossYear type to PRODES if the sensitivity analysis is "legal_Amazon_loss"
+        val changeLossSource: Boolean =
+          getAnyMapValue[String](acc.kwargs, "sensitivityType") == "legal_Amazon_loss"
+
         // This is a pixel by pixel operation
-        val lossYear: Integer = raster.tile.loss.getData(col, row)
+        val lossYear: Integer = {
+          if (changeLossSource) raster.tile.lossLegalAmazon.getData(col, row)
+          else raster.tile.loss.getData(col, row)
+        }
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
@@ -218,7 +228,7 @@ object CarbonSensitivitySummary {
         val updatedSummary: Map[CarbonSensitivityDataGroup, CarbonSensitivityData] =
           updateSummary(thresholds, acc.stats)
 
-        CarbonSensitivitySummary(updatedSummary)
+        CarbonSensitivitySummary(updatedSummary, acc.kwargs)
 
       }
     }
