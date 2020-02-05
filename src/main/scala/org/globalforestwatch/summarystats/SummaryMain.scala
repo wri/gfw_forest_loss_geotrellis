@@ -137,6 +137,10 @@ object SummaryMain
           .option[String]("sensitivity_type", help = "Sensitivity type for carbon flux model")
           .withDefault("standard")
 
+        val fireAlertSourceOpt = Opts
+          .option[String]("fire_alert_source", help = "Sensitivity type for carbon flux model")
+          .withDefault("VIIRS")
+
         val logger = Logger.getLogger("SummaryMain")
 
         (
@@ -161,7 +165,8 @@ object SummaryMain
           tclOpt,
           gladOpt,
           changeOnlyOpt,
-          sensitivityTypeOpt
+          fireAlertSourceOpt
+//          sensitivityTypeOpt
 //          buildDataCubeOpt
         ).mapN {
           (analysis,
@@ -185,7 +190,7 @@ object SummaryMain
            tcl,
            glad,
            changeOnly,
-           sensitivityType) =>
+           fireAlertSource) =>
 //           buildDataCube) =>
 
             val kwargs = Map(
@@ -208,7 +213,7 @@ object SummaryMain
               "glad" -> glad,
               "changeOnly" -> changeOnly,
 //              "buildDataCube" -> buildDataCube
-              "sensitivityType" -> sensitivityType
+              "fireAlertSource" -> fireAlertSource
             )
 
             val featureObj = FeatureFactory(featureType).featureObj

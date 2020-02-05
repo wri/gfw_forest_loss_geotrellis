@@ -9,6 +9,7 @@ import org.globalforestwatch.summarystats.annualupdate.AnnualUpdateAnalysis
 import org.globalforestwatch.summarystats.annualupdate_minimal.AnnualUpdateMinimalAnalysis
 import org.globalforestwatch.summarystats.carbonflux.CarbonFluxAnalysis
 import org.globalforestwatch.summarystats.carbon_sensitivity.CarbonSensitivityAnalysis
+import org.globalforestwatch.summarystats.firealerts.FireAlertsAnalysis
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsAnalysis
 import org.globalforestwatch.summarystats.treecoverloss.TreeLossAnalysis
 
@@ -63,6 +64,14 @@ case class SummaryAnalysisFactory(analysis: String,
         )
       case "treecoverloss" =>
         TreeLossAnalysis(
+          featureRDD: RDD[Feature[Geometry, FeatureId]],
+          featureType: String,
+          part: HashPartitioner,
+          spark: SparkSession,
+          kwargs: Map[String, Any]
+        )
+      case "firealerts" =>
+        FireAlertsAnalysis(
           featureRDD: RDD[Feature[Geometry, FeatureId]],
           featureType: String,
           part: HashPartitioner,
