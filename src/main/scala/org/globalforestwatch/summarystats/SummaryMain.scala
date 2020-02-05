@@ -137,9 +137,13 @@ object SummaryMain
           .option[String]("sensitivity_type", help = "Sensitivity type for carbon flux model")
           .withDefault("standard")
 
-        val fireAlertSourceOpt = Opts
-          .option[String]("fire_alert_source", help = "Sensitivity type for carbon flux model")
+        val fireAlertTypeOpt = Opts
+          .option[String]("fire_alert_type", help = "MODIS or VIIRS")
           .withDefault("VIIRS")
+
+        val fireAlertSourceOpt = Opts
+          .option[String]("fire_alert_source", help = "URI of fire alerts in TSV format")
+          .withDefault("s3://viirs/**/*.tsv")
 
         val logger = Logger.getLogger("SummaryMain")
 
@@ -155,8 +159,8 @@ object SummaryMain
           isoEndOpt,
           admin1Opt,
           admin2Opt,
-          idStartOpt,
-          idEndOpt,
+          //idStartOpt,
+          //idEndOpt,
           iucnCatOpts,
           wdpaStatusOpts,
           tcdOpt,
@@ -165,6 +169,7 @@ object SummaryMain
           tclOpt,
           gladOpt,
           changeOnlyOpt,
+          fireAlertTypeOpt,
           fireAlertSourceOpt
 //          sensitivityTypeOpt
 //          buildDataCubeOpt
@@ -180,8 +185,8 @@ object SummaryMain
            isoEnd,
            admin1,
            admin2,
-           idStart,
-           idEnd,
+           //idStart,
+           //idEnd,
            iucnCat,
            wdpaStatus,
            tcdYear,
@@ -190,6 +195,7 @@ object SummaryMain
            tcl,
            glad,
            changeOnly,
+           fireAlertType,
            fireAlertSource) =>
 //           buildDataCube) =>
 
@@ -202,8 +208,8 @@ object SummaryMain
               "isoEnd" -> isoEnd,
               "admin1" -> admin1,
               "admin2" -> admin2,
-              "idStart" -> idStart,
-              "idEnd" -> idEnd,
+              //"idStart" -> idStart,
+              //"idEnd" -> idEnd,
               "iucnCat" -> iucnCat,
               "wdpaStatus" -> wdpaStatus,
               "tcdYear" -> tcdYear,
@@ -213,6 +219,7 @@ object SummaryMain
               "glad" -> glad,
               "changeOnly" -> changeOnly,
 //              "buildDataCube" -> buildDataCube
+              "fireAlertType" -> fireAlertType,
               "fireAlertSource" -> fireAlertSource
             )
 

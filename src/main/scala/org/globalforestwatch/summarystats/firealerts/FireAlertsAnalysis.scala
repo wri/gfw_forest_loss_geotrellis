@@ -1,5 +1,6 @@
 package org.globalforestwatch.summarystats.firealerts
 
+import java.io.FileNotFoundException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -53,14 +54,12 @@ object FireAlertsAnalysis {
                       partitioner: Partitioner,
                       spark: SparkSession,
                       kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FeatureId], ord: Ordering[SUMMARY] = null):  RDD[Feature[Geometry, FireAlertFeatureId]] = {
-
-    val fireScientificUri = if (kwargs.get("fireAlertSource").equals("modis")) "file:/Users/justin.terry/dev/gfw_forest_loss_geotrellis/input/fire_alerts_modis.tsv" else "file:/Users/justin.terry/dev/gfw_forest_loss_geotrellis/input/fire_alerts_viirs.tsv"
-
+    val fireSrcUri: String = getAnyMapValue[String](kwargs, "fireAlertSource")
     val windowLayout = FireAlertsGrid.blockTileGrid // TODO should use viirs/modis grid
     val pointRDD = spark
       .read
       .options(Map("header" -> "true", "delimiter" -> "\t"))
-      .csv(fireScientificUri)
+      .csv(fireSrcUri)
       .rdd.mapPartitions({iter: Iterator[Row] => {
       for {
         i <- iter
