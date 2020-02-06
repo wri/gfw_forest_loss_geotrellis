@@ -78,4 +78,55 @@ object FireAlertsDF {
         sum("alert__count") as "alert__count"
       )
   }
+
+  def aggChangeWeekly(cols: List[String],
+                      wdpa: Boolean = false)(df: DataFrame): DataFrame = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
+
+    val fireCols = List(
+      year($"alert__date") as "alert__year",
+      weekofyear($"alert__date") as "alert__week"
+    )
+    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, fireCols, wdpa)
+  }
+
+  def aggChangeWeekly2(cols: List[String],
+                       wdpa: Boolean = false)(df: DataFrame): DataFrame = {
+
+    val spark = df.sparkSession
+    import spark.implicits._
+
+    val gladCols = List($"alert__year", $"alert__week")
+    _aggChangeWeekly(df, cols, gladCols, wdpa)
+  }
+
+  private def _aggChangeWeekly(df: DataFrame,
+                               cols: List[String],
+                               fireCols: List[Column],
+                               wdpa: Boolean = false): DataFrame = {
+    val spark = df.sparkSession
+    import spark.implicits._
+
+    val fireCols2 = List("alert__year", "alert__week")
+
+    val aggCols = List($"alert__count")
+
+    val contextLayers: List[String] = contextualLayers
+
+    // TODO what the heck is this doing?
+    val selectCols: List[Column] = cols.foldRight(Nil: List[Column])(
+      col(_) :: _
+    ) ::: fireCols ::: contextLayers
+      .foldRight(Nil: List[Column])(col(_) :: _) ::: aggCols
+
+    val groupByCols = cols ::: fireCols2 ::: contextLayers
+
+    df.select(selectCols: _*)
+      .groupBy(groupByCols.head, groupByCols.tail: _*)
+      .agg(
+        sum("alert__count") as "alert__count"
+      )
+  }
 }
