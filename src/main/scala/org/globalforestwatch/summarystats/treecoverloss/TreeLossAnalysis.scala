@@ -8,7 +8,7 @@ import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.util.Util.getAnyMapValue
+import org.globalforestwatch.util.Util.{getAnyMapValue, getKeyedFeatureRDD}
 
 object TreeLossAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
@@ -17,8 +17,10 @@ object TreeLossAnalysis {
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
     import spark.implicits._
+
+    val keyedFeatureRDD = getKeyedFeatureRDD(featureRDD, TreeLossGrid.blockTileGrid, part)
     val summaryRDD: RDD[(FeatureId, TreeLossSummary)] =
-      TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, part, kwargs)
+      TreeLossRDD(keyedFeatureRDD, TreeLossGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
       TreeLossDFFactory(featureType, summaryRDD, spark).getDataFrame

@@ -27,7 +27,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
     * @param partitioner how to partition keys from the windowLayout
     */
   def apply[FEATUREID <: FeatureId](
-                                     featureRDD: RDD[Feature[Geometry, FEATUREID]],
+                                     featureRDD: RDD[(SpatialKey, Feature[Geometry, FEATUREID])],
                                      windowLayout: LayoutDefinition,
                                      partitioner: Partitioner,
                                      kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
@@ -36,16 +36,8 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      * Each features will intersect one or more windows, possibly creating a duplicate record.
      * Later we will calculate partial result for each intersection and merge them.
      */
-    val keyedFeatureRDD: RDD[(SpatialKey, Feature[Geometry, FEATUREID])] =
-      featureRDD
-        .flatMap { feature: Feature[Geometry, FEATUREID] =>
-          val keys: Set[SpatialKey] =
-            windowLayout.mapTransform.keysForGeometry(feature.geom)
-          keys.toSeq.map { key =>
-            (key, feature)
-          }
-        }
-        .partitionBy(partitioner)
+
+
     /* Here we're going to work with the features one partition at a time.
      * We're going to use the tile key from windowLayout to read pixels from appropriate raster.
      * Each record in this RDD may still represent only a partial result for that feature.
@@ -53,7 +45,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      * The RDD is keyed by Id such that we can join and recombine partial results later.
      */
     val featuresWithSummaries: RDD[(FEATUREID, SUMMARY)] =
-      keyedFeatureRDD.mapPartitions {
+      featureRDD.mapPartitions {
         featurePartition: Iterator[
           (SpatialKey, Feature[Geometry, FEATUREID])
         ] =>
@@ -118,6 +110,12 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                           )
                           throw te
                         }
+                        case be: java.lang.ArrayIndexOutOfBoundsException => {
+                          println(
+                            s"There is an issue with geometry ${feature.geom}"
+                          )
+                          throw be
+                        }
                         case e: Throwable => throw e
 
                       }
@@ -132,17 +130,19 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      */
     val featuresGroupedWithSummaries: RDD[(FEATUREID, SUMMARY)] =
       reduceSummarybyKey[FEATUREID](featuresWithSummaries): RDD[(FEATUREID, SUMMARY)]
+    print(featuresGroupedWithSummaries.toDebugString)
+
     featuresGroupedWithSummaries
   }
 
   def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES]
 
   def readWindow(rs: SOURCES, window: Extent): Either[Throwable, Raster[TILE]]
-
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,
                           kwargs: Map[String, Any]): SUMMARY
+
 
   def reduceSummarybyKey[FEATUREID <: FeatureId](
     featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]

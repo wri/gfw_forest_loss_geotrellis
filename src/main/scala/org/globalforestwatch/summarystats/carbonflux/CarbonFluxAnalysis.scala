@@ -8,7 +8,7 @@ import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.util.Util.getAnyMapValue
+import org.globalforestwatch.util.Util.{getAnyMapValue, getKeyedFeatureRDD}
 
 object CarbonFluxAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
@@ -19,8 +19,9 @@ object CarbonFluxAnalysis {
 
     import spark.implicits._
 
+    val keyedFeatureRDD = getKeyedFeatureRDD(featureRDD, CarbonFluxGrid.blockTileGrid, part)
     val summaryRDD: RDD[(FeatureId, CarbonFluxSummary)] =
-      CarbonFluxRDD(featureRDD, CarbonFluxGrid.blockTileGrid, part, kwargs)
+      CarbonFluxRDD(keyedFeatureRDD, CarbonFluxGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
       CarbonFluxDFFactory(featureType, summaryRDD, spark).getDataFrame

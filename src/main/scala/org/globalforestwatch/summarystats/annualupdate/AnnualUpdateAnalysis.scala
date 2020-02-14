@@ -8,7 +8,7 @@ import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.util.Util.getAnyMapValue
+import org.globalforestwatch.util.Util.{getAnyMapValue, getKeyedFeatureRDD}
 
 object AnnualUpdateAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
@@ -19,8 +19,9 @@ object AnnualUpdateAnalysis {
 
     import spark.implicits._
 
+    val keyedFeatueRDD = getKeyedFeatureRDD(featureRDD, AnnualUpdateGrid.blockTileGrid, part)
     val summaryRDD: RDD[(FeatureId, AnnualUpdateSummary)] =
-      AnnualUpdateRDD(featureRDD, AnnualUpdateGrid.blockTileGrid, part, kwargs)
+      AnnualUpdateRDD(keyedFeatueRDD, AnnualUpdateGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
       AnnualUpdateDFFactory(featureType, summaryRDD, spark).getDataFrame

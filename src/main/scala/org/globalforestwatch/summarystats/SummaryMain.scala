@@ -143,7 +143,7 @@ object SummaryMain
 
         val fireAlertSourceOpt = Opts
           .option[String]("fire_alert_source", help = "URI of fire alerts in TSV format")
-          .withDefault("s3://viirs/**/*.tsv")
+          .orNone
 
         val logger = Logger.getLogger("SummaryMain")
 

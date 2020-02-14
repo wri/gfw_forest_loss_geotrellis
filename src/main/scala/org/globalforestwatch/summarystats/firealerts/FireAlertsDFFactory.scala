@@ -15,6 +15,9 @@ case class FireAlertsDFFactory(
   def getDataFrame: DataFrame = {
     featureType match {
       case "gadm"    => getGadmDataFrame
+      case "feature" => getFeatureDataFrame
+      case "wdpa" => getWdpaDataFrame
+      case "geostore" => getGeostoreDataFrame
       case _ =>
         throw new IllegalArgumentException("Not a valid FeatureId")
     }

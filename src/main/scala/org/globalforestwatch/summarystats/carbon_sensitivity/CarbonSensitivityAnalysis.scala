@@ -8,7 +8,7 @@ import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.util.Util.getAnyMapValue
+import org.globalforestwatch.util.Util.{getAnyMapValue, getKeyedFeatureRDD}
 
 object CarbonSensitivityAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
@@ -21,8 +21,9 @@ object CarbonSensitivityAnalysis {
 
     val model:String = getAnyMapValue[String](kwargs,"sensitivityType")
 
+    val keyedFeatureRDD = getKeyedFeatureRDD(featureRDD, CarbonSensitivityGrid.blockTileGrid, part)
     val summaryRDD: RDD[(FeatureId, CarbonSensitivitySummary)] =
-      CarbonSensitivityRDD(featureRDD, CarbonSensitivityGrid.blockTileGrid, part, kwargs)
+      CarbonSensitivityRDD(keyedFeatureRDD, CarbonSensitivityGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
       CarbonSensitivityDFFactory(featureType, summaryRDD, spark).getDataFrame

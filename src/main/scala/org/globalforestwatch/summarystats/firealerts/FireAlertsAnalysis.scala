@@ -1,6 +1,5 @@
 package org.globalforestwatch.summarystats.firealerts
 
-import java.io.FileNotFoundException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -53,34 +52,32 @@ object FireAlertsAnalysis {
                       windowLayout: LayoutDefinition,
                       partitioner: Partitioner,
                       spark: SparkSession,
-                      kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FeatureId], ord: Ordering[SUMMARY] = null):  RDD[Feature[Geometry, FireAlertFeatureId]] = {
-    val fireSrcUri: String = getAnyMapValue[String](kwargs, "fireAlertSource")
+                      kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FeatureId], ord: Ordering[SUMMARY] = null):  RDD[(SpatialKey, Feature[Geometry, FireAlertFeatureId])] = {
+    val fireSrcUri: String = getAnyMapValue[Option[String]](kwargs, "fireAlertSource") match {
+      case None => throw new java.lang.IllegalAccessException("fire_alert_source parameter required for fire alerts analysis")
+      case Some(s: String) => s
+    }
     val windowLayout = FireAlertsGrid.blockTileGrid // TODO should use viirs/modis grid
     val pointRDD = spark
       .read
       .options(Map("header" -> "true", "delimiter" -> "\t"))
       .csv(fireSrcUri)
-      .rdd.mapPartitions({iter: Iterator[Row] => {
-      for {
-        i <- iter
-      } yield {
-        val lat: Float = i.getString(0).toFloat
-        val lon: Float = i.getString(1).toFloat
-        val alertDate: String = i.getString(2)
+      .rdd.map(line => {
+        val lat: Float = line.getString(0).toFloat
+        val lon: Float = line.getString(1).toFloat
+        val alertDate: String = line.getString(2)
         val geom: Geometry = Point(lon, lat)
 
         geotrellis.vector
           .Feature(geom, (lat, lon, alertDate))
-      }
-    }}, preservesPartitioning = true)
+      })
       .flatMap { feature =>
         val keys: Set[SpatialKey] =
           windowLayout.mapTransform.keysForGeometry(feature.geom)
         keys.toSeq.map { key =>
           (key, feature)
         }
-      }
-      .partitionBy(partitioner)
+      }.partitionBy(partitioner)
 
     val polygonRDD = featureRDD.flatMap { feature: Feature[Geometry, FeatureId] =>
       val keys: Set[SpatialKey] =
@@ -88,26 +85,20 @@ object FireAlertsAnalysis {
       keys.toSeq.map { key =>
         (key, feature)
       }
-    }
-      .partitionBy(partitioner)
+    }.partitionBy(partitioner)
 
-    val pipRDD: RDD[Feature[Geometry, FireAlertFeatureId]] = pointRDD
-      .cogroup(polygonRDD)
-      .mapPartitions(iter => {
-        //val preparedGeometryFactory = new PreparedGeometryFactory()
-        iter.flatMap {
-          case (_, (points, polygons)) => {
-            val polygonArr = polygons.toArray
-            points.flatMap(point => {
-              polygonArr
-                .filter(_.intersects(point))
-                .map(polygon => {
-                  Feature(point.geom, FireAlertFeatureId(point.data._3, polygon.data)) // TODO should be more clear than _3
-                })
-            })
-          }
-        }
-      })
+    val pipRDD: RDD[(SpatialKey, Feature[Geometry, FireAlertFeatureId])] = pointRDD
+      .join(polygonRDD)
+      .filter{row: (SpatialKey, (Feature[Geometry, (Float, Float, String)], Feature[Geometry, FeatureId])) => {
+          val point = row._2._1
+          val polygon = row._2._2
+          point.geom.intersects(polygon.geom)
+      }}
+      .map{row: (SpatialKey, (Feature[Geometry, (Float, Float, String)], Feature[Geometry, FeatureId])) => {
+        val point = row._2._1
+        val polygon = row._2._2
+        (row._1, Feature(point.geom, FireAlertFeatureId(point.data._3, polygon.data))) // TODO should be more clear than _3
+      }}
 
     pipRDD
   }
