@@ -142,7 +142,7 @@ object SummaryMain
           .withDefault("VIIRS")
 
         val fireAlertSourceOpt = Opts
-          .option[String]("fire_alert_source", help = "URI of fire alerts in TSV format")
+          .options[String]("fire_alert_source", help = "URI of fire alerts in TSV format")
           .orNone
 
         val logger = Logger.getLogger("SummaryMain")
@@ -195,10 +195,9 @@ object SummaryMain
            tcl,
            glad,
            changeOnly,
+//           buildDataCube
            fireAlertType,
-           fireAlertSource) =>
-//           buildDataCube) =>
-
+           fireAlertSources) =>
             val kwargs = Map(
               "outputUrl" -> outputUrl,
               "limit" -> limit,
@@ -220,7 +219,8 @@ object SummaryMain
               "changeOnly" -> changeOnly,
 //              "buildDataCube" -> buildDataCube
               "fireAlertType" -> fireAlertType,
-              "fireAlertSource" -> fireAlertSource
+              "fireAlertSource" -> fireAlertSources,
+              "featureUris" -> featureUris
             )
 
             val featureObj = FeatureFactory(featureType).featureObj
@@ -229,25 +229,12 @@ object SummaryMain
               SummarySparkSession("GFW Summary Stats Spark Session")
 //            import spark.implicits._
 
-            // ref: https://github.com/databricks/spark-csv
-            val featuresDF: DataFrame =
-              FeatureDF(featureUris, featureObj, kwargs, spark)
 
-            /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
-            val featureRDD: RDD[Feature[Geometry, FeatureId]] =
-              FeatureRDD(featuresDF, featureObj)
-
-            val inputPartitionMultiplier = 64
-
-            val part = new HashPartitioner(
-              partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
-            )
-
-            SummaryAnalysisFactory(
+             SummaryAnalysisFactory(
               analysis,
-              featureRDD,
+              featureObj,
               featureType,
-              part,
+              featureUris,
               spark,
               kwargs
             ).runAnalysis

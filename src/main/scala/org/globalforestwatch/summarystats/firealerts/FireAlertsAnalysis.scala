@@ -3,28 +3,43 @@ package org.globalforestwatch.summarystats.firealerts
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import geotrellis.spark.SpatialKey
-import geotrellis.spark.tiling.LayoutDefinition
-import geotrellis.vector.{Feature, Geometry, Point}
-import org.apache.spark.{HashPartitioner, Partitioner}
+import geotrellis.vector.Feature
+import org.apache.spark.{HashPartitioner}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Row, SparkSession}
-import org.globalforestwatch.features.{FeatureId, FireAlertFeatureId}
+import org.apache.spark.sql.SparkSession
+import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, FeatureRDD, FireAlertFeature, FireAlertFeatureId, GadmFeatureId}
 import org.globalforestwatch.summarystats.firealerts.FireAlertsRDD.SUMMARY
 import org.globalforestwatch.util.Util._
+import org.datasyslab.geospark.spatialRDD.{PointRDD, SpatialRDD}
+import org.datasyslab.geospark.enums.{GridType, IndexType}
+import org.datasyslab.geospark.spatialOperator.JoinQuery
+import java.util.HashSet
 
+import cats.data.NonEmptyList
+import com.vividsolutions.jts.geom.{Geometry, Point, Polygon}
+
+import collection.JavaConverters._
 import scala.reflect.ClassTag
+import org.apache.spark.api.java.JavaRDD
+import org.datasyslab.geospark.spatialRDD.SpatialRDD
+import org.datasyslab.geosparksql.utils.Adapter
 
 object FireAlertsAnalysis {
-  def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
+  def apply(featureObj: org.globalforestwatch.features.Feature,
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
     import spark.implicits._
 
-    val fireAlertFeatureRDD = getFireAlertFeatureRDD(featureRDD, FireAlertsGrid.blockTileGrid, part, spark, kwargs)
+
+    //val fireAlertFeatureRDD = getFireAlertFeatureRDD(featureRDD, FireAlertsGrid.blockTileGrid, part, spark, kwargs)
+    val fireAlertFeatureRDD = getFireAlertFeatureRDDGeoSpark(spark, featureObj, kwargs)
+
+    val inputPartitionMultiplier = 64
+    val part = new HashPartitioner(
+      partitions = fireAlertFeatureRDD.getNumPartitions * inputPartitionMultiplier
+    )
 
     val summaryRDD: RDD[(FireAlertFeatureId, FireAlertsSummary)] =
       FireAlertsRDD(fireAlertFeatureRDD, FireAlertsGrid.blockTileGrid, part, kwargs)
@@ -47,59 +62,45 @@ object FireAlertsAnalysis {
     )
   }
 
-
-  def getFireAlertFeatureRDD(featureRDD: RDD[Feature[Geometry, FeatureId]],
-                      windowLayout: LayoutDefinition,
-                      partitioner: Partitioner,
-                      spark: SparkSession,
-                      kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FeatureId], ord: Ordering[SUMMARY] = null):  RDD[(SpatialKey, Feature[Geometry, FireAlertFeatureId])] = {
-    val fireSrcUri: String = getAnyMapValue[Option[String]](kwargs, "fireAlertSource") match {
+  def getFireAlertFeatureRDDGeoSpark(spark: SparkSession,
+                                     featureObj: org.globalforestwatch.features.Feature,
+                             kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FeatureId], ord: Ordering[SUMMARY] = null): RDD[Feature[geotrellis.vector.Geometry, FireAlertFeatureId]]  = {
+    val fireSrcUris: NonEmptyList[String] = getAnyMapValue[Option[NonEmptyList[String]]](kwargs, "fireAlertSource") match {
       case None => throw new java.lang.IllegalAccessException("fire_alert_source parameter required for fire alerts analysis")
-      case Some(s: String) => s
+      case Some(s: NonEmptyList[String]) => s
     }
-    val windowLayout = FireAlertsGrid.blockTileGrid // TODO should use viirs/modis grid
-    val pointRDD = spark
-      .read
-      .options(Map("header" -> "true", "delimiter" -> "\t"))
-      .csv(fireSrcUri)
-      .rdd.map(line => {
-        val lat: Float = line.getString(0).toFloat
-        val lon: Float = line.getString(1).toFloat
-        val alertDate: String = line.getString(2)
-        val geom: Geometry = Point(lon, lat)
 
-        geotrellis.vector
-          .Feature(geom, (lat, lon, alertDate))
-      })
-      .flatMap { feature =>
-        val keys: Set[SpatialKey] =
-          windowLayout.mapTransform.keysForGeometry(feature.geom)
-        keys.toSeq.map { key =>
-          (key, feature)
-        }
-      }.partitionBy(partitioner)
+    val featureUris = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
-    val polygonRDD = featureRDD.flatMap { feature: Feature[Geometry, FeatureId] =>
-      val keys: Set[SpatialKey] =
-        windowLayout.mapTransform.keysForGeometry(feature.geom)
-      keys.toSeq.map { key =>
-        (key, feature)
-      }
-    }.partitionBy(partitioner)
+    val fireAlertDF = FeatureDF(fireSrcUris, FeatureFactory("firealerts").featureObj, kwargs, spark, "longitude", "latitude")
+    var fireAlertRDD = new PointRDD
+    fireAlertRDD.rawSpatialRDD = Adapter.toJavaRdd(fireAlertDF).asInstanceOf[JavaRDD[Point]]
 
-    val pipRDD: RDD[(SpatialKey, Feature[Geometry, FireAlertFeatureId])] = pointRDD
-      .join(polygonRDD)
-      .filter{row: (SpatialKey, (Feature[Geometry, (Float, Float, String)], Feature[Geometry, FeatureId])) => {
-          val point = row._2._1
-          val polygon = row._2._2
-          point.geom.intersects(polygon.geom)
-      }}
-      .map{row: (SpatialKey, (Feature[Geometry, (Float, Float, String)], Feature[Geometry, FeatureId])) => {
-        val point = row._2._1
-        val polygon = row._2._2
-        (row._1, Feature(point.geom, FireAlertFeatureId(point.data._3, polygon.data))) // TODO should be more clear than _3
-      }}
+    val featureDF = FeatureDF(featureUris, featureObj, kwargs, spark, "geom")
+    var featureRDD = new SpatialRDD[Geometry]
+    featureRDD.rawSpatialRDD = Adapter.toJavaRdd(featureDF)
 
-    pipRDD
+    val considerBoundaryIntersection = false // Only return geometries fully covered by each query window in queryWindowRDD
+    fireAlertRDD.analyze()
+
+    fireAlertRDD.spatialPartitioning(GridType.QUADTREE)
+    featureRDD.spatialPartitioning(fireAlertRDD.getPartitioner)
+
+    val buildOnSpatialPartitionedRDD = true // Set to TRUE only if run join query
+    featureRDD.buildIndex(IndexType.QUADTREE, buildOnSpatialPartitionedRDD)
+
+    val joinResultRDD: org.apache.spark.api.java.JavaPairRDD[Geometry, HashSet[Point]] = JoinQuery.SpatialJoinQuery(fireAlertRDD, featureRDD, true, considerBoundaryIntersection)
+    val joinResultScalaRDD: RDD[(Geometry, HashSet[Point])] = org.apache.spark.api.java.JavaPairRDD.toRDD(joinResultRDD)
+
+    joinResultScalaRDD.flatMap {
+      case (geom: Geometry, points: HashSet[Point]) =>
+        val geomFields = geom.getUserData.asInstanceOf[String].split('\t')
+        val featureId = featureObj.getFeatureId(geomFields)
+
+        points.asScala.map((pt: Point) => {
+          val fireFeatureData = pt.getUserData.asInstanceOf[String].split('\t')
+          FireAlertFeature.getFireAlertFeature(pt.getX, pt.getY, fireFeatureData, featureId)
+        })
+    }
   }
 }

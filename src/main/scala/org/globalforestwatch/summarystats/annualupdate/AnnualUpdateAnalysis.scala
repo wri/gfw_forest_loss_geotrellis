@@ -19,9 +19,8 @@ object AnnualUpdateAnalysis {
 
     import spark.implicits._
 
-    val keyedFeatueRDD = getKeyedFeatureRDD(featureRDD, AnnualUpdateGrid.blockTileGrid, part)
     val summaryRDD: RDD[(FeatureId, AnnualUpdateSummary)] =
-      AnnualUpdateRDD(keyedFeatueRDD, AnnualUpdateGrid.blockTileGrid, part, kwargs)
+      AnnualUpdateRDD(featureRDD, AnnualUpdateGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
       AnnualUpdateDFFactory(featureType, summaryRDD, spark).getDataFrame

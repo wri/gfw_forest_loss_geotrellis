@@ -16,18 +16,25 @@ object WdpaFeature extends Feature {
   val statusPos = 4
   val geomPos = 7
 
-  def get(i: Row): geotrellis.vector.Feature[Geometry, WdpaFeatureId] = {
-    val wdpaId: Int = i.getString(wdpaIdPos).toInt
-    val name: String = i.getString(namePos)
-    val iucnCat: String = i.getString(iucnCatPos)
-    val iso: String = i.getString(isoPos)
-    val status: String = i.getString(statusPos)
+  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
+    val featureId = getFeatureId(i)
     val geom: Geometry =
       GeometryReducer.reduce(GeometryReducer.gpr)(
         WKB.read(i.getString(geomPos))
       )
+
     geotrellis.vector
-      .Feature(geom, WdpaFeatureId(wdpaId, name, iucnCat, iso, status))
+      .Feature(geom, featureId)
+  }
+
+  def getFeatureId(i: Array[String]): FeatureId = {
+    val wdpaId: Int = i(wdpaIdPos).toInt
+    val name: String = i(namePos)
+    val iucnCat: String = i(iucnCatPos)
+    val iso: String = i(isoPos)
+    val status: String = i(statusPos)
+
+    WdpaFeatureId(wdpaId, name, iucnCat, iso, status)
   }
 
   override def custom_filter(

@@ -19,10 +19,9 @@ object AnnualUpdateMinimalAnalysis {
 
     import spark.implicits._
 
-    val keyedFeatueRDD = getKeyedFeatureRDD(featureRDD, AnnualUpdateMinimalGrid.blockTileGrid, part)
     val summaryRDD: RDD[(FeatureId, AnnualUpdateMinimalSummary)] =
       AnnualUpdateMinimalRDD(
-        keyedFeatueRDD,
+        featureRDD,
         AnnualUpdateMinimalGrid.blockTileGrid,
         part,
         kwargs

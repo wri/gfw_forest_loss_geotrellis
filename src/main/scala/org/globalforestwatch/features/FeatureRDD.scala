@@ -18,5 +18,4 @@ object FeatureRDD {
       }
     }, preservesPartitioning = true)
   }
-
 }

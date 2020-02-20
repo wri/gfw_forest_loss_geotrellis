@@ -18,9 +18,9 @@ object GladAlertsAnalysis {
             kwargs: Map[String, Any]): Unit = {
 
     import spark.implicits._
-    val keyedFeatureRDD = getKeyedFeatureRDD(featureRDD, GladAlertsGrid.blockTileGrid, part)
+
     val summaryRDD: RDD[(FeatureId, GladAlertsSummary)] =
-      GladAlertsRDD(keyedFeatureRDD, GladAlertsGrid.blockTileGrid, part, kwargs)
+      GladAlertsRDD(featureRDD, GladAlertsGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
       GladAlertsDFFactory(featureType, summaryRDD, spark).getDataFrame

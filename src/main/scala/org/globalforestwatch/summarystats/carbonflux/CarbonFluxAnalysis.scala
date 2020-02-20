@@ -19,9 +19,8 @@ object CarbonFluxAnalysis {
 
     import spark.implicits._
 
-    val keyedFeatureRDD = getKeyedFeatureRDD(featureRDD, CarbonFluxGrid.blockTileGrid, part)
     val summaryRDD: RDD[(FeatureId, CarbonFluxSummary)] =
-      CarbonFluxRDD(keyedFeatureRDD, CarbonFluxGrid.blockTileGrid, part, kwargs)
+      CarbonFluxRDD(featureRDD, CarbonFluxGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
       CarbonFluxDFFactory(featureType, summaryRDD, spark).getDataFrame

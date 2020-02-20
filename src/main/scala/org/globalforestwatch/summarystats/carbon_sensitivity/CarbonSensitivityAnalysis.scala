@@ -21,9 +21,8 @@ object CarbonSensitivityAnalysis {
 
     val model:String = getAnyMapValue[String](kwargs,"sensitivityType")
 
-    val keyedFeatureRDD = getKeyedFeatureRDD(featureRDD, CarbonSensitivityGrid.blockTileGrid, part)
     val summaryRDD: RDD[(FeatureId, CarbonSensitivitySummary)] =
-      CarbonSensitivityRDD(keyedFeatureRDD, CarbonSensitivityGrid.blockTileGrid, part, kwargs)
+      CarbonSensitivityRDD(featureRDD, CarbonSensitivityGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
       CarbonSensitivityDFFactory(featureType, summaryRDD, spark).getDataFrame

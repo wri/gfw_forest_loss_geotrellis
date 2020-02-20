@@ -27,7 +27,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
     * @param partitioner how to partition keys from the windowLayout
     */
   def apply[FEATUREID <: FeatureId](
-                                     featureRDD: RDD[(SpatialKey, Feature[Geometry, FEATUREID])],
+                                     featureRDD: RDD[Feature[Geometry, FEATUREID]],
                                      windowLayout: LayoutDefinition,
                                      partitioner: Partitioner,
                                      kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
@@ -37,6 +37,15 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      * Later we will calculate partial result for each intersection and merge them.
      */
 
+    val keyedFeatureRDD: RDD[(SpatialKey, Feature[Geometry, FEATUREID])] = featureRDD
+      .flatMap { feature: Feature[Geometry, FEATUREID] =>
+        val keys: Set[SpatialKey] =
+          windowLayout.mapTransform.keysForGeometry(feature.geom)
+        keys.toSeq.map { key =>
+          (key, feature)
+        }
+      }
+      .partitionBy(partitioner)
 
     /* Here we're going to work with the features one partition at a time.
      * We're going to use the tile key from windowLayout to read pixels from appropriate raster.
@@ -45,7 +54,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      * The RDD is keyed by Id such that we can join and recombine partial results later.
      */
     val featuresWithSummaries: RDD[(FEATUREID, SUMMARY)] =
-      featureRDD.mapPartitions {
+      keyedFeatureRDD.mapPartitions {
         featurePartition: Iterator[
           (SpatialKey, Feature[Geometry, FEATUREID])
         ] =>
