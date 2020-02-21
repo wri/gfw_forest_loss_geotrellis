@@ -125,6 +125,7 @@ assemblyOption in assembly := (assemblyOption in assembly).value.copy(appendCont
 assemblyMergeStrategy in assembly := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat
+  case PathList("org", "geotools", xs @ _*) => MergeStrategy.last
   case PathList("META-INF", xs@_*) =>
     xs match {
       case ("MANIFEST.MF" :: Nil) => MergeStrategy.discard

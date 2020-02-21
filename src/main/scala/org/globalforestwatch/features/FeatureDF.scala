@@ -31,7 +31,6 @@ object FeatureDF {
          |FROM $viewName
       """.stripMargin)
 
-    spatialDf.show()
     spatialDf
   }
 
@@ -53,7 +52,6 @@ object FeatureDF {
     //val spatialRDD = new SpatialRDD[Geometry]
     //spatialRDD.rawSpatialRDD = Adapter.toRdd(spatialDf)
 
-    spatialDf.show()
     spatialDf
   }
 }
