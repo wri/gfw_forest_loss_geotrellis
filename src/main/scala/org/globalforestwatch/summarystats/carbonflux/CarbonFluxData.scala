@@ -3,10 +3,10 @@ package org.globalforestwatch.summarystats.carbonflux
 import cats.Semigroup
 
 /** Summary data per class
-  *
-  * Note: This case class contains mutable values
-  *
-  */
+ *
+ * Note: This case class contains mutable values
+ *
+ */
 case class CarbonFluxData(var totalTreecoverLoss: Double,
                           var totalBiomassLoss: Double,
                           var totalGrossEmissionsCo2eCo2Only: Double,
@@ -32,7 +32,7 @@ case class CarbonFluxData(var totalTreecoverLoss: Double,
                           var totalCarbon2000: Double,
                           var totalJplTropicsAbovegroundBiomassDensity2000: Double,
                           var totalTreecoverLossLegalAmazon: Double
-) {
+                         ) {
   def merge(other: CarbonFluxData): CarbonFluxData = {
     CarbonFluxData(
       totalTreecoverLoss + other.totalTreecoverLoss,

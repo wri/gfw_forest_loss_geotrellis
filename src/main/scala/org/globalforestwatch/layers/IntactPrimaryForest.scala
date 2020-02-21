@@ -1,8 +1,8 @@
 package org.globalforestwatch.layers
 
-case class IntactPrimaryForest(grid: String, model: String="standard")
-    extends BooleanLayer
+case class IntactPrimaryForest(grid: String)
+  extends BooleanLayer
     with OptionalILayer {
   val uri: String =
-    s"$basePath/ifl_primary/$model/$grid.tif"
+    s"$basePath/ifl_primary/standard/$grid.tif"
 }

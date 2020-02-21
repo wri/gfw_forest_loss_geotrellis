@@ -1,6 +1,7 @@
+/*
 package org.globalforestwatch.layers
 
-/*
+
 import org.scalatest.FunSuite
 
 class TreeCoverDensitySuits extends FunSuite {

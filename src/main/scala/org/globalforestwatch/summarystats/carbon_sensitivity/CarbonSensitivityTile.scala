@@ -4,10 +4,10 @@ import geotrellis.raster.{CellGrid, CellType}
 import org.globalforestwatch.layers._
 
 /**
-  *
-  * Tile-like structure to hold tiles from datasets required for our summary.
-  * We can not use GeoTrellis MultibandTile because it requires all bands share a CellType.
-  */
+ *
+ * Tile-like structure to hold tiles from datasets required for our summary.
+ * We can not use GeoTrellis MultibandTile because it requires all bands share a CellType.
+ */
 case class CarbonSensitivityTile(
                                   loss: TreeCoverLoss#ITile,
                                   gain: TreeCoverGain#ITile,
@@ -47,7 +47,10 @@ case class CarbonSensitivityTile(
                                   riverBasins: RiverBasins#OptionalITile,
                                   primaryForest: PrimaryForest#OptionalITile,
                                   lossLegalAmazon: TreeCoverLossLegalAmazon#OptionalITile,
-                                  prodesLegalAmazonExtent2000: ProdesLegalAmazonExtent2000#OptionalITile
+                                  prodesLegalAmazonExtent2000: ProdesLegalAmazonExtent2000#OptionalITile,
+                                  lossFirstYear20012015Mekong: TreeCoverLossFirstYear20012015Mekong#OptionalITile,
+                                  mekongTreeCoverLossExtent: MekongTreeCoverLossExtent#OptionalITile,
+                                  tropicLatitudeExtent: TropicLatitudeExtent#OptionalITile
                                 ) extends CellGrid {
   def cellType: CellType = loss.cellType
 

@@ -144,9 +144,9 @@ object CarbonFluxDF {
   def aggChange(groupByCols: List[String])(df: DataFrame): DataFrame = {
 
     df.groupBy(
-        groupByCols.head,
-        groupByCols.tail ::: List("treecover_loss__year") ::: contextualLayers: _*
-      )
+      groupByCols.head,
+      groupByCols.tail ::: List("treecover_loss__year") ::: contextualLayers: _*
+    )
       .agg(
         sum("treecover_loss__ha") as "treecover_loss__ha",
         sum("aboveground_biomass_loss__Mg") as "aboveground_biomass_loss__Mg",

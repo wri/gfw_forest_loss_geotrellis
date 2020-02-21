@@ -1,5 +1,6 @@
-package org.globalforestwatch.annualupdate
 /*
+package org.globalforestwatch.annualupdate
+
 import geotrellis.contrib.vlm.geotiff._
 import geotrellis.proj4._
 import geotrellis.raster.{RasterExtent, TileLayout, _}

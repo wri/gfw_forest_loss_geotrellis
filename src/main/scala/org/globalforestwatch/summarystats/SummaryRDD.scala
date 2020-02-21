@@ -63,8 +63,8 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
           // Grouping by spatial key allows us to minimize read thrashing from record to record
 
           val groupedByKey
-            : Map[SpatialKey,
-                  Array[(SpatialKey, Feature[Geometry, FEATUREID])]] =
+          : Map[SpatialKey,
+            Array[(SpatialKey, Feature[Geometry, FEATUREID])]] =
             featurePartition.toArray.groupBy {
               case (windowKey, feature) => windowKey
             }
@@ -145,7 +145,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                           kwargs: Map[String, Any]): SUMMARY
 
   def reduceSummarybyKey[FEATUREID <: FeatureId](
-    featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
+                                                  featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
                                                 )(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
     featuresWithSummaries.reduceByKey {
       case (summary1, summary2) =>

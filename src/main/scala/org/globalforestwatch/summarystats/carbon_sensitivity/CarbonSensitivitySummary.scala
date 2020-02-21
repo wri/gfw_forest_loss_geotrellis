@@ -36,12 +36,13 @@ object CarbonSensitivitySummary {
                   ): CarbonSensitivitySummary = {
 
         // Changes the lossYear type to PRODES if the sensitivity analysis is "legal_Amazon_loss"
-        val changeLossSource: Boolean =
-          getAnyMapValue[String](acc.kwargs, "sensitivityType") == "legal_Amazon_loss"
+        val changeLossSource: String =
+          getAnyMapValue[String](acc.kwargs, "sensitivityType")
 
         // This is a pixel by pixel operation
         val lossYear: Integer = {
-          if (changeLossSource) raster.tile.lossLegalAmazon.getData(col, row)
+          if (changeLossSource == "legal_Amazon_loss") raster.tile.lossLegalAmazon.getData(col, row)
+          else if (changeLossSource == "Mekong_loss") raster.tile.lossFirstYear20012015Mekong.getData(col, row)
           else raster.tile.loss.getData(col, row)
         }
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
@@ -100,6 +101,9 @@ object CarbonSensitivitySummary {
         val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
         val lossYearLegalAmazon: Integer = raster.tile.lossLegalAmazon.getData(col, row)
         val prodesLegalAmazonExtent2000: Boolean = raster.tile.prodesLegalAmazonExtent2000.getData(col, row)
+        val treeCoverLossFirstYear20012015Mekong: Integer = raster.tile.lossFirstYear20012015Mekong.getData(col, row)
+        val mekongTreeCoverLossExtent: Boolean = raster.tile.mekongTreeCoverLossExtent.getData(col, row)
+        val tropicLatitudeExtent: Boolean = raster.tile.tropicLatitudeExtent.getData(col, row)
 
         //        val cols: Int = raster.rasterExtent.cols
         //        val rows: Int = raster.rasterExtent.rows
@@ -117,6 +121,12 @@ object CarbonSensitivitySummary {
         val carbonfluxLossYearLegalAmazon: Integer = if (lossYearLegalAmazon != null
           && lossYearLegalAmazon >= 2001 && lossYearLegalAmazon <= 2015) lossYearLegalAmazon else null
         val isLossLegalAmazon: Boolean = carbonfluxLossYearLegalAmazon != null
+
+        val carbonfluxLossYearMekong: Integer = if (treeCoverLossFirstYear20012015Mekong != null
+          && treeCoverLossFirstYear20012015Mekong >= 2001 && treeCoverLossFirstYear20012015Mekong <= 2015)
+          treeCoverLossFirstYear20012015Mekong else null
+        val isLoss20012015Mekong: Boolean = carbonfluxLossYearMekong != null
+
 
         val biomassPixel = biomass * areaHa
         //        val grossAnnualRemovalsCarbonPixel = grossAnnualRemovalsCarbon * areaHa
@@ -175,13 +185,16 @@ object CarbonSensitivitySummary {
               riverBasins,
               primaryForest,
               isLossLegalAmazon,
-              prodesLegalAmazonExtent2000
+              prodesLegalAmazonExtent2000,
+              isLoss20012015Mekong,
+              mekongTreeCoverLossExtent,
+              tropicLatitudeExtent
             )
 
             val summary: CarbonSensitivityData =
               stats.getOrElse(
                 key = pKey,
-                default = CarbonSensitivityData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                default = CarbonSensitivityData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
                 //                  default = CarbonSensitivityData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 //                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
@@ -204,6 +217,7 @@ object CarbonSensitivitySummary {
                 //                summary.carbonEmisYear += totalCarbonEmisYearPixel
               }
               if (isLossLegalAmazon) summary.totalTreecoverLossLegalAmazon += areaHa
+              if (isLoss20012015Mekong) summary.totalTreeCoverLossFirstYear20012015Mekong += areaHa
 
               summary.totalTreecoverExtent2000 += areaHa
               summary.totalBiomass += biomassPixel

@@ -8,8 +8,8 @@ import org.globalforestwatch.layers._
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 /**
-  * @param gridId top left corner, padded from east ex: "10N_010E"
-  */
+ * @param gridId top left corner, padded from east ex: "10N_010E"
+ */
 case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any]) extends GridSources {
 
   val model: String = getAnyMapValue[String](kwargs,"sensitivityType")
@@ -49,8 +49,8 @@ case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any
   val landRights = LandRights(gridId)
   val intactForestLandscapes = IntactForestLandscapes(gridId)
   val plantations = Plantations(gridId)
-  val intactPrimaryForest = IntactPrimaryForest(gridId, model)
-  val peatlandsFlux = PeatlandsFlux(gridId, model)
+  val intactPrimaryForest = IntactPrimaryForest(gridId)
+  val peatlandsFlux = PeatlandsFlux(gridId)
   val forestAgeCategory = ForestAgeCategory(gridId, model)
   val jplTropicsAbovegroundBiomassExtent2000 = JplTropicsAbovegroundBiomassExtent2000(gridId)
   val fiaRegionsUsExtent = FiaRegionsUsExtent(gridId)
@@ -59,6 +59,9 @@ case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any
   val primaryForest = PrimaryForest(gridId)
   val treeCoverLossLegalAmazon = TreeCoverLossLegalAmazon(gridId)
   val prodesLegalAmazonExtent2000 = ProdesLegalAmazonExtent2000(gridId)
+  val treeCoverLossFirstYear20012015Mekong = TreeCoverLossFirstYear20012015Mekong(gridId)
+  val mekongTreeCoverLossExtent = MekongTreeCoverLossExtent(gridId)
+  val tropicLatitudeExtent = TropicLatitudeExtent(gridId)
 
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonSensitivityTile]] = {
 
@@ -117,6 +120,9 @@ case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any
       val primaryForestTile = primaryForest.fetchWindow(window)
       val treeCoverLossLegalAmazonTile = treeCoverLossLegalAmazon.fetchWindow(window)
       val prodesLegalAmazonExtent2000Tile = prodesLegalAmazonExtent2000.fetchWindow(window)
+      val treeCoverLossFirstYear20012015MekongTile = treeCoverLossFirstYear20012015Mekong.fetchWindow(window)
+      val mekongTreeCoverLossExtentTile = mekongTreeCoverLossExtent.fetchWindow(window)
+      val tropicLatitudeExtentTile = tropicLatitudeExtent.fetchWindow(window)
 
       val tile = CarbonSensitivityTile(
         lossTile,
@@ -157,7 +163,10 @@ case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any
         riverBasinsTile,
         primaryForestTile,
         treeCoverLossLegalAmazonTile,
-        prodesLegalAmazonExtent2000Tile
+        prodesLegalAmazonExtent2000Tile,
+        treeCoverLossFirstYear20012015MekongTile,
+        mekongTreeCoverLossExtentTile,
+        tropicLatitudeExtentTile
       )
 
       Raster(tile, window)

@@ -26,7 +26,10 @@ object CarbonSensitivityDF {
     "river_basin__name",
     "is__regional_primary_forest",
     "is__treecover_loss_legal_Amazon_2001-2015",
-    "is__prodes_legal_Amazon_extent_2000"
+    "is__prodes_legal_Amazon_extent_2000",
+    "is__treecover_loss_first_year_Mekong_2001-2015",
+    "is__treecover_loss_extent_Mekong",
+    "is__tropic_latitude_extent"
   )
 
   def unpackValues(df: DataFrame): DataFrame = {
@@ -61,6 +64,10 @@ object CarbonSensitivityDF {
       $"dataGroup.primaryForest" as "is__regional_primary_forest",
       $"dataGroup.isLossLegalAmazon" as "is__treecover_loss_legal_Amazon_2001-2015",
       $"dataGroup.prodesLegalAmazonExtent2000" as "is__prodes_legal_Amazon_extent_2000",
+      $"dataGroup.isLoss20012015Mekong" as "is__treecover_loss_first_year_Mekong_2001-2015",
+      $"dataGroup.mekongTreeCoverLossExtent" as "is__treecover_loss_extent_Mekong",
+      $"dataGroup.tropicLatitudeExtent" as "is__tropic_latitude_extent",
+
       $"data.totalTreecoverLoss" as "treecover_loss__ha",
       $"data.totalBiomassLoss" as "aboveground_biomass_loss__Mg",
       $"data.totalGrossEmissionsCo2eCo2Only" as "gross_emissions_co2e_co2_only__Mg",
@@ -85,7 +92,8 @@ object CarbonSensitivityDF {
       $"data.totalSoil2000" as "soil_carbon_stock_2000__Mg",
       //      $"data.totalCarbon2000" as "total_carbon_stock_2000__Mg",
       $"data.totalJplTropicsAbovegroundBiomassDensity2000" as "jpl_tropics_aboveground_biomass_density_2000__Mg",
-      $"data.totalTreecoverLossLegalAmazon" as "treecover_loss_legal_Amazon__ha"
+      $"data.totalTreecoverLossLegalAmazon" as "treecover_loss_legal_Amazon__ha",
+      $"data.totalTreeCoverLossFirstYear20012015Mekong" as "treecover_loss_first_year_Mekong__ha"
     )
   }
   def aggSummary(groupByCols: List[String])(df: DataFrame): DataFrame = {
@@ -110,7 +118,8 @@ object CarbonSensitivityDF {
         sum("gross_emissions_co2e_non_co2__Mg") as "gross_emissions_co2e_non_co2_2001-2015__Mg",
         sum("gross_emissions_co2e_all_gases__Mg") as "gross_emissions_co2e_all_gases_2001-2015__Mg",
         sum("jpl_tropics_aboveground_biomass_density_2000__Mg") as "jpl_tropics_aboveground_biomass_density_2000__Mg",
-        sum("treecover_loss_legal_Amazon__ha") as "treecover_loss_legal_Amazon_2001-2015__ha"
+        sum("treecover_loss_legal_Amazon__ha") as "treecover_loss_legal_Amazon_2001-2015__ha",
+        sum("treecover_loss_first_year_Mekong__ha") as "treecover_loss_first_year_Mekong_2001-2015__ha"
       )
   }
 
@@ -136,7 +145,8 @@ object CarbonSensitivityDF {
         sum("gross_emissions_co2e_non_co2_2001-2015__Mg") as "gross_emissions_co2e_non_co2_2001-2015__Mg",
         sum("gross_emissions_co2e_all_gases_2001-2015__Mg") as "gross_emissions_co2e_all_gases_2001-2015__Mg",
         sum("jpl_tropics_aboveground_biomass_density_2000__Mg") as "jpl_tropics_aboveground_biomass_density_2000__Mg",
-        sum("treecover_loss_legal_Amazon_2001-2015__ha") as "treecover_loss_legal_Amazon_2001-2015__ha"
+        sum("treecover_loss_legal_Amazon_2001-2015__ha") as "treecover_loss_legal_Amazon_2001-2015__ha",
+        sum("treecover_loss_first_year_Mekong_2001-2015__ha") as "treecover_loss_first_year_Mekong_2001-2015__ha"
       )
   }
 
@@ -158,7 +168,8 @@ object CarbonSensitivityDF {
         //        sum("litter_carbon_stock_in_emissions_year__Mg") as "litter_carbon_stock_in_emissions_year__Mg",
         sum("soil_carbon_stock_in_emissions_year__Mg") as "soil_carbon_stock_in_emissions_year__Mg",
         //        sum("total_carbon_stock_in_emissions_year__Mg") as "total_carbon_stock_in_emissions_year__Mg",
-        sum("treecover_loss_legal_Amazon__ha") as "treecover_loss_legal_Amazon__ha"
+        sum("treecover_loss_legal_Amazon__ha") as "treecover_loss_legal_Amazon__ha",
+        sum("treecover_loss_first_year_Mekong__ha") as "treecover_loss_first_year_Mekong__ha"
       )
   }
 
@@ -192,7 +203,10 @@ object CarbonSensitivityDF {
         max(length($"river_basin__name")).cast("boolean") as "river_basin__name",
         max($"is__regional_primary_forest") as "is__regional_primary_forest",
         max($"is__treecover_loss_legal_Amazon_2001-2015") as "is__treecover_loss_legal_Amazon_2001-2015",
-        max($"is__prodes_legal_Amazon_extent_2000") as "is__prodes_legal_Amazon_extent_2000"
+        max($"is__prodes_legal_Amazon_extent_2000") as "is__prodes_legal_Amazon_extent_2000",
+        max($"is__treecover_loss_first_year_Mekong_2001-2015") as "is__treecover_loss_first_year_Mekong_2001-2015",
+        max($"is__treecover_loss_extent_Mekong") as "is__treecover_loss_extent_Mekong",
+        max($"is__tropic_latitude_extent") as "is__tropic_latitude_extent"
       )
   }
 
@@ -221,7 +235,10 @@ object CarbonSensitivityDF {
         max($"river_basin__name") as "river_basin__name",
         max($"is__regional_primary_forest") as "is__regional_primary_forest",
         max($"is__treecover_loss_legal_Amazon_2001-2015") as "is__treecover_loss_legal_Amazon_2001-2015",
-        max($"is__prodes_legal_Amazon_extent_2000") as "is__prodes_legal_Amazon_extent_2000"
+        max($"is__prodes_legal_Amazon_extent_2000") as "is__prodes_legal_Amazon_extent_2000",
+        max($"is__treecover_loss_first_year_Mekong_2001-2015") as "is__treecover_loss_first_year_Mekong_2001-2015",
+        max($"is__treecover_loss_extent_Mekong") as "is__treecover_loss_extent_Mekong",
+        max($"is__tropic_latitude_extent") as "is__tropic_latitude_extent"
       )
   }
 }

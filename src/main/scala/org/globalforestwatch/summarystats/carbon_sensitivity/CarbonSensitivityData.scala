@@ -3,10 +3,10 @@ package org.globalforestwatch.summarystats.carbon_sensitivity
 import cats.Semigroup
 
 /** Summary data per class
-  *
-  * Note: This case class contains mutable values
-  *
-  */
+ *
+ * Note: This case class contains mutable values
+ *
+ */
 case class CarbonSensitivityData(var totalTreecoverLoss: Double,
                                  var totalBiomassLoss: Double,
                                  var totalGrossEmissionsCo2eCo2Only: Double,
@@ -34,7 +34,8 @@ case class CarbonSensitivityData(var totalTreecoverLoss: Double,
                                  //                          var totalGrossEmissionsCo2eNoneCo2: Double,
                                  //                          var totalGrossEmissionsCo2e: Double,
                                  var totalJplTropicsAbovegroundBiomassDensity2000: Double,
-                                 var totalTreecoverLossLegalAmazon: Double
+                                 var totalTreecoverLossLegalAmazon: Double,
+                                 var totalTreeCoverLossFirstYear20012015Mekong: Double
                                 ) {
   def merge(other: CarbonSensitivityData): CarbonSensitivityData = {
     CarbonSensitivityData(
@@ -65,7 +66,8 @@ case class CarbonSensitivityData(var totalTreecoverLoss: Double,
       //      totalGrossEmissionsCo2eNoneCo2 + other.totalGrossEmissionsCo2eNoneCo2,
       //      totalGrossEmissionsCo2e + other.totalGrossEmissionsCo2e,
       totalJplTropicsAbovegroundBiomassDensity2000 + other.totalJplTropicsAbovegroundBiomassDensity2000,
-      totalTreecoverLossLegalAmazon + other.totalTreecoverLossLegalAmazon
+      totalTreecoverLossLegalAmazon + other.totalTreecoverLossLegalAmazon,
+      totalTreeCoverLossFirstYear20012015Mekong + other.totalTreeCoverLossFirstYear20012015Mekong
     )
   }
 }

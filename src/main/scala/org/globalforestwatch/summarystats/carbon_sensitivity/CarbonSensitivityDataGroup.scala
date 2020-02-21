@@ -1,3 +1,4 @@
+
 package org.globalforestwatch.summarystats.carbon_sensitivity
 
 case class CarbonSensitivityDataGroup(lossYear: Integer,
@@ -20,5 +21,8 @@ case class CarbonSensitivityDataGroup(lossYear: Integer,
                                       riverBasins: String,
                                       primaryForest: Boolean,
                                       isLossLegalAmazon: Boolean,
-                                      prodesLegalAmazonExtent2000: Boolean
+                                      prodesLegalAmazonExtent2000: Boolean,
+                                      isLoss20012015Mekong: Boolean,
+                                      mekongTreeCoverLossExtent: Boolean,
+                                      tropicLatitudeExtent: Boolean
                                      )

@@ -1,3 +1,4 @@
+/*
 package org.globalforestwatch.annualupdate
 
 import geotrellis.contrib.polygonal._
@@ -5,7 +6,7 @@ import geotrellis.contrib.vlm.geotiff._
 import geotrellis.raster._
 import geotrellis.vector.Extent
 import org.scalatest._
-/*
+
 class TreeLossSummarySpec extends FunSpec with Matchers {
 
   val rs = GeoTiffRasterSource("s3://gfw2-data/forest_change/hansen_2018/50N_080W.tif")
