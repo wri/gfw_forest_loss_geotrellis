@@ -17,6 +17,7 @@ object GladAlertsAnalysis {
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
+
     import spark.implicits._
     val summaryRDD: RDD[(FeatureId, GladAlertsSummary)] =
       GladAlertsRDD(featureRDD, GladAlertsGrid.blockTileGrid, part, kwargs)
