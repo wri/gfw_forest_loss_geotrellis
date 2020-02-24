@@ -2,7 +2,7 @@ package org.globalforestwatch.layers
 
 case class RSPO(grid: String) extends StringLayer with OptionalILayer {
 
-  val uri: String = s"$basePath/rspo/$grid.tif"
+  val uri: String = s"$basePath/rspo/v20200114/$grid.tif"
 
   def lookup(value: Int): String = value match {
     case 1 => "Certified"
