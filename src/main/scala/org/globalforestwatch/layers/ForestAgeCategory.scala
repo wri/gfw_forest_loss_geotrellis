@@ -2,7 +2,7 @@ package org.globalforestwatch.layers
 
 case class ForestAgeCategory(grid: String, model: String="standard") extends StringLayer with OptionalILayer {
 
-  val uri: String = s"$basePath/forest_age_category/$model/$grid.tif"
+  val uri: String = s"$basePath/forest_age_category/standard/$grid.tif"
   override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {

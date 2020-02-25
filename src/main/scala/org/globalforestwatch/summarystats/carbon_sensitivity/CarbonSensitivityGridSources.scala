@@ -51,7 +51,7 @@ case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any
   val plantations = Plantations(gridId)
   val intactPrimaryForest = IntactPrimaryForest(gridId)
   val peatlandsFlux = PeatlandsFlux(gridId)
-  val forestAgeCategory = ForestAgeCategory(gridId, model)
+  val forestAgeCategory = ForestAgeCategory(gridId)
   val jplTropicsAbovegroundBiomassExtent2000 = JplTropicsAbovegroundBiomassExtent2000(gridId)
   val fiaRegionsUsExtent = FiaRegionsUsExtent(gridId)
   val brazilBiomes = BrazilBiomes(gridId)
