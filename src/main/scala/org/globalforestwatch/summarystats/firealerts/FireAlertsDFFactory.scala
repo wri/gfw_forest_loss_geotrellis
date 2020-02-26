@@ -2,108 +2,185 @@ package org.globalforestwatch.summarystats.firealerts
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{FireAlertFeatureId, GadmFeatureId, SimpleFeatureId, WdpaFeatureId, GeostoreFeatureId}
+import org.globalforestwatch.features._
+import org.globalforestwatch.util.Util.getAnyMapValue
+
+import scala.collection.immutable
 
 case class FireAlertsDFFactory(
                                 featureType: String,
-                                summaryRDD: RDD[(FireAlertFeatureId, FireAlertsSummary)],
-                                spark: SparkSession
+                                summaryRDD: RDD[(FeatureId, FireAlertsSummary)],
+                                spark: SparkSession,
+                                kwargs: Map[String, Any]
 ) {
+  val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
 
   import spark.implicits._
 
   def getDataFrame: DataFrame = {
-    featureType match {
-      case "gadm"    => getGadmDataFrame
-      case "feature" => getFeatureDataFrame
-      case "wdpa" => getWdpaDataFrame
-      case "geostore" => getGeostoreDataFrame
+    fireAlertType match {
+      case "viirs" => featureType match {
+        case "gadm" => getViirsGadmDataFrame
+        case "wdpa" => getViirsWdpaDataFrame
+        case "geostore" => getViirsGeostoreDataFrame
+        case "simple" => getViirsSimpleDataFrame
+        case _ =>
+          throw new IllegalArgumentException("Not a valid feature type")
+      }
+      case "modis" => featureType match {
+        case "gadm" => getModisGadmDataFrame
+        case "wdpa" => getModisWdpaDataFrame
+        case "geostore" => getModisGeostoreDataFrame
+        case "simple" => getModisSimpleDataFrame
+        case _ =>
+          throw new IllegalArgumentException("Not a valid feature type")
+      }
       case _ =>
-        throw new IllegalArgumentException("Not a valid FeatureId")
+        throw new IllegalArgumentException("Not a valid fire alert type")
     }
   }
 
-  private def getGadmDataFrame: DataFrame = {
+  def getViirsGadmDataFrame: DataFrame = {
     summaryRDD
       .flatMap {
         case (id, summary) =>
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case fireId: FireAlertFeatureId =>
-                  fireId.feature match {
-                    case gadmId: GadmFeatureId =>
-                      FireAlertsRowGadm(gadmId, fireId.alertDate, dataGroup, data)
-                    case _ =>
-                      throw new IllegalArgumentException("Not a supported feature ID type for fire alerts")
-                  }
+                case CombinedFeatureId(viirsId: ViirsFireAlertFeatureId, gadmId: GadmFeatureId) =>
+                  FireAlertsRowViirsGadm(viirsId, gadmId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a valid Fire Alert ID")
               }
             }
           }
       }
-      .toDF("id", "alertDate", "data_group", "data")
+      .toDF("fireId", "featureId", "data_group", "data")
   }
 
-  private def getWdpaDataFrame: DataFrame = {
+  def getViirsWdpaDataFrame: DataFrame = {
     summaryRDD
       .flatMap {
         case (id, summary) =>
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case fireId: FireAlertFeatureId =>
-                  fireId.feature match {
-                    case wdpaId: WdpaFeatureId =>
-                      FireAlertsRowWdpa(wdpaId, fireId.alertDate, dataGroup, data)
-                    case _ =>
-                      throw new IllegalArgumentException("Not a supported feature ID type for fire alerts")
-                  }
+                case CombinedFeatureId(viirsId: ViirsFireAlertFeatureId, wdpaId: WdpaFeatureId) =>
+                  FireAlertsRowViirsWdpa(viirsId, wdpaId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a valid Fire Alert ID")
               }
             }
           }
       }
-      .toDF("id", "alertDate", "data_group", "data")
+      .toDF("fireId", "featureId", "data_group", "data")
   }
 
-  private def getFeatureDataFrame: DataFrame = {
+  def getViirsGeostoreDataFrame: DataFrame = {
     summaryRDD
       .flatMap {
         case (id, summary) =>
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case fireId: FireAlertFeatureId =>
-                  fireId.feature match {
-                    case featureId: SimpleFeatureId =>
-                      FireAlertsRowSimple(featureId, fireId.alertDate, dataGroup, data)
-                    case _ =>
-                      throw new IllegalArgumentException("Not a supported feature ID type for fire alerts")
-                  }
+                case CombinedFeatureId(viirsId: ViirsFireAlertFeatureId, geostoreId: GeostoreFeatureId) =>
+                  FireAlertsRowViirsGeostore(viirsId, geostoreId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a valid Fire Alert ID")
               }
             }
           }
       }
-      .toDF("id", "alertDate", "data_group", "data")
+      .toDF("fireId", "featureId", "data_group", "data")
   }
 
-  private def getGeostoreDataFrame: DataFrame = {
+  def getViirsSimpleDataFrame: DataFrame = {
     summaryRDD
       .flatMap {
         case (id, summary) =>
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case fireId: FireAlertFeatureId =>
-                  fireId.feature match {
-                    case geostoreId: GeostoreFeatureId =>
-                      FireAlertsRowGeostore(geostoreId, fireId.alertDate, dataGroup, data)
-                    case _ =>
-                      throw new IllegalArgumentException("Not a supported feature ID type for fire alerts")
-                  }
+                case CombinedFeatureId(viirsId: ViirsFireAlertFeatureId, simpleId: SimpleFeatureId) =>
+                  FireAlertsRowViirsSimple(viirsId, simpleId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a valid Fire Alert ID")
               }
             }
           }
       }
-      .toDF("id", "alertDate", "data_group", "data")
+      .toDF("fireId", "featureId", "data_group", "data")
+  }
+
+  def getModisGadmDataFrame: DataFrame = {
+    summaryRDD
+      .flatMap {
+        case (id, summary) =>
+          summary.stats.map {
+            case (dataGroup, data) => {
+              id match {
+                case CombinedFeatureId(modisId: ModisFireAlertFeatureId, gadmId: GadmFeatureId) =>
+                  FireAlertsRowModisGadm(modisId, gadmId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a valid Fire Alert ID")
+              }
+            }
+          }
+      }
+      .toDF("fireId", "featureId", "data_group", "data")
+  }
+
+  def getModisWdpaDataFrame: DataFrame = {
+    summaryRDD
+      .flatMap {
+        case (id, summary) =>
+          summary.stats.map {
+            case (dataGroup, data) => {
+              id match {
+                case CombinedFeatureId(modisId: ModisFireAlertFeatureId, wdpaId: WdpaFeatureId) =>
+                  FireAlertsRowModisWdpa(modisId, wdpaId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a valid Fire Alert ID")
+              }
+            }
+          }
+      }
+      .toDF("fireId", "featureId", "data_group", "data")
+  }
+
+  def getModisGeostoreDataFrame: DataFrame = {
+    summaryRDD
+      .flatMap {
+        case (id, summary) =>
+          summary.stats.map {
+            case (dataGroup, data) => {
+              id match {
+                case CombinedFeatureId(modisId: ModisFireAlertFeatureId, geostoreId: GeostoreFeatureId) =>
+                  FireAlertsRowModisGeostore(modisId, geostoreId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a valid Fire Alert ID")
+              }
+            }
+          }
+      }
+      .toDF("fireId", "featureId", "data_group", "data")
+  }
+
+  def getModisSimpleDataFrame: DataFrame = {
+    summaryRDD
+      .flatMap {
+        case (id, summary) =>
+          summary.stats.map {
+            case (dataGroup, data) => {
+              id match {
+                case CombinedFeatureId(modisId: ModisFireAlertFeatureId, simpleId: SimpleFeatureId) =>
+                  FireAlertsRowModisSimple(modisId, simpleId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a valid Fire Alert ID")
+              }
+            }
+          }
+      }
+      .toDF("fireId", "featureId", "data_group", "data")
   }
 }

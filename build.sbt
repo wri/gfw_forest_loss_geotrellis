@@ -125,6 +125,7 @@ assemblyOption in assembly := (assemblyOption in assembly).value.copy(appendCont
 assemblyMergeStrategy in assembly := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat
+  // both GeoSpark and Geotrellis bring in this library, need to use GeoSpark version
   case PathList("org", "geotools", xs @ _*) => MergeStrategy.last
   case PathList("META-INF", xs@_*) =>
     xs match {

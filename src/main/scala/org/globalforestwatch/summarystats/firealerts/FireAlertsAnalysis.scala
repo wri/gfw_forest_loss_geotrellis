@@ -4,10 +4,10 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import geotrellis.vector.Feature
-import org.apache.spark.{HashPartitioner}
+import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, FeatureRDD, FireAlertFeature, FireAlertFeatureId, GadmFeatureId}
+import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, FireAlertFeature, ViirsFireAlertFeatureId}
 import org.globalforestwatch.summarystats.firealerts.FireAlertsRDD.SUMMARY
 import org.globalforestwatch.util.Util._
 import org.datasyslab.geospark.spatialRDD.{PointRDD, SpatialRDD}
@@ -32,8 +32,6 @@ object FireAlertsAnalysis {
 
     import spark.implicits._
 
-
-    //val fireAlertFeatureRDD = getFireAlertFeatureRDD(featureRDD, FireAlertsGrid.blockTileGrid, part, spark, kwargs)
     val fireAlertFeatureRDD = getFireAlertFeatureRDDGeoSpark(spark, featureObj, kwargs)
 
     val inputPartitionMultiplier = 64
@@ -41,13 +39,13 @@ object FireAlertsAnalysis {
       partitions = fireAlertFeatureRDD.getNumPartitions * inputPartitionMultiplier
     )
 
-    val summaryRDD: RDD[(FireAlertFeatureId, FireAlertsSummary)] =
+    val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
       FireAlertsRDD(fireAlertFeatureRDD, FireAlertsGrid.blockTileGrid, part, kwargs)
 
     val summaryDF =
-      FireAlertsDFFactory(featureType, summaryRDD, spark).getDataFrame
+      FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
 
-    summaryDF.repartition(partitionExprs = $"id")
+    summaryDF.repartition(partitionExprs = $"featureId")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
       "/fireAlerts_" + DateTimeFormatter
@@ -64,11 +62,13 @@ object FireAlertsAnalysis {
 
   def getFireAlertFeatureRDDGeoSpark(spark: SparkSession,
                                      featureObj: org.globalforestwatch.features.Feature,
-                             kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FeatureId], ord: Ordering[SUMMARY] = null): RDD[Feature[geotrellis.vector.Geometry, FireAlertFeatureId]]  = {
+                             kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FeatureId], ord: Ordering[SUMMARY] = null): RDD[Feature[geotrellis.vector.Geometry, FeatureId]]  = {
     val fireSrcUris: NonEmptyList[String] = getAnyMapValue[Option[NonEmptyList[String]]](kwargs, "fireAlertSource") match {
       case None => throw new java.lang.IllegalAccessException("fire_alert_source parameter required for fire alerts analysis")
       case Some(s: NonEmptyList[String]) => s
     }
+
+    val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
 
     val featureUris = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
@@ -99,7 +99,7 @@ object FireAlertsAnalysis {
 
         points.asScala.map((pt: Point) => {
           val fireFeatureData = pt.getUserData.asInstanceOf[String].split('\t')
-          FireAlertFeature.getFireAlertFeature(pt.getX, pt.getY, fireFeatureData, featureId)
+          FireAlertFeature.getFireAlertFeature(fireAlertType, pt.getX, pt.getY, fireFeatureData, featureId)
         })
     }
   }

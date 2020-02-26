@@ -30,8 +30,6 @@ case class FireAlertsGridSources(gridId: String) extends GridSources {
   val peruForestConcessions = PeruForestConcessions(gridId)
   val protectedAreas = ProtectedAreas(gridId)
 
-  // TODO need Indonesia peat and concessions
-
   def readWindow(window: Extent): Either[Throwable, Raster[FireAlertsTile]] = {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
       val primaryForestTile = primaryForest.fetchWindow(window)
