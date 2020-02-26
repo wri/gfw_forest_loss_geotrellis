@@ -165,7 +165,7 @@ For local testing input should be limited with `--limit` flag to minimize the ti
 ```sbt
 sbt:geotrellis-wri> test:runMain org.globalforestwatch.summarystats.SummaryMain --features file:/Users/input/ten-by-ten-gadm36/wdpa__10N_010E.tsv --output file:/User/out/summary --limit 10
 ```
-
+    
 ### EMR
 
 Before running review `sbtlighter` configuration in `build.sbt`, `reload` SBT session if modified.
