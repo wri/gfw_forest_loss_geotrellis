@@ -10,7 +10,7 @@ object FeatureDF {
             filters: Map[String, Any],
             spark: SparkSession): DataFrame =
     spark.read
-      .options(Map("header" -> "true", "delimiter" -> "\t"))
+      .options(Map("header" -> "true", "delimiter" -> "\t", "escape" -> "\""))
       .csv(input.toList: _*)
       .transform(featureObj.filter(filters))
 
@@ -27,7 +27,7 @@ object FeatureDF {
     df.createOrReplaceTempView(viewName)
     val spatialDf = spark.sql(
       s"""
-         |SELECT ST_Point(CAST($lonField AS Decimal(24,20)),CAST($latField AS Decimal(24,20))) AS geometry, *
+         |SELECT ST_Point(CAST($lonField AS Decimal(24,10)),CAST($latField AS Decimal(24,10))) AS geometry, *
          |FROM $viewName
       """.stripMargin)
 
@@ -43,14 +43,15 @@ object FeatureDF {
 
     val viewName = featureObj.getClass.getSimpleName.dropRight(1).toLowerCase
     df.createOrReplaceTempView(viewName)
+
+    // Create Geometry field, reducing precision of coordinates and filtering out
+    // any empty polygonss
     val spatialDf = spark.sql(
       s"""
-         |SELECT ST_GeomFromWKB($wkbField) AS geometry, *
+         |SELECT ST_PrecisionReduce(ST_GeomFromWKB($wkbField), 13) AS geometry, *
          |FROM $viewName
+         |WHERE geom != '0106000020E610000000000000'
       """.stripMargin)
-
-    //val spatialRDD = new SpatialRDD[Geometry]
-    //spatialRDD.rawSpatialRDD = Adapter.toRdd(spatialDf)
 
     spatialDf
   }

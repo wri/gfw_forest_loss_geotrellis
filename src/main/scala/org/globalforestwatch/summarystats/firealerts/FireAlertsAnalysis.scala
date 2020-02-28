@@ -81,11 +81,11 @@ object FireAlertsAnalysis {
     featureRDD.rawSpatialRDD = Adapter.toJavaRdd(featureDF)
 
     val considerBoundaryIntersection = false // Only return geometries fully covered by each query window in queryWindowRDD
-    fireAlertRDD.analyze()
+    featureRDD.analyze()
 
-    fireAlertRDD.spatialPartitioning(GridType.QUADTREE)
-    featureRDD.spatialPartitioning(fireAlertRDD.getPartitioner)
-
+    featureRDD.spatialPartitioning(GridType.QUADTREE)
+    fireAlertRDD.spatialPartitioning(featureRDD.getPartitioner)
+    
     val buildOnSpatialPartitionedRDD = true // Set to TRUE only if run join query
     featureRDD.buildIndex(IndexType.QUADTREE, buildOnSpatialPartitionedRDD)
 
