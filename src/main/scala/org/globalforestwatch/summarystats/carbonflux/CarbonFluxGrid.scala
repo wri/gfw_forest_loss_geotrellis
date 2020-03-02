@@ -1,9 +1,9 @@
 package org.globalforestwatch.summarystats.carbonflux
 
 import geotrellis.vector.Extent
-import org.globalforestwatch.grids.TenByTenGrid
+import org.globalforestwatch.grids.TenByTen30mGrid
 
-object CarbonFluxGrid extends TenByTenGrid[CarbonFluxGridSources] {
+object CarbonFluxGrid extends TenByTen30mGrid[CarbonFluxGridSources] {
 
   val gridExtent: Extent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
 

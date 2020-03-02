@@ -1,10 +1,12 @@
 package org.globalforestwatch.summarystats.firealerts
 
-import org.globalforestwatch.grids.{Grid, GridSources}
+import geotrellis.vector.Extent
+import org.globalforestwatch.grids.EightByEight375mGrid
 
-trait ViirsGrid[T <: GridSources] extends Grid[T] {
-  val pixelSize = (90.0 / 27008.0)
-  val gridSize = 90
-  val rowCount = 10
-  val blockSize = 128
+object ViirsGrid extends EightByEight375mGrid[FireAlertsGridSources] {
+
+  val gridExtent: Extent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
+
+  def getSources(gridId: String, kwargs: Map[String, Any]): FireAlertsGridSources = FireAlertsGridSources.getCachedSources(gridId)
+
 }

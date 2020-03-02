@@ -11,9 +11,9 @@ import org.globalforestwatch.layers._
   */
 case class FireAlertsGridSources(gridId: String) extends GridSources {
   val primaryForest = PrimaryForest(gridId)
-  val keyBiodiversityAreas = KeyBiodiversityAreas(gridId)
+  val keyBiodiversityAreas = KeyBiodiversityAreas(gridId) // not found
   val aze = Aze(gridId)
-  val landmark = Landmark(gridId)
+  val landmark = Landmark(gridId) // not found
   val plantations = Plantations(gridId)
   val mining = Mining(gridId)
   val oilPalm = OilPalm(gridId)

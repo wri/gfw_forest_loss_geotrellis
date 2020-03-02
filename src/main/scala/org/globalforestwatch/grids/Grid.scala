@@ -102,6 +102,7 @@ trait Grid[T <: GridSources] {
 
   def getRasterSource(windowExtent: Extent, kwargs:  Map[String, Any]): T = {
     val gridId = GridId.pointGridId(windowExtent.center, gridSize)
-    checkSources(gridId, windowExtent: Extent, kwargs:  Map[String, Any])
+    val gridPath = f"$gridSize/$rowCount/$gridId"
+    checkSources(gridPath, windowExtent: Extent, kwargs:  Map[String, Any])
   }
 }

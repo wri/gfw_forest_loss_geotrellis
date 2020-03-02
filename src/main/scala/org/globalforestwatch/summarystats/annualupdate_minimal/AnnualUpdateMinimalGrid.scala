@@ -1,9 +1,9 @@
 package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import geotrellis.vector.Extent
-import org.globalforestwatch.grids.TenByTenGrid
+import org.globalforestwatch.grids.TenByTen30mGrid
 
-object AnnualUpdateMinimalGrid extends TenByTenGrid[AnnualUpdateMinimalGridSources] {
+object AnnualUpdateMinimalGrid extends TenByTen30mGrid[AnnualUpdateMinimalGridSources] {
 
   val gridExtent: Extent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
 

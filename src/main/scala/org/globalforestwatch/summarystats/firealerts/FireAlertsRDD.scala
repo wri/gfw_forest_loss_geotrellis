@@ -6,6 +6,7 @@ import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
 import org.globalforestwatch.summarystats.SummaryRDD
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 
 object FireAlertsRDD extends SummaryRDD {
@@ -15,8 +16,13 @@ object FireAlertsRDD extends SummaryRDD {
   type TILE = FireAlertsTile
 
   def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES] = {
+    val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
+
     Either.catchNonFatal {
-      FireAlertsGrid.getRasterSource(window, kwargs)
+      fireAlertType match {
+        case "viirs" => ViirsGrid.getRasterSource(window, kwargs)
+        case "modis" => ModisGrid.getRasterSource(window, kwargs)
+      }
     }
   }
 

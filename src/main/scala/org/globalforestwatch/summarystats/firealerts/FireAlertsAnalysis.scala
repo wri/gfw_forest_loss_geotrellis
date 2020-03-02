@@ -31,16 +31,21 @@ object FireAlertsAnalysis {
             kwargs: Map[String, Any]): Unit = {
 
     import spark.implicits._
-
-    val fireAlertFeatureRDD = getFireAlertFeatureRDDGeoSpark(spark, featureObj, kwargs)
+    val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
+    val fireAlertFeatureRDD = getFireAlertFeatureRDD(spark, featureObj, fireAlertType, kwargs)
 
     val inputPartitionMultiplier = 64
     val part = new HashPartitioner(
       partitions = fireAlertFeatureRDD.getNumPartitions * inputPartitionMultiplier
     )
 
+    val layoutDefinition = fireAlertType match {
+      case "viirs" => ViirsGrid.blockTileGrid
+      case "modis" => ModisGrid.blockTileGrid
+    }
+
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
-      FireAlertsRDD(fireAlertFeatureRDD, FireAlertsGrid.blockTileGrid, part, kwargs)
+      FireAlertsRDD(fireAlertFeatureRDD, layoutDefinition, part, kwargs)
 
     val summaryDF =
       FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
@@ -60,15 +65,14 @@ object FireAlertsAnalysis {
     )
   }
 
-  def getFireAlertFeatureRDDGeoSpark(spark: SparkSession,
-                                     featureObj: org.globalforestwatch.features.Feature,
+  def getFireAlertFeatureRDD(spark: SparkSession,
+                             featureObj: org.globalforestwatch.features.Feature,
+                             fireAlertType: String,
                              kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FeatureId], ord: Ordering[SUMMARY] = null): RDD[Feature[geotrellis.vector.Geometry, FeatureId]]  = {
     val fireSrcUris: NonEmptyList[String] = getAnyMapValue[Option[NonEmptyList[String]]](kwargs, "fireAlertSource") match {
       case None => throw new java.lang.IllegalAccessException("fire_alert_source parameter required for fire alerts analysis")
       case Some(s: NonEmptyList[String]) => s
     }
-
-    val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
 
     val featureUris = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 

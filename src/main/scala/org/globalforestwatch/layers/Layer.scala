@@ -22,7 +22,7 @@ trait Layer {
   val uri: String
   val internalNoDataValue: A
   val externalNoDataValue: B
-  val basePath: String = s"s3://gfw-files/2018_update"
+  val basePath: String = s"s3://gfw-data-lake"
 
   def lookup(a: A): B
 
