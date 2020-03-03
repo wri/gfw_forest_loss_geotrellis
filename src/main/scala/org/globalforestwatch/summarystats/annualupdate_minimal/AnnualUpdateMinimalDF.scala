@@ -15,6 +15,7 @@ object AnnualUpdateMinimalDF {
     "is__mangroves_1996",
     "is__mangroves_2016",
     "intact_forest_landscape__year",
+    "is__regional_primary_forest",
     "is__tiger_conservation_landscape",
     "is__landmark",
     "is__gfw_land_right",
