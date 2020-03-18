@@ -85,14 +85,15 @@ object FireAlertsAnalysis {
     featureRDD.rawSpatialRDD = Adapter.toJavaRdd(featureDF)
 
     val considerBoundaryIntersection = false // Only return geometries fully covered by each query window in queryWindowRDD
-    featureRDD.analyze()
 
-    featureRDD.spatialPartitioning(GridType.QUADTREE)
-    fireAlertRDD.spatialPartitioning(featureRDD.getPartitioner)
-    
+    fireAlertRDD.analyze()
+
+    fireAlertRDD.spatialPartitioning(GridType.QUADTREE)
+    featureRDD.spatialPartitioning(fireAlertRDD.getPartitioner)
+
     val buildOnSpatialPartitionedRDD = true // Set to TRUE only if run join query
-    featureRDD.buildIndex(IndexType.QUADTREE, buildOnSpatialPartitionedRDD)
-
+    fireAlertRDD.buildIndex(IndexType.QUADTREE, buildOnSpatialPartitionedRDD)
+    
     val joinResultRDD: org.apache.spark.api.java.JavaPairRDD[Geometry, HashSet[Point]] = JoinQuery.SpatialJoinQuery(fireAlertRDD, featureRDD, true, considerBoundaryIntersection)
     val joinResultScalaRDD: RDD[(Geometry, HashSet[Point])] = org.apache.spark.api.java.JavaPairRDD.toRDD(joinResultRDD)
 

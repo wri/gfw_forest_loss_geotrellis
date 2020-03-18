@@ -56,7 +56,7 @@ object FireAlertsExport extends SummaryExport {
 
     gadmDF.cache()
     gadmDF
-      .coalesce(1)
+      .coalesce(300)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/all")
@@ -104,7 +104,7 @@ object FireAlertsExport extends SummaryExport {
       .transform(FireAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
 
     adm2DailyDF
-      .coalesce(1)
+      .coalesce(130)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/daily_alerts")
@@ -113,7 +113,7 @@ object FireAlertsExport extends SummaryExport {
       .transform(FireAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2")))
 
     adm2DF
-      .coalesce(1)
+      .coalesce(100)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/weekly_alerts")
@@ -122,7 +122,7 @@ object FireAlertsExport extends SummaryExport {
       .transform(FireAlertsDF.aggChangeWeekly2(List("iso", "adm1")))
 
     adm1DF
-      .coalesce(1)
+      .coalesce(75)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/weekly_alerts")
@@ -133,7 +133,7 @@ object FireAlertsExport extends SummaryExport {
 
 
     isoDF
-      .coalesce(1)
+      .coalesce(50)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/weekly_alerts")
@@ -239,7 +239,7 @@ object FireAlertsExport extends SummaryExport {
     )
 
     df.cache()
-    df.coalesce(1)
+    df.coalesce(200)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/all")
@@ -253,13 +253,13 @@ object FireAlertsExport extends SummaryExport {
     }
 
     df.transform(FireAlertsDF.aggChangeDaily(cols, wdpa = wdpa))
-      .coalesce(1)
+      .coalesce(100)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
 
     df.transform(FireAlertsDF.aggChangeWeekly(cols, wdpa = wdpa))
-      .coalesce(1)
+      .coalesce(75)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/weekly_alerts")
