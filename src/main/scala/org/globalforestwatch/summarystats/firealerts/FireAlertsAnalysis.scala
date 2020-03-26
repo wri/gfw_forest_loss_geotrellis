@@ -53,7 +53,7 @@ object FireAlertsAnalysis {
     summaryDF.repartition(partitionExprs = $"featureId")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      "/fireAlerts_" + DateTimeFormatter
+      "/firealerts_" + DateTimeFormatter
       .ofPattern("yyyyMMdd_HHmm")
       .format(LocalDateTime.now)
 

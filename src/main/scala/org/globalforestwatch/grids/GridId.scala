@@ -14,7 +14,7 @@ object GridId {
     val row = math.ceil(point.y / gridSize).toInt * gridSize
     val lat: String = if (row >= 0) f"$row%02dN" else f"${-row}%02dS"
 
-    s"i${lat}_$long"
+    s"${lat}_$long"
   }
 
   def toGladGridId(grid: String): String = {

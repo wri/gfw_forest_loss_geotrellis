@@ -1,7 +1,9 @@
 package org.globalforestwatch.layers
 
-case class DeadwoodCarbonEmisYear(grid: String, model: String="standard")
+import org.globalforestwatch.grids.GridTile
+
+case class DeadwoodCarbonEmisYear(gridTile: GridTile, model: String="standard")
   extends FloatLayer
     with OptionalFLayer {
-  val uri: String = s"$basePath/deadwood_carbon_emis_year/$model/$grid.tif"
+  val uri: String = s"$basePath/gfw_deadwood_carbon_stock_in_emissions_year/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/Mg/geotiff/${gridTile.tileId}.tif"
 }

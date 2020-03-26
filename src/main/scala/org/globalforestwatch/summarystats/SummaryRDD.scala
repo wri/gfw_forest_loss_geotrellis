@@ -45,7 +45,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
           (key, feature)
         }
       }
-      .partitionBy(partitioner)
+      //.partitionBy(partitioner)
 
     /* Here we're going to work with the features one partition at a time.
      * We're going to use the tile key from windowLayout to read pixels from appropriate raster.

@@ -1,8 +1,10 @@
 package org.globalforestwatch.layers
 
-case class FiaRegionsUsExtent(grid: String) extends StringLayer with OptionalILayer {
+import org.globalforestwatch.grids.GridTile
 
-  val uri: String = s"$basePath/FIA_regions_US_extent/$grid.tif"
+case class FiaRegionsUsExtent(gridTile: GridTile) extends StringLayer with OptionalILayer {
+  // TODO
+  val uri: String = s"$basePath/FIA_regions_US_extent/v20190816/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
   override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {

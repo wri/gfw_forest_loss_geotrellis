@@ -3,32 +3,32 @@ package org.globalforestwatch.summarystats.firealerts
 import cats.implicits._
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
-import org.globalforestwatch.grids.GridSources
+import org.globalforestwatch.grids.{GridSources, GridTile}
 import org.globalforestwatch.layers._
 
 /**
-  * @param gridId top left corner, padded from east ex: "10N_010E"
+  * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
-case class FireAlertsGridSources(gridId: String) extends GridSources {
-  val primaryForest = PrimaryForest(gridId)
-  val keyBiodiversityAreas = KeyBiodiversityAreas(gridId) // not found
-  val aze = Aze(gridId)
-  val landmark = Landmark(gridId) // not found
-  val plantations = Plantations(gridId)
-  val mining = Mining(gridId)
-  val oilPalm = OilPalm(gridId)
-  val peatlands = Peatlands(gridId)
-  val rspo = RSPO(gridId)
-  val woodFiber = WoodFiber(gridId)
-  val indonesiaForestMoratorium = IndonesiaForestMoratorium(gridId)
-  val indonesiaForestArea = IndonesiaForestArea(gridId)
-  val oilGas = OilGas(gridId)
-  val logging = Logging(gridId)
-  val braBiomes = BrazilBiomes(gridId)
-  val mangroves2016 = Mangroves2016(gridId)
-  val intactForestLandscapes2016 = IntactForestLandscapes2016(gridId)
-  val peruForestConcessions = PeruForestConcessions(gridId)
-  val protectedAreas = ProtectedAreas(gridId)
+case class FireAlertsGridSources(gridTile: GridTile) extends GridSources {
+  val primaryForest = PrimaryForest(gridTile)
+  val keyBiodiversityAreas = KeyBiodiversityAreas(gridTile) // not found
+  val aze = Aze(gridTile)
+  val landmark = Landmark(gridTile) // not found
+  val plantations = Plantations(gridTile)
+  val mining = Mining(gridTile)
+  val oilPalm = OilPalm(gridTile)
+  val peatlands = Peatlands(gridTile)
+  val rspo = RSPO(gridTile)
+  val woodFiber = WoodFiber(gridTile)
+  val indonesiaForestMoratorium = IndonesiaForestMoratorium(gridTile)
+  val indonesiaForestArea = IndonesiaForestArea(gridTile)
+  val oilGas = OilGas(gridTile)
+  val logging = Logging(gridTile)
+  val braBiomes = BrazilBiomes(gridTile)
+  val mangroves2016 = Mangroves2016(gridTile)
+  val intactForestLandscapes2016 = IntactForestLandscapes2016(gridTile)
+  val peruForestConcessions = PeruForestConcessions(gridTile)
+  val protectedAreas = ProtectedAreas(gridTile)
 
   def readWindow(window: Extent): Either[Throwable, Raster[FireAlertsTile]] = {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
@@ -56,6 +56,7 @@ case class FireAlertsGridSources(gridId: String) extends GridSources {
         braBiomes.fetchWindow(window)
 
       val tile = FireAlertsTile(
+        gridTile,
         primaryForestTile,
         protectedAreasTile,
         azeTile,
@@ -87,9 +88,9 @@ object FireAlertsGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, FireAlertsGridSources]
 
-  def getCachedSources(gridId: String): FireAlertsGridSources = {
+  def getCachedSources(gridTile: GridTile): FireAlertsGridSources = {
 
-    cache.getOrElseUpdate(gridId, FireAlertsGridSources(gridId))
+    cache.getOrElseUpdate(gridTile.tileId, FireAlertsGridSources(gridTile))
 
   }
 

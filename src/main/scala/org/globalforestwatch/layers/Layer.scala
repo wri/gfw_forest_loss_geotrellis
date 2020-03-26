@@ -1,12 +1,16 @@
 package org.globalforestwatch.layers
 
+import org.globalforestwatch.grids.GridTile
 import java.io.FileNotFoundException
 
 import cats.implicits._
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.services.s3.AmazonS3URI
 import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
 import geotrellis.raster.crop._
 import geotrellis.raster.{CellType, Tile, isNoData}
+import geotrellis.spark.io.s3.AmazonS3Client
+import geotrellis.spark.io.s3.S3Client.defaultConfiguration
 import geotrellis.vector.Extent
 
 trait Layer {
@@ -17,8 +21,7 @@ trait Layer {
   type A
   type B
 
-  val s3Client: geotrellis.spark.io.s3.S3Client =
-    geotrellis.spark.io.s3.S3Client.DEFAULT
+  val s3Client: geotrellis.spark.io.s3.S3Client = geotrellis.spark.io.s3.S3Client.DEFAULT
   val uri: String
   val internalNoDataValue: A
   val externalNoDataValue: B
@@ -225,6 +228,7 @@ trait OptionalLayer extends Layer {
   /** Check if URI exists before trying to open it, return None if no file found */
   lazy val source: Option[GeoTiffRasterSource] = {
     // Removes the expected 404 errors from console log
+
     val s3uri = new AmazonS3URI(uri)
     if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
       println(s"Opening: $uri")

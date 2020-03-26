@@ -1,8 +1,8 @@
 package org.globalforestwatch.grids
 
-trait EightByEight375mGrid[T <: GridSources] extends Grid[T] {
+trait NinetyByNinety375mGrid[T <: GridSources] extends Grid[T] {
   val pixelSize = (90.0 / 27008.0)
   val gridSize = 90
-  val rowCount = 10
+  val rowCount = 27008
   val blockSize = 128
 }

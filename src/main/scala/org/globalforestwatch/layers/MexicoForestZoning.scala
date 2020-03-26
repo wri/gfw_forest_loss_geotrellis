@@ -1,9 +1,10 @@
 package org.globalforestwatch.layers
 
-case class MexicoForestZoning(grid: String) extends StringLayer with OptionalILayer {
+import org.globalforestwatch.grids.GridTile
 
-  val uri: String =
-    s"$basePath/mex_forest_zoning/$grid.tif"
+case class MexicoForestZoning(gridTile: GridTile) extends StringLayer with OptionalILayer {
+
+  val uri: String = s"$basePath/gfw_land_rights/v20160502/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/zone/geotiff/${gridTile.tileId}.tif"
 
   override val externalNoDataValue: String = ""
 

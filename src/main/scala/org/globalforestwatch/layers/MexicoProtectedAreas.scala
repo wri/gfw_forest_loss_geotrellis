@@ -1,8 +1,10 @@
 package org.globalforestwatch.layers
 
-case class MexicoProtectedAreas(grid: String)
+import org.globalforestwatch.grids.GridTile
+
+case class MexicoProtectedAreas(gridTile: GridTile)
     extends BooleanLayer
     with OptionalILayer {
   val uri: String =
-    s"$basePath/mex_protected_areas/$grid.tif"
+    s"$basePath/mex_protected_areas/v20161003/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
 }

@@ -1,6 +1,8 @@
 package org.globalforestwatch.layers
 
-case class Mangroves2016(grid: String) extends BooleanLayer with OptionalILayer {
+import org.globalforestwatch.grids.GridTile
+
+case class Mangroves2016(gridTile: GridTile) extends BooleanLayer with OptionalILayer {
   val uri: String =
-    s"$basePath/mangroves_2016/$grid.tif"
+    s"$basePath/gmw_mangroves_2016/v20180701/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
 }

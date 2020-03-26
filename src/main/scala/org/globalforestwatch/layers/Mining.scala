@@ -1,5 +1,7 @@
 package org.globalforestwatch.layers
 
-case class Mining(grid: String) extends BooleanLayer with OptionalILayer {
-  val uri: String = s"$basePath/mining/$grid.tif"
+import org.globalforestwatch.grids.GridTile
+
+case class Mining(gridTile: GridTile) extends BooleanLayer with OptionalILayer {
+  val uri: String = s"$basePath/gfw_mining/v20190205/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
 }
