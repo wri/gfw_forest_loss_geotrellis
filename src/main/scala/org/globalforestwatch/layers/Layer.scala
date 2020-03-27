@@ -156,7 +156,7 @@ trait RequiredLayer extends Layer {
 
   //  lazy val extent: Extent = {
   //    source.extent
-  //  }
+  //  } s3://gfw-data-lake/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/10/40000/threshold/geotiff/
 
   def cropWindow(tile: Tile): Tile = {
 
