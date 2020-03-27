@@ -234,6 +234,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .csv(path = outputUrl + "/wdpa/summary")
     }
     exportDF
+      .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
       .transform(AnnualUpdateMinimalDF.aggChange(idCols, wdpa = true))
       .coalesce(50) // this should result in an avg file size of 100MB
       .write
@@ -272,14 +273,15 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
       exportDF
         .transform(AnnualUpdateMinimalDF.aggSummary(idCols))
-        .coalesce(4) // this should result in an avg file size of 100MB
+        .coalesce(33) // this should result in an avg file size of 100MB
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/geostore/summary")
     }
     exportDF
+      .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
       .transform(AnnualUpdateMinimalDF.aggChange(idCols))
-      .coalesce(10) // this should result in an avg file size of 100MB
+      .coalesce(50) // this should result in an avg file size of 100MB
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/geostore/change")
