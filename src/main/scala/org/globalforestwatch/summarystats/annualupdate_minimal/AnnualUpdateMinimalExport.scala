@@ -273,7 +273,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
       exportDF
         .transform(AnnualUpdateMinimalDF.aggSummary(idCols))
-        .coalesce(33) // this should result in an avg file size of 100MB
+        .coalesce(4) // this should result in an avg file size of 100MB
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/geostore/summary")
@@ -281,7 +281,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     exportDF
       .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
       .transform(AnnualUpdateMinimalDF.aggChange(idCols))
-      .coalesce(50) // this should result in an avg file size of 100MB
+      .coalesce(10) // this should result in an avg file size of 100MB
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/geostore/change")
