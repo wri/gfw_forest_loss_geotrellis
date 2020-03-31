@@ -1,5 +1,6 @@
 package org.globalforestwatch.summarystats.firealerts
 
+import math.ceil
 import org.apache.spark.sql.{Column, DataFrame}
 import org.globalforestwatch.summarystats.SummaryExport
 import org.globalforestwatch.util.Util.getAnyMapValue
@@ -16,6 +17,8 @@ object FireAlertsExport extends SummaryExport {
 
     val spark = summaryDF.sparkSession
     import spark.implicits._
+
+    val numPartitions = summaryDF.rdd.getNumPartitions
 
     val viirsFireCols = List(
       $"fireId.lon" as "longitude",
@@ -56,15 +59,15 @@ object FireAlertsExport extends SummaryExport {
 
     gadmDF.cache()
     gadmDF
-      .coalesce(300)
+      .coalesce(ceil(numPartitions / 20.0).toInt)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/all")
 
+    exportChange(gadmDF, outputUrl, numPartitions)
     if (!changeOnly) {
       exportWhitelist(gadmDF, outputUrl)
     }
-    exportChange(gadmDF, outputUrl)
     gadmDF.unpersist()
   }
 
@@ -98,13 +101,13 @@ object FireAlertsExport extends SummaryExport {
 
   }
 
-  private def exportChange(df: DataFrame, outputUrl: String): Unit = {
+  private def exportChange(df: DataFrame, outputUrl: String, numPartitions: Int): Unit = {
 
     val adm2DailyDF = df
       .transform(FireAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
 
     adm2DailyDF
-      .coalesce(130)
+      .coalesce(ceil(numPartitions / 40.0).toInt)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/daily_alerts")
@@ -113,7 +116,7 @@ object FireAlertsExport extends SummaryExport {
       .transform(FireAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2")))
 
     adm2DF
-      .coalesce(100)
+      .coalesce(ceil(numPartitions / 50.0).toInt)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/weekly_alerts")
@@ -122,7 +125,7 @@ object FireAlertsExport extends SummaryExport {
       .transform(FireAlertsDF.aggChangeWeekly2(List("iso", "adm1")))
 
     adm1DF
-      .coalesce(75)
+      .coalesce(ceil(numPartitions / 75.0).toInt)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/weekly_alerts")
@@ -133,7 +136,7 @@ object FireAlertsExport extends SummaryExport {
 
 
     isoDF
-      .coalesce(50)
+      .coalesce(ceil(numPartitions / 100.0).toInt)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/weekly_alerts")
