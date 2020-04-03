@@ -34,12 +34,17 @@ object FireAlertFeature extends Feature {
       case "modis" =>
         val acqDate: String = i(2)
         val acqTime: Int = i(3).toInt
-        val confidence: Int = i(4).toInt
+        val confidencePerc: Int = i(4).toInt
+        val confidenceCat: String = confidencePerc match {
+          case perc if perc >= 99 => "h"
+          case perc if perc >= 40 => "n"
+          case _ => "l"
+        }
         val brightness: Float = i(5).toFloat
         val brightT31: Float = i(6).toFloat
         val frp: Float = i(7).toFloat
 
-        ModisFireAlertFeatureId(x, y, acqDate, acqTime, confidence, brightness, brightT31, frp)
+        ModisFireAlertFeatureId(x, y, acqDate, acqTime, confidencePerc, confidenceCat, brightness, brightT31, frp)
     }
 
     vector.Feature(geom, CombinedFeatureId(fireFeatureId, featureId))

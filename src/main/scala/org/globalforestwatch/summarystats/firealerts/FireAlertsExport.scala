@@ -36,7 +36,8 @@ object FireAlertsExport extends SummaryExport {
       $"fireId.lat" as "latitude",
       $"fireId.alertDate" as "alert__date",
       $"fireId.alertTime" as "alert__time_utc",
-      $"fireId.confidence" as "confidence__perc",
+      $"fireId.confidencePerc" as "confidence__perc",
+      $"fireId.confidenceCat" as "confidence__cat",
       $"fireId.brightness" as "brightness__K",
       $"fireId.brightT31" as "bright_t31__K",
       $"fireId.frp" as "frp__MW"
@@ -102,7 +103,6 @@ object FireAlertsExport extends SummaryExport {
   }
 
   private def exportChange(df: DataFrame, outputUrl: String, numPartitions: Int): Unit = {
-
     val adm2DailyDF = df
       .transform(FireAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
 
@@ -224,7 +224,8 @@ object FireAlertsExport extends SummaryExport {
       $"fireId.lat" as "latitude",
       $"fireId.alertDate" as "alert__date",
       $"fireId.alertTime" as "alert__time_utc",
-      $"fireId.confidence" as "confidence__perc",
+      $"fireId.confidencePerc" as "confidence__perc",
+      $"fireId.confidenceCat" as "confidence__cat",
       $"fireId.brightness" as "brightness__K",
       $"fireId.brightT31" as "bright_t31__K",
       $"fireId.frp" as "frp__MW"
