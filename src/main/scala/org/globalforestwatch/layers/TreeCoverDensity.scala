@@ -20,14 +20,14 @@ trait TreeCoverDensity extends IntegerLayer with RequiredILayer {
   }
 }
 
-case class TreeCoverDensityThresholds2000(gridTile: GridTile)
+case class TreeCoverDensityPercent2000(gridTile: GridTile)
   extends TreeCoverDensity {
-  val uri: String = s"$basePath/umd_tree_cover_density_2000/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/threshold/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/umd_tree_cover_density_2000/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/geotiff/${gridTile.tileId}.tif"
 }
 
-case class TreeCoverDensityThresholds2010(gridTile: GridTile)
+case class TreeCoverDensityPercent2010(gridTile: GridTile)
   extends TreeCoverDensity {
-  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/threshold/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/geotiff/${gridTile.tileId}.tif"
 }
 
 case class TreeCoverDensity2010_60(gridTile: GridTile)

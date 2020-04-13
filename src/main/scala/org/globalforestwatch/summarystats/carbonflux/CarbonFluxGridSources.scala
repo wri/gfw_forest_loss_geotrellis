@@ -12,7 +12,7 @@ import org.globalforestwatch.layers._
 case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensityThresholds2000(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
 
   val biomassPerHectar = BiomassPerHectar(gridTile)
   val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridTile)

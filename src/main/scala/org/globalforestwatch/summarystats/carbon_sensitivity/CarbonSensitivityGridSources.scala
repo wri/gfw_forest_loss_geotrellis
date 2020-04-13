@@ -15,7 +15,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String,
   val model: String = getAnyMapValue[String](kwargs,"sensitivityType")
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensityThresholds2000(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
 
   val biomassPerHectar = BiomassPerHectar(gridTile)
 //  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridId)
