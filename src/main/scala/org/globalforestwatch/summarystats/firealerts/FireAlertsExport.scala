@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.firealerts
 
 import math.ceil
-import org.apache.spark.sql.{Column, DataFrame}
+import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.globalforestwatch.summarystats.SummaryExport
 import org.globalforestwatch.util.Util.getAnyMapValue
 
@@ -20,39 +20,11 @@ object FireAlertsExport extends SummaryExport {
 
     val numPartitions = summaryDF.rdd.getNumPartitions
 
-    val viirsFireCols = List(
-      $"fireId.lon" as "longitude",
-      $"fireId.lat" as "latitude",
-      $"fireId.alertDate" as "alert__date",
-      $"fireId.alertTime" as "alert__time_utc",
-      $"fireId.confidence" as "confidence__cat",
-      $"fireId.brightTi4" as "bright_ti4__K",
-      $"fireId.brightTi5" as "bright_ti5__K",
-      $"fireId.frp" as "frp__MW"
-    )
-
-    val modisFireCols = List(
-      $"fireId.lon" as "longitude",
-      $"fireId.lat" as "latitude",
-      $"fireId.alertDate" as "alert__date",
-      $"fireId.alertTime" as "alert__time_utc",
-      $"fireId.confidencePerc" as "confidence__perc",
-      $"fireId.confidenceCat" as "confidence__cat",
-      $"fireId.brightness" as "brightness__K",
-      $"fireId.brightT31" as "bright_t31__K",
-      $"fireId.frp" as "frp__MW"
-    )
-
     val featureCols =
       List($"featureId.iso" as "iso", $"featureId.adm1" as "adm1", $"featureId.adm2" as "adm2")
 
-    val cols = featureCols ++ (fireAlertType match {
-      case "viirs" => viirsFireCols
-      case "modis" => modisFireCols
-    })
-
-    //val gadmDF =
-    //  summaryDF.transform(FireAlertsDF.unpackValues(cols))
+    val fireCols = _getFireCols(fireAlertType, spark)
+    val cols = featureCols ++ fireCols
 
     val gadmDF =
       summaryDF.transform(FireAlertsDF.unpackValues(cols))
@@ -206,37 +178,10 @@ object FireAlertsExport extends SummaryExport {
     val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
 
     val spark = summaryDF.sparkSession
-    import spark.implicits._
-
-    val viirsFireCols = List(
-      $"fireId.lon" as "longitude",
-      $"fireId.lat" as "latitude",
-      $"fireId.alertDate" as "alert__date",
-      $"fireId.alertTime" as "alert__time_utc",
-      $"fireId.confidence" as "confidence__cat",
-      $"fireId.brightTi4" as "bright_ti4__K",
-      $"fireId.brightTi5" as "bright_ti5__K",
-      $"fireId.frp" as "frp__MW"
-    )
-
-    val modisFireCols = List(
-      $"fireId.lon" as "longitude",
-      $"fireId.lat" as "latitude",
-      $"fireId.alertDate" as "alert__date",
-      $"fireId.alertTime" as "alert__time_utc",
-      $"fireId.confidencePerc" as "confidence__perc",
-      $"fireId.confidenceCat" as "confidence__cat",
-      $"fireId.brightness" as "brightness__K",
-      $"fireId.brightT31" as "bright_t31__K",
-      $"fireId.frp" as "frp__MW"
-    )
 
     val cols = groupByCols
-
-    val unpackAllCols = unpackCols ++ (fireAlertType match {
-      case "viirs" => viirsFireCols
-      case "modis" => modisFireCols
-    })
+    val fireCols = _getFireCols(fireAlertType, spark)
+    val unpackAllCols = unpackCols ++ fireCols
 
     val df = summaryDF.transform(
       FireAlertsDF.unpackValues(unpackAllCols, wdpa = wdpa)
@@ -272,5 +217,33 @@ object FireAlertsExport extends SummaryExport {
 
     df.unpersist()
     ()
+  }
+
+  private def _getFireCols(fireAlertType: String, spark: SparkSession): List[Column] = {
+    import spark.implicits._
+
+    fireAlertType match {
+      case "viirs" => List(
+        $"fireId.lon" as "longitude",
+        $"fireId.lat" as "latitude",
+        $"fireId.alertDate" as "alert__date",
+        $"fireId.alertTime" as "alert__time_utc",
+        $"fireId.confidence" as "confidence__cat",
+        $"fireId.brightTi4" as "bright_ti4__K",
+        $"fireId.brightTi5" as "bright_ti5__K",
+        $"fireId.frp" as "frp__MW"
+      )
+      case "modis" => List(
+        $"fireId.lon" as "longitude",
+        $"fireId.lat" as "latitude",
+        $"fireId.alertDate" as "alert__date",
+        $"fireId.alertTime" as "alert__time_utc",
+        $"fireId.confidencePerc" as "confidence__perc",
+        $"fireId.confidenceCat" as "confidence__cat",
+        $"fireId.brightness" as "brightness__K",
+        $"fireId.brightT31" as "bright_t31__K",
+        $"fireId.frp" as "frp__MW"
+      )
+    }
   }
 }

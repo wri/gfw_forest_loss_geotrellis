@@ -6,7 +6,7 @@ import geotrellis.vector.Geometry
 import org.apache.spark.sql.Row
 
 object FireAlertFeature extends Feature {
-  def getFireAlertFeature(fireAlertType: String, x: Double, y: Double, i: Array[String], featureId: FeatureId): vector.Feature[Geometry, FeatureId] = {
+  def create(fireAlertType: String, x: Double, y: Double, i: Array[String], featureId: FeatureId): vector.Feature[Geometry, FeatureId] = {
     val adjustedX =
       if (x.toString.split("[.]")(1).size == 1)
         x - 0.00001
@@ -53,7 +53,7 @@ object FireAlertFeature extends Feature {
   override val geomPos: Int = 0
 
   override def get(i: Row): vector.Feature[Geometry, FeatureId] = {
-    getFireAlertFeature("viirs", 0, 0, Array[String](), new EmptyFeatureId)
+    create("viirs", 0, 0, Array[String](), new EmptyFeatureId)
   }
 
   override def getFeatureId(i: Array[String]): FeatureId = {

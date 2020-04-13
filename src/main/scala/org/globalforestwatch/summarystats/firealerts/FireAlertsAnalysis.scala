@@ -7,7 +7,7 @@ import geotrellis.vector.Feature
 import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, FireAlertFeature, ViirsFireAlertFeatureId}
+import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, FireAlertFeature}
 import org.globalforestwatch.summarystats.firealerts.FireAlertsRDD.SUMMARY
 import org.globalforestwatch.util.Util._
 import org.datasyslab.geospark.spatialRDD.{PointRDD, SpatialRDD}
@@ -21,7 +21,6 @@ import com.vividsolutions.jts.geom.{Geometry, Point, Polygon}
 import collection.JavaConverters._
 import scala.reflect.ClassTag
 import org.apache.spark.api.java.JavaRDD
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geosparksql.utils.Adapter
 
 object FireAlertsAnalysis {
@@ -104,7 +103,7 @@ object FireAlertsAnalysis {
 
         points.asScala.map((pt: Point) => {
           val fireFeatureData = pt.getUserData.asInstanceOf[String].split('\t')
-          FireAlertFeature.getFireAlertFeature(fireAlertType, pt.getX, pt.getY, fireFeatureData, featureId)
+          FireAlertFeature.create(fireAlertType, pt.getX, pt.getY, fireFeatureData, featureId)
         })
     }
   }
