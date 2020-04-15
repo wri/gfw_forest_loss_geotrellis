@@ -161,7 +161,7 @@ object SummaryMain
           admin2Opt,
           idStartOpt,
           idEndOpt,
-          iucnCatOpts,
+          //iucnCatOpts,
           wdpaStatusOpts,
           tcdOpt,
           thresholdOpts,
@@ -170,8 +170,8 @@ object SummaryMain
           gladOpt,
           changeOnlyOpt,
           fireAlertTypeOpt,
-          fireAlertSourceOpt
-//          sensitivityTypeOpt
+          fireAlertSourceOpt,
+          sensitivityTypeOpt
 //          buildDataCubeOpt
         ).mapN {
           (analysis,
@@ -187,7 +187,7 @@ object SummaryMain
            admin2,
            idStart,
            idEnd,
-           iucnCat,
+           //iucnCat,
            wdpaStatus,
            tcdYear,
            thresholdFilter,
@@ -197,7 +197,8 @@ object SummaryMain
            changeOnly,
 //           buildDataCube
            fireAlertType,
-           fireAlertSources) =>
+           fireAlertSources,
+           sensitivityType) =>
             val kwargs = Map(
               "outputUrl" -> outputUrl,
               "limit" -> limit,
@@ -209,7 +210,7 @@ object SummaryMain
               "admin2" -> admin2,
               "idStart" -> idStart,
               "idEnd" -> idEnd,
-              "iucnCat" -> iucnCat,
+              //"iucnCat" -> iucnCat,
               "wdpaStatus" -> wdpaStatus,
               "tcdYear" -> tcdYear,
               "thresholdFilter" -> thresholdFilter,
@@ -220,7 +221,8 @@ object SummaryMain
 //              "buildDataCube" -> buildDataCube
               "fireAlertType" -> fireAlertType,
               "fireAlertSource" -> fireAlertSources,
-              "featureUris" -> featureUris
+              "featureUris" -> featureUris,
+              "sensitivityType" -> sensitivityType
             )
 
             val spark: SparkSession =

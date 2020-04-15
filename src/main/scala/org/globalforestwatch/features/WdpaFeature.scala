@@ -53,8 +53,8 @@ object WdpaFeature extends Feature {
     val wdpaIdStart: Option[Int] =
       getAnyMapValue[Option[Int]](filters, "idStart")
     val wdpaIdEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
-    val iucnCat: Option[String] =
-      getAnyMapValue[Option[String]](filters, "iucnCat")
+    //val iucnCat: Option[String] =
+    //  getAnyMapValue[Option[String]](filters, "iucnCat")
     val wdpaStatus: Option[String] =
       getAnyMapValue[Option[String]](filters, "wdpaStatus")
 
