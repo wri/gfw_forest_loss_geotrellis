@@ -1,8 +1,8 @@
 package org.globalforestwatch.summarystats.firealerts
 
-import org.globalforestwatch.features.{ViirsFireAlertFeatureId, WdpaFeatureId}
+import org.globalforestwatch.features.{FireAlertViirsFeatureId, WdpaFeatureId}
 
-case class FireAlertsRowViirsWdpa(fireId: ViirsFireAlertFeatureId,
+case class FireAlertsRowViirsWdpa(fireId: FireAlertViirsFeatureId,
                                   wdpaId: WdpaFeatureId,
                                   dataGroup: FireAlertsDataGroup,
                                   data: FireAlertsData)

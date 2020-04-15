@@ -47,7 +47,7 @@ case class FireAlertsDFFactory(
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case CombinedFeatureId(viirsId: ViirsFireAlertFeatureId, gadmId: GadmFeatureId) =>
+                case CombinedFeatureId(viirsId: FireAlertViirsFeatureId, gadmId: GadmFeatureId) =>
                   FireAlertsRowViirsGadm(viirsId, gadmId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a valid Fire Alert ID")
@@ -65,7 +65,7 @@ case class FireAlertsDFFactory(
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case CombinedFeatureId(viirsId: ViirsFireAlertFeatureId, wdpaId: WdpaFeatureId) =>
+                case CombinedFeatureId(viirsId: FireAlertViirsFeatureId, wdpaId: WdpaFeatureId) =>
                   FireAlertsRowViirsWdpa(viirsId, wdpaId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a valid Fire Alert ID")
@@ -83,7 +83,7 @@ case class FireAlertsDFFactory(
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case CombinedFeatureId(viirsId: ViirsFireAlertFeatureId, geostoreId: GeostoreFeatureId) =>
+                case CombinedFeatureId(viirsId: FireAlertViirsFeatureId, geostoreId: GeostoreFeatureId) =>
                   FireAlertsRowViirsGeostore(viirsId, geostoreId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a valid Fire Alert ID")
@@ -101,7 +101,7 @@ case class FireAlertsDFFactory(
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case CombinedFeatureId(viirsId: ViirsFireAlertFeatureId, simpleId: SimpleFeatureId) =>
+                case CombinedFeatureId(viirsId: FireAlertViirsFeatureId, simpleId: SimpleFeatureId) =>
                   FireAlertsRowViirsSimple(viirsId, simpleId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a valid Fire Alert ID")
@@ -119,7 +119,7 @@ case class FireAlertsDFFactory(
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case CombinedFeatureId(modisId: ModisFireAlertFeatureId, gadmId: GadmFeatureId) =>
+                case CombinedFeatureId(modisId: FireAlertModisFeatureId, gadmId: GadmFeatureId) =>
                   FireAlertsRowModisGadm(modisId, gadmId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a valid Fire Alert ID")
@@ -137,7 +137,7 @@ case class FireAlertsDFFactory(
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case CombinedFeatureId(modisId: ModisFireAlertFeatureId, wdpaId: WdpaFeatureId) =>
+                case CombinedFeatureId(modisId: FireAlertModisFeatureId, wdpaId: WdpaFeatureId) =>
                   FireAlertsRowModisWdpa(modisId, wdpaId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a valid Fire Alert ID")
@@ -155,7 +155,7 @@ case class FireAlertsDFFactory(
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case CombinedFeatureId(modisId: ModisFireAlertFeatureId, geostoreId: GeostoreFeatureId) =>
+                case CombinedFeatureId(modisId: FireAlertModisFeatureId, geostoreId: GeostoreFeatureId) =>
                   FireAlertsRowModisGeostore(modisId, geostoreId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a valid Fire Alert ID")
@@ -173,7 +173,7 @@ case class FireAlertsDFFactory(
           summary.stats.map {
             case (dataGroup, data) => {
               id match {
-                case CombinedFeatureId(modisId: ModisFireAlertFeatureId, simpleId: SimpleFeatureId) =>
+                case CombinedFeatureId(modisId: FireAlertModisFeatureId, simpleId: SimpleFeatureId) =>
                   FireAlertsRowModisSimple(modisId, simpleId, dataGroup, data)
                 case _ =>
                   throw new IllegalArgumentException("Not a valid Fire Alert ID")

@@ -1,6 +1,5 @@
 package org.globalforestwatch.layers
 
-import org.globalforestwatch.grids.GridTile
 import java.io.FileNotFoundException
 
 import cats.implicits._
@@ -9,8 +8,6 @@ import com.amazonaws.services.s3.AmazonS3URI
 import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
 import geotrellis.raster.crop._
 import geotrellis.raster.{CellType, Tile, isNoData}
-import geotrellis.spark.io.s3.AmazonS3Client
-import geotrellis.spark.io.s3.S3Client.defaultConfiguration
 import geotrellis.vector.Extent
 
 trait Layer {
@@ -156,7 +153,7 @@ trait RequiredLayer extends Layer {
 
   //  lazy val extent: Extent = {
   //    source.extent
-  //  } s3://gfw-data-lake/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/10/40000/threshold/geotiff/
+  //  }
 
   def cropWindow(tile: Tile): Tile = {
 

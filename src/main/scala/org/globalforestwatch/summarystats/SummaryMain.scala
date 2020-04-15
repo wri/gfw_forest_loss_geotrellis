@@ -223,20 +223,27 @@ object SummaryMain
               "featureUris" -> featureUris
             )
 
-            val featureObj = FeatureFactory(featureType).featureObj
-
             val spark: SparkSession =
               SummarySparkSession("GFW Summary Stats Spark Session")
-//            import spark.implicits._
+            //import spark.implicits._
 
+            /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
+            val featureRDD: RDD[Feature[Geometry, FeatureId]] =
+              FeatureRDDFactory(analysis, featureType, featureUris, kwargs, spark)
+
+            val inputPartitionMultiplier = 64
+
+            val part = new HashPartitioner(
+              partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
+            )
 
              SummaryAnalysisFactory(
-              analysis,
-              featureObj,
-              featureType,
-              featureUris,
-              spark,
-              kwargs
+               analysis,
+               featureRDD,
+               part,
+               featureType,
+               spark,
+               kwargs
             ).runAnalysis
 
             spark.stop

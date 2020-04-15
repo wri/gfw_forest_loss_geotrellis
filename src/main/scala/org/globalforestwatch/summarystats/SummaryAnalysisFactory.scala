@@ -15,28 +15,13 @@ import org.globalforestwatch.summarystats.gladalerts.GladAlertsAnalysis
 import org.globalforestwatch.summarystats.treecoverloss.TreeLossAnalysis
 
 case class SummaryAnalysisFactory(analysis: String,
-                                  featureObj: org.globalforestwatch.features.Feature,
+                                  featureRDD: RDD[Feature[Geometry, FeatureId]],
+                                  part: HashPartitioner,
                                   featureType: String,
-                                  featureUris: NonEmptyList[String],
                                   spark: SparkSession,
                                   kwargs: Map[String, Any]) {
 
   val runAnalysis: Unit =
-    if (analysis != "firealerts") {
-      // ref: https://github.com/databricks/spark-csv
-      val featuresDF: DataFrame =
-        FeatureDF(featureUris, featureObj, kwargs, spark)
-
-      /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
-      val featureRDD: RDD[Feature[Geometry, FeatureId]] =
-        FeatureRDD(featuresDF, featureObj)
-
-      val inputPartitionMultiplier = 64
-
-      val part = new HashPartitioner(
-        partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
-      )
-
       analysis match {
         case "annualupdate" =>
           AnnualUpdateAnalysis(
@@ -86,16 +71,15 @@ case class SummaryAnalysisFactory(analysis: String,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
+        case "firealerts" =>
+          FireAlertsAnalysis(
+            featureRDD: RDD[Feature[Geometry, FeatureId]],
+            featureType: String,
+            part: HashPartitioner,
+            spark: SparkSession,
+            kwargs: Map[String, Any]
+          )
         case _ =>
           throw new IllegalArgumentException("Not a valid analysis")
       }
-    } else {
-      val runAnalysis: Unit =
-        FireAlertsAnalysis(
-          featureObj,
-          featureType: String,
-          spark: SparkSession,
-          kwargs: Map[String, Any]
-        )
-    }
 }

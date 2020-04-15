@@ -1,6 +1,6 @@
 package org.globalforestwatch.features
 
-case class ModisFireAlertFeatureId(
+case class FireAlertModisFeatureId(
                                     lon: Double,
                                     lat: Double,
                                     alertDate: String,

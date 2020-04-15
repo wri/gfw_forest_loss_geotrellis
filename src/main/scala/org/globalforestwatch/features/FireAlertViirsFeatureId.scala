@@ -1,6 +1,6 @@
 package org.globalforestwatch.features
 
-case class ViirsFireAlertFeatureId(
+case class FireAlertViirsFeatureId(
                                     lon: Double,
                                     lat: Double,
                                     alertDate: String,
