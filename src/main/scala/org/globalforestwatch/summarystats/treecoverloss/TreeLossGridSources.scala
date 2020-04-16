@@ -3,20 +3,20 @@ package org.globalforestwatch.summarystats.treecoverloss
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import cats.implicits._
-import org.globalforestwatch.grids.GridSources
+import org.globalforestwatch.grids.{GridSources, GridTile}
 import org.globalforestwatch.layers._
 
 /**
-  * @param gridId top left corner, padded from east ex: "10N_010E"
+  * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
-case class TreeLossGridSources(gridId: String) extends GridSources {
+case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
 
-  val treeCoverLoss = TreeCoverLoss(gridId)
-  val treeCoverGain = TreeCoverGain(gridId)
-  val treeCoverDensity2000 = TreeCoverDensity2000(gridId)
-  val treeCoverDensity2010 = TreeCoverDensity2010(gridId)
-  val biomassPerHectar = BiomassPerHectar(gridId)
-  val primaryForest = PrimaryForest(gridId)
+  val treeCoverLoss = TreeCoverLoss(gridTile)
+  val treeCoverGain = TreeCoverGain(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensity2000(gridTile)
+  val treeCoverDensity2010 = TreeCoverDensity2010(gridTile)
+  val biomassPerHectar = BiomassPerHectar(gridTile)
+  val primaryForest = PrimaryForest(gridTile)
 
 
   def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
@@ -59,9 +59,9 @@ object TreeLossGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, TreeLossGridSources]
 
-  def getCachedSources(gridId: String): TreeLossGridSources = {
+  def getCachedSources(gridTile: GridTile): TreeLossGridSources = {
 
-    cache.getOrElseUpdate(gridId, TreeLossGridSources(gridId))
+    cache.getOrElseUpdate(gridTile.tileId, TreeLossGridSources(gridTile))
 
   }
 

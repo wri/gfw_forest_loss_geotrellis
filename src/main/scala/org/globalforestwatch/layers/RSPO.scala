@@ -1,8 +1,10 @@
 package org.globalforestwatch.layers
 
-case class RSPO(grid: String) extends StringLayer with OptionalILayer {
+import org.globalforestwatch.grids.GridTile
 
-  val uri: String = s"$basePath/rspo/v20200114/$grid.tif"
+case class RSPO(gridTile: GridTile) extends StringLayer with OptionalILayer {
+
+  val uri: String = s"$basePath/rspo_oil_palm/v20200114/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/certification_status/geotiff/${gridTile.tileId}.tif"
 
   def lookup(value: Int): String = value match {
     case 1 => "Certified"

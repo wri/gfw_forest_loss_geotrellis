@@ -90,7 +90,6 @@ object GladAlertsExport extends SummaryExport {
   }
 
   private def exportWhitelist(df: DataFrame, outputUrl: String): Unit = {
-
     val adm2DF = df
       .transform(GladAlertsDF.whitelist(List("iso", "adm1", "adm2")))
 

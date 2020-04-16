@@ -1,5 +1,7 @@
 package org.globalforestwatch.layers
 
+import org.globalforestwatch.grids.GridTile
+
 trait TreeCoverDensity extends IntegerLayer with RequiredILayer {
 
   override val externalNoDataValue: Integer = 0
@@ -18,35 +20,35 @@ trait TreeCoverDensity extends IntegerLayer with RequiredILayer {
   }
 }
 
-case class TreeCoverDensityThresholds2000(grid: String)
+case class TreeCoverDensityPercent2000(gridTile: GridTile)
   extends TreeCoverDensity {
-  val uri: String = s"$basePath/tcd_2000/$grid.tif"
+  val uri: String = s"$basePath/umd_tree_cover_density_2000/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/geotiff/${gridTile.tileId}.tif"
 }
 
-case class TreeCoverDensityThresholds2010(grid: String)
+case class TreeCoverDensityPercent2010(gridTile: GridTile)
   extends TreeCoverDensity {
-  val uri: String = s"$basePath/tcd_2010/$grid.tif"
+  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/geotiff/${gridTile.tileId}.tif"
 }
 
-case class TreeCoverDensity2010_60(grid: String)
+case class TreeCoverDensity2010_60(gridTile: GridTile)
   extends BooleanLayer
     with RequiredILayer {
-  val uri: String = s"$basePath/tcd_2010/$grid.tif"
+  val uri: String = s"$basePath/tcd_2010/v20190816/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
 
   override def lookup(value: Int): Boolean = value > 60
 
 }
 
-case class TreeCoverDensity2000(grid: String)
+case class TreeCoverDensity2000(gridTile: GridTile)
   extends IntegerLayer
     with RequiredILayer {
   override val externalNoDataValue: Integer = 0
-  val uri: String = s"$basePath/tcd_2000/$grid.tif"
+  val uri: String = s"$basePath/tcd_2000/v20190816/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
 }
 
-case class TreeCoverDensity2010(grid: String)
+case class TreeCoverDensity2010(gridTile: GridTile)
   extends IntegerLayer
     with RequiredILayer {
   override val externalNoDataValue: Integer = 0
-  val uri: String = s"$basePath/tcd_2010/$grid.tif"
+  val uri: String = s"$basePath/tcd_2010/v20190816/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
 }

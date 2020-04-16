@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats
 
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
+import org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator
 
 object SummarySparkSession {
 
@@ -24,6 +25,9 @@ object SummarySparkSession {
         SparkSession.builder.config(localConf).getOrCreate
       case e: Throwable => throw e
     }
+
+    GeoSparkSQLRegistrator.registerAll(spark)
+
     spark
   }
 }

@@ -13,13 +13,18 @@ object SimpleFeature extends Feature {
 
   def get(
                   i: Row
-                ): geotrellis.vector.Feature[Geometry, SimpleFeatureId] = {
-    val feature_id: Int = i.getString(idPos).toInt
+                ): geotrellis.vector.Feature[Geometry, FeatureId] = {
+    val featureId = getFeatureId(i)
     val geom: Geometry =
       GeometryReducer.reduce(GeometryReducer.gpr)(
         WKB.read(i.getString(geomPos))
       )
-    geotrellis.vector.Feature(geom, SimpleFeatureId(feature_id))
+    geotrellis.vector.Feature(geom, featureId)
+  }
+
+  def getFeatureId(i: Array[String]): FeatureId = {
+    val feature_id: Int = i(idPos).toInt
+    SimpleFeatureId(feature_id)
   }
 
   override def custom_filter(

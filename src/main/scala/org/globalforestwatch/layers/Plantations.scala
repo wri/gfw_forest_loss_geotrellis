@@ -1,9 +1,10 @@
 package org.globalforestwatch.layers
 
-case class Plantations(grid: String) extends StringLayer with OptionalILayer {
+import org.globalforestwatch.grids.GridTile
 
-  val uri: String =
-    s"$basePath/plantations/$grid.tif"
+case class Plantations(gridTile: GridTile) extends StringLayer with OptionalILayer {
+
+  val uri: String = s"$basePath/gfw_plantations/v1.3/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/geotiff/${gridTile.tileId}.tif"
 
   def lookup(value: Int): String = value match {
     case 1  => "Fruit"

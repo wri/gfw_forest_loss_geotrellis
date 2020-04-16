@@ -40,6 +40,7 @@ resolvers ++= Seq(
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
+
 libraryDependencies ++= Seq(
   sparkCore % Provided,
   sparkSQL % Provided,
@@ -64,14 +65,20 @@ libraryDependencies ++= Seq(
   "com.azavea.geotrellis" %% "geotrellis-contrib-summary" % "0.1.1",
   "org.scalanlp" %% "breeze" % "0.13.2",
   "org.scalanlp" %% "breeze-natives" % "0.13.2",
-  "org.scalanlp" %% "breeze-viz" % "0.13.2"
+  "org.scalanlp" %% "breeze-viz" % "0.13.2",
+
 )
 
+dependencyOverrides += "com.google.guava" % "guava" % "15.0"
+
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+libraryDependencies += "org.datasyslab" % "geospark" % "1.2.0"
+libraryDependencies += "org.datasyslab" % "geospark-sql_2.3" % "1.2.0"
 
 // spark-daria
 resolvers += "jitpack" at "https://jitpack.io"
 libraryDependencies += "com.github.mrpowers" % "spark-daria" % "v0.35.0"
+
 
 // auto imports for local SBT console
 // can be used with `test:console` command
@@ -118,6 +125,8 @@ assemblyOption in assembly := (assemblyOption in assembly).value.copy(appendCont
 assemblyMergeStrategy in assembly := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat
+  // both GeoSpark and Geotrellis bring in this library, need to use GeoSpark version
+  case PathList("org", "geotools", xs @ _*) => MergeStrategy.last
   case PathList("META-INF", xs@_*) =>
     xs match {
       case ("MANIFEST.MF" :: Nil) => MergeStrategy.discard

@@ -1,7 +1,10 @@
 package org.globalforestwatch.layers
 
-case class LitterCarbon2000(grid: String, model: String="standard")
+import org.globalforestwatch.grids.GridTile
+
+case class LitterCarbon2000(gridTile: GridTile, model: String="standard")
   extends FloatLayer
     with OptionalFLayer {
-  val uri: String = s"$basePath/litter_carbon_2000/$model/$grid.tif"
+  val model_suffix = if (model == "standard") "" else s"__$model"
+  val uri: String = s"$basePath/gfw_litter_carbon_stock_2000$model_suffix/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/Mg/geotiff/${gridTile.tileId}.tif"
 }

@@ -8,7 +8,7 @@ import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.util.Util.getAnyMapValue
+import org.globalforestwatch.util.Util.{getAnyMapValue, getKeyedFeatureRDD}
 
 object AnnualUpdateAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],

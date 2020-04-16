@@ -1,8 +1,10 @@
 package org.globalforestwatch.layers
 
-case class GlobalLandcover(grid: String) extends StringLayer with OptionalILayer {
+import org.globalforestwatch.grids.GridTile
+
+case class GlobalLandcover(gridTile: GridTile) extends StringLayer with OptionalILayer {
   val uri: String =
-    s"$basePath/global_landcover/$grid.tif"
+    s"$basePath/esa_landcover_2015/v20160111/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/class/geotiff/${gridTile.tileId}.tif"
   override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {
