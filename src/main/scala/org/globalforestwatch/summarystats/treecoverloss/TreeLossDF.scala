@@ -7,7 +7,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object TreeLossDF {
 
   val treecoverLossMinYear = 2001
-  val treecoverLossMaxYear = 2018
+  val treecoverLossMaxYear = 2019
 
   def unpackValues(df: DataFrame): DataFrame = {
 
