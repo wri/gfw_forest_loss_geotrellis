@@ -59,14 +59,14 @@ object WdpaFeature extends Feature {
       getAnyMapValue[Option[String]](filters, "wdpaStatus")
 
     val isoFirstDF: DataFrame = isoFirst.foldLeft(df)(
-      (acc, i) => acc.filter(substring($"gid_0", 0, 1) === i(0))
+      (acc, i) => acc.filter(substring($"iso", 0, 1) === i(0))
     )
     val isoStartDF: DataFrame =
-      isoStart.foldLeft(isoFirstDF)((acc, i) => acc.filter($"gid_0" >= i))
+      isoStart.foldLeft(isoFirstDF)((acc, i) => acc.filter($"iso" >= i))
     val isoEndDF: DataFrame =
-      isoEnd.foldLeft(isoStartDF)((acc, i) => acc.filter($"gid_0" < i))
+      isoEnd.foldLeft(isoStartDF)((acc, i) => acc.filter($"iso" < i))
     val isoDF: DataFrame =
-      iso.foldLeft(isoEndDF)((acc, i) => acc.filter($"gid_0" === i))
+      iso.foldLeft(isoEndDF)((acc, i) => acc.filter($"iso" === i))
 
     val wdpaIdStartDF =
       wdpaIdStart.foldLeft(isoDF)((acc, i) => acc.filter($"wdpaid" >= i))

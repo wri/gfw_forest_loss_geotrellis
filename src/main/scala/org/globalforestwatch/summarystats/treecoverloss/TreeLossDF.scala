@@ -20,34 +20,34 @@ object TreeLossDF {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("treecoverLoss") as s"treecover_loss_${i}__ha"
+          .getItem("treecoverLoss") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
     val abovegroundBiomassLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("biomassLoss") as s"aboveground_biomass_loss_${i}__Mg"
+          .getItem("biomassLoss") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
 
     val co2EmissionsCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("carbonEmissions") as s"co2_emissions_${i}__Mg"
+          .getItem("carbonEmissions") as s"whrc_aboveground_co2_emissions_${i}__Mg"
       }).toList
 
     val cols = List(
       $"id.featureId" as "feature__id",
-      $"data_group.threshold" as "treecover_density__threshold",
-      $"data_group.tcdYear" as "treecover_extent__year",
-      $"data_group.primaryForest" as "is__regional_primary_forest",
-      $"data.treecoverExtent2000" as "treecover_extent_2000__ha",
-      $"data.treecoverExtent2010" as "treecover_extent_2010__ha",
+      $"data_group.threshold" as "umd_tree_cover_density__threshold",
+      $"data_group.tcdYear" as "umd_tree_cover_extent__year",
+      $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
+      $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
+      $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
-      $"data.totalGainArea" as "treecover_gain_2000-2012__ha",
-      $"data.totalBiomass" as "aboveground_biomass_stock_2000__Mg",
-      $"data.avgBiomass" as "avg_aboveground_biomass_stock_2000__Mg_ha-1",
-      $"data.totalCo2" as "co2_stock_2000__Mt"
+      $"data.totalGainArea" as "umd_tree_cover_gain_2000-2012__ha",
+      $"data.totalBiomass" as "whrc_aboveground_biomass_stock_2000__Mg",
+      $"data.avgBiomass" as "avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1",
+      $"data.totalCo2" as "whrc_aboveground_co2_stock_2000__Mt"
     )
 
     df.select(
@@ -63,36 +63,36 @@ object TreeLossDF {
 
     val treecoverLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"treecover_loss_${i}__ha") as s"treecover_loss_${i}__ha"
+        sum(s"umd_tree_cover_loss_${i}__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
     val abovegroundBiomassLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"aboveground_biomass_loss_${i}__Mg") as s"aboveground_biomass_loss_${i}__Mg"
+        sum(s"whrc_aboveground_biomass_loss_${i}__Mg") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
 
     val co2EmissionsCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"co2_emissions_${i}__Mg") as s"co2_emissions_${i}__Mg"
+        sum(s"whrc_aboveground_co2_emissions_${i}__Mg") as s"whrc_aboveground_co2_emissions_${i}__Mg"
       }).toList
 
     val cols = List(
       sum("area__ha") as "area__ha",
-      sum("treecover_extent_2000__ha") as "treecover_extent_2000__ha",
-      sum("treecover_extent_2010__ha") as "treecover_extent_2010__ha",
-      sum("treecover_gain_2000-2012__ha") as "treecover_gain_2000-2012__ha",
-      sum("aboveground_biomass_stock_2000__Mg") as "aboveground_biomass_stock_2000__Mg",
+      sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
+      sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
+      sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
+      sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
       sum(
-        $"avg_aboveground_biomass_stock_2000__Mg_ha-1" * $"treecover_extent_2000__ha"
-      ) / sum($"treecover_extent_2000__ha") as "avg_aboveground_biomass_stock_2000__Mg_ha-1",
-      sum("co2_stock_2000__Mt") as "co2_stock_2000__Mt"
+        $"avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1" * $"umd_tree_cover_extent_2000__ha"
+      ) / sum($"umd_tree_cover_extent_2000__ha") as "avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1",
+      sum("whrc_aboveground_co2_stock_2000__Mt") as "whrc_aboveground_co2_stock_2000__Mt"
     )
 
     if (include) df
     else {
       df.groupBy(
           $"feature__id",
-          $"treecover_density__threshold",
-          $"treecover_extent__year"
+        $"umd_tree_cover_density__threshold",
+        $"umd_tree_cover_extent__year"
         )
         .agg(
           cols.head,

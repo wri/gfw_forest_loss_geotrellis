@@ -7,23 +7,23 @@ import org.apache.spark.sql.{Column, DataFrame}
 object FireAlertsDF {
 
   val contextualLayers: List[String] = List(
-    "is__regional_primary_forest",
-    "is__alliance_for_zero_extinction_site",
-    "is__key_biodiversity_area",
-    "is__landmark",
+    "is__umd_regional_primary_forest_2001",
+    "is__birdlife_alliance_for_zero_extinction_site",
+    "is__birdlife_key_biodiversity_area",
+    "is__landmark_land_right",
     "gfw_plantation__type",
     "is__gfw_mining",
-    "is__gfw_logging",
+    "is__gfw_managed_forest",
     "rspo_oil_palm__certification_status",
     "is__gfw_wood_fiber",
-    "is__peat_land",
+    "is__peatland",
     "is__idn_forest_moratorium",
     "is__gfw_oil_palm",
     "idn_forest_area__type",
     "per_forest_concession__type",
     "is__gfw_oil_gas",
-    "is__mangroves_2016",
-    "is__intact_forest_landscapes_2016",
+    "is__gmw_mangroves_2016",
+    "is__ifl_intact_forest_landscape_2016",
     "bra_biome__name"
   )
 
@@ -37,23 +37,23 @@ object FireAlertsDF {
 
     def defaultCols =
       List(
-        $"data_group.primaryForest" as "is__regional_primary_forest",
-        $"data_group.aze" as "is__alliance_for_zero_extinction_site",
-        $"data_group.keyBiodiversityAreas" as "is__key_biodiversity_area",
-        $"data_group.landmark" as "is__landmark",
+        $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
+        $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
+        $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_area",
+        $"data_group.landmark" as "is__landmark_land_right",
         $"data_group.plantations" as "gfw_plantation__type",
         $"data_group.mining" as "is__gfw_mining",
-        $"data_group.logging" as "is__gfw_logging",
+        $"data_group.logging" as "is__gfw_managed_forest",
         $"data_group.rspo" as "rspo_oil_palm__certification_status",
         $"data_group.woodFiber" as "is__gfw_wood_fiber",
-        $"data_group.peatlands" as "is__peat_land",
+        $"data_group.peatlands" as "is__peatland",
         $"data_group.indonesiaForestMoratorium" as "is__idn_forest_moratorium",
         $"data_group.oilPalm" as "is__gfw_oil_palm",
         $"data_group.indonesiaForestArea" as "idn_forest_area__type",
         $"data_group.peruForestConcessions" as "per_forest_concession__type",
         $"data_group.oilGas" as "is__gfw_oil_gas",
-        $"data_group.mangroves2016" as "is__mangroves_2016",
-        $"data_group.intactForestLandscapes2016" as "is__intact_forest_landscapes_2016",
+        $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
+        $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscape_2016",
         $"data_group.braBiomes" as "bra_biome__name",
         $"data.totalAlerts" as "alert__count"
       )
@@ -147,18 +147,18 @@ object FireAlertsDF {
     import spark.implicits._
 
     val defaultAggCols = List(
-      max("is__regional_primary_forest") as "is__regional_primary_forest",
-      max("is__alliance_for_zero_extinction_site") as "is__alliance_for_zero_extinction_site",
-      max("is__key_biodiversity_area") as "is__key_biodiversity_area",
-      max("is__landmark") as "is__landmark",
+      max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
+      max("is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
+      max("is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
+      max("is__landmark_land_right") as "is__landmark_land_right",
       max(length($"gfw_plantation__type"))
         .cast("boolean") as "gfw_plantation__type",
       max("is__gfw_mining") as "is__gfw_mining",
-      max("is__gfw_logging") as "is__gfw_logging",
+      max("is__gfw_managed_forest") as "is__gfw_managed_forest",
       max(length($"rspo_oil_palm__certification_status"))
         .cast("boolean") as "rspo_oil_palm__certification_status",
       max("is__gfw_wood_fiber") as "is__gfw_wood_fiber",
-      max("is__peat_land") as "is__peat_land",
+      max("is__peatland") as "is__peatland",
       max("is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max("is__gfw_oil_palm") as "is__gfw_oil_palm",
       max(length($"idn_forest_area__type"))
@@ -166,8 +166,8 @@ object FireAlertsDF {
       max(length($"per_forest_concession__type"))
         .cast("boolean") as "per_forest_concession__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
-      max("is__mangroves_2016") as "is__mangroves_2016",
-      max("is__intact_forest_landscapes_2016") as "is__intact_forest_landscapes_2016",
+      max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
+      max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
       max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name"
     )
 
@@ -185,23 +185,23 @@ object FireAlertsDF {
                  wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val defaultAggCols = List(
-      max("is__regional_primary_forest") as "is__regional_primary_forest",
-      max("is__alliance_for_zero_extinction_site") as "is__alliance_for_zero_extinction_site",
-      max("is__key_biodiversity_area") as "is__key_biodiversity_area",
-      max("is__landmark") as "is__landmark",
+      max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
+      max("is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
+      max("is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
+      max("is__landmark_land_right") as "is__landmark_land_right",
       max("gfw_plantation__type") as "gfw_plantation__type",
       max("is__gfw_mining") as "is__gfw_mining",
-      max("is__gfw_logging") as "is__gfw_logging",
+      max("is__gfw_managed_forest") as "is__gfw_managed_forest",
       max("rspo_oil_palm__certification_status") as "rspo_oil_palm__certification_status",
       max("is__gfw_wood_fiber") as "is__gfw_wood_fiber",
-      max("is__peat_land") as "is__peat_land",
+      max("is__peatland") as "is__peatland",
       max("is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max("is__gfw_oil_palm") as "is__gfw_oil_palm",
       max("idn_forest_area__type") as "idn_forest_area__type",
       max("per_forest_concession__type") as "per_forest_concession__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
-      max("is__mangroves_2016") as "is__mangroves_2016",
-      max("is__intact_forest_landscapes_2016") as "is__intact_forest_landscapes_2016",
+      max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
+      max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
       max("bra_biome__name") as "bra_biome__name"
     )
 
