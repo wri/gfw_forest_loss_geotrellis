@@ -38,40 +38,7 @@ object FireAlertsExport extends SummaryExport {
       .csv(path = outputUrl + "/all")
 
     exportChange(gadmDF, outputUrl, numPartitions)
-    if (!changeOnly) {
-      exportWhitelist(gadmDF, outputUrl)
-    }
     gadmDF.unpersist()
-  }
-
-  private def exportWhitelist(df: DataFrame, outputUrl: String): Unit = {
-    val adm2DF = df
-      .transform(FireAlertsDF.whitelist(List("iso", "adm1", "adm2")))
-
-    adm2DF
-      .coalesce(1)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/adm2/whitelist")
-
-    val adm1DF = adm2DF
-      .transform(FireAlertsDF.whitelist2(List("iso", "adm1")))
-
-    adm1DF
-      .coalesce(1)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/adm1/whitelist")
-
-    val isoDF = adm1DF
-      .transform(FireAlertsDF.whitelist2(List("iso")))
-
-    isoDF
-      .coalesce(1)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/iso/whitelist")
-
   }
 
   private def exportChange(df: DataFrame, outputUrl: String, numPartitions: Int): Unit = {
@@ -194,14 +161,6 @@ object FireAlertsExport extends SummaryExport {
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/all")
-
-    if (!changeOnly) {
-      df.transform(FireAlertsDF.whitelist(cols, wdpa = wdpa))
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/whitelist")
-    }
 
     df.transform(FireAlertsDF.aggChangeDaily(cols, wdpa = wdpa))
       .coalesce(ceil(numPartitions / 100.0).toInt)
