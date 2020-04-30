@@ -52,7 +52,7 @@ object WdpaFeature extends Feature {
     val iso: Option[String] = getAnyMapValue[Option[String]](filters, "iso")
     val wdpaIdStart: Option[Int] =
       getAnyMapValue[Option[Int]](filters, "idStart")
-    val wdpaIdEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
+    //val wdpaIdEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
     //val iucnCat: Option[String] =
     //  getAnyMapValue[Option[String]](filters, "iucnCat")
     val wdpaStatus: Option[String] =
@@ -71,6 +71,7 @@ object WdpaFeature extends Feature {
     val wdpaIdStartDF =
       wdpaIdStart.foldLeft(isoDF)((acc, i) => acc.filter($"wdpaid" >= i))
 
+    /*
     val wdpaIdEndtDF =
       wdpaIdEnd.foldLeft(wdpaIdStartDF)((acc, i) => acc.filter($"wdpaid" < i))
 
@@ -78,8 +79,8 @@ object WdpaFeature extends Feature {
       wdpaIdEnd.foldLeft(wdpaIdEndtDF)(
         (acc, i) => acc.filter($"iucn_cat" === i)
       )
+    */
 
-    wdpaStatus.foldLeft(iucnCatDF)((acc, i) => acc.filter($"status" === i))
-
+    wdpaStatus.foldLeft(isoDF)((acc, i) => acc.filter($"status" === i))
   }
 }
