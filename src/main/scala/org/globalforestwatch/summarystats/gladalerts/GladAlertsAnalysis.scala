@@ -33,8 +33,9 @@ object GladAlertsAnalysis {
     summaryDF.repartition($"id", $"data_group")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      s"/${DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now)}" +
-      "/gladalerts"
+      "/gladalerts_" + DateTimeFormatter
+      .ofPattern("yyyyMMdd_HHmm")
+      .format(LocalDateTime.now)
 
     GladAlertsExport.export(
       featureType,

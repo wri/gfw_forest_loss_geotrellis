@@ -37,8 +37,9 @@ object AnnualUpdateMinimalAnalysis {
     summaryDF.repartition($"id", $"data_group")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      s"/${DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now)}" +
-      "/annualupdate_minimal"
+      "/annualupdate_minimal_" + DateTimeFormatter
+      .ofPattern("yyyyMMdd_HHmm")
+      .format(LocalDateTime.now)
 
     AnnualUpdateMinimalExport.export(
       featureType,

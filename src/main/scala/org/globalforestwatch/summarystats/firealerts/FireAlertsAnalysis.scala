@@ -46,8 +46,9 @@ object FireAlertsAnalysis {
     summaryDF.repartition(partitionExprs = $"featureId")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      s"/${DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now)}" +
-      s"/firealerts/$fireAlertType"
+      s"/firealerts_${fireAlertType}_" + DateTimeFormatter
+      .ofPattern("yyyyMMdd_HHmm")
+      .format(LocalDateTime.now)
 
     FireAlertsExport.export(
       featureType,
