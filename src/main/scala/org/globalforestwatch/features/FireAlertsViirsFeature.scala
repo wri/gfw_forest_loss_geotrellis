@@ -11,15 +11,15 @@ object FireAlertsViirsFeature extends Feature {
   override def get(i: Row): vector.Feature[Geometry, FeatureId] = {
     val featureId = getFeatureId(i)
     val geom = GeometryReducer.reduce(GeometryReducer.gpr)(
-      vector.Point(i.getDouble(geomPos), i.getDouble(geomPos + 1))
+      vector.Point(i.getDouble(geomPos + 1), i.getDouble(geomPos))
     )
 
     geotrellis.vector.Feature(geom, featureId)
   }
 
   override def getFeatureId(i: Array[String]): FeatureId = {
-    val lon: Double = i(0).toDouble
-    val lat: Double = i(1).toDouble
+    val lat: Double = i(0).toDouble
+    val lon: Double = i(1).toDouble
     val acqDate: String = i(2)
     val acqTime: Int = i(3).toInt
     val confidence: String = i(4)
