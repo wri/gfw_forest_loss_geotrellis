@@ -40,7 +40,8 @@ object SummaryMain
         val featureTypeOpt = Opts
           .option[String](
             "feature_type",
-            help = "Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature'"
+            help =
+              "Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature'"
           )
           .withDefault("feature")
 
@@ -91,18 +92,18 @@ object SummaryMain
             )
             .orNone
 
-        val idEndOpt =
-          Opts
-            .option[Int](
-              "id_end",
-              help = "Filter by IDs smaller than given value"
-            )
-            .orNone
-
-        val iucnCatOpts =
-          Opts
-            .options[String]("iucn_cat", help = "Filter by IUCN Category")
-            .orNone
+        //        val idEndOpt =
+        //          Opts
+        //            .option[Int](
+        //              "id_end",
+        //              help = "Filter by IDs smaller than given value"
+        //            )
+        //            .orNone
+        //
+        //        val iucnCatOpts =
+        //          Opts
+        //            .options[String]("iucn_cat", help = "Filter by IUCN Category")
+        //            .orNone
 
         val wdpaStatusOpts =
           Opts
@@ -130,12 +131,26 @@ object SummaryMain
         val changeOnlyOpt =
           Opts.flag("change_only", "Process change only").orFalse
 
-        val buildDataCubeOpt =
-          Opts.flag("build_data_cube", "Build XYZ data cube").orFalse
+        //        val buildDataCubeOpt =
+        //          Opts.flag("build_data_cube", "Build XYZ data cube").orFalse
 
         val sensitivityTypeOpt = Opts
-          .option[String]("sensitivity_type", help = "Sensitivity type for carbon flux model")
+          .option[String](
+            "sensitivity_type",
+            help = "Sensitivity type for carbon flux model"
+          )
           .withDefault("standard")
+
+        val fireAlertTypeOpt = Opts
+          .option[String]("fire_alert_type", help = "MODIS or VIIRS")
+          .withDefault("VIIRS")
+
+        val fireAlertSourceOpt = Opts
+          .options[String](
+            "fire_alert_source",
+            help = "URI of fire alerts in TSV format"
+          )
+          .orNone
 
         val logger = Logger.getLogger("SummaryMain")
 
@@ -152,8 +167,8 @@ object SummaryMain
           admin1Opt,
           admin2Opt,
           idStartOpt,
-          idEndOpt,
-          iucnCatOpts,
+
+
           wdpaStatusOpts,
           tcdOpt,
           thresholdOpts,
@@ -161,6 +176,8 @@ object SummaryMain
           tclOpt,
           gladOpt,
           changeOnlyOpt,
+          fireAlertTypeOpt,
+          fireAlertSourceOpt,
           sensitivityTypeOpt
 //          buildDataCubeOpt
         ).mapN {
@@ -176,8 +193,8 @@ object SummaryMain
            admin1,
            admin2,
            idStart,
-           idEnd,
-           iucnCat,
+           //           idEnd,
+           //           iucnCat,
            wdpaStatus,
            tcdYear,
            thresholdFilter,
@@ -185,9 +202,10 @@ object SummaryMain
            tcl,
            glad,
            changeOnly,
+           //           buildDataCube
+           fireAlertType,
+           fireAlertSources,
            sensitivityType) =>
-//           buildDataCube) =>
-
             val kwargs = Map(
               "outputUrl" -> outputUrl,
               "limit" -> limit,
@@ -198,8 +216,8 @@ object SummaryMain
               "admin1" -> admin1,
               "admin2" -> admin2,
               "idStart" -> idStart,
-              "idEnd" -> idEnd,
-              "iucnCat" -> iucnCat,
+              //              "idEnd" -> idEnd,
+              //              "iucnCat" -> iucnCat,
               "wdpaStatus" -> wdpaStatus,
               "tcdYear" -> tcdYear,
               "thresholdFilter" -> thresholdFilter,
@@ -208,22 +226,25 @@ object SummaryMain
               "glad" -> glad,
               "changeOnly" -> changeOnly,
 //              "buildDataCube" -> buildDataCube
+              "fireAlertType" -> fireAlertType,
+              "fireAlertSource" -> fireAlertSources,
+              "featureUris" -> featureUris,
               "sensitivityType" -> sensitivityType
             )
 
-            val featureObj = FeatureFactory(featureType).featureObj
-
             val spark: SparkSession =
               SummarySparkSession("GFW Summary Stats Spark Session")
-//            import spark.implicits._
-
-            // ref: https://github.com/databricks/spark-csv
-            val featuresDF: DataFrame =
-              FeatureDF(featureUris, featureObj, kwargs, spark)
+            //import spark.implicits._
 
             /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
             val featureRDD: RDD[Feature[Geometry, FeatureId]] =
-              FeatureRDD(featuresDF, featureObj)
+              FeatureRDDFactory(
+                analysis,
+                featureType,
+                featureUris,
+                kwargs,
+                spark
+              )
 
             val inputPartitionMultiplier = 64
 
@@ -234,8 +255,8 @@ object SummaryMain
             SummaryAnalysisFactory(
               analysis,
               featureRDD,
-              featureType,
               part,
+              featureType,
               spark,
               kwargs
             ).runAnalysis

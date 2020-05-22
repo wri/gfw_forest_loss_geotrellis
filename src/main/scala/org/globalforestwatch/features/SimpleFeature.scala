@@ -11,15 +11,18 @@ object SimpleFeature extends Feature {
   val idPos = 0
   val geomPos = 1
 
-  def get(
-                  i: Row
-                ): geotrellis.vector.Feature[Geometry, SimpleFeatureId] = {
-    val feature_id: Int = i.getString(idPos).toInt
+  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
+    val featureId = getFeatureId(i)
     val geom: Geometry =
       GeometryReducer.reduce(GeometryReducer.gpr)(
         WKB.read(i.getString(geomPos))
       )
-    geotrellis.vector.Feature(geom, SimpleFeatureId(feature_id))
+    geotrellis.vector.Feature(geom, featureId)
+  }
+
+  def getFeatureId(i: Array[String]): FeatureId = {
+    val feature_id: Int = i(idPos).toInt
+    SimpleFeatureId(feature_id)
   }
 
   override def custom_filter(
@@ -30,12 +33,12 @@ object SimpleFeature extends Feature {
     import spark.implicits._
 
     val idStart: Option[Int] = getAnyMapValue[Option[Int]](filters, "idStart")
-    val idEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
+    //    val idEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
 
-    val idStartDF: DataFrame =
-      idStart.foldLeft(df)((acc, i) => acc.filter($"fid" >= i))
+    //    val idStartDF: DataFrame =
+    idStart.foldLeft(df)((acc, i) => acc.filter($"fid" >= i))
 
-    idEnd.foldLeft(idStartDF)((acc, i) => acc.filter($"fid" < i))
+    //    idEnd.foldLeft(idStartDF)((acc, i) => acc.filter($"fid" < i))
 
   }
 }

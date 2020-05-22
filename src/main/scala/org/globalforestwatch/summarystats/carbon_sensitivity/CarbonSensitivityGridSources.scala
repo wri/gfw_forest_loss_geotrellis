@@ -3,55 +3,55 @@ package org.globalforestwatch.summarystats.carbon_sensitivity
 import cats.implicits._
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
-import org.globalforestwatch.grids.GridSources
+import org.globalforestwatch.grids.{GridSources, GridTile}
 import org.globalforestwatch.layers._
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 /**
-  * @param gridId top left corner, padded from east ex: "10N_010E"
+  * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
-case class CarbonSensitivityGridSources(gridId: String, kwargs:  Map[String, Any]) extends GridSources {
+case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String, Any]) extends GridSources {
 
   val model: String = getAnyMapValue[String](kwargs,"sensitivityType")
 
-  val treeCoverLoss = TreeCoverLoss(gridId)
-  val treeCoverDensity2000 = TreeCoverDensityThresholds2000(gridId)
+  val treeCoverLoss = TreeCoverLoss(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
 
-  val biomassPerHectar = BiomassPerHectar(gridId)
+  val biomassPerHectar = BiomassPerHectar(gridTile)
 //  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridId)
-  val grossCumulRemovalsCarbon = GrossCumulRemovalsCo2(gridId, model)
-  val netFluxCo2 = NetFluxCo2e(gridId, model)
+  val grossCumulRemovalsCarbon = GrossCumulRemovalsCo2(gridTile, model)
+  val netFluxCo2 = NetFluxCo2e(gridTile, model)
 
-  val agcEmisYear = AgcEmisYear(gridId, model)
+  val agcEmisYear = AgcEmisYear(gridTile, model)
 //  val bgcEmisYear = BgcEmisYear(gridId)
 //  val deadwoodCarbonEmisYear = DeadwoodCarbonEmisYear(gridId)
 //  val litterCarbonEmisYear = LitterCarbonEmisYear(gridId)
-  val soilCarbonEmisYear = SoilCarbonEmisYear(gridId, model)
+  val soilCarbonEmisYear = SoilCarbonEmisYear(gridTile, model)
 //  val totalCarbonEmisYear = TotalCarbonEmisYear(gridId)
 
-  val agc2000 = Agc2000(gridId, model)
+  val agc2000 = Agc2000(gridTile, model)
 //  val bgc2000 = Bgc2000(gridId)
 //  val deadwoodCarbon2000 = DeadwoodCarbon2000(gridId)
 //  val litterCarbon2000 = LitterCarbon2000(gridId)
-  val soilCarbon2000 = SoilCarbon2000(gridId, model)
+  val soilCarbon2000 = SoilCarbon2000(gridTile, model)
 //  val totalCarbon2000 = TotalCarbon2000(gridId)
 
-  val grossEmissionsCo2eNoneCo2 = GrossEmissionsNonCo2Co2e(gridId, model)
-  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridId, model)
+  val grossEmissionsCo2eNoneCo2 = GrossEmissionsNonCo2Co2e(gridTile, model)
+  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridTile, model)
 
-  val treeCoverGain = TreeCoverGain(gridId)
-  val mangroveBiomassExtent = MangroveBiomassExtent(gridId)
-  val treeCoverLossDrivers = TreeCoverLossDrivers(gridId)
-  val ecozones = Ecozones(gridId)
-  val protectedAreas = ProtectedAreas(gridId)
-  val landRights = LandRights(gridId)
-  val intactForestLandscapes = IntactForestLandscapes(gridId)
-  val plantations = Plantations(gridId)
-  val intactPrimaryForest = IntactPrimaryForest(gridId)
-  val peatlandsFlux = PeatlandsFlux(gridId)
-  val forestAgeCategory = ForestAgeCategory(gridId)
-  val jplAGBExtent = JplAGBextent(gridId)
-  val fiaRegionsUsExtent = FiaRegionsUsExtent(gridId)
+  val treeCoverGain = TreeCoverGain(gridTile)
+  val mangroveBiomassExtent = MangroveBiomassExtent(gridTile)
+  val treeCoverLossDrivers = TreeCoverLossDrivers(gridTile)
+  val ecozones = Ecozones(gridTile)
+  val protectedAreas = ProtectedAreas(gridTile)
+  val landRights = LandRights(gridTile)
+  val intactForestLandscapes = IntactForestLandscapes(gridTile)
+  val plantations = Plantations(gridTile)
+  val intactPrimaryForest = IntactPrimaryForest(gridTile)
+  val peatlandsFlux = PeatlandsFlux(gridTile)
+  val forestAgeCategory = ForestAgeCategory(gridTile)
+  val jplAGBExtent = JplAGBextent(gridTile)
+  val fiaRegionsUsExtent = FiaRegionsUsExtent(gridTile)
 
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonSensitivityTile]] = {
 
@@ -151,9 +151,9 @@ object CarbonSensitivityGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, CarbonSensitivityGridSources]
 
-  def getCachedSources(gridId: String, kwargs:  Map[String, Any]): CarbonSensitivityGridSources = {
+  def getCachedSources(gridTile: GridTile, kwargs:  Map[String, Any]): CarbonSensitivityGridSources = {
 
-    cache.getOrElseUpdate(gridId, CarbonSensitivityGridSources(gridId, kwargs:  Map[String, Any]))
+    cache.getOrElseUpdate(gridTile.tileId, CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String, Any]))
 
   }
 

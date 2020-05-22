@@ -3,36 +3,36 @@ package org.globalforestwatch.summarystats.gladalerts
 import cats.implicits._
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
-import org.globalforestwatch.grids.{GridId, GridSources}
+import org.globalforestwatch.grids.{GridId, GridSources, GridTile}
 import org.globalforestwatch.layers._
 
 /**
-  * @param gridId top left corner, padded from east ex: "10N_010E"
+  * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
-case class GladAlertsGridSources(gridId: String) extends GridSources {
+case class GladAlertsGridSources(gridTile: GridTile) extends GridSources {
 
-  val gladAlerts = GladAlerts(gridId)
-  val biomassPerHectar = BiomassPerHectar(gridId)
-  val climateMask = ClimateMask(gridId)
-  val primaryForest = PrimaryForest(gridId)
-  val protectedAreas = ProtectedAreas(gridId)
-  val aze = Aze(gridId)
-  val keyBiodiversityAreas = KeyBiodiversityAreas(gridId)
-  val landmark = Landmark(gridId)
-  val plantations = Plantations(gridId)
-  val mining = Mining(gridId)
-  val logging = Logging(gridId)
-  val rspo = RSPO(gridId)
-  val woodFiber = WoodFiber(gridId)
-  val peatlands = Peatlands(gridId)
-  val indonesiaForestMoratorium = IndonesiaForestMoratorium(gridId)
-  val oilPalm = OilPalm(gridId)
-  val indonesiaForestArea = IndonesiaForestArea(gridId)
-  val peruForestConcessions = PeruForestConcessions(gridId)
-  val oilGas = OilGas(gridId)
-  val mangroves2016 = Mangroves2016(gridId)
-  val intactForestLandscapes2016 = IntactForestLandscapes2016(gridId)
-  val braBiomes = BrazilBiomes(gridId)
+  val gladAlerts = GladAlerts(gridTile)
+  val biomassPerHectar = BiomassPerHectar(gridTile)
+  val climateMask = ClimateMask(gridTile)
+  val primaryForest = PrimaryForest(gridTile)
+  val protectedAreas = ProtectedAreas(gridTile)
+  val aze = Aze(gridTile)
+  val keyBiodiversityAreas = KeyBiodiversityAreas(gridTile)
+  val landmark = Landmark(gridTile)
+  val plantations = Plantations(gridTile)
+  val mining = Mining(gridTile)
+  val logging = Logging(gridTile)
+  val rspo = RSPO(gridTile)
+  val woodFiber = WoodFiber(gridTile)
+  val peatlands = Peatlands(gridTile)
+  val indonesiaForestMoratorium = IndonesiaForestMoratorium(gridTile)
+  val oilPalm = OilPalm(gridTile)
+  val indonesiaForestArea = IndonesiaForestArea(gridTile)
+  val peruForestConcessions = PeruForestConcessions(gridTile)
+  val oilGas = OilGas(gridTile)
+  val mangroves2016 = Mangroves2016(gridTile)
+  val intactForestLandscapes2016 = IntactForestLandscapes2016(gridTile)
+  val braBiomes = BrazilBiomes(gridTile)
 
   def readWindow(window: Extent): Either[Throwable, Raster[GladAlertsTile]] = {
 
@@ -107,9 +107,9 @@ object GladAlertsGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, GladAlertsGridSources]
 
-  def getCachedSources(gridId: String): GladAlertsGridSources = {
+  def getCachedSources(gridTile: GridTile): GladAlertsGridSources = {
 
-    cache.getOrElseUpdate(gridId, GladAlertsGridSources(gridId))
+    cache.getOrElseUpdate(gridTile.tileId, GladAlertsGridSources(gridTile))
 
   }
 

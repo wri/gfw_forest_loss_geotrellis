@@ -14,6 +14,8 @@ Currently the following analysis are implemented
 *   Carbon Flux Full Standard Model
 *   Carbon Flux Sensitivity Analysis
 *   Glad Alerts
+*   Viirs Fire Alerts
+*   MODIS Fire Alerts
 
 ### Tree Cover Loss
 
@@ -104,6 +106,26 @@ sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladal
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
 ```
 
+### Viirs/ MODIS Fire Alerts
+
+Viirs/ MODIS Fire alert analysis computes whitelist, daily and weekly change data for given input features and intersects areas with the same contextual layers as in glad alerts. 
+It also enriches all fire data with intersecting contextual information.
+It is used to update the country and user dashboards for the GFW website.
+
+Supported input features are
+
+*   GADM
+*   Geostore
+*   WDPA
+*   Simple Feature
+
+```sbt
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+```
+
 ## Inputs
 
 Use Polygon Features encoded in TSV format. Geometries must be encoded in WKB. You can specify one or many input files using wildcards:
@@ -123,30 +145,30 @@ If you are not sure how to best approach this, simply use the [ArcPY Client](htt
 
 The following options are supported:
 
-|Option         |Type  |Analysis or Feature Type |Description                                                                                                                      |
-|---------------|------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-|analysis       |string|                         |Type of analysis to run `annualupdate`, `annualupdate_minimal`, `carbonflux`, `carbon_sensitivity`, `gladalerts`, `treecoverloss`|
-|features       |string|all (required)           |URI of features in TSV format                                                                                                    |
-|output         |string|all (required)           |URI of output dir for CSV files                                                                                                  |
-|feature_type   |string|all (required)           |Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature                                                                      |
-|limit          |int   |all                      |Limit number of records processed                                                                                                |
-|iso_first      |string|`gadm` or `wdpa` features|Filter by first letter of ISO code                                                                                               |
-|iso_start      |string|`gadm` or `wdpa` features|Filter by ISO code larger than or equal to given value                                                                           |
-|iso_end        |string|`gadm` or `wdpa` features|Filter by ISO code smaller than given value                                                                                      |
-|iso            |string|`gadm` or `wdpa` features|Filter by country ISO code                                                                                                       |
-|admin1         |string|`gadm` features          |Filter by country Admin1 code                                                                                                    |
-|admin2         |string|`gadm` features          |Filter by country Admin2 code                                                                                                    |
-|id_start       |int   |`feature` analysis       |Filter by IDs larger than or equal to given value                                                                                |
-|id_end         |int   |`feature` analysis       |Filter by IDs smaller than given value                                                                                           |
-|iucn_cat       |string|`wdpa` features          |Filter by IUCN Category                                                                                                          |
-|wdpa_status    |string|`wdpa` features          |Filter by WDPA Status                                                                                                            |
-|tcd            |int   |`treecover` analysis     |Select tree cover density year                                                                                                   |
-|threshold      |int   |`treecover` analysis     |Treecover threshold to apply                                                                                                     |
-|primary-forests|flag  |`treecover` analysis     |Include Primary Forests                                                                                                          |
-|tcl            |flag  |all                      |Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class                                     |
-|glad           |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class                                   |
-|change_only    |flag  |all except `treecover`   |Process change only                                                                                                              |
-|build_data_cube|flag  |`glad` analysis          |Build XYZ data cube                                                                                                              |
+|Option           |Type  |Analysis or Feature Type |Description                                                                                                                      |
+|-----------------|------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+|analysis         |string|                         |Type of analysis to run `annualupdate`, `annualupdate_minimal`, `carbonflux`, `carbon_sensitivity`, `gladalerts`, `treecoverloss`|
+|features         |string|all (required)           |URI of features in TSV format                                                                                                    |
+|output           |string|all (required)           |URI of output dir for CSV files                                                                                                  |
+|feature_type     |string|all (required)           |Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature                                                                      |
+|limit            |int   |all                      |Limit number of records processed                                                                                                |
+|iso_first        |string|`gadm` or `wdpa` features|Filter by first letter of ISO code                                                                                               |
+|iso_start        |string|`gadm` or `wdpa` features|Filter by ISO code larger than or equal to given value                                                                           |
+|iso_end          |string|`gadm` or `wdpa` features|Filter by ISO code smaller than given value                                                                                      |
+|iso              |string|`gadm` or `wdpa` features|Filter by country ISO code                                                                                                       |
+|admin1           |string|`gadm` features          |Filter by country Admin1 code                                                                                                    |
+|admin2           |string|`gadm` features          |Filter by country Admin2 code                                                                                                    |
+|id_start         |int   |`feature` analysis       |Filter by IDs larger than or equal to given value                                                                                |
+|wdpa_status      |string|`wdpa` features          |Filter by WDPA Status                                                                                                            |
+|tcd              |int   |`treecover` analysis     |Select tree cover density year                                                                                                   |
+|threshold        |int   |`treecover` analysis     |Treecover threshold to apply                                                                                                     |
+|primary-forests  |flag  |`treecover` analysis     |Include Primary Forests                                                                                                          |
+|tcl              |flag  |all                      |Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class                                     |
+|glad             |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class                                   |
+|change_only      |flag  |all except `treecover`   |Process change only                                                                                                              |
+|sensitivity_type |string|`carbon_sensitivity`     |Select carbon sensitivity model                                                                                                  |
+|fire_alert_type  |string|`firealerts`             |Select Fire alert type                                                                                                           |
+|fire_alert_source|string|`firealerts`             |URI of fire alert TSV file                                                                                                       |
 
 ## Inventory
 
