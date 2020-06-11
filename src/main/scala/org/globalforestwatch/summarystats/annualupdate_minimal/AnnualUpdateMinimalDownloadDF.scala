@@ -24,6 +24,7 @@ object AnnualUpdateMinimalDownloadDF {
         sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions__Mg"
       )
       .as("annual")
+      .na.fill(0, Seq("adm1", "adm2"))
 
     val totalDF = df
       .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density__threshold")
@@ -39,6 +40,7 @@ object AnnualUpdateMinimalDownloadDF {
         sum("whrc_aboveground_co2_stock_2000__Mg") as "whrc_aboveground_co2_stock_2000__Mg"
       )
       .as("total")
+      .na.fill(0, Seq("adm1", "adm2"))
 
     totalDF
       .join(
@@ -135,6 +137,7 @@ object AnnualUpdateMinimalDownloadDF {
       groupByCols.tail ::: List("umd_tree_cover_density__threshold"): _*
     )
       .agg(aggCols.head, aggCols.tail: _*)
+      .na.fill(0, Seq("avg_whrc_aboveground_biomass_2000_Mt_ha-1"))
   }
 
   def roundDownload(roundCols: List[Column])(df: DataFrame): DataFrame = {
@@ -224,7 +227,7 @@ object AnnualUpdateMinimalDownloadDF {
   private def setNullZero(df: DataFrame): DataFrame = {
 
     def setZero(column: Column): Column =
-      when(column.isNull, 0).otherwise(column)
+      when(column.isNull || column.isNaN, 0).otherwise(column)
 
     val treecoverLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {

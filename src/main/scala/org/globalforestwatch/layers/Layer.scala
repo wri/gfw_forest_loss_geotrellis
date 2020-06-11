@@ -5,6 +5,7 @@ import java.io.FileNotFoundException
 import cats.implicits._
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.services.s3.AmazonS3URI
+import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
 import geotrellis.raster.crop._
 import geotrellis.raster.{CellType, Tile, isNoData}
@@ -145,8 +146,12 @@ trait RequiredLayer extends Layer {
   lazy val source: GeoTiffRasterSource = {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
-    if (!s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
-      throw new FileNotFoundException(uri)
+    try {
+      if (!s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+        throw new FileNotFoundException(uri)
+      }
+    } catch {
+      case e: AmazonS3Exception => throw new FileNotFoundException(uri)
     }
     GeoTiffRasterSource(uri)
   }
@@ -227,12 +232,18 @@ trait OptionalLayer extends Layer {
     // Removes the expected 404 errors from console log
 
     val s3uri = new AmazonS3URI(uri)
-    if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
-      println(s"Opening: $uri")
-      Some(GeoTiffRasterSource(uri))
-    } else {
-      println(s"Cannot open: $uri")
-      None
+    try {
+      if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+        println(s"Opening: $uri")
+        Some(GeoTiffRasterSource(uri))
+      } else {
+        println(s"Cannot open: $uri")
+        None
+      }
+    } catch {
+      case e: AmazonS3Exception =>
+        println(s"Cannot open: $uri")
+        None
     }
   }
 
