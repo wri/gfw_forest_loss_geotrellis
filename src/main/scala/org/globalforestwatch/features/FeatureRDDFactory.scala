@@ -29,7 +29,7 @@ object FeatureRDDFactory {
           fireSrcUris,
           fireFeatureObj,
           kwargs,
-          spark)
+          spark).distinct  // call distinct to remove duplicate PIP intersections due to how we split input geometries
       case _ =>
         FeatureRDD(featureUris, featureObj, kwargs, spark)
     }

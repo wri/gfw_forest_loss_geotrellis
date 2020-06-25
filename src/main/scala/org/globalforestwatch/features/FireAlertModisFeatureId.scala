@@ -10,5 +10,5 @@ case class FireAlertModisFeatureId(
                                     brightness: Float,
                                     brightT31: Float,
                                     frp: Float) extends FeatureId {
-  override def toString: String = alertDate + " " + alertTime.toString
+  override def toString: String = alertDate + " " + alertTime.toString + " " + lon.toString + " " + lat.toString
 }
