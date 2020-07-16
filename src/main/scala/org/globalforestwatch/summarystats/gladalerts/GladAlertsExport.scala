@@ -64,7 +64,7 @@ object GladAlertsExport extends SummaryExport {
       .transform(GladAlertsDF.aggSummary(List("iso", "adm1", "adm2")))
 
     adm2DF
-      .coalesce(1)
+      .coalesce(10)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/summary")
@@ -73,7 +73,7 @@ object GladAlertsExport extends SummaryExport {
       .transform(GladAlertsDF.aggSummary(List("iso", "adm1")))
 
     adm1DF
-      .coalesce(1)
+      .coalesce(10)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/summary")
@@ -82,7 +82,7 @@ object GladAlertsExport extends SummaryExport {
       .transform(GladAlertsDF.aggSummary(List("iso")))
 
     isoDF
-      .coalesce(1)
+      .coalesce(10)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/summary")
@@ -125,7 +125,7 @@ object GladAlertsExport extends SummaryExport {
       .transform(GladAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
 
     adm2DailyDF
-      .coalesce(1)
+      .coalesce(10)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/daily_alerts")
@@ -134,7 +134,7 @@ object GladAlertsExport extends SummaryExport {
       .transform(GladAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2")))
 
     adm2DF
-      .coalesce(1)
+      .coalesce(10)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/weekly_alerts")
@@ -143,7 +143,7 @@ object GladAlertsExport extends SummaryExport {
       .transform(GladAlertsDF.aggChangeWeekly2(List("iso", "adm1")))
 
     adm1DF
-      .coalesce(1)
+      .coalesce(10)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/weekly_alerts")
@@ -154,7 +154,7 @@ object GladAlertsExport extends SummaryExport {
 
 
     isoDF
-      .coalesce(1)
+      .coalesce(10)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/weekly_alerts")
@@ -209,7 +209,7 @@ object GladAlertsExport extends SummaryExport {
     val groupByCols = List("geostore__id")
     val unpackCols = List($"id.geostoreId" as "geostore__id")
 
-    _export(summaryDF, outputUrl + "/geostore", kwargs, groupByCols, unpackCols)
+    _export(summaryDF, outputUrl + "/geostore", kwargs, groupByCols, unpackCols, numExportParts = 20)
 
   }
 
@@ -218,7 +218,8 @@ object GladAlertsExport extends SummaryExport {
                       kwargs: Map[String, Any],
                       groupByCols: List[String],
                       unpackCols: List[Column],
-                      wdpa: Boolean = false): Unit = {
+                      wdpa: Boolean = false,
+                      numExportParts: Int = 10): Unit = {
 
     val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
@@ -244,20 +245,20 @@ object GladAlertsExport extends SummaryExport {
         .csv(path = outputUrl + "/whitelist")
 
       df.transform(GladAlertsDF.aggSummary(cols, wdpa = wdpa))
-        .coalesce(1)
+        .coalesce(numExportParts)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/summary")
     }
 
     df.transform(GladAlertsDF.aggChangeDaily(cols, wdpa = wdpa))
-      .coalesce(1)
+      .coalesce(numExportParts)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
 
     df.transform(GladAlertsDF.aggChangeWeekly(cols, wdpa = wdpa))
-      .coalesce(1)
+      .coalesce(numExportParts)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/weekly_alerts")
