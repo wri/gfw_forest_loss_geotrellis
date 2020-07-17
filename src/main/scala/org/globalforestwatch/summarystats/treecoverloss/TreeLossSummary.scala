@@ -36,15 +36,15 @@ object TreeLossSummary {
                    row: Int,
                    acc: TreeLossSummary): TreeLossSummary = {
 
-        val tcdYear: Int = getAnyMapValue[Int](acc.kwargs, "tcdYear")
+        // val tcdYear: Int = getAnyMapValue[Int](acc.kwargs, "tcdYear")
 
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
-        val gain: Boolean = raster.tile.gain.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
-        val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
-        val biomass: Double = raster.tile.biomass.getData(col, row)
         val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
+        val ifl: Boolean = raster.tile.ifl.getData(col, row)
+        val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
+        val protectedAreas: String = raster.tile.protectedAreas.getData(col, row)
 
         //        val cols: Int = raster.rasterExtent.cols
         //        val rows: Int = raster.rasterExtent.rows
@@ -56,69 +56,55 @@ object TreeLossSummary {
 
         val areaHa = area / 10000.0
 
-        val gainArea: Double = gain * areaHa
+        // val thresholds: List[Int] =
+        //  getAnyMapValue[NonEmptyList[Int]](acc.kwargs, "thresholdFilter").toList
 
-        val co2Factor = 0.5 * 44 / 12
-
-        val biomassPixel = biomass * areaHa
-        val co2Pixel = biomassPixel * co2Factor
-
-        val thresholds: List[Int] =
-          getAnyMapValue[NonEmptyList[Int]](acc.kwargs, "thresholdFilter").toList
-
-        @tailrec
+        // @tailrec
         def updateSummary(
-                           thresholds: List[Int],
                            stats: Map[TreeLossDataGroup, TreeLossData]
-                         ): Map[TreeLossDataGroup, TreeLossData] = {
-          if (thresholds == Nil) stats
-          else {
-            val pKey =
-              TreeLossDataGroup(thresholds.head, tcdYear, primaryForest)
+         ): Map[TreeLossDataGroup, TreeLossData] = {
+          val pKey = TreeLossDataGroup()
+          val summary: TreeLossData =
+            stats.getOrElse(
+              key = pKey,
+              default =
+                TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            )
 
-            val summary: TreeLossData =
-              stats.getOrElse(
-                key = pKey,
-                default =
-                  TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0)
-              )
+            val primaryForestArea = areaHa * primaryForest
+            val iflArea = areaHa * ifl
+            val peatlandsArea = areaHa * peatlands
+            val wdpaArea = areaHa * (!protectedAreas.isEmpty)
 
             summary.totalArea += areaHa
-            summary.totalGainArea += gainArea
+            summary.primaryForestExtent += primaryForestArea
+            summary.iflExtent += iflArea
+            summary.peatlandsExtent += peatlandsArea
+            summary.wdpaExtent += wdpaArea
 
-            if ((tcd2000 >= thresholds.head && tcdYear == 2000) || (tcd2010 >= thresholds.head && tcdYear == 2010)) {
+            if (tcd2000 >= 30) {
+              summary.treecoverExtent2000 += areaHa
 
               if (loss != null) {
+                summary.totalLossArea += areaHa
+                summary.totalPrimaryForestLoss += primaryForestArea
+                summary.totalIflLoss += iflArea
+                summary.totalPeatlandsLoss += peatlandsArea
+                summary.totalWdpaLoss += wdpaArea
+
                 summary.lossYear(loss).treecoverLoss += areaHa
-                summary.lossYear(loss).biomassLoss += biomassPixel
-                summary.lossYear(loss).carbonEmissions += co2Pixel
+                summary.lossYear(loss).primaryLoss += primaryForestArea
+                summary.lossYear(loss).iflLoss += iflArea
+                summary.lossYear(loss).peatlandsLoss += peatlandsArea
+                summary.lossYear(loss).wdpaLoss += wdpaArea
               }
-
-              // TODO: use extent2010 to calculate avg biomass incase year is selected
-              summary.avgBiomass = ((summary.avgBiomass * summary.treecoverExtent2000) + (biomass * areaHa)) / (summary.treecoverExtent2000 + areaHa)
-              tcdYear match {
-                case 2000 => summary.treecoverExtent2000 += areaHa
-                case 2010 => summary.treecoverExtent2010 += areaHa
-              }
-              summary.totalBiomass += biomassPixel
-              summary.totalCo2 += co2Pixel
             }
 
-            tcdYear match {
-              case 2000 =>
-                if (tcd2010 >= thresholds.head)
-                  summary.treecoverExtent2010 += areaHa
-              case 2010 =>
-                if (tcd2000 >= thresholds.head)
-                  summary.treecoverExtent2000 += areaHa
-            }
-
-            updateSummary(thresholds.tail, stats.updated(pKey, summary))
-          }
+          stats.updated(pKey, summary)
         }
 
         val updatedSummary: Map[TreeLossDataGroup, TreeLossData] =
-          updateSummary(thresholds, acc.stats)
+          updateSummary(acc.stats)
 
         TreeLossSummary(updatedSummary, acc.kwargs)
 

@@ -9,12 +9,16 @@ import cats.Semigroup
 case class TreeLossData(
                          var lossYear: scala.collection.mutable.Map[Int, TreeLossYearData],
                          var treecoverExtent2000: Double,
-                         var treecoverExtent2010: Double,
                          var totalArea: Double,
-                         var totalGainArea: Double,
-                         var totalBiomass: Double,
-                         var totalCo2: Double,
-                         var avgBiomass: Double
+                         var totalLossArea: Double,
+                         var primaryForestExtent: Double,
+                         var iflExtent: Double,
+                         var peatlandsExtent: Double,
+                         var wdpaExtent: Double,
+                         var totalPrimaryForestLoss: Double,
+                         var totalIflLoss: Double,
+                         var totalPeatlandsLoss: Double,
+                         var totalWdpaLoss: Double
                        ) {
   def merge(other: TreeLossData): TreeLossData = {
 
@@ -24,19 +28,24 @@ case class TreeLossData(
           val loss: TreeLossYearData = lossYear(k)
           val otherLoss: TreeLossYearData = v
           otherLoss.treecoverLoss += loss.treecoverLoss
-          otherLoss.biomassLoss += loss.biomassLoss
-          otherLoss.carbonEmissions += loss.carbonEmissions
+          otherLoss.primaryLoss += loss.primaryLoss
+          otherLoss.iflLoss += loss.iflLoss
+          otherLoss.peatlandsLoss += loss.peatlandsLoss
+          otherLoss.wdpaLoss += loss.wdpaLoss
           k -> otherLoss
         }
       },
       treecoverExtent2000 + other.treecoverExtent2000,
-      treecoverExtent2010 + other.treecoverExtent2010,
       totalArea + other.totalArea,
-      totalGainArea + other.totalGainArea,
-      totalBiomass + other.totalBiomass,
-      totalCo2 + other.totalCo2,
-      // TODO: use extent2010 to calculate avg biomass incase year is selected
-      ((avgBiomass * treecoverExtent2000) + (other.avgBiomass * other.treecoverExtent2000)) / (treecoverExtent2000 + other.treecoverExtent2000)
+      totalLossArea + other.totalLossArea,
+      primaryForestExtent + other.primaryForestExtent,
+      iflExtent + other.iflExtent,
+      peatlandsExtent + other.peatlandsExtent,
+      wdpaExtent + other.wdpaExtent,
+      totalPrimaryForestLoss + other.totalPrimaryForestLoss,
+      totalIflLoss + other.totalIflLoss,
+      totalPeatlandsLoss + other.totalPeatlandsLoss,
+      totalWdpaLoss + other.totalWdpaLoss
     )
   }
 }

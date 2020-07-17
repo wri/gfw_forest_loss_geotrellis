@@ -14,7 +14,7 @@ object TreeLossDF {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
-    validatePresenceOfColumns(df, Seq("id", "data_group", "data"))
+    validatePresenceOfColumns(df, Seq("id", "data"))
 
     val treecoverLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
@@ -22,40 +22,52 @@ object TreeLossDF {
           .getItem(i)
           .getItem("treecoverLoss") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
-    val abovegroundBiomassLossCols =
+    val primaryLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("biomassLoss") as s"whrc_aboveground_biomass_loss_${i}__Mg"
+          .getItem("primaryLoss") as s"umd_primary_forest_loss_${i}__ha"
       }).toList
-
-    val co2EmissionsCols =
+    val iflLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("carbonEmissions") as s"whrc_aboveground_co2_emissions_${i}__Mg"
+          .getItem("iflLoss") as s"intact_forest_landscapes_2016_loss_${i}__ha"
+      }).toList
+    val peatlandsLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        $"data.lossYear"
+          .getItem(i)
+          .getItem("peatlandsLoss") as s"peatlands_loss_${i}__ha"
+      }).toList
+    val protectedAreasLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        $"data.lossYear"
+          .getItem(i)
+          .getItem("wdpaLoss") as s"protected_areas_loss_${i}__ha"
       }).toList
 
     val cols = List(
       $"id.featureId" as "feature__id",
-      $"data_group.threshold" as "umd_tree_cover_density__threshold",
-      $"data_group.tcdYear" as "umd_tree_cover_extent__year",
-      $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
-      $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
-      $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
-      $"data.totalGainArea" as "umd_tree_cover_gain_2000-2012__ha",
-      $"data.totalBiomass" as "whrc_aboveground_biomass_stock_2000__Mg",
-      $"data.avgBiomass" as "avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1",
-      $"data.totalCo2" as "whrc_aboveground_co2_stock_2000__Mt"
+      $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
+      $"data.totalLossArea" as "total_umd_tree_cover_loss__ha",
+      $"data.primaryForestExtent" as "primary_forest_extent__ha",
+      $"data.iflExtent" as "intact_forest_landscapes_2016_extent__ha",
+      $"data.peatlandsExtent" as "peatlands_extent__ha",
+      $"data.wdpaExtent" as "protected_areas_extent__ha",
+      $"data.totalPrimaryForestLoss" as "total_primary_forest_loss__ha",
+      $"data.totalIflLoss" as "total_intact_forest_landscapes_2016_loss__ha",
+      $"data.totalPeatlandsLoss" as "total_peatlands_loss__ha",
+      $"data.totalWdpaLoss" as "total_protected_areas_loss__ha"
     )
 
     df.select(
-      cols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
+      cols ::: treecoverLossCols ::: primaryLossCols ::: iflLossCols ::: peatlandsLossCols ::: protectedAreasLossCols: _*
     )
 
   }
-
+  /*
   def primaryForestFilter(include: Boolean)(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
@@ -99,6 +111,6 @@ object TreeLossDF {
           cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
         )
     }
-  }
+  }*/
 
 }

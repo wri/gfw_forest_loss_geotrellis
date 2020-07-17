@@ -12,12 +12,13 @@ import org.globalforestwatch.layers._
 case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
-  val treeCoverGain = TreeCoverGain(gridTile)
   val treeCoverDensity2000 = TreeCoverDensity2000(gridTile)
-  val treeCoverDensity2010 = TreeCoverDensity2010(gridTile)
-  val biomassPerHectar = BiomassPerHectar(gridTile)
   val primaryForest = PrimaryForest(gridTile)
-
+  val protectedAreas = ProtectedAreas(gridTile)
+  val peatlands = Peatlands(gridTile)
+  // val indonesiaForestMoratorium = IndonesiaForestMoratorium(gridTile)
+  val intactForestLandscapes2016 = IntactForestLandscapes2016(gridTile)
+ //  val braBiomes = BrazilBiomes(gridTile)
 
   def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
 
@@ -25,27 +26,24 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
       // Failure for any of these reads will result in function returning Left[Throwable]
       // These are effectively required fields without which we can't make sense of the analysis
       lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(window)).right
-      gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(window)).right
       tcd2000Tile <- Either
         .catchNonFatal(treeCoverDensity2000.fetchWindow(window))
-        .right
-      tcd2010Tile <- Either
-        .catchNonFatal(treeCoverDensity2010.fetchWindow(window))
         .right
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
-      val biomassTile = biomassPerHectar.fetchWindow(window)
       val primaryForestTile = primaryForest.fetchWindow(window)
-
+      val protectedAreasTile = protectedAreas.fetchWindow(window)
+      val peatlandsForestTile = peatlands.fetchWindow(window)
+      val intactForestLandscapes2016Tile = intactForestLandscapes2016.fetchWindow(window)
 
       val tile = TreeLossTile(
         lossTile,
-        gainTile,
         tcd2000Tile,
-        tcd2010Tile,
-        biomassTile,
-        primaryForestTile
+        primaryForestTile,
+        intactForestLandscapes2016Tile,
+        peatlandsForestTile,
+        protectedAreasTile
       )
 
       Raster(tile, window)

@@ -18,9 +18,9 @@ object TreeLossExport extends SummaryExport {
 
     summaryDF
       .transform(TreeLossDF.unpackValues)
-      .transform(TreeLossDF.primaryForestFilter(includePrimaryForest))
+      //.transform(TreeLossDF.primaryForestFilter(includePrimaryForest))
       .coalesce(1)
-      .orderBy($"feature__id", $"umd_tree_cover_density__threshold")
+      .orderBy($"feature__id")
       .write
       .options(csvOptions)
       .csv(path = outputUrl)
