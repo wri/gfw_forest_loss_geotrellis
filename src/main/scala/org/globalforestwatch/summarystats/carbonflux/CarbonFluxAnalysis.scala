@@ -3,6 +3,8 @@ package org.globalforestwatch.summarystats.carbonflux
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import geotrellis.spark.SpatialKey
+import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
@@ -20,7 +22,7 @@ object CarbonFluxAnalysis {
     import spark.implicits._
 
     val summaryRDD: RDD[(FeatureId, CarbonFluxSummary)] =
-      CarbonFluxRDD(featureRDD, CarbonFluxGrid.blockTileGrid, part, kwargs)
+      CarbonFluxRDD(featureRDD, CarbonFluxGrid.blockTileGrid, Some(part), kwargs)
 
     val summaryDF =
       CarbonFluxDFFactory(featureType, summaryRDD, spark).getDataFrame

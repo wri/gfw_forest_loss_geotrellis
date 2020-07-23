@@ -3,6 +3,8 @@ package org.globalforestwatch.summarystats.treecoverloss
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import geotrellis.spark.SpatialKey
+import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
@@ -19,7 +21,7 @@ object TreeLossAnalysis {
     import spark.implicits._
 
     val summaryRDD: RDD[(FeatureId, TreeLossSummary)] =
-      TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, part, kwargs)
+      TreeLossRDD(featureRDD, TreeLossGrid.blockTileGrid, Some(part), kwargs)
 
     val summaryDF =
       TreeLossDFFactory(featureType, summaryRDD, spark).getDataFrame

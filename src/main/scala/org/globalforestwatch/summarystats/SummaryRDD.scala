@@ -5,6 +5,7 @@ import com.typesafe.scalalogging.LazyLogging
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.spark.SpatialKey
+import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.vector._
 import org.apache.spark.Partitioner
@@ -29,7 +30,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
   def apply[FEATUREID <: FeatureId](
                                      featureRDD: RDD[Feature[Geometry, FEATUREID]],
                                      windowLayout: LayoutDefinition,
-                                     partitioner: Partitioner,
+                                     partitioner: Option[Partitioner],
                                      kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
 
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
@@ -45,7 +46,11 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
           (key, feature)
         }
       }
-      .partitionBy(partitioner)
+
+    val partitionedFeatureRDD = partitioner match {
+      case Some(part) => keyedFeatureRDD.partitionBy(part)
+      case None => keyedFeatureRDD
+    }
 
     /* Here we're going to work with the features one partition at a time.
      * We're going to use the tile key from windowLayout to read pixels from appropriate raster.
@@ -54,7 +59,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      * The RDD is keyed by Id such that we can join and recombine partial results later.
      */
     val featuresWithSummaries: RDD[(FEATUREID, SUMMARY)] =
-      keyedFeatureRDD.mapPartitions {
+      partitionedFeatureRDD.mapPartitions {
         featurePartition: Iterator[
           (SpatialKey, Feature[Geometry, FEATUREID])
         ] =>

@@ -3,6 +3,8 @@ package org.globalforestwatch.summarystats.annualupdate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import geotrellis.spark.SpatialKey
+import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
@@ -20,7 +22,7 @@ object AnnualUpdateAnalysis {
     import spark.implicits._
 
     val summaryRDD: RDD[(FeatureId, AnnualUpdateSummary)] =
-      AnnualUpdateRDD(featureRDD, AnnualUpdateGrid.blockTileGrid, part, kwargs)
+      AnnualUpdateRDD(featureRDD, AnnualUpdateGrid.blockTileGrid, Some(part), kwargs)
 
     val summaryDF =
       AnnualUpdateDFFactory(featureType, summaryRDD, spark).getDataFrame

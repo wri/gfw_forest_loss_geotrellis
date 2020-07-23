@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats
 
 import cats.implicits._
 import com.monovore.decline.{CommandApp, Opts}
+import geotrellis.spark.{KeyBounds, SpatialKey}
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.log4j.Logger
 import org.apache.spark._
@@ -251,6 +252,7 @@ object SummaryMain
             val part = new HashPartitioner(
               partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
             )
+
 
             SummaryAnalysisFactory(
               analysis,

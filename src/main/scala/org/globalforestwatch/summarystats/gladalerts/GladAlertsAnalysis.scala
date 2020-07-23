@@ -3,6 +3,8 @@ package org.globalforestwatch.summarystats.gladalerts
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import geotrellis.spark.{KeyBounds, SpatialKey}
+import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
@@ -21,7 +23,7 @@ object GladAlertsAnalysis {
     import spark.implicits._
 
     val summaryRDD: RDD[(FeatureId, GladAlertsSummary)] =
-      GladAlertsRDD(featureRDD, GladAlertsGrid.blockTileGrid, part, kwargs)
+      GladAlertsRDD(featureRDD, GladAlertsGrid.blockTileGrid, Some(part), kwargs)
 
     val summaryDF =
       GladAlertsDFFactory(featureType, summaryRDD, spark).getDataFrame

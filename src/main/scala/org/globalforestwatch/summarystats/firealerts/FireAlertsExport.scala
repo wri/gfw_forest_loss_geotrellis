@@ -31,11 +31,15 @@ object FireAlertsExport extends SummaryExport {
     summaryDF.unpersist()
 
     gadmDF.cache()
-    gadmDF
-      .coalesce(ceil(numPartitions / 40.0).toInt)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/all")
+
+    // only export all points for viirs gadm
+    if (fireAlertType == "viirs") {
+      gadmDF
+        .coalesce (ceil (numPartitions / 40.0).toInt)
+        .write
+        .options (csvOptions)
+        .csv (path = outputUrl + "/all")
+    }
 
     exportChange(gadmDF, outputUrl, numPartitions)
     gadmDF.unpersist()
@@ -157,10 +161,11 @@ object FireAlertsExport extends SummaryExport {
     val numPartitions = summaryDF.rdd.getNumPartitions
 
     df.cache()
-    df.coalesce(ceil(numPartitions / 40.0).toInt)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/all")
+    // for now only export VIIRS GADM all
+//    df.coalesce(ceil(numPartitions / 40.0).toInt)
+//      .write
+//      .options(csvOptions)
+//      .csv(path = outputUrl + "/all")
 
     df.transform(FireAlertsDF.aggChangeDaily(cols, wdpa = wdpa))
       .coalesce(ceil(numPartitions / 100.0).toInt)

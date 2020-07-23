@@ -3,6 +3,8 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import geotrellis.spark.SpatialKey
+import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
@@ -23,7 +25,7 @@ object AnnualUpdateMinimalAnalysis {
       AnnualUpdateMinimalRDD(
         featureRDD,
         AnnualUpdateMinimalGrid.blockTileGrid,
-        part,
+        Some(part),
         kwargs
       )
 
