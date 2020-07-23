@@ -21,7 +21,7 @@ object SimpleFeature extends Feature {
   }
 
   def getFeatureId(i: Array[String]): FeatureId = {
-    val feature_id: Int = i(idPos).toInt
+    val feature_id: Long = i(idPos).toLong
     SimpleFeatureId(feature_id)
   }
 

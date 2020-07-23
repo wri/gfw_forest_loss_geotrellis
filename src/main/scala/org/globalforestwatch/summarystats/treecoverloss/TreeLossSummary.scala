@@ -68,7 +68,7 @@ object TreeLossSummary {
             stats.getOrElse(
               key = pKey,
               default =
-                TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             )
 
             val primaryForestArea = areaHa * primaryForest
@@ -84,6 +84,10 @@ object TreeLossSummary {
 
             if (tcd2000 >= 30) {
               summary.treecoverExtent2000 += areaHa
+              summary.primaryForestExtent += primaryForestArea
+              summary.iflTreeCoverExtent += iflArea
+              summary.peatlandsTreeCoverExtent += peatlandsArea
+              summary.wdpaTreeCoverExtent += wdpaArea
 
               if (loss != null) {
                 summary.totalLossArea += areaHa

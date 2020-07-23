@@ -18,7 +18,11 @@ case class TreeLossData(
                          var totalPrimaryForestLoss: Double,
                          var totalIflLoss: Double,
                          var totalPeatlandsLoss: Double,
-                         var totalWdpaLoss: Double
+                         var totalWdpaLoss: Double,
+                         var primaryForestTreeCoverExtent: Double,
+                         var iflTreeCoverExtent: Double,
+                         var peatlandsTreeCoverExtent: Double,
+                         var wdpaTreeCoverExtent: Double
                        ) {
   def merge(other: TreeLossData): TreeLossData = {
 
@@ -45,7 +49,11 @@ case class TreeLossData(
       totalPrimaryForestLoss + other.totalPrimaryForestLoss,
       totalIflLoss + other.totalIflLoss,
       totalPeatlandsLoss + other.totalPeatlandsLoss,
-      totalWdpaLoss + other.totalWdpaLoss
+      totalWdpaLoss + other.totalWdpaLoss,
+      iflTreeCoverExtent + other.iflTreeCoverExtent,
+      peatlandsTreeCoverExtent + other.peatlandsTreeCoverExtent,
+      wdpaTreeCoverExtent + other.wdpaTreeCoverExtent,
+      primaryForestExtent + other.primaryForestExtent
     )
   }
 }

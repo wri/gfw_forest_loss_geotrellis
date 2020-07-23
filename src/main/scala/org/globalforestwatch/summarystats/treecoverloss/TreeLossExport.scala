@@ -19,7 +19,7 @@ object TreeLossExport extends SummaryExport {
     summaryDF
       .transform(TreeLossDF.unpackValues)
       //.transform(TreeLossDF.primaryForestFilter(includePrimaryForest))
-      .coalesce(1)
+      .coalesce(50)
       .orderBy($"feature__id")
       .write
       .options(csvOptions)
