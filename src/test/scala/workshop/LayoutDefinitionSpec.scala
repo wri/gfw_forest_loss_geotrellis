@@ -2,7 +2,7 @@ package workshop
 
 import geotrellis.raster.TileLayout
 import geotrellis.spark._
-import geotrellis.spark.tiling.LayoutDefinition
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.vector._
 import geotrellis.vector.io.wkt.WKT
 import org.scalatest._

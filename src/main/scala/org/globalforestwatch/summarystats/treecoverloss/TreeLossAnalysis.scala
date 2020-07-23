@@ -3,7 +3,7 @@ package org.globalforestwatch.summarystats.treecoverloss
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import geotrellis.spark.SpatialKey
+import geotrellis.layer.SpatialKey
 import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.HashPartitioner

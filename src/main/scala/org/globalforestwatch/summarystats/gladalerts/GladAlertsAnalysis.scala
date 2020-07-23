@@ -3,7 +3,7 @@ package org.globalforestwatch.summarystats.gladalerts
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import geotrellis.spark.{KeyBounds, SpatialKey}
+import geotrellis.layer.{KeyBounds, SpatialKey}
 import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.HashPartitioner

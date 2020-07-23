@@ -1,7 +1,7 @@
 package org.globalforestwatch.grids
 
 import geotrellis.raster.TileLayout
-import geotrellis.spark.tiling.LayoutDefinition
+import geotrellis.layer.LayoutDefinition
 import geotrellis.vector.{Extent, Point}
 import org.globalforestwatch.layers.{OptionalLayer, RequiredLayer}
 

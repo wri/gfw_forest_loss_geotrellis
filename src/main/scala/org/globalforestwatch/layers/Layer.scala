@@ -10,6 +10,8 @@ import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
 import geotrellis.raster.crop._
 import geotrellis.raster.{CellType, Tile, isNoData}
 import geotrellis.vector.Extent
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException}
 
 trait Layer {
 
@@ -19,7 +21,7 @@ trait Layer {
   type A
   type B
 
-  val s3Client: geotrellis.spark.io.s3.S3Client = geotrellis.spark.io.s3.S3Client.DEFAULT
+  val s3Client: S3Client = geotrellis.store.s3.S3ClientProducer.get()
   val uri: String
   val internalNoDataValue: A
   val externalNoDataValue: B
@@ -147,7 +149,17 @@ trait RequiredLayer extends Layer {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
     try {
-      if (!s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+      val keyExists =
+        try {
+          val headRequest = HeadObjectRequest.builder().bucket(s3uri.getBucket).key(s3uri.getKey).build()
+          s3Client.headObject(headRequest)
+          true
+        } catch {
+          case e: NoSuchKeyException => false
+          case _: Throwable => throw new Exception(f"Unexpected exception on key ${s3uri.getKey}")
+        }
+
+      if (!keyExists) {
         throw new FileNotFoundException(uri)
       }
     } catch {
@@ -233,7 +245,17 @@ trait OptionalLayer extends Layer {
 
     val s3uri = new AmazonS3URI(uri)
     try {
-      if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+      val keyExists =
+        try {
+          val headRequest = HeadObjectRequest.builder().bucket(s3uri.getBucket).key(s3uri.getKey).build()
+          s3Client.headObject(headRequest)
+          true
+        } catch {
+          case e: NoSuchKeyException => false
+          case _: Throwable => throw new Exception(f"Unexpected exception on key ${s3uri.getKey}")
+        }
+
+      if (keyExists) {
         println(s"Opening: $uri")
         Some(GeoTiffRasterSource(uri))
       } else {

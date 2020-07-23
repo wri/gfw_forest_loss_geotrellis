@@ -31,7 +31,7 @@ case class GladAlertsTile(
                            mangroves2016: Mangroves2016#OptionalITile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
                            brazilBiomes: BrazilBiomes#OptionalITile
-                         ) extends CellGrid {
+                         ) extends CellGrid[Int] {
   def cellType: CellType = glad.cellType
 
   def cols: Int = glad.cols

@@ -3,7 +3,7 @@ package org.globalforestwatch.annualupdate
 import geotrellis.contrib.vlm.geotiff._
 import geotrellis.proj4._
 import geotrellis.raster.{RasterExtent, TileLayout, _}
-import geotrellis.spark.tiling.LayoutDefinition
+import geotrellis.layer.LayoutDefinition
 import geotrellis.vector.Extent
 import org.scalatest._
 /*

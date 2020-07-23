@@ -102,8 +102,8 @@ In `geotrellis-spark` package it is common to work with rasters that are keyed b
 For instance `layoutDefinition` defines the grid on which 1x1 degree GeoTiffs of National Elevation Dataset are published.
 
 ```scala
-scala> import geotrellis.spark.tiling.LayoutDefinition
-import geotrellis.spark.tiling.LayoutDefinition
+scala> import geotrellis.layer.LayoutDefinition
+import geotrellis.layer.LayoutDefinition
 
 scala> import geotrellis.raster.TileLayout
 import geotrellis.raster.TileLayout

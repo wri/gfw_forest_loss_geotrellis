@@ -4,9 +4,8 @@ import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
-import geotrellis.spark.SpatialKey
+import geotrellis.layer.{SpatialKey, LayoutDefinition}
 import geotrellis.spark.partition.SpacePartitioner
-import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.vector._
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
@@ -19,7 +18,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
   type SOURCES <: GridSources
   type SUMMARY <: Summary[SUMMARY]
-  type TILE <: CellGrid
+  type TILE <: CellGrid[Int]
 
   /** Produce RDD of tree cover loss from RDD of areas of interest*
     *
