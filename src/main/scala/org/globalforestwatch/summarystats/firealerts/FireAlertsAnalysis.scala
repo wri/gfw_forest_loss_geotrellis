@@ -3,16 +3,13 @@ package org.globalforestwatch.summarystats.firealerts
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import geotrellis.vector.{Feature, Geometry}
+import geotrellis.vector.Feature
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
-import org.globalforestwatch.features.{FireAlertModisFeatureId, FireAlertViirsFeatureId}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId}
 import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
-import geotrellis.spark.{KeyBounds, SpatialKey}
-import geotrellis.spark.partition.SpacePartitioner
 import org.apache.spark.HashPartitioner
 
 object FireAlertsAnalysis {
@@ -33,38 +30,7 @@ object FireAlertsAnalysis {
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
       FireAlertsRDD(featureRDD, layoutDefinition, None, kwargs)
 
-    val fireDF = fireAlertType match {
-      case "viirs" => summaryRDD
-        .flatMap {
-          case (id, summary) =>
-            summary.stats.map {
-              case (dataGroup, data) => {
-                id match {
-                  case viirsId: FireAlertViirsFeatureId =>
-                    FireAlertsRowViirs(viirsId, dataGroup, data)
-                  case _ =>
-                    throw new IllegalArgumentException("Not a valid Fire Alert ID")
-                }
-              }
-            }
-        }
-        .toDF("fireId", "data_group", "data")
-      case "modis" => summaryRDD
-        .flatMap {
-          case (id, summary) =>
-            summary.stats.map {
-              case (dataGroup, data) => {
-                id match {
-                  case modisId: FireAlertModisFeatureId =>
-                    FireAlertsRowModis(modisId, dataGroup, data)
-                  case _ =>
-                    throw new IllegalArgumentException("Not a valid Fire Alert ID")
-                }
-              }
-            }
-        }
-        .toDF("fireId", "data_group", "data")
-    }
+    val fireDF = FireAlertsDFFactory(summaryRDD, spark, kwargs).getDataFrame
 
     val fireViewName = "fire_alerts"
     fireDF.createOrReplaceTempView(fireViewName)
@@ -92,47 +58,7 @@ object FireAlertsAnalysis {
       """.stripMargin)
 
     polySpatialDf.createOrReplaceTempView(featureViewName)
-
-    val polyStructIdDf = featureType match {
-      case "gadm" =>
-        val polyIdDf = polySpatialDf.select($"polyshape", $"gid_0" as "iso", $"gid_1" as "adm1", $"gid_2" as "adm2")
-        polyIdDf.createOrReplaceTempView(featureViewName)
-        spark.sql(
-          s"""
-             |SELECT polyshape, struct(iso, adm1, adm2) as featureId
-             |FROM $featureViewName
-          """.stripMargin)
-      case "wdpa" =>
-        val polyIdDf = polySpatialDf.select(
-          $"polyshape", $"wdpaid" as "wdpaid",
-          $"name" as "name",
-          $"iucn_cat" as "iucnCat",  $"iso", $"status")
-
-        polyIdDf.createOrReplaceTempView(featureViewName)
-        spark.sql(
-          s"""
-             |SELECT polyshape, struct(wdpaId, name, iucnCat, iso, status) as featureId
-             |FROM $featureViewName
-          """.stripMargin)
-      case "feature" =>
-        val polyIdDf = polySpatialDf.select($"polyshape", $"fid" as "featureId")
-        polyIdDf.createOrReplaceTempView(featureViewName)
-        spark.sql(
-          s"""
-             |SELECT polyshape, struct(featureId) as featureId
-             |FROM $featureViewName
-          """.stripMargin)
-      case "geostore" =>
-        val polyIdDf = polySpatialDf.select($"polyshape", $"geostore_id" as "geostoreId")
-        polyIdDf.createOrReplaceTempView(featureViewName)
-        spark.sql(
-          s"""
-             |SELECT polyshape, struct(geostoreId) as featureId
-             |FROM $featureViewName
-          """.stripMargin)
-    }
-
-
+    val polyStructIdDf = getFeatureDataframe(featureType, polySpatialDf, featureViewName, spark)
     polyStructIdDf.createOrReplaceTempView(featureViewName)
 
     val joined = spark.sql(
@@ -156,5 +82,48 @@ object FireAlertsAnalysis {
       runOutputUrl,
       kwargs
     )
+  }
+
+  def getFeatureDataframe(featureType: String, featureDF: DataFrame, featureViewName: String, spark: SparkSession): DataFrame = {
+    import spark.implicits._
+
+    featureType match {
+      case "gadm" =>
+        val polyIdDf = featureDF.select($"polyshape", $"gid_0" as "iso", $"gid_1" as "adm1", $"gid_2" as "adm2")
+        polyIdDf.createOrReplaceTempView(featureViewName)
+        spark.sql(
+          s"""
+             |SELECT polyshape, struct(iso, adm1, adm2) as featureId
+             |FROM $featureViewName
+          """.stripMargin)
+      case "wdpa" =>
+        val polyIdDf = featureDF.select(
+          $"polyshape", $"wdpaid" as "wdpaid",
+          $"name" as "name",
+          $"iucn_cat" as "iucnCat",  $"iso", $"status")
+
+        polyIdDf.createOrReplaceTempView(featureViewName)
+        spark.sql(
+          s"""
+             |SELECT polyshape, struct(wdpaId, name, iucnCat, iso, status) as featureId
+             |FROM $featureViewName
+          """.stripMargin)
+      case "feature" =>
+        val polyIdDf = featureDF.select($"polyshape", $"fid" as "featureId")
+        polyIdDf.createOrReplaceTempView(featureViewName)
+        spark.sql(
+          s"""
+             |SELECT polyshape, struct(featureId) as featureId
+             |FROM $featureViewName
+          """.stripMargin)
+      case "geostore" =>
+        val polyIdDf = featureDF.select($"polyshape", $"geostore_id" as "geostoreId")
+        polyIdDf.createOrReplaceTempView(featureViewName)
+        spark.sql(
+          s"""
+             |SELECT polyshape, struct(geostoreId) as featureId
+             |FROM $featureViewName
+          """.stripMargin)
+    }
   }
 }
