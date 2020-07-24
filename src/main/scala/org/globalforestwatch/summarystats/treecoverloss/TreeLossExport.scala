@@ -18,13 +18,13 @@ object TreeLossExport extends SummaryExport {
 
     summaryDF
       .transform(TreeLossDF.unpackValues)
-      //.transform(TreeLossDF.primaryForestFilter(includePrimaryForest))
-      .coalesce(50)
+      .coalesce(5)
       .orderBy($"feature__id")
       .write
       .options(csvOptions)
       .csv(path = outputUrl)
 
+    //.transform(TreeLossDF.primaryForestFilter(includePrimaryForest))
   }
 
 }
