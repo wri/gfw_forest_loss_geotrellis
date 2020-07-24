@@ -1,8 +1,8 @@
 package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import cats.implicits._
-import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
+import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import org.globalforestwatch.util.Implicits._
@@ -25,15 +25,17 @@ object AnnualUpdateMinimalSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
 
   implicit val mdhCellRegisterForTreeLossRaster1
-  : CellVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary] =
-    new CellVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary] {
+    : GridVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary] =
+        new GridVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary] {
+      val acc = new AnnualUpdateMinimalSummary()
 
-      def register(
+      def result = acc
+
+      def visit(
                     raster: Raster[AnnualUpdateMinimalTile],
                     col: Int,
-                    row: Int,
-                    acc: AnnualUpdateMinimalSummary
-                  ): AnnualUpdateMinimalSummary = {
+                    row: Int
+                  ): Unit = {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
         val gain: Boolean = raster.tile.gain.getData(col, row)
@@ -206,10 +208,8 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
         }
 
         val updatedSummary
-        : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
-          updateSummary(thresholds, acc.stats)
-
-        AnnualUpdateMinimalSummary(updatedSummary)
+          : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
+            updateSummary(thresholds, acc.stats)
       }
     }
 }

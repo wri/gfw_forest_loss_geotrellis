@@ -2,7 +2,7 @@ package org.globalforestwatch.summarystats.treecoverloss
 
 import cats.data.NonEmptyList
 import cats.implicits._
-import geotrellis.contrib.polygonal.CellVisitor
+import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
@@ -13,14 +13,13 @@ import scala.annotation.tailrec
 
 /** LossData Summary by year */
 case class TreeLossSummary(stats: Map[TreeLossDataGroup, TreeLossData] =
-                           Map.empty,
-                           kwargs: Map[String, Any])
+                           Map.empty)
   extends Summary[TreeLossSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: TreeLossSummary): TreeLossSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    TreeLossSummary(stats.combine(other.stats), kwargs)
+    TreeLossSummary(stats.combine(other.stats))
   }
 }
 
@@ -28,15 +27,17 @@ object TreeLossSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
 
   implicit val mdhCellRegisterForTreeLossRaster1
-  : CellVisitor[Raster[TreeLossTile], TreeLossSummary] =
-    new CellVisitor[Raster[TreeLossTile], TreeLossSummary] {
+    : GridVisitor[Raster[TreeLossTile], TreeLossSummary] =
+      new GridVisitor[Raster[TreeLossTile], TreeLossSummary] {
+      val acc = new TreeLossSummary()
 
-      def register(raster: Raster[TreeLossTile],
+      def result = acc
+
+      def visit(raster: Raster[TreeLossTile],
                    col: Int,
-                   row: Int,
-                   acc: TreeLossSummary): TreeLossSummary = {
+                   row: Int): Unit = {
 
-        val tcdYear: Int = getAnyMapValue[Int](acc.kwargs, "tcdYear")
+        val tcdYear: Int = 2000 // getAnyMapValue[Int](acc.kwargs, "tcdYear")
 
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
@@ -63,8 +64,8 @@ object TreeLossSummary {
         val biomassPixel = biomass * areaHa
         val co2Pixel = biomassPixel * co2Factor
 
-        val thresholds: List[Int] =
-          getAnyMapValue[NonEmptyList[Int]](acc.kwargs, "thresholdFilter").toList
+        val thresholds: List[Int] = 30::List.empty
+          // getAnyMapValue[NonEmptyList[Int]](acc.kwargs, "thresholdFilter").toList
 
         @tailrec
         def updateSummary(
@@ -120,7 +121,7 @@ object TreeLossSummary {
         val updatedSummary: Map[TreeLossDataGroup, TreeLossData] =
           updateSummary(thresholds, acc.stats)
 
-        TreeLossSummary(updatedSummary, acc.kwargs)
+        TreeLossSummary(updatedSummary)
 
       }
     }

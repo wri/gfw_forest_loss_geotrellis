@@ -1,4 +1,4 @@
-package workshop
+/*package workshop
 
 import cats._
 import geotrellis.contrib.polygonal._
@@ -62,4 +62,4 @@ class NewSummarySpec extends FunSpec {
     info(s"Result: $mymean")
   }
 
-}
+}*/

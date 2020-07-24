@@ -3,10 +3,9 @@ package org.globalforestwatch.layers
 import java.io.FileNotFoundException
 
 import cats.implicits._
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
-import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
+import geotrellis.raster.geotiff.GeoTiffRasterSource
 import geotrellis.raster.crop._
 import geotrellis.raster.{CellType, Tile, isNoData}
 import geotrellis.vector.Extent

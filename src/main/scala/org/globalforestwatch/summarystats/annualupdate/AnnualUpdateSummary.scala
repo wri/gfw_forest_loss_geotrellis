@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.annualupdate
 
 import cats.implicits._
-import geotrellis.contrib.polygonal.CellVisitor
+import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
@@ -25,13 +25,15 @@ object AnnualUpdateSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
 
   implicit val mdhCellRegisterForTreeLossRaster1
-    : CellVisitor[Raster[AnnualUpdateTile], AnnualUpdateSummary] =
-    new CellVisitor[Raster[AnnualUpdateTile], AnnualUpdateSummary] {
+    : GridVisitor[Raster[AnnualUpdateTile], AnnualUpdateSummary]
+      = new GridVisitor[Raster[AnnualUpdateTile], AnnualUpdateSummary] {
+      val acc = new AnnualUpdateSummary()
 
-      def register(raster: Raster[AnnualUpdateTile],
+      def result = acc
+
+      def visit(raster: Raster[AnnualUpdateTile],
                    col: Int,
-                   row: Int,
-                   acc: AnnualUpdateSummary): AnnualUpdateSummary = {
+                   row: Int): Unit = {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
         val gain: Boolean = raster.tile.gain.getData(col, row)
@@ -207,9 +209,6 @@ object AnnualUpdateSummary {
 
         val updatedSummary: Map[AnnualUpdateDataGroup, AnnualUpdateData] =
           updateSummary(thresholds, acc.stats)
-
-        AnnualUpdateSummary(updatedSummary)
-
       }
     }
 }

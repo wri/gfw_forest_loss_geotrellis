@@ -4,9 +4,12 @@ import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
-import geotrellis.layer.{SpatialKey, LayoutDefinition}
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
+import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResult, Summary}
 import geotrellis.spark.partition.SpacePartitioner
+import geotrellis.spark.summary.polygonal.RDDPolygonalSummary
 import geotrellis.vector._
+import org.apache.commons.lang.NotImplementedException
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
@@ -108,8 +111,10 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                           feature.geom,
                           rasterizeOptions,
                           kwargs
-                        )
-
+                        ) match {
+                          case Summary(result: SUMMARY) => result
+                          case NoIntersection => throw new NotImplementedException("")
+                        }
                       } catch {
                         case ise: java.lang.IllegalStateException => {
                           println(
@@ -154,7 +159,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,
-                          kwargs: Map[String, Any]): SUMMARY
+                          kwargs: Map[String, Any]): PolygonalSummaryResult[SUMMARY]
 
 
   def reduceSummarybyKey[FEATUREID <: FeatureId](
@@ -164,6 +169,5 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
       case (summary1, summary2) =>
         summary1.merge(summary2)
     }
-
   }
 }

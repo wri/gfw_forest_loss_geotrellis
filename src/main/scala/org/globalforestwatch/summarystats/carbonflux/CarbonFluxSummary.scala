@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.carbonflux
 
 import cats.implicits._
-import geotrellis.contrib.polygonal.CellVisitor
+import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
@@ -23,15 +23,16 @@ case class CarbonFluxSummary(
 object CarbonFluxSummary {
   // CarbonFluxSummary form Raster[CarbonFluxTile] -- cell types may not be the same
 
-  implicit val mdhCellRegisterForCarbonFluxRaster1: CellVisitor[Raster[CarbonFluxTile], CarbonFluxSummary] =
-    new CellVisitor[Raster[CarbonFluxTile], CarbonFluxSummary] {
+  implicit val mdhCellRegisterForTreeLossRaster1
+    : GridVisitor[Raster[CarbonFluxTile], CarbonFluxSummary] =
+      new GridVisitor[Raster[CarbonFluxTile], CarbonFluxSummary] {
+      val acc = new CarbonFluxSummary()
 
-      def register(
-                    raster: Raster[CarbonFluxTile],
-                    col: Int,
-                    row: Int,
-                    acc: CarbonFluxSummary
-                  ): CarbonFluxSummary = {
+      def result = acc
+
+      def visit(raster: Raster[CarbonFluxTile],
+                  col: Int,
+                  row: Int): Unit = {
         // This is a pixel by pixel operation
         val lossYear: Integer = raster.tile.loss.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)

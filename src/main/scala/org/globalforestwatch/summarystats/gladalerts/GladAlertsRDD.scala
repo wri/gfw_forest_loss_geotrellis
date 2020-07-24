@@ -1,7 +1,8 @@
 package org.globalforestwatch.summarystats.gladalerts
 
 import cats.implicits._
-import geotrellis.contrib.polygonal._
+import geotrellis.raster.summary.polygonal._
+import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
@@ -25,12 +26,11 @@ object GladAlertsRDD extends SummaryRDD {
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,
-                          kwargs: Map[String, Any]): SUMMARY = {
+                          kwargs: Map[String, Any]): PolygonalSummaryResult[SUMMARY] = {
     raster.polygonalSummary(
-      geometry = geometry,
-      emptyResult = new GladAlertsSummary(kwargs = kwargs),
+      geometry,
+      GridVisitor[Raster[GladAlertsTile], GladAlertsSummary],
       options = options
     )
   }
-
 }

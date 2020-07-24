@@ -1,12 +1,13 @@
 package org.globalforestwatch.annualupdate
 
+/*
 import geotrellis.contrib.vlm.geotiff._
 import geotrellis.proj4._
 import geotrellis.raster.{RasterExtent, TileLayout, _}
 import geotrellis.layer.LayoutDefinition
 import geotrellis.vector.Extent
 import org.scalatest._
-/*
+
 class RasterSourceSpec extends FunSpec with Matchers {
 
   val rs = GeoTiffRasterSource("s3://gfw2-data/forest_change/hansen_2018/50N_080W.tif")

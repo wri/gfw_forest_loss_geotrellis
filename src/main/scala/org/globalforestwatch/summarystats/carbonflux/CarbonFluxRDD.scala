@@ -1,9 +1,11 @@
 package org.globalforestwatch.summarystats.carbonflux
 
 import cats.implicits._
-import geotrellis.contrib.polygonal._
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
+import geotrellis.raster.summary.GridVisitor
+import geotrellis.raster.summary.polygonal._
+import geotrellis.raster.summary.polygonal.PolygonalSummaryResult
 import geotrellis.vector._
 import org.globalforestwatch.summarystats.SummaryRDD
 
@@ -25,10 +27,10 @@ object CarbonFluxRDD extends SummaryRDD {
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,
-                          kwargs: Map[String, Any]): SUMMARY = {
+                          kwargs: Map[String, Any]): PolygonalSummaryResult[SUMMARY] = {
     raster.polygonalSummary(
-      geometry = geometry,
-      emptyResult = new CarbonFluxSummary(),
+      geometry,
+      GridVisitor[Raster[CarbonFluxTile], CarbonFluxSummary],
       options = options
     )
   }

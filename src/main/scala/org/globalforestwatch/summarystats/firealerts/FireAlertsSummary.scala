@@ -1,22 +1,21 @@
 package org.globalforestwatch.summarystats.firealerts
 
 import cats.implicits._
-import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
+import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Util.getAnyMapValue
 import org.globalforestwatch.util.{Geodesy, Mercantile}
 
 /** LossData Summary by year */
 case class FireAlertsSummary(stats: Map[FireAlertsDataGroup, FireAlertsData] =
-                             Map.empty,
-                             kwargs: Map[String, Any])
+                             Map.empty)
   extends Summary[FireAlertsSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: FireAlertsSummary): FireAlertsSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    FireAlertsSummary(stats.combine(other.stats), kwargs)
+    FireAlertsSummary(stats.combine(other.stats))
   }
 }
 
@@ -24,14 +23,15 @@ object FireAlertsSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
 
   implicit val mdhCellRegisterForFireAlertsRaster
-    : CellVisitor[Raster[FireAlertsTile], FireAlertsSummary] =
-    new CellVisitor[Raster[FireAlertsTile], FireAlertsSummary] {
+    : GridVisitor[Raster[FireAlertsTile], FireAlertsSummary] =
+      new GridVisitor[Raster[FireAlertsTile], FireAlertsSummary] {
+      val acc = new FireAlertsSummary()
 
-      def register(raster: Raster[FireAlertsTile],
+      def result = acc
+
+      def visit(raster: Raster[FireAlertsTile],
                    col: Int,
-                   row: Int,
-                   acc: FireAlertsSummary): FireAlertsSummary = {
-
+                   row: Int): Unit = {
         val primaryForest: Boolean =
           raster.tile.primaryForest.getData(col, row)
         val protectedAreas: String =
@@ -106,7 +106,7 @@ object FireAlertsSummary {
         val updatedSummary: Map[FireAlertsDataGroup, FireAlertsData] =
           updateSummary(acc.stats)
 
-        FireAlertsSummary(updatedSummary, acc.kwargs)
+        FireAlertsSummary(updatedSummary)
     }
   }
 }
