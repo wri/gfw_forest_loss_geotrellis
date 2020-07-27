@@ -3,14 +3,17 @@ package org.globalforestwatch.features
 import java.util.HashSet
 
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.{Geometry, Point}
+import com.vividsolutions.jts.geom.{Geometry, Point, Polygon}
 import geotrellis.vector
+import geotrellis.vector.io.wkb.WKB
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.datasyslab.geospark.enums.{GridType, IndexType}
 import org.datasyslab.geospark.spatialRDD.{PointRDD, SpatialRDD}
 import org.datasyslab.geosparksql.utils.Adapter
+import org.globalforestwatch.features.GadmFeature.geomPos
+import geotrellis.vector.io.wkb.WKB
 import org.globalforestwatch.util.GeometryReducer
 import org.globalforestwatch.util.Util._
 
@@ -55,7 +58,29 @@ object FeatureRDDFactory {
             vector.Feature(geom, pointFeatureId)
         }
       case _ =>
-        FeatureRDD(featureUris, featureObj, kwargs, spark)
+        val featuresDF: DataFrame =
+          FeatureDF(featureUris, featureObj, kwargs, spark, "geom")
+
+        val polyFeatureDF = FeatureDF(featureUris, featureObj, kwargs, spark, "geom")
+        var polyFeatureRDD = new SpatialRDD[Geometry]
+        polyFeatureRDD.rawSpatialRDD = Adapter.toJavaRdd(polyFeatureDF)
+
+        polyFeatureRDD.analyze()
+        polyFeatureRDD.spatialPartitioning(GridType.QUADTREE)
+
+        val scalaRDD = org.apache.spark.api.java.JavaRDD.toRDD(polyFeatureRDD.spatialPartitionedRDD)
+        scalaRDD.map {
+          case g: Geometry =>
+            val featureData: Array[String] = g.getUserData.asInstanceOf[String].split('\t')
+            val featureGeom: vector.Geometry =
+              GeometryReducer.reduce(GeometryReducer.gpr)(
+                WKB.read(featureData(featureObj.geomPos))
+              )
+
+            val featureId = featureObj.getFeatureId(featureData)
+            vector.Feature(featureGeom, featureId)
+        }
+        //FeatureRDD(featureUris, featureObj, kwargs, spark)
     }
   }
 }

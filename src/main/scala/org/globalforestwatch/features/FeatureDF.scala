@@ -27,7 +27,7 @@ object FeatureDF {
     df.createOrReplaceTempView(viewName)
     val spatialDf = spark.sql(
       s"""
-         |SELECT ST_Point(CAST($lonField AS Decimal(24,10)),CAST($latField AS Decimal(24,10))) AS geometry, *
+         |SELECT ST_Point(CAST($lonField AS Decimal(24,10)),CAST($latField AS Decimal(24,10))) AS pointshape, *
          |FROM $viewName
       """.stripMargin)
 
@@ -48,7 +48,7 @@ object FeatureDF {
     // any empty polygons
     val spatialDf = spark.sql(
       s"""
-         |SELECT ST_PrecisionReduce(ST_GeomFromWKB($wkbField), 13) AS geometry, *
+         |SELECT ST_PrecisionReduce(ST_GeomFromWKB($wkbField), 13) AS polyshape, *
          |FROM $viewName
          |WHERE geom != '0106000020E610000000000000'
       """.stripMargin)

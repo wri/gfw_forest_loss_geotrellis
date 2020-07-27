@@ -45,19 +45,9 @@ object FireAlertsAnalysis {
     val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
-    val polyFeatureDF = FeatureDF(featureUris, featureObj, kwargs, spark)
+    val polySpatialDf = FeatureDF(featureUris, featureObj, kwargs, spark, "geom")
     val featureViewName = featureObj.getClass.getSimpleName.dropRight(1).toLowerCase
 
-    polyFeatureDF.createOrReplaceTempView(featureViewName)
-    val polySpatialDf =
-      spark.sql(
-      s"""
-         |SELECT ST_PrecisionReduce(ST_GeomFromWKB(geom), 13) AS polyshape, *
-         |FROM $featureViewName
-         |WHERE geom != '0106000020E610000000000000'
-      """.stripMargin)
-
-    polySpatialDf.createOrReplaceTempView(featureViewName)
     val polyStructIdDf = getFeatureDataframe(featureType, polySpatialDf, featureViewName, spark)
     polyStructIdDf.createOrReplaceTempView(featureViewName)
 

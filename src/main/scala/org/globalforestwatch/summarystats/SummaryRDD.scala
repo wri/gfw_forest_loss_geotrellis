@@ -48,7 +48,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
       }
 
     val partitionedFeatureRDD = partitioner match {
-      case Some(part) => keyedFeatureRDD.partitionBy(part)
+      case Some(part) => keyedFeatureRDD//.partitionBy(part)
       case None => keyedFeatureRDD
     }
 
