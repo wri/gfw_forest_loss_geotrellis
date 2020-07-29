@@ -247,17 +247,9 @@ object SummaryMain
                 spark
               )
 
-            val inputPartitionMultiplier = 64
-
-            val part = new HashPartitioner(
-              partitions = featureRDD.getNumPartitions * inputPartitionMultiplier
-            )
-
-
             SummaryAnalysisFactory(
               analysis,
               featureRDD,
-              part,
               featureType,
               spark,
               kwargs

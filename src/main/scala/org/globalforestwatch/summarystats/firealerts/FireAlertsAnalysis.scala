@@ -10,12 +10,10 @@ import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId}
 import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
-import org.apache.spark.HashPartitioner
 
 object FireAlertsAnalysis {
   def apply(featureRDD: RDD[Feature[vector.Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
@@ -28,7 +26,7 @@ object FireAlertsAnalysis {
     }
 
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
-      FireAlertsRDD(featureRDD, layoutDefinition, None, kwargs)
+      FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = false)
 
     val fireDF = FireAlertsDFFactory(summaryRDD, spark, kwargs).getDataFrame
 

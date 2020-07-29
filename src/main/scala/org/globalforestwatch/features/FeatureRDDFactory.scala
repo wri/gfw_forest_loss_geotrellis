@@ -58,29 +58,7 @@ object FeatureRDDFactory {
             vector.Feature(geom, pointFeatureId)
         }
       case _ =>
-        val featuresDF: DataFrame =
-          FeatureDF(featureUris, featureObj, kwargs, spark, "geom")
-
-        val polyFeatureDF = FeatureDF(featureUris, featureObj, kwargs, spark, "geom")
-        var polyFeatureRDD = new SpatialRDD[Geometry]
-        polyFeatureRDD.rawSpatialRDD = Adapter.toJavaRdd(polyFeatureDF)
-
-        polyFeatureRDD.analyze()
-        polyFeatureRDD.spatialPartitioning(GridType.QUADTREE)
-
-        val scalaRDD = org.apache.spark.api.java.JavaRDD.toRDD(polyFeatureRDD.spatialPartitionedRDD)
-        scalaRDD.map {
-          case g: Geometry =>
-            val featureData: Array[String] = g.getUserData.asInstanceOf[String].split('\t')
-            val featureGeom: vector.Geometry =
-              GeometryReducer.reduce(GeometryReducer.gpr)(
-                WKB.read(featureData(featureObj.geomPos))
-              )
-
-            val featureId = featureObj.getFeatureId(featureData)
-            vector.Feature(featureGeom, featureId)
-        }
-        //FeatureRDD(featureUris, featureObj, kwargs, spark)
+        FeatureRDD(featureUris, featureObj, kwargs, spark)
     }
   }
 }

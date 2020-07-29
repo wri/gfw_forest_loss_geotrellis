@@ -244,20 +244,20 @@ object GladAlertsExport extends SummaryExport {
         .csv(path = outputUrl + "/whitelist")
 
       df.transform(GladAlertsDF.aggSummary(cols, wdpa = wdpa))
-        .coalesce(1)
+        .coalesce(30)
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/summary")
     }
 
     df.transform(GladAlertsDF.aggChangeDaily(cols, wdpa = wdpa))
-      .coalesce(1)
+      .coalesce(30)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
 
     df.transform(GladAlertsDF.aggChangeWeekly(cols, wdpa = wdpa))
-      .coalesce(1)
+      .coalesce(30)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/weekly_alerts")
