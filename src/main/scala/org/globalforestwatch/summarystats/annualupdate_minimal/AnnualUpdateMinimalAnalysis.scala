@@ -4,16 +4,14 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import geotrellis.vector.{Feature, Geometry}
-import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.util.Util.{getAnyMapValue, getKeyedFeatureRDD}
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 object AnnualUpdateMinimalAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
@@ -23,7 +21,6 @@ object AnnualUpdateMinimalAnalysis {
       AnnualUpdateMinimalRDD(
         featureRDD,
         AnnualUpdateMinimalGrid.blockTileGrid,
-        part,
         kwargs
       )
 
