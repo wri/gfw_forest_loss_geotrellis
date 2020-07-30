@@ -28,6 +28,27 @@ object FireAlertsAnalysis {
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
       FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = false)
 
+    val joinedDF = joinWithFeatures(summaryRDD, featureType, spark, kwargs)
+
+    joinedDF.repartition(partitionExprs = $"featureId")
+
+    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
+      s"/firealerts_${fireAlertType}_" + DateTimeFormatter
+      .ofPattern("yyyyMMdd_HHmm")
+      .format(LocalDateTime.now)
+
+    FireAlertsExport.export(
+      featureType,
+      joinedDF,
+      runOutputUrl,
+      kwargs
+    )
+  }
+
+  def joinWithFeatures(summaryRDD: RDD[(FeatureId, FireAlertsSummary)],
+                       featureType: String,
+                       spark: SparkSession,
+                       kwargs: Map[String, Any]): DataFrame = {
     val fireDF = FireAlertsDFFactory(summaryRDD, spark, kwargs).getDataFrame
 
     val fireViewName = "fire_alerts"
@@ -49,26 +70,12 @@ object FireAlertsAnalysis {
     val polyStructIdDf = getFeatureDataframe(featureType, polySpatialDf, featureViewName, spark)
     polyStructIdDf.createOrReplaceTempView(featureViewName)
 
-    val joined = spark.sql(
+    spark.sql(
       s"""
          |SELECT $featureViewName.*, $fireViewName.*
          |FROM $fireViewName, $featureViewName
          |WHERE ST_Intersects($fireViewName.pointshape, $featureViewName.polyshape)
       """.stripMargin
-    )
-
-    joined.repartition(partitionExprs = $"featureId")
-
-    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      s"/firealerts_${fireAlertType}_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
-
-    FireAlertsExport.export(
-      featureType,
-      joined,
-      runOutputUrl,
-      kwargs
     )
   }
 
