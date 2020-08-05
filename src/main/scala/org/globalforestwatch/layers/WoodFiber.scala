@@ -3,5 +3,5 @@ package org.globalforestwatch.layers
 import org.globalforestwatch.grids.GridTile
 
 case class WoodFiber(gridTile: GridTile) extends BooleanLayer with OptionalILayer {
-  val uri: String = s"$basePath/gfw_wood_fiber/v20190917/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/gfw_wood_fiber/v20200725/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
 }
