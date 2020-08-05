@@ -59,38 +59,10 @@ object FireAlertsAnalysis {
     val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
-    val polySpatialDf = FeatureDF(featureUris, featureObj, kwargs, spark, "geom")
-    val polyStructIdDf = getFeatureDataframe(featureType, polySpatialDf, spark)
+    val featureDF = FeatureDF(featureUris, featureObj, featureType, kwargs, spark, "geom")
 
     firePointDF
-      .join(polyStructIdDf)
+      .join(featureDF)
       .where("ST_Intersects(pointshape, polyshape)")
-  }
-
-  def getFeatureDataframe(featureType: String, featureDF: DataFrame, spark: SparkSession): DataFrame = {
-    import spark.implicits._
-
-    featureType match {
-      case "gadm" =>
-        featureDF.select(
-          $"polyshape",
-          struct(
-            $"gid_0" as "iso",
-            split(split($"gid_1", "\\.")(1), "_")(0) as "adm1",
-            split(split($"gid_2", "\\.")(2), "_")(0) as "adm2"
-          ) as "featureId"
-        )
-      case "wdpa" =>
-        featureDF.select(
-          $"polyshape",
-          struct(
-            $"wdpaid".cast("Int") as "wdpaId",  $"name" as "name", $"iucn_cat" as "iucnCat",  $"iso",  $"status"
-          ) as "featureId"
-        )
-      case "feature" =>
-        featureDF.select($"polyshape", struct($"fid".cast("Int") as "featureId") as "featureId")
-      case "geostore" =>
-        featureDF.select($"polyshape", struct($"geostore_id" as "geostoreId") as "featureId")
-    }
   }
 }
