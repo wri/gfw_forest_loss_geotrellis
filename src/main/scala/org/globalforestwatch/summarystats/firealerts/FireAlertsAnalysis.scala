@@ -10,6 +10,7 @@ import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId}
 import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
+import org.apache.spark.sql.functions.{split, struct}
 
 object FireAlertsAnalysis {
   def apply(featureRDD: RDD[Feature[vector.Geometry, FeatureId]],
@@ -84,7 +85,13 @@ object FireAlertsAnalysis {
 
     featureType match {
       case "gadm" =>
-        val polyIdDf = featureDF.select($"polyshape", $"gid_0" as "iso", $"gid_1" as "adm1", $"gid_2" as "adm2")
+        val polyIdDf =
+          featureDF.select(
+            $"polyshape",
+            $"gid_0" as "iso",
+            split(split($"gid_1", "\\.")(1), "_")(0) as "adm1",
+            split(split($"gid_2", "\\.")(2), "_")(0) as "adm2"
+          )
         polyIdDf.createOrReplaceTempView(featureViewName)
         spark.sql(
           s"""
