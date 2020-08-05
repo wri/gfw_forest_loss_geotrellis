@@ -11,6 +11,7 @@ import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
 import org.apache.spark.sql.functions.{split, struct}
+import org.apache.spark.sql.geosparksql.expressions.{ST_Point, ST_Intersects}
 
 object FireAlertsAnalysis {
   def apply(featureRDD: RDD[Feature[vector.Geometry, FeatureId]],
@@ -52,80 +53,44 @@ object FireAlertsAnalysis {
                        kwargs: Map[String, Any]): DataFrame = {
     val fireDF = FireAlertsDFFactory(summaryRDD, spark, kwargs).getDataFrame
 
-    val fireViewName = "fire_alerts"
-    fireDF.createOrReplaceTempView(fireViewName)
-    val firePointDF = spark.sql(
-      s"""
-         |SELECT ST_Point(CAST(fireId.lon AS Decimal(24,10)),CAST(fireId.lat AS Decimal(24,10))) AS pointshape, *
-         |FROM $fireViewName
-      """.stripMargin)
-
-    firePointDF.createOrReplaceTempView(fireViewName)
+    val firePointDF = fireDF
+      .selectExpr("ST_Point(CAST(fireId.lon AS Decimal(24,10)),CAST(fireId.lat AS Decimal(24,10))) AS pointshape", "*")
 
     val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
     val polySpatialDf = FeatureDF(featureUris, featureObj, kwargs, spark, "geom")
-    val featureViewName = featureObj.getClass.getSimpleName.dropRight(1).toLowerCase
+    val polyStructIdDf = getFeatureDataframe(featureType, polySpatialDf, spark)
 
-    val polyStructIdDf = getFeatureDataframe(featureType, polySpatialDf, featureViewName, spark)
-    polyStructIdDf.createOrReplaceTempView(featureViewName)
-
-    spark.sql(
-      s"""
-         |SELECT $featureViewName.*, $fireViewName.*
-         |FROM $fireViewName, $featureViewName
-         |WHERE ST_Intersects($fireViewName.pointshape, $featureViewName.polyshape)
-      """.stripMargin
-    )
+    firePointDF
+      .join(polyStructIdDf)
+      .where("ST_Intersects(pointshape, polyshape)")
   }
 
-  def getFeatureDataframe(featureType: String, featureDF: DataFrame, featureViewName: String, spark: SparkSession): DataFrame = {
+  def getFeatureDataframe(featureType: String, featureDF: DataFrame, spark: SparkSession): DataFrame = {
     import spark.implicits._
 
     featureType match {
       case "gadm" =>
-        val polyIdDf =
-          featureDF.select(
-            $"polyshape",
+        featureDF.select(
+          $"polyshape",
+          struct(
             $"gid_0" as "iso",
             split(split($"gid_1", "\\.")(1), "_")(0) as "adm1",
             split(split($"gid_2", "\\.")(2), "_")(0) as "adm2"
-          )
-        polyIdDf.createOrReplaceTempView(featureViewName)
-        spark.sql(
-          s"""
-             |SELECT polyshape, struct(iso, adm1, adm2) as featureId
-             |FROM $featureViewName
-          """.stripMargin)
+          ) as "featureId"
+        )
       case "wdpa" =>
-        val polyIdDf = featureDF.select(
-          $"polyshape", $"wdpaid" as "wdpaid",
-          $"name" as "name",
-          $"iucn_cat" as "iucnCat",  $"iso", $"status")
-
-        polyIdDf.createOrReplaceTempView(featureViewName)
-        spark.sql(
-          s"""
-             |SELECT polyshape, struct(wdpaId, name, iucnCat, iso, status) as featureId
-             |FROM $featureViewName
-          """.stripMargin)
+        featureDF.select(
+          $"polyshape",
+          struct(
+            $"wdpaid".cast("Int") as "wdpaId",  $"name" as "name", $"iucn_cat" as "iucnCat",  $"iso",  $"status"
+          ) as "featureId"
+        )
       case "feature" =>
-        val polyIdDf = featureDF.select($"polyshape", $"fid" as "featureId")
-        polyIdDf.createOrReplaceTempView(featureViewName)
-        spark.sql(
-          s"""
-             |SELECT polyshape, struct(featureId) as featureId
-             |FROM $featureViewName
-          """.stripMargin)
+        featureDF.select($"polyshape", struct($"fid".cast("Int") as "featureId") as "featureId")
       case "geostore" =>
-        val polyIdDf = featureDF.select($"polyshape", $"geostore_id" as "geostoreId")
-        polyIdDf.createOrReplaceTempView(featureViewName)
-        spark.sql(
-          s"""
-             |SELECT polyshape, struct(geostoreId) as featureId
-             |FROM $featureViewName
-          """.stripMargin)
+        featureDF.select($"polyshape", struct($"geostore_id" as "geostoreId") as "featureId")
     }
   }
 }
