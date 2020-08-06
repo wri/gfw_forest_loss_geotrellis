@@ -1,7 +1,8 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.{split, struct}
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 
 
 object FeatureDF {
@@ -34,26 +35,23 @@ object FeatureDF {
     spatialDf
   }
 
+  /*
+   * Use GeoSpark to directly generate a DataFrame with a geometry column
+   */
   def apply(input: NonEmptyList[String],
             featureObj: Feature,
+            featureType: String,
             filters: Map[String, Any],
             spark: SparkSession,
             wkbField: String): DataFrame = {
-    val df: DataFrame = apply(input, featureObj, filters, spark)
 
-    val viewName = featureObj.getClass.getSimpleName.dropRight(1).toLowerCase
-    df.createOrReplaceTempView(viewName)
+    val featureDF: DataFrame = apply(input, featureObj, filters, spark)
+    val emptyPolygonWKB = "0106000020E610000000000000"
 
-    // Create Geometry field, reducng precision of coordinates and filtering out
-    // any empty polygons
-    val spatialDf = spark.sql(
-      s"""
-         |SELECT ST_PrecisionReduce(ST_GeomFromWKB($wkbField), 13) AS polyshape, *
-         |FROM $viewName
-         |WHERE geom != '0106000020E610000000000000'
-      """.stripMargin)
-
-    spatialDf.createOrReplaceTempView(viewName)
-    spatialDf
+    featureDF
+      .selectExpr(
+        s"ST_PrecisionReduce(ST_GeomFromWKB(${wkbField}), 13) AS polyshape",
+        s"struct(${featureObj.featureIdExpr}) as featureId")
+      .where(s"${wkbField} != '${emptyPolygonWKB}'")
   }
 }

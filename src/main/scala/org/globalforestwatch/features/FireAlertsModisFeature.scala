@@ -8,6 +8,10 @@ import org.globalforestwatch.util.GeometryReducer
 object FireAlertsModisFeature extends Feature {
   override val geomPos: Int = 0
 
+  val featureIdExpr =
+    "latitude as lat, longitude as lon, acq_date as acqDate, acq_time as acqTime, confidence, " +
+      "bright_t31 as brightT31, brightness, frp"
+
   override def isValidGeom(i: Row): Boolean = {
     val lon = i.getString(geomPos + 1).toDouble
     val lat = i.getString(geomPos).toDouble
