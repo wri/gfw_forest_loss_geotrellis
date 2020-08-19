@@ -5,9 +5,10 @@ import com.typesafe.scalalogging.LazyLogging
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.spark.SpatialKey
+import geotrellis.spark.io.index.zcurve.Z2
 import geotrellis.spark.tiling.LayoutDefinition
 import geotrellis.vector._
-import org.apache.spark.Partitioner
+import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
@@ -24,28 +25,44 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
     *
     * @param featureRDD areas of interest
     * @param windowLayout window layout used for distribution of IO, subdivision of 10x10 degree grid
-    * @param partitioner how to partition keys from the windowLayout
+    * @param partition flag of whether to partition RDD while processing
     */
   def apply[FEATUREID <: FeatureId](
                                      featureRDD: RDD[Feature[Geometry, FEATUREID]],
                                      windowLayout: LayoutDefinition,
-                                     partitioner: Partitioner,
-                                     kwargs: Map[String, Any])(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
+                                     kwargs: Map[String, Any],
+                                     partition: Boolean = true)(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
 
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.
+     * Then create a key based off the Z curve value from the grid cell, to use for partitioning.
      * Later we will calculate partial result for each intersection and merge them.
      */
-    val keyedFeatureRDD: RDD[(SpatialKey, Feature[Geometry, FEATUREID])] =
-      featureRDD
-        .flatMap { feature: Feature[Geometry, FEATUREID] =>
-          val keys: Set[SpatialKey] =
-            windowLayout.mapTransform.keysForGeometry(feature.geom)
-          keys.toSeq.map { key =>
-            (key, feature)
-          }
+
+    val keyedFeatureRDD: RDD[(Long, (SpatialKey, Feature[Geometry, FEATUREID]))] = featureRDD
+      .flatMap { feature: Feature[Geometry, FEATUREID] =>
+        val keys: Set[SpatialKey] =
+          windowLayout.mapTransform.keysForGeometry(feature.geom)
+        keys.toSeq.map { key =>
+          val z = Z2(key.col, key.row).z
+          (z, (key, feature))
         }
-        .partitionBy(partitioner)
+      }
+
+    /*
+     * Use a Range Partitioner based on the Z curve value to efficiently and evenly partition RDD for analysis,
+     * but still preserving locality which will both reduce the S3 reads per executor and make it more likely
+     * for features to be close together already during export.
+     */
+    val partitionedFeatureRDD = if (partition) {
+      val inputPartitionMultiplier = 64
+      val rangePartitioner =
+        new RangePartitioner(featureRDD.getNumPartitions * inputPartitionMultiplier, keyedFeatureRDD)
+      keyedFeatureRDD.partitionBy(rangePartitioner)
+    } else {
+      keyedFeatureRDD
+    }
+
     /* Here we're going to work with the features one partition at a time.
      * We're going to use the tile key from windowLayout to read pixels from appropriate raster.
      * Each record in this RDD may still represent only a partial result for that feature.
@@ -53,19 +70,24 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      * The RDD is keyed by Id such that we can join and recombine partial results later.
      */
     val featuresWithSummaries: RDD[(FEATUREID, SUMMARY)] =
-      keyedFeatureRDD.mapPartitions {
+      partitionedFeatureRDD.mapPartitions {
         featurePartition: Iterator[
-          (SpatialKey, Feature[Geometry, FEATUREID])
+          (Long, (SpatialKey, Feature[Geometry, FEATUREID]))
         ] =>
           // Code inside .mapPartitions works in an Iterator of records
           // Doing things this way allows us to reuse resources and perform other optimizations
 
           // Grouping by spatial key allows us to minimize read thrashing from record to record
 
+          val windowFeature = featurePartition.map {
+            case (z, (windowKey, feature)) =>
+              (windowKey, feature)
+          }
+
           val groupedByKey
-          : Map[SpatialKey,
-            Array[(SpatialKey, Feature[Geometry, FEATUREID])]] =
-            featurePartition.toArray.groupBy {
+            : Map[SpatialKey,
+                  Array[(SpatialKey, Feature[Geometry, FEATUREID])]] =
+            windowFeature.toArray.groupBy {
               case (windowKey, feature) => windowKey
             }
 
@@ -98,13 +120,12 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                   case Right(raster) =>
                     val summary: SUMMARY =
                       try {
-                        runPolygonalSummary(
+                          runPolygonalSummary(
                           raster,
                           feature.geom,
                           rasterizeOptions,
                           kwargs
                         )
-
                       } catch {
                         case ise: java.lang.IllegalStateException => {
                           println(
@@ -117,6 +138,12 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                             s"There is an issue with geometry Topology for ${feature.data}"
                           )
                           throw te
+                        }
+                        case be: java.lang.ArrayIndexOutOfBoundsException => {
+                          println(
+                            s"There is an issue with geometry ${feature.geom}"
+                          )
+                          throw be
                         }
                         case e: Throwable => throw e
 
@@ -132,20 +159,22 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      */
     val featuresGroupedWithSummaries: RDD[(FEATUREID, SUMMARY)] =
       reduceSummarybyKey[FEATUREID](featuresWithSummaries): RDD[(FEATUREID, SUMMARY)]
+    print(featuresGroupedWithSummaries.toDebugString)
+
     featuresGroupedWithSummaries
   }
 
   def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES]
 
   def readWindow(rs: SOURCES, window: Extent): Either[Throwable, Raster[TILE]]
-
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,
                           kwargs: Map[String, Any]): SUMMARY
 
+
   def reduceSummarybyKey[FEATUREID <: FeatureId](
-                                                  featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
+    featuresWithSummaries: RDD[(FEATUREID, SUMMARY)]
                                                 )(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
     featuresWithSummaries.reduceByKey {
       case (summary1, summary2) =>

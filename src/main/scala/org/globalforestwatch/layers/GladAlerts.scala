@@ -1,12 +1,14 @@
 package org.globalforestwatch.layers
 
+import org.globalforestwatch.grids.GridTile
+
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.globalforestwatch.grids.GridId.toGladGridId
 
-case class GladAlerts(grid: String) extends DateConfLayer with RequiredILayer {
+case class GladAlerts(gridTile: GridTile) extends DateConfLayer with RequiredILayer {
 
-  val gladGrid: String = toGladGridId(grid)
+  val gladGrid: String = toGladGridId(gridTile.tileId)
 
   val uri: String =
     s"s3://gfw2-data/forest_change/umd_landsat_alerts/prod/analysis/$gladGrid.tif"

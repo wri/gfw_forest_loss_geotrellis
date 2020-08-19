@@ -1,6 +1,7 @@
 package org.globalforestwatch.layers
 
-case class TigerLandscapes(grid: String) extends BooleanLayer with OptionalILayer {
-  val uri: String =
-    s"$basePath/tiger_landscapes/$grid.tif"
+import org.globalforestwatch.grids.GridTile
+
+case class TigerLandscapes(gridTile: GridTile) extends BooleanLayer with OptionalILayer {
+  val uri: String = s"$basePath/gfw_tiger_landscapes/v201904/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
 }

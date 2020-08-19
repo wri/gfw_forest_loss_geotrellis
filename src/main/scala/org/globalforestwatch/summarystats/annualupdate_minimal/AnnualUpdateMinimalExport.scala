@@ -97,7 +97,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     import spark.implicits._
 
     val adm2ApiDF = df
-      .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
+      .filter($"umd_tree_cover_loss__year".isNotNull && $"umd_tree_cover_loss__ha" > 0)
       .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2")))
       .coalesce(133) // this should result in an avg file size of 100MB
 
@@ -145,7 +145,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         $"country",
         $"subnational1",
         $"subnational2",
-        $"treecover_density__threshold"
+        $"umd_tree_cover_density__threshold"
       )
       .write
       .options(csvOptions)
@@ -162,7 +162,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
           .roundDownload2(List($"iso" as "country", $"adm1" as "subnational1"))
       )
       .coalesce(1)
-      .orderBy($"country", $"subnational1", $"treecover_density__threshold")
+      .orderBy($"country", $"subnational1", $"umd_tree_cover_density__threshold")
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/download")
@@ -178,7 +178,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
           .roundDownload2(List($"iso" as "country"))
       )
       .coalesce(1)
-      .orderBy($"country", $"treecover_density__threshold")
+      .orderBy($"country", $"umd_tree_cover_density__threshold")
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/download")
@@ -234,6 +234,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .csv(path = outputUrl + "/wdpa/summary")
     }
     exportDF
+      .filter($"umd_tree_cover_loss__year".isNotNull && $"umd_tree_cover_loss__ha" > 0)
       .transform(AnnualUpdateMinimalDF.aggChange(idCols, wdpa = true))
       .coalesce(50) // this should result in an avg file size of 100MB
       .write
@@ -278,6 +279,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         .csv(path = outputUrl + "/geostore/summary")
     }
     exportDF
+      .filter($"umd_tree_cover_loss__year".isNotNull && $"umd_tree_cover_loss__ha" > 0)
       .transform(AnnualUpdateMinimalDF.aggChange(idCols))
       .coalesce(10) // this should result in an avg file size of 100MB
       .write

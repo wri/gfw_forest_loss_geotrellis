@@ -1,8 +1,10 @@
 package org.globalforestwatch.layers
 
-case class ForestAgeCategory(grid: String, model: String="standard") extends StringLayer with OptionalILayer {
+import org.globalforestwatch.grids.GridTile
 
-  val uri: String = s"$basePath/forest_age_category/standard/$grid.tif"
+case class ForestAgeCategory(gridTile: GridTile) extends StringLayer with OptionalILayer {
+
+  val uri: String = s"$basePath/gfw_forest_age_category/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/category/geotiff/${gridTile.tileId}.tif"
   override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {

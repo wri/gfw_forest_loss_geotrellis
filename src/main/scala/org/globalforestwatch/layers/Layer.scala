@@ -3,7 +3,9 @@ package org.globalforestwatch.layers
 import java.io.FileNotFoundException
 
 import cats.implicits._
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.services.s3.AmazonS3URI
+import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
 import geotrellis.raster.crop._
 import geotrellis.raster.{CellType, Tile, isNoData}
@@ -17,12 +19,11 @@ trait Layer {
   type A
   type B
 
-  val s3Client: geotrellis.spark.io.s3.S3Client =
-    geotrellis.spark.io.s3.S3Client.DEFAULT
+  val s3Client: geotrellis.spark.io.s3.S3Client = geotrellis.spark.io.s3.S3Client.DEFAULT
   val uri: String
   val internalNoDataValue: A
   val externalNoDataValue: B
-  val basePath: String = s"s3://gfw-files/2018_update"
+  val basePath: String = s"s3://gfw-data-lake"
 
   def lookup(a: A): B
 
@@ -145,8 +146,12 @@ trait RequiredLayer extends Layer {
   lazy val source: GeoTiffRasterSource = {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
-    if (!s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
-      throw new FileNotFoundException(uri)
+    try {
+      if (!s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+        throw new FileNotFoundException(uri)
+      }
+    } catch {
+      case e: AmazonS3Exception => throw new FileNotFoundException(uri)
     }
     GeoTiffRasterSource(uri)
   }
@@ -225,13 +230,20 @@ trait OptionalLayer extends Layer {
   /** Check if URI exists before trying to open it, return None if no file found */
   lazy val source: Option[GeoTiffRasterSource] = {
     // Removes the expected 404 errors from console log
+
     val s3uri = new AmazonS3URI(uri)
-    if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
-      println(s"Opening: $uri")
-      Some(GeoTiffRasterSource(uri))
-    } else {
-      println(s"Cannot open: $uri")
-      None
+    try {
+      if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+        println(s"Opening: $uri")
+        Some(GeoTiffRasterSource(uri))
+      } else {
+        println(s"Cannot open: $uri")
+        None
+      }
+    } catch {
+      case e: AmazonS3Exception =>
+        println(s"Cannot open: $uri")
+        None
     }
   }
 

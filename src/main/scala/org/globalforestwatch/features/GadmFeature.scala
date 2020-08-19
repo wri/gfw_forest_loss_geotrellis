@@ -8,31 +8,40 @@ import org.globalforestwatch.util.GeometryReducer
 import org.globalforestwatch.util.Util._
 
 object GadmFeature extends Feature {
-
   val countryPos = 1
   val adm1Pos = 2
   val adm2Pos = 3
   val geomPos = 7
 
-  def get(i: Row): geotrellis.vector.Feature[Geometry, GadmFeatureId] = {
-    val countryCode: String = i.getString(countryPos)
+  val featureIdExpr =
+    "gid_0 as iso, split(split(gid_1, '\\\\.')[1], '_')[0] as adm1, split(split(gid_2, '\\\\.')[2], '_')[0] as adm2"
+
+
+  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
+    val featureId = getFeatureId(i)
+    val geom: Geometry =
+      GeometryReducer.reduce(GeometryReducer.gpr)(
+        WKB.read(i.getString(geomPos))
+      )
+
+    geotrellis.vector.Feature(geom, featureId)
+  }
+
+  def getFeatureId(i: Array[String]): FeatureId = {
+    val countryCode = i(countryPos)
     val admin1: Integer = try {
-      i.getString(adm1Pos).split("[.]")(1).split("[_]")(0).toInt
+      i(adm1Pos).split("[.]")(1).split("[_]")(0).toInt
     } catch {
       case e: Exception => null
     }
 
     val admin2: Integer = try {
-      i.getString(adm2Pos).split("[.]")(2).split("[_]")(0).toInt
+      i(adm2Pos).split("[.]")(2).split("[_]")(0).toInt
     } catch {
       case e: Exception => null
     }
 
-    val geom: Geometry =
-      GeometryReducer.reduce(GeometryReducer.gpr)(
-        WKB.read(i.getString(geomPos))
-      )
-    geotrellis.vector.Feature(geom, GadmFeatureId(countryCode, admin1, admin2))
+    GadmFeatureId(countryCode, admin1, admin2)
   }
 
   override def custom_filter(

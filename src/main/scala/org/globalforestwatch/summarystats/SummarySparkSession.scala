@@ -2,6 +2,8 @@ package org.globalforestwatch.summarystats
 
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
+import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
+import org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator
 
 object SummarySparkSession {
 
@@ -10,7 +12,9 @@ object SummarySparkSession {
       .setAppName(name)
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
+      .set("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
       .set("spark.debug.maxToStringFields", "255")
+      .set("geospark.join.gridtype", "kdbtree")
     //    .set("spark.sql.crossJoin.enabled", "true")
 
     val localConf: SparkConf = conf
@@ -24,6 +28,9 @@ object SummarySparkSession {
         SparkSession.builder.config(localConf).getOrCreate
       case e: Throwable => throw e
     }
+
+    GeoSparkSQLRegistrator.registerAll(spark)
+
     spark
   }
 }

@@ -1,7 +1,9 @@
 package org.globalforestwatch.layers
 
-case class KeyBiodiversityAreas(grid: String)
+import org.globalforestwatch.grids.GridTile
+
+case class KeyBiodiversityAreas(gridTile: GridTile)
     extends BooleanLayer
     with OptionalILayer {
-  val uri: String = s"$basePath/kba/$grid.tif"
+    val uri: String = s"$basePath/birdlife_key_biodiversity_areas/v20191211/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
 }

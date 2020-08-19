@@ -89,7 +89,7 @@ object CarbonSensitivityExport extends SummaryExport {
     import spark.implicits._
 
     val adm2ApiDF = df
-      .filter($"treecover_loss__year".isNotNull && $"treecover_loss__ha" > 0)
+      .filter($"umd_tree_cover_loss__year".isNotNull && $"umd_tree_cover_loss__ha" > 0)
       .transform(CarbonSensitivityDF.aggChange(List("iso", "adm1", "adm2")))
       .coalesce(100) // this should result in an avg file size of 100MB.
 

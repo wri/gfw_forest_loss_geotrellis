@@ -1,1 +1,1 @@
-version in ThisBuild := "1.0.1-carbonflux"
+version in ThisBuild := "1.1.3-carbonflux"

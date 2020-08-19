@@ -10,15 +10,22 @@ object GeostoreFeature extends Feature {
   val idPos = 0
   val geomPos = 1
 
+  val featureIdExpr = "geostore_id as geostoreId"
+
   def get(
     i: Row
-  ): geotrellis.vector.Feature[Geometry, GeostoreFeatureId] = {
-    val geostoreId: String = i.getString(idPos)
+  ): geotrellis.vector.Feature[Geometry, FeatureId] = {
+    val featureId = getFeatureId(i)
     val geom: Geometry =
       GeometryReducer.reduce(GeometryReducer.gpr)(
         WKB.read(i.getString(geomPos))
       )
-    geotrellis.vector.Feature(geom, GeostoreFeatureId(geostoreId))
+    geotrellis.vector.Feature(geom, featureId)
+  }
+
+  def getFeatureId(i: Array[String]): FeatureId = {
+    val geostoreId: String = i(idPos)
+    GeostoreFeatureId(geostoreId)
   }
 
 }
