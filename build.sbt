@@ -161,7 +161,7 @@ sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-00335589f5f424283")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 6   // 201 for carbonflux and carbon_sensitivity
+sparkInstanceCount := 201   // 201 for carbonflux and carbon_sensitivity
 sparkMasterType := "r4.2xlarge"
 sparkCoreType := "r4.2xlarge"
 sparkMasterEbsSize := Some(10)
@@ -208,9 +208,9 @@ sparkEmrConfigs := List(
     "spark.executor.memoryOverhead" -> "1g", //5G
     "spark.driver.cores" -> "1",
     "spark.driver.memory" -> "6652m",
-    "spark.executor.instances" -> "39", // 1599 for carbonflux and carbon_sensitivity
-    "spark.default.parallelism" -> "390", // 15990 for carbonflux and carbon_sensitivity
-    "spark.sql.shuffle.partitions" -> "390", // 15990 for carbonflux and carbon_sensitivity
+    "spark.executor.instances" -> "1599", // 1599 for carbonflux and carbon_sensitivity
+    "spark.default.parallelism" -> "15990", // 15990 for carbonflux and carbon_sensitivity
+    "spark.sql.shuffle.partitions" -> "15990", // 15990 for carbonflux and carbon_sensitivity
     "spark.driver.maxResultSize" -> "3g",
     "spark.shuffle.service.enabled" -> "true",
     "spark.shuffle.compress" -> "true",

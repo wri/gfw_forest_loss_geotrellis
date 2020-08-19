@@ -2,8 +2,7 @@ package org.globalforestwatch.layers
 
 case class BrazilBiomes(grid: String) extends StringLayer with OptionalILayer {
 
-  val uri: String =
-    s"$basePath/bra_biomes/$grid.tif"
+  val uri: String = s"$basePath/bra_biomes/$grid.tif"
 
   def lookup(value: Int): String = value match {
     case 1 => "Caatinga"
