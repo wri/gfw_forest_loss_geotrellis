@@ -13,14 +13,13 @@ import org.globalforestwatch.util.Util.getAnyMapValue
 object CarbonCustomAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
     import spark.implicits._
 
     val summaryRDD: RDD[(FeatureId, CarbonCustomSummary)] =
-      CarbonCustomRDD(featureRDD, CarbonCustomGrid.blockTileGrid, part, kwargs)
+      CarbonCustomRDD(featureRDD, CarbonCustomGrid.blockTileGrid, kwargs)
 
     val summaryDF =
       CarbonCustomDFFactory(featureType, summaryRDD, spark).getDataFrame

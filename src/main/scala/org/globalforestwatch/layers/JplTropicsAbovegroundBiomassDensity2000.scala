@@ -1,5 +1,7 @@
 package org.globalforestwatch.layers
 
-case class JplTropicsAbovegroundBiomassDensity2000(grid: String) extends FloatLayer with OptionalFLayer {
-  val uri: String = s"$basePath/jpl_tropics_abovegroundbiomass_density_2000/Mg_ha-1/$grid.tif"
+import org.globalforestwatch.grids.GridTile
+
+case class JplTropicsAbovegroundBiomassDensity2000(gridTile: GridTile) extends FloatLayer with OptionalFLayer {
+  val uri: String = s"$basePath/jpl_tropics_abovegroundbiomass_density_2000/v20190816/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/Mg/geotiff/${gridTile.tileId}.tif"
 }

@@ -59,8 +59,8 @@ object CarbonFluxDF {
       $"dataGroup.braBiomes" as "bra_biome__name",
       $"dataGroup.riverBasins" as "mapbox_river_basin__name",
       $"dataGroup.primaryForest" as "is__regional_primary_forest",
-      $"dataGroup.isLossLegalAmazon" as "is__treecover_loss_legal_Amazon_2001-2015",
-      $"dataGroup.prodesLegalAmazonExtent2000" as "is__prodes_legal_Amazon_e
+      $"dataGroup.isLossLegalAmazon" as "is__legal_amazon_umd_tree_cover_loss_2001-2015",
+      $"dataGroup.prodesLegalAmazonExtent2000" as "is__legal_amazon_prodes_extent",
       $"data.totalTreecoverLoss" as "umd_tree_cover_loss__ha",
       $"data.totalBiomassLoss" as "whrc_aboveground_biomass_loss__Mg",
       $"data.totalGrossEmissionsCo2eCo2Only" as "gfw_gross_emissions_co2e_co2_only__Mg",

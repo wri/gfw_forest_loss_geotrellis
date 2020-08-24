@@ -3,28 +3,28 @@ package org.globalforestwatch.summarystats.carbonflux_custom_area
 import cats.implicits._
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
-import org.globalforestwatch.grids.GridSources
+import org.globalforestwatch.grids.{GridSources, GridTile}
 import org.globalforestwatch.layers._
 
 /**
-  * @param gridId top left corner, padded from east ex: "10N_010E"
+  * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
-case class CarbonCustomGridSources(gridId: String) extends GridSources {
+case class CarbonCustomGridSources(gridTile: GridTile) extends GridSources {
 
-  val treeCoverLoss = TreeCoverLoss(gridId)
-  val treeCoverDensity2000 = TreeCoverDensityThresholds2000(gridId)
+  val treeCoverLoss = TreeCoverLoss(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
 
-  val biomassPerHectar = BiomassPerHectar(gridId)
-  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridId)
-  val grossCumulRemovalsCarbon = GrossCumulRemovalsCo2(gridId)
-  val netFluxCo2 = NetFluxCo2e(gridId)
+  val biomassPerHectar = BiomassPerHectar(gridTile)
+  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridTile)
+  val grossCumulRemovalsCarbon = GrossCumulRemovalsCo2(gridTile)
+  val netFluxCo2 = NetFluxCo2e(gridTile)
 
-  val grossEmissionsCo2eNoneCo2 = GrossEmissionsNonCo2Co2e(gridId)
-  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridId)
+  val grossEmissionsCo2eNoneCo2 = GrossEmissionsNonCo2Co2e(gridTile)
+  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridTile)
 
 
-  val treeCoverGain = TreeCoverGain(gridId)
-  val carbonFluxCustomArea1 = CarbonFluxCustomArea1(gridId)
+  val treeCoverGain = TreeCoverGain(gridTile)
+  val carbonFluxCustomArea1 = CarbonFluxCustomArea1(gridTile)
 
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonCustomTile]] = {
 
@@ -76,9 +76,9 @@ object CarbonCustomGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, CarbonCustomGridSources]
 
-  def getCachedSources(gridId: String): CarbonCustomGridSources = {
+  def getCachedSources(gridTile: GridTile): CarbonCustomGridSources = {
 
-    cache.getOrElseUpdate(gridId, CarbonCustomGridSources(gridId))
+    cache.getOrElseUpdate(gridTile.tileId, CarbonCustomGridSources(gridTile))
 
   }
 
