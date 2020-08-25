@@ -4,7 +4,7 @@ import cats.implicits._
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import org.globalforestwatch.grids.{GridSources, GridTile}
-import org.globalforestwatch.layers._
+import org.globalforestwatch.layers.{TropicLatitudeExtent, _}
 
 /**
   * @param gridTile top left corner, padded from east ex: "10N_010E"
@@ -15,8 +15,12 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
   val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
 
   val biomassPerHectar = BiomassPerHectar(gridTile)
-  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridTile)
-  val grossCumulRemovalsCarbon = GrossCumulRemovalsCo2(gridTile)
+
+  val grossAnnualAbovegroundRemovalsCarbon = GrossAnnualAbovegroundRemovalsCarbon(gridTile)
+  val grossAnnualBelowgroundRemovalsCarbon = GrossAnnualBelowgroundRemovalsCarbon(gridTile)
+  val grossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile)
+  val grossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile)
+
   val netFluxCo2 = NetFluxCo2e(gridTile)
 
   val agcEmisYear = AgcEmisYear(gridTile)
@@ -24,18 +28,21 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
   val deadwoodCarbonEmisYear = DeadwoodCarbonEmisYear(gridTile)
   val litterCarbonEmisYear = LitterCarbonEmisYear(gridTile)
   val soilCarbonEmisYear = SoilCarbonEmisYear(gridTile)
-  val totalCarbonEmisYear = TotalCarbonEmisYear(gridTile)
 
   val agc2000 = Agc2000(gridTile)
   val bgc2000 = Bgc2000(gridTile)
   val deadwoodCarbon2000 = DeadwoodCarbon2000(gridTile)
   val litterCarbon2000 = LitterCarbon2000(gridTile)
   val soilCarbon2000 = SoilCarbon2000(gridTile)
-  val totalCarbon2000 = TotalCarbon2000(gridTile)
 
-  val grossEmissionsCo2eNoneCo2 = GrossEmissionsNonCo2Co2e(gridTile)
+  val grossEmissionsCo2eNonCo2 = GrossEmissionsNonCo2Co2e(gridTile)
   val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridTile)
 
+  val stdevAnnualAbovegroundRemovalsCarbon = StdevAnnualAbovegroundRemovalsCarbon(gridTile)
+  val stdevSoilCarbonEmisYear = StdevSoilCarbonEmisYear(gridTile)
+
+  val fluxModelExtent = FluxModelExtent(gridTile)
+  val removalForestType = RemovalForestType(gridTile)
   val treeCoverGain = TreeCoverGain(gridTile)
   val mangroveBiomassExtent = MangroveBiomassExtent(gridTile)
   val treeCoverLossDrivers = TreeCoverLossDrivers(gridTile)
@@ -43,9 +50,9 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
   val protectedAreas = ProtectedAreas(gridTile)
   val landRights = LandRights(gridTile)
   val intactForestLandscapes = IntactForestLandscapes(gridTile)
-  val plantations = Plantations(gridTile)
+  val plantationsTypeFluxModel = PlantationsTypeFluxModel(gridTile)
   val intactPrimaryForest = IntactPrimaryForest(gridTile)
-  val peatlandsFlux = PeatlandsFlux(gridTile)
+  val peatlandsExtentFluxModel = PeatlandsExtentFluxModel(gridTile)
   val forestAgeCategory = ForestAgeCategory(gridTile)
   val jplTropicsAbovegroundBiomassExtent2000 = JplTropicsAbovegroundBiomassExtent2000(gridTile)
   val fiaRegionsUsExtent = FiaRegionsUsExtent(gridTile)
@@ -55,6 +62,7 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
   val primaryForest = PrimaryForest(gridTile)
   val treeCoverLossLegalAmazon = TreeCoverLossLegalAmazon(gridTile)
   val prodesLegalAmazonExtent2000 = ProdesLegalAmazonExtent2000(gridTile)
+  val tropicLatitudeExtent = TropicLatitudeExtent(gridTile)
 
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonFluxTile]] = {
 
@@ -70,41 +78,38 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
       val biomassTile = biomassPerHectar.fetchWindow(window)
-      val grossAnnualRemovalsCarbonTile =
-        grossAnnualRemovalsCarbon.fetchWindow(window)
-      val grossCumulRemovalsCarbonTile =
-        grossCumulRemovalsCarbon.fetchWindow(window)
+      val grossAnnualAbovegroundRemovalsCarbonTile = grossAnnualAbovegroundRemovalsCarbon.fetchWindow(window)
+      val grossAnnualBelowgroundRemovalsCarbonTile = grossAnnualBelowgroundRemovalsCarbon.fetchWindow(window)
+      val grossCumulAbovegroundRemovalsCo2Tile = grossCumulAbovegroundRemovalsCo2.fetchWindow(window)
+      val grossCumulBelowgroundRemovalsCo2Tile = grossCumulBelowgroundRemovalsCo2.fetchWindow(window)
       val netFluxCo2Tile = netFluxCo2.fetchWindow(window)
       val agcEmisYearTile = agcEmisYear.fetchWindow(window)
       val bgcEmisYearTile = bgcEmisYear.fetchWindow(window)
-      val deadwoodCarbonEmisYearTile =
-        deadwoodCarbonEmisYear.fetchWindow(window)
+      val deadwoodCarbonEmisYearTile = deadwoodCarbonEmisYear.fetchWindow(window)
       val litterCarbonEmisYearTile = litterCarbonEmisYear.fetchWindow(window)
       val soilCarbonEmisYearTile = soilCarbonEmisYear.fetchWindow(window)
-      val totalCarbonEmisYearTile = totalCarbonEmisYear.fetchWindow(window)
       val agc2000Tile = agc2000.fetchWindow(window)
       val bgc2000Tile = bgc2000.fetchWindow(window)
       val deadwoodCarbon2000Tile = deadwoodCarbon2000.fetchWindow(window)
       val litterCarbon2000Tile = litterCarbon2000.fetchWindow(window)
       val soilCarbon2000Tile = soilCarbon2000.fetchWindow(window)
-      val totalCarbon2000Tile = totalCarbon2000.fetchWindow(window)
-      val grossEmissionsCo2eNoneCo2Tile =
-        grossEmissionsCo2eNoneCo2.fetchWindow(window)
-      val grossEmissionsCo2eCo2OnlyTile =
-        grossEmissionsCo2eCo2Only.fetchWindow(window)
-      val jplTropicsAbovegroundBiomassDensity2000Tile =
-        jplTropicsAbovegroundBiomassDensity2000.fetchWindow(window)
+      val grossEmissionsCo2eNonCo2Tile = grossEmissionsCo2eNonCo2.fetchWindow(window)
+      val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(window)
+      val jplTropicsAbovegroundBiomassDensity2000Tile = jplTropicsAbovegroundBiomassDensity2000.fetchWindow(window)
+      val stdevAnnualAbovegroundRemovalsCarbonTile = stdevAnnualAbovegroundRemovalsCarbon.fetchWindow(window)
+      val stdevSoilCarbonEmisYearTile = stdevSoilCarbonEmisYear.fetchWindow(window)
 
+      val fluxModelExtentTile = fluxModelExtent.fetchWindow(window)
+      val removalForestTypeTile = removalForestType.fetchWindow(window)
       val mangroveBiomassExtentTile = mangroveBiomassExtent.fetchWindow(window)
       val driversTile = treeCoverLossDrivers.fetchWindow(window)
       val ecozonesTile = ecozones.fetchWindow(window)
       val landRightsTile = landRights.fetchWindow(window)
       val wdpaTile = protectedAreas.fetchWindow(window)
-      val intactForestLandscapesTile =
-        intactForestLandscapes.fetchWindow(window)
-      val plantationsTile = plantations.fetchWindow(window)
+      val intactForestLandscapesTile = intactForestLandscapes.fetchWindow(window)
+      val plantationsTypeFluxTile = plantationsTypeFluxModel.fetchWindow(window)
       val intactPrimaryForestTile = intactPrimaryForest.fetchWindow(window)
-      val peatlandFluxTile = peatlandsFlux.fetchWindow(window)
+      val peatlandsExtentFluxTile = peatlandsExtentFluxModel.fetchWindow(window)
       val forestAgeCategoryTile = forestAgeCategory.fetchWindow(window)
       val jplTropicsAbovegroundBiomassExtent2000Tile = jplTropicsAbovegroundBiomassExtent2000.fetchWindow(window)
       val fiaRegionsUsExtentTile = fiaRegionsUsExtent.fetchWindow(window)
@@ -113,39 +118,45 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
       val primaryForestTile = primaryForest.fetchWindow(window)
       val treeCoverLossLegalAmazonTile = treeCoverLossLegalAmazon.fetchWindow(window)
       val prodesLegalAmazonExtent2000Tile = prodesLegalAmazonExtent2000.fetchWindow(window)
+      val tropicLatitudeExtentTile = tropicLatitudeExtent.fetchWindow(window)
 
       val tile = CarbonFluxTile(
         lossTile,
         gainTile,
         tcd2000Tile,
         biomassTile,
-        grossAnnualRemovalsCarbonTile,
-        grossCumulRemovalsCarbonTile,
+        grossAnnualAbovegroundRemovalsCarbonTile,
+        grossAnnualBelowgroundRemovalsCarbonTile,
+        grossCumulAbovegroundRemovalsCo2Tile,
+        grossCumulBelowgroundRemovalsCo2Tile,
         netFluxCo2Tile,
         agcEmisYearTile,
         bgcEmisYearTile,
         deadwoodCarbonEmisYearTile,
         litterCarbonEmisYearTile,
         soilCarbonEmisYearTile,
-        totalCarbonEmisYearTile,
         agc2000Tile,
         bgc2000Tile,
         deadwoodCarbon2000Tile,
         litterCarbon2000Tile,
         soilCarbon2000Tile,
-        totalCarbon2000Tile,
-        grossEmissionsCo2eNoneCo2Tile,
+        grossEmissionsCo2eNonCo2Tile,
         grossEmissionsCo2eCo2OnlyTile,
         jplTropicsAbovegroundBiomassDensity2000Tile,
+        stdevAnnualAbovegroundRemovalsCarbonTile,
+        stdevSoilCarbonEmisYearTile,
+
+        fluxModelExtentTile,
+        removalForestTypeTile,
         mangroveBiomassExtentTile,
         driversTile,
         ecozonesTile,
         landRightsTile,
         wdpaTile,
         intactForestLandscapesTile,
-        plantationsTile,
+        plantationsTypeFluxTile,
         intactPrimaryForestTile,
-        peatlandFluxTile,
+        peatlandsExtentFluxTile,
         forestAgeCategoryTile,
         jplTropicsAbovegroundBiomassExtent2000Tile,
         fiaRegionsUsExtentTile,
@@ -153,7 +164,8 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
         riverBasinsTile,
         primaryForestTile,
         treeCoverLossLegalAmazonTile,
-        prodesLegalAmazonExtent2000Tile
+        prodesLegalAmazonExtent2000Tile,
+        tropicLatitudeExtentTile
       )
 
       Raster(tile, window)

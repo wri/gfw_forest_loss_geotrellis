@@ -19,7 +19,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String,
 
   val biomassPerHectar = BiomassPerHectar(gridTile)
 //  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridId)
-  val grossCumulRemovalsCarbon = GrossCumulRemovalsCo2(gridTile, model)
+  val grossCumulRemovalsCarbon = GrossCumulAbovegroundRemovalsCo2(gridTile, model)
   val netFluxCo2 = NetFluxCo2e(gridTile, model)
 
   val agcEmisYear = AgcEmisYear(gridTile, model)
@@ -48,7 +48,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String,
   val intactForestLandscapes = IntactForestLandscapes(gridTile)
   val plantations = Plantations(gridTile)
   val intactPrimaryForest = IntactPrimaryForest(gridTile)
-  val peatlandsFlux = PeatlandsFlux(gridTile)
+  val peatlandsFlux = PeatlandsExtentFluxModel(gridTile)
   val forestAgeCategory = ForestAgeCategory(gridTile)
   val jplTropicsAbovegroundBiomassExtent2000 = JplTropicsAbovegroundBiomassExtent2000(gridTile)
   val fiaRegionsUsExtent = FiaRegionsUsExtent(gridTile)

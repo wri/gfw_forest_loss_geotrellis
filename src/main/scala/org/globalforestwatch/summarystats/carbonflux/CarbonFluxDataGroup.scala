@@ -1,6 +1,9 @@
 package org.globalforestwatch.summarystats.carbonflux
 
-case class CarbonFluxDataGroup(lossYear: Integer,
+case class CarbonFluxDataGroup(
+                               fluxModelExtent: Boolean,
+                               removalForestType: String,
+                               lossYear: Integer,
                                threshold: Integer,
                                isGain: Boolean,
                                isLoss: Boolean,
@@ -10,9 +13,9 @@ case class CarbonFluxDataGroup(lossYear: Integer,
                                landRights: Boolean,
                                wdpa: String,
                                intactForestLandscapes: String,
-                               plantations: String,
+                               plantationsTypeFluxModel: String,
                                intactPrimaryForest: Boolean,
-                               peatlandsFlux: Boolean,
+                               peatlandsExtentFluxModel: Boolean,
                                forestAgeCategory: String,
                                jplTropicsAbovegroundBiomassExtent2000: Boolean,
                                fiaRegionsUsExtent: String,
@@ -20,5 +23,6 @@ case class CarbonFluxDataGroup(lossYear: Integer,
                                riverBasins: String,
                                primaryForest: Boolean,
                                isLossLegalAmazon: Boolean,
-                               prodesLegalAmazonExtent2000: Boolean
+                               prodesLegalAmazonExtent2000: Boolean,
+                               tropicLatitudeExtent: Boolean
                               )

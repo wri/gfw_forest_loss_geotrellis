@@ -15,8 +15,8 @@ case class CarbonCustomGridSources(gridTile: GridTile) extends GridSources {
   val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
 
   val biomassPerHectar = BiomassPerHectar(gridTile)
-  val grossAnnualRemovalsCarbon = GrossAnnualRemovalsBiomass(gridTile)
-  val grossCumulRemovalsCarbon = GrossCumulRemovalsCo2(gridTile)
+  val grossAnnualRemovalsCarbon = GrossAnnualAbovegroundRemovalsCarbon(gridTile)
+  val grossCumulRemovalsCarbon = GrossCumulAbovegroundRemovalsCo2(gridTile)
   val netFluxCo2 = NetFluxCo2e(gridTile)
 
   val grossEmissionsCo2eNoneCo2 = GrossEmissionsNonCo2Co2e(gridTile)
