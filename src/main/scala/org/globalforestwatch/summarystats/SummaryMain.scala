@@ -2,10 +2,8 @@ package org.globalforestwatch.summarystats
 
 import cats.implicits._
 import com.monovore.decline.{CommandApp, Opts}
-import geotrellis.spark.{KeyBounds, SpatialKey}
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.log4j.Logger
-import org.apache.spark._
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
 import org.globalforestwatch.features._
@@ -120,10 +118,9 @@ object SummaryMain
           .options[Int]("threshold", "Treecover threshold to apply")
           .withDefault(List(30))
 
-        val primartyForestOpt = Opts
-          .flag("primary-forests", "Include Primary Forests")
-          .orFalse
-          .withDefault(false)
+        val contextualLayersOpts = Opts
+          .options[String]("contextual_layer", "Contextual Layer to include (currently supported: is__umd_regional_primary_forest_2001, is__gfw_plantations")
+          .orNone
 
         val tclOpt = Opts.flag("tcl", "TCL tile extent").orFalse
 
@@ -173,7 +170,7 @@ object SummaryMain
           wdpaStatusOpts,
           tcdOpt,
           thresholdOpts,
-          primartyForestOpt,
+          contextualLayersOpts,
           tclOpt,
           gladOpt,
           changeOnlyOpt,
@@ -199,7 +196,7 @@ object SummaryMain
            wdpaStatus,
            tcdYear,
            thresholdFilter,
-           includePrimaryForest,
+           contextualLayers,
            tcl,
            glad,
            changeOnly,
@@ -222,7 +219,7 @@ object SummaryMain
               "wdpaStatus" -> wdpaStatus,
               "tcdYear" -> tcdYear,
               "thresholdFilter" -> thresholdFilter,
-              "includePrimaryForest" -> includePrimaryForest,
+              "contextualLayers" -> contextualLayers,
               "tcl" -> tcl,
               "glad" -> glad,
               "changeOnly" -> changeOnly,

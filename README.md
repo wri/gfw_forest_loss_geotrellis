@@ -161,8 +161,8 @@ The following options are supported:
 |id_start         |int   |`feature` analysis       |Filter by IDs larger than or equal to given value                                                                                |
 |wdpa_status      |string|`wdpa` features          |Filter by WDPA Status                                                                                                            |
 |tcd              |int   |`treecover` analysis     |Select tree cover density year                                                                                                   |
-|threshold        |int   |`treecover` analysis     |Treecover threshold to apply                                                                                                     |
-|primary-forests  |flag  |`treecover` analysis     |Include Primary Forests                                                                                                          |
+|threshold        |int   |`treecover` analysis     |Treecover threshold to apply (multiple)                                                                                          |
+|contextual_layer |string|`treecover` analysis     |Include (multiple) selected contextual layers: `is__umd_regional_primary_forest_2001`, `is__gfw_plantations`                     |
 |tcl              |flag  |all                      |Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class                                     |
 |glad             |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class                                   |
 |change_only      |flag  |all except `treecover`   |Process change only                                                                                                              |
