@@ -91,44 +91,27 @@ object TreeLossDF {
       sum("whrc_aboveground_co2_stock_2000__Mt") as "whrc_aboveground_co2_stock_2000__Mt"
     )
 
-    (includePrimaryForest, includePlantations) match {
-      case (true, true) => df
-      case (true, false) => {
-        df.groupBy(
-          $"feature__id",
-          $"is__umd_regional_primary_forest_2001",
-          $"umd_tree_cover_density__threshold",
-          $"umd_tree_cover_extent__year"
-        )
-          .agg(
-            cols.head,
-            cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
-          )
-      }
-      case (false, true) => {
-        df.groupBy(
-          $"feature__id",
-          $"is__gfw_plantations",
-          $"umd_tree_cover_density__threshold",
-          $"umd_tree_cover_extent__year"
-        )
-          .agg(
-            cols.head,
-            cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
-          )
-      }
-      case _ => {
-        df.groupBy(
-          $"feature__id",
-          $"umd_tree_cover_density__threshold",
-          $"umd_tree_cover_extent__year"
-        )
-          .agg(
-            cols.head,
-            cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
-          )
-      }
+    val groupByCols = List(
+      $"feature__id",
+      $"umd_tree_cover_density__threshold",
+      $"umd_tree_cover_extent__year"
+    )
+
+    val pfGroupByCol = {
+      if (includePrimaryForest) List($"is__umd_regional_primary_forest_2001")
+      else List()
     }
+
+    val plGroupByCol = {
+      if (includePlantations) List($"is__gfw_plantations")
+      else List()
+    }
+
+    df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol: _*)
+      .agg(
+        cols.head,
+        cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
+      )
 
   }
 

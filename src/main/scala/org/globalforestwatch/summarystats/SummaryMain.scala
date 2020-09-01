@@ -1,5 +1,6 @@
 package org.globalforestwatch.summarystats
 
+import cats.data.NonEmptyList
 import cats.implicits._
 import com.monovore.decline.{CommandApp, Opts}
 import geotrellis.vector.{Feature, Geometry}
@@ -120,7 +121,7 @@ object SummaryMain
 
         val contextualLayersOpts = Opts
           .options[String]("contextual_layer", "Contextual Layer to include (currently supported: is__umd_regional_primary_forest_2001, is__gfw_plantations")
-          .orNone
+          .withDefault(NonEmptyList.of(""))
 
         val tclOpt = Opts.flag("tcl", "TCL tile extent").orFalse
 

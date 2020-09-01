@@ -14,17 +14,14 @@ object TreeLossExport extends SummaryExport {
     val spark = summaryDF.sparkSession
     import spark.implicits._
 
-    val maybeContextualLayers: Option[NonEmptyList[String]] =
-      getAnyMapValue[Option[NonEmptyList[String]]](kwargs, "contextualLayers")
+    val contextualLayers: List[String] =
+      getAnyMapValue[NonEmptyList[String]](kwargs, "contextualLayers").toList
 
     val (includePrimaryForest, includePlantations) = {
-      if (maybeContextualLayers isDefined) {
-        val contextualLayers = maybeContextualLayers.toList
-        (
-          contextualLayers contains "is__umd_regional_primary_forest_2001",
-          contextualLayers contains "is__gfw_plantations"
-        )
-      } else (false, false)
+      (
+        contextualLayers contains "is__umd_regional_primary_forest_2001",
+        contextualLayers contains "is__gfw_plantations"
+      )
     }
 
     summaryDF

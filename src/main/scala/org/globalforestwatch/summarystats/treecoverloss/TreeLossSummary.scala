@@ -45,24 +45,19 @@ object TreeLossSummary {
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
-        val maybeContextualLayers: Option[NonEmptyList[String]] =
-          getAnyMapValue[Option[NonEmptyList[String]]](acc.kwargs, "contextualLayers")
-
+        val contextualLayers: List[String] =
+          getAnyMapValue[NonEmptyList[String]](acc.kwargs, "contextualLayers").toList
 
         val isPrimaryForest: Boolean = {
-          if ((maybeContextualLayers isDefined) && (maybeContextualLayers.toList contains "is__umd_regional_primary_forest_2001")) {
+          if (contextualLayers contains "is__umd_regional_primary_forest_2001")
             raster.tile.primaryForest.getData(col, row)
-          } else {
-            false
-          }
+          else false
         }
 
         val isPlantations: Boolean = {
-          if ((maybeContextualLayers isDefined) && (maybeContextualLayers contains "is__gfw_plantations")) {
-            raster.tile.primaryForest.getData(col, row)
-          } else {
-            false
-          }
+          if (contextualLayers contains "is__gfw_plantations")
+            raster.tile.plantationsBool.getData(col, row)
+          else false
         }
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
@@ -88,7 +83,12 @@ object TreeLossSummary {
           if (thresholds == Nil) stats
           else {
             val pKey =
-              TreeLossDataGroup(thresholds.head, tcdYear, isPrimaryForest, isPlantations)
+              TreeLossDataGroup(
+                thresholds.head,
+                tcdYear,
+                isPrimaryForest,
+                isPlantations
+              )
 
             val summary: TreeLossData =
               stats.getOrElse(
