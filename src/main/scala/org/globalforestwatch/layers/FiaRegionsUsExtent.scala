@@ -6,8 +6,11 @@ case class FiaRegionsUsExtent(gridTile: GridTile)
   extends StringLayer
     with OptionalILayer {
 
-  val uri: String = s"$basePath/usfs_fia_regions/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"
-  override val externalNoDataValue = "Unknown"
+  val uri: String =
+//    s"$basePath/usfs_fia_regions/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"
+    s"s3://gfw-files/flux_2_1_0/FIA_regions/${gridTile.tileId}.tif"
+
+  override val externalNoDataValue = "Not applicable"
 
   def lookup(value: Int): String = value match {
     case 1  => "PNWE"
@@ -21,6 +24,6 @@ case class FiaRegionsUsExtent(gridTile: GridTile)
     case 9  => "CS"
     case 10 => "GP"
     case 11 => "RMN"
-    case _ => ""
+    case _ => "Unknown"
   }
 }

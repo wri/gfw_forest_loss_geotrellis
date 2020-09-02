@@ -32,7 +32,7 @@ case class CarbonFluxTile(
                            grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e#OptionalFTile,
                            jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000#OptionalFTile,
                            stdevAnnualAbovegroundRemovalsCarbon: StdevAnnualAbovegroundRemovalsCarbon#OptionalFTile,
-                           stdevSoilCarbonEmisYear: StdevSoilCarbonEmisYear#OptionalFTile,
+                           stdevSoilCarbon2000: StdevSoilCarbon2000#OptionalFTile,
 
                            fluxModelExtent: FluxModelExtent#OptionalITile,
                            removalForestType: RemovalForestType#OptionalITile,
@@ -53,7 +53,9 @@ case class CarbonFluxTile(
                            primaryForest: PrimaryForest#OptionalITile,
                            lossLegalAmazon: TreeCoverLossLegalAmazon#OptionalITile,
                            prodesLegalAmazonExtent2000: ProdesLegalAmazonExtent2000#OptionalITile,
-                           tropicLatitudeExtent: TropicLatitudeExtent#OptionalITile
+                           tropicLatitudeExtent: TropicLatitudeExtent#OptionalITile,
+                           burnYearHansenLoss: BurnYearHansenLoss#OptionalITile,
+                           grossEmissionsNodeCodes: GrossEmissionsNodeCodes#OptionalITile
                          ) extends CellGrid {
   def cellType: CellType = loss.cellType
 

@@ -56,7 +56,7 @@ object CarbonFluxSummary {
         val grossEmissionsCo2eCo2Only: Float =  raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
         val jplTropicsAbovegroundBiomassDensity2000: Float = raster.tile.jplTropicsAbovegroundBiomassDensity2000.getData(col, row)
         val stdevAnnualAbovegroundRemovalsCarbon: Float = raster.tile.stdevAnnualAbovegroundRemovalsCarbon.getData(col, row)
-        val stdevSoilCarbonEmisYear: Float = raster.tile.stdevSoilCarbonEmisYear.getData(col, row)
+        val stdevSoilCarbon2000: Float = raster.tile.stdevSoilCarbon2000.getData(col, row)
 
         val isGain: Boolean = raster.tile.gain.getData(col, row)
         val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
@@ -79,6 +79,8 @@ object CarbonFluxSummary {
         val lossYearLegalAmazon: Integer = raster.tile.lossLegalAmazon.getData(col, row)
         val prodesLegalAmazonExtent2000: Boolean = raster.tile.prodesLegalAmazonExtent2000.getData(col, row)
         val tropicLatitudeExtent: Boolean = raster.tile.tropicLatitudeExtent.getData(col, row)
+        val burnYearHansenLoss: Integer = raster.tile.burnYearHansenLoss.getData(col, row)
+        val grossEmissionsNodeCodes: String = raster.tile.grossEmissionsNodeCodes.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -91,6 +93,9 @@ object CarbonFluxSummary {
 //        val carbonfluxLossYearLegalAmazon: Integer = if (lossYearLegalAmazon != null
 //          && lossYearLegalAmazon >= 2001 && lossYearLegalAmazon <= 2015) lossYearLegalAmazon else null
         val isLossLegalAmazon: Boolean = lossYearLegalAmazon != null
+
+        // Creates variable of whether the Hansen loss coincided with burning
+        val isBurnLoss: Boolean = burnYearHansenLoss != null
 
         val biomassPixel = biomass * areaHa
         val grossAnnualAbovegroundRemovalsCarbonPixel = grossAnnualAbovegroundRemovalsCarbon * areaHa
@@ -123,8 +128,18 @@ object CarbonFluxSummary {
 
         val jplTropicsAbovegroundBiomassDensity2000Pixel = jplTropicsAbovegroundBiomassDensity2000 * areaHa
 
-        val stdevAnnualAbovegroundRemovalsCarbonPixel = stdevAnnualAbovegroundRemovalsCarbon * areaHa
-        val stdevSoilCarbonEmisYearPixel = stdevSoilCarbonEmisYear * areaHa
+        // Calculates the variance for each removal factor pixel (units are Mg^2/ha^2/yr^2)
+        val varianceAnnualAbovegroundRemovalsCarbonPixel = math.pow(stdevAnnualAbovegroundRemovalsCarbon, 2)
+
+        // Keeps track of the number of pixels with variance in them
+        val varianceAnnualAbovegroundRemovalsCarbonCount = if (stdevAnnualAbovegroundRemovalsCarbon != 0) 1 else 0
+
+        // Calculates the variance for each soil carbon pixel (units are Mg^2/ha^2)
+        val stdevSoilCarbonEmisYear: Float = if (lossYear != null) stdevSoilCarbon2000 else 0
+        val varianceSoilCarbonEmisYearPixel: Double = math.pow(stdevSoilCarbonEmisYear, 2)
+
+        // Keeps track of the number of pixels with variance in them
+        val varianceSoilCarbonEmisYearCount = if (lossYear != null && stdevSoilCarbon2000 != 0) 1 else 0
 
         val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
 
@@ -159,7 +174,9 @@ object CarbonFluxSummary {
               primaryForest,
               isLossLegalAmazon,
               prodesLegalAmazonExtent2000,
-              tropicLatitudeExtent
+              tropicLatitudeExtent,
+              isBurnLoss,
+              grossEmissionsNodeCodes
             )
 
             val summary: CarbonFluxData =
@@ -171,7 +188,7 @@ object CarbonFluxSummary {
                   0, 0, 0, 0, 0, 0,
                   0, 0, 0, 0, 0, 0,
                   0, 0, 0, 0, 0, 0,
-                  0)
+                  0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -212,8 +229,10 @@ object CarbonFluxSummary {
               summary.totalCarbon2000 += totalCarbon2000Pixel
               summary.totalJplTropicsAbovegroundBiomassDensity2000 += jplTropicsAbovegroundBiomassDensity2000Pixel
 
-              summary.totalStdevAnnualAbovegroundRemovalsCarbon += stdevAnnualAbovegroundRemovalsCarbonPixel
-              summary.totalStdevSoilCarbonEmisYear += stdevSoilCarbonEmisYearPixel
+              summary.totalVarianceAnnualAbovegroundRemovalsCarbon += varianceAnnualAbovegroundRemovalsCarbonPixel
+              summary.totalVarianceAnnualAbovegroundRemovalsCarbonCount += varianceAnnualAbovegroundRemovalsCarbonCount
+              summary.totalVarianceSoilCarbonEmisYear += varianceSoilCarbonEmisYearPixel
+              summary.totalVarianceSoilCarbonEmisYearCount += varianceSoilCarbonEmisYearCount
             }
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
           }

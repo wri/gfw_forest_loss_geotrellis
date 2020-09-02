@@ -36,8 +36,10 @@ case class CarbonFluxData(var totalTreecoverLoss: Double,
                           var totalCarbon2000: Double,
                           var totalJplTropicsAbovegroundBiomassDensity2000: Double,
                           var totalTreecoverLossLegalAmazon: Double,
-                          var totalStdevAnnualAbovegroundRemovalsCarbon: Double,
-                          var totalStdevSoilCarbonEmisYear: Double
+                          var totalVarianceAnnualAbovegroundRemovalsCarbon: Double,
+                          var totalVarianceAnnualAbovegroundRemovalsCarbonCount: Double,
+                          var totalVarianceSoilCarbonEmisYear: Double,
+                          var totalVarianceSoilCarbonEmisYearCount: Double
                          ) {
   def merge(other: CarbonFluxData): CarbonFluxData = {
     CarbonFluxData(
@@ -70,8 +72,10 @@ case class CarbonFluxData(var totalTreecoverLoss: Double,
       totalCarbon2000 + other.totalCarbon2000,
       totalJplTropicsAbovegroundBiomassDensity2000 + other.totalJplTropicsAbovegroundBiomassDensity2000,
       totalTreecoverLossLegalAmazon + other.totalTreecoverLossLegalAmazon,
-      totalStdevAnnualAbovegroundRemovalsCarbon + other.totalStdevAnnualAbovegroundRemovalsCarbon,
-      totalStdevSoilCarbonEmisYear + other.totalStdevSoilCarbonEmisYear
+      totalVarianceAnnualAbovegroundRemovalsCarbon + other.totalVarianceAnnualAbovegroundRemovalsCarbon,
+      totalVarianceAnnualAbovegroundRemovalsCarbonCount + other.totalVarianceAnnualAbovegroundRemovalsCarbonCount,
+      totalVarianceSoilCarbonEmisYear + other.totalVarianceSoilCarbonEmisYear,
+      totalVarianceSoilCarbonEmisYearCount + other.totalVarianceSoilCarbonEmisYearCount
     )
   }
 }

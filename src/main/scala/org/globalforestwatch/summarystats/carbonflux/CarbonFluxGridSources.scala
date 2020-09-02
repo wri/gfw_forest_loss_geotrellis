@@ -39,7 +39,7 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
   val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridTile)
 
   val stdevAnnualAbovegroundRemovalsCarbon = StdevAnnualAbovegroundRemovalsCarbon(gridTile)
-  val stdevSoilCarbonEmisYear = StdevSoilCarbonEmisYear(gridTile)
+  val stdevSoilCarbon2000 = StdevSoilCarbon2000(gridTile)
 
   val fluxModelExtent = FluxModelExtent(gridTile)
   val removalForestType = RemovalForestType(gridTile)
@@ -63,6 +63,8 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
   val treeCoverLossLegalAmazon = TreeCoverLossLegalAmazon(gridTile)
   val prodesLegalAmazonExtent2000 = ProdesLegalAmazonExtent2000(gridTile)
   val tropicLatitudeExtent = TropicLatitudeExtent(gridTile)
+  val burnYearHansenLoss = BurnYearHansenLoss(gridTile)
+  val grossEmissionsNodeCodes = GrossEmissionsNodeCodes(gridTile)
 
   def readWindow(window: Extent): Either[Throwable, Raster[CarbonFluxTile]] = {
 
@@ -97,7 +99,7 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
       val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(window)
       val jplTropicsAbovegroundBiomassDensity2000Tile = jplTropicsAbovegroundBiomassDensity2000.fetchWindow(window)
       val stdevAnnualAbovegroundRemovalsCarbonTile = stdevAnnualAbovegroundRemovalsCarbon.fetchWindow(window)
-      val stdevSoilCarbonEmisYearTile = stdevSoilCarbonEmisYear.fetchWindow(window)
+      val stdevSoilCarbon2000Tile = stdevSoilCarbon2000.fetchWindow(window)
 
       val fluxModelExtentTile = fluxModelExtent.fetchWindow(window)
       val removalForestTypeTile = removalForestType.fetchWindow(window)
@@ -119,6 +121,8 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
       val treeCoverLossLegalAmazonTile = treeCoverLossLegalAmazon.fetchWindow(window)
       val prodesLegalAmazonExtent2000Tile = prodesLegalAmazonExtent2000.fetchWindow(window)
       val tropicLatitudeExtentTile = tropicLatitudeExtent.fetchWindow(window)
+      val burnYearHansenLossTile = burnYearHansenLoss.fetchWindow(window)
+      val grossEmissionsNodeCodesTile = grossEmissionsNodeCodes.fetchWindow(window)
 
       val tile = CarbonFluxTile(
         lossTile,
@@ -144,7 +148,7 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
         grossEmissionsCo2eCo2OnlyTile,
         jplTropicsAbovegroundBiomassDensity2000Tile,
         stdevAnnualAbovegroundRemovalsCarbonTile,
-        stdevSoilCarbonEmisYearTile,
+        stdevSoilCarbon2000Tile,
 
         fluxModelExtentTile,
         removalForestTypeTile,
@@ -165,7 +169,9 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
         primaryForestTile,
         treeCoverLossLegalAmazonTile,
         prodesLegalAmazonExtent2000Tile,
-        tropicLatitudeExtentTile
+        tropicLatitudeExtentTile,
+        burnYearHansenLossTile,
+        grossEmissionsNodeCodesTile
       )
 
       Raster(tile, window)

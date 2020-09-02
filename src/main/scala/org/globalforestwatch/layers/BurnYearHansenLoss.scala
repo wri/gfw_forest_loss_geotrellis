@@ -1,0 +1,11 @@
+package org.globalforestwatch.layers
+
+import org.globalforestwatch.grids.GridTile
+
+case class BurnYearHansenLoss(gridTile: GridTile) extends IntegerLayer with OptionalILayer {
+  val uri: String =
+//    s"$basePath/gfw_burn_year_Hansen_loss/v20190816/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/geotiff/${gridTile.tileId}.tif"
+    s"s3://gfw-files/flux_2_1_0/burn_year_with_Hansen_loss/${gridTile.tileId}.tif"
+
+  override def lookup(value: Int): Integer = if (value == 0) null else value + 2000
+}

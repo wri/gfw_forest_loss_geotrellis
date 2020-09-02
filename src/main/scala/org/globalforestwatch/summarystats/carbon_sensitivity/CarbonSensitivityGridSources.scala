@@ -29,11 +29,11 @@ case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String,
   val soilCarbonEmisYear = SoilCarbonEmisYear(gridTile, model)
 //  val totalCarbonEmisYear = TotalCarbonEmisYear(gridId)
 
-  val agc2000 = Agc2000(gridTile, model)
+  val agc2000 = Agc2000(gridTile)
 //  val bgc2000 = Bgc2000(gridId)
 //  val deadwoodCarbon2000 = DeadwoodCarbon2000(gridId)
 //  val litterCarbon2000 = LitterCarbon2000(gridId)
-  val soilCarbon2000 = SoilCarbon2000(gridTile, model)
+  val soilCarbon2000 = SoilCarbon2000(gridTile)
 //  val totalCarbon2000 = TotalCarbon2000(gridId)
 
   val grossEmissionsCo2eNoneCo2 = GrossEmissionsNonCo2Co2e(gridTile, model)

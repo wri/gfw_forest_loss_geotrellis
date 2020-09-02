@@ -24,5 +24,7 @@ case class CarbonFluxDataGroup(
                                primaryForest: Boolean,
                                isLossLegalAmazon: Boolean,
                                prodesLegalAmazonExtent2000: Boolean,
-                               tropicLatitudeExtent: Boolean
+                               tropicLatitudeExtent: Boolean,
+                               isBurnLoss: Boolean,
+                               grossEmissionsNodeCodes: String
                               )

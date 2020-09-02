@@ -27,9 +27,11 @@ object CarbonFluxDF {
     "bra_biome__name",
     "mapbox_river_basin__name",
     "is__regional_primary_forest",
-    "is__treecover_loss_legal_Amazon_2001-2019",
+    "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015",
     "is__prodes_legal_Amazon_extent_2000",
-    "is__tropical_latitude_extent"
+    "is__tropical_latitude_extent",
+    "is__gfw_burn_loss_2001-19",
+    "gfw_gross_emissions_code__type"
   )
 
   def unpackValues(df: DataFrame): DataFrame = {
@@ -64,9 +66,11 @@ object CarbonFluxDF {
       $"dataGroup.braBiomes" as "bra_biome__name",
       $"dataGroup.riverBasins" as "mapbox_river_basin__name",
       $"dataGroup.primaryForest" as "is__regional_primary_forest",
-      $"dataGroup.isLossLegalAmazon" as "is__legal_amazon_umd_tree_cover_loss_2001-2015",
-      $"dataGroup.prodesLegalAmazonExtent2000" as "is__legal_amazon_prodes_extent",
+      $"dataGroup.isLossLegalAmazon" as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015",
+      $"dataGroup.prodesLegalAmazonExtent2000" as "is__prodes_legal_Amazon_extent_2000",
       $"dataGroup.tropicLatitudeExtent" as "is__tropical_latitude_extent",
+      $"dataGroup.isBurnLoss" as "is__gfw_burn_loss_2001-19",
+      $"dataGroup.grossEmissionsNodeCodes" as "gfw_gross_emissions_code__type",
 
       $"data.totalTreecoverLoss" as "umd_tree_cover_loss__ha",
       $"data.totalBiomassLoss" as "whrc_aboveground_biomass_loss__Mg",
@@ -95,10 +99,12 @@ object CarbonFluxDF {
       $"data.totalLitterCarbon2000" as "gfw_litter_carbon_stock_2000__Mg",
       $"data.totalSoilCarbon2000" as "gfw_soil_carbon_stock_2000__Mg",
       $"data.totalCarbon2000" as "gfw_total_carbon_stock_2000__Mg",
-      $"data.totalJplTropicsAbovegroundBiomassDensity2000" as "jpl_tropics_aboveground_biomass_density_2000__Mg",
+      $"data.totalJplTropicsAbovegroundBiomassDensity2000" as "jpl_tropics_aboveground_biomass_2000__Mg",
       $"data.totalTreecoverLossLegalAmazon" as "legal_amazon_umd_tree_cover_loss__ha",
-      $"data.totalStdevAnnualAbovegroundRemovalsCarbon" as "gfw_standard_deviation_annual_aboveground_carbon_removals__Mg",
-      $"data.totalStdevSoilCarbonEmisYear" as "gfw_standard_deviation_soil_carbon_stock_in_emissions_year__Mg"
+      $"data.totalVarianceAnnualAbovegroundRemovalsCarbon" as "gfw_total_variance_annual_aboveground_carbon_removals__Mg^2_ha^2_yr^2",
+      $"data.totalVarianceAnnualAbovegroundRemovalsCarbonCount" as "gfw_pixel_count_variance_annual_aboveground_carbon_removals__pixels",
+      $"data.totalVarianceSoilCarbonEmisYear" as "gfw_total_variance_soil_carbon_2000_in_emissions_year__Mg^2_ha^2",
+      $"data.totalVarianceSoilCarbonEmisYearCount" as "gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels"
     )
   }
 
@@ -127,10 +133,12 @@ object CarbonFluxDF {
         sum("gfw_gross_emissions_co2e_co2_only__Mg") as "gfw_gross_emissions_co2e_co2_only_2001-2019__Mg",
         sum("gfw_gross_emissions_co2e_non_co2__Mg") as "gfw_gross_emissions_co2e_non_co2_2001-2019__Mg",
         sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases_2001-2019__Mg",
-        sum("jpl_tropics_aboveground_biomass_density_2000__Mg") as "jpl_tropics_aboveground_biomass_density_2000__Mg",
+        sum("jpl_tropics_aboveground_biomass_2000__Mg") as "jpl_tropics_aboveground_biomass_2000__Mg",
         sum("legal_amazon_umd_tree_cover_loss__ha") as "legal_amazon_umd_tree_cover_loss_2001-2015__ha",
-        sum("gfw_standard_deviation_annual_aboveground_carbon_removals__Mg") as "gfw_standard_deviation_annual_aboveground_carbon_removals__Mg",
-        sum("gfw_standard_deviation_soil_carbon_stock_in_emissions_year__Mg") as "gfw_standard_deviation_soil_carbon_stock_in_emissions_year__Mg"
+        sum("gfw_total_variance_annual_aboveground_carbon_removals__Mg^2_ha^2_yr^2") as "gfw_total_variance_annual_aboveground_carbon_removals__Mg^2_ha^2_yr^2",
+        sum("gfw_pixel_count_variance_annual_aboveground_carbon_removals__pixels") as "gfw_pixel_count_variance_annual_aboveground_carbon_removals__pixels",
+        sum("gfw_total_variance_soil_carbon_2000_in_emissions_year__Mg^2_ha^2") as "gfw_total_variance_soil_carbon_2000_in_emissions_year__Mg^2_ha^2",
+        sum("gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels") as "gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels"
 
       )
   }
@@ -160,10 +168,12 @@ object CarbonFluxDF {
         sum("gfw_gross_emissions_co2e_co2_only_2001-2019__Mg") as "gfw_gross_emissions_co2e_co2_only_2001-2019__Mg",
         sum("gfw_gross_emissions_co2e_non_co2_2001-2019__Mg") as "gfw_gross_emissions_co2e_non_co2_2001-2019__Mg",
         sum("gfw_gross_emissions_co2e_all_gases_2001-2019__Mg") as "gfw_gross_emissions_co2e_all_gases_2001-2019__Mg",
-        sum("jpl_tropics_aboveground_biomass_density_2000__Mg") as "jpl_tropics_aboveground_biomass_density_2000__Mg",
+        sum("jpl_tropics_aboveground_biomass_2000__Mg") as "jpl_tropics_aboveground_biomass_2000__Mg",
         sum("legal_amazon_umd_tree_cover_loss_2001-2015__ha") as "legal_amazon_umd_tree_cover_loss_2001-2015__ha",
-        sum("gfw_standard_deviation_annual_aboveground_carbon_removals__Mg") as "gfw_standard_deviation_annual_aboveground_carbon_removals___Mg",
-        sum("gfw_standard_deviation_soil_carbon_stock_in_emissions_year__Mg") as "gfw_standard_deviation_soil_carbon_stock_in_emissions_year___Mg"
+        sum("gfw_total_variance_annual_aboveground_carbon_removals__Mg^2_ha^2_yr^2") as "gfw_total_variance_annual_aboveground_carbon_removals__Mg^2_ha^2_yr^2",
+        sum("gfw_pixel_count_variance_annual_aboveground_carbon_removals__pixels") as "gfw_pixel_count_variance_annual_aboveground_carbon_removals__pixels",
+        sum("gfw_total_variance_soil_carbon_2000_in_emissions_year__Mg^2_ha^2") as "gfw_total_variance_soil_carbon_2000_in_emissions_year__Mg^2_ha^2",
+        sum("gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels") as "gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels"
 
       )
   }
@@ -204,25 +214,22 @@ object CarbonFluxDF {
         max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
         max(length($"wwf_eco_region__name")).cast("boolean") as "wwf_eco_region__name",
         max($"is__gfw_land_right") as "is__gfw_land_right",
-        max(length($"wdpa_protected_area__iucn_cat"))
-          .cast("boolean") as "wdpa_protected_area__iucn_cat",
-        max(length($"ifl_intact_forest_landscape__year"))
-          .cast("boolean") as "ifl_intact_forest_landscape__year",
-        max(length($"gfw_plantation_flux_model__type"))
-          .cast("boolean") as "gfw_plantation_flux_model__type",
+        max(length($"wdpa_protected_area__iucn_cat")).cast("boolean") as "wdpa_protected_area__iucn_cat",
+        max(length($"ifl_intact_forest_landscape__year")).cast("boolean") as "ifl_intact_forest_landscape__year",
+        max(length($"gfw_plantation_flux_model__type")).cast("boolean") as "gfw_plantation_flux_model__type",
         max($"is__intact_primary_forest") as "is__intact_primary_forest",
         max($"is__peatlands_extent_flux_model") as "is__peatlands_extent_flux_model",
-        max(length($"gfw_forest_age_category__cat"))
-          .cast("boolean") as "gfw_forest_age_category__cat",
+        max(length($"gfw_forest_age_category__cat")).cast("boolean") as "gfw_forest_age_category__cat",
         max($"is__jpl_aboveground_biomass_extent") as "is__jpl_aboveground_biomass_extent",
-        max(length($"usfs_fia_region__name"))
-          .cast("boolean") as "usfs_fia_region__name",
+        max(length($"usfs_fia_region__name")).cast("boolean") as "usfs_fia_region__name",
         max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name",
         max(length($"mapbox_river_basin__name")).cast("boolean") as "mapbox_river_basin__name",
         max($"is__regional_primary_forest") as "is__regional_primary_forest",
-        max($"is__legal_amazon_umd_tree_cover_loss_2001-2015") as "is__legal_amazon_umd_tree_cover_loss_2001-2015",
-        max($"is__legal_amazon_prodes_extent_2000") as "is__legal_amazon_prodes_extent_2000",
-        max($"is__tropical_latitude_extent") as "is__tropical_latitude_extent"
+        max($"is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015") as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015",
+        max($"is__prodes_legal_Amazon_extent_2000") as "is__prodes_legal_Amazon_extent_2000",
+        max($"is__tropical_latitude_extent") as "is__tropical_latitude_extent",
+        max($"is__gfw_burn_loss_2001-19") as "is__gfw_burn_loss_2001-19",
+        max(length($"gfw_gross_emissions_code__type")).cast("boolean") as "gfw_gross_emissions_code__type"
       )
   }
 
@@ -252,9 +259,11 @@ object CarbonFluxDF {
         max($"bra_biome__name") as "bra_biome__name",
         max($"mapbox_river_basin__name") as "mapbox_river_basin__name",
         max($"is__regional_primary_forest") as "is__regional_primary_forest",
-        max($"is__legal_amazon_umd_tree_cover_loss_2001-2015") as "is__legal_amazon_umd_tree_cover_loss_2001-2015",
-        max($"is__legal_amazon_prodes_extent_2000") as "is__legal_amazon_prodes_extent_2000",
-        max($"is__tropical_latitude_extent") as "is__tropical_latitude_extent"
+        max($"is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015") as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015",
+        max($"is__prodes_legal_Amazon_extent_2000") as "is__prodes_legal_Amazon_extent_2000",
+        max($"is__tropical_latitude_extent") as "is__tropical_latitude_extent",
+        max($"is__gfw_burn_loss_2001-19") as "is__gfw_burn_loss_2001-19",
+        max($"gfw_gross_emissions_code__type") as "gfw_gross_emissions_code__type"
       )
   }
 
