@@ -42,57 +42,31 @@ object CarbonSensitivitySummary {
         // This is a pixel by pixel operation
         val lossYear: Integer = {
           if (changeLossSource == "legal_Amazon_loss") raster.tile.lossLegalAmazon.getData(col, row)
-          else if (changeLossSource == "Mekong_loss") raster.tile.lossFirstYear20012015Mekong.getData(col, row)
           else raster.tile.loss.getData(col, row)
         }
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
-
-        //        val grossAnnualRemovalsCarbon: Float =
-        //          raster.tile.grossAnnualRemovalsCarbon.getData(col, row)
-        val grossCumulRemovalsCarbon: Float =
-        raster.tile.grossCumulRemovalsCarbon.getData(col, row)
+        val grossCumulAbovegroundRemovalsCo2: Float = raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
+        val grossCumulBelowgroundRemovalsCo2: Float = raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
         val agcEmisYear: Float = raster.tile.agcEmisYear.getData(col, row)
-        //        val bgcEmisYear: Float = raster.tile.bgcEmisYear.getData(col, row)
-        //        val deadwoodCarbonEmisYear: Float =
-        //          raster.tile.deadwoodCarbonEmisYear.getData(col, row)
-        //        val litterCarbonEmisYear: Float =
-        //          raster.tile.litterCarbonEmisYear.getData(col, row)
-        val soilCarbonEmisYear: Float =
-        raster.tile.soilCarbonEmisYear.getData(col, row)
-        //        val totalCarbonEmisYear: Float =
-        //          raster.tile.totalCarbonEmisYear.getData(col, row)
-        val agc2000: Float = raster.tile.agc2000.getData(col, row)
-        //        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
-        //        val deadwoodCarbon2000: Float =
-        //          raster.tile.deadwoodCarbon2000.getData(col, row)
-        //        val litterCarbon2000: Float =
-        //          raster.tile.litterCarbon2000.getData(col, row)
-        val soilCarbon2000: Float =
-        raster.tile.soilCarbon2000.getData(col, row)
-        //        val totalCarbon2000: Float =
-        //          raster.tile.totalCarbon2000.getData(col, row)
-        val grossEmissionsCo2eNoneCo2: Float =
-        raster.tile.grossEmissionsCo2eNoneCo2.getData(col, row)
-        val grossEmissionsCo2eCo2Only: Float =
-          raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
-        val jplTropicsAbovegroundBiomassDensity2000: Float =
-          raster.tile.jplTropicsAbovegroundBiomassDensity2000.getData(col, row)
+        val soilCarbonEmisYear: Float = raster.tile.soilCarbonEmisYear.getData(col, row)
+        val grossEmissionsCo2eNonCo2: Float = raster.tile.grossEmissionsCo2eNonCo2.getData(col, row)
+        val grossEmissionsCo2eCo2Only: Float = raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
+        val jplTropicsAbovegroundBiomassDensity2000: Float = raster.tile.jplTropicsAbovegroundBiomassDensity2000.getData(col, row)
 
         val isGain: Boolean = raster.tile.gain.getData(col, row)
-        val mangroveBiomassExtent: Boolean =
-          raster.tile.mangroveBiomassExtent.getData(col, row)
+        val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
+        val removalForestType: String = raster.tile.removalForestType.getData(col, row)
+        val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
         val drivers: String = raster.tile.drivers.getData(col, row)
         val wdpa: String = raster.tile.wdpa.getData(col, row)
-        val plantations: String = raster.tile.plantations.getData(col, row)
+        val plantationsTypeFluxModel: String = raster.tile.plantationsTypeFluxModel.getData(col, row)
         val ecozones: String = raster.tile.ecozones.getData(col, row)
-        val intactForestLandscapes: String =
-          raster.tile.intactForestLandscapes.getData(col, row)
+        val intactForestLandscapes: String = raster.tile.intactForestLandscapes.getData(col, row)
         val landRights: Boolean = raster.tile.landRights.getData(col, row)
-        val intactPrimaryForest: Boolean =
-          raster.tile.intactPrimaryForest.getData(col, row)
-        val peatlandsFlux: Boolean = raster.tile.peatlandsFlux.getData(col, row)
+        val intactPrimaryForest: Boolean = raster.tile.intactPrimaryForest.getData(col, row)
+        val peatlandsExtentFluxModel: Boolean = raster.tile.peatlandsExtentFluxModel.getData(col, row)
         val forestAgeCategory: String = raster.tile.forestAgeCategory.getData(col, row)
         val jplTropicsAbovegroundBiomassExtent2000: Boolean = raster.tile.jplTropicsAbovegroundBiomassExtent2000.getData(col, row)
         val fiaRegionsUsExtent: String = raster.tile.fiaRegionsUsExtent.getData(col, row)
@@ -101,57 +75,36 @@ object CarbonSensitivitySummary {
         val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
         val lossYearLegalAmazon: Integer = raster.tile.lossLegalAmazon.getData(col, row)
         val prodesLegalAmazonExtent2000: Boolean = raster.tile.prodesLegalAmazonExtent2000.getData(col, row)
-        val treeCoverLossFirstYear20012015Mekong: Integer = raster.tile.lossFirstYear20012015Mekong.getData(col, row)
-        val mekongTreeCoverLossExtent: Boolean = raster.tile.mekongTreeCoverLossExtent.getData(col, row)
         val tropicLatitudeExtent: Boolean = raster.tile.tropicLatitudeExtent.getData(col, row)
-
-        //        val cols: Int = raster.rasterExtent.cols
-        //        val rows: Int = raster.rasterExtent.rows
-        //        val ext = raster.rasterExtent.extent
-        //        val cellSize = raster.cellSize
+        val burnYearHansenLoss: Integer = raster.tile.burnYearHansenLoss.getData(col, row)
+        val grossEmissionsNodeCodes: String = raster.tile.grossEmissionsNodeCodes.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
-        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
+        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordinate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
         val areaHa = area / 10000.0
 
-        val carbonfluxLossYear: Integer = if (lossYear != null && lossYear >= 2001 && lossYear <= 2015) lossYear else null
+        val carbonfluxLossYear: Integer = if (lossYear != null) lossYear else null
         val isLoss: Boolean = carbonfluxLossYear != null
 
         val carbonfluxLossYearLegalAmazon: Integer = if (lossYearLegalAmazon != null
           && lossYearLegalAmazon >= 2001 && lossYearLegalAmazon <= 2015) lossYearLegalAmazon else null
         val isLossLegalAmazon: Boolean = carbonfluxLossYearLegalAmazon != null
 
-        val carbonfluxLossYearMekong: Integer = if (treeCoverLossFirstYear20012015Mekong != null
-          && treeCoverLossFirstYear20012015Mekong >= 2001 && treeCoverLossFirstYear20012015Mekong <= 2015)
-          treeCoverLossFirstYear20012015Mekong else null
-        val isLoss20012015Mekong: Boolean = carbonfluxLossYearMekong != null
-
+        // Creates variable of whether the Hansen loss coincided with burning
+        val isBurnLoss: Boolean = burnYearHansenLoss != null
 
         val biomassPixel = biomass * areaHa
-        //        val grossAnnualRemovalsCarbonPixel = grossAnnualRemovalsCarbon * areaHa
-        val grossCumulRemovalsCarbonPixel = grossCumulRemovalsCarbon * areaHa
+        val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
+        val grossCumulBelowgroundRemovalsCo2Pixel = grossCumulBelowgroundRemovalsCo2 * areaHa
+        val grossCumulAboveBelowgroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2Pixel + grossCumulBelowgroundRemovalsCo2Pixel
         val netFluxCo2Pixel = netFluxCo2 * areaHa
         val agcEmisYearPixel = agcEmisYear * areaHa
-        //        val bgcEmisYearPixel = bgcEmisYear * areaHa
-        //        val deadwoodCarbonEmisYearPixel = deadwoodCarbonEmisYear * areaHa
-        //        val litterCarbonEmisYearPixel = litterCarbonEmisYear * areaHa
         val soilCarbonEmisYearPixel = soilCarbonEmisYear * areaHa
-        //        val totalCarbonEmisYear = agcEmisYear + bgcEmisYear + deadwoodCarbonEmisYear + litterCarbonEmisYear + soilCarbonEmisYear
-        //        val totalCarbonEmisYearPixel = totalCarbonEmisYear * areaHa
-        val agc2000Pixel = agc2000 * areaHa
-        //        val bgc2000Pixel = bgc2000 * areaHa
-        //        val deadwoodCarbon2000Pixel = deadwoodCarbon2000 * areaHa
-        //        val litterCarbon2000Pixel = litterCarbon2000 * areaHa
-        val soilCarbon2000Pixel = soilCarbon2000 * areaHa
-        //        val totalCarbon2000 = agc2000 + bgc2000 + deadwoodCarbon2000 + litterCarbon2000 + soilCarbon2000
-        //        val totalCarbon2000Pixel = totalCarbon2000 * areaHa
-        val grossEmissionsCo2eNoneCo2Pixel = grossEmissionsCo2eNoneCo2 * areaHa
+        val grossEmissionsCo2eNonCo2Pixel = grossEmissionsCo2eNonCo2 * areaHa
         val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
-
-        val grossEmissionsCo2e = grossEmissionsCo2eNoneCo2 + grossEmissionsCo2eCo2Only
+        val grossEmissionsCo2e = grossEmissionsCo2eNonCo2 + grossEmissionsCo2eCo2Only
         val grossEmissionsCo2ePixel = grossEmissionsCo2e * areaHa
-
         val jplTropicsAbovegroundBiomassDensity2000Pixel = jplTropicsAbovegroundBiomassDensity2000 * areaHa
 
         val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
@@ -165,7 +118,9 @@ object CarbonSensitivitySummary {
           if (thresholds == Nil) stats
           else {
             val pKey = CarbonSensitivityDataGroup(
-              carbonfluxLossYear,
+              fluxModelExtent,
+              removalForestType,
+              lossYear,
               thresholds.head,
               isGain,
               isLoss,
@@ -175,9 +130,9 @@ object CarbonSensitivitySummary {
               landRights,
               wdpa,
               intactForestLandscapes,
-              plantations,
+              plantationsTypeFluxModel,
               intactPrimaryForest,
-              peatlandsFlux,
+              peatlandsExtentFluxModel,
               forestAgeCategory,
               jplTropicsAbovegroundBiomassExtent2000,
               fiaRegionsUsExtent,
@@ -186,17 +141,19 @@ object CarbonSensitivitySummary {
               primaryForest,
               isLossLegalAmazon,
               prodesLegalAmazonExtent2000,
-              isLoss20012015Mekong,
-              mekongTreeCoverLossExtent,
-              tropicLatitudeExtent
+              tropicLatitudeExtent,
+              isBurnLoss,
+              grossEmissionsNodeCodes
             )
 
             val summary: CarbonSensitivityData =
               stats.getOrElse(
                 key = pKey,
-                default = CarbonSensitivityData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-                //                  default = CarbonSensitivityData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                //                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                default = CarbonSensitivityData(
+                  0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0)
+
               )
 
             summary.totalArea += areaHa
@@ -207,33 +164,22 @@ object CarbonSensitivitySummary {
                 summary.totalTreecoverLoss += areaHa
                 summary.totalBiomassLoss += biomassPixel
                 summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-                summary.totalGrossEmissionsCo2eNoneCo2 += grossEmissionsCo2eNoneCo2Pixel
+                summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
                 summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
                 summary.totalAgcEmisYear += agcEmisYearPixel
-                //                summary.agcEmisYear += bgcEmisYearPixel
-                //                summary.deadwoodCarbonEmisYear += deadwoodCarbonEmisYearPixel
-                //                summary.litterCarbonEmisYear += litterCarbonEmisYearPixel
                 summary.totalSoilCarbonEmisYear += soilCarbonEmisYearPixel
-                //                summary.carbonEmisYear += totalCarbonEmisYearPixel
               }
+
               if (isLossLegalAmazon) summary.totalTreecoverLossLegalAmazon += areaHa
-              if (isLoss20012015Mekong) summary.totalTreeCoverLossFirstYear20012015Mekong += areaHa
 
               summary.totalTreecoverExtent2000 += areaHa
               summary.totalBiomass += biomassPixel
-              //              summary.totalGrossAnnualRemovalsCarbon += grossAnnualRemovalsCarbonPixel
-              summary.totalGrossCumulRemovalsCarbon += grossCumulRemovalsCarbonPixel
+              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
+              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
+              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
               summary.totalNetFluxCo2 += netFluxCo2Pixel
-              summary.totalAgc2000 += agc2000Pixel
-              //              summary.totalBgc2000 += bgc2000Pixel
-              //              summary.totalDeadwoodCarbon2000 += deadwoodCarbon2000Pixel
-              //              summary.totalLitterCarbon2000 += litterCarbon2000Pixel
-              summary.totalSoil2000 += soilCarbon2000Pixel
-              //              summary.totalCarbon2000 += totalCarbon2000Pixel
               summary.totalJplTropicsAbovegroundBiomassDensity2000 += jplTropicsAbovegroundBiomassDensity2000Pixel
-
             }
-
 
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
           }

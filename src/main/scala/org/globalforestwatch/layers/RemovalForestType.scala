@@ -4,7 +4,9 @@ import org.globalforestwatch.grids.GridTile
 case class RemovalForestType(gridTile: GridTile, model: String = "standard")
   extends StringLayer
     with OptionalILayer {
-      val model_suffix = if (model == "standard") "" else s"__$model"
+  //      val model_suffix = if (model == "standard") "" else s"__$model"
+    //      val model_suffix = if (model == "standard") "" else s"__$model"
+  val model_suffix: String = if (model == "standard") "standard" else s"$model"
 
   val uri: String =
 //    s"$basePath/gfw_removal_forest_type$model_suffix/v20150601/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/geotiff/${gridTile.tileId}.tif"

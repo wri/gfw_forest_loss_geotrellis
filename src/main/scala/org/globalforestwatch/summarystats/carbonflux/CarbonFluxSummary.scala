@@ -179,6 +179,7 @@ object CarbonFluxSummary {
               grossEmissionsNodeCodes
             )
 
+            // Number of 0s must match number of summary. items below (including summary.totalArea)
             val summary: CarbonFluxData =
               stats.getOrElse(
                 key = pKey,

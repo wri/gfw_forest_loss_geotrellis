@@ -13,31 +13,25 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
   val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
-
   val biomassPerHectar = BiomassPerHectar(gridTile)
-
   val grossAnnualAbovegroundRemovalsCarbon = GrossAnnualAbovegroundRemovalsCarbon(gridTile)
   val grossAnnualBelowgroundRemovalsCarbon = GrossAnnualBelowgroundRemovalsCarbon(gridTile)
   val grossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile)
   val grossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile)
-
   val netFluxCo2 = NetFluxCo2e(gridTile)
-
   val agcEmisYear = AgcEmisYear(gridTile)
   val bgcEmisYear = BgcEmisYear(gridTile)
   val deadwoodCarbonEmisYear = DeadwoodCarbonEmisYear(gridTile)
   val litterCarbonEmisYear = LitterCarbonEmisYear(gridTile)
   val soilCarbonEmisYear = SoilCarbonEmisYear(gridTile)
-
   val agc2000 = Agc2000(gridTile)
   val bgc2000 = Bgc2000(gridTile)
   val deadwoodCarbon2000 = DeadwoodCarbon2000(gridTile)
   val litterCarbon2000 = LitterCarbon2000(gridTile)
   val soilCarbon2000 = SoilCarbon2000(gridTile)
-
   val grossEmissionsCo2eNonCo2 = GrossEmissionsNonCo2Co2e(gridTile)
   val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridTile)
-
+  val jplTropicsAbovegroundBiomassDensity2000 = JplTropicsAbovegroundBiomassDensity2000(gridTile)
   val stdevAnnualAbovegroundRemovalsCarbon = StdevAnnualAbovegroundRemovalsCarbon(gridTile)
   val stdevSoilCarbon2000 = StdevSoilCarbon2000(gridTile)
 
@@ -56,7 +50,6 @@ case class CarbonFluxGridSources(gridTile: GridTile) extends GridSources {
   val forestAgeCategory = ForestAgeCategory(gridTile)
   val jplTropicsAbovegroundBiomassExtent2000 = JplTropicsAbovegroundBiomassExtent2000(gridTile)
   val fiaRegionsUsExtent = FiaRegionsUsExtent(gridTile)
-  val jplTropicsAbovegroundBiomassDensity2000 = JplTropicsAbovegroundBiomassDensity2000(gridTile)
   val brazilBiomes = BrazilBiomes(gridTile)
   val riverBasins = RiverBasins(gridTile)
   val primaryForest = PrimaryForest(gridTile)

@@ -1,7 +1,10 @@
 
 package org.globalforestwatch.summarystats.carbon_sensitivity
 
-case class CarbonSensitivityDataGroup(lossYear: Integer,
+case class CarbonSensitivityDataGroup(
+                                      fluxModelExtent: Boolean,
+                                      removalForestType: String,
+                                      lossYear: Integer,
                                       threshold: Integer,
                                       isGain: Boolean,
                                       isLoss: Boolean,
@@ -11,9 +14,9 @@ case class CarbonSensitivityDataGroup(lossYear: Integer,
                                       landRights: Boolean,
                                       wdpa: String,
                                       intactForestLandscapes: String,
-                                      plantations: String,
+                                      plantationsTypeFluxModel: String,
                                       intactPrimaryForest: Boolean,
-                                      peatlandsFlux: Boolean,
+                                      peatlandsExtentFluxModel: Boolean,
                                       forestAgeCategory: String,
                                       jplTropicsAbovegroundBiomassExtent2000: Boolean,
                                       fiaRegionsUsExtent: String,
@@ -22,7 +25,7 @@ case class CarbonSensitivityDataGroup(lossYear: Integer,
                                       primaryForest: Boolean,
                                       isLossLegalAmazon: Boolean,
                                       prodesLegalAmazonExtent2000: Boolean,
-                                      isLoss20012015Mekong: Boolean,
-                                      mekongTreeCoverLossExtent: Boolean,
-                                      tropicLatitudeExtent: Boolean
+                                      tropicLatitudeExtent: Boolean,
+                                      isBurnLoss: Boolean,
+                                      grossEmissionsNodeCodes: String
                                      )
