@@ -104,7 +104,8 @@ object CarbonFluxDF {
       $"data.totalVarianceAnnualAbovegroundRemovalsCarbon" as "gfw_total_variance_annual_aboveground_carbon_removals__Mg^2_ha^2_yr^2",
       $"data.totalVarianceAnnualAbovegroundRemovalsCarbonCount" as "gfw_pixel_count_variance_annual_aboveground_carbon_removals__pixels",
       $"data.totalVarianceSoilCarbonEmisYear" as "gfw_total_variance_soil_carbon_2000_in_emissions_year__Mg^2_ha^2",
-      $"data.totalVarianceSoilCarbonEmisYearCount" as "gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels"
+      $"data.totalVarianceSoilCarbonEmisYearCount" as "gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels",
+      $"data.totalFluxModelExtentArea" as "gfw_flux_model_extent__ha"
     )
   }
 
@@ -138,8 +139,8 @@ object CarbonFluxDF {
         sum("gfw_total_variance_annual_aboveground_carbon_removals__Mg^2_ha^2_yr^2") as "gfw_total_variance_annual_aboveground_carbon_removals__Mg^2_ha^2_yr^2",
         sum("gfw_pixel_count_variance_annual_aboveground_carbon_removals__pixels") as "gfw_pixel_count_variance_annual_aboveground_carbon_removals__pixels",
         sum("gfw_total_variance_soil_carbon_2000_in_emissions_year__Mg^2_ha^2") as "gfw_total_variance_soil_carbon_2000_in_emissions_year__Mg^2_ha^2",
-        sum("gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels") as "gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels"
-
+        sum("gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels") as "gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels",
+        sum("gfw_flux_model_extent__ha") as "gfw_flux_model_extent__ha"
       )
   }
 
@@ -173,7 +174,8 @@ object CarbonFluxDF {
         sum("gfw_total_variance_annual_aboveground_carbon_removals__Mg^2_ha^2_yr^2") as "gfw_total_variance_annual_aboveground_carbon_removals__Mg^2_ha^2_yr^2",
         sum("gfw_pixel_count_variance_annual_aboveground_carbon_removals__pixels") as "gfw_pixel_count_variance_annual_aboveground_carbon_removals__pixels",
         sum("gfw_total_variance_soil_carbon_2000_in_emissions_year__Mg^2_ha^2") as "gfw_total_variance_soil_carbon_2000_in_emissions_year__Mg^2_ha^2",
-        sum("gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels") as "gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels"
+        sum("gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels") as "gfw_pixel_count_variance_soil_carbon_2000_in_emissions_year__pixels",
+        sum("gfw_flux_model_extent__ha") as "gfw_flux_model_extent__ha"
 
       )
   }

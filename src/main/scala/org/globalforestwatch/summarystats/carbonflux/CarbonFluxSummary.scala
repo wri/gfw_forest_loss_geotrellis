@@ -97,6 +97,12 @@ object CarbonFluxSummary {
         // Creates variable of whether the Hansen loss coincided with burning
         val isBurnLoss: Boolean = burnYearHansenLoss != null
 
+        // Calculates model extent area. Need to convert from boolean to integer, unlike in
+        // annualupdate_minimal package where gain bollean can be multiplied by areaHa directly. Not sure why different
+        // here.
+        val fluxModelExtentAreaInt: Integer = if (fluxModelExtent) 1 else 0
+        val fluxModelExtentAreaPixel: Double = fluxModelExtentAreaInt * areaHa
+
         val biomassPixel = biomass * areaHa
         val grossAnnualAbovegroundRemovalsCarbonPixel = grossAnnualAbovegroundRemovalsCarbon * areaHa
         val grossAnnualBelowgroundRemovalsCarbonPixel = grossAnnualBelowgroundRemovalsCarbon * areaHa
@@ -189,7 +195,7 @@ object CarbonFluxSummary {
                   0, 0, 0, 0, 0, 0,
                   0, 0, 0, 0, 0, 0,
                   0, 0, 0, 0, 0, 0,
-                  0, 0, 0)
+                  0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -234,6 +240,8 @@ object CarbonFluxSummary {
               summary.totalVarianceAnnualAbovegroundRemovalsCarbonCount += varianceAnnualAbovegroundRemovalsCarbonCount
               summary.totalVarianceSoilCarbonEmisYear += varianceSoilCarbonEmisYearPixel
               summary.totalVarianceSoilCarbonEmisYearCount += varianceSoilCarbonEmisYearCount
+
+              summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
             }
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
           }

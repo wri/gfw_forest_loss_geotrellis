@@ -87,7 +87,8 @@ object CarbonSensitivityDF {
         $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
         $"data.totalNetFluxCo2" as "gfw_net_flux_co2e__Mg",
         $"data.totalJplTropicsAbovegroundBiomassDensity2000" as "jpl_tropics_aboveground_biomass_2000__Mg",
-        $"data.totalTreecoverLossLegalAmazon" as "legal_amazon_umd_tree_cover_loss__ha"
+        $"data.totalTreecoverLossLegalAmazon" as "legal_amazon_umd_tree_cover_loss__ha",
+        $"data.totalFluxModelExtentArea" as "gfw_flux_model_extent__ha"
       )
     }
 
@@ -108,7 +109,8 @@ object CarbonSensitivityDF {
           sum("gfw_gross_emissions_co2e_non_co2__Mg") as "gfw_gross_emissions_co2e_non_co2_2001-2019__Mg",
           sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases_2001-2019__Mg",
           sum("jpl_tropics_aboveground_biomass_2000__Mg") as "jpl_tropics_aboveground_biomass_2000__Mg",
-          sum("legal_amazon_umd_tree_cover_loss__ha") as "legal_amazon_umd_tree_cover_loss_2001-2015__ha"
+          sum("legal_amazon_umd_tree_cover_loss__ha") as "legal_amazon_umd_tree_cover_loss_2001-2015__ha",
+          sum("gfw_flux_model_extent__ha") as "gfw_flux_model_extent__ha"
 
         )
     }
@@ -130,7 +132,8 @@ object CarbonSensitivityDF {
           sum("gfw_gross_emissions_co2e_non_co2_2001-2019__Mg") as "gfw_gross_emissions_co2e_non_co2_2001-2019__Mg",
           sum("gfw_gross_emissions_co2e_all_gases_2001-2019__Mg") as "gfw_gross_emissions_co2e_all_gases_2001-2019__Mg",
           sum("jpl_tropics_aboveground_biomass_2000__Mg") as "jpl_tropics_aboveground_biomass_2000__Mg",
-          sum("legal_amazon_umd_tree_cover_loss_2001-2015__ha") as "legal_amazon_umd_tree_cover_loss_2001-2015__ha"
+          sum("legal_amazon_umd_tree_cover_loss_2001-2015__ha") as "legal_amazon_umd_tree_cover_loss_2001-2015__ha",
+          sum("gfw_flux_model_extent__ha") as "gfw_flux_model_extent__ha"
 
         )
     }

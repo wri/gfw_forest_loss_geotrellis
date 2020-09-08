@@ -39,7 +39,8 @@ case class CarbonFluxData(var totalTreecoverLoss: Double,
                           var totalVarianceAnnualAbovegroundRemovalsCarbon: Double,
                           var totalVarianceAnnualAbovegroundRemovalsCarbonCount: Double,
                           var totalVarianceSoilCarbonEmisYear: Double,
-                          var totalVarianceSoilCarbonEmisYearCount: Double
+                          var totalVarianceSoilCarbonEmisYearCount: Double,
+                          var totalFluxModelExtentArea: Double
                          ) {
   def merge(other: CarbonFluxData): CarbonFluxData = {
     CarbonFluxData(
@@ -75,7 +76,8 @@ case class CarbonFluxData(var totalTreecoverLoss: Double,
       totalVarianceAnnualAbovegroundRemovalsCarbon + other.totalVarianceAnnualAbovegroundRemovalsCarbon,
       totalVarianceAnnualAbovegroundRemovalsCarbonCount + other.totalVarianceAnnualAbovegroundRemovalsCarbonCount,
       totalVarianceSoilCarbonEmisYear + other.totalVarianceSoilCarbonEmisYear,
-      totalVarianceSoilCarbonEmisYearCount + other.totalVarianceSoilCarbonEmisYearCount
+      totalVarianceSoilCarbonEmisYearCount + other.totalVarianceSoilCarbonEmisYearCount,
+      totalFluxModelExtentArea + other.totalFluxModelExtentArea
     )
   }
 }

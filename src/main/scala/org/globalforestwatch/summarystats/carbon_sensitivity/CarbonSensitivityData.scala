@@ -22,7 +22,8 @@ case class CarbonSensitivityData(var totalTreecoverLoss: Double,
                                  var totalGrossCumulAboveBelowgroundRemovalsCo2: Double,
                                  var totalNetFluxCo2: Double,
                                  var totalJplTropicsAbovegroundBiomassDensity2000: Double,
-                                 var totalTreecoverLossLegalAmazon: Double
+                                 var totalTreecoverLossLegalAmazon: Double,
+                                 var totalFluxModelExtentArea: Double
                                 ) {
   def merge(other: CarbonSensitivityData): CarbonSensitivityData = {
     CarbonSensitivityData(
@@ -41,7 +42,8 @@ case class CarbonSensitivityData(var totalTreecoverLoss: Double,
       totalGrossCumulAboveBelowgroundRemovalsCo2 + other.totalGrossCumulAboveBelowgroundRemovalsCo2,
       totalNetFluxCo2 + other.totalNetFluxCo2,
       totalJplTropicsAbovegroundBiomassDensity2000 + other.totalJplTropicsAbovegroundBiomassDensity2000,
-      totalTreecoverLossLegalAmazon + other.totalTreecoverLossLegalAmazon
+      totalTreecoverLossLegalAmazon + other.totalTreecoverLossLegalAmazon,
+      totalFluxModelExtentArea + other.totalFluxModelExtentArea
     )
   }
 }
