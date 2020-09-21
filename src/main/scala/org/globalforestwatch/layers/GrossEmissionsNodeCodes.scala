@@ -1,5 +1,4 @@
 package org.globalforestwatch.layers
-
 import org.globalforestwatch.grids.GridTile
 
 case class GrossEmissionsNodeCodes(gridTile: GridTile, model: String = "standard")

@@ -5,12 +5,11 @@ case class RemovalForestType(gridTile: GridTile, model: String = "standard")
   extends StringLayer
     with OptionalILayer {
   //      val model_suffix = if (model == "standard") "" else s"__$model"
-    //      val model_suffix = if (model == "standard") "" else s"__$model"
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
 
   val uri: String =
 //    s"$basePath/gfw_removal_forest_type$model_suffix/v20150601/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/geotiff/${gridTile.tileId}.tif"
-    s"s3://gfw-files/flux_2_1_0/removal_forest_type/standard/${gridTile.tileId}.tif"
+    s"s3://gfw-files/flux_2_1_0/removal_forest_type/$model_suffix/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Not applicable"
 

@@ -27,7 +27,7 @@ object CarbonSensitivityDF {
       "bra_biome__name",
       "mapbox_river_basin__name",
       "is__regional_primary_forest",
-      "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015",
+      "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019",
       "is__prodes_legal_Amazon_extent_2000",
       "is__tropical_latitude_extent",
       "is__gfw_burn_loss_2001-19",
@@ -66,7 +66,7 @@ object CarbonSensitivityDF {
         $"dataGroup.braBiomes" as "bra_biome__name",
         $"dataGroup.riverBasins" as "mapbox_river_basin__name",
         $"dataGroup.primaryForest" as "is__regional_primary_forest",
-        $"dataGroup.isLossLegalAmazon" as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015",
+        $"dataGroup.isLossLegalAmazon" as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019",
         $"dataGroup.prodesLegalAmazonExtent2000" as "is__prodes_legal_Amazon_extent_2000",
         $"dataGroup.tropicLatitudeExtent" as "is__tropical_latitude_extent",
         $"dataGroup.isBurnLoss" as "is__gfw_burn_loss_2001-19",
@@ -109,7 +109,7 @@ object CarbonSensitivityDF {
           sum("gfw_gross_emissions_co2e_non_co2__Mg") as "gfw_gross_emissions_co2e_non_co2_2001-2019__Mg",
           sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases_2001-2019__Mg",
           sum("jpl_tropics_aboveground_biomass_2000__Mg") as "jpl_tropics_aboveground_biomass_2000__Mg",
-          sum("legal_amazon_umd_tree_cover_loss__ha") as "legal_amazon_umd_tree_cover_loss_2001-2015__ha",
+          sum("legal_amazon_umd_tree_cover_loss__ha") as "legal_amazon_umd_tree_cover_loss_2001-2019__ha",
           sum("gfw_flux_model_extent__ha") as "gfw_flux_model_extent__ha"
 
         )
@@ -132,7 +132,7 @@ object CarbonSensitivityDF {
           sum("gfw_gross_emissions_co2e_non_co2_2001-2019__Mg") as "gfw_gross_emissions_co2e_non_co2_2001-2019__Mg",
           sum("gfw_gross_emissions_co2e_all_gases_2001-2019__Mg") as "gfw_gross_emissions_co2e_all_gases_2001-2019__Mg",
           sum("jpl_tropics_aboveground_biomass_2000__Mg") as "jpl_tropics_aboveground_biomass_2000__Mg",
-          sum("legal_amazon_umd_tree_cover_loss_2001-2015__ha") as "legal_amazon_umd_tree_cover_loss_2001-2015__ha",
+          sum("legal_amazon_umd_tree_cover_loss_2001-2019__ha") as "legal_amazon_umd_tree_cover_loss_2001-2019__ha",
           sum("gfw_flux_model_extent__ha") as "gfw_flux_model_extent__ha"
 
         )
@@ -181,7 +181,7 @@ object CarbonSensitivityDF {
           max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name",
           max(length($"mapbox_river_basin__name")).cast("boolean") as "mapbox_river_basin__name",
           max($"is__regional_primary_forest") as "is__regional_primary_forest",
-          max($"is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015") as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015",
+          max($"is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019") as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019",
           max($"is__prodes_legal_Amazon_extent_2000") as "is__prodes_legal_Amazon_extent_2000",
           max($"is__tropical_latitude_extent") as "is__tropical_latitude_extent",
           max($"is__gfw_burn_loss_2001-19") as "is__gfw_burn_loss_2001-19",
@@ -215,7 +215,7 @@ object CarbonSensitivityDF {
           max($"bra_biome__name") as "bra_biome__name",
           max($"mapbox_river_basin__name") as "mapbox_river_basin__name",
           max($"is__regional_primary_forest") as "is__regional_primary_forest",
-          max($"is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015") as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2015",
+          max($"is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019") as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019",
           max($"is__prodes_legal_Amazon_extent_2000") as "is__prodes_legal_Amazon_extent_2000",
           max($"is__tropical_latitude_extent") as "is__tropical_latitude_extent",
           max($"is__gfw_burn_loss_2001-19") as "is__gfw_burn_loss_2001-19",
