@@ -17,6 +17,7 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
   val treeCoverDensity2010 = TreeCoverDensity2010(gridTile)
   val biomassPerHectar = BiomassPerHectar(gridTile)
   val primaryForest = PrimaryForest(gridTile)
+  val plantationsBool = PlantationsBool(gridTile)
 
 
   def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
@@ -37,6 +38,7 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
       val biomassTile = biomassPerHectar.fetchWindow(window)
       val primaryForestTile = primaryForest.fetchWindow(window)
+      val plantationsBoolTile = plantationsBool.fetchWindow(window)
 
 
       val tile = TreeLossTile(
@@ -45,7 +47,8 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
         tcd2000Tile,
         tcd2010Tile,
         biomassTile,
-        primaryForestTile
+        primaryForestTile,
+        plantationsBoolTile
       )
 
       Raster(tile, window)

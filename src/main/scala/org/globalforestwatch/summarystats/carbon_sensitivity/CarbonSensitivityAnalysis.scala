@@ -3,19 +3,15 @@ package org.globalforestwatch.summarystats.carbon_sensitivity
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import geotrellis.layer.SpatialKey
-import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
-import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.util.Util.{getAnyMapValue, getKeyedFeatureRDD}
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 object CarbonSensitivityAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
@@ -24,7 +20,7 @@ object CarbonSensitivityAnalysis {
     val model:String = getAnyMapValue[String](kwargs,"sensitivityType")
 
     val summaryRDD: RDD[(FeatureId, CarbonSensitivitySummary)] =
-      CarbonSensitivityRDD(featureRDD, CarbonSensitivityGrid.blockTileGrid, Some(part), kwargs)
+      CarbonSensitivityRDD(featureRDD, CarbonSensitivityGrid.blockTileGrid, kwargs)
 
     val summaryDF =
       CarbonSensitivityDFFactory(featureType, summaryRDD, spark).getDataFrame

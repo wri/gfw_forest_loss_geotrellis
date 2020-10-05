@@ -13,8 +13,11 @@ case class TreeLossTile(loss: TreeCoverLoss#ITile,
                         tcd2000: TreeCoverDensity2000#ITile,
                         tcd2010: TreeCoverDensity2010#ITile,
                         biomass: BiomassPerHectar#OptionalDTile,
-                        primaryForest: PrimaryForest#OptionalITile)
+                        primaryForest: PrimaryForest#OptionalITile,
+                        plantationsBool: PlantationsBool#OptionalITile)
+
   extends CellGrid[Int] {
+
   def cellType: CellType = loss.cellType
 
   def cols: Int = loss.cols

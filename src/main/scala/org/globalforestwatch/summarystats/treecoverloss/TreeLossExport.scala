@@ -1,5 +1,6 @@
 package org.globalforestwatch.summarystats.treecoverloss
 
+import cats.data.NonEmptyList
 import org.apache.spark.sql.DataFrame
 import org.globalforestwatch.summarystats.SummaryExport
 import org.globalforestwatch.util.Util.getAnyMapValue
@@ -13,12 +14,22 @@ object TreeLossExport extends SummaryExport {
     val spark = summaryDF.sparkSession
     import spark.implicits._
 
-    val includePrimaryForest: Boolean =
-      getAnyMapValue[Boolean](kwargs, "includePrimaryForest")
+    val contextualLayers: List[String] =
+      getAnyMapValue[NonEmptyList[String]](kwargs, "contextualLayers").toList
+
+    val (includePrimaryForest, includePlantations) = {
+      (
+        contextualLayers contains "is__umd_regional_primary_forest_2001",
+        contextualLayers contains "is__gfw_plantations"
+      )
+    }
 
     summaryDF
       .transform(TreeLossDF.unpackValues)
-      .transform(TreeLossDF.primaryForestFilter(includePrimaryForest))
+      .transform(
+        TreeLossDF
+          .contextualLayerFilter(includePrimaryForest, includePlantations)
+      )
       .coalesce(1)
       .orderBy($"feature__id", $"umd_tree_cover_density__threshold")
       .write

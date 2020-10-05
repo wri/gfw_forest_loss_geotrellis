@@ -18,7 +18,6 @@ import org.globalforestwatch.summarystats.treecoverloss.TreeLossAnalysis
 
 case class SummaryAnalysisFactory(analysis: String,
                                   featureRDD: RDD[Feature[Geometry, FeatureId]],
-                                  part: HashPartitioner,
                                   featureType: String,
                                   spark: SparkSession,
                                   kwargs: Map[String, Any]) {
@@ -29,7 +28,6 @@ case class SummaryAnalysisFactory(analysis: String,
           AnnualUpdateAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
@@ -37,7 +35,6 @@ case class SummaryAnalysisFactory(analysis: String,
           AnnualUpdateMinimalAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
@@ -45,7 +42,6 @@ case class SummaryAnalysisFactory(analysis: String,
           CarbonFluxAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
@@ -53,7 +49,6 @@ case class SummaryAnalysisFactory(analysis: String,
           CarbonSensitivityAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
@@ -61,7 +56,6 @@ case class SummaryAnalysisFactory(analysis: String,
           GladAlertsAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
@@ -69,7 +63,6 @@ case class SummaryAnalysisFactory(analysis: String,
           TreeLossAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
@@ -77,7 +70,6 @@ case class SummaryAnalysisFactory(analysis: String,
           FireAlertsAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
-            part: HashPartitioner,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )

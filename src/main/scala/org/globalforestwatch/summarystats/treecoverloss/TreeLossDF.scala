@@ -40,7 +40,8 @@ object TreeLossDF {
       $"id.featureId" as "feature__id",
       $"data_group.threshold" as "umd_tree_cover_density__threshold",
       $"data_group.tcdYear" as "umd_tree_cover_extent__year",
-      $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
+      $"data_group.isPrimaryForest" as "is__umd_regional_primary_forest_2001",
+      $"data_group.isPlantations" as "is__gfw_plantations",
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
@@ -56,7 +57,10 @@ object TreeLossDF {
 
   }
 
-  def primaryForestFilter(include: Boolean)(df: DataFrame): DataFrame = {
+  def contextualLayerFilter(
+                             includePrimaryForest: Boolean,
+                             includePlantations: Boolean
+                           )(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
@@ -87,18 +91,28 @@ object TreeLossDF {
       sum("whrc_aboveground_co2_stock_2000__Mt") as "whrc_aboveground_co2_stock_2000__Mt"
     )
 
-    if (include) df
-    else {
-      df.groupBy(
-          $"feature__id",
-        $"umd_tree_cover_density__threshold",
-        $"umd_tree_cover_extent__year"
-        )
-        .agg(
-          cols.head,
-          cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
-        )
+    val groupByCols = List(
+      $"feature__id",
+      $"umd_tree_cover_density__threshold",
+      $"umd_tree_cover_extent__year"
+    )
+
+    val pfGroupByCol = {
+      if (includePrimaryForest) List($"is__umd_regional_primary_forest_2001")
+      else List()
     }
+
+    val plGroupByCol = {
+      if (includePlantations) List($"is__gfw_plantations")
+      else List()
+    }
+
+    df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol: _*)
+      .agg(
+        cols.head,
+        cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
+      )
+
   }
 
 }
