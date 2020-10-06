@@ -9,7 +9,7 @@ import geotrellis.layer.SpatialKey
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.store.s3.S3ClientProducer
 import geotrellis.layer.LayoutDefinition
-import geotrellis.vector.{Feature, Geometry, Point, Polygon}
+import geotrellis.vector.{Extent, Feature, Geometry, Point, Polygon}
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
@@ -34,12 +34,12 @@ object Util {
   ): Seq[Feature[G, A]] = {
     def zindex(p: Point): Long = {
       val col = rasterExtent.mapXToGrid(p.getX)
-      val row = rasterExtent.mapXToGrid(p.getY)
+      val row = rasterExtent.mapYToGrid(p.getY)
       Z2(col, row).z
     }
 
     features.sortBy { feature =>
-      zindex(feature.geom.getEnvelope.getCentroid)
+      zindex(Extent(feature.geom.getEnvelopeInternal).northWest)
     }
   }
 
