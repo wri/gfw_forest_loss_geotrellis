@@ -26,9 +26,9 @@ object GladAlertsSummary {
   implicit val mdhCellRegisterForTreeLossRaster1
     : GridVisitor[Raster[GladAlertsTile], GladAlertsSummary] =
       new GridVisitor[Raster[GladAlertsTile], GladAlertsSummary] {
-      val acc = new GladAlertsSummary()
+      private var acc: GladAlertsSummary = new GladAlertsSummary()
 
-      def result = acc
+      def result: GladAlertsSummary = acc
 
       def visit(raster: Raster[GladAlertsTile],
                    col: Int,
@@ -45,7 +45,7 @@ object GladAlertsSummary {
         val glad: Option[(String, Boolean)] =
           raster.tile.glad.getData(col, row)
 
-        if (!(changeOnly && glad.isEmpty)) {
+        acc = if (!(changeOnly && glad.isEmpty)) {
           val biomass: Double = raster.tile.biomass.getData(col, row)
           val climateMask: Boolean = raster.tile.climateMask.getData(col, row)
           val primaryForest: Boolean =
@@ -169,7 +169,6 @@ object GladAlertsSummary {
             updateSummary(tile, acc.stats)
 
           GladAlertsSummary(updatedSummary)
-
         } else acc
       }
     }

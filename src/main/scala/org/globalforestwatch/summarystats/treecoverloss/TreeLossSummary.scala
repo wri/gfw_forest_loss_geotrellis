@@ -46,8 +46,8 @@ object TreeLossSummary {
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
-        val contextualLayers: List[String] =
-          getAnyMapValue[NonEmptyList[String]](acc.kwargs, "contextualLayers").toList
+        val contextualLayers: List[String] = List[String]()
+//          getAnyMapValue[NonEmptyList[String]](acc.kwargs, "contextualLayers").toList
 
         val isPrimaryForest: Boolean = {
           if (contextualLayers contains "is__umd_regional_primary_forest_2001")
