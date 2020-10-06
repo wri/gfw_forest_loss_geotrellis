@@ -13,6 +13,7 @@ import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
+import org.globalforestwatch.util.GeometryReducer
 
 import scala.reflect.ClassTag
 
@@ -95,6 +96,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
           groupedByKey.toIterator.flatMap {
             case (windowKey, keysAndFeatures) =>
               val window: Extent = windowKey.extent(windowLayout)
+
               val maybeRasterSource: Either[Throwable, SOURCES] =
                 getSources(window, kwargs)
 
@@ -126,14 +128,10 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                           feature.geom,
                           rasterizeOptions,
                           kwargs
-<<<<<<< HEAD
                         ) match {
                           case Summary(result: SUMMARY) => result
                           case NoIntersection => throw new NotImplementedException("")
                         }
-=======
-                        )
->>>>>>> develop
                       } catch {
                         case ise: java.lang.IllegalStateException => {
                           println(
