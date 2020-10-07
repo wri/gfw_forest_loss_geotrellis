@@ -27,9 +27,9 @@ object AnnualUpdateSummary {
   implicit val mdhCellRegisterForTreeLossRaster1
     : GridVisitor[Raster[AnnualUpdateTile], AnnualUpdateSummary]
       = new GridVisitor[Raster[AnnualUpdateTile], AnnualUpdateSummary] {
-      val acc = new AnnualUpdateSummary()
+      private var acc: AnnualUpdateSummary = new AnnualUpdateSummary()
 
-      def result = acc
+      def result: AnnualUpdateSummary = acc
 
       def visit(raster: Raster[AnnualUpdateTile],
                    col: Int,
@@ -209,6 +209,8 @@ object AnnualUpdateSummary {
 
         val updatedSummary: Map[AnnualUpdateDataGroup, AnnualUpdateData] =
           updateSummary(thresholds, acc.stats)
+
+        acc = AnnualUpdateSummary(updatedSummary)
       }
     }
 }

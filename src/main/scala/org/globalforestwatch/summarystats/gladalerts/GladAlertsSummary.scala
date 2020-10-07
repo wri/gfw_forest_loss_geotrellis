@@ -22,22 +22,19 @@ case class GladAlertsSummary(stats: Map[GladAlertsDataGroup, GladAlertsData] = M
 
 object GladAlertsSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
-
-  implicit val mdhCellRegisterForTreeLossRaster1
-    : GridVisitor[Raster[GladAlertsTile], GladAlertsSummary] =
-      new GridVisitor[Raster[GladAlertsTile], GladAlertsSummary] {
+  def getGridVisitor(kwargs: Map[String, Any]): GridVisitor[Raster[GladAlertsTile], GladAlertsSummary] = {
+    new GridVisitor[Raster[GladAlertsTile], GladAlertsSummary] {
       private var acc: GladAlertsSummary = new GladAlertsSummary()
 
       def result: GladAlertsSummary = acc
 
       def visit(raster: Raster[GladAlertsTile],
-                   col: Int,
-                   row: Int): Unit = {
+                col: Int,
+                row: Int): Unit = {
 
-        val changeOnly: Boolean = true
-          // getAnyMapValue[Boolean](acc.kwargs, "changeOnly")
+        val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
-        val buildDataCube: Boolean = false //getAnyMapValue[Boolean](acc.kwargs, "buildDataCube")
+        val buildDataCube: Boolean = false //getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
         val maxZoom = 12
 
@@ -45,7 +42,7 @@ object GladAlertsSummary {
         val glad: Option[(String, Boolean)] =
           raster.tile.glad.getData(col, row)
 
-        acc = if (!(changeOnly && glad.isEmpty)) {
+        if (!(changeOnly && glad.isEmpty)) {
           val biomass: Double = raster.tile.biomass.getData(col, row)
           val climateMask: Boolean = raster.tile.climateMask.getData(col, row)
           val primaryForest: Boolean =
@@ -168,8 +165,9 @@ object GladAlertsSummary {
           val updatedSummary: Map[GladAlertsDataGroup, GladAlertsData] =
             updateSummary(tile, acc.stats)
 
-          GladAlertsSummary(updatedSummary)
-        } else acc
+          acc = GladAlertsSummary(updatedSummary)
+        }
       }
     }
+  }
 }

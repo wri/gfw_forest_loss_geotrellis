@@ -1,6 +1,7 @@
 package org.globalforestwatch.summarystats.firealerts
 
 import cats.implicits._
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.summary.polygonal._
 import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
@@ -16,19 +17,19 @@ object FireAlertsRDD extends SummaryRDD {
   type SUMMARY = FireAlertsSummary
   type TILE = FireAlertsTile
 
-  def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES] = {
+  def getSources(windowKey: SpatialKey, windowLayout: LayoutDefinition, kwargs: Map[String, Any]): Either[Throwable, SOURCES] = {
     val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
 
     Either.catchNonFatal {
       fireAlertType match {
-        case "viirs" => ViirsGrid.getRasterSource(window, kwargs)
-        case "modis" => ModisGrid.getRasterSource(window, kwargs)
+        case "viirs" => ViirsGrid.getRasterSource(windowKey, windowLayout, kwargs)
+        case "modis" => ModisGrid.getRasterSource(windowKey, windowLayout, kwargs)
       }
     }
   }
 
-  def readWindow(rs: SOURCES, window: Extent): Either[Throwable, Raster[TILE]] =
-    rs.readWindow(window)
+  def readWindow(rs: SOURCES, windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[TILE]] =
+    rs.readWindow(windowKey, windowLayout)
 
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,

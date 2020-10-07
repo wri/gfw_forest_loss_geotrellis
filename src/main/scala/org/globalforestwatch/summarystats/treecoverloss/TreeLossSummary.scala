@@ -26,18 +26,17 @@ case class TreeLossSummary(stats: Map[TreeLossDataGroup, TreeLossData] =
 object TreeLossSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
 
-  implicit val mdhCellRegisterForTreeLossRaster1
-    : GridVisitor[Raster[TreeLossTile], TreeLossSummary] =
-      new GridVisitor[Raster[TreeLossTile], TreeLossSummary] {
-      val acc = new TreeLossSummary()
+  def getGridVisitor(kwargs: Map[String, Any]): GridVisitor[Raster[TreeLossTile], TreeLossSummary] =
+    new GridVisitor[Raster[TreeLossTile], TreeLossSummary] {
+      private var acc: TreeLossSummary = new TreeLossSummary()
 
-      def result = acc
+      def result: TreeLossSummary = acc
 
       def visit(raster: Raster[TreeLossTile],
                    col: Int,
                    row: Int): Unit = {
 
-        val tcdYear: Int = 2000 // getAnyMapValue[Int](acc.kwargs, "tcdYear")
+        val tcdYear: Int = getAnyMapValue[Int](kwargs, "tcdYear")
 
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
@@ -46,8 +45,8 @@ object TreeLossSummary {
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
-        val contextualLayers: List[String] = List[String]()
-//          getAnyMapValue[NonEmptyList[String]](acc.kwargs, "contextualLayers").toList
+        val contextualLayers: List[String] =
+          getAnyMapValue[NonEmptyList[String]](kwargs, "contextualLayers").toList
 
         val isPrimaryForest: Boolean = {
           if (contextualLayers contains "is__umd_regional_primary_forest_2001")
@@ -73,8 +72,8 @@ object TreeLossSummary {
         val biomassPixel = biomass * areaHa
         val co2Pixel = biomassPixel * co2Factor
 
-        val thresholds: List[Int] = 30::List.empty
-          // getAnyMapValue[NonEmptyList[Int]](acc.kwargs, "thresholdFilter").toList
+        val thresholds: List[Int] =
+           getAnyMapValue[NonEmptyList[Int]](kwargs, "thresholdFilter").toList
 
         @tailrec
         def updateSummary(
@@ -135,7 +134,7 @@ object TreeLossSummary {
         val updatedSummary: Map[TreeLossDataGroup, TreeLossData] =
           updateSummary(thresholds, acc.stats)
 
-        TreeLossSummary(updatedSummary)
+        acc = TreeLossSummary(updatedSummary)
 
       }
     }

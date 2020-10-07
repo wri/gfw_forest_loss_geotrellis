@@ -5,6 +5,7 @@ import java.io.FileNotFoundException
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
+import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.geotiff.GeoTiffRasterSource
 import geotrellis.raster.crop._
 import geotrellis.raster.{CellType, Tile, isNoData}
@@ -27,7 +28,6 @@ trait Layer {
   val basePath: String = s"s3://gfw-data-lake"
 
   def lookup(a: A): B
-
 }
 
 trait ILayer extends Layer {
@@ -195,9 +195,10 @@ trait RequiredILayer extends RequiredLayer with ILayer {
   /**
     * Define how to fetch data for required Integer rasters
     */
-  def fetchWindow(window: Extent): ITile = {
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): ITile = {
+    val layoutSource = LayoutTileSource.spatial(source, windowLayout)
     val tile = source.synchronized {
-      source.read(window).get.tile.band(0)
+      layoutSource.read(windowKey).get.band(0)
     }
     new ITile(cropWindow(tile))
   }
@@ -209,9 +210,10 @@ trait RequiredDLayer extends RequiredLayer with DLayer {
   /**
     * Define how to fetch data for required Double rasters
     */
-  def fetchWindow(window: Extent): DTile = {
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): DTile = {
+    val layoutSource = LayoutTileSource.spatial(source, windowLayout)
     val tile = source.synchronized {
-      source.read(window).get.tile.band(0)
+      layoutSource.read(windowKey).get.band(0)
     }
     new DTile(cropWindow(tile))
   }
@@ -224,9 +226,10 @@ trait RequiredFLayer extends RequiredLayer with FLayer {
   /**
     * Define how to fetch data for required Double rasters
     */
-  def fetchWindow(window: Extent): FTile = {
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): FTile = {
+    val layoutSource = LayoutTileSource.spatial(source, windowLayout)
     val tile = source.synchronized {
-      source.read(window).get.tile.band(0)
+      layoutSource.read(windowKey).get.band(0)
     }
     new FTile(cropWindow(tile))
   }
@@ -303,14 +306,14 @@ trait OptionalILayer extends OptionalLayer with ILayer {
   /**
     * Define how to fetch data for optional Integer rasters
     */
-  def fetchWindow(window: Extent): OptionalITile = {
-
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalITile = {
     new OptionalITile(cropWindow(for {
       source <- source
       raster <- Either
-        .catchNonFatal(source.synchronized {
-          source.read(window).get.tile.band(0)
-        })
+        .catchNonFatal(
+          source.synchronized {
+            LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
+          })
         .toOption
     } yield raster))
   }
@@ -321,12 +324,12 @@ trait OptionalDLayer extends OptionalLayer with DLayer {
   /**
     * Define how to fetch data for optional double rasters
     */
-  def fetchWindow(window: Extent): OptionalDTile =
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalDTile =
     new OptionalDTile(cropWindow(for {
       source <- source
       raster <- Either
         .catchNonFatal(source.synchronized {
-          source.read(window).get.tile.band(0)
+          LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
         })
         .toOption
     } yield raster))
@@ -337,12 +340,12 @@ trait OptionalFLayer extends OptionalLayer with FLayer {
   /**
     * Define how to fetch data for optional double rasters
     */
-  def fetchWindow(window: Extent): OptionalFTile =
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalFTile =
     new OptionalFTile(cropWindow(for {
       source <- source
       raster <- Either
         .catchNonFatal(source.synchronized {
-          source.read(window).get.tile.band(0)
+          LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
         })
         .toOption
     } yield raster))

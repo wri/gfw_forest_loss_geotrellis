@@ -78,7 +78,8 @@ libraryDependencies += "org.datasyslab" % "geospark-sql_2.3" % "1.2.0"
 
 // spark-daria
 resolvers += "jitpack" at "https://jitpack.io"
-libraryDependencies += "com.github.mrpowers" % "spark-daria" % "v0.35.0"
+resolvers += "maven2" at "https://repo1.maven.org/maven2"
+libraryDependencies += "com.github.mrpowers" % "spark-daria_2.11" % "0.38.2"
 
 
 // auto imports for local SBT console

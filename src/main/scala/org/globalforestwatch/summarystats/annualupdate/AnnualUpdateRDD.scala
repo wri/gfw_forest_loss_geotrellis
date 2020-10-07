@@ -1,6 +1,7 @@
 package org.globalforestwatch.summarystats.annualupdate
 
 import cats.implicits._
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.summary.polygonal._
 import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
@@ -14,14 +15,14 @@ object AnnualUpdateRDD extends SummaryRDD {
   type SUMMARY = AnnualUpdateSummary
   type TILE = AnnualUpdateTile
 
-  def getSources(window: Extent, kwargs:Map[String, Any]): Either[Throwable, SOURCES] = {
+  def getSources(windowKey: SpatialKey, windowLayout: LayoutDefinition, kwargs:Map[String, Any]): Either[Throwable, SOURCES] = {
     Either.catchNonFatal {
-      AnnualUpdateGrid.getRasterSource(window, kwargs)
+      AnnualUpdateGrid.getRasterSource(windowKey, windowLayout, kwargs)
     }
   }
 
-  def readWindow(rs: SOURCES, window: Extent): Either[Throwable, Raster[TILE]] =
-    rs.readWindow(window)
+  def readWindow(rs: SOURCES, windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[TILE]] =
+    rs.readWindow(windowKey, windowLayout)
 
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,

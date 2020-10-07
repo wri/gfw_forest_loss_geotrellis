@@ -20,7 +20,7 @@ object Version {
   val scala       = "2.11.12"
   val geotrellis  = "3.5.0"
   val hadoop      = "2.8.0"
-  val spark       = "2.4.0"
+  val spark       = "2.4.7"
   val geotools    = "23.1"
 }
 

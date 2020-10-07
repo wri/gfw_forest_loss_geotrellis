@@ -1,6 +1,7 @@
 package org.globalforestwatch.summarystats.carbonflux
 
 import cats.implicits._
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.raster.summary.GridVisitor
@@ -15,14 +16,14 @@ object CarbonFluxRDD extends SummaryRDD {
   type SUMMARY = CarbonFluxSummary
   type TILE = CarbonFluxTile
 
-  def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES] = {
+  def getSources(windowKey: SpatialKey, windowLayout: LayoutDefinition, kwargs: Map[String, Any]): Either[Throwable, SOURCES] = {
     Either.catchNonFatal {
-      CarbonFluxGrid.getRasterSource(window, kwargs)
+      CarbonFluxGrid.getRasterSource(windowKey, windowLayout, kwargs)
     }
   }
 
-  def readWindow(rs: SOURCES, window: Extent): Either[Throwable, Raster[TILE]] =
-    rs.readWindow(window)
+  def readWindow(rs: SOURCES, windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[TILE]] =
+    rs.readWindow(windowKey, windowLayout)
 
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,

@@ -26,9 +26,9 @@ object CarbonSensitivitySummary {
   implicit val mdhCellRegisterForTreeLossRaster1
   : GridVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] =
     new GridVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] {
-      val acc = new CarbonSensitivitySummary()
+      private var acc: CarbonSensitivitySummary = new CarbonSensitivitySummary()
 
-      def result = acc
+      def result: CarbonSensitivitySummary = acc
 
       def visit(
                     raster: Raster[CarbonSensitivityTile],
@@ -197,7 +197,7 @@ object CarbonSensitivitySummary {
         val updatedSummary: Map[CarbonSensitivityDataGroup, CarbonSensitivityData] =
           updateSummary(thresholds, acc.stats)
 
-        CarbonSensitivitySummary(updatedSummary)
+        acc = CarbonSensitivitySummary(updatedSummary)
       }
     }
 }

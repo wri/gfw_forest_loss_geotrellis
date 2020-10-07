@@ -1,7 +1,7 @@
 package org.globalforestwatch.grids
 
 import geotrellis.raster.TileLayout
-import geotrellis.layer.LayoutDefinition
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.vector.{Extent, Point}
 import org.globalforestwatch.layers.{OptionalLayer, RequiredLayer}
 
@@ -58,7 +58,7 @@ trait Grid[T <: GridSources] {
 
   def getSources(gridTile: GridTile, kwargs:  Map[String, Any]): T
 
-  def checkSources(gridTile: GridTile, windowExtent: Extent, kwargs:  Map[String, Any]): T = {
+  def checkSources(gridTile: GridTile, windowExtent: Extent, windowKey: SpatialKey, windowLayout: LayoutDefinition, kwargs:  Map[String, Any]): T = {
 
     def ccToMap(cc: AnyRef): Map[String, Any] =
       (Map[String, Any]() /: cc.getClass.getDeclaredFields) { (a, f) =>
@@ -100,10 +100,11 @@ trait Grid[T <: GridSources] {
     }
   }
 
-  def getRasterSource(windowExtent: Extent, kwargs:  Map[String, Any]): T = {
+  def getRasterSource(windowKey: SpatialKey, windowLayout: LayoutDefinition, kwargs:  Map[String, Any]): T = {
+    val windowExtent: Extent = windowKey.extent(windowLayout)
     val gridId = GridId.pointGridId(windowExtent.center, gridSize)
     val gridTile = GridTile(gridSize, rowCount, blockSize, gridId)
 
-    checkSources(gridTile, windowExtent: Extent, kwargs:  Map[String, Any])
+    checkSources(gridTile, windowExtent: Extent, windowKey: SpatialKey, windowLayout: LayoutDefinition, kwargs:  Map[String, Any])
   }
 }

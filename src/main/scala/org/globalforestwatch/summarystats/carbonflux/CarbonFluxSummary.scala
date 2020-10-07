@@ -26,9 +26,9 @@ object CarbonFluxSummary {
   implicit val mdhCellRegisterForTreeLossRaster1
     : GridVisitor[Raster[CarbonFluxTile], CarbonFluxSummary] =
       new GridVisitor[Raster[CarbonFluxTile], CarbonFluxSummary] {
-      val acc = new CarbonFluxSummary()
+      private var acc: CarbonFluxSummary = new CarbonFluxSummary()
 
-      def result = acc
+      def result: CarbonFluxSummary = acc
 
       def visit(raster: Raster[CarbonFluxTile],
                   col: Int,
@@ -194,7 +194,7 @@ object CarbonFluxSummary {
         val updatedSummary: Map[CarbonFluxDataGroup, CarbonFluxData] =
           updateSummary(thresholds, acc.stats)
 
-        CarbonFluxSummary(updatedSummary)
+        acc = CarbonFluxSummary(updatedSummary)
 
       }
     }

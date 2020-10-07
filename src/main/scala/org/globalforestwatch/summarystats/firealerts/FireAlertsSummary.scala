@@ -25,9 +25,9 @@ object FireAlertsSummary {
   implicit val mdhCellRegisterForFireAlertsRaster
     : GridVisitor[Raster[FireAlertsTile], FireAlertsSummary] =
       new GridVisitor[Raster[FireAlertsTile], FireAlertsSummary] {
-      val acc = new FireAlertsSummary()
+      private var acc: FireAlertsSummary = new FireAlertsSummary()
 
-      def result = acc
+      def result: FireAlertsSummary = acc
 
       def visit(raster: Raster[FireAlertsTile],
                    col: Int,
@@ -106,7 +106,7 @@ object FireAlertsSummary {
         val updatedSummary: Map[FireAlertsDataGroup, FireAlertsData] =
           updateSummary(acc.stats)
 
-        FireAlertsSummary(updatedSummary)
+        acc = FireAlertsSummary(updatedSummary)
     }
   }
 }

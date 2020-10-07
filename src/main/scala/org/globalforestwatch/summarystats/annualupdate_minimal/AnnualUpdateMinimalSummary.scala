@@ -27,9 +27,9 @@ object AnnualUpdateMinimalSummary {
   implicit val mdhCellRegisterForTreeLossRaster1
     : GridVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary] =
         new GridVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary] {
-      val acc = new AnnualUpdateMinimalSummary()
+      private var acc: AnnualUpdateMinimalSummary = new AnnualUpdateMinimalSummary()
 
-      def result = acc
+      def result: AnnualUpdateMinimalSummary = acc
 
       def visit(
                     raster: Raster[AnnualUpdateMinimalTile],
@@ -210,6 +210,8 @@ val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
         val updatedSummary
           : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
             updateSummary(thresholds, acc.stats)
+
+        acc = AnnualUpdateMinimalSummary(updatedSummary)
       }
     }
 }

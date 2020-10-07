@@ -95,16 +95,14 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
           groupedByKey.toIterator.flatMap {
             case (windowKey, keysAndFeatures) =>
-              val window: Extent = windowKey.extent(windowLayout)
-
               val maybeRasterSource: Either[Throwable, SOURCES] =
-                getSources(window, kwargs)
+                getSources(windowKey, windowLayout, kwargs)
 
               val features = keysAndFeatures map { case (_, feature) => feature }
 
               val maybeRaster: Either[Throwable, Raster[TILE]] =
                 maybeRasterSource.flatMap { rs: SOURCES =>
-                  readWindow(rs, window)
+                  readWindow(rs, windowKey, windowLayout)
                 }
 
               // flatMap here flattens out and ignores the errors
@@ -170,9 +168,9 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
     featuresGroupedWithSummaries
   }
 
-  def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES]
+  def getSources(key: SpatialKey, windowLayout: LayoutDefinition, kwargs: Map[String, Any]): Either[Throwable, SOURCES]
 
-  def readWindow(rs: SOURCES, window: Extent): Either[Throwable, Raster[TILE]]
+  def readWindow(rs: SOURCES, windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[TILE]]
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,
