@@ -1,22 +1,19 @@
 package org.globalforestwatch.util
 
-import java.io.{File, FileInputStream}
+import java.io.File
 
 import com.amazonaws.services.s3.AmazonS3URI
-import com.amazonaws.services.s3.model.ObjectMetadata
 import geotrellis.raster.RasterExtent
-import geotrellis.layer.SpatialKey
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.store.s3.S3ClientProducer
-import geotrellis.layer.LayoutDefinition
-import geotrellis.vector.{Extent, Feature, Geometry, Point, Polygon}
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
+import geotrellis.vector.{Extent, Feature, Geometry, Point}
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
-import scala.util.control.NonFatal
 
 object Util {
   def uploadFile(file: File, uri: AmazonS3URI): Unit = {
