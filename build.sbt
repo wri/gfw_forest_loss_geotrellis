@@ -36,8 +36,7 @@ resolvers ++= Seq(
   "GeoSolutions" at "http://maven.geo-solutions.it/",
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
   "LT-snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
-  "NewOsGeo" at "https://repo.osgeo.org/repository/release/",
-  "OSGeo" at "http://download.osgeo.org/webdav/geotools/",
+  "OsGeo" at "https://repo.osgeo.org/repository/release/",
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 

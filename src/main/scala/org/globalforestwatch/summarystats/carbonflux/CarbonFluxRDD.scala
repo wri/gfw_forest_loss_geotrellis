@@ -6,7 +6,6 @@ import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster.summary.polygonal._
-import geotrellis.raster.summary.polygonal.PolygonalSummaryResult
 import geotrellis.vector._
 import org.globalforestwatch.summarystats.SummaryRDD
 

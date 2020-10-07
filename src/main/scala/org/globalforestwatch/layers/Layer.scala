@@ -9,7 +9,6 @@ import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.geotiff.GeoTiffRasterSource
 import geotrellis.raster.crop._
 import geotrellis.raster.{CellType, Tile, isNoData}
-import geotrellis.vector.Extent
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException}
 
@@ -154,8 +153,8 @@ trait RequiredLayer extends Layer {
           s3Client.headObject(headRequest)
           true
         } catch {
-          case e: NoSuchKeyException => false
-          case _: Throwable => throw new Exception(f"Unexpected exception on key ${s3uri.getKey}")
+          case noSuchKeyE: NoSuchKeyException => false
+          case e: Throwable => throw e
         }
 
       if (!keyExists) {
