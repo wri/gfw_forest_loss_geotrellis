@@ -36,7 +36,7 @@ resolvers ++= Seq(
   "GeoSolutions" at "http://maven.geo-solutions.it/",
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
   "LT-snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
-  "OsGeo" at "https://repo.osgeo.org/repository/release/",
+  "OSGeo" at "https://repo.osgeo.org/repository/release/",
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
@@ -61,8 +61,6 @@ libraryDependencies ++= Seq(
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
-  //"com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.9.0",
-  //"com.azavea.geotrellis" %% "geotrellis-contrib-summary" % "0.1.1",
   "org.scalanlp" %% "breeze" % "0.13.2",
   "org.scalanlp" %% "breeze-natives" % "0.13.2",
   "org.scalanlp" %% "breeze-viz" % "0.13.2"
