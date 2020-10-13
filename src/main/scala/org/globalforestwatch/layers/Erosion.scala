@@ -3,7 +3,7 @@ package org.globalforestwatch.layers
 import org.globalforestwatch.grids.GridTile
 
 case class Erosion(gridTile: GridTile) extends StringLayer with OptionalILayer {
-  val uri: String = s"$basePath/aqueduct_erosion_risk/latest/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/level/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/aqueduct_erosion_risk/latest/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/level/gdal-geotiff/${gridTile.tileId}.tif"
   override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {

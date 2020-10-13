@@ -5,7 +5,7 @@ import org.globalforestwatch.grids.GridTile
 case class BrazilBiomes(gridTile: GridTile) extends StringLayer with OptionalILayer {
 
   val uri: String =
-    s"$basePath/bra_biomes/v20150601/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"
+    s"$basePath/bra_biomes/v20150601/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/gdal-geotiff/${gridTile.tileId}.tif"
 
   def lookup(value: Int): String = value match {
     case 1 => "Caatinga"

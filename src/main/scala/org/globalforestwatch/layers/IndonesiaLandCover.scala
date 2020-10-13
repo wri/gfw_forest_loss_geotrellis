@@ -4,7 +4,7 @@ import org.globalforestwatch.grids.GridTile
 
 case class IndonesiaLandCover(gridTile: GridTile) extends StringLayer with OptionalILayer {
 
-  val uri: String = s"$basePath/idn_land_cover_2017/v20180720/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/class/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/idn_land_cover_2017/v20180720/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/class/gdal-geotiff/${gridTile.tileId}.tif"
 
   override val externalNoDataValue: String = ""
 

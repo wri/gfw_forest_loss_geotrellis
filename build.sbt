@@ -40,6 +40,9 @@ resolvers ++= Seq(
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
+resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+libraryDependencies += "org.gdal" % "gdal" % "2.4.0"
+libraryDependencies += "com.azavea.gdal" % "gdal-warp-bindings" % "33.f1da4f7"
 
 libraryDependencies ++= Seq(
   sparkCore % Provided,
@@ -55,6 +58,7 @@ libraryDependencies ++= Seq(
   geotrellisShapefile,
   geotrellisGeotools,
   geotrellisVectorTile,
+  geotrellisGdal,
   logging,
   decline,
   scalatest % Test,
@@ -64,14 +68,12 @@ libraryDependencies ++= Seq(
   "org.scalanlp" %% "breeze" % "0.13.2",
   "org.scalanlp" %% "breeze-natives" % "0.13.2",
   "org.scalanlp" %% "breeze-viz" % "0.13.2"
-
 )
 
-dependencyOverrides += "com.google.guava" % "guava" % "15.0"
-
-resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 libraryDependencies += "org.datasyslab" % "geospark" % "1.2.0"
 libraryDependencies += "org.datasyslab" % "geospark-sql_2.3" % "1.2.0"
+
+dependencyOverrides += "com.google.guava" % "guava" % "15.0"
 
 // spark-daria
 resolvers += "jitpack" at "https://jitpack.io"
@@ -165,6 +167,12 @@ import com.amazonaws.services.elasticmapreduce.model.Tag
 sparkEmrRelease := "emr-5.27.0"
 sparkAwsRegion := "us-east-1"
 sparkEmrApplications := Seq("Spark", "Zeppelin", "Ganglia")
+sparkEmrBootstrap := List(
+  BootstrapAction(
+    "Install GDAL 2.4 dependencies",
+    "s3://geotrellis-build-artifacts/rpms/bootstrap.sh",
+    "s3://geotrellis-build-artifacts", "gdal-2.4.1"
+  ))
 sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-116d9a4a")
@@ -213,7 +221,7 @@ sparkEmrConfigs := List(
     "spark.dynamicAllocation.enabled" -> "false",
     "spark.executor.cores" -> "1", //5",
     "spark.executor.memory" -> "6652m", //37G
-    "spark.executor.memoryOverhead" -> "1g", //5G
+    "spark.executor.memoryOverhead" -> "2g", //5G
     "spark.driver.cores" -> "1",
     "spark.driver.memory" -> "6652m",
     "spark.executor.instances" -> "799", // 1339",

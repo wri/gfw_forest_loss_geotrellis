@@ -31,10 +31,11 @@ object Dependencies {
   val geotrellisVector        = "org.locationtech.geotrellis" %% "geotrellis-vector"         % Version.geotrellis
   val geotrellisVectorTile    = "org.locationtech.geotrellis" %% "geotrellis-vectortile"     % Version.geotrellis
   val geotrellisUtil          = "org.locationtech.geotrellis" %% "geotrellis-util"           % Version.geotrellis
-  val geotrellisShapefile     = "org.locationtech.geotrellis" %% "geotrellis-shapefile"        % Version.geotrellis
+  val geotrellisShapefile     = "org.locationtech.geotrellis" %% "geotrellis-shapefile"      % Version.geotrellis
   val geotrellisGeotools      = "org.locationtech.geotrellis" %% "geotrellis-geotools"       % Version.geotrellis
   val geotrellisSparkTestKit  = "org.locationtech.geotrellis" %% "geotrellis-spark-testkit"  % Version.geotrellis
   val geotrellisRasterTestkit = "org.locationtech.geotrellis" %% "geotrellis-raster-testkit" % Version.geotrellis
+  val geotrellisGdal          = "org.locationtech.geotrellis" %% "geotrellis-gdal"           % Version.geotrellis
   val sparkJts                = "org.locationtech.geomesa"    %% "geomesa-spark-jts"         % "2.2.0"
 
   val pureconfig          = "com.github.pureconfig"      %% "pureconfig"               % "0.9.1"
