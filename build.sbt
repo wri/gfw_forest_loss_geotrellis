@@ -40,9 +40,9 @@ resolvers ++= Seq(
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
-resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
-libraryDependencies += "org.gdal" % "gdal" % "2.4.0"
-libraryDependencies += "com.azavea.gdal" % "gdal-warp-bindings" % "33.f1da4f7"
+//resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+//libraryDependencies += "org.gdal" % "gdal" % "3.0.0"
+//libraryDependencies += "com.azavea.geotrellis" % "gdal-warp-bindings" % "1.0.1"
 
 libraryDependencies ++= Seq(
   sparkCore % Provided,
@@ -196,6 +196,7 @@ sparkRunJobFlowRequest := sparkRunJobFlowRequest.value
   .withTags(new Tag("Project Lead", "Thomas Maschler"))
   .withTags(new Tag("Name", "geotrellis-treecoverloss"))
 sparkEmrConfigs := List(
+  // reference to example by geotrellis: https://github.com/geotrellis/geotrellis-spark-job.g8/blob/master/src/main/g8/build.sbt#L70-L91
   EmrConfig("spark").withProperties("maximizeResourceAllocation" -> "true"),
   EmrConfig("spark-defaults").withProperties(
     // https://aws.amazon.com/blogs/big-data/best-practices-for-successfully-managing-memory-for-apache-spark-applications-on-amazon-emr/
