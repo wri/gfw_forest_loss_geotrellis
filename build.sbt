@@ -167,12 +167,6 @@ import com.amazonaws.services.elasticmapreduce.model.Tag
 sparkEmrRelease := "emr-5.27.0"
 sparkAwsRegion := "us-east-1"
 sparkEmrApplications := Seq("Spark", "Zeppelin", "Ganglia")
-sparkEmrBootstrap := List(
-  BootstrapAction(
-    "Install GDAL 2.4 dependencies",
-    "s3://geotrellis-build-artifacts/rpms/bootstrap.sh",
-    "s3://geotrellis-build-artifacts", "gdal-2.4.1"
-  ))
 sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
 sparkSubnetId := Some("subnet-116d9a4a")
