@@ -21,3 +21,9 @@ case class Plantations(gridTile: GridTile) extends StringLayer with OptionalILay
     case _ => ""
   }
 }
+
+case class PlantationsBool(gridTile: GridTile) extends BooleanLayer with OptionalILayer {
+
+  val uri: String = s"$basePath/gfw_plantations/v1.3/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/geotiff/${gridTile.tileId}.tif"
+
+}
