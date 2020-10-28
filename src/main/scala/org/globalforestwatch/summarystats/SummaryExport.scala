@@ -10,7 +10,8 @@ trait SummaryExport {
     //"quote" -> "\u0000",
     "escape" -> "\"",
     "quoteMode" -> "MINIMAL",
-    "nullValue" -> "\u0000"
+    "nullValue" -> null,
+    "emptyValue" -> null
   )
 
   def export(featureType: String,
