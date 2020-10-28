@@ -16,7 +16,7 @@ object WdpaFeature extends Feature {
   val statusPos = 4
   val geomPos = 7
 
-  val featureIdExpr =  "cast(wdpaid as int) as wdpaId, name as name, iucn_cat as iucnCat, iso3, status"
+  val featureIdExpr =  "cast(wdpaid as int) as wdpaId, name as name, iucn_cat as iucnCat, iso3 as iso, status"
 
   def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
     val featureId = getFeatureId(i)
