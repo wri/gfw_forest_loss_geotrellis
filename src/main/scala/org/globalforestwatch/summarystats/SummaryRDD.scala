@@ -5,7 +5,8 @@ import com.typesafe.scalalogging.LazyLogging
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
-import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResult, Summary}
+import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResult}
+import geotrellis.raster.summary.polygonal
 import org.apache.commons.lang.NotImplementedException
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector._
@@ -13,7 +14,6 @@ import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
-import org.globalforestwatch.util.GeometryReducer
 
 import scala.reflect.ClassTag
 
@@ -127,7 +127,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                           rasterizeOptions,
                           kwargs
                         ) match {
-                          case Summary(result: SUMMARY) => result
+                          case polygonal.Summary(result: SUMMARY) => result
                           case NoIntersection => throw new NotImplementedException("")
                         }
                       } catch {

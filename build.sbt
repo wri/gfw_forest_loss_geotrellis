@@ -40,15 +40,16 @@ resolvers ++= Seq(
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
-//resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
-//libraryDependencies += "org.gdal" % "gdal" % "3.0.0"
-//libraryDependencies += "com.azavea.geotrellis" % "gdal-warp-bindings" % "1.0.1"
+resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/"
+libraryDependencies += "org.gdal" % "gdal" % "3.1.0"
+libraryDependencies += "com.azavea.geotrellis" % "gdal-warp-bindings" % "1.1.0"
 
 libraryDependencies ++= Seq(
   sparkCore % Provided,
   sparkSQL % Provided,
   sparkHive % Provided,
   hadoopAws % Provided,
+  hadoopCommon % Provided,
   logging,
   decline,
   scalatest % Test,
@@ -70,15 +71,15 @@ libraryDependencies ++= Seq(
   "org.scalanlp" %% "breeze-viz" % "0.13.2"
 )
 
-libraryDependencies += "org.datasyslab" % "geospark" % "1.2.0"
-libraryDependencies += "org.datasyslab" % "geospark-sql_2.3" % "1.2.0"
+libraryDependencies += "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
+libraryDependencies += "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
 
-dependencyOverrides += "com.google.guava" % "guava" % "15.0"
+dependencyOverrides += "com.google.guava" % "guava" % "20.0"
 
 // spark-daria
 resolvers += "jitpack" at "https://jitpack.io"
 resolvers += "maven2" at "https://repo1.maven.org/maven2"
-libraryDependencies += "com.github.mrpowers" % "spark-daria_2.11" % "0.38.2"
+libraryDependencies += "com.github.mrpowers" % "spark-daria_2.12" % "0.38.2"
 
 
 // auto imports for local SBT console

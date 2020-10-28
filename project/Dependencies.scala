@@ -17,10 +17,10 @@
 import sbt._
 
 object Version {
-  val scala       = "2.12.12"
+  val scala       = "2.12.6"
   val geotrellis  = "3.5.0"
-  val hadoop      = "2.8.0"
-  val spark       = "2.4.7"
+  val hadoop      = "3.2.1"
+  val spark       = "3.0.0"
   val geotools    = "23.1"
 }
 
@@ -48,5 +48,6 @@ object Dependencies {
   val sparkSQL            = "org.apache.spark"           %% "spark-sql"                % Version.spark
   val sparkHive           = "org.apache.spark"           %% "spark-hive"               % Version.spark
   val hadoopClient        = "org.apache.hadoop"           % "hadoop-client"            % Version.hadoop
+  val hadoopCommon        = "org.apache.hadoop"           % "hadoop-common"            % Version.hadoop
   val hadoopAws           = "org.apache.hadoop"           % "hadoop-aws"               % Version.hadoop
 }
