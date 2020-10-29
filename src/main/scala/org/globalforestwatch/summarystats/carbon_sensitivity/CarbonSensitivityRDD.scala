@@ -30,7 +30,7 @@ object CarbonSensitivityRDD extends SummaryRDD {
                           kwargs: Map[String, Any]): PolygonalSummaryResult[SUMMARY] = {
     raster.polygonalSummary(
       geometry,
-      GridVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary],
+      CarbonSensitivitySummary.getGridVisitor(kwargs),
       options = options
     )
   }

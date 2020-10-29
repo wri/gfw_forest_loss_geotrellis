@@ -30,7 +30,7 @@ object CarbonFluxRDD extends SummaryRDD {
                           kwargs: Map[String, Any]): PolygonalSummaryResult[SUMMARY] = {
     raster.polygonalSummary(
       geometry,
-      GridVisitor[Raster[CarbonFluxTile], CarbonFluxSummary],
+      CarbonFluxSummary.getGridVisitor(kwargs),
       options = options
     )
   }

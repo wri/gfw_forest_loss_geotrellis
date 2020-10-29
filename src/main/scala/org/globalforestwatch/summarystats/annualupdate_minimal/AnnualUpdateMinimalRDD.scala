@@ -30,7 +30,7 @@ object AnnualUpdateMinimalRDD extends SummaryRDD {
                           kwargs: Map[String, Any]): PolygonalSummaryResult[SUMMARY] = {
     raster.polygonalSummary(
       geometry,
-      GridVisitor[Raster[AnnualUpdateMinimalTile], AnnualUpdateMinimalSummary],
+      AnnualUpdateMinimalSummary.getGridVisitor(kwargs),
       options = options
     )
   }

@@ -23,8 +23,7 @@ case class CarbonSensitivitySummary(
 object CarbonSensitivitySummary {
   // CarbonSensitivitySummary form Raster[CarbonSensitivityTile] -- cell types may not be the same
 
-  implicit val mdhCellRegisterForTreeLossRaster1
-  : GridVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] =
+  def getGridVisitor(kwargs: Map[String, Any]) : GridVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] = {
     new GridVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] {
       private var acc: CarbonSensitivitySummary = new CarbonSensitivitySummary()
 
@@ -200,4 +199,5 @@ object CarbonSensitivitySummary {
         acc = CarbonSensitivitySummary(updatedSummary)
       }
     }
+  }
 }

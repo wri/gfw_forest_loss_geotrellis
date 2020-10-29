@@ -37,7 +37,7 @@ object FireAlertsRDD extends SummaryRDD {
                           kwargs: Map[String, Any]): PolygonalSummaryResult[SUMMARY] = {
     raster.polygonalSummary(
       geometry,
-      GridVisitor[Raster[FireAlertsTile], FireAlertsSummary],
+      FireAlertsSummary.getGridVisitor(kwargs),
       options = options
     )
   }

@@ -30,7 +30,7 @@ object AnnualUpdateRDD extends SummaryRDD {
                           kwargs: Map[String, Any]): PolygonalSummaryResult[SUMMARY] = {
     raster.polygonalSummary(
       geometry,
-      GridVisitor[Raster[AnnualUpdateTile], AnnualUpdateSummary],
+      AnnualUpdateSummary.getGridVisitor(kwargs),
       options = options
     )
   }
