@@ -41,8 +41,8 @@ resolvers ++= Seq(
 )
 
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/"
-libraryDependencies += "org.gdal" % "gdal" % "3.1.0"
-libraryDependencies += "com.azavea.geotrellis" % "gdal-warp-bindings" % "1.1.0"
+//libraryDependencies += "org.gdal" % "gdal" % "3.1.0"
+//libraryDependencies += "com.azavea.geotrellis" % "gdal-warp-bindings" % "1.1.0"
 
 libraryDependencies ++= Seq(
   sparkCore % Provided,
