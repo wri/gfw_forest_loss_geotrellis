@@ -188,7 +188,7 @@ sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
 sparkEmrBootstrap := List(
   BootstrapAction(
     "Install GDAL 3.1.2 dependencies",
-    "s3://geotrellis-test/emr-gdal/bootstrap.sh",
+    "s3://gfw-pipelines/geotrellis/bootstrap/gdal.sh",
     "3.1.2"
   )
 )
@@ -223,7 +223,7 @@ sparkEmrConfigs := List(
     // spark.sql.shuffle.partitions = spark.default.parallelism
     "spark.dynamicAllocation.enabled" -> "false",
     "spark.executor.cores" -> "1", //5",
-    "spark.executor.memory" -> "6652m", //37G
+    "spark.executor.memory" -> "5652m", //37G
     "spark.executor.memoryOverhead" -> "2g", //5G
     "spark.driver.cores" -> "1",
     "spark.driver.memory" -> "5652m",
