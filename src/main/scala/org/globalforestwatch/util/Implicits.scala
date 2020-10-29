@@ -33,9 +33,9 @@ object Implicits {
     }
 
   // Note: This implicit currently exists in geotrellis.contrib.polygonal.Implicits , which is already imported
-  implicit def rasterHasRasterExtent[T <: CellGrid[Int]] = new GetComponent[Raster[T], RasterExtent] {
-    override def get: Raster[T] => RasterExtent = { raster  => raster.rasterExtent }
-  }
+  // implicit def rasterHasRasterExtent[T <: CellGrid[Int]] = new GetComponent[Raster[T], RasterExtent] {
+  //   override def get: Raster[T] => RasterExtent = { raster  => raster.rasterExtent }
+  // }
 
   implicit def newFeatureIdEncoder[T <: FeatureId : TypeTag]: Encoder[T] = ExpressionEncoder()
 
