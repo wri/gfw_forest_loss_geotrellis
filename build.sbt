@@ -251,6 +251,10 @@ sparkEmrConfigs := List(
     "spark.yarn.appMasterEnv.LD_LIBRARY_PATH" ->"/usr/local/miniconda/lib/:/usr/local/lib",
     "spark.executorEnv.LD_LIBRARY_PATH"->  "/usr/local/miniconda/lib/:/usr/local/lib",
 
+    // set this environment variable for GDAL to use request payer method for S3 files
+    "spark.appMasterEnv.AWS_REQUEST_PAYER"->  "requester",
+    "spark.executorEnv.AWS_REQUEST_PAYER"->  "requester",
+
   ),
   //  EmrConfig("spark-env").withProperties(
   //    "LD_LIBRARY_PATH" -> "/usr/local/lib"

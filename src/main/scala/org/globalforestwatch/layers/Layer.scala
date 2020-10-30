@@ -7,10 +7,9 @@ import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
-import geotrellis.raster.crop._
 import geotrellis.raster.{CellType, Tile, isNoData}
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException}
+import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
 
 trait Layer {
 
@@ -149,7 +148,11 @@ trait RequiredLayer extends Layer {
     try {
       val keyExists =
         try {
-          val headRequest = HeadObjectRequest.builder().bucket(s3uri.getBucket).key(s3uri.getKey).build()
+          val headRequest = HeadObjectRequest.builder()
+            .bucket(s3uri.getBucket)
+            .key(s3uri.getKey)
+            .requestPayer(RequestPayer.REQUESTER)
+            .build()
           s3Client.headObject(headRequest)
           true
         } catch {
@@ -165,28 +168,6 @@ trait RequiredLayer extends Layer {
     }
     GDALRasterSource(uri)
   }
-
-  //  lazy val extent: Extent = {
-  //    source.extent
-  //  }
-
-  def cropWindow(tile: Tile): Tile = {
-
-    // TODO: don't use magic number 401. Instead fetch number from 10x10 grid block definition
-
-    val cols = tile.cols
-    val rows = tile.rows
-
-    if (cols == 401 && rows == 401)
-      tile.crop(1, 1, cols, rows, Crop.Options(force = true))
-    else if (cols == 401)
-      tile.crop(1, 0, cols, rows, Crop.Options(force = true))
-    else if (rows == 401)
-      tile.crop(0, 1, cols, rows, Crop.Options(force = true))
-    else tile
-
-  }
-
 }
 
 trait RequiredILayer extends RequiredLayer with ILayer {
@@ -199,7 +180,7 @@ trait RequiredILayer extends RequiredLayer with ILayer {
     val tile = source.synchronized {
       layoutSource.read(windowKey).get.band(0)
     }
-    new ITile(cropWindow(tile))
+    new ITile(tile)
   }
 
 }
@@ -214,7 +195,7 @@ trait RequiredDLayer extends RequiredLayer with DLayer {
     val tile = source.synchronized {
       layoutSource.read(windowKey).get.band(0)
     }
-    new DTile(cropWindow(tile))
+    new DTile(tile)
   }
 
 }
@@ -230,7 +211,7 @@ trait RequiredFLayer extends RequiredLayer with FLayer {
     val tile = source.synchronized {
       layoutSource.read(windowKey).get.band(0)
     }
-    new FTile(cropWindow(tile))
+    new FTile(tile)
   }
 
 }
@@ -248,12 +229,16 @@ trait OptionalLayer extends Layer {
     try {
       val keyExists =
         try {
-          val headRequest = HeadObjectRequest.builder().bucket(s3uri.getBucket).key(s3uri.getKey).build()
+          val headRequest = HeadObjectRequest.builder()
+            .bucket(s3uri.getBucket)
+            .key(s3uri.getKey)
+            .requestPayer(RequestPayer.REQUESTER)
+            .build()
           s3Client.headObject(headRequest)
           true
         } catch {
           case e: NoSuchKeyException => false
-          case _: Throwable => throw new Exception(f"Unexpected exception on key ${s3uri.getKey}")
+          case any: Throwable => throw any
         }
 
       if (keyExists) {
@@ -269,35 +254,6 @@ trait OptionalLayer extends Layer {
         None
     }
   }
-
-  //  lazy val extent: Option[Extent] = source match {
-  //
-  //    case Some(s) => Some(s.extent)
-  //    case None => None
-  //
-  //  }
-
-  def cropWindow(tile: Option[Tile]): Option[Tile] = {
-
-    // TODO: don't use magic number 401. Instead fetch number from 10x10 grid block definition
-
-    tile match {
-      case Some(tile) => {
-        val cols = tile.cols
-        val rows = tile.rows
-
-        if (cols == 401 && rows == 401)
-          Option(tile.crop(1, 1, cols, rows, Crop.Options(force = true)))
-        else if (cols == 401)
-          Option(tile.crop(1, 0, cols, rows, Crop.Options(force = true)))
-        else if (rows == 401)
-          Option(tile.crop(0, 1, cols, rows, Crop.Options(force = true)))
-        else Option(tile)
-      }
-      case None => tile
-    }
-
-  }
 }
 
 trait OptionalILayer extends OptionalLayer with ILayer {
@@ -306,7 +262,7 @@ trait OptionalILayer extends OptionalLayer with ILayer {
     * Define how to fetch data for optional Integer rasters
     */
   def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalITile = {
-    new OptionalITile(cropWindow(for {
+    new OptionalITile(for {
       source <- source
       raster <- Either
         .catchNonFatal(
@@ -314,7 +270,7 @@ trait OptionalILayer extends OptionalLayer with ILayer {
             LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
           })
         .toOption
-    } yield raster))
+    } yield raster)
   }
 }
 
@@ -324,14 +280,14 @@ trait OptionalDLayer extends OptionalLayer with DLayer {
     * Define how to fetch data for optional double rasters
     */
   def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalDTile =
-    new OptionalDTile(cropWindow(for {
+    new OptionalDTile(for {
       source <- source
       raster <- Either
         .catchNonFatal(source.synchronized {
           LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
         })
         .toOption
-    } yield raster))
+    } yield raster)
 }
 
 trait OptionalFLayer extends OptionalLayer with FLayer {
@@ -340,14 +296,14 @@ trait OptionalFLayer extends OptionalLayer with FLayer {
     * Define how to fetch data for optional double rasters
     */
   def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalFTile =
-    new OptionalFTile(cropWindow(for {
+    new OptionalFTile(for {
       source <- source
       raster <- Either
         .catchNonFatal(source.synchronized {
           LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
         })
         .toOption
-    } yield raster))
+    } yield raster)
 }
 
 trait BooleanLayer extends ILayer {
