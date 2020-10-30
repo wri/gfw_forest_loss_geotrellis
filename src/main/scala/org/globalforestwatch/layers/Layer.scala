@@ -3,13 +3,13 @@ package org.globalforestwatch.layers
 import java.io.FileNotFoundException
 
 import cats.implicits._
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
-import geotrellis.contrib.vlm.geotiff.GeoTiffRasterSource
-import geotrellis.raster.crop._
+import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
+import geotrellis.raster.gdal.GDALRasterSource
 import geotrellis.raster.{CellType, Tile, isNoData}
-import geotrellis.vector.Extent
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
 
 trait Layer {
 
@@ -19,14 +19,13 @@ trait Layer {
   type A
   type B
 
-  val s3Client: geotrellis.spark.io.s3.S3Client = geotrellis.spark.io.s3.S3Client.DEFAULT
+  val s3Client: S3Client = geotrellis.store.s3.S3ClientProducer.get()
   val uri: String
   val internalNoDataValue: A
   val externalNoDataValue: B
   val basePath: String = s"s3://gfw-data-lake"
 
   def lookup(a: A): B
-
 }
 
 trait ILayer extends Layer {
@@ -143,40 +142,32 @@ trait RequiredLayer extends Layer {
   /**
     * Define how to read sources for required layers
     */
-  lazy val source: GeoTiffRasterSource = {
+  lazy val source: GDALRasterSource = {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
     try {
-      if (!s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+      val keyExists =
+        try {
+          val headRequest = HeadObjectRequest.builder()
+            .bucket(s3uri.getBucket)
+            .key(s3uri.getKey)
+            .requestPayer(RequestPayer.REQUESTER)
+            .build()
+          s3Client.headObject(headRequest)
+          true
+        } catch {
+          case noSuchKeyE: NoSuchKeyException => false
+          case e: Throwable => throw e
+        }
+
+      if (!keyExists) {
         throw new FileNotFoundException(uri)
       }
     } catch {
       case e: AmazonS3Exception => throw new FileNotFoundException(uri)
     }
-    GeoTiffRasterSource(uri)
+    GDALRasterSource(uri)
   }
-
-  //  lazy val extent: Extent = {
-  //    source.extent
-  //  }
-
-  def cropWindow(tile: Tile): Tile = {
-
-    // TODO: don't use magic number 401. Instead fetch number from 10x10 grid block definition
-
-    val cols = tile.cols
-    val rows = tile.rows
-
-    if (cols == 401 && rows == 401)
-      tile.crop(1, 1, cols, rows, Crop.Options(force = true))
-    else if (cols == 401)
-      tile.crop(1, 0, cols, rows, Crop.Options(force = true))
-    else if (rows == 401)
-      tile.crop(0, 1, cols, rows, Crop.Options(force = true))
-    else tile
-
-  }
-
 }
 
 trait RequiredILayer extends RequiredLayer with ILayer {
@@ -184,11 +175,12 @@ trait RequiredILayer extends RequiredLayer with ILayer {
   /**
     * Define how to fetch data for required Integer rasters
     */
-  def fetchWindow(window: Extent): ITile = {
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): ITile = {
+    val layoutSource = LayoutTileSource.spatial(source, windowLayout)
     val tile = source.synchronized {
-      source.read(window).get.tile.band(0)
+      layoutSource.read(windowKey).get.band(0)
     }
-    new ITile(cropWindow(tile))
+    new ITile(tile)
   }
 
 }
@@ -198,11 +190,12 @@ trait RequiredDLayer extends RequiredLayer with DLayer {
   /**
     * Define how to fetch data for required Double rasters
     */
-  def fetchWindow(window: Extent): DTile = {
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): DTile = {
+    val layoutSource = LayoutTileSource.spatial(source, windowLayout)
     val tile = source.synchronized {
-      source.read(window).get.tile.band(0)
+      layoutSource.read(windowKey).get.band(0)
     }
-    new DTile(cropWindow(tile))
+    new DTile(tile)
   }
 
 }
@@ -213,11 +206,12 @@ trait RequiredFLayer extends RequiredLayer with FLayer {
   /**
     * Define how to fetch data for required Double rasters
     */
-  def fetchWindow(window: Extent): FTile = {
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): FTile = {
+    val layoutSource = LayoutTileSource.spatial(source, windowLayout)
     val tile = source.synchronized {
-      source.read(window).get.tile.band(0)
+      layoutSource.read(windowKey).get.band(0)
     }
-    new FTile(cropWindow(tile))
+    new FTile(tile)
   }
 
 }
@@ -228,14 +222,28 @@ trait OptionalLayer extends Layer {
     * Define how to read sources for optional Layers
     */
   /** Check if URI exists before trying to open it, return None if no file found */
-  lazy val source: Option[GeoTiffRasterSource] = {
+  lazy val source: Option[GDALRasterSource] = {
     // Removes the expected 404 errors from console log
 
     val s3uri = new AmazonS3URI(uri)
     try {
-      if (s3Client.doesObjectExist(s3uri.getBucket, s3uri.getKey)) {
+      val keyExists =
+        try {
+          val headRequest = HeadObjectRequest.builder()
+            .bucket(s3uri.getBucket)
+            .key(s3uri.getKey)
+            .requestPayer(RequestPayer.REQUESTER)
+            .build()
+          s3Client.headObject(headRequest)
+          true
+        } catch {
+          case e: NoSuchKeyException => false
+          case any: Throwable => throw any
+        }
+
+      if (keyExists) {
         println(s"Opening: $uri")
-        Some(GeoTiffRasterSource(uri))
+        Some(GDALRasterSource(uri))
       } else {
         println(s"Cannot open: $uri")
         None
@@ -246,35 +254,6 @@ trait OptionalLayer extends Layer {
         None
     }
   }
-
-  //  lazy val extent: Option[Extent] = source match {
-  //
-  //    case Some(s) => Some(s.extent)
-  //    case None => None
-  //
-  //  }
-
-  def cropWindow(tile: Option[Tile]): Option[Tile] = {
-
-    // TODO: don't use magic number 401. Instead fetch number from 10x10 grid block definition
-
-    tile match {
-      case Some(tile) => {
-        val cols = tile.cols
-        val rows = tile.rows
-
-        if (cols == 401 && rows == 401)
-          Option(tile.crop(1, 1, cols, rows, Crop.Options(force = true)))
-        else if (cols == 401)
-          Option(tile.crop(1, 0, cols, rows, Crop.Options(force = true)))
-        else if (rows == 401)
-          Option(tile.crop(0, 1, cols, rows, Crop.Options(force = true)))
-        else Option(tile)
-      }
-      case None => tile
-    }
-
-  }
 }
 
 trait OptionalILayer extends OptionalLayer with ILayer {
@@ -282,16 +261,16 @@ trait OptionalILayer extends OptionalLayer with ILayer {
   /**
     * Define how to fetch data for optional Integer rasters
     */
-  def fetchWindow(window: Extent): OptionalITile = {
-
-    new OptionalITile(cropWindow(for {
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalITile = {
+    new OptionalITile(for {
       source <- source
       raster <- Either
-        .catchNonFatal(source.synchronized {
-          source.read(window).get.tile.band(0)
-        })
+        .catchNonFatal(
+          source.synchronized {
+            LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
+          })
         .toOption
-    } yield raster))
+    } yield raster)
   }
 }
 
@@ -300,15 +279,15 @@ trait OptionalDLayer extends OptionalLayer with DLayer {
   /**
     * Define how to fetch data for optional double rasters
     */
-  def fetchWindow(window: Extent): OptionalDTile =
-    new OptionalDTile(cropWindow(for {
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalDTile =
+    new OptionalDTile(for {
       source <- source
       raster <- Either
         .catchNonFatal(source.synchronized {
-          source.read(window).get.tile.band(0)
+          LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
         })
         .toOption
-    } yield raster))
+    } yield raster)
 }
 
 trait OptionalFLayer extends OptionalLayer with FLayer {
@@ -316,15 +295,15 @@ trait OptionalFLayer extends OptionalLayer with FLayer {
   /**
     * Define how to fetch data for optional double rasters
     */
-  def fetchWindow(window: Extent): OptionalFTile =
-    new OptionalFTile(cropWindow(for {
+  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalFTile =
+    new OptionalFTile(for {
       source <- source
       raster <- Either
         .catchNonFatal(source.synchronized {
-          source.read(window).get.tile.band(0)
+          LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
         })
         .toOption
-    } yield raster))
+    } yield raster)
 }
 
 trait BooleanLayer extends ILayer {

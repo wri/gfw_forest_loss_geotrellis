@@ -4,7 +4,7 @@ import org.globalforestwatch.grids.GridTile
 
 case class Plantations(gridTile: GridTile) extends StringLayer with OptionalILayer {
 
-  val uri: String = s"$basePath/gfw_plantations/v1.3/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/gfw_plantations/v1.3/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
 
   def lookup(value: Int): String = value match {
     case 1  => "Fruit"
@@ -24,6 +24,6 @@ case class Plantations(gridTile: GridTile) extends StringLayer with OptionalILay
 
 case class PlantationsBool(gridTile: GridTile) extends BooleanLayer with OptionalILayer {
 
-  val uri: String = s"$basePath/gfw_plantations/v1.3/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/gfw_plantations/v1.3/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
 
 }

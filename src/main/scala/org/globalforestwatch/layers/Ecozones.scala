@@ -4,7 +4,7 @@ import org.globalforestwatch.grids.GridTile
 
 case class Ecozones(gridTile: GridTile) extends StringLayer with OptionalILayer {
 
-  val uri: String = s"$basePath/wwf_eco_regions/v2012/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/wwf_eco_regions/v2012/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/gdal-geotiff/${gridTile.tileId}.tif"
   override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {

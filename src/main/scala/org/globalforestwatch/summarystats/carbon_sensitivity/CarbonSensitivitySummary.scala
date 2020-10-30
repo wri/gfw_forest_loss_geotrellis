@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.carbon_sensitivity
 
 import cats.implicits._
-import geotrellis.contrib.polygonal.CellVisitor
+import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
@@ -23,15 +23,17 @@ case class CarbonSensitivitySummary(
 object CarbonSensitivitySummary {
   // CarbonSensitivitySummary form Raster[CarbonSensitivityTile] -- cell types may not be the same
 
-  implicit val mdhCellRegisterForCarbonSensitivityRaster1: CellVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] =
-    new CellVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] {
+  def getGridVisitor(kwargs: Map[String, Any]) : GridVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] = {
+    new GridVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] {
+      private var acc: CarbonSensitivitySummary = new CarbonSensitivitySummary()
 
-      def register(
+      def result: CarbonSensitivitySummary = acc
+
+      def visit(
                     raster: Raster[CarbonSensitivityTile],
                     col: Int,
-                    row: Int,
-                    acc: CarbonSensitivitySummary
-                  ): CarbonSensitivitySummary = {
+                    row: Int
+                  ): Unit = {
         // This is a pixel by pixel operation
         val lossYear: Integer = raster.tile.loss.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
@@ -194,8 +196,8 @@ object CarbonSensitivitySummary {
         val updatedSummary: Map[CarbonSensitivityDataGroup, CarbonSensitivityData] =
           updateSummary(thresholds, acc.stats)
 
-        CarbonSensitivitySummary(updatedSummary)
-
+        acc = CarbonSensitivitySummary(updatedSummary)
       }
     }
+  }
 }

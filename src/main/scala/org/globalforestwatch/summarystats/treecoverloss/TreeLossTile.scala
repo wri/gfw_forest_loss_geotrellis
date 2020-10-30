@@ -16,7 +16,8 @@ case class TreeLossTile(loss: TreeCoverLoss#ITile,
                         primaryForest: PrimaryForest#OptionalITile,
                         plantationsBool: PlantationsBool#OptionalITile)
 
-  extends CellGrid {
+  extends CellGrid[Int] {
+
   def cellType: CellType = loss.cellType
 
   def cols: Int = loss.cols

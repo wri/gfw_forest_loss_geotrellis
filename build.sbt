@@ -36,16 +36,20 @@ resolvers ++= Seq(
   "GeoSolutions" at "http://maven.geo-solutions.it/",
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
   "LT-snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
-  "OSGeo" at "http://download.osgeo.org/webdav/geotools/",
+  "OSGeo" at "https://repo.osgeo.org/repository/release/",
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
+resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/"
+//libraryDependencies += "org.gdal" % "gdal" % "3.1.0"
+//libraryDependencies += "com.azavea.geotrellis" % "gdal-warp-bindings" % "1.1.0"
 
 libraryDependencies ++= Seq(
   sparkCore % Provided,
   sparkSQL % Provided,
   sparkHive % Provided,
   hadoopAws % Provided,
+  hadoopCommon % Provided,
   logging,
   decline,
   scalatest % Test,
@@ -55,29 +59,27 @@ libraryDependencies ++= Seq(
   geotrellisShapefile,
   geotrellisGeotools,
   geotrellisVectorTile,
+  geotrellisGdal,
   logging,
   decline,
   scalatest % Test,
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
-  "com.azavea.geotrellis" %% "geotrellis-contrib-vlm" % "0.9.0",
-  "com.azavea.geotrellis" %% "geotrellis-contrib-summary" % "0.1.1",
   "org.scalanlp" %% "breeze" % "0.13.2",
   "org.scalanlp" %% "breeze-natives" % "0.13.2",
-  "org.scalanlp" %% "breeze-viz" % "0.13.2",
-
+  "org.scalanlp" %% "breeze-viz" % "0.13.2"
 )
 
-dependencyOverrides += "com.google.guava" % "guava" % "15.0"
+libraryDependencies += "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
+libraryDependencies += "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
 
-resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
-libraryDependencies += "org.datasyslab" % "geospark" % "1.2.0"
-libraryDependencies += "org.datasyslab" % "geospark-sql_2.3" % "1.2.0"
+dependencyOverrides += "com.google.guava" % "guava" % "20.0"
 
 // spark-daria
 resolvers += "jitpack" at "https://jitpack.io"
-libraryDependencies += "com.github.mrpowers" % "spark-daria" % "v0.35.0"
+resolvers += "maven2" at "https://repo1.maven.org/maven2"
+libraryDependencies += "com.github.mrpowers" % "spark-daria_2.12" % "0.38.2"
 
 
 // auto imports for local SBT console
@@ -126,7 +128,7 @@ assemblyMergeStrategy in assembly := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat
   // both GeoSpark and Geotrellis bring in this library, need to use GeoSpark version
-  case PathList("org", "geotools", xs @ _*) => MergeStrategy.last
+  case PathList("org", "geotools", xs @ _*) => MergeStrategy.first
   case PathList("META-INF", xs@_*) =>
     xs match {
       case ("MANIFEST.MF" :: Nil) => MergeStrategy.discard
@@ -163,7 +165,7 @@ import com.amazonaws.services.elasticmapreduce.model.Tag
 //  GFW subnet zone us-east-1e: subnet-037b97cff4493e3a1
 //  GFW subnet zone us-east-1f: subnet-0360516ee122586ff
 
-sparkEmrRelease := "emr-5.27.0"
+sparkEmrRelease := "emr-6.1.0"
 sparkAwsRegion := "us-east-1"
 sparkEmrApplications := Seq("Spark", "Zeppelin", "Ganglia")
 sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
@@ -183,12 +185,20 @@ sparkInstanceRole := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
   "tmaschler_wri2"
 )
+sparkEmrBootstrap := List(
+  BootstrapAction(
+    "Install GDAL 3.1.2 dependencies",
+    "s3://gfw-pipelines/geotrellis/bootstrap/gdal.sh",
+    "3.1.2"
+  )
+)
 sparkRunJobFlowRequest := sparkRunJobFlowRequest.value
   .withTags(new Tag("Project", "Global Forest Watch"))
   .withTags(new Tag("Job", "Tree Cover Loss Analysis Geotrellis"))
   .withTags(new Tag("Project Lead", "Thomas Maschler"))
   .withTags(new Tag("Name", "geotrellis-treecoverloss"))
 sparkEmrConfigs := List(
+  // reference to example by geotrellis: https://github.com/geotrellis/geotrellis-spark-job.g8/blob/master/src/main/g8/build.sbt#L70-L91
   EmrConfig("spark").withProperties("maximizeResourceAllocation" -> "true"),
   EmrConfig("spark-defaults").withProperties(
     // https://aws.amazon.com/blogs/big-data/best-practices-for-successfully-managing-memory-for-apache-spark-applications-on-amazon-emr/
@@ -213,10 +223,10 @@ sparkEmrConfigs := List(
     // spark.sql.shuffle.partitions = spark.default.parallelism
     "spark.dynamicAllocation.enabled" -> "false",
     "spark.executor.cores" -> "1", //5",
-    "spark.executor.memory" -> "6652m", //37G
-    "spark.executor.memoryOverhead" -> "1g", //5G
+    "spark.executor.memory" -> "5652m", //37G
+    "spark.executor.memoryOverhead" -> "2g", //5G
     "spark.driver.cores" -> "1",
-    "spark.driver.memory" -> "6652m",
+    "spark.driver.memory" -> "5652m",
     "spark.executor.instances" -> "799", // 1339",
     "spark.default.parallelism" -> "7990", // "26790",
     "spark.sql.shuffle.partitions" -> "7990", //"26790",
@@ -234,8 +244,16 @@ sparkEmrConfigs := List(
     //    "spark.driver.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'"
 
     // Use these GC strategy as default
-    "spark.driver.extraJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
-    "spark.executor.extraJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'"
+    "spark.driver.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
+    "spark.executor.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
+
+    // Need to set these env variables so the bootstrap script for GDAL can use conda to install
+    "spark.yarn.appMasterEnv.LD_LIBRARY_PATH" ->"/usr/local/miniconda/lib/:/usr/local/lib",
+    "spark.executorEnv.LD_LIBRARY_PATH"->  "/usr/local/miniconda/lib/:/usr/local/lib",
+
+    // set this environment variable for GDAL to use request payer method for S3 files
+    "spark.appMasterEnv.AWS_REQUEST_PAYER"->  "requester",
+    "spark.executorEnv.AWS_REQUEST_PAYER"->  "requester",
 
   ),
   //  EmrConfig("spark-env").withProperties(

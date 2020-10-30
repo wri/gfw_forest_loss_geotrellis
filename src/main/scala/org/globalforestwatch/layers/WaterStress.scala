@@ -3,7 +3,7 @@ package org.globalforestwatch.layers
 import org.globalforestwatch.grids.GridTile
 
 case class WaterStress(gridTile: GridTile) extends StringLayer with OptionalILayer {
-  val uri: String = s"$basePath/aqueduct_baseline_water_stress/v2.1/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/level/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/aqueduct_baseline_water_stress/v2.1/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/level/gdal-geotiff/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Unknown"
 

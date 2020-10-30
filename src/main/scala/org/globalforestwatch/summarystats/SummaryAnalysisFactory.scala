@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats
 
 import cats.data.NonEmptyList
-import geotrellis.spark.SpatialKey
+import geotrellis.layer.SpatialKey
 import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.HashPartitioner
