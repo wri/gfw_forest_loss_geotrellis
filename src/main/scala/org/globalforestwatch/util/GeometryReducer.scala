@@ -21,7 +21,7 @@ object GeometryReducer extends java.io.Serializable {
   def reduce(
     gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
   )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
-    geotrellis.vector.Geometry(gpr.reduce(g.jtsGeom))
+    geotrellis.vector.GeomFactory.factory.createGeometry(gpr.reduce(g))
 
   def isValidGeom(wkb: String): Boolean = {
     val geom: Option[Geometry] = try {

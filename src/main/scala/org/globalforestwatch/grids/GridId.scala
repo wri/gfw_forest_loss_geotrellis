@@ -8,10 +8,10 @@ object GridId {
     * Top-Left corner, exclusive on south, east, inclusive on north and west
     */
   def pointGridId(point: Point, gridSize: Int): String = {
-    val col = math.floor(point.x / gridSize).toInt * gridSize
+    val col = math.floor(point.getX / gridSize).toInt * gridSize
     val long: String = if (col >= 0) f"$col%03dE" else f"${-col}%03dW"
 
-    val row = math.ceil(point.y / gridSize).toInt * gridSize
+    val row = math.ceil(point.getY / gridSize).toInt * gridSize
     val lat: String = if (row >= 0) f"$row%02dN" else f"${-row}%02dS"
 
     s"${lat}_$long"

@@ -1,6 +1,7 @@
 package org.globalforestwatch.summarystats.carbon_sensitivity
 
 import cats.implicits._
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import org.globalforestwatch.grids.{GridSources, GridTile}
@@ -50,51 +51,51 @@ case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String,
   val burnYearHansenLoss = BurnYearHansenLoss(gridTile)
   val grossEmissionsNodeCodes = GrossEmissionsNodeCodes(gridTile, model)
 
-  def readWindow(window: Extent): Either[Throwable, Raster[CarbonSensitivityTile]] = {
+  def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[CarbonSensitivityTile]] = {
 
     for {
       // Failure for any of these reads will result in function returning Left[Throwable]
       // These are effectively required fields without which we can't make sense of the analysis
-      lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(window)).right
-      gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(window)).right
+      lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(windowKey, windowLayout)).right
+      gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(windowKey, windowLayout)).right
       tcd2000Tile <- Either
-        .catchNonFatal(treeCoverDensity2000.fetchWindow(window))
+        .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
         .right
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
-      val biomassTile = biomassPerHectar.fetchWindow(window)
-      val grossCumulAbovegroundRemovalsCo2Tile = grossCumulAbovegroundRemovalsCo2.fetchWindow(window)
-      val grossCumulBelowgroundRemovalsCo2Tile = grossCumulBelowgroundRemovalsCo2.fetchWindow(window)
-      val netFluxCo2Tile = netFluxCo2.fetchWindow(window)
-      val agcEmisYearTile = agcEmisYear.fetchWindow(window)
-      val soilCarbonEmisYearTile = soilCarbonEmisYear.fetchWindow(window)
-      val grossEmissionsCo2eNonCo2Tile = grossEmissionsCo2eNonCo2.fetchWindow(window)
-      val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(window)
-      val jplTropicsAbovegroundBiomassDensity2000Tile = jplTropicsAbovegroundBiomassDensity2000.fetchWindow(window)
+      val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
+      val grossCumulAbovegroundRemovalsCo2Tile = grossCumulAbovegroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
+      val grossCumulBelowgroundRemovalsCo2Tile = grossCumulBelowgroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
+      val netFluxCo2Tile = netFluxCo2.fetchWindow(windowKey, windowLayout)
+      val agcEmisYearTile = agcEmisYear.fetchWindow(windowKey, windowLayout)
+      val soilCarbonEmisYearTile = soilCarbonEmisYear.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eNonCo2Tile = grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
+      val jplTropicsAbovegroundBiomassDensity2000Tile = jplTropicsAbovegroundBiomassDensity2000.fetchWindow(windowKey, windowLayout)
 
-      val fluxModelExtentTile = fluxModelExtent.fetchWindow(window)
-      val removalForestTypeTile = removalForestType.fetchWindow(window)
-      val mangroveBiomassExtentTile = mangroveBiomassExtent.fetchWindow(window)
-      val driversTile = treeCoverLossDrivers.fetchWindow(window)
-      val ecozonesTile = ecozones.fetchWindow(window)
-      val landRightsTile = landRights.fetchWindow(window)
-      val wdpaTile = protectedAreas.fetchWindow(window)
-      val intactForestLandscapesTile = intactForestLandscapes.fetchWindow(window)
-      val plantationsTypeFluxTile = plantationsTypeFluxModel.fetchWindow(window)
-      val intactPrimaryForestTile = intactPrimaryForest.fetchWindow(window)
-      val peatlandsExtentFluxTile = peatlandsExtentFluxModel.fetchWindow(window)
-      val forestAgeCategoryTile = forestAgeCategory.fetchWindow(window)
-      val jplTropicsAbovegroundBiomassExtent2000Tile = jplTropicsAbovegroundBiomassExtent2000.fetchWindow(window)
-      val fiaRegionsUsExtentTile = fiaRegionsUsExtent.fetchWindow(window)
-      val braBiomesTile = brazilBiomes.fetchWindow(window)
-      val riverBasinsTile = riverBasins.fetchWindow(window)
-      val primaryForestTile = primaryForest.fetchWindow(window)
-      val treeCoverLossLegalAmazonTile = treeCoverLossLegalAmazon.fetchWindow(window)
-      val prodesLegalAmazonExtent2000Tile = prodesLegalAmazonExtent2000.fetchWindow(window)
-      val tropicLatitudeExtentTile = tropicLatitudeExtent.fetchWindow(window)
-      val burnYearHansenLossTile = burnYearHansenLoss.fetchWindow(window)
-      val grossEmissionsNodeCodesTile = grossEmissionsNodeCodes.fetchWindow(window)
+      val fluxModelExtentTile = fluxModelExtent.fetchWindow(windowKey, windowLayout)
+      val removalForestTypeTile = removalForestType.fetchWindow(windowKey, windowLayout)
+      val mangroveBiomassExtentTile = mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)
+      val driversTile = treeCoverLossDrivers.fetchWindow(windowKey, windowLayout)
+      val ecozonesTile = ecozones.fetchWindow(windowKey, windowLayout)
+      val landRightsTile = landRights.fetchWindow(windowKey, windowLayout)
+      val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
+      val intactForestLandscapesTile = intactForestLandscapes.fetchWindow(windowKey, windowLayout)
+      val plantationsTypeFluxTile = plantationsTypeFluxModel.fetchWindow(windowKey, windowLayout)
+      val intactPrimaryForestTile = intactPrimaryForest.fetchWindow(windowKey, windowLayout)
+      val peatlandsExtentFluxTile = peatlandsExtentFluxModel.fetchWindow(windowKey, windowLayout)
+      val forestAgeCategoryTile = forestAgeCategory.fetchWindow(windowKey, windowLayout)
+      val jplTropicsAbovegroundBiomassExtent2000Tile = jplTropicsAbovegroundBiomassExtent2000.fetchWindow(windowKey, windowLayout)
+      val fiaRegionsUsExtentTile = fiaRegionsUsExtent.fetchWindow(windowKey, windowLayout)
+      val braBiomesTile = brazilBiomes.fetchWindow(windowKey, windowLayout)
+      val riverBasinsTile = riverBasins.fetchWindow(windowKey, windowLayout)
+      val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
+      val treeCoverLossLegalAmazonTile = treeCoverLossLegalAmazon.fetchWindow(windowKey, windowLayout)
+      val prodesLegalAmazonExtent2000Tile = prodesLegalAmazonExtent2000.fetchWindow(windowKey, windowLayout)
+      val tropicLatitudeExtentTile = tropicLatitudeExtent.fetchWindow(windowKey, windowLayout)
+      val burnYearHansenLossTile = burnYearHansenLoss.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsNodeCodesTile = grossEmissionsNodeCodes.fetchWindow(windowKey, windowLayout)
 
       val tile = CarbonSensitivityTile(
         lossTile,
@@ -134,7 +135,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String,
         grossEmissionsNodeCodesTile
       )
 
-      Raster(tile, window)
+      Raster(tile, windowKey.extent(windowLayout))
     }
   }
 }

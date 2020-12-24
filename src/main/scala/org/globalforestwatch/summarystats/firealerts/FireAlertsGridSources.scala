@@ -1,6 +1,7 @@
 package org.globalforestwatch.summarystats.firealerts
 
 import cats.implicits._
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import org.globalforestwatch.grids.{GridSources, GridTile}
@@ -30,30 +31,30 @@ case class FireAlertsGridSources(gridTile: GridTile) extends GridSources {
   val peruForestConcessions = PeruForestConcessions(gridTile)
   val protectedAreas = ProtectedAreas(gridTile)
 
-  def readWindow(window: Extent): Either[Throwable, Raster[FireAlertsTile]] = {
+  def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[FireAlertsTile]] = {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
-      val primaryForestTile = primaryForest.fetchWindow(window)
-      val protectedAreasTile = protectedAreas.fetchWindow(window)
-      val azeTile = aze.fetchWindow(window)
-      val keyBiodiversityAreasTile = keyBiodiversityAreas.fetchWindow(window)
-      val landmarkTile = landmark.fetchWindow(window)
-      val plantationsTile = plantations.fetchWindow(window)
-      val miningTile = mining.fetchWindow(window)
-      val loggingTile = logging.fetchWindow(window)
-      val rspoTile = rspo.fetchWindow(window)
-      val woodFiberTile = woodFiber.fetchWindow(window)
-      val peatlandsTile = peatlands.fetchWindow(window)
+      val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
+      val protectedAreasTile = protectedAreas.fetchWindow(windowKey, windowLayout)
+      val azeTile = aze.fetchWindow(windowKey, windowLayout)
+      val keyBiodiversityAreasTile = keyBiodiversityAreas.fetchWindow(windowKey, windowLayout)
+      val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
+      val plantationsTile = plantations.fetchWindow(windowKey, windowLayout)
+      val miningTile = mining.fetchWindow(windowKey, windowLayout)
+      val loggingTile = logging.fetchWindow(windowKey, windowLayout)
+      val rspoTile = rspo.fetchWindow(windowKey, windowLayout)
+      val woodFiberTile = woodFiber.fetchWindow(windowKey, windowLayout)
+      val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
       val indonesiaForestMoratoriumTile =
-        indonesiaForestMoratorium.fetchWindow(window)
-      val oilPalmTile = oilPalm.fetchWindow(window)
-      val indonesiaForestAreaTile = indonesiaForestArea.fetchWindow(window)
-      val peruForestConcessionsTile = peruForestConcessions.fetchWindow(window)
-      val oilGasTile = oilGas.fetchWindow(window)
-      val mangroves2016Tile = mangroves2016.fetchWindow(window)
+        indonesiaForestMoratorium.fetchWindow(windowKey, windowLayout)
+      val oilPalmTile = oilPalm.fetchWindow(windowKey, windowLayout)
+      val indonesiaForestAreaTile = indonesiaForestArea.fetchWindow(windowKey, windowLayout)
+      val peruForestConcessionsTile = peruForestConcessions.fetchWindow(windowKey, windowLayout)
+      val oilGasTile = oilGas.fetchWindow(windowKey, windowLayout)
+      val mangroves2016Tile = mangroves2016.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2016Tile =
-        intactForestLandscapes2016.fetchWindow(window)
+        intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
       val braBiomesTile =
-        braBiomes.fetchWindow(window)
+        braBiomes.fetchWindow(windowKey, windowLayout)
 
       val tile = FireAlertsTile(
         gridTile,
@@ -78,7 +79,7 @@ case class FireAlertsGridSources(gridTile: GridTile) extends GridSources {
         braBiomesTile
       )
 
-      Right(Raster(tile, window))
+      Right(Raster(tile, windowKey.extent(windowLayout)))
     }
 }
 

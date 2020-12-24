@@ -1,43 +1,45 @@
 package org.globalforestwatch.summarystats.carbon_sensitivity
 
 import cats.implicits._
-import geotrellis.contrib.polygonal.CellVisitor
 import geotrellis.raster._
+import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.util.Implicits._
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 import scala.annotation.tailrec
 
 /** LossData Summary by year */
-case class CarbonSensitivitySummary(stats: Map[CarbonSensitivityDataGroup, CarbonSensitivityData] =
-                                    Map.empty,
-                                    kwargs: Map[String, Any])
-  extends Summary[CarbonSensitivitySummary] {
+case class CarbonSensitivitySummary(
+                                     stats: Map[CarbonSensitivityDataGroup, CarbonSensitivityData] = Map.empty
+                                   ) extends Summary[CarbonSensitivitySummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: CarbonSensitivitySummary): CarbonSensitivitySummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    CarbonSensitivitySummary(stats.combine(other.stats), kwargs)
+    CarbonSensitivitySummary(stats.combine(other.stats))
   }
 }
 
 object CarbonSensitivitySummary {
   // CarbonSensitivitySummary form Raster[CarbonSensitivityTile] -- cell types may not be the same
 
-  implicit val mdhCellRegisterForCarbonSensitivityRaster1: CellVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] =
-    new CellVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] {
+  def getGridVisitor(kwargs: Map[String, Any]) : GridVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] = {
+    new GridVisitor[Raster[CarbonSensitivityTile], CarbonSensitivitySummary] {
+      private var acc: CarbonSensitivitySummary = new CarbonSensitivitySummary()
 
-      def register(
+      def result: CarbonSensitivitySummary = acc
+
+      def visit(
                     raster: Raster[CarbonSensitivityTile],
                     col: Int,
-                    row: Int,
-                    acc: CarbonSensitivitySummary
-                  ): CarbonSensitivitySummary = {
+                    row: Int
+                  ): Unit = {
 
         // Changes the lossYear type to PRODES if the sensitivity analysis is "legal_Amazon_loss"
         val changeLossSource: String =
-          getAnyMapValue[String](acc.kwargs, "sensitivityType")
+          getAnyMapValue[String](kwargs, "sensitivityType")
 
         // This is a pixel by pixel operation
         val lossYear: Integer = {
@@ -196,8 +198,8 @@ object CarbonSensitivitySummary {
         val updatedSummary: Map[CarbonSensitivityDataGroup, CarbonSensitivityData] =
           updateSummary(thresholds, acc.stats)
 
-        CarbonSensitivitySummary(updatedSummary, acc.kwargs)
-
+        acc = CarbonSensitivitySummary(updatedSummary)
       }
     }
+  }
 }

@@ -6,7 +6,7 @@ case class MangroveBiomassExtent(gridTile: GridTile)
     with OptionalDLayer {
 
   val uri: String =
-    s"$basePath/jpl_mangrove_aboveground_biomass_stock_2000/v20190215/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/Mg_ha-1/geotiff/${gridTile.tileId}.tif"
+    s"$basePath/jpl_mangrove_aboveground_biomass_stock_2000/v20190215/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/Mg_ha-1/gdal-geotiff/${gridTile.tileId}.tif"
 
   def lookup(value: Double): Boolean = {
     if (value == 0) false

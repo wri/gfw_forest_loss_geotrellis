@@ -44,7 +44,7 @@ case class CarbonSensitivityTile(
                                   tropicLatitudeExtent: TropicLatitudeExtent#OptionalITile,
                                   burnYearHansenLoss: BurnYearHansenLoss#OptionalITile,
                                   grossEmissionsNodeCodes: GrossEmissionsNodeCodes#OptionalITile
-                                ) extends CellGrid {
+                                ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
 
   def cols: Int = loss.cols

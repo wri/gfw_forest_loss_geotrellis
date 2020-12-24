@@ -29,7 +29,7 @@ case class FireAlertsTile(gridTile: GridTile,
                            mangroves2016: Mangroves2016#OptionalITile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
                            brazilBiomes: BrazilBiomes#OptionalITile
-                         ) extends CellGrid {
+                         ) extends CellGrid[Int] {
   def cellType: CellType = protectedAreas.cellType // TODO all optional, any guaranteed to exist everywhere?
 
   def cols: Int = gridTile.blockSize

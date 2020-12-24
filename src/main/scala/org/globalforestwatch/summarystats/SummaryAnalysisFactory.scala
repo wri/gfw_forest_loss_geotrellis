@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats
 
 import cats.data.NonEmptyList
-import geotrellis.spark.SpatialKey
+import geotrellis.layer.SpatialKey
 import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.HashPartitioner
@@ -11,7 +11,6 @@ import org.globalforestwatch.features.{FeatureDF, FeatureId, FeatureRDD}
 import org.globalforestwatch.summarystats.annualupdate.AnnualUpdateAnalysis
 import org.globalforestwatch.summarystats.annualupdate_minimal.AnnualUpdateMinimalAnalysis
 import org.globalforestwatch.summarystats.carbonflux.CarbonFluxAnalysis
-import org.globalforestwatch.summarystats.carbonflux_custom_area.CarbonCustomAnalysis
 import org.globalforestwatch.summarystats.carbon_sensitivity.CarbonSensitivityAnalysis
 import org.globalforestwatch.summarystats.firealerts.FireAlertsAnalysis
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsAnalysis
@@ -48,13 +47,6 @@ case class SummaryAnalysisFactory(analysis: String,
           )
         case "carbon_sensitivity" =>
           CarbonSensitivityAnalysis(
-            featureRDD: RDD[Feature[Geometry, FeatureId]],
-            featureType: String,
-            spark: SparkSession,
-            kwargs: Map[String, Any]
-          )
-        case "carbon_custom" =>
-          CarbonCustomAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,

@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.carbonflux
 
 import cats.implicits._
-import geotrellis.contrib.polygonal.CellVisitor
+import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
@@ -23,19 +23,19 @@ case class CarbonFluxSummary(
 object CarbonFluxSummary {
   // CarbonFluxSummary form Raster[CarbonFluxTile] -- cell types may not be the same
 
-  implicit val mdhCellRegisterForCarbonFluxRaster1: CellVisitor[Raster[CarbonFluxTile], CarbonFluxSummary] =
-    new CellVisitor[Raster[CarbonFluxTile], CarbonFluxSummary] {
+  def getGridVisitor(kwargs: Map[String, Any]) : GridVisitor[Raster[CarbonFluxTile], CarbonFluxSummary] = {
+      new GridVisitor[Raster[CarbonFluxTile], CarbonFluxSummary] {
+        private var acc: CarbonFluxSummary = new CarbonFluxSummary()
 
-      def register(
-                    raster: Raster[CarbonFluxTile],
+        def result: CarbonFluxSummary = acc
+
+        def visit(raster: Raster[CarbonFluxTile],
                     col: Int,
-                    row: Int,
-                    acc: CarbonFluxSummary
-                  ): CarbonFluxSummary = {
-        // This is a pixel by pixel operation
-        val lossYear: Integer = raster.tile.loss.getData(col, row)
-        val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
-        val biomass: Double = raster.tile.biomass.getData(col, row)
+                    row: Int): Unit = {
+          // This is a pixel by pixel operation
+          val lossYear: Integer = raster.tile.loss.getData(col, row)
+          val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
+          val biomass: Double = raster.tile.biomass.getData(col, row)
 
         val grossAnnualAbovegroundRemovalsCarbon: Float = raster.tile.grossAnnualAbovegroundRemovalsCarbon.getData(col, row)
         val grossAnnualBelowgroundRemovalsCarbon: Float = raster.tile.grossAnnualBelowgroundRemovalsCarbon.getData(col, row)
@@ -82,10 +82,10 @@ object CarbonFluxSummary {
         val burnYearHansenLoss: Integer = raster.tile.burnYearHansenLoss.getData(col, row)
         val grossEmissionsNodeCodes: String = raster.tile.grossEmissionsNodeCodes.getData(col, row)
 
-        val lat: Double = raster.rasterExtent.gridRowToMap(row)
-        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
+          val lat: Double = raster.rasterExtent.gridRowToMap(row)
+          val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
-        val areaHa = area / 10000.0
+          val areaHa = area / 10000.0
 
 //        val carbonfluxLossYear: Integer = if (lossYear != null && lossYear >= 2001 && lossYear <= 2015) lossYear else null
         val isLoss: Boolean = lossYear != null
@@ -198,9 +198,9 @@ object CarbonFluxSummary {
                   0, 0, 0, 0)
               )
 
-            summary.totalArea += areaHa
+              summary.totalArea += areaHa
 
-            if (tcd2000 >= thresholds.head) {
+              if (tcd2000 >= thresholds.head) {
 
               if (lossYear != null) {
                 summary.totalTreecoverLoss += areaHa
@@ -247,11 +247,12 @@ object CarbonFluxSummary {
           }
         }
 
-        val updatedSummary: Map[CarbonFluxDataGroup, CarbonFluxData] =
-          updateSummary(thresholds, acc.stats)
+          val updatedSummary: Map[CarbonFluxDataGroup, CarbonFluxData] =
+            updateSummary(thresholds, acc.stats)
 
-        CarbonFluxSummary(updatedSummary)
+          acc = CarbonFluxSummary(updatedSummary)
 
+        }
       }
-    }
+  }
 }
