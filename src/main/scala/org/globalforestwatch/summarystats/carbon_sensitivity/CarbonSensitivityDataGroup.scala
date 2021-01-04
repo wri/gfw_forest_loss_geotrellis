@@ -1,6 +1,10 @@
+
 package org.globalforestwatch.summarystats.carbon_sensitivity
 
-case class CarbonSensitivityDataGroup(lossYear: Integer,
+case class CarbonSensitivityDataGroup(
+                                      fluxModelExtent: Boolean,
+                                      removalForestType: String,
+                                      lossYear: Integer,
                                       threshold: Integer,
                                       isGain: Boolean,
                                       isLoss: Boolean,
@@ -10,9 +14,18 @@ case class CarbonSensitivityDataGroup(lossYear: Integer,
                                       landRights: Boolean,
                                       wdpa: String,
                                       intactForestLandscapes: String,
-                                      plantations: String,
+                                      plantationsTypeFluxModel: String,
                                       intactPrimaryForest: Boolean,
-                                      peatlandsFlux: Boolean,
+                                      peatlandsExtentFluxModel: Boolean,
                                       forestAgeCategory: String,
-                                      jplAGBextent: Boolean,
-                                      fiaRegionsUsExtent: String)
+                                      jplTropicsAbovegroundBiomassExtent2000: Boolean,
+                                      fiaRegionsUsExtent: String,
+                                      braBiomes: String,
+                                      riverBasins: String,
+                                      primaryForest: Boolean,
+                                      isLossLegalAmazon: Boolean,
+                                      prodesLegalAmazonExtent2000: Boolean,
+                                      tropicLatitudeExtent: Boolean,
+                                      isBurnLoss: Boolean,
+                                      grossEmissionsNodeCodes: String
+                                     )

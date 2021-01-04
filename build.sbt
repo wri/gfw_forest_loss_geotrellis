@@ -33,7 +33,7 @@ addCompilerPlugin(
   "org.scalamacros" %% "paradise" % "2.1.1" cross CrossVersion.full
 )
 resolvers ++= Seq(
-  "GeoSolutions" at "http://maven.geo-solutions.it/",
+  "GeoSolutions" at "https://maven.geo-solutions.it/",
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
   "LT-snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
   "OSGeo" at "https://repo.osgeo.org/repository/release/",
@@ -170,9 +170,9 @@ sparkAwsRegion := "us-east-1"
 sparkEmrApplications := Seq("Spark", "Zeppelin", "Ganglia")
 sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
 sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
-sparkSubnetId := Some("subnet-116d9a4a")
+sparkSubnetId := Some("subnet-8c2b5ea1")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 101
+sparkInstanceCount := 201   // 201 for carbonflux and carbon_sensitivity
 sparkMasterType := "r4.2xlarge"
 sparkCoreType := "r4.2xlarge"
 sparkMasterEbsSize := Some(10)
@@ -226,10 +226,10 @@ sparkEmrConfigs := List(
     "spark.executor.memory" -> "5652m", //37G
     "spark.executor.memoryOverhead" -> "2g", //5G
     "spark.driver.cores" -> "1",
-    "spark.driver.memory" -> "5652m",
-    "spark.executor.instances" -> "799", // 1339",
-    "spark.default.parallelism" -> "7990", // "26790",
-    "spark.sql.shuffle.partitions" -> "7990", //"26790",
+    "spark.driver.memory" -> "6652m",
+    "spark.executor.instances" -> "1599", // 1599 for carbonflux and carbon_sensitivity
+    "spark.default.parallelism" -> "15990", // 15990 for carbonflux and carbon_sensitivity
+    "spark.sql.shuffle.partitions" -> "15990", // 15990 for carbonflux and carbon_sensitivity
     "spark.driver.maxResultSize" -> "3g",
     "spark.shuffle.service.enabled" -> "true",
     "spark.shuffle.compress" -> "true",
