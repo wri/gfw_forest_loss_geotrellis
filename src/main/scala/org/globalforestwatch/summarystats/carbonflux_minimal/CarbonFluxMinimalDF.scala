@@ -30,18 +30,18 @@ object CarbonFluxMinimalDF {
           .getItem("biomassLoss") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
 
-    val GrossEmissionsCo2eCo2OnlyCols =
-      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        $"data.lossYear"
-          .getItem(i)
-          .getItem("grossEmissionsCo2eCo2Only") as s"gfw_gross_emissions_co2e_co2_only_${i}__Mg"
-      }).toList
-    val totalGrossEmissionsCo2eNonCo2Cols =
-      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        $"data.lossYear"
-          .getItem(i)
-          .getItem("grossEmissionsCo2eNonCo2") as s"gfw_gross_emissions_co2e_non_co2_${i}__Mg"
-      }).toList
+//    val GrossEmissionsCo2eCo2OnlyCols =
+//      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+//        $"data.lossYear"
+//          .getItem(i)
+//          .getItem("grossEmissionsCo2eCo2Only") as s"gfw_gross_emissions_co2e_co2_only_${i}__Mg"
+//      }).toList
+//    val totalGrossEmissionsCo2eNonCo2Cols =
+//      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+//        $"data.lossYear"
+//          .getItem(i)
+//          .getItem("grossEmissionsCo2eNonCo2") as s"gfw_gross_emissions_co2e_non_co2_${i}__Mg"
+//      }).toList
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
@@ -73,7 +73,8 @@ object CarbonFluxMinimalDF {
 
     df.select(
       cols ::: treecoverLossCols ::: abovegroundBiomassLossCols :::
-        GrossEmissionsCo2eCo2OnlyCols ::: totalGrossEmissionsCo2eNonCo2Cols ::: totalGrossEmissionsCo2eAllGasesCols: _*
+//        GrossEmissionsCo2eCo2OnlyCols ::: totalGrossEmissionsCo2eNonCo2Cols :::
+        totalGrossEmissionsCo2eAllGasesCols: _*
     )
 
   }
@@ -95,14 +96,14 @@ object CarbonFluxMinimalDF {
         sum(s"whrc_aboveground_biomass_loss_${i}__Mg") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
 
-    val GrossEmissionsCo2eCo2OnlyCols =
-      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"gfw_gross_emissions_co2e_co2_only_${i}__Mg") as s"gfw_gross_emissions_co2e_co2_only_${i}__Mg"
-      }).toList
-    val totalGrossEmissionsCo2eNonCo2Cols =
-      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"gfw_gross_emissions_co2e_non_co2_${i}__Mg") as s"gfw_gross_emissions_co2e_non_co2_${i}__Mg"
-      }).toList
+//    val GrossEmissionsCo2eCo2OnlyCols =
+//      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+//        sum(s"gfw_gross_emissions_co2e_co2_only_${i}__Mg") as s"gfw_gross_emissions_co2e_co2_only_${i}__Mg"
+//      }).toList
+//    val totalGrossEmissionsCo2eNonCo2Cols =
+//      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+//        sum(s"gfw_gross_emissions_co2e_non_co2_${i}__Mg") as s"gfw_gross_emissions_co2e_non_co2_${i}__Mg"
+//      }).toList
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         sum(s"gfw_gross_emissions_co2e_all_gases_${i}__Mg") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
@@ -151,7 +152,8 @@ object CarbonFluxMinimalDF {
       .agg(
         cols.head,
         cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols :::
-          GrossEmissionsCo2eCo2OnlyCols ::: totalGrossEmissionsCo2eNonCo2Cols ::: totalGrossEmissionsCo2eAllGasesCols: _*
+//          GrossEmissionsCo2eCo2OnlyCols ::: totalGrossEmissionsCo2eNonCo2Cols :::
+          totalGrossEmissionsCo2eAllGasesCols: _*
       )
 
   }

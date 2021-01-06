@@ -82,7 +82,6 @@ object CarbonFluxMinimalSummary {
 
         val grossEmissionsCo2eNonCo2Pixel = grossEmissionsCo2eNonCo2 * areaHa
         val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
-        val grossEmissionsCo2eAllGases = grossEmissionsCo2eNonCo2 + grossEmissionsCo2eCo2Only
         val grossEmissionsCo2eAllGasesPixel = grossEmissionsCo2eNonCo2Pixel + grossEmissionsCo2eCo2OnlyPixel
 
         val netFluxCo2Pixel = netFluxCo2 * areaHa

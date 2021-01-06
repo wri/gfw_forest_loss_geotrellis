@@ -10,8 +10,8 @@ import org.globalforestwatch.layers._
   */
 case class CarbonFluxMinimalTile(loss: TreeCoverLoss#ITile,
                                  gain: TreeCoverGain#ITile,
-//                                 tcd2000: TreeCoverDensity2000#ITile,
-                                 tcd2000: TreeCoverDensity#ITile,
+//                                 tcd2000: TreeCoverDensity2000#ITile,   // Same as treecoverloss package
+                                 tcd2000: TreeCoverDensity#ITile,   // Same as carbonflux and annualupdate_minimal packages
                                  tcd2010: TreeCoverDensity2010#ITile,
                                  biomass: BiomassPerHectar#OptionalDTile,
                                  primaryForest: PrimaryForest#OptionalITile,
