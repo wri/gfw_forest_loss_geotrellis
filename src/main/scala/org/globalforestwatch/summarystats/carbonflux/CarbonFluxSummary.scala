@@ -32,10 +32,10 @@ object CarbonFluxSummary {
         def visit(raster: Raster[CarbonFluxTile],
                     col: Int,
                     row: Int): Unit = {
-          // This is a pixel by pixel operation
-          val lossYear: Integer = raster.tile.loss.getData(col, row)
-          val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
-          val biomass: Double = raster.tile.biomass.getData(col, row)
+        // This is a pixel by pixel operation
+        val lossYear: Integer = raster.tile.loss.getData(col, row)
+        val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
+        val biomass: Double = raster.tile.biomass.getData(col, row)
 
         val grossAnnualAbovegroundRemovalsCarbon: Float = raster.tile.grossAnnualAbovegroundRemovalsCarbon.getData(col, row)
         val grossAnnualBelowgroundRemovalsCarbon: Float = raster.tile.grossAnnualBelowgroundRemovalsCarbon.getData(col, row)
@@ -82,12 +82,12 @@ object CarbonFluxSummary {
         val burnYearHansenLoss: Integer = raster.tile.burnYearHansenLoss.getData(col, row)
         val grossEmissionsNodeCodes: String = raster.tile.grossEmissionsNodeCodes.getData(col, row)
 
-          val lat: Double = raster.rasterExtent.gridRowToMap(row)
-          val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
+        val lat: Double = raster.rasterExtent.gridRowToMap(row)
+        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
-          val areaHa = area / 10000.0
+        val areaHa = area / 10000.0
 
-//        val carbonfluxLossYear: Integer = if (lossYear != null && lossYear >= 2001 && lossYear <= 2015) lossYear else null
+//      val carbonfluxLossYear: Integer = if (lossYear != null && lossYear >= 2001 && lossYear <= 2015) lossYear else null
         val isLoss: Boolean = lossYear != null
 
 //        val carbonfluxLossYearLegalAmazon: Integer = if (lossYearLegalAmazon != null
