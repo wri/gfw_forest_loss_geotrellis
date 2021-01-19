@@ -67,7 +67,7 @@ object CarbonFluxSummary {
         val plantationsTypeFluxModel: String = raster.tile.plantationsTypeFluxModel.getData(col, row)
         val ecozones: String = raster.tile.ecozones.getData(col, row)
         val intactForestLandscapes: String = raster.tile.intactForestLandscapes.getData(col, row)
-        val landRights: Boolean = raster.tile.landRights.getData(col, row)
+        val landmark: Boolean = raster.tile.landmark.getData(col, row)
         val intactPrimaryForest: Boolean = raster.tile.intactPrimaryForest.getData(col, row)
         val peatlandsExtentFluxModel: Boolean = raster.tile.peatlandsExtentFluxModel.getData(col, row)
         val forestAgeCategory: String = raster.tile.forestAgeCategory.getData(col, row)
@@ -166,7 +166,7 @@ object CarbonFluxSummary {
               mangroveBiomassExtent,
               drivers,
               ecozones,
-              landRights,
+              landmark,
               wdpa,
               intactForestLandscapes,
               plantationsTypeFluxModel,

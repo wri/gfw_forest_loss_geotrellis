@@ -100,7 +100,8 @@ object TreeLossSummary {
             summary.totalArea += areaHa
             summary.totalGainArea += gainArea
 
-            if ((tcd2000 >= thresholds.head && tcdYear == 2000) || (tcd2010 >= thresholds.head && tcdYear == 2010)) {
+//            if ((tcd2000 >= thresholds.head && tcdYear == 2000) || (tcd2010 >= thresholds.head && tcdYear == 2010)) {
+            if ((tcd2000 > thresholds.head && tcdYear == 2000) || (tcd2010 > thresholds.head && tcdYear == 2010)) {
 
               if (loss != null) {
                 summary.lossYear(loss).treecoverLoss += areaHa
