@@ -119,16 +119,16 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                     List.empty
 
                   case Right(raster) =>
-                    val summary: SUMMARY =
+                    val summary: Option[SUMMARY] =
                       try {
-                          runPolygonalSummary(
+                        runPolygonalSummary(
                           raster,
                           feature.geom,
                           rasterizeOptions,
                           kwargs
                         ) match {
-                          case polygonal.Summary(result: SUMMARY) => result
-                          case NoIntersection => throw new NotImplementedException("")
+                          case polygonal.Summary(result: SUMMARY) => Some(result)
+                          case NoIntersection => None
                         }
                       } catch {
                         case ise: java.lang.IllegalStateException => {
@@ -152,7 +152,11 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                         case e: Throwable => throw e
 
                       }
-                    List((id, summary))
+
+                    summary match {
+                      case Some(result) => List((id, result))
+                      case None => List.empty
+                    }
                 }
               }
           }
