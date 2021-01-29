@@ -3,65 +3,81 @@ package org.globalforestwatch.summarystats.carbonflux
 import cats.Semigroup
 
 /** Summary data per class
-  *
-  * Note: This case class contains mutable values
-  *
-  */
-case class CarbonFluxData(var treecoverLoss: Double,
-                          var biomassLoss: Double,
-                          var grossEmissionsCo2eCo2Only: Double,
-                          var grossEmissionsCo2eNoneCo2: Double,
-                          var grossEmissionsCo2e: Double,
-                          var agcEmisYear: Double,
-                          var bgcEmisYear: Double,
-                          var deadwoodCarbonEmisYear: Double,
-                          var litterCarbonEmisYear: Double,
-                          var soilCarbonEmisYear: Double,
-                          var carbonEmisYear: Double,
-                          var treecoverExtent2000: Double,
+ *
+ * Note: This case class contains mutable values
+ *
+ */
+case class CarbonFluxData(var totalTreecoverLoss: Double,
+                          var totalBiomassLoss: Double,
+                          var totalGrossEmissionsCo2eCo2Only: Double,
+                          var totalGrossEmissionsCo2eNonCo2: Double,
+                          var totalGrossEmissionsCo2e: Double,
+                          var totalAgcEmisYear: Double,
+                          var totalBgcEmisYear: Double,
+                          var totalDeadwoodCarbonEmisYear: Double,
+                          var totalLitterCarbonEmisYear: Double,
+                          var totalSoilCarbonEmisYear: Double,
+                          var totalCarbonEmisYear: Double,
+                          var totalTreecoverExtent2000: Double,
                           var totalArea: Double,
                           var totalBiomass: Double,
-                          var totalGrossAnnualRemovalsCarbon: Double,
-                          var totalGrossCumulRemovalsCarbon: Double,
+                          var totalGrossAnnualAbovegroundRemovalsCarbon: Double,
+                          var totalGrossAnnualBelowgroundRemovalsCarbon: Double,
+                          var totalGrossAnnualAboveBelowgroundRemovalsCarbon: Double,
+                          var totalGrossCumulAbovegroundRemovalsCo2: Double,
+                          var totalGrossCumulBelowgroundRemovalsCo2: Double,
+                          var totalGrossCumulAboveBelowgroundRemovalsCo2: Double,
                           var totalNetFluxCo2: Double,
                           var totalAgc2000: Double,
                           var totalBgc2000: Double,
                           var totalDeadwoodCarbon2000: Double,
                           var totalLitterCarbon2000: Double,
-                          var totalSoil2000: Double,
-                          var totalCarbon2000: Double
-                          //                          var totalGrossEmissionsCo2eCo2Only: Double,
-                          //                          var totalGrossEmissionsCo2eNoneCo2: Double,
-                          //                          var totalGrossEmissionsCo2e: Double
-) {
+                          var totalSoilCarbon2000: Double,
+                          var totalCarbon2000: Double,
+                          var totalJplTropicsAbovegroundBiomassDensity2000: Double,
+                          var totalTreecoverLossLegalAmazon: Double,
+                          var totalVarianceAnnualAbovegroundRemovalsCarbon: Double,
+                          var totalVarianceAnnualAbovegroundRemovalsCarbonCount: Double,
+                          var totalVarianceSoilCarbonEmisYear: Double,
+                          var totalVarianceSoilCarbonEmisYearCount: Double,
+                          var totalFluxModelExtentArea: Double
+                         ) {
   def merge(other: CarbonFluxData): CarbonFluxData = {
     CarbonFluxData(
-      treecoverLoss + other.treecoverLoss,
-      biomassLoss + other.biomassLoss,
-      grossEmissionsCo2eCo2Only + other.grossEmissionsCo2eCo2Only,
-      grossEmissionsCo2eNoneCo2 + other.grossEmissionsCo2eNoneCo2,
-      grossEmissionsCo2e + other.grossEmissionsCo2e,
-      agcEmisYear + other.agcEmisYear,
-      bgcEmisYear + other.bgcEmisYear,
-      deadwoodCarbonEmisYear + other.deadwoodCarbonEmisYear,
-      litterCarbonEmisYear + other.litterCarbonEmisYear,
-      soilCarbonEmisYear + other.soilCarbonEmisYear,
-      carbonEmisYear + other.carbonEmisYear,
-      treecoverExtent2000 + other.treecoverExtent2000,
+      totalTreecoverLoss + other.totalTreecoverLoss,
+      totalBiomassLoss + other.totalBiomassLoss,
+      totalGrossEmissionsCo2eCo2Only + other.totalGrossEmissionsCo2eCo2Only,
+      totalGrossEmissionsCo2eNonCo2 + other.totalGrossEmissionsCo2eNonCo2,
+      totalGrossEmissionsCo2e + other.totalGrossEmissionsCo2e,
+      totalAgcEmisYear + other.totalAgcEmisYear,
+      totalBgcEmisYear + other.totalBgcEmisYear,
+      totalDeadwoodCarbonEmisYear + other.totalDeadwoodCarbonEmisYear,
+      totalLitterCarbonEmisYear + other.totalLitterCarbonEmisYear,
+      totalSoilCarbonEmisYear + other.totalSoilCarbonEmisYear,
+      totalCarbonEmisYear + other.totalCarbonEmisYear,
+      totalTreecoverExtent2000 + other.totalTreecoverExtent2000,
       totalArea + other.totalArea,
       totalBiomass + other.totalBiomass,
-      totalGrossAnnualRemovalsCarbon + other.totalGrossAnnualRemovalsCarbon,
-      totalGrossCumulRemovalsCarbon + other.totalGrossCumulRemovalsCarbon,
+      totalGrossAnnualAbovegroundRemovalsCarbon + other.totalGrossAnnualAbovegroundRemovalsCarbon,
+      totalGrossAnnualBelowgroundRemovalsCarbon + other.totalGrossAnnualBelowgroundRemovalsCarbon,
+      totalGrossAnnualAboveBelowgroundRemovalsCarbon + other.totalGrossAnnualAboveBelowgroundRemovalsCarbon,
+      totalGrossCumulAbovegroundRemovalsCo2 + other.totalGrossCumulAbovegroundRemovalsCo2,
+      totalGrossCumulBelowgroundRemovalsCo2 + other.totalGrossCumulBelowgroundRemovalsCo2,
+      totalGrossCumulAboveBelowgroundRemovalsCo2 + other.totalGrossCumulAboveBelowgroundRemovalsCo2,
       totalNetFluxCo2 + other.totalNetFluxCo2,
       totalAgc2000 + other.totalAgc2000,
       totalBgc2000 + other.totalBgc2000,
       totalDeadwoodCarbon2000 + other.totalDeadwoodCarbon2000,
       totalLitterCarbon2000 + other.totalLitterCarbon2000,
-      totalSoil2000 + other.totalSoil2000,
-      totalCarbon2000 + other.totalCarbon2000
-      //      totalGrossEmissionsCo2eCo2Only + other.totalGrossEmissionsCo2eCo2Only,
-      //      totalGrossEmissionsCo2eNoneCo2 + other.totalGrossEmissionsCo2eNoneCo2,
-      //      totalGrossEmissionsCo2e + other.totalGrossEmissionsCo2e
+      totalSoilCarbon2000 + other.totalSoilCarbon2000,
+      totalCarbon2000 + other.totalCarbon2000,
+      totalJplTropicsAbovegroundBiomassDensity2000 + other.totalJplTropicsAbovegroundBiomassDensity2000,
+      totalTreecoverLossLegalAmazon + other.totalTreecoverLossLegalAmazon,
+      totalVarianceAnnualAbovegroundRemovalsCarbon + other.totalVarianceAnnualAbovegroundRemovalsCarbon,
+      totalVarianceAnnualAbovegroundRemovalsCarbonCount + other.totalVarianceAnnualAbovegroundRemovalsCarbonCount,
+      totalVarianceSoilCarbonEmisYear + other.totalVarianceSoilCarbonEmisYear,
+      totalVarianceSoilCarbonEmisYearCount + other.totalVarianceSoilCarbonEmisYearCount,
+      totalFluxModelExtentArea + other.totalFluxModelExtentArea
     )
   }
 }

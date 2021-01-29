@@ -5,8 +5,8 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{FeatureId, GadmFeatureId}
 
 case class CarbonSensitivityDFFactory(featureType: String,
-                               summaryRDD: RDD[(FeatureId, CarbonSensitivitySummary)],
-                               spark: SparkSession) {
+                                      summaryRDD: RDD[(FeatureId, CarbonSensitivitySummary)],
+                                      spark: SparkSession) {
 
   import spark.implicits._
 
