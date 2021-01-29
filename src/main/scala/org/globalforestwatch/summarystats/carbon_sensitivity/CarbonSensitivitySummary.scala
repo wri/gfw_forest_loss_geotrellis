@@ -90,7 +90,7 @@ object CarbonSensitivitySummary {
         val isLoss: Boolean = carbonfluxLossYear != null
 
         val carbonfluxLossYearLegalAmazon: Integer = if (lossYearLegalAmazon != null
-          && lossYearLegalAmazon >= 2001 && lossYearLegalAmazon <= 2015) lossYearLegalAmazon else null
+          && lossYearLegalAmazon >= 2001) lossYearLegalAmazon else null
         val isLossLegalAmazon: Boolean = carbonfluxLossYearLegalAmazon != null
 
         // Creates variable of whether the Hansen loss coincided with burning
