@@ -16,7 +16,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
   val treeCoverDensity2000 = TreeCoverDensity2000(gridTile)
   val primaryForest = PrimaryForest(gridTile)
   val peatlands = Peatlands(gridTile)
-  val intactForestLandscapes = IntactForestLandscapes(gridTile)
+  val intactForestLandscapes2016 = IntactForestLandscapes2016(gridTile)
   val protectedAreas = ProtectedAreas(gridTile)
   val seAsiaLandCover = SEAsiaLandCover(gridTile)
   val idnLandCover = IndonesiaLandCover(gridTile)
@@ -43,7 +43,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapesTile =
-        intactForestLandscapes.fetchWindow(windowKey, windowLayout)
+        intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val seAsiaLandCoverTile = seAsiaLandCover.fetchWindow(windowKey, windowLayout)
       val idnLandCoverTile = idnLandCover.fetchWindow(windowKey, windowLayout)
@@ -53,7 +53,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
         tcd2000Tile,
         primaryForestTile,
         peatlandsTile,
-        intactForestLandscapesTile,
+        intactForestLandscapesTile2016,
         wdpaTile,
         seAsiaLandCoverTile,
         idnLandCoverTile
