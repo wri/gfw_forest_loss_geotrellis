@@ -3,11 +3,11 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 import org.globalforestwatch.util.Implicits._
 import scala.collection.immutable.SortedMap
 
-case class ForestChangeDiagnosticTCLYearly(stats: SortedMap[Int, Double]) {
+case class ForestChangeDiagnosticLossYearly(stats: SortedMap[Int, Double]) {
   def merge(
-    other: ForestChangeDiagnosticTCLYearly
-  ): ForestChangeDiagnosticTCLYearly = {
-    ForestChangeDiagnosticTCLYearly(stats ++ other.stats.map {
+             other: ForestChangeDiagnosticLossYearly
+           ): ForestChangeDiagnosticLossYearly = {
+    ForestChangeDiagnosticLossYearly(stats ++ other.stats.map {
       case (key, otherValue) =>
         key ->
           (stats(key) + otherValue)
@@ -16,9 +16,9 @@ case class ForestChangeDiagnosticTCLYearly(stats: SortedMap[Int, Double]) {
   }
 }
 
-object ForestChangeDiagnosticTCLYearly {
-  def empty: ForestChangeDiagnosticTCLYearly =
-    ForestChangeDiagnosticTCLYearly(
+object ForestChangeDiagnosticLossYearly {
+  def empty: ForestChangeDiagnosticLossYearly =
+    ForestChangeDiagnosticLossYearly(
       SortedMap(
         2001 -> 0,
         2002 -> 0,
@@ -42,8 +42,8 @@ object ForestChangeDiagnosticTCLYearly {
       )
     )
 
-  def fill(lossYear: Int, areaHa: Double, include: Boolean = true): ForestChangeDiagnosticTCLYearly = {
-    ForestChangeDiagnosticTCLYearly(SortedMap(
+  def fill(lossYear: Int, areaHa: Double, include: Boolean = true): ForestChangeDiagnosticLossYearly = {
+    ForestChangeDiagnosticLossYearly(SortedMap(
       lossYear ->
         areaHa * include
     ))
