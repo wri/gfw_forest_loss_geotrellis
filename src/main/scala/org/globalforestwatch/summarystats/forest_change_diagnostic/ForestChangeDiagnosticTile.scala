@@ -18,7 +18,8 @@ case class ForestChangeDiagnosticTile(
                                        seAsiaLandCover: SEAsiaLandCover#OptionalITile,
                                        idnLandCover: IndonesiaLandCover#OptionalITile,
                                        isSoyPlantedArea: SoyPlantedAreas#OptionalITile,
-                                       idnForestArea: IndonesiaForestArea#OptionalITile
+                                       idnForestArea: IndonesiaForestArea#OptionalITile,
+                                       isIDNForestMoratorium: IndonesiaForestMoratorium#OptionalITile
 
 ) extends CellGrid[Int] {
 
