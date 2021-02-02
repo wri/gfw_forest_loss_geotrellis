@@ -1,6 +1,8 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-case class ForestChangeDiagnosticTCLYearly(stats: Map[Int, Double]) {
+import scala.collection.immutable.SortedMap
+
+case class ForestChangeDiagnosticTCLYearly(stats: SortedMap[Int, Double]) {
   def merge(
     other: ForestChangeDiagnosticTCLYearly
   ): ForestChangeDiagnosticTCLYearly = {
@@ -16,7 +18,7 @@ case class ForestChangeDiagnosticTCLYearly(stats: Map[Int, Double]) {
 object ForestChangeDiagnosticTCLYearly {
   def empty: ForestChangeDiagnosticTCLYearly =
     ForestChangeDiagnosticTCLYearly(
-      Map(
+      SortedMap(
         2001 -> 0,
         2002 -> 0,
         2003 -> 0,
