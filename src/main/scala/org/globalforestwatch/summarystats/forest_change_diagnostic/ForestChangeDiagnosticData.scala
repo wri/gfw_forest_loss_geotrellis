@@ -7,11 +7,12 @@ import cats.Semigroup
   * Note: This case class contains mutable values
   */
 case class ForestChangeDiagnosticData(
-  treeCoverLossTotalYearly: ForestChangeDiagnosticTCLYearly,
-  treeCoverLossPrimaryForestYearly: ForestChangeDiagnosticTCLYearly,
-  treeCoverLossPeatLandYearly: ForestChangeDiagnosticTCLYearly,
-  treeCoverLossIntactForestYearly: ForestChangeDiagnosticTCLYearly,
-  treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticTCLYearly
+                                       treeCoverLossTotalYearly: ForestChangeDiagnosticTCLYearly,
+                                       treeCoverLossPrimaryForestYearly: ForestChangeDiagnosticTCLYearly,
+                                       treeCoverLossPeatLandYearly: ForestChangeDiagnosticTCLYearly,
+                                       treeCoverLossIntactForestYearly: ForestChangeDiagnosticTCLYearly,
+                                       treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticTCLYearly,
+                                       treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticTCLClassYearly
 ) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
@@ -27,7 +28,8 @@ case class ForestChangeDiagnosticData(
       ),
       treeCoverLossProtectedAreasYearly.merge(
         other.treeCoverLossProtectedAreasYearly
-      )
+      ),
+      treeCoverLossSEAsiaLandCoverYearly.merge(other.treeCoverLossSEAsiaLandCoverYearly)
     )
   }
 }
@@ -39,7 +41,8 @@ object ForestChangeDiagnosticData {
     ForestChangeDiagnosticTCLYearly.empty,
     ForestChangeDiagnosticTCLYearly.empty,
     ForestChangeDiagnosticTCLYearly.empty,
-    ForestChangeDiagnosticTCLYearly.empty
+    ForestChangeDiagnosticTCLYearly.empty,
+    ForestChangeDiagnosticTCLClassYearly.empty
   )
 
   implicit val lossDataSemigroup: Semigroup[ForestChangeDiagnosticData] =

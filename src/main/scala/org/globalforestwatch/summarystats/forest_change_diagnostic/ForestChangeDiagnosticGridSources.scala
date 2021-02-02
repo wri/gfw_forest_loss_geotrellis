@@ -18,6 +18,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
   val peatlands = Peatlands(gridTile)
   val intactForestLandscapes = IntactForestLandscapes(gridTile)
   val protectedAreas = ProtectedAreas(gridTile)
+  val seAsiaLandCover = SEAsiaLandCover(gridTile)
 
   def readWindow(
     windowKey: SpatialKey,
@@ -43,6 +44,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
       val intactForestLandscapesTile =
         intactForestLandscapes.fetchWindow(windowKey, windowLayout)
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
+      val seAsiaLandCoverTile = seAsiaLandCover.fetchWindow(windowKey, windowLayout)
 
       val tile = ForestChangeDiagnosticTile(
         lossTile,
@@ -50,7 +52,8 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
         primaryForestTile,
         peatlandsTile,
         intactForestLandscapesTile,
-        wdpaTile
+        wdpaTile,
+        seAsiaLandCoverTile
       )
 
       Raster(tile, windowKey.extent(windowLayout))

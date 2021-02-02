@@ -12,3 +12,12 @@ case class ForestChangeDiagnosticTCLClassYearly(
     })
   }
 }
+
+
+object ForestChangeDiagnosticTCLClassYearly {
+  def empty: ForestChangeDiagnosticTCLClassYearly =
+    ForestChangeDiagnosticTCLClassYearly(
+      Map()
+    )
+
+}
