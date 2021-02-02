@@ -14,12 +14,13 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
   val treeCoverDensity2000 = TreeCoverDensity2000(gridTile)
-  val primaryForest = PrimaryForest(gridTile)
-  val peatlands = Peatlands(gridTile)
-  val intactForestLandscapes2016 = IntactForestLandscapes2016(gridTile)
+  val isPrimaryForest = PrimaryForest(gridTile)
+  val isPeatlands = Peatlands(gridTile)
+  val isIntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile)
   val protectedAreas = ProtectedAreas(gridTile)
   val seAsiaLandCover = SEAsiaLandCover(gridTile)
   val idnLandCover = IndonesiaLandCover(gridTile)
+  val isSoyPlantedArea = SoyPlantedAreas(gridTile)
 
   def readWindow(
     windowKey: SpatialKey,
@@ -40,23 +41,25 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
 
     } yield {
       // Failure for these will be converted to optional result and propagated with ForestChangeDiagnosticTile
-      val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
-      val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
-      val intactForestLandscapesTile =
-        intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
+      val isPrimaryForestTile = isPrimaryForest.fetchWindow(windowKey, windowLayout)
+      val isPeatlandsTile = isPeatlands.fetchWindow(windowKey, windowLayout)
+      val isIntactForestLandscapes2016Tile =
+        isIntactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val seAsiaLandCoverTile = seAsiaLandCover.fetchWindow(windowKey, windowLayout)
       val idnLandCoverTile = idnLandCover.fetchWindow(windowKey, windowLayout)
+      val isSoyPlantedAreasTile = isSoyPlantedArea.fetchWindow(windowKey, windowLayout)
 
       val tile = ForestChangeDiagnosticTile(
         lossTile,
         tcd2000Tile,
-        primaryForestTile,
-        peatlandsTile,
-        intactForestLandscapesTile2016,
+        isPrimaryForestTile,
+        isPeatlandsTile,
+        isIntactForestLandscapes2016Tile,
         wdpaTile,
         seAsiaLandCoverTile,
-        idnLandCoverTile
+        idnLandCoverTile,
+        isSoyPlantedAreasTile
       )
 
       Raster(tile, windowKey.extent(windowLayout))

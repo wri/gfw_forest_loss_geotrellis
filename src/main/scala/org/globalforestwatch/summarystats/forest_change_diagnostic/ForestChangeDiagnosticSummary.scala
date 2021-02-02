@@ -57,14 +57,16 @@ object ForestChangeDiagnosticSummary {
           // contextual layers
 
           val isPrimaryForest: Boolean =
-            raster.tile.primaryForest.getData(col, row)
-          val isPeatlands: Boolean = raster.tile.peatlands.getData(col, row)
-          val intactForestLandscapes2016: Boolean =
-            raster.tile.intactForestLandscapes2016.getData(col, row)
-          val wdpa: String = raster.tile.wdpa.getData(col, row)
+            raster.tile.isPrimaryForest.getData(col, row)
+          val isPeatlands: Boolean = raster.tile.isPeatlands.getData(col, row)
+          val isIntactForestLandscapes2016: Boolean =
+            raster.tile.isIntactForestLandscapes2016.getData(col, row)
+          val wdpa: String = raster.tile.wdpaProtectedAreas.getData(col, row)
           val seAsiaLandCover: String =
             raster.tile.seAsiaLandCover.getData(col, row)
           val idnLandCover: String = raster.tile.idnLandCover.getData(col, row)
+          val isSoyPlantedAreas: Boolean = raster.tile.isSoyPlantedArea.getData(col, row)
+
 
           // summary statistics
           val treeCoverLossTotalYearly = ForestChangeDiagnosticTCLYearly(
@@ -89,7 +91,7 @@ object ForestChangeDiagnosticSummary {
           val treeCoverLossIntactForestYearly = ForestChangeDiagnosticTCLYearly(
             Map(
               lossYear ->
-                areaHa * intactForestLandscapes2016
+                areaHa * isIntactForestLandscapes2016
             )
           )
 
@@ -129,6 +131,14 @@ object ForestChangeDiagnosticSummary {
                 )
             }
 
+          val treeCoverLossSoyPlantedAreasYearly = ForestChangeDiagnosticTCLYearly(
+            Map(
+              lossYear ->
+                areaHa * isSoyPlantedAreas
+            )
+          )
+
+          // Combine results
           val newStats = ForestChangeDiagnosticData(
             treeCoverLossTotalYearly,
             treeCoverLossPrimaryForestYearly,
@@ -136,7 +146,8 @@ object ForestChangeDiagnosticSummary {
             treeCoverLossIntactForestYearly,
             treeCoverLossProtectedAreasYearly,
             treeCoverLossSEAsiaLandCoverYearly,
-            treeCoverLossIDNLandCoverYearly
+            treeCoverLossIDNLandCoverYearly,
+            treeCoverLossSoyPlantedAreasYearly
           )
 
           acc = ForestChangeDiagnosticSummary(acc.stats.merge(newStats))

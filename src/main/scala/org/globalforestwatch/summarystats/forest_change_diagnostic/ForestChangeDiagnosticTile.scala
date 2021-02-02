@@ -11,12 +11,13 @@ import org.globalforestwatch.layers._
 case class ForestChangeDiagnosticTile(
                                        loss: TreeCoverLoss#ITile,
                                        tcd2000: TreeCoverDensity2000#ITile,
-                                       primaryForest: PrimaryForest#OptionalITile,
-                                       peatlands: Peatlands#OptionalITile,
-                                       intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
-                                       wdpa: ProtectedAreas#OptionalITile,
+                                       isPrimaryForest: PrimaryForest#OptionalITile,
+                                       isPeatlands: Peatlands#OptionalITile,
+                                       isIntactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
+                                       wdpaProtectedAreas: ProtectedAreas#OptionalITile,
                                        seAsiaLandCover: SEAsiaLandCover#OptionalITile,
-                                       idnLandCover: IndonesiaLandCover#OptionalITile
+                                       idnLandCover: IndonesiaLandCover#OptionalITile,
+                                       isSoyPlantedArea: SoyPlantedAreas#OptionalITile
 
 ) extends CellGrid[Int] {
 
