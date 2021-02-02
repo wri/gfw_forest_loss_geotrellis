@@ -1,5 +1,7 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
+import scala.collection.immutable.SortedMap
+
 case class ForestChangeDiagnosticTCLClassYearly(
   stats: Map[String, ForestChangeDiagnosticTCLYearly]
 ) {
@@ -19,5 +21,21 @@ object ForestChangeDiagnosticTCLClassYearly {
     ForestChangeDiagnosticTCLClassYearly(
       Map()
     )
+
+  def fill(className: String, lossYear: Int, areaHa: Double, noData: String): ForestChangeDiagnosticTCLClassYearly = {
+
+    className match {
+      case noData =>
+        ForestChangeDiagnosticTCLClassYearly.empty
+      case _ =>
+        ForestChangeDiagnosticTCLClassYearly(
+          Map(
+            className -> ForestChangeDiagnosticTCLYearly(
+              SortedMap(lossYear -> areaHa)
+            )
+          )
+        )
+    }
+  }
 
 }

@@ -14,7 +14,8 @@ case class ForestChangeDiagnosticData(
                                        treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticTCLYearly,
                                        treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticTCLClassYearly,
                                        treeCoverLossIDNLandCoverYearly: ForestChangeDiagnosticTCLClassYearly,
-                                       treeCoverLossSoyPlanedAreasYearly: ForestChangeDiagnosticTCLYearly
+                                       treeCoverLossSoyPlanedAreasYearly: ForestChangeDiagnosticTCLYearly,
+                                       treeCoverLossIDNForestAreaYearly: ForestChangeDiagnosticTCLClassYearly
 ) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
@@ -39,6 +40,9 @@ case class ForestChangeDiagnosticData(
       ),
       treeCoverLossSoyPlanedAreasYearly.merge(
         other.treeCoverLossSoyPlanedAreasYearly
+      ),
+      treeCoverLossIDNForestAreaYearly.merge(
+        other.treeCoverLossIDNForestAreaYearly
       )
     )
   }
@@ -55,6 +59,7 @@ object ForestChangeDiagnosticData {
     ForestChangeDiagnosticTCLClassYearly.empty,
     ForestChangeDiagnosticTCLClassYearly.empty,
     ForestChangeDiagnosticTCLYearly.empty,
+    ForestChangeDiagnosticTCLClassYearly.empty
   )
 
   implicit val lossDataSemigroup: Semigroup[ForestChangeDiagnosticData] =

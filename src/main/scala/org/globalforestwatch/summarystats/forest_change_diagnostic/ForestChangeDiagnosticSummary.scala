@@ -1,13 +1,10 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import cats.implicits._
-import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
+import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
-import org.globalforestwatch.util.Implicits._
-
-import scala.collection.immutable.SortedMap
 
 /** LossData Summary by year */
 case class ForestChangeDiagnosticSummary(
@@ -68,77 +65,30 @@ object ForestChangeDiagnosticSummary {
             raster.tile.seAsiaLandCover.getData(col, row)
           val idnLandCover: String = raster.tile.idnLandCover.getData(col, row)
           val isSoyPlantedAreas: Boolean = raster.tile.isSoyPlantedArea.getData(col, row)
-
+          val idnForestArea: String = raster.tile.idnForestArea.getData(col, row)
 
           // summary statistics
-          val treeCoverLossTotalYearly = ForestChangeDiagnosticTCLYearly(
-            SortedMap(lossYear -> areaHa)
-          )
+          val treeCoverLossTotalYearly = ForestChangeDiagnosticTCLYearly.fill(lossYear, areaHa)
 
-          val treeCoverLossPrimaryForestYearly =
-            ForestChangeDiagnosticTCLYearly(
-              SortedMap(
-                lossYear ->
-                  areaHa * isPrimaryForest
-              )
-            )
+          val treeCoverLossPrimaryForestYearly = ForestChangeDiagnosticTCLYearly.fill(lossYear, areaHa, isPrimaryForest)
 
-          val treeCoverLossPeatlandYearly = ForestChangeDiagnosticTCLYearly(
-            SortedMap(
-              lossYear ->
-                areaHa * isPeatlands
-            )
-          )
+          val treeCoverLossPeatlandYearly = ForestChangeDiagnosticTCLYearly.fill(lossYear, areaHa, isPeatlands)
 
-          val treeCoverLossIntactForestYearly = ForestChangeDiagnosticTCLYearly(
-            SortedMap(
-              lossYear ->
-                areaHa * isIntactForestLandscapes2016
-            )
-          )
+          val treeCoverLossIntactForestYearly = ForestChangeDiagnosticTCLYearly.fill(lossYear, areaHa, isIntactForestLandscapes2016)
 
-          val treeCoverLossProtectedAreasYearly =
-            ForestChangeDiagnosticTCLYearly(
-              SortedMap(
-                lossYear ->
-                  areaHa * (wdpa == "Category Ia/b or II")
-              )
-            )
+          val treeCoverLossProtectedAreasYearly = ForestChangeDiagnosticTCLYearly.fill(lossYear, areaHa, (wdpa == "Category Ia/b or II"))
 
           val treeCoverLossSEAsiaLandCoverYearly =
-            seAsiaLandCover match {
-              case "Unknown" =>
-                ForestChangeDiagnosticTCLClassYearly.empty
-              case _ =>
-                ForestChangeDiagnosticTCLClassYearly(
-                  Map(
-                    seAsiaLandCover -> ForestChangeDiagnosticTCLYearly(
-                      SortedMap(lossYear -> areaHa)
-                    )
-                  )
-                )
-            }
+            ForestChangeDiagnosticTCLClassYearly.fill(seAsiaLandCover, lossYear, areaHa, "Unknown")
+
 
           val treeCoverLossIDNLandCoverYearly =
-            idnLandCover match {
-              case "" =>
-                ForestChangeDiagnosticTCLClassYearly.empty
-              case _ =>
-                ForestChangeDiagnosticTCLClassYearly(
-                  Map(
-                    idnLandCover -> ForestChangeDiagnosticTCLYearly(
-                      SortedMap(lossYear -> areaHa)
-                    )
-                  )
-                )
-            }
+            ForestChangeDiagnosticTCLClassYearly.fill(idnLandCover, lossYear, areaHa, "")
 
-          val treeCoverLossSoyPlantedAreasYearly = ForestChangeDiagnosticTCLYearly(
-            SortedMap(
-              lossYear ->
-                areaHa * isSoyPlantedAreas
-            )
-          )
+
+          val treeCoverLossSoyPlantedAreasYearly = ForestChangeDiagnosticTCLYearly.fill(lossYear, areaHa, isSoyPlantedAreas)
+
+          val treeCoverLossIDNForestAreaYearly = ForestChangeDiagnosticTCLClassYearly.fill(idnForestArea, lossYear, areaHa, "")
 
           // Combine results
           val newStats = ForestChangeDiagnosticData(
@@ -149,7 +99,8 @@ object ForestChangeDiagnosticSummary {
             treeCoverLossProtectedAreasYearly,
             treeCoverLossSEAsiaLandCoverYearly,
             treeCoverLossIDNLandCoverYearly,
-            treeCoverLossSoyPlantedAreasYearly
+            treeCoverLossSoyPlantedAreasYearly,
+            treeCoverLossIDNForestAreaYearly
           )
 
           acc = ForestChangeDiagnosticSummary(acc.stats.merge(newStats))

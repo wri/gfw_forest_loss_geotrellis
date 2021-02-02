@@ -21,6 +21,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
   val seAsiaLandCover = SEAsiaLandCover(gridTile)
   val idnLandCover = IndonesiaLandCover(gridTile)
   val isSoyPlantedArea = SoyPlantedAreas(gridTile)
+  val idnForestArea = IndonesiaForestArea(gridTile)
 
   def readWindow(
     windowKey: SpatialKey,
@@ -49,6 +50,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
       val seAsiaLandCoverTile = seAsiaLandCover.fetchWindow(windowKey, windowLayout)
       val idnLandCoverTile = idnLandCover.fetchWindow(windowKey, windowLayout)
       val isSoyPlantedAreasTile = isSoyPlantedArea.fetchWindow(windowKey, windowLayout)
+      val idnForestAreaTile = idnForestArea.fetchWindow(windowKey, windowLayout)
 
       val tile = ForestChangeDiagnosticTile(
         lossTile,
@@ -59,7 +61,8 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
         wdpaTile,
         seAsiaLandCoverTile,
         idnLandCoverTile,
-        isSoyPlantedAreasTile
+        isSoyPlantedAreasTile,
+        idnForestAreaTile
       )
 
       Raster(tile, windowKey.extent(windowLayout))
