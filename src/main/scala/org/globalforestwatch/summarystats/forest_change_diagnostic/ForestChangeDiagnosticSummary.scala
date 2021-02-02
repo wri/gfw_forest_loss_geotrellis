@@ -69,27 +69,34 @@ object ForestChangeDiagnosticSummary {
         val braBiomes: String = raster.tile.braBiomes.getData(col, row)
 
         // compute Booleans
-        val isLossYear: Boolean = tcd2000 > 30 && lossYear > 0
+        val isTreeCoverExtent: Boolean = tcd2000 > 30
+        val isLossYear: Boolean = isTreeCoverExtent && lossYear > 0
         val isProtectedAreas: Boolean = wdpa == "Category Ia/b or II"
         val isProdesLoss: Boolean = prodesLossYear > 0
 
         // summary statistics
-        val treeCoverLossTotalYearly = ForestChangeDiagnosticLossYearly.fill(lossYear, areaHa, isLossYear)
-        val treeCoverLossPrimaryForestYearly = ForestChangeDiagnosticLossYearly.fill(lossYear, areaHa, isPrimaryForest && isLossYear)
-        val treeCoverLossPeatlandYearly = ForestChangeDiagnosticLossYearly.fill(lossYear, areaHa, isPeatlands && isLossYear)
-        val treeCoverLossIntactForestYearly = ForestChangeDiagnosticLossYearly.fill(lossYear, areaHa, isIntactForestLandscapes2016 && isLossYear)
-        val treeCoverLossProtectedAreasYearly = ForestChangeDiagnosticLossYearly.fill(lossYear, areaHa, isProtectedAreas && isLossYear)
+        val treeCoverLossTotalYearly = ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, isLossYear)
+        val treeCoverLossPrimaryForestYearly = ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, isPrimaryForest && isLossYear)
+        val treeCoverLossPeatlandYearly = ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, isPeatlands && isLossYear)
+        val treeCoverLossIntactForestYearly = ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, isIntactForestLandscapes2016 && isLossYear)
+        val treeCoverLossProtectedAreasYearly = ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, isProtectedAreas && isLossYear)
         val treeCoverLossSEAsiaLandCoverYearly =
-          ForestChangeDiagnosticLossYearlyCategory.fill(seAsiaLandCover, lossYear, areaHa, "Unknown", isLossYear)
+          ForestChangeDiagnosticDataLossYearlyCategory.fill(seAsiaLandCover, lossYear, areaHa, "Unknown", isLossYear)
         val treeCoverLossIDNLandCoverYearly =
-          ForestChangeDiagnosticLossYearlyCategory.fill(idnLandCover, lossYear, areaHa, "", isLossYear)
-        val treeCoverLossSoyPlantedAreasYearly = ForestChangeDiagnosticLossYearly.fill(lossYear, areaHa, isSoyPlantedAreas && isLossYear)
-        val treeCoverLossIDNForestAreaYearly = ForestChangeDiagnosticLossYearlyCategory.fill(idnForestArea, lossYear, areaHa, "", isLossYear)
-        val treeCoverLossIDNForestMoratoriumYearly = ForestChangeDiagnosticLossYearly.fill(lossYear, areaHa, isIDNForestMoratorium && isLossYear)
-        val prodesLossYearly = ForestChangeDiagnosticLossYearly.fill(prodesLossYear, areaHa, isProdesLoss)
-        val prodesLossProtectedAreasYearly = ForestChangeDiagnosticLossYearly.fill(prodesLossYear, areaHa, isProdesLoss && isProtectedAreas)
-        val prodesLossPrimaryForestYearly = ForestChangeDiagnosticLossYearly.fill(prodesLossYear, areaHa, isProdesLoss && isPrimaryForest)
-        val treeCoverLossBRABiomesYearly = ForestChangeDiagnosticLossYearlyCategory.fill(braBiomes, lossYear, areaHa, "Unknown", isLossYear)
+          ForestChangeDiagnosticDataLossYearlyCategory.fill(idnLandCover, lossYear, areaHa, "", isLossYear)
+        val treeCoverLossSoyPlantedAreasYearly = ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, isSoyPlantedAreas && isLossYear)
+        val treeCoverLossIDNForestAreaYearly = ForestChangeDiagnosticDataLossYearlyCategory.fill(idnForestArea, lossYear, areaHa, "", isLossYear)
+        val treeCoverLossIDNForestMoratoriumYearly = ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, isIDNForestMoratorium && isLossYear)
+        val prodesLossYearly = ForestChangeDiagnosticDataLossYearly.fill(prodesLossYear, areaHa, isProdesLoss)
+        val prodesLossProtectedAreasYearly = ForestChangeDiagnosticDataLossYearly.fill(prodesLossYear, areaHa, isProdesLoss && isProtectedAreas)
+        val prodesLossPrimaryForestYearly = ForestChangeDiagnosticDataLossYearly.fill(prodesLossYear, areaHa, isProdesLoss && isPrimaryForest)
+        val treeCoverLossBRABiomesYearly = ForestChangeDiagnosticDataLossYearlyCategory.fill(braBiomes, lossYear, areaHa, "Unknown", isLossYear)
+        val treeCoverExtent = ForestChangeDiagnosticDataDouble.fill(areaHa, isTreeCoverExtent)
+        val treeCoverExtentPrimaryForest = ForestChangeDiagnosticDataDouble.fill(areaHa, isTreeCoverExtent && isPrimaryForest)
+        val treeCoverExtentProtectedAreas = ForestChangeDiagnosticDataDouble.fill(areaHa, isTreeCoverExtent && isProtectedAreas)
+        val treeCoverExtentPeatlands = ForestChangeDiagnosticDataDouble.fill(areaHa, isTreeCoverExtent && isPeatlands)
+        val treeCoverExtentIntactForests = ForestChangeDiagnosticDataDouble.fill(areaHa, isTreeCoverExtent && isIntactForestLandscapes2016)
+
 
           // Combine results
           val newStats = ForestChangeDiagnosticData(
@@ -106,7 +113,12 @@ object ForestChangeDiagnosticSummary {
             prodesLossYearly,
             prodesLossProtectedAreasYearly,
             prodesLossPrimaryForestYearly,
-            treeCoverLossBRABiomesYearly
+            treeCoverLossBRABiomesYearly,
+            treeCoverExtent,
+            treeCoverExtentPrimaryForest,
+            treeCoverExtentProtectedAreas,
+            treeCoverExtentPeatlands,
+            treeCoverExtentIntactForests
           )
 
           acc = ForestChangeDiagnosticSummary(acc.stats.merge(newStats))

@@ -7,27 +7,31 @@ import cats.Semigroup
   * Note: This case class contains mutable values
   */
 case class ForestChangeDiagnosticData(
-                                       treeCoverLossTotalYearly: ForestChangeDiagnosticLossYearly,
-                                       treeCoverLossPrimaryForestYearly: ForestChangeDiagnosticLossYearly,
-                                       treeCoverLossPeatLandYearly: ForestChangeDiagnosticLossYearly,
-                                       treeCoverLossIntactForestYearly: ForestChangeDiagnosticLossYearly,
-                                       treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticLossYearly,
-                                       treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticLossYearlyCategory,
-                                       treeCoverLossIDNLandCoverYearly: ForestChangeDiagnosticLossYearlyCategory,
-                                       treeCoverLossSoyPlanedAreasYearly: ForestChangeDiagnosticLossYearly,
-                                       treeCoverLossIDNForestAreaYearly: ForestChangeDiagnosticLossYearlyCategory,
-                                       treeCoverLossIDNForestMoratoriumYearly: ForestChangeDiagnosticLossYearly,
-                                       prodesLossYearly: ForestChangeDiagnosticLossYearly,
-                                       prodesLossProtectedAreasYearly: ForestChangeDiagnosticLossYearly,
-                                       prodesLossProdesPrimaryForestYearly: ForestChangeDiagnosticLossYearly,
-                                       treeCoverLossBRABiomesYearly: ForestChangeDiagnosticLossYearlyCategory
-
+                                       treeCoverLossYearly: ForestChangeDiagnosticDataLossYearly,
+                                       treeCoverLossPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly,
+                                       treeCoverLossPeatLandYearly: ForestChangeDiagnosticDataLossYearly,
+                                       treeCoverLossIntactForestYearly: ForestChangeDiagnosticDataLossYearly,
+                                       treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly,
+                                       treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory,
+                                       treeCoverLossIDNLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory,
+                                       treeCoverLossSoyPlanedAreasYearly: ForestChangeDiagnosticDataLossYearly,
+                                       treeCoverLossIDNForestAreaYearly: ForestChangeDiagnosticDataLossYearlyCategory,
+                                       treeCoverLossIDNForestMoratoriumYearly: ForestChangeDiagnosticDataLossYearly,
+                                       prodesLossYearly: ForestChangeDiagnosticDataLossYearly,
+                                       prodesLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly,
+                                       prodesLossProdesPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly,
+                                       treeCoverLossBRABiomesYearly: ForestChangeDiagnosticDataLossYearlyCategory,
+                                       treeCoverExtent: ForestChangeDiagnosticDataDouble,
+                                       treeCoverExtentPrimaryForest: ForestChangeDiagnosticDataDouble,
+                                       treeCoverExtentProtectedAreas: ForestChangeDiagnosticDataDouble,
+                                       treeCoverExtentPeatlands: ForestChangeDiagnosticDataDouble,
+                                       treeCoverExtentIntactForests: ForestChangeDiagnosticDataDouble,
 ) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
 
     ForestChangeDiagnosticData(
-      treeCoverLossTotalYearly.merge(other.treeCoverLossTotalYearly),
+      treeCoverLossYearly.merge(other.treeCoverLossYearly),
       treeCoverLossPrimaryForestYearly.merge(
         other.treeCoverLossPrimaryForestYearly
       ),
@@ -54,30 +58,46 @@ case class ForestChangeDiagnosticData(
         other.treeCoverLossIDNForestMoratoriumYearly
       ),
       prodesLossYearly.merge(other.prodesLossYearly),
-      prodesLossProtectedAreasYearly.merge(other.prodesLossProtectedAreasYearly),
-      prodesLossProdesPrimaryForestYearly.merge(other.prodesLossProdesPrimaryForestYearly),
-      treeCoverLossBRABiomesYearly.merge(other.treeCoverLossBRABiomesYearly)
+      prodesLossProtectedAreasYearly.merge(
+        other.prodesLossProtectedAreasYearly
+      ),
+      prodesLossProdesPrimaryForestYearly.merge(
+        other.prodesLossProdesPrimaryForestYearly
+      ),
+      treeCoverLossBRABiomesYearly.merge(other.treeCoverLossBRABiomesYearly),
+      treeCoverExtent.merge(other.treeCoverExtent),
+      treeCoverExtentPrimaryForest.merge(other.treeCoverExtentPrimaryForest),
+      treeCoverExtentProtectedAreas.merge(other.treeCoverExtentProtectedAreas),
+      treeCoverExtentPeatlands.merge(other.treeCoverExtentPeatlands),
+      treeCoverExtentIntactForests.merge(other.treeCoverExtentIntactForests)
     )
   }
 }
 
 object ForestChangeDiagnosticData {
 
-  def empty: ForestChangeDiagnosticData = ForestChangeDiagnosticData(
-    ForestChangeDiagnosticLossYearly.empty,
-    ForestChangeDiagnosticLossYearly.empty,
-    ForestChangeDiagnosticLossYearly.empty,
-    ForestChangeDiagnosticLossYearly.empty,
-    ForestChangeDiagnosticLossYearly.empty,
-    ForestChangeDiagnosticLossYearlyCategory.empty,
-    ForestChangeDiagnosticLossYearlyCategory.empty,
-    ForestChangeDiagnosticLossYearly.empty,
-    ForestChangeDiagnosticLossYearlyCategory.empty,
-    ForestChangeDiagnosticLossYearly.empty,
-    ForestChangeDiagnosticLossYearly.empty,
-    ForestChangeDiagnosticLossYearly.empty,
-    ForestChangeDiagnosticLossYearly.empty,
-    ForestChangeDiagnosticLossYearlyCategory.empty)
+  def empty: ForestChangeDiagnosticData =
+    ForestChangeDiagnosticData(
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearlyCategory.empty,
+      ForestChangeDiagnosticDataLossYearlyCategory.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearlyCategory.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearlyCategory.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty
+    )
 
   implicit val lossDataSemigroup: Semigroup[ForestChangeDiagnosticData] =
     new Semigroup[ForestChangeDiagnosticData] {
