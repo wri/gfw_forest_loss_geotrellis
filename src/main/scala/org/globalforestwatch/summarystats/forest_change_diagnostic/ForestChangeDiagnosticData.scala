@@ -12,7 +12,8 @@ case class ForestChangeDiagnosticData(
                                        treeCoverLossPeatLandYearly: ForestChangeDiagnosticTCLYearly,
                                        treeCoverLossIntactForestYearly: ForestChangeDiagnosticTCLYearly,
                                        treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticTCLYearly,
-                                       treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticTCLClassYearly
+                                       treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticTCLClassYearly,
+                                       treeCoverLossIDNLandCoverYearly: ForestChangeDiagnosticTCLClassYearly
 ) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
@@ -29,7 +30,8 @@ case class ForestChangeDiagnosticData(
       treeCoverLossProtectedAreasYearly.merge(
         other.treeCoverLossProtectedAreasYearly
       ),
-      treeCoverLossSEAsiaLandCoverYearly.merge(other.treeCoverLossSEAsiaLandCoverYearly)
+      treeCoverLossSEAsiaLandCoverYearly.merge(other.treeCoverLossSEAsiaLandCoverYearly),
+      treeCoverLossIDNLandCoverYearly.merge(other.treeCoverLossIDNLandCoverYearly)
     )
   }
 }
@@ -42,6 +44,7 @@ object ForestChangeDiagnosticData {
     ForestChangeDiagnosticTCLYearly.empty,
     ForestChangeDiagnosticTCLYearly.empty,
     ForestChangeDiagnosticTCLYearly.empty,
+    ForestChangeDiagnosticTCLClassYearly.empty,
     ForestChangeDiagnosticTCLClassYearly.empty
   )
 

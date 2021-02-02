@@ -64,6 +64,7 @@ object ForestChangeDiagnosticSummary {
           val wdpa: String = raster.tile.wdpa.getData(col, row)
           val seAsiaLandCover: String =
             raster.tile.seAsiaLandCover.getData(col, row)
+          val idnLandCover: String = raster.tile.idnLandCover.getData(col, row)
 
           // summary statistics
           val treeCoverLossTotalYearly = ForestChangeDiagnosticTCLYearly(
@@ -114,13 +115,28 @@ object ForestChangeDiagnosticSummary {
                 )
             }
 
+          val treeCoverLossIDNLandCoverYearly =
+            idnLandCover match {
+              case "" =>
+                ForestChangeDiagnosticTCLClassYearly.empty
+              case _ =>
+                ForestChangeDiagnosticTCLClassYearly(
+                  Map(
+                    idnLandCover -> ForestChangeDiagnosticTCLYearly(
+                      Map(lossYear -> areaHa)
+                    )
+                  )
+                )
+            }
+
           val newStats = ForestChangeDiagnosticData(
             treeCoverLossTotalYearly,
             treeCoverLossPrimaryForestYearly,
             treeCoverLossPeatlandYearly,
             treeCoverLossIntactForestYearly,
             treeCoverLossProtectedAreasYearly,
-            treeCoverLossSEAsiaLandCoverYearly
+            treeCoverLossSEAsiaLandCoverYearly,
+            treeCoverLossIDNLandCoverYearly
           )
 
           acc = ForestChangeDiagnosticSummary(acc.stats.merge(newStats))
