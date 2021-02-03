@@ -1,11 +1,16 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 import org.globalforestwatch.util.Implicits._
+import io.circe.syntax._
 
-case class ForestChangeDiagnosticDataDouble(value: Double) extends ValueParser {
+case class ForestChangeDiagnosticDataDouble(value: Double) extends ValueParser[ForestChangeDiagnosticDataDouble] {
   def merge(
     other: ForestChangeDiagnosticDataDouble
   ): ForestChangeDiagnosticDataDouble = {
     ForestChangeDiagnosticDataDouble(value + other.value)
+  }
+
+  def toJson: String = {
+    this.value.asJson.noSpaces
   }
 }
 

@@ -1,9 +1,11 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
+
+import io.circe.syntax._
 import org.globalforestwatch.util.Implicits._
 
 case class ForestChangeDiagnosticDataDoubleCategory(
   value: Map[String, ForestChangeDiagnosticDataDouble]
-                                                   ) extends ValueParser {
+                                                   ) extends ValueParser[ForestChangeDiagnosticDataDoubleCategory] {
   def merge(
     other: ForestChangeDiagnosticDataDoubleCategory
   ): ForestChangeDiagnosticDataDoubleCategory = {
@@ -14,6 +16,13 @@ case class ForestChangeDiagnosticDataDoubleCategory(
           .getOrElse(key, ForestChangeDiagnosticDataDouble.empty)
           .merge(otherValue)
     })
+  }
+
+  def toJson: String = {
+    this.value.map {
+      case (key, value) =>
+        key -> value.value
+    }.asJson.noSpaces
   }
 }
 

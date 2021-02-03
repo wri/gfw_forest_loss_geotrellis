@@ -1,6 +1,9 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-trait ValueParser {
+trait ValueParser[Self <: ValueParser[Self]] {
   val value: Any
-  override def toString() = value.toString
+
+  def merge(other: Self): Self
+
+  def toJson: String
 }

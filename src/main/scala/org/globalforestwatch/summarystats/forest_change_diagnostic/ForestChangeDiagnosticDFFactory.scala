@@ -1,5 +1,6 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
+import io.circe.syntax._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{FeatureId, SimpleFeatureId}
@@ -26,36 +27,36 @@ case class ForestChangeDiagnosticDFFactory(
         case (id, summary) =>
           id match {
             case simpleId: SimpleFeatureId =>
-              ForestChangeDiagnosticRowSimple(simpleId.toString,
-                summary.stats.treeCoverLossYearly.toString,
-                summary.stats.treeCoverLossPrimaryForestYearly.toString,
-                summary.stats.treeCoverLossPeatLandYearly.toString,
-                summary.stats.treeCoverLossIntactForestYearly.toString,
-                summary.stats.treeCoverLossProtectedAreasYearly.toString,
-                summary.stats.treeCoverLossSEAsiaLandCoverYearly.toString,
-                summary.stats.treeCoverLossIDNLandCoverYearly.toString,
-                summary.stats.treeCoverLossSoyPlanedAreasYearly.toString,
-                summary.stats.treeCoverLossIDNForestAreaYearly.toString,
-                summary.stats.treeCoverLossIDNForestMoratoriumYearly.toString,
-                summary.stats.prodesLossYearly.toString,
-                summary.stats.prodesLossProtectedAreasYearly.toString,
-                summary.stats.prodesLossProdesPrimaryForestYearly.toString,
-                summary.stats.treeCoverLossBRABiomesYearly.toString,
-                summary.stats.treeCoverExtent.toString,
-                summary.stats.treeCoverExtentPrimaryForest.toString,
-                summary.stats.treeCoverExtentProtectedAreas.toString,
-                summary.stats.treeCoverExtentPeatlands.toString,
-                summary.stats.treeCoverExtentIntactForests.toString,
-                summary.stats.primaryForestArea.toString,
-                summary.stats.intactForest2016Area.toString,
-                summary.stats.totalArea.toString,
-                summary.stats.protectedAreasArea.toString,
-                summary.stats.peatlandsArea.toString,
-                summary.stats.braBiomesArea.toString,
-                summary.stats.idnForestAreaArea.toString,
-                summary.stats.seAsiaLandCoverArea.toString,
-                summary.stats.idnLandCoverArea.toString,
-                summary.stats.idnForestMoratoriumArea.toString
+              ForestChangeDiagnosticRowSimple(simpleId.featureId.asJson.noSpaces,
+                summary.stats.treeCoverLossYearly.toJson,
+                summary.stats.treeCoverLossPrimaryForestYearly.toJson,
+                summary.stats.treeCoverLossPeatLandYearly.toJson,
+                summary.stats.treeCoverLossIntactForestYearly.toJson,
+                summary.stats.treeCoverLossProtectedAreasYearly.toJson,
+                summary.stats.treeCoverLossSEAsiaLandCoverYearly.toJson,
+                summary.stats.treeCoverLossIDNLandCoverYearly.toJson,
+                summary.stats.treeCoverLossSoyPlanedAreasYearly.toJson,
+                summary.stats.treeCoverLossIDNForestAreaYearly.toJson,
+                summary.stats.treeCoverLossIDNForestMoratoriumYearly.toJson,
+                summary.stats.prodesLossYearly.toJson,
+                summary.stats.prodesLossProtectedAreasYearly.toJson,
+                summary.stats.prodesLossProdesPrimaryForestYearly.toJson,
+                summary.stats.treeCoverLossBRABiomesYearly.toJson,
+                summary.stats.treeCoverExtent.toJson,
+                summary.stats.treeCoverExtentPrimaryForest.toJson,
+                summary.stats.treeCoverExtentProtectedAreas.toJson,
+                summary.stats.treeCoverExtentPeatlands.toJson,
+                summary.stats.treeCoverExtentIntactForests.toJson,
+                summary.stats.primaryForestArea.toJson,
+                summary.stats.intactForest2016Area.toJson,
+                summary.stats.totalArea.toJson,
+                summary.stats.protectedAreasArea.toJson,
+                summary.stats.peatlandsArea.toJson,
+                summary.stats.braBiomesArea.toJson,
+                summary.stats.idnForestAreaArea.toJson,
+                summary.stats.seAsiaLandCoverArea.toJson,
+                summary.stats.idnLandCoverArea.toJson,
+                summary.stats.idnForestMoratoriumArea.toJson
 
               )
             case _ =>

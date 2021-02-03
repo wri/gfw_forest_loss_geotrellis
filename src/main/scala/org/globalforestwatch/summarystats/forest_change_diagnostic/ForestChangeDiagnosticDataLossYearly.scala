@@ -2,8 +2,9 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import org.globalforestwatch.util.Implicits._
 import scala.collection.immutable.SortedMap
+import io.circe.syntax._
 
-case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double]) extends ValueParser {
+case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double]) extends ValueParser[ForestChangeDiagnosticDataLossYearly] {
   def merge(
              other: ForestChangeDiagnosticDataLossYearly
            ): ForestChangeDiagnosticDataLossYearly = {
@@ -13,6 +14,10 @@ case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double]) e
         key ->
           (value.getOrElse(key, 0.0) + otherValue)
     })
+  }
+
+  def toJson: String = {
+    this.value.asJson.noSpaces
   }
 }
 
