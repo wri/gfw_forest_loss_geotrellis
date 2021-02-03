@@ -19,10 +19,13 @@ case class ForestChangeDiagnosticDataDoubleCategory(
   }
 
   def toJson: String = {
-    this.value.map {
-      case (key, value) =>
-        key -> value.value
-    }.asJson.noSpaces
+    this.value
+      .map {
+        case (key, value) =>
+          key -> value.value
+      }
+      .asJson
+      .noSpaces
   }
 }
 
@@ -31,20 +34,17 @@ object ForestChangeDiagnosticDataDoubleCategory {
     ForestChangeDiagnosticDataDoubleCategory(Map())
 
   def fill(
-    className: String,
-    areaHa: Double,
-    noData: String,
-    include: Boolean = true
+            className: String,
+            areaHa: Double,
+            noData: List[String] = List("", "Unknown", "Not applicable"),
+            include: Boolean = true
   ): ForestChangeDiagnosticDataDoubleCategory = {
-
-    className match {
-      case `noData` =>
-        ForestChangeDiagnosticDataDoubleCategory.empty
-      case _ =>
-        ForestChangeDiagnosticDataDoubleCategory(
-          Map(className -> ForestChangeDiagnosticDataDouble(areaHa * include))
-        )
-    }
+    if (noData.contains(className))
+      ForestChangeDiagnosticDataDoubleCategory.empty
+    else
+      ForestChangeDiagnosticDataDoubleCategory(
+        Map(className -> ForestChangeDiagnosticDataDouble(areaHa * include))
+      )
   }
 
 }

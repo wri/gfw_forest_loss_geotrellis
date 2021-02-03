@@ -20,10 +20,13 @@ case class ForestChangeDiagnosticDataLossYearlyCategory(
   }
 
   def toJson: String = {
-    this.value.map {
-      case (key, value) =>
-        key -> value.value
-    }.asJson.noSpaces
+    this.value
+      .map {
+        case (key, value) =>
+          key -> value.value
+      }
+      .asJson
+      .noSpaces
   }
 }
 
@@ -35,22 +38,20 @@ object ForestChangeDiagnosticDataLossYearlyCategory {
             className: String,
             lossYear: Int,
             areaHa: Double,
-            noData: String,
+            noData: List[String] = List("", "Unknown", "Not applicable"),
             include: Boolean = true
           ): ForestChangeDiagnosticDataLossYearlyCategory = {
 
-    className match {
-      case `noData` =>
-        ForestChangeDiagnosticDataLossYearlyCategory.empty
-      case _ =>
-        ForestChangeDiagnosticDataLossYearlyCategory(
-          Map(
-            className -> ForestChangeDiagnosticDataLossYearly(
-              SortedMap(lossYear -> areaHa * include)
-            )
+    if (noData.contains(className))
+      ForestChangeDiagnosticDataLossYearlyCategory.empty
+    else
+      ForestChangeDiagnosticDataLossYearlyCategory(
+        Map(
+          className -> ForestChangeDiagnosticDataLossYearly(
+            SortedMap(lossYear -> areaHa * include)
           )
         )
-    }
+      )
   }
 
 }
