@@ -3,7 +3,7 @@ import org.globalforestwatch.util.Implicits._
 
 case class ForestChangeDiagnosticDataDoubleCategory(
   value: Map[String, ForestChangeDiagnosticDataDouble]
-) {
+                                                   ) extends ValueParser {
   def merge(
     other: ForestChangeDiagnosticDataDoubleCategory
   ): ForestChangeDiagnosticDataDoubleCategory = {

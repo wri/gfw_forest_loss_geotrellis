@@ -5,7 +5,7 @@ import scala.collection.immutable.SortedMap
 
 case class ForestChangeDiagnosticDataLossYearlyCategory(
                                                          value: Map[String, ForestChangeDiagnosticDataLossYearly]
-) {
+                                                       ) extends ValueParser {
   def merge(
              other: ForestChangeDiagnosticDataLossYearlyCategory
            ): ForestChangeDiagnosticDataLossYearlyCategory = {

@@ -68,7 +68,7 @@ libraryDependencies ++= Seq(
   "com.nativelibs4java" % "bridj" % "0.6.1",
   "org.scalanlp" %% "breeze" % "0.13.2",
   "org.scalanlp" %% "breeze-natives" % "0.13.2",
-  "org.scalanlp" %% "breeze-viz" % "0.13.2"
+  "org.scalanlp" %% "breeze-viz" % "0.13.2",
 )
 
 libraryDependencies += "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"

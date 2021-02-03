@@ -1,6 +1,32 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-import org.globalforestwatch.features.SimpleFeatureId
-
-case class ForestChangeDiagnosticRowSimple(id: SimpleFeatureId,
-                                           data: ForestChangeDiagnosticData)
+case class ForestChangeDiagnosticRowSimple(id: String,
+                                           treeCoverLossYearly: String,
+                                           treeCoverLossPrimaryForestYearly: String,
+                                           treeCoverLossPeatLandYearly: String,
+                                           treeCoverLossIntactForestYearly: String,
+                                           treeCoverLossProtectedAreasYearly: String,
+                                           treeCoverLossSEAsiaLandCoverYearly: String,
+                                           treeCoverLossIDNLandCoverYearly: String,
+                                           treeCoverLossSoyPlanedAreasYearly: String,
+                                           treeCoverLossIDNForestAreaYearly: String,
+                                           treeCoverLossIDNForestMoratoriumYearly: String,
+                                           prodesLossYearly: String,
+                                           prodesLossProtectedAreasYearly: String,
+                                           prodesLossProdesPrimaryForestYearly: String,
+                                           treeCoverLossBRABiomesYearly: String,
+                                           treeCoverExtent: String,
+                                           treeCoverExtentPrimaryForest: String,
+                                           treeCoverExtentProtectedAreas: String,
+                                           treeCoverExtentPeatlands: String,
+                                           treeCoverExtentIntactForests: String,
+                                           primaryForestArea: String,
+                                           intactForest2016Area: String,
+                                           totalArea: String,
+                                           protectedAreasArea: String,
+                                           peatlandsArea: String,
+                                           braBiomesArea: String,
+                                           idnForestAreaArea: String,
+                                           seAsiaLandCoverArea: String,
+                                           idnLandCoverArea: String,
+                                           idnForestMoratoriumArea: String)

@@ -3,7 +3,7 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 import org.globalforestwatch.util.Implicits._
 import scala.collection.immutable.SortedMap
 
-case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double]) {
+case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double]) extends ValueParser {
   def merge(
              other: ForestChangeDiagnosticDataLossYearly
            ): ForestChangeDiagnosticDataLossYearly = {
