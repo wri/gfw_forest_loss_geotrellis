@@ -96,8 +96,16 @@ object ForestChangeDiagnosticSummary {
         val treeCoverExtentProtectedAreas = ForestChangeDiagnosticDataDouble.fill(areaHa, isTreeCoverExtent && isProtectedAreas)
         val treeCoverExtentPeatlands = ForestChangeDiagnosticDataDouble.fill(areaHa, isTreeCoverExtent && isPeatlands)
         val treeCoverExtentIntactForests = ForestChangeDiagnosticDataDouble.fill(areaHa, isTreeCoverExtent && isIntactForestLandscapes2016)
-
-
+        val primaryForestArea = ForestChangeDiagnosticDataDouble.fill(areaHa, isPrimaryForest)
+        val intactForest2016Area = ForestChangeDiagnosticDataDouble.fill(areaHa, isIntactForestLandscapes2016)
+        val totalArea = ForestChangeDiagnosticDataDouble.fill(areaHa)
+        val protectedAreasArea = ForestChangeDiagnosticDataDouble.fill(areaHa, isProtectedAreas)
+        val peatlandsArea = ForestChangeDiagnosticDataDouble.fill(areaHa, isPeatlands)
+        val braBiomesArea = ForestChangeDiagnosticDataDoubleCategory.fill(braBiomes, areaHa, "Unknown")
+        val idnForestAreaArea = ForestChangeDiagnosticDataDoubleCategory.fill(idnForestArea, areaHa, "")
+        val seAsiaLandCoverArea = ForestChangeDiagnosticDataDoubleCategory.fill(seAsiaLandCover, areaHa, "Unknown")
+        val idnLandCoverArea = ForestChangeDiagnosticDataDoubleCategory.fill(idnLandCover, areaHa, "")
+        val idnForestMoratoriumArea = ForestChangeDiagnosticDataDouble.fill(areaHa, isIDNForestMoratorium)
           // Combine results
           val newStats = ForestChangeDiagnosticData(
             treeCoverLossTotalYearly,
@@ -118,7 +126,17 @@ object ForestChangeDiagnosticSummary {
             treeCoverExtentPrimaryForest,
             treeCoverExtentProtectedAreas,
             treeCoverExtentPeatlands,
-            treeCoverExtentIntactForests
+            treeCoverExtentIntactForests,
+            primaryForestArea,
+            intactForest2016Area,
+            totalArea,
+            protectedAreasArea,
+            peatlandsArea,
+            braBiomesArea,
+            idnForestAreaArea,
+            seAsiaLandCoverArea,
+            idnLandCoverArea,
+            idnForestMoratoriumArea
           )
 
           acc = ForestChangeDiagnosticSummary(acc.stats.merge(newStats))

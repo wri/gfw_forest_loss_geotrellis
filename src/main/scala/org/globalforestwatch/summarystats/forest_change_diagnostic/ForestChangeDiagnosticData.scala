@@ -26,6 +26,16 @@ case class ForestChangeDiagnosticData(
                                        treeCoverExtentProtectedAreas: ForestChangeDiagnosticDataDouble,
                                        treeCoverExtentPeatlands: ForestChangeDiagnosticDataDouble,
                                        treeCoverExtentIntactForests: ForestChangeDiagnosticDataDouble,
+                                       primaryForestArea: ForestChangeDiagnosticDataDouble,
+                                       intactForest2016Area: ForestChangeDiagnosticDataDouble,
+                                       totalArea: ForestChangeDiagnosticDataDouble,
+                                       protectedAreasArea: ForestChangeDiagnosticDataDouble,
+                                       peatlandsArea: ForestChangeDiagnosticDataDouble,
+                                       braBiomesArea: ForestChangeDiagnosticDataDoubleCategory,
+                                       idnForestAreaArea: ForestChangeDiagnosticDataDoubleCategory,
+                                       seAsiaLandCoverArea: ForestChangeDiagnosticDataDoubleCategory,
+                                       idnLandCoverArea: ForestChangeDiagnosticDataDoubleCategory,
+                                       idnForestMoratoriumArea: ForestChangeDiagnosticDataDouble
 ) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
@@ -69,7 +79,17 @@ case class ForestChangeDiagnosticData(
       treeCoverExtentPrimaryForest.merge(other.treeCoverExtentPrimaryForest),
       treeCoverExtentProtectedAreas.merge(other.treeCoverExtentProtectedAreas),
       treeCoverExtentPeatlands.merge(other.treeCoverExtentPeatlands),
-      treeCoverExtentIntactForests.merge(other.treeCoverExtentIntactForests)
+      treeCoverExtentIntactForests.merge(other.treeCoverExtentIntactForests),
+      primaryForestArea.merge(other.primaryForestArea),
+      intactForest2016Area.merge(other.intactForest2016Area),
+      totalArea.merge(other.totalArea),
+      protectedAreasArea.merge(other.protectedAreasArea),
+      peatlandsArea.merge(other.peatlandsArea),
+      braBiomesArea.merge(other.braBiomesArea),
+      idnForestAreaArea.merge(other.idnForestAreaArea),
+      seAsiaLandCoverArea.merge(other.seAsiaLandCoverArea),
+      idnLandCoverArea.merge(other.idnLandCoverArea),
+      idnForestMoratoriumArea.merge(other.idnForestMoratoriumArea)
     )
   }
 }
@@ -96,6 +116,16 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDouble.empty
     )
 
