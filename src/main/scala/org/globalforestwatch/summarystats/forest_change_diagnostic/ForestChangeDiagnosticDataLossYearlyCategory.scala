@@ -9,24 +9,30 @@ case class ForestChangeDiagnosticDataLossYearlyCategory(
   def merge(
              other: ForestChangeDiagnosticDataLossYearlyCategory
            ): ForestChangeDiagnosticDataLossYearlyCategory = {
+
     ForestChangeDiagnosticDataLossYearlyCategory(value ++ other.value.map {
       case (key, otherValue) =>
-        key -> value(key).merge(otherValue)
+        key -> value
+          .getOrElse(key, ForestChangeDiagnosticDataLossYearly.empty)
+          .merge(otherValue)
     })
   }
 }
 
-
 object ForestChangeDiagnosticDataLossYearlyCategory {
   def empty: ForestChangeDiagnosticDataLossYearlyCategory =
-    ForestChangeDiagnosticDataLossYearlyCategory(
-      Map()
-    )
+    ForestChangeDiagnosticDataLossYearlyCategory(Map())
 
-  def fill(className: String, lossYear: Int, areaHa: Double, noData: String, include: Boolean = true): ForestChangeDiagnosticDataLossYearlyCategory = {
+  def fill(
+            className: String,
+            lossYear: Int,
+            areaHa: Double,
+            noData: String,
+            include: Boolean = true
+          ): ForestChangeDiagnosticDataLossYearlyCategory = {
 
     className match {
-      case noData =>
+      case `noData` =>
         ForestChangeDiagnosticDataLossYearlyCategory.empty
       case _ =>
         ForestChangeDiagnosticDataLossYearlyCategory(
