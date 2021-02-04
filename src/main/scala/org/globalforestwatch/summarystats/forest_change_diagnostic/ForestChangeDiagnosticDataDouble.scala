@@ -10,7 +10,7 @@ case class ForestChangeDiagnosticDataDouble(value: Double) extends ValueParser[F
   }
 
   def toJson: String = {
-    this.value.asJson.noSpaces
+    this.round(this.value).asJson.noSpaces
   }
 }
 

@@ -17,7 +17,8 @@ case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double]) e
   }
 
   def toJson: String = {
-    this.value.asJson.noSpaces
+    val output = this.value.map { case (key, value) => key -> this.round(value) }
+    output.asJson.noSpaces
   }
 }
 

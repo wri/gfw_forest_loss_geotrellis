@@ -22,7 +22,7 @@ case class ForestChangeDiagnosticDataDoubleCategory(
     this.value
       .map {
         case (key, value) =>
-          key -> value.value
+          key -> value.toJson
       }
       .asJson
       .noSpaces

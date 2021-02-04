@@ -69,6 +69,7 @@ object ForestChangeDiagnosticSummary {
         val isIDNForestMoratorium: Boolean =
           raster.tile.isIDNForestMoratorium.getData(col, row)
         val braBiomes: String = raster.tile.braBiomes.getData(col, row)
+        val gfwProCoverage: Map[String, Boolean] = raster.tile.gfwProCoverage.getData(col, row)
 
         // compute Booleans
         val isTreeCoverExtent: Boolean = tcd2000 > 30
@@ -185,6 +186,12 @@ object ForestChangeDiagnosticSummary {
           ForestChangeDiagnosticDataDoubleCategory.fill(idnLandCover, areaHa)
         val idnForestMoratoriumArea =
           ForestChangeDiagnosticDataDouble.fill(areaHa, isIDNForestMoratorium)
+        val southAmericaPresence = ForestChangeDiagnosticDataBoolean.fill(gfwProCoverage.getOrElse("South America", false))
+        val legalAmazonPresence = ForestChangeDiagnosticDataBoolean.fill(gfwProCoverage.getOrElse("Legal Amazon", false))
+        val braBiomesPresence = ForestChangeDiagnosticDataBoolean.fill(gfwProCoverage.getOrElse("Brazil Biomes", false))
+        val cerradoBiomesPresence = ForestChangeDiagnosticDataBoolean.fill(gfwProCoverage.getOrElse("Cerrado Biomes", false))
+        val seAsiaPresence = ForestChangeDiagnosticDataBoolean.fill(gfwProCoverage.getOrElse("South East Asia", false))
+        val idnPresence = ForestChangeDiagnosticDataBoolean.fill(gfwProCoverage.getOrElse("Indonesia", false))
 
         // Combine results
         val newStats = ForestChangeDiagnosticData(
@@ -216,7 +223,13 @@ object ForestChangeDiagnosticSummary {
           idnForestAreaArea,
           seAsiaLandCoverArea,
           idnLandCoverArea,
-          idnForestMoratoriumArea
+          idnForestMoratoriumArea,
+          southAmericaPresence,
+          legalAmazonPresence,
+          braBiomesPresence,
+          cerradoBiomesPresence,
+          seAsiaPresence,
+          idnPresence
         )
 
         acc = ForestChangeDiagnosticSummary(acc.stats.merge(newStats))

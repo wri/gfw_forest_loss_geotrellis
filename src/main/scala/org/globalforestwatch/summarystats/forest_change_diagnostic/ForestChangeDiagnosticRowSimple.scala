@@ -29,4 +29,10 @@ case class ForestChangeDiagnosticRowSimple(id: String,
                                            idnForestAreaArea: String,
                                            seAsiaLandCoverArea: String,
                                            idnLandCoverArea: String,
-                                           idnForestMoratoriumArea: String)
+                                           idnForestMoratoriumArea: String,
+                                           southAmericaPresence: String,
+                                           legalAmazonPresence: String,
+                                           braBiomesPresence: String,
+                                           cerradoBiomesPresence: String,
+                                           seAsiaPresence: String,
+                                           idnPresence: String)

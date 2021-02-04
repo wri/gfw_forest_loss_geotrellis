@@ -35,7 +35,14 @@ case class ForestChangeDiagnosticData(
                                        idnForestAreaArea: ForestChangeDiagnosticDataDoubleCategory,
                                        seAsiaLandCoverArea: ForestChangeDiagnosticDataDoubleCategory,
                                        idnLandCoverArea: ForestChangeDiagnosticDataDoubleCategory,
-                                       idnForestMoratoriumArea: ForestChangeDiagnosticDataDouble
+                                       idnForestMoratoriumArea: ForestChangeDiagnosticDataDouble,
+                                       southAmericaPresence: ForestChangeDiagnosticDataBoolean,
+                                       legalAmazonPresence: ForestChangeDiagnosticDataBoolean,
+                                       braBiomesPresence: ForestChangeDiagnosticDataBoolean,
+                                       cerradoBiomesPresence: ForestChangeDiagnosticDataBoolean,
+                                       seAsiaPresence: ForestChangeDiagnosticDataBoolean,
+                                       idnPresence: ForestChangeDiagnosticDataBoolean
+
 ) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
@@ -89,7 +96,14 @@ case class ForestChangeDiagnosticData(
       idnForestAreaArea.merge(other.idnForestAreaArea),
       seAsiaLandCoverArea.merge(other.seAsiaLandCoverArea),
       idnLandCoverArea.merge(other.idnLandCoverArea),
-      idnForestMoratoriumArea.merge(other.idnForestMoratoriumArea)
+      idnForestMoratoriumArea.merge(other.idnForestMoratoriumArea),
+
+      southAmericaPresence.merge(southAmericaPresence),
+      legalAmazonPresence.merge(legalAmazonPresence),
+      braBiomesPresence.merge(braBiomesPresence),
+      cerradoBiomesPresence.merge(cerradoBiomesPresence),
+      seAsiaPresence.merge(seAsiaPresence),
+      idnPresence.merge(idnPresence)
     )
   }
 }
@@ -126,7 +140,13 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
-      ForestChangeDiagnosticDataDouble.empty
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataBoolean.empty,
+      ForestChangeDiagnosticDataBoolean.empty,
+      ForestChangeDiagnosticDataBoolean.empty,
+      ForestChangeDiagnosticDataBoolean.empty,
+      ForestChangeDiagnosticDataBoolean.empty,
+      ForestChangeDiagnosticDataBoolean.empty
     )
 
   implicit val lossDataSemigroup: Semigroup[ForestChangeDiagnosticData] =

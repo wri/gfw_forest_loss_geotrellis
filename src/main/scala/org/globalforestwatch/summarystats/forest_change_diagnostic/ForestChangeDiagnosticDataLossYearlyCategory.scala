@@ -23,7 +23,7 @@ case class ForestChangeDiagnosticDataLossYearlyCategory(
     this.value
       .map {
         case (key, value) =>
-          key -> value.value
+          key -> value.toJson
       }
       .asJson
       .noSpaces
