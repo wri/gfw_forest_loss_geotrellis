@@ -74,7 +74,7 @@ object ForestChangeDiagnosticSummary {
         // compute Booleans
         val isTreeCoverExtent: Boolean = tcd2000 > 30
         val isLossYear: Boolean = isTreeCoverExtent && lossYear > 0
-        val isProtectedAreas: Boolean = wdpa == "Category Ia/b or II"
+        val isProtectedAreas: Boolean = wdpa != ""
         val isProdesLoss: Boolean = prodesLossYear > 0
 
         // summary statistics

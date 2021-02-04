@@ -4,7 +4,7 @@ import org.globalforestwatch.util.Implicits._
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
 
-case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double]) extends ValueParser[ForestChangeDiagnosticDataLossYearly] {
+case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double]) extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataLossYearly] {
   def merge(
              other: ForestChangeDiagnosticDataLossYearly
            ): ForestChangeDiagnosticDataLossYearly = {

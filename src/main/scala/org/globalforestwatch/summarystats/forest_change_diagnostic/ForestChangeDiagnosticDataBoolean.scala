@@ -3,7 +3,7 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 import io.circe.syntax._
 
 case class ForestChangeDiagnosticDataBoolean(value: Boolean)
-    extends ValueParser[ForestChangeDiagnosticDataBoolean] {
+  extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataBoolean] {
   def merge(
     other: ForestChangeDiagnosticDataBoolean
   ): ForestChangeDiagnosticDataBoolean = {

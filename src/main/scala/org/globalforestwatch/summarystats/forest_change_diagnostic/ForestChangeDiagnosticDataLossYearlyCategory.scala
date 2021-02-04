@@ -6,7 +6,7 @@ import io.circe.syntax._
 
 case class ForestChangeDiagnosticDataLossYearlyCategory(
                                                          value: Map[String, ForestChangeDiagnosticDataLossYearly]
-                                                       ) extends ValueParser[ForestChangeDiagnosticDataLossYearlyCategory] {
+                                                       ) extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataLossYearlyCategory] {
   def merge(
              other: ForestChangeDiagnosticDataLossYearlyCategory
            ): ForestChangeDiagnosticDataLossYearlyCategory = {

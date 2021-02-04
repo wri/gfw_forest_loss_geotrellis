@@ -70,7 +70,6 @@ case class ForestChangeDiagnosticDFFactory(
           }
       }
       .toDF("location_id",
-
         "tree_cover_loss_total_yearly", // treeCoverLossYearly
         "tree_cover_loss_primary_forest_yearly", // treeCoverLossPrimaryForestYearly
         "tree_cover_loss_peat_yearly", //treeCoverLossPeatLandYearly
