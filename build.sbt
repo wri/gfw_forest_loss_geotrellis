@@ -168,22 +168,22 @@ import com.amazonaws.services.elasticmapreduce.model.Tag
 sparkEmrRelease := "emr-6.1.0"
 sparkAwsRegion := "us-east-1"
 sparkEmrApplications := Seq("Spark", "Zeppelin", "Ganglia")
-sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
-sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
-sparkSubnetId := Some("subnet-8c2b5ea1")
-sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 201   // 201 for carbonflux and carbon_sensitivity
+sparkS3JarFolder := "s3://gfw-pipelines-dev/geotrellis/jars"
+sparkS3LogUri := Some("s3://gfw-pipelines-dev/geotrellis/logs")
+sparkSubnetId := Some("subnet-067b91868bc3a8ff1")
+sparkSecurityGroupIds := Seq("sg-07c11c0c9189c0a7a", "sg-068c422162d468700")
+sparkInstanceCount := 21 // 201 for carbonflux and carbon_sensitivity
 sparkMasterType := "r4.2xlarge"
 sparkCoreType := "r4.2xlarge"
 sparkMasterEbsSize := Some(10)
 sparkCoreEbsSize := Some(10)
 //sparkMasterPrice := Some(3.0320)
 sparkCorePrice := Some(0.532)
-sparkClusterName := s"geotrellis-treecoverloss"
+sparkClusterName := s"geotrellis-forest-change-diagnostic"
 sparkEmrServiceRole := "EMR_DefaultRole"
 sparkInstanceRole := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
-  "tmaschler_wri2"
+  "tmaschler_gfw"
 )
 sparkEmrBootstrap := List(
   BootstrapAction(
@@ -227,9 +227,9 @@ sparkEmrConfigs := List(
     "spark.executor.memoryOverhead" -> "2g", //5G
     "spark.driver.cores" -> "1",
     "spark.driver.memory" -> "6652m",
-    "spark.executor.instances" -> "1599", // 1599 for carbonflux and carbon_sensitivity
-    "spark.default.parallelism" -> "15990", // 15990 for carbonflux and carbon_sensitivity
-    "spark.sql.shuffle.partitions" -> "15990", // 15990 for carbonflux and carbon_sensitivity
+    "spark.executor.instances" -> "159", // 1599 for carbonflux and carbon_sensitivity
+    "spark.default.parallelism" -> "1590", // 15990 for carbonflux and carbon_sensitivity
+    "spark.sql.shuffle.partitions" -> "1590", // 15990 for carbonflux and carbon_sensitivity
     "spark.driver.maxResultSize" -> "3g",
     "spark.shuffle.service.enabled" -> "true",
     "spark.shuffle.compress" -> "true",
