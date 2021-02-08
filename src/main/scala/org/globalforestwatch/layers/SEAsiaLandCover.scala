@@ -12,10 +12,23 @@ case class SEAsiaLandCover(gridTile: GridTile)
 
   override val externalNoDataValue = "Unknown"
 
-  //FIXME: Need to verify legend
   def lookup(value: Int): String = value match {
-    case 1 => "Rubber Plantation"
-    case 2 => "Secondary Forest"
-    case _ => "Unknown"
+    case 19 => "Bare land"
+    case 18 => "Coastal fish pond"
+    case 7 => "Rubber plantation"
+    case 13 | 17 => "Agriculture"
+    case 2 | 6 | 5 => "Secondary forest"
+    case 15 | 11 => "Grassland/ shrub"
+    case 20 => "Mining"
+    case 10 => "Mixed tree crops"
+    case 22 => "No data"
+    case 8 => "Oil palm plantation"
+    case 14 => "Settlements"
+    case 16 | 12 => "Swamp"
+    case 9 => "Timber plantation"
+    case 1 | 4 | 3 => "Primary forest"
+    case 21 => "Water bodies"
+
+
   }
 }
