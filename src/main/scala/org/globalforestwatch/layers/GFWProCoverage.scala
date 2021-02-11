@@ -6,13 +6,11 @@ case class GFWProCoverage(gridTile: GridTile)
     extends MapLayer
     with OptionalILayer {
 
-  // FIXME: verify source path
   val uri: String =
-    s"$basePath/gfwpro_coverage/v1/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/coverage/gdal-geotiff/${gridTile.tileId}.tif"
+    s"$basePath/gfwpro_forest_change_regions/v20210129/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/bit_encoding/gdal-geotiff/${gridTile.tileId}.tif"
 
   def lookup(value: Int): Map[String, Boolean] = {
     val bits = "0000000" + value.toBinaryString takeRight 8
-    // FIXME: verify bit order
     Map(
       "South America" -> (bits(7) == '1'),
       "Legal Amazon" -> (bits(6) == '1'),
