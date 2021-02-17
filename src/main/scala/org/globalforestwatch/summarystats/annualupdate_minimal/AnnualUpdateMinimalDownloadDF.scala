@@ -4,9 +4,8 @@ import org.apache.spark.sql.functions.{col, round, sum, when}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 object AnnualUpdateMinimalDownloadDF {
-
   val treecoverLossMinYear = 2001
-  val treecoverLossMaxYear = 2019
+  val treecoverLossMaxYear = 2020
 
   def sumDownload(df: DataFrame): DataFrame = {
 
