@@ -1,19 +1,16 @@
 package org.globalforestwatch.summarystats
 
-import cats.data.NonEmptyList
-import geotrellis.layer.SpatialKey
-import geotrellis.spark.partition.SpacePartitioner
 import geotrellis.vector.{Feature, Geometry}
-import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{FeatureDF, FeatureId, FeatureRDD}
+import org.apache.spark.sql.SparkSession
+import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.summarystats.annualupdate.AnnualUpdateAnalysis
 import org.globalforestwatch.summarystats.annualupdate_minimal.AnnualUpdateMinimalAnalysis
+import org.globalforestwatch.summarystats.carbon_sensitivity.CarbonSensitivityAnalysis
 import org.globalforestwatch.summarystats.carbonflux.CarbonFluxAnalysis
 import org.globalforestwatch.summarystats.carbonflux_minimal.CarbonFluxMinimalAnalysis
-import org.globalforestwatch.summarystats.carbon_sensitivity.CarbonSensitivityAnalysis
 import org.globalforestwatch.summarystats.firealerts.FireAlertsAnalysis
+import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticAnalysis
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsAnalysis
 import org.globalforestwatch.summarystats.treecoverloss.TreeLossAnalysis
 
@@ -76,6 +73,13 @@ case class SummaryAnalysisFactory(analysis: String,
           )
         case "firealerts" =>
           FireAlertsAnalysis(
+            featureRDD: RDD[Feature[Geometry, FeatureId]],
+            featureType: String,
+            spark: SparkSession,
+            kwargs: Map[String, Any]
+          )
+        case "forest_change_diagnostic" =>
+          ForestChangeDiagnosticAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
