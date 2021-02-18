@@ -97,13 +97,12 @@ case class ForestChangeDiagnosticData(
       seAsiaLandCoverArea.merge(other.seAsiaLandCoverArea),
       idnLandCoverArea.merge(other.idnLandCoverArea),
       idnForestMoratoriumArea.merge(other.idnForestMoratoriumArea),
-
-      southAmericaPresence.merge(southAmericaPresence),
-      legalAmazonPresence.merge(legalAmazonPresence),
-      braBiomesPresence.merge(braBiomesPresence),
-      cerradoBiomesPresence.merge(cerradoBiomesPresence),
-      seAsiaPresence.merge(seAsiaPresence),
-      idnPresence.merge(idnPresence)
+      southAmericaPresence.merge(other.southAmericaPresence),
+      legalAmazonPresence.merge(other.legalAmazonPresence),
+      braBiomesPresence.merge(other.braBiomesPresence),
+      cerradoBiomesPresence.merge(other.cerradoBiomesPresence),
+      seAsiaPresence.merge(other.seAsiaPresence),
+      idnPresence.merge(other.idnPresence)
     )
   }
 }

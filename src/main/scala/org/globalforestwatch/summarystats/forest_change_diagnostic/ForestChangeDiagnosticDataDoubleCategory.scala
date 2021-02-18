@@ -22,7 +22,7 @@ case class ForestChangeDiagnosticDataDoubleCategory(
     this.value
       .map {
         case (key, value) =>
-          key -> value.toJson
+          key -> value.round
       }
       .asJson
       .noSpaces
@@ -43,7 +43,7 @@ object ForestChangeDiagnosticDataDoubleCategory {
       ForestChangeDiagnosticDataDoubleCategory.empty
     else
       ForestChangeDiagnosticDataDoubleCategory(
-        Map(className -> ForestChangeDiagnosticDataDouble(areaHa * include))
+        Map(className -> ForestChangeDiagnosticDataDouble.fill(areaHa, include))
       )
   }
 

@@ -20,13 +20,15 @@ case class ForestChangeDiagnosticDataLossYearlyCategory(
   }
 
   def toJson: String = {
-    this.value
+    val new_val = this.value
       .map {
         case (key, value) =>
-          key -> value.toJson
+          key -> value.round
       }
       .asJson
       .noSpaces
+
+    new_val
   }
 }
 
@@ -47,9 +49,7 @@ object ForestChangeDiagnosticDataLossYearlyCategory {
     else
       ForestChangeDiagnosticDataLossYearlyCategory(
         Map(
-          className -> ForestChangeDiagnosticDataLossYearly(
-            SortedMap(lossYear -> areaHa * include)
-          )
+          className -> ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, include)
         )
       )
   }

@@ -4,13 +4,15 @@ import io.circe.syntax._
 
 case class ForestChangeDiagnosticDataDouble(value: Double) extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataDouble] {
   def merge(
-    other: ForestChangeDiagnosticDataDouble
-  ): ForestChangeDiagnosticDataDouble = {
+             other: ForestChangeDiagnosticDataDouble
+           ): ForestChangeDiagnosticDataDouble = {
     ForestChangeDiagnosticDataDouble(value + other.value)
   }
 
+  def round: Double = this.round(value)
+
   def toJson: String = {
-    this.round(this.value).asJson.noSpaces
+    this.round.asJson.noSpaces
   }
 }
 
