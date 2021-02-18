@@ -26,6 +26,11 @@ case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double]) e
 object ForestChangeDiagnosticDataLossYearly {
   def empty: ForestChangeDiagnosticDataLossYearly =
     ForestChangeDiagnosticDataLossYearly(
+      SortedMap()
+    )
+
+  def prefilled: ForestChangeDiagnosticDataLossYearly =
+    ForestChangeDiagnosticDataLossYearly(
       SortedMap(
         2001 -> 0,
         2002 -> 0,
@@ -54,17 +59,18 @@ object ForestChangeDiagnosticDataLossYearly {
            include: Boolean = true): ForestChangeDiagnosticDataLossYearly = {
 
     // Only except lossYear values within range of default map
-    val minLossYear: Int = this.empty.value.keysIterator.min
-    val maxLossYear: Int = this.empty.value.keysIterator.max
+    val minLossYear: Int = this.prefilled.value.keysIterator.min
+    val maxLossYear: Int = this.prefilled.value.keysIterator.max
 
-    if (minLossYear <= lossYear && lossYear <= maxLossYear)
-      ForestChangeDiagnosticDataLossYearly(
-        SortedMap(
-          lossYear ->
-            areaHa * include
+    if (minLossYear <= lossYear && lossYear <= maxLossYear && include) {
+      ForestChangeDiagnosticDataLossYearly.prefilled.merge(
+        ForestChangeDiagnosticDataLossYearly(
+          SortedMap(
+            lossYear -> areaHa
+          )
         )
       )
-    else
+    } else
       this.empty
   }
 
