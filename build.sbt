@@ -41,8 +41,9 @@ resolvers ++= Seq(
 )
 
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/"
-//libraryDependencies += "org.gdal" % "gdal" % "3.1.0"
-//libraryDependencies += "com.azavea.geotrellis" % "gdal-warp-bindings" % "1.1.0"
+
+libraryDependencies += "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
+libraryDependencies += "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   sparkCore % Provided,
@@ -63,16 +64,13 @@ libraryDependencies ++= Seq(
   logging,
   decline,
   scalatest % Test,
-  "org.geotools" % "gt-ogr-bridj" % Version.geotools
-    exclude("com.nativelibs4java", "bridj"),
+  //"org.geotools" % "gt-ogr-bridj" % Version.geotools
+  //  exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
   "org.scalanlp" %% "breeze" % "0.13.2",
   "org.scalanlp" %% "breeze-natives" % "0.13.2",
   "org.scalanlp" %% "breeze-viz" % "0.13.2"
 )
-
-libraryDependencies += "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
-libraryDependencies += "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
 
@@ -128,7 +126,7 @@ assemblyMergeStrategy in assembly := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat
   // both GeoSpark and Geotrellis bring in this library, need to use GeoSpark version
-  case PathList("org", "geotools", xs @ _*) => MergeStrategy.last
+  case PathList("org", "geotools", xs @ _*) => MergeStrategy.first
   case PathList("META-INF", xs@_*) =>
     xs match {
       case ("MANIFEST.MF" :: Nil) => MergeStrategy.discard

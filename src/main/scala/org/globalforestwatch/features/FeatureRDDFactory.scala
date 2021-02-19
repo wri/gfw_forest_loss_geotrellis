@@ -3,7 +3,8 @@ package org.globalforestwatch.features
 import java.util.HashSet
 
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.{Geometry, Point}
+import org.geotools.geometry.jts.coordinatesequence.CoordinateSequences
+import com.vividsolutions.jts.geom.{Geometry, Point, CoordinateSequence}
 import geotrellis.vector
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.rdd.RDD
