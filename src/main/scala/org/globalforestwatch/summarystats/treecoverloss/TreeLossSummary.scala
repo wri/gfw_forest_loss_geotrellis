@@ -73,11 +73,7 @@ object TreeLossSummary {
         val areaHa = area / 10000.0
 
         val gainArea: Double = gain * areaHa
-
-        val co2Factor = 0.5 * 44 / 12
-
         val biomassPixel = biomass * areaHa
-        val co2Pixel = biomassPixel * co2Factor
 
         val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
         val grossCumulBelowgroundRemovalsCo2Pixel = grossCumulBelowgroundRemovalsCo2 * areaHa
@@ -114,7 +110,7 @@ object TreeLossSummary {
               stats.getOrElse(
                 key = pKey,
                 default =
-                  TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                  TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -126,7 +122,6 @@ object TreeLossSummary {
               if (loss != null) {
                 summary.lossYear(loss).treecoverLoss += areaHa
                 summary.lossYear(loss).biomassLoss += biomassPixel
-                summary.lossYear(loss).carbonEmissions += co2Pixel
                 summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
                 summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
                 summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
@@ -139,7 +134,6 @@ object TreeLossSummary {
                 case 2010 => summary.treecoverExtent2010 += areaHa
               }
               summary.totalBiomass += biomassPixel
-              summary.totalCo2 += co2Pixel
 
               summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
               summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel

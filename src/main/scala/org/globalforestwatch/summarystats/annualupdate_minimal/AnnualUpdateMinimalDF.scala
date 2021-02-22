@@ -26,7 +26,8 @@ object AnnualUpdateMinimalDF {
     "is__idn_forest_moratorium",
     "is__gfw_wood_fiber",
     "is__gfw_resource_right",
-    "is__gfw_managed_forest"
+    "is__gfw_managed_forest",
+    "is__umd_tree_cover_gain_2000-2012"
   )
 
   def unpackValues(cols: List[Column],

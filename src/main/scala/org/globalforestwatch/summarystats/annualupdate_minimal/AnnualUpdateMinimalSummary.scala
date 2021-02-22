@@ -112,7 +112,7 @@ object AnnualUpdateMinimalSummary {
         val gainArea: Double = gain * areaHa
         val biomassPixel = biomass * areaHa
 
-        val co2Factor = 0.5 * 44 / 12
+        val co2Factor = 0.47 * 44 / 12
         val co2Pixel = biomassPixel * co2Factor
 
         val grossEmissionsCo2eNonCo2: Float = raster.tile.grossEmissionsCo2eNonCo2.getData(col, row)
@@ -120,7 +120,7 @@ object AnnualUpdateMinimalSummary {
         val grossCumulAbovegroundRemovalsCo2: Float =
           raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
         val grossCumulBelowgroundRemovalsCo2: Float =
-          raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
+          raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
 
         val netFluxCo2Pixel = netFluxCo2 * areaHa

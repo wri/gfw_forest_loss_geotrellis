@@ -13,7 +13,6 @@ case class TreeLossData(
                          var totalArea: Double,
                          var totalGainArea: Double,
                          var totalBiomass: Double,
-                         var totalCo2: Double,
                          var avgBiomass: Double,
                          var totalGrossCumulAbovegroundRemovalsCo2: Double,
                          var totalGrossCumulBelowgroundRemovalsCo2: Double,
@@ -33,7 +32,6 @@ case class TreeLossData(
           val otherLoss: TreeLossYearData = v
           otherLoss.treecoverLoss += loss.treecoverLoss
           otherLoss.biomassLoss += loss.biomassLoss
-          otherLoss.carbonEmissions += loss.carbonEmissions
           otherLoss.grossEmissionsCo2eCo2Only += loss.grossEmissionsCo2eCo2Only
           otherLoss.grossEmissionsCo2eNonCo2 += loss.grossEmissionsCo2eNonCo2
           otherLoss.grossEmissionsCo2eAllGases += loss.grossEmissionsCo2eAllGases
@@ -45,7 +43,6 @@ case class TreeLossData(
       totalArea + other.totalArea,
       totalGainArea + other.totalGainArea,
       totalBiomass + other.totalBiomass,
-      totalCo2 + other.totalCo2,
       // TODO: use extent2010 to calculate avg biomass incase year is selected
       ((avgBiomass * treecoverExtent2000) + (other.avgBiomass * other.treecoverExtent2000)) / (treecoverExtent2000 + other.treecoverExtent2000),
       totalGrossCumulAbovegroundRemovalsCo2 + other.totalGrossCumulAbovegroundRemovalsCo2,
