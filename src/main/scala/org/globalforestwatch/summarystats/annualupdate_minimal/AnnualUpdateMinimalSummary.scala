@@ -132,7 +132,7 @@ object AnnualUpdateMinimalSummary {
         val grossEmissionsCo2e = grossEmissionsCo2eNonCo2 + grossEmissionsCo2eCo2Only
         val grossEmissionsCo2ePixel = grossEmissionsCo2e * areaHa
 
-        val thresholds = List(10, 15, 20, 25, 30, 50, 75)
+        val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
 
         @tailrec
         def updateSummary(

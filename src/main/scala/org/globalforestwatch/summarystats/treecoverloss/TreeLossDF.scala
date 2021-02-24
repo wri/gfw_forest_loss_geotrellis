@@ -89,12 +89,12 @@ object TreeLossDF {
       sum("area__ha") as "area__ha",
       sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
       sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
-      sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2013__ha",
+      sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
       sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
       sum(
-        $"avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1" * $"umd_tree_cover_extent_2000__ha"
-      ),
-      sum($"umd_tree_cover_extent_2000__ha") as "avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1",
+          $"avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1" * $"umd_tree_cover_extent_2000__ha"
+        ) /
+        sum($"umd_tree_cover_extent_2000__ha") as "avg_whrc_aboveground_biomass_density_2000__Mg_ha-1",
       sum("gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg")
         as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
       sum("gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg")
