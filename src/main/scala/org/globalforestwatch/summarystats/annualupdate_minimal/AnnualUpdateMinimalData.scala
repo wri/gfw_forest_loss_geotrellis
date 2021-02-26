@@ -16,10 +16,14 @@ case class AnnualUpdateMinimalData(var treecoverLoss: Double,
                                    var totalArea: Double,
                                    var totalGainArea: Double,
                                    var totalBiomass: Double,
+                                   var totalGrossEmissionsCo2eCo2Only: Double,
+                                   var totalGrossEmissionsCo2eNonCo2: Double,
+                                   var totalGrossEmissionsCo2e: Double,
+                                   var totalGrossCumulAbovegroundRemovalsCo2: Double,
+                                   var totalGrossCumulBelowgroundRemovalsCo2: Double,
+                                   var totalGrossCumulAboveBelowgroundRemovalsCo2: Double,
+                                   var totalNetFluxCo2: Double,
                                    var totalCo2: Double
-                                   //                                   var totalMangroveBiomass: Double,
-                                   //                                   var totalMangroveCo2: Double,
-                                   //                                   var weightedMangroveBiomass: Double
                                   ) {
   def merge(other: AnnualUpdateMinimalData): AnnualUpdateMinimalData = {
 
@@ -34,10 +38,14 @@ case class AnnualUpdateMinimalData(var treecoverLoss: Double,
       totalArea + other.totalArea,
       totalGainArea + other.totalGainArea,
       totalBiomass + other.totalBiomass,
+      totalGrossEmissionsCo2eCo2Only + other.totalGrossEmissionsCo2eCo2Only,
+      totalGrossEmissionsCo2eNonCo2 + other.totalGrossEmissionsCo2eNonCo2,
+      totalGrossEmissionsCo2e + other.totalGrossEmissionsCo2e,
+      totalGrossCumulAbovegroundRemovalsCo2 + other.totalGrossCumulAbovegroundRemovalsCo2,
+      totalGrossCumulBelowgroundRemovalsCo2 + other.totalGrossCumulBelowgroundRemovalsCo2,
+      totalGrossCumulAboveBelowgroundRemovalsCo2 + other.totalGrossCumulAboveBelowgroundRemovalsCo2,
+      totalNetFluxCo2 + other.totalNetFluxCo2,
       totalCo2 + other.totalCo2
-//      totalMangroveBiomass + other.totalMangroveBiomass,
-//      totalMangroveCo2 + other.totalMangroveBiomass,
-//      mangroveBiomassHistogram.merge(other.mangroveBiomassHistogram)
     )
   }
 }

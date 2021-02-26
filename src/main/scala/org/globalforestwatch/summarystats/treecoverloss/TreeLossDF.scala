@@ -7,10 +7,9 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object TreeLossDF {
 
   val treecoverLossMinYear = 2001
-  val treecoverLossMaxYear = 2019
+  val treecoverLossMaxYear = 2020
 
   def unpackValues(df: DataFrame): DataFrame = {
-
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
@@ -29,11 +28,11 @@ object TreeLossDF {
           .getItem("biomassLoss") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
 
-    val co2EmissionsCols =
+    val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("carbonEmissions") as s"whrc_aboveground_co2_emissions_${i}__Mg"
+          .getItem("grossEmissionsCo2eAllGases") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
       }).toList
 
     val cols = List(
@@ -48,11 +47,18 @@ object TreeLossDF {
       $"data.totalGainArea" as "umd_tree_cover_gain_2000-2012__ha",
       $"data.totalBiomass" as "whrc_aboveground_biomass_stock_2000__Mg",
       $"data.avgBiomass" as "avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1",
-      $"data.totalCo2" as "whrc_aboveground_co2_stock_2000__Mt"
+      $"data.totalGrossCumulAbovegroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
+      $"data.totalGrossCumulBelowgroundRemovalsCo2" as "gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg",
+      $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_belowground_co2_removals_2001-2020__Mg",
+      $"data.totalGrossEmissionsCo2eCo2Only" as "gfw_gross_emissions_co2e_co2_only_2001-2020__Mg",
+      $"data.totalGrossEmissionsCo2eNonCo2" as "gfw_gross_emissions_co2e_non_co2_2001-2020__Mg",
+      $"data.totalGrossEmissionsCo2eAllGases" as "gfw_gross_emissions_co2e_all_gases_2001-2020__Mg",
+      $"data.totalNetFluxCo2" as "gfw_net_flux_co2e_2001-2020__Mg",
+      $"data.totalFluxModelExtentArea" as "gfw_flux_model_extent__ha"
     )
 
     df.select(
-      cols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
+      cols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: totalGrossEmissionsCo2eAllGasesCols: _*
     )
 
   }
@@ -74,9 +80,9 @@ object TreeLossDF {
         sum(s"whrc_aboveground_biomass_loss_${i}__Mg") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
 
-    val co2EmissionsCols =
+    val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"whrc_aboveground_co2_emissions_${i}__Mg") as s"whrc_aboveground_co2_emissions_${i}__Mg"
+        sum(s"gfw_gross_emissions_co2e_all_gases_${i}__Mg") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
       }).toList
 
     val cols = List(
@@ -86,9 +92,23 @@ object TreeLossDF {
       sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
       sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
       sum(
-        $"avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1" * $"umd_tree_cover_extent_2000__ha"
-      ) / sum($"umd_tree_cover_extent_2000__ha") as "avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1",
-      sum("whrc_aboveground_co2_stock_2000__Mt") as "whrc_aboveground_co2_stock_2000__Mt"
+          $"avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1" * $"umd_tree_cover_extent_2000__ha"
+        ) /
+        sum($"umd_tree_cover_extent_2000__ha") as "avg_whrc_aboveground_biomass_density_2000__Mg_ha-1",
+      sum("gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg")
+        as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
+      sum("gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg")
+        as "gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg",
+      sum("gfw_gross_cumulative_aboveground_belowground_co2_removals_2001-2020__Mg")
+        as "gfw_gross_cumulative_aboveground_belowground_co2_removals_2001-2020__Mg",
+      sum("gfw_gross_emissions_co2e_co2_only_2001-2020__Mg")
+        as "gfw_gross_emissions_co2e_co2_only_2001-2020__Mg",
+      sum("gfw_gross_emissions_co2e_non_co2_2001-2020__Mg")
+        as "gfw_gross_emissions_co2e_non_co2_2001-2020__Mg",
+      sum("gfw_gross_emissions_co2e_all_gases_2001-2020__Mg")
+        as "gfw_gross_emissions_co2e_all_gases_2001-2020__Mg",
+      sum("gfw_net_flux_co2e_2001-2020__Mg") as "gfw_net_flux_co2e_2001-2020__Mg",
+      sum("gfw_flux_model_extent__ha") as "gfw_flux_model_extent__ha"
     )
 
     val groupByCols = List(
@@ -110,7 +130,7 @@ object TreeLossDF {
     df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol: _*)
       .agg(
         cols.head,
-        cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: co2EmissionsCols: _*
+        cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: totalGrossEmissionsCo2eAllGasesCols: _*
       )
 
   }
