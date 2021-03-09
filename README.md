@@ -21,6 +21,11 @@ Currently the following analysis are implemented
 
 A simple analysis which only looks at Tree Cover Loss, Tree Cover Density (2000 or 2010) and optionally Primary Forest.
 Users can select one or many tree cover thresholds. Output will be a flat file, with one row per input feature and tree cover density threshold.
+The emissions outputs (annual and total) are from the forest carbon flux model (Harris et al. 2021 Nature Climate Change) [forest carbon flux model](https://github.com/wri/carbon-budget).
+Outputs also include carbon removals and carbon net flux (total only). 
+Emissions, removals, and net flux are reported for (> tree cover density 2000 threshold OR Hansen gain) because the model results
+include not just pixels above a certain tree cover density threshold, but also Hansen gain pixels.
+Other outputs from this analysis (loss, gain, biomass, etc.) use the simple tree cover density threshold. 
 
 This type of analysis only supports simple features as input. Best used together with the [ArcPY Client](https://github.com/wri/gfw_forest_loss_geotrellis_arcpy_client).
 
@@ -40,7 +45,7 @@ sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annual
 ### Annual Update minimal
 
 This analysis follows the same methodology as the annual update analysis above, just with fewer intersecting layers. 
-It is used to compute statistics for the GFW country and user dashboards.
+It is used to compute statistics for the GFW country and user dashboards, including carbon flux outputs (emissions, removals, net flux).
 
 Supported input features are
 
@@ -62,7 +67,7 @@ sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annual
 
 ### Carbon Flux Full Standard Model
 
-Carbon Flux (full standard model) analysis is used to produce statistics for GFW climate topic dashboards.
+Carbon Flux (full standard model) analysis is used to produce detailed statistics for carbon flux research, with additional model-specific contextual layers.
 It uses the same approach as the annual update analysis, but with all stock and flux outputs from the [forest carbon flux model](https://github.com/wri/carbon-budget). 
 It also analyzes several contextual layers that are unique to the carbon flux model and does not include many contextual layers used in the Tree Cover Loss analyses. 
 It currently only works with GADM features.

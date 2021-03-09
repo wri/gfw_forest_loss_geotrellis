@@ -41,6 +41,7 @@ object TreeLossDF {
       $"data_group.tcdYear" as "umd_tree_cover_extent__year",
       $"data_group.isPrimaryForest" as "is__umd_regional_primary_forest_2001",
       $"data_group.isPlantations" as "is__gfw_plantations",
+//      $"data_group.isGain" as "is__umd_tree_cover_gain_2000-2012",
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
@@ -65,7 +66,7 @@ object TreeLossDF {
 
   def contextualLayerFilter(
                              includePrimaryForest: Boolean,
-                             includePlantations: Boolean
+                             includePlantations: Boolean,
                            )(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
@@ -91,9 +92,7 @@ object TreeLossDF {
       sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
       sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
       sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
-      sum(
-          $"avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1" * $"umd_tree_cover_extent_2000__ha"
-        ) /
+      sum($"avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1" * $"umd_tree_cover_extent_2000__ha") /
         sum($"umd_tree_cover_extent_2000__ha") as "avg_whrc_aboveground_biomass_density_2000__Mg_ha-1",
       sum("gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg")
         as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
@@ -126,6 +125,7 @@ object TreeLossDF {
       if (includePlantations) List($"is__gfw_plantations")
       else List()
     }
+
 
     df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol: _*)
       .agg(

@@ -11,7 +11,7 @@ case class CarbonSensitivityDataGroup(
                                       mangroveBiomassExtent: Boolean,
                                       drivers: String,
                                       ecozones: String,
-                                      landRights: Boolean,
+                                      landmark: Boolean,
                                       wdpa: String,
                                       intactForestLandscapes: String,
                                       plantationsTypeFluxModel: String,
