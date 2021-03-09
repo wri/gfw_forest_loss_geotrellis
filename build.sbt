@@ -221,20 +221,17 @@ sparkEmrConfigs := List(
     // spark.executor.instances = (number of executors per instance * number of core instances) minus 1 for the driver
     // spark.default.parallelism = spark.executor.instances * spark.executors.cores * 2
     // spark.sql.shuffle.partitions = spark.default.parallelism
-    "spark.dynamicAllocation.enabled" -> "false",
-    "spark.executor.cores" -> "1", //5",
-    "spark.executor.memory" -> "5652m", //37G
-    "spark.executor.memoryOverhead" -> "2g", //5G
-    "spark.driver.cores" -> "1",
-    "spark.driver.memory" -> "6652m",
-    "spark.executor.instances" -> "1599", // 1599 for carbonflux and carbon_sensitivity
-    "spark.default.parallelism" -> "15990", // 15990 for carbonflux and carbon_sensitivity
-    "spark.sql.shuffle.partitions" -> "15990", // 15990 for carbonflux and carbon_sensitivity
-    "spark.driver.maxResultSize" -> "3g",
-    "spark.shuffle.service.enabled" -> "true",
-    "spark.shuffle.compress" -> "true",
+
     "spark.shuffle.spill.compress" -> "true",
+    "spark.driver.maxResultSize" -> "3G",
+    "spark.shuffle.compress" -> "true",
+    "spark.yarn.appMasterEnv.LD_LIBRARY_PATH" -> "/usr/local/miniconda/lib/:/usr/local/lib",
     "spark.rdd.compress" -> "true",
+    "spark.shuffle.service.enabled" -> "true",
+    "spark.driver.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
+    "spark.executorEnv.LD_LIBRARY_PATH" -> "/usr/local/miniconda/lib/:/usr/local/lib",
+    "spark.dynamicAllocation.enabled" -> "true",
+    "spark.executor.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
     //    "spark.kryoserializer.buffer.max" -> "2047m",
 
     //     Best practice 4: Always set up a garbage collector when handling large volume of data through Spark.
