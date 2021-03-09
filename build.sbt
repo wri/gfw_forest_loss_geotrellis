@@ -235,16 +235,8 @@ sparkEmrConfigs := List(
     //     Best practice 4: Always set up a garbage collector when handling large volume of data through Spark.
 
     // Use these GC strategy to avoid java.lang.OutOfMemoryError: GC overhead limit exceeded
-    //    "spark.executor.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
-    //    "spark.driver.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'"
-
-    // Use these GC strategy as default
-    "spark.driver.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
-    "spark.executor.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
-
-    // Need to set these env variables so the bootstrap script for GDAL can use conda to install
-    "spark.yarn.appMasterEnv.LD_LIBRARY_PATH" ->"/usr/local/miniconda/lib/:/usr/local/lib",
-    "spark.executorEnv.LD_LIBRARY_PATH"->  "/usr/local/miniconda/lib/:/usr/local/lib",
+    //    "spark.executor.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
+    //    "spark.driver.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'"
 
     // set this environment variable for GDAL to use request payer method for S3 files
     "spark.appMasterEnv.AWS_REQUEST_PAYER"->  "requester",
