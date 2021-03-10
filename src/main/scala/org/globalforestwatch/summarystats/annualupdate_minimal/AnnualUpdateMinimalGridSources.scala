@@ -14,8 +14,8 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile) extends GridSource
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
   val treeCoverGain = TreeCoverGain(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
-  val treeCoverDensity2010 = TreeCoverDensityPercent2010(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityThreshold2000(gridTile)
+  val treeCoverDensity2010 = TreeCoverDensityThreshold2010(gridTile)
   val biomassPerHectar = BiomassPerHectar(gridTile)
 
   //  val mangroveBiomass = MangroveBiomass(gridTile)

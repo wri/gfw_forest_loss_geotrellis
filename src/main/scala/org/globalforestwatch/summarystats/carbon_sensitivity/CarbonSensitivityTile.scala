@@ -11,7 +11,7 @@ import org.globalforestwatch.layers._
 case class CarbonSensitivityTile(
                                   loss: TreeCoverLoss#ITile,
                                   gain: TreeCoverGain#ITile,
-                                  tcd2000: TreeCoverDensity#ITile,
+                                  tcd2000: TreeCoverDensityThreshold#ITile,
                                   biomass: BiomassPerHectar#OptionalDTile,
                                   grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2#OptionalFTile,
                                   grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2#OptionalFTile,

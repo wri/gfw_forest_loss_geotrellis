@@ -119,7 +119,8 @@ object TreeLossSummary {
             summary.totalGainArea += gainArea
 
             // Specifically for TCD=0. Otherwise, values for TCD=0 are under-estimated.
-            if ((thresholds.head == 0 && tcdYear == 2000) || (thresholds.head == 0 && tcdYear == 2010)) {
+            if (((thresholds.head == 0 || tcd2000 > thresholds.head) && tcdYear == 2000) || ((thresholds.head == 0 || tcd2010 > thresholds.head) && tcdYear == 2010))
+            {
 
               if (loss != null) {
                 summary.lossYear(loss).treecoverLoss += areaHa
@@ -148,44 +149,9 @@ object TreeLossSummary {
               summary.totalNetFluxCo2 += netFluxCo2Pixel
 
               summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
-            }
-
-            // exclusive threshold because of the tcd class used (unlike other packages). For non TCD=0 thresholds.
-            else if ((tcd2000 > thresholds.head && tcdYear == 2000) || (tcd2010 > thresholds.head && tcdYear == 2010)) {
-
-              if (loss != null) {
-                summary.lossYear(loss).treecoverLoss += areaHa
-                summary.lossYear(loss).biomassLoss += biomassPixel
-                summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-                summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
-                summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
-              }
-
-              // TODO: use extent2010 to calculate avg biomass incase year is selected
-              summary.avgBiomass = ((summary.avgBiomass * summary.treecoverExtent2000) + (biomass * areaHa)) / (summary.treecoverExtent2000 + areaHa)
-              tcdYear match {
-                case 2000 => summary.treecoverExtent2000 += areaHa
-                case 2010 => summary.treecoverExtent2010 += areaHa
-              }
-              summary.totalBiomass += biomassPixel
-
-              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
-              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
-              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
-
-              summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-              summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
-              summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
-
-              summary.totalNetFluxCo2 += netFluxCo2Pixel
-
-              summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
-            }
-
+            } else if (gain) {
             // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
             // the correct flux model outputs (TCD>=threshold OR Hansen gain)
-            else if (gain) {
-
               summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
               summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
               summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
@@ -203,16 +169,6 @@ object TreeLossSummary {
                 summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
                 summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
               }
-
-            }
-
-            tcdYear match {
-              case 2000 =>
-                if (tcd2010 >= thresholds.head)
-                  summary.treecoverExtent2010 += areaHa
-              case 2010 =>
-                if (tcd2000 >= thresholds.head)
-                  summary.treecoverExtent2000 += areaHa
             }
 
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
@@ -223,7 +179,6 @@ object TreeLossSummary {
           updateSummary(thresholds, acc.stats)
 
         acc = TreeLossSummary(updatedSummary)
-
       }
     }
 }
