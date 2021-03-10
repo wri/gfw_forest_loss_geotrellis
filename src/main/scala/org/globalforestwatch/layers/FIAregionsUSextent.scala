@@ -8,7 +8,7 @@ case class FiaRegionsUsExtent(gridTile: GridTile)
 
   val uri: String =
   //    s"$basePath/usfs_fia_regions/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"
-    s"s3://gfw-files/flux_2_1_0/FIA_regions/${gridTile.tileId}.tif"
+    s"s3://gfw-files/flux_1_2_0/FIA_regions/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Not applicable"
 

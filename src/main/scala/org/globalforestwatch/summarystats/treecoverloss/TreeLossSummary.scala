@@ -67,8 +67,9 @@ object TreeLossSummary {
           else false
         }
 
+
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
-        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
+        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordinate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
         val areaHa = area / 10000.0
 
@@ -103,7 +104,8 @@ object TreeLossSummary {
                 thresholds.head,
                 tcdYear,
                 isPrimaryForest,
-                isPlantations
+                isPlantations,
+                gain
               )
 
             val summary: TreeLossData =
@@ -116,8 +118,8 @@ object TreeLossSummary {
             summary.totalArea += areaHa
             summary.totalGainArea += gainArea
 
-            // exclusive threshold because of the tcd class used (unlike other packages)
-            if ((tcd2000 > thresholds.head && tcdYear == 2000) || (tcd2010 > thresholds.head && tcdYear == 2010)) {
+            // Specifically for TCD=0. Otherwise, values for TCD=0 are under-estimated.
+            if ((thresholds.head == 0 && tcdYear == 2000) || (thresholds.head == 0 && tcdYear == 2010)) {
 
               if (loss != null) {
                 summary.lossYear(loss).treecoverLoss += areaHa
@@ -146,6 +148,62 @@ object TreeLossSummary {
               summary.totalNetFluxCo2 += netFluxCo2Pixel
 
               summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
+            }
+
+            // exclusive threshold because of the tcd class used (unlike other packages). For non TCD=0 thresholds.
+            else if ((tcd2000 > thresholds.head && tcdYear == 2000) || (tcd2010 > thresholds.head && tcdYear == 2010)) {
+
+              if (loss != null) {
+                summary.lossYear(loss).treecoverLoss += areaHa
+                summary.lossYear(loss).biomassLoss += biomassPixel
+                summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+                summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
+              }
+
+              // TODO: use extent2010 to calculate avg biomass incase year is selected
+              summary.avgBiomass = ((summary.avgBiomass * summary.treecoverExtent2000) + (biomass * areaHa)) / (summary.treecoverExtent2000 + areaHa)
+              tcdYear match {
+                case 2000 => summary.treecoverExtent2000 += areaHa
+                case 2010 => summary.treecoverExtent2010 += areaHa
+              }
+              summary.totalBiomass += biomassPixel
+
+              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
+              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
+              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+
+              summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+              summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+              summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
+
+              summary.totalNetFluxCo2 += netFluxCo2Pixel
+
+              summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
+            }
+
+            // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
+            // the correct flux model outputs (TCD>=threshold OR Hansen gain)
+            else if (gain) {
+
+              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
+              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
+              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+
+              summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+              summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+              summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
+
+              summary.totalNetFluxCo2 += netFluxCo2Pixel
+
+              summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
+
+              if (loss != null) {
+                summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+                summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
+              }
+
             }
 
             tcdYear match {
