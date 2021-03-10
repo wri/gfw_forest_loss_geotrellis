@@ -118,7 +118,6 @@ object TreeLossSummary {
             summary.totalArea += areaHa
             summary.totalGainArea += gainArea
 
-            // Specifically for TCD=0. Otherwise, values for TCD=0 are under-estimated.
             if (((thresholds.head == 0 || tcd2000 > thresholds.head) && tcdYear == 2000) || ((thresholds.head == 0 || tcd2010 > thresholds.head) && tcdYear == 2010))
             {
 
