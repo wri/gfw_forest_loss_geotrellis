@@ -22,54 +22,230 @@ case class ForestChangeDiagnosticDFFactory(
   }
 
   private def getFeatureDataFrame: DataFrame = {
-    summaryRDD
-      .map {
+
+    println("SUMMARY RDD", summaryRDD.count())
+    //    summaryRDD.take(10).foreach(println)
+    var i = 0
+    val dataRDD = summaryRDD
+      .flatMap {
         case (id, summary) =>
+          summary.stats.map {
+            case (dataGroup, data) =>
+              val result = (
+                id,
+                ForestChangeDiagnosticData(
+                  treeCoverLossYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isUMDLoss
+                    ),
+                  treeCoverLossPrimaryForestYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isPrimaryForest && dataGroup.isUMDLoss
+                    ),
+                  treeCoverLossPeatLandYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isPeatlands && dataGroup.isUMDLoss
+                    ),
+                  treeCoverLossIntactForestYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isIntactForestLandscapes2016 && dataGroup.isUMDLoss
+                    ),
+                  treeCoverLossProtectedAreasYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isProtectedArea && dataGroup.isUMDLoss
+                    ),
+                  treeCoverLossSEAsiaLandCoverYearly =
+                    ForestChangeDiagnosticDataLossYearlyCategory.fill(
+                      dataGroup.seAsiaLandCover,
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      include = dataGroup.isUMDLoss
+                    ),
+                  treeCoverLossIDNLandCoverYearly =
+                    ForestChangeDiagnosticDataLossYearlyCategory.fill(
+                      dataGroup.idnLandCover,
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      include = dataGroup.isUMDLoss
+                    ),
+                  treeCoverLossSoyPlanedAreasYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isSoyPlantedAreas && dataGroup.isUMDLoss
+                    ),
+                  treeCoverLossIDNForestAreaYearly =
+                    ForestChangeDiagnosticDataLossYearlyCategory.fill(
+                      dataGroup.idnForestArea,
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      include = dataGroup.isUMDLoss
+                    ),
+                  treeCoverLossIDNForestMoratoriumYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isIdnForestMoratorium && dataGroup.isUMDLoss
+                    ),
+                  prodesLossYearly = ForestChangeDiagnosticDataLossYearly.fill(
+                    dataGroup.prodesLossYear,
+                    data.totalArea,
+                    dataGroup.isProdesLoss
+                  ),
+                  prodesLossProtectedAreasYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.prodesLossYear,
+                      data.totalArea,
+                      dataGroup.isProdesLoss && dataGroup.isProtectedArea
+                    ),
+                  prodesLossProdesPrimaryForestYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.prodesLossYear,
+                      data.totalArea,
+                      dataGroup.isProdesLoss && dataGroup.isPrimaryForest
+                    ),
+                  treeCoverLossBRABiomesYearly =
+                    ForestChangeDiagnosticDataLossYearlyCategory.fill(
+                      dataGroup.braBiomes,
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      include = dataGroup.isUMDLoss
+                    ),
+                  treeCoverExtent = ForestChangeDiagnosticDataDouble
+                    .fill(data.totalArea, dataGroup.isTreeCoverExtent),
+                  treeCoverExtentPrimaryForest =
+                    ForestChangeDiagnosticDataDouble.fill(
+                      data.totalArea,
+                      dataGroup.isTreeCoverExtent && dataGroup.isPrimaryForest
+                    ),
+                  treeCoverExtentProtectedAreas =
+                    ForestChangeDiagnosticDataDouble.fill(
+                      data.totalArea,
+                      dataGroup.isTreeCoverExtent && dataGroup.isProtectedArea
+                    ),
+                  treeCoverExtentPeatlands =
+                    ForestChangeDiagnosticDataDouble.fill(
+                      data.totalArea,
+                      dataGroup.isTreeCoverExtent && dataGroup.isPeatlands
+                    ),
+                  treeCoverExtentIntactForests =
+                    ForestChangeDiagnosticDataDouble.fill(
+                      data.totalArea,
+                      dataGroup.isTreeCoverExtent && dataGroup.isIntactForestLandscapes2016
+                    ),
+                  primaryForestArea = ForestChangeDiagnosticDataDouble
+                    .fill(data.totalArea, dataGroup.isPrimaryForest),
+                  intactForest2016Area = ForestChangeDiagnosticDataDouble.fill(
+                    data.totalArea,
+                    dataGroup.isIntactForestLandscapes2016
+                  ),
+                  totalArea =
+                    ForestChangeDiagnosticDataDouble.fill(data.totalArea),
+                  protectedAreasArea = ForestChangeDiagnosticDataDouble
+                    .fill(data.totalArea, dataGroup.isProtectedArea),
+                  peatlandsArea = ForestChangeDiagnosticDataDouble
+                    .fill(data.totalArea, dataGroup.isPeatlands),
+                  braBiomesArea = ForestChangeDiagnosticDataDoubleCategory
+                    .fill(dataGroup.braBiomes, data.totalArea),
+                  idnForestAreaArea = ForestChangeDiagnosticDataDoubleCategory
+                    .fill(dataGroup.idnForestArea, data.totalArea),
+                  seAsiaLandCoverArea = ForestChangeDiagnosticDataDoubleCategory
+                    .fill(dataGroup.seAsiaLandCover, data.totalArea),
+                  idnLandCoverArea = ForestChangeDiagnosticDataDoubleCategory
+                    .fill(dataGroup.idnLandCover, data.totalArea),
+                  idnForestMoratoriumArea = ForestChangeDiagnosticDataDouble
+                    .fill(data.totalArea, dataGroup.isIdnForestMoratorium),
+                  southAmericaPresence = ForestChangeDiagnosticDataBoolean
+                    .fill(dataGroup.southAmericaPresence),
+                  legalAmazonPresence = ForestChangeDiagnosticDataBoolean
+                    .fill(dataGroup.legalAmazonPresence),
+                  braBiomesPresence = ForestChangeDiagnosticDataBoolean
+                    .fill(dataGroup.braBiomesPresence),
+                  cerradoBiomesPresence = ForestChangeDiagnosticDataBoolean
+                    .fill(dataGroup.cerradoBiomesPresence),
+                  seAsiaPresence = ForestChangeDiagnosticDataBoolean.fill(
+                    dataGroup.seAsiaPresence
+                  ),
+                  idnPresence = ForestChangeDiagnosticDataBoolean.fill(
+                    dataGroup.idnPresence
+                  )
+                )
+              )
+              i = i + 1
+              print("I ", i)
+              result
+
+          }
+      }.cache()
+
+    println("DATA RDD", dataRDD.count())
+    //    dataRDD.take(10).foreach(println)
+
+    val aggRDD = dataRDD.reduceByKey(_ merge _)
+
+    println("AGG RDD", aggRDD.count())
+    //    aggRDD.take(10).foreach(println)
+
+
+    aggRDD
+      .map {
+        case (id, data) =>
           id match {
             case simpleId: SimpleFeatureId =>
-              ForestChangeDiagnosticRowSimple(simpleId.featureId.asJson.noSpaces,
-                summary.stats.treeCoverLossYearly.toJson,
-                summary.stats.treeCoverLossPrimaryForestYearly.toJson,
-                summary.stats.treeCoverLossPeatLandYearly.toJson,
-                summary.stats.treeCoverLossIntactForestYearly.toJson,
-                summary.stats.treeCoverLossProtectedAreasYearly.toJson,
-                summary.stats.treeCoverLossSEAsiaLandCoverYearly.toJson,
-                summary.stats.treeCoverLossIDNLandCoverYearly.toJson,
-                summary.stats.treeCoverLossSoyPlanedAreasYearly.toJson,
-                summary.stats.treeCoverLossIDNForestAreaYearly.toJson,
-                summary.stats.treeCoverLossIDNForestMoratoriumYearly.toJson,
-                summary.stats.prodesLossYearly.toJson,
-                summary.stats.prodesLossProtectedAreasYearly.toJson,
-                summary.stats.prodesLossProdesPrimaryForestYearly.toJson,
-                summary.stats.treeCoverLossBRABiomesYearly.toJson,
-                summary.stats.treeCoverExtent.toJson,
-                summary.stats.treeCoverExtentPrimaryForest.toJson,
-                summary.stats.treeCoverExtentProtectedAreas.toJson,
-                summary.stats.treeCoverExtentPeatlands.toJson,
-                summary.stats.treeCoverExtentIntactForests.toJson,
-                summary.stats.primaryForestArea.toJson,
-                summary.stats.intactForest2016Area.toJson,
-                summary.stats.totalArea.toJson,
-                summary.stats.protectedAreasArea.toJson,
-                summary.stats.peatlandsArea.toJson,
-                summary.stats.braBiomesArea.toJson,
-                summary.stats.idnForestAreaArea.toJson,
-                summary.stats.seAsiaLandCoverArea.toJson,
-                summary.stats.idnLandCoverArea.toJson,
-                summary.stats.idnForestMoratoriumArea.toJson,
-                summary.stats.southAmericaPresence.toJson,
-                summary.stats.legalAmazonPresence.toJson,
-                summary.stats.braBiomesPresence.toJson,
-                summary.stats.cerradoBiomesPresence.toJson,
-                summary.stats.seAsiaPresence.toJson,
-                summary.stats.idnPresence.toJson
-
+              ForestChangeDiagnosticRowSimple(
+                simpleId.featureId.asJson.noSpaces,
+                data.treeCoverLossYearly.toJson,
+                data.treeCoverLossPrimaryForestYearly.toJson,
+                data.treeCoverLossPeatLandYearly.toJson,
+                data.treeCoverLossIntactForestYearly.toJson,
+                data.treeCoverLossProtectedAreasYearly.toJson,
+                data.treeCoverLossSEAsiaLandCoverYearly.toJson,
+                data.treeCoverLossIDNLandCoverYearly.toJson,
+                data.treeCoverLossSoyPlanedAreasYearly.toJson,
+                data.treeCoverLossIDNForestAreaYearly.toJson,
+                data.treeCoverLossIDNForestMoratoriumYearly.toJson,
+                data.prodesLossYearly.toJson,
+                data.prodesLossProtectedAreasYearly.toJson,
+                data.prodesLossProdesPrimaryForestYearly.toJson,
+                data.treeCoverLossBRABiomesYearly.toJson,
+                data.treeCoverExtent.toJson,
+                data.treeCoverExtentPrimaryForest.toJson,
+                data.treeCoverExtentProtectedAreas.toJson,
+                data.treeCoverExtentPeatlands.toJson,
+                data.treeCoverExtentIntactForests.toJson,
+                data.primaryForestArea.toJson,
+                data.intactForest2016Area.toJson,
+                data.totalArea.toJson,
+                data.protectedAreasArea.toJson,
+                data.peatlandsArea.toJson,
+                data.braBiomesArea.toJson,
+                data.idnForestAreaArea.toJson,
+                data.seAsiaLandCoverArea.toJson,
+                data.idnLandCoverArea.toJson,
+                data.idnForestMoratoriumArea.toJson,
+                data.southAmericaPresence.toJson,
+                data.legalAmazonPresence.toJson,
+                data.braBiomesPresence.toJson,
+                data.cerradoBiomesPresence.toJson,
+                data.seAsiaPresence.toJson,
+                data.idnPresence.toJson
               )
             case _ =>
               throw new IllegalArgumentException("Not a SimpleFeatureId")
           }
       }
-      .toDF("location_id",
+      .toDF(
+        "location_id",
         "tree_cover_loss_total_yearly", // treeCoverLossYearly
         "tree_cover_loss_primary_forest_yearly", // treeCoverLossPrimaryForestYearly
         "tree_cover_loss_peat_yearly", //treeCoverLossPeatLandYearly
@@ -104,9 +280,7 @@ case class ForestChangeDiagnosticDFFactory(
         "brazil_biomes_presence", // braBiomesPresence,
         "cerrado_biome_presence", // cerradoBiomesPresence,
         "southeast_asia_presence", // seAsiaPresence,
-        "indonesia_presence", // idnPresence
+        "indonesia_presence" // idnPresence
       )
-    
   }
-
 }
