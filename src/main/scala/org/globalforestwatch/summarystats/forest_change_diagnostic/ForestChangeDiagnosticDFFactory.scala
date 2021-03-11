@@ -22,16 +22,13 @@ case class ForestChangeDiagnosticDFFactory(
   }
 
   private def getFeatureDataFrame: DataFrame = {
-
-    println("SUMMARY RDD", summaryRDD.count())
-    //    summaryRDD.take(10).foreach(println)
-    var i = 0
-    val dataRDD = summaryRDD
+    summaryRDD
       .flatMap {
         case (id, summary) =>
-          summary.stats.map {
+          // We need to convert the Map to a List in order to correctly flatmap the data
+          summary.stats.toList.map {
             case (dataGroup, data) =>
-              val result = (
+              (
                 id,
                 ForestChangeDiagnosticData(
                   treeCoverLossYearly =
@@ -181,23 +178,11 @@ case class ForestChangeDiagnosticDFFactory(
                   )
                 )
               )
-              i = i + 1
-              print("I ", i)
-              result
+
 
           }
-      }.cache()
-
-    println("DATA RDD", dataRDD.count())
-    //    dataRDD.take(10).foreach(println)
-
-    val aggRDD = dataRDD.reduceByKey(_ merge _)
-
-    println("AGG RDD", aggRDD.count())
-    //    aggRDD.take(10).foreach(println)
-
-
-    aggRDD
+      }
+      .reduceByKey(_ merge _)
       .map {
         case (id, data) =>
           id match {
