@@ -24,6 +24,11 @@ case class TreeLossData(
                          var totalFluxModelExtentArea: Double
                        ) {
   def merge(other: TreeLossData): TreeLossData = {
+    if (treecoverExtent2000 + other.treecoverExtent2000 > 0) {
+      avgBiomass = ((avgBiomass * treecoverExtent2000) + (other.avgBiomass * other.treecoverExtent2000)) / (treecoverExtent2000 + other.treecoverExtent2000)
+    } else {
+      avgBiomass = 0
+    }
 
     TreeLossData(
       lossYear ++ other.lossYear.map {
@@ -44,7 +49,7 @@ case class TreeLossData(
       totalGainArea + other.totalGainArea,
       totalBiomass + other.totalBiomass,
       // TODO: use extent2010 to calculate avg biomass incase year is selected
-      ((avgBiomass * treecoverExtent2000) + (other.avgBiomass * other.treecoverExtent2000)) / (treecoverExtent2000 + other.treecoverExtent2000),
+      avgBiomass,
       totalGrossCumulAbovegroundRemovalsCo2 + other.totalGrossCumulAbovegroundRemovalsCo2,
       totalGrossCumulBelowgroundRemovalsCo2 + other.totalGrossCumulBelowgroundRemovalsCo2,
       totalGrossCumulAboveBelowgroundRemovalsCo2 + other.totalGrossCumulAboveBelowgroundRemovalsCo2,

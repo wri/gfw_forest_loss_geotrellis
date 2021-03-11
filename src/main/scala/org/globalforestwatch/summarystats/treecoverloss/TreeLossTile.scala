@@ -10,8 +10,8 @@ import org.globalforestwatch.layers._
   */
 case class TreeLossTile(loss: TreeCoverLoss#ITile,
                         gain: TreeCoverGain#ITile,
-                        tcd2000: TreeCoverDensity2000#ITile,
-                        tcd2010: TreeCoverDensity2010#ITile,
+                        tcd2000: TreeCoverDensityPercent2000#ITile,
+                        tcd2010: TreeCoverDensityPercent2010#ITile,
                         biomass: BiomassPerHectar#OptionalDTile,
                         primaryForest: PrimaryForest#OptionalITile,
                         plantationsBool: PlantationsBool#OptionalITile,
