@@ -5,11 +5,13 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{FeatureId, SimpleFeatureId}
 
+import scala.collection.immutable.SortedMap
+
 case class ForestChangeDiagnosticDFFactory(
-  featureType: String,
-  summaryRDD: RDD[(FeatureId, ForestChangeDiagnosticSummary)],
-  spark: SparkSession
-) {
+                                            featureType: String,
+                                            summaryRDD: RDD[(FeatureId, ForestChangeDiagnosticSummary)],
+                                            spark: SparkSession
+                                          ) {
 
   import spark.implicits._
 
@@ -31,11 +33,17 @@ case class ForestChangeDiagnosticDFFactory(
               (
                 id,
                 ForestChangeDiagnosticData(
-                  treeCoverLossYearly =
+                  treeCoverLossTcd30Yearly =
                     ForestChangeDiagnosticDataLossYearly.fill(
                       dataGroup.umdTreeCoverLossYear,
                       data.totalArea,
                       dataGroup.isUMDLoss
+                    ),
+                  treeCoverLossTcd90Yearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isUMDLoss && dataGroup.isTreeCoverExtent90
                     ),
                   treeCoverLossPrimaryForestYearly =
                     ForestChangeDiagnosticDataLossYearly.fill(
@@ -119,26 +127,26 @@ case class ForestChangeDiagnosticDFFactory(
                       include = dataGroup.isUMDLoss
                     ),
                   treeCoverExtent = ForestChangeDiagnosticDataDouble
-                    .fill(data.totalArea, dataGroup.isTreeCoverExtent),
+                    .fill(data.totalArea, dataGroup.isTreeCoverExtent30),
                   treeCoverExtentPrimaryForest =
                     ForestChangeDiagnosticDataDouble.fill(
                       data.totalArea,
-                      dataGroup.isTreeCoverExtent && dataGroup.isPrimaryForest
+                      dataGroup.isTreeCoverExtent30 && dataGroup.isPrimaryForest
                     ),
                   treeCoverExtentProtectedAreas =
                     ForestChangeDiagnosticDataDouble.fill(
                       data.totalArea,
-                      dataGroup.isTreeCoverExtent && dataGroup.isProtectedArea
+                      dataGroup.isTreeCoverExtent30 && dataGroup.isProtectedArea
                     ),
                   treeCoverExtentPeatlands =
                     ForestChangeDiagnosticDataDouble.fill(
                       data.totalArea,
-                      dataGroup.isTreeCoverExtent && dataGroup.isPeatlands
+                      dataGroup.isTreeCoverExtent30 && dataGroup.isPeatlands
                     ),
                   treeCoverExtentIntactForests =
                     ForestChangeDiagnosticDataDouble.fill(
                       data.totalArea,
-                      dataGroup.isTreeCoverExtent && dataGroup.isIntactForestLandscapes2016
+                      dataGroup.isTreeCoverExtent30 && dataGroup.isIntactForestLandscapes2016
                     ),
                   primaryForestArea = ForestChangeDiagnosticDataDouble
                     .fill(data.totalArea, dataGroup.isPrimaryForest),
@@ -175,21 +183,125 @@ case class ForestChangeDiagnosticDFFactory(
                   ),
                   idnPresence = ForestChangeDiagnosticDataBoolean.fill(
                     dataGroup.idnPresence
-                  )
+                  ),
+                  filteredTreeCoverExtentYearly =
+                    ForestChangeDiagnosticDataExtentYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation
+                    ),
+                  plantationArea = ForestChangeDiagnosticDataDouble
+                    .fill(data.totalArea, dataGroup.isPlantation),
+                  forestValueIndicator =
+                    ForestChangeDiagnosticDataLossYearly.empty,
+                  peatValueIndicator = ForestChangeDiagnosticDataDouble.empty,
+                  protectedAreaValueIndicator =
+                    ForestChangeDiagnosticDataDouble.empty,
+                  deforestationThreatIndicator =
+                    ForestChangeDiagnosticDataLossYearly.empty,
+                  peatThreatIndicator =
+                    ForestChangeDiagnosticDataLossYearly.empty,
+                  protectedAreaThreatIndicator =
+                    ForestChangeDiagnosticDataLossYearly.empty,
+                  fireThreatIndicator =
+                    ForestChangeDiagnosticDataLossYearly.empty
                 )
               )
-
 
           }
       }
       .reduceByKey(_ merge _)
+      .map {
+        case (id, data) => {
+          val minLossYear = data.treeCoverLossTcd90Yearly.value.keysIterator.min
+          val maxLossYear = data.treeCoverLossTcd90Yearly.value.keysIterator.max
+          val years: List[Int] = List.range(minLossYear, maxLossYear + 1)
+
+          val forestValueIndicator: SortedMap[Int, Double] =
+            data.filteredTreeCoverExtentYearly.value
+          val peatValueIndicator: Double = data.peatlandsArea.value
+          val protectedAreaValueIndicator: Double =
+            data.protectedAreasArea.value
+          val deforestationThreatIndicator: SortedMap[Int, Double] = SortedMap(
+            years.map(
+              year =>
+                (year, {
+
+                  // Somehow the compiler cannot infer the types correctly
+                  // I hence declare them here explicitly to help him out.
+                  val a: Double = data.filteredTreeCoverExtentYearly.value
+                    .getOrElse(year, 0)
+                  val b: Double = data.treeCoverLossTcd90Yearly.value
+                    .getOrElse(year, 0)
+                  val c: Double = data.filteredTreeCoverExtentYearly.value
+                    .getOrElse(year - 1, 0)
+                  val d: Double = data.treeCoverLossTcd90Yearly.value
+                    .getOrElse(year - 1, 0)
+
+                  (a * b) + (c * d)
+                })
+            ): _*
+          )
+
+          val peatThreatIndicator: SortedMap[Int, Double] = SortedMap(
+            years.map(
+              year =>
+                (
+                  year, {
+                  // Somehow the compiler cannot infer the types correctly
+                  // I hence declare them here explicitly to help him out.
+                  val a: Double = deforestationThreatIndicator
+                    .getOrElse(year, 0)
+                  (a * peatValueIndicator) + (peatValueIndicator * data.plantationArea.value)
+
+                }
+                )
+            ): _*
+          )
+          val protectedAreaThreatIndicator: SortedMap[Int, Double] = SortedMap(
+            years.map(
+              year =>
+                (
+                  year, {
+                  // Somehow the compiler cannot infer the types correctly
+                  // I hence declare them here explicitly to help him out.
+                  val a: Double = deforestationThreatIndicator
+                    .getOrElse(year, 0)
+
+                  (a * protectedAreaValueIndicator) + (protectedAreaValueIndicator * data.plantationArea.value)
+                }
+                )
+            ): _*
+          )
+          //          val fireThreatIndicator: SortedMap[Int, Double] = ???
+
+          val new_data = data.update(
+            forestValueIndicator =
+              ForestChangeDiagnosticDataLossYearly(forestValueIndicator),
+            peatValueIndicator =
+              ForestChangeDiagnosticDataDouble(peatValueIndicator),
+            protectedAreaValueIndicator =
+              ForestChangeDiagnosticDataDouble(protectedAreaValueIndicator),
+            deforestationThreatIndicator = ForestChangeDiagnosticDataLossYearly(
+              deforestationThreatIndicator
+            ),
+            peatThreatIndicator =
+              ForestChangeDiagnosticDataLossYearly(peatThreatIndicator),
+            protectedAreaThreatIndicator =
+              ForestChangeDiagnosticDataLossYearly(protectedAreaThreatIndicator)
+            //            fireThreatIndicator =
+            //              ForestChangeDiagnosticDataLossYearly(fireThreatIndicator)
+          )
+          (id, new_data)
+        }
+      }
       .map {
         case (id, data) =>
           id match {
             case simpleId: SimpleFeatureId =>
               ForestChangeDiagnosticRowSimple(
                 simpleId.featureId.asJson.noSpaces,
-                data.treeCoverLossYearly.toJson,
+                data.treeCoverLossTcd30Yearly.toJson,
                 data.treeCoverLossPrimaryForestYearly.toJson,
                 data.treeCoverLossPeatLandYearly.toJson,
                 data.treeCoverLossIntactForestYearly.toJson,
@@ -223,7 +335,15 @@ case class ForestChangeDiagnosticDFFactory(
                 data.braBiomesPresence.toJson,
                 data.cerradoBiomesPresence.toJson,
                 data.seAsiaPresence.toJson,
-                data.idnPresence.toJson
+                data.idnPresence.toJson,
+                data.filteredTreeCoverExtentYearly.toJson,
+                data.forestValueIndicator.toJson,
+                data.peatValueIndicator.toJson,
+                data.protectedAreaValueIndicator.toJson,
+                data.deforestationThreatIndicator.toJson,
+                data.peatThreatIndicator.toJson,
+                data.protectedAreaThreatIndicator.toJson,
+                data.fireThreatIndicator.toJson
               )
             case _ =>
               throw new IllegalArgumentException("Not a SimpleFeatureId")
@@ -265,7 +385,15 @@ case class ForestChangeDiagnosticDFFactory(
         "brazil_biomes_presence", // braBiomesPresence,
         "cerrado_biome_presence", // cerradoBiomesPresence,
         "southeast_asia_presence", // seAsiaPresence,
-        "indonesia_presence" // idnPresence
+        "indonesia_presence", // idnPresence
+        "filtered_tree_cover_yearly", // filteredTreeCoverExtentYearly
+        "forest_value_indicator", //  forestValueIndicator
+        "peat_value_indicator", // peatValueIndicator
+        "protected_area_value_indicator", // protectedAreaValueIndicator
+        "deforestation_threat_indicator", // deforestationThreatIndicator
+        "peat_threat_indicator", // peatThreatIndicator
+        "protected_area_threat_indicator", // protectedAreaThreatIndicator
+        "fire_threat_indicator" // fireThreatIndicator
       )
   }
 }

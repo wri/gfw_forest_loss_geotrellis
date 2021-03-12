@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 case class ForestChangeDiagnosticRowSimple(id: String,
-                                           treeCoverLossYearly: String,
+                                           treeCoverLossTcd30Yearly: String,
                                            treeCoverLossPrimaryForestYearly: String,
                                            treeCoverLossPeatLandYearly: String,
                                            treeCoverLossIntactForestYearly: String,
@@ -35,4 +35,13 @@ case class ForestChangeDiagnosticRowSimple(id: String,
                                            braBiomesPresence: String,
                                            cerradoBiomesPresence: String,
                                            seAsiaPresence: String,
-                                           idnPresence: String)
+                                           idnPresence: String,
+                                           filteredTreeCoverExtentYearly: String,
+                                           forestValueIndicator: String,
+                                           peatValueIndicator: String,
+                                           protectedAreaValueIndicator: String,
+                                           deforestationThreatIndicator: String,
+                                           peatThreatIndicator: String,
+                                           protectedAreaThreatIndicator: String,
+                                           fireThreatIndicator: String
+                                          )

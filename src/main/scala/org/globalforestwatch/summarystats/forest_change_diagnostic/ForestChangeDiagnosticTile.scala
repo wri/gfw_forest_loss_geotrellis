@@ -22,9 +22,10 @@ case class ForestChangeDiagnosticTile(
                                        isIDNForestMoratorium: IndonesiaForestMoratorium#OptionalITile,
                                        prodesLossYear: ProdesLossYear#OptionalITile,
                                        braBiomes: BrazilBiomes#OptionalITile,
+                                       isPlantation: PlantationsBool#OptionalITile,
                                        gfwProCoverage: GFWProCoverage#OptionalITile
 
-) extends CellGrid[Int] {
+                                     ) extends CellGrid[Int] {
 
   def cellType: CellType = loss.cellType
 

@@ -7,7 +7,8 @@ import cats.Semigroup
   * Note: This case class contains mutable values
   */
 case class ForestChangeDiagnosticData(
-                                       treeCoverLossYearly: ForestChangeDiagnosticDataLossYearly,
+                                       treeCoverLossTcd30Yearly: ForestChangeDiagnosticDataLossYearly,
+                                       treeCoverLossTcd90Yearly: ForestChangeDiagnosticDataLossYearly,
                                        treeCoverLossPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly,
                                        treeCoverLossPeatLandYearly: ForestChangeDiagnosticDataLossYearly,
                                        treeCoverLossIntactForestYearly: ForestChangeDiagnosticDataLossYearly,
@@ -41,14 +42,24 @@ case class ForestChangeDiagnosticData(
                                        braBiomesPresence: ForestChangeDiagnosticDataBoolean,
                                        cerradoBiomesPresence: ForestChangeDiagnosticDataBoolean,
                                        seAsiaPresence: ForestChangeDiagnosticDataBoolean,
-                                       idnPresence: ForestChangeDiagnosticDataBoolean
+                                       idnPresence: ForestChangeDiagnosticDataBoolean,
+                                       filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataExtentYearly,
+                                       plantationArea: ForestChangeDiagnosticDataDouble,
+                                       forestValueIndicator: ForestChangeDiagnosticDataLossYearly,
+                                       peatValueIndicator: ForestChangeDiagnosticDataDouble,
+                                       protectedAreaValueIndicator: ForestChangeDiagnosticDataDouble,
+                                       deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly,
+                                       peatThreatIndicator: ForestChangeDiagnosticDataLossYearly,
+                                       protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly,
+                                       fireThreatIndicator: ForestChangeDiagnosticDataLossYearly
 
-) {
+                                     ) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
 
     ForestChangeDiagnosticData(
-      treeCoverLossYearly.merge(other.treeCoverLossYearly),
+      treeCoverLossTcd30Yearly.merge(other.treeCoverLossTcd30Yearly),
+      treeCoverLossTcd90Yearly.merge(other.treeCoverLossTcd90Yearly),
       treeCoverLossPrimaryForestYearly.merge(
         other.treeCoverLossPrimaryForestYearly
       ),
@@ -102,9 +113,114 @@ case class ForestChangeDiagnosticData(
       braBiomesPresence.merge(other.braBiomesPresence),
       cerradoBiomesPresence.merge(other.cerradoBiomesPresence),
       seAsiaPresence.merge(other.seAsiaPresence),
-      idnPresence.merge(other.idnPresence)
+      idnPresence.merge(other.idnPresence),
+      filteredTreeCoverExtentYearly.merge(other.filteredTreeCoverExtentYearly),
+      plantationArea.merge(other.plantationArea),
+      forestValueIndicator.merge(other.forestValueIndicator),
+      peatValueIndicator.merge(other.peatValueIndicator),
+      protectedAreaValueIndicator.merge(other.protectedAreaValueIndicator),
+      deforestationThreatIndicator.merge(other.deforestationThreatIndicator),
+      peatThreatIndicator.merge(other.peatThreatIndicator),
+      protectedAreaThreatIndicator.merge(other.protectedAreaThreatIndicator),
+      fireThreatIndicator.merge(other.fireThreatIndicator)
     )
   }
+
+  def update(treeCoverLossTcd30Yearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossTcd30Yearly,
+             treeCoverLossTcd90Yearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossTcd90Yearly,
+             treeCoverLossPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossPrimaryForestYearly,
+             treeCoverLossPeatLandYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossPeatLandYearly,
+             treeCoverLossIntactForestYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossProtectedAreasYearly,
+             treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossProtectedAreasYearly,
+             treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory = this.treeCoverLossSEAsiaLandCoverYearly,
+             treeCoverLossIDNLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory = this.treeCoverLossIDNLandCoverYearly,
+             treeCoverLossSoyPlanedAreasYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossSoyPlanedAreasYearly,
+             treeCoverLossIDNForestAreaYearly: ForestChangeDiagnosticDataLossYearlyCategory = this.treeCoverLossIDNForestAreaYearly,
+             treeCoverLossIDNForestMoratoriumYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossIDNForestMoratoriumYearly,
+             prodesLossYearly: ForestChangeDiagnosticDataLossYearly = this.prodesLossYearly,
+             prodesLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly = this.prodesLossProtectedAreasYearly,
+             prodesLossProdesPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly = this.prodesLossProdesPrimaryForestYearly,
+             treeCoverLossBRABiomesYearly: ForestChangeDiagnosticDataLossYearlyCategory = this.treeCoverLossBRABiomesYearly,
+             treeCoverExtent: ForestChangeDiagnosticDataDouble = this.treeCoverExtent,
+             treeCoverExtentPrimaryForest: ForestChangeDiagnosticDataDouble = this.treeCoverExtentPrimaryForest,
+             treeCoverExtentProtectedAreas: ForestChangeDiagnosticDataDouble = this.treeCoverExtentProtectedAreas,
+             treeCoverExtentPeatlands: ForestChangeDiagnosticDataDouble = this.treeCoverExtentPeatlands,
+             treeCoverExtentIntactForests: ForestChangeDiagnosticDataDouble = this.treeCoverExtentIntactForests,
+             primaryForestArea: ForestChangeDiagnosticDataDouble = this.primaryForestArea,
+             intactForest2016Area: ForestChangeDiagnosticDataDouble = this.intactForest2016Area,
+             totalArea: ForestChangeDiagnosticDataDouble = this.totalArea,
+             protectedAreasArea: ForestChangeDiagnosticDataDouble = this.protectedAreasArea,
+             peatlandsArea: ForestChangeDiagnosticDataDouble = this.peatlandsArea,
+             braBiomesArea: ForestChangeDiagnosticDataDoubleCategory = this.braBiomesArea,
+             idnForestAreaArea: ForestChangeDiagnosticDataDoubleCategory = this.idnForestAreaArea,
+             seAsiaLandCoverArea: ForestChangeDiagnosticDataDoubleCategory = this.seAsiaLandCoverArea,
+             idnLandCoverArea: ForestChangeDiagnosticDataDoubleCategory = this.idnLandCoverArea,
+             idnForestMoratoriumArea: ForestChangeDiagnosticDataDouble = this.idnForestMoratoriumArea,
+             southAmericaPresence: ForestChangeDiagnosticDataBoolean = this.southAmericaPresence,
+             legalAmazonPresence: ForestChangeDiagnosticDataBoolean = this.legalAmazonPresence,
+             braBiomesPresence: ForestChangeDiagnosticDataBoolean = this.braBiomesPresence,
+             cerradoBiomesPresence: ForestChangeDiagnosticDataBoolean = this.cerradoBiomesPresence,
+             seAsiaPresence: ForestChangeDiagnosticDataBoolean = this.seAsiaPresence,
+             idnPresence: ForestChangeDiagnosticDataBoolean = this.idnPresence,
+             filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataExtentYearly = this.filteredTreeCoverExtentYearly,
+             plantationArea: ForestChangeDiagnosticDataDouble = this.plantationArea,
+             forestValueIndicator: ForestChangeDiagnosticDataLossYearly = this.forestValueIndicator,
+             peatValueIndicator: ForestChangeDiagnosticDataDouble = this.peatValueIndicator,
+             protectedAreaValueIndicator: ForestChangeDiagnosticDataDouble = this.protectedAreaValueIndicator,
+             deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly = this.deforestationThreatIndicator,
+             peatThreatIndicator: ForestChangeDiagnosticDataLossYearly = this.peatThreatIndicator,
+             protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly = this.protectedAreaThreatIndicator,
+             fireThreatIndicator: ForestChangeDiagnosticDataLossYearly = this.fireThreatIndicator): ForestChangeDiagnosticData = {
+
+    ForestChangeDiagnosticData(
+      treeCoverLossTcd30Yearly,
+      treeCoverLossTcd90Yearly,
+      treeCoverLossPrimaryForestYearly,
+      treeCoverLossPeatLandYearly,
+      treeCoverLossIntactForestYearly,
+      treeCoverLossProtectedAreasYearly,
+      treeCoverLossSEAsiaLandCoverYearly,
+      treeCoverLossIDNLandCoverYearly,
+      treeCoverLossSoyPlanedAreasYearly,
+      treeCoverLossIDNForestAreaYearly,
+      treeCoverLossIDNForestMoratoriumYearly,
+      prodesLossYearly,
+      prodesLossProtectedAreasYearly,
+      prodesLossProdesPrimaryForestYearly,
+      treeCoverLossBRABiomesYearly,
+      treeCoverExtent,
+      treeCoverExtentPrimaryForest,
+      treeCoverExtentProtectedAreas,
+      treeCoverExtentPeatlands,
+      treeCoverExtentIntactForests,
+      primaryForestArea,
+      intactForest2016Area,
+      totalArea,
+      protectedAreasArea,
+      peatlandsArea,
+      braBiomesArea,
+      idnForestAreaArea,
+      seAsiaLandCoverArea,
+      idnLandCoverArea,
+      idnForestMoratoriumArea,
+      southAmericaPresence,
+      legalAmazonPresence,
+      braBiomesPresence,
+      cerradoBiomesPresence,
+      seAsiaPresence,
+      idnPresence,
+      filteredTreeCoverExtentYearly,
+      plantationArea,
+      forestValueIndicator,
+      peatValueIndicator,
+      protectedAreaValueIndicator,
+      deforestationThreatIndicator,
+      peatThreatIndicator,
+      protectedAreaThreatIndicator,
+      fireThreatIndicator
+    )
+  }
+
 }
 
 object ForestChangeDiagnosticData {
@@ -116,6 +232,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
@@ -145,7 +262,16 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataBoolean.empty,
       ForestChangeDiagnosticDataBoolean.empty,
       ForestChangeDiagnosticDataBoolean.empty,
-      ForestChangeDiagnosticDataBoolean.empty
+      ForestChangeDiagnosticDataBoolean.empty,
+      ForestChangeDiagnosticDataExtentYearly.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearly.empty,
     )
 
   implicit val lossDataSemigroup: Semigroup[ForestChangeDiagnosticData] =

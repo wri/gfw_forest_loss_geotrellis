@@ -25,7 +25,9 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
   val isIDNForestMoratorium = IndonesiaForestMoratorium(gridTile)
   val prodesLossYear = ProdesLossYear(gridTile)
   val braBiomes = BrazilBiomes(gridTile)
+  val isPlantation = PlantationsBool(gridTile)
   val gfwProCoverage = GFWProCoverage(gridTile)
+
 
   def readWindow(
     windowKey: SpatialKey,
@@ -58,6 +60,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
       val isINDForestMoratoriumTile = isIDNForestMoratorium.fetchWindow(windowKey, windowLayout)
       val prodesLossYearTile = prodesLossYear.fetchWindow(windowKey, windowLayout)
       val braBiomesTile = braBiomes.fetchWindow(windowKey, windowLayout)
+      val isPlantationTile = isPlantation.fetchWindow(windowKey, windowLayout)
       val gfwProCoverageTile = gfwProCoverage.fetchWindow(windowKey, windowLayout)
 
 
@@ -75,6 +78,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
         isINDForestMoratoriumTile,
         prodesLossYearTile,
         braBiomesTile,
+        isPlantationTile,
         gfwProCoverageTile
       )
 

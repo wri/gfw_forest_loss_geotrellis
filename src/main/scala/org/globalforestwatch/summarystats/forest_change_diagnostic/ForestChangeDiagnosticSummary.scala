@@ -79,11 +79,13 @@ object ForestChangeDiagnosticSummary {
         val isIdnForestMoratorium: Boolean =
           raster.tile.isIDNForestMoratorium.getData(col, row)
         val braBiomes: String = raster.tile.braBiomes.getData(col, row)
+        val isPlantation: Boolean = raster.tile.isPlantation.getData(col, row)
         val gfwProCoverage: Map[String, Boolean] = raster.tile.gfwProCoverage.getData(col, row)
 
         // compute Booleans
-        val isTreeCoverExtent: Boolean = tcd2000 > 30
-        val isUMDLoss: Boolean = isTreeCoverExtent && umdTreeCoverLossYear > 0
+        val isTreeCoverExtent30: Boolean = tcd2000 > 30
+        val isTreeCoverExtent90: Boolean = tcd2000 > 90
+        val isUMDLoss: Boolean = isTreeCoverExtent30 && umdTreeCoverLossYear > 0
         val isProtectedArea: Boolean = wdpa != ""
         val isProdesLoss: Boolean = prodesLossYear > 0
 
@@ -101,7 +103,8 @@ object ForestChangeDiagnosticSummary {
           isUMDLoss,
           prodesLossYear,
           isProdesLoss,
-          isTreeCoverExtent,
+          isTreeCoverExtent30,
+          isTreeCoverExtent90,
           isPrimaryForest,
           isPeatlands,
           isIntactForestLandscapes2016,
@@ -112,6 +115,7 @@ object ForestChangeDiagnosticSummary {
           idnForestArea,
           isIdnForestMoratorium,
           braBiomes,
+          isPlantation,
           southAmericaPresence,
           legalAmazonPresence,
           braBiomesPresence,
