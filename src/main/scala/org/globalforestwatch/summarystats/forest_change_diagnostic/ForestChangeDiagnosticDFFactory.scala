@@ -190,8 +190,30 @@ case class ForestChangeDiagnosticDFFactory(
                       data.totalArea,
                       dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation
                     ),
+                  filteredTreeCoverLossYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isUMDLoss && dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation
+                    ),
+                  filteredTreeCoverLossPeatYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isUMDLoss && dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation && dataGroup.isPeatlands
+                    ),
+                  filteredTreeCoverLossProtectedAreasYearly =
+                    ForestChangeDiagnosticDataLossYearly.fill(
+                      dataGroup.umdTreeCoverLossYear,
+                      data.totalArea,
+                      dataGroup.isUMDLoss && dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation && dataGroup.isProtectedArea
+                    ),
                   plantationArea = ForestChangeDiagnosticDataDouble
                     .fill(data.totalArea, dataGroup.isPlantation),
+                  plantationOnPeatArea = ForestChangeDiagnosticDataDouble
+                    .fill(data.totalArea, dataGroup.isPlantation && dataGroup.isPeatlands),
+                  plantationInProtectedAreasArea = ForestChangeDiagnosticDataDouble
+                    .fill(data.totalArea, dataGroup.isPlantation && dataGroup.isProtectedArea),
                   forestValueIndicator =
                     ForestChangeDiagnosticDataLossYearly.empty,
                   peatValueIndicator = ForestChangeDiagnosticDataDouble.empty,
@@ -212,7 +234,7 @@ case class ForestChangeDiagnosticDFFactory(
       }
       .reduceByKey(_ merge _)
       .map {
-        case (id, data) => {
+        case (id, data) =>
           val minLossYear = data.treeCoverLossTcd90Yearly.value.keysIterator.min
           val maxLossYear = data.treeCoverLossTcd90Yearly.value.keysIterator.max
           val years: List[Int] = List.range(minLossYear, maxLossYear + 1)
@@ -229,16 +251,13 @@ case class ForestChangeDiagnosticDFFactory(
 
                   // Somehow the compiler cannot infer the types correctly
                   // I hence declare them here explicitly to help him out.
-                  val a: Double = data.filteredTreeCoverExtentYearly.value
+                  val thisYearLoss: Double = data.filteredTreeCoverLossYearly.value
                     .getOrElse(year, 0)
-                  val b: Double = data.treeCoverLossTcd90Yearly.value
-                    .getOrElse(year, 0)
-                  val c: Double = data.filteredTreeCoverExtentYearly.value
-                    .getOrElse(year - 1, 0)
-                  val d: Double = data.treeCoverLossTcd90Yearly.value
+
+                  val lastYearLoss: Double = data.filteredTreeCoverLossYearly.value
                     .getOrElse(year - 1, 0)
 
-                  (a * b) + (c * d)
+                  thisYearLoss + lastYearLoss
                 })
             ): _*
           )
@@ -250,9 +269,14 @@ case class ForestChangeDiagnosticDFFactory(
                   year, {
                   // Somehow the compiler cannot infer the types correctly
                   // I hence declare them here explicitly to help him out.
-                  val a: Double = deforestationThreatIndicator
+                  val thisYearPeatLoss: Double = data.filteredTreeCoverLossPeatYearly.value
                     .getOrElse(year, 0)
-                  (a * peatValueIndicator) + (peatValueIndicator * data.plantationArea.value)
+
+                  val lastYearPeatLoss: Double = data.filteredTreeCoverLossPeatYearly.value
+                    .getOrElse(year - 1, 0)
+
+                  thisYearPeatLoss + lastYearPeatLoss + data.plantationOnPeatArea.value
+
 
                 }
                 )
@@ -265,10 +289,13 @@ case class ForestChangeDiagnosticDFFactory(
                   year, {
                   // Somehow the compiler cannot infer the types correctly
                   // I hence declare them here explicitly to help him out.
-                  val a: Double = deforestationThreatIndicator
+                  val thisYearProtectedAreaLoss: Double = data.filteredTreeCoverLossProtectedAreasYearly.value
                     .getOrElse(year, 0)
 
-                  (a * protectedAreaValueIndicator) + (protectedAreaValueIndicator * data.plantationArea.value)
+                  val lastYearProtectedAreaLoss: Double = data.filteredTreeCoverLossProtectedAreasYearly.value
+                    .getOrElse(year - 1, 0)
+
+                  thisYearProtectedAreaLoss + lastYearProtectedAreaLoss + data.plantationInProtectedAreasArea.value
                 }
                 )
             ): _*
@@ -293,7 +320,6 @@ case class ForestChangeDiagnosticDFFactory(
             //              ForestChangeDiagnosticDataLossYearly(fireThreatIndicator)
           )
           (id, new_data)
-        }
       }
       .map {
         case (id, data) =>
