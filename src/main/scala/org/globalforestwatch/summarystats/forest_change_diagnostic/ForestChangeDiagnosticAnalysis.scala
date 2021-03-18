@@ -50,23 +50,31 @@ object ForestChangeDiagnosticAnalysis {
                 spark: SparkSession,
                 kwargs: Map[String, Any]): Unit = {
 
-    SedonaSQLRegistrator.registerAll(spark)
-
+    //    SedonaSQLRegistrator.registerAll(spark)
 
     // FIRE RDD
-    val fireAlertType: String = getAnyMapValue[String](kwargs, "fireAlertType")
-    val fireAlertObj = FeatureFactory(fireAlertType).featureObj
-    val fireAlertUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "fireAlertSource")
+    val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
+    val fireAlertUris: NonEmptyList[String] = getAnyMapValue[Option[NonEmptyList[String]]](kwargs, "fireAlertSource") match {
+      case None => throw new java.lang.IllegalAccessException("fire_alert_source parameter required for fire alerts analysis")
+      case Some(s: NonEmptyList[String]) => s
+    }
+    val fireAlertObj = FeatureFactory("firealerts", Some(fireAlertType)).featureObj
     val fireAlertPointDF = FeatureDF(fireAlertUris, fireAlertObj, kwargs, spark, "longitude", "latitude")
     val fireAlertSpatialRDD = Adapter.toSpatialRdd(fireAlertPointDF, "pointshape")
 
+    fireAlertSpatialRDD.analyze()
+    println(s"*************** FIRE POINTS ${fireAlertSpatialRDD.rawSpatialRDD.count} ***************")
+
 
     // Feature RDD
-
     val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
     val featurePolygonDF = FeatureDF(featureUris, featureObj, featureType, kwargs, spark, "geom")
     val featureSpatialRDD = Adapter.toSpatialRdd(featurePolygonDF, "polyshape")
+
+    featureSpatialRDD.analyze()
+
+    println(s"*************** FEATURE POLYGONS ${featureSpatialRDD.rawSpatialRDD.count} ***************")
 
     val buildOnSpatialPartitionedRDD = true // Set to TRUE only if run join query
     val considerBoundaryIntersection = false // Only return gemeotries fully covered by each query window in queryWindowRDD
@@ -79,6 +87,7 @@ object ForestChangeDiagnosticAnalysis {
 
     val pairRDD = JoinQuery.SpatialJoinQuery(fireAlertSpatialRDD, featureSpatialRDD, usingIndex, considerBoundaryIntersection)
 
+    println(s"*************** PAIRS ${pairRDD.count} *****************")
     pairRDD.take(10).forEach(println)
 
 

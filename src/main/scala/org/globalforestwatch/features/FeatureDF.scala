@@ -1,8 +1,7 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import org.apache.spark.sql.functions.{split, struct}
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 
 object FeatureDF {

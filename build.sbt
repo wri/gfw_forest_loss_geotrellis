@@ -40,21 +40,24 @@ resolvers ++= Seq(
   "Open Source Geospatial Foundation Repository" at "https://repo.osgeo.org/repository/release/",
   "Apache Software Foundation Snapshots" at "https://repository.apache.org/content/groups/snapshots",
   "Java.net repository" at "https://download.java.net/maven/2",
+  "Artifacts" at "https://mvnrepository.com/artifact",
+  "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/",
+  "jitpack" at "https://jitpack.io",
+  "maven2" at "https://repo1.maven.org/maven2",
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
-resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/"
-//libraryDependencies += "org.gdal" % "gdal" % "3.1.0"
-//libraryDependencies += "com.azavea.geotrellis" % "gdal-warp-bindings" % "1.1.0"
 
 libraryDependencies ++= Seq(
-  sparkCore % Provided,
-  sparkSQL % Provided,
-  sparkHive % Provided,
-  hadoopAws % Provided,
-  hadoopCommon % Provided,
+  sparkCore,
+  sparkSQL,
+  sparkHive,
+  hadoopAws,
+  hadoopCommon,
+  hadoopMapReduceClientCore,
   logging,
   decline,
+  paranamer,
   scalatest % Test,
   geotrellisSpark,
   geotrellisSparkTestKit % Test,
@@ -69,23 +72,17 @@ libraryDependencies ++= Seq(
   sedonaCore,
   sedonaSQL,
   jtsCore,
+  jts2geojson,
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
   "org.scalanlp" %% "breeze" % "0.13.2",
   "org.scalanlp" %% "breeze-natives" % "0.13.2",
   "org.scalanlp" %% "breeze-viz" % "0.13.2",
+  "com.github.mrpowers" % "spark-daria_2.12" % "0.38.2"
 )
 
-//libraryDependencies += "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
-//libraryDependencies += "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
-
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
-
-// spark-daria
-resolvers += "jitpack" at "https://jitpack.io"
-resolvers += "maven2" at "https://repo1.maven.org/maven2"
-libraryDependencies += "com.github.mrpowers" % "spark-daria_2.12" % "0.38.2"
 
 
 // auto imports for local SBT console

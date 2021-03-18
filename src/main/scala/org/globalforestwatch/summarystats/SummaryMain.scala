@@ -7,16 +7,17 @@ import geotrellis.vector.{Feature, Geometry}
 import org.apache.log4j.Logger
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
-import org.globalforestwatch.features._
+import org.globalforestwatch.features.{FeatureId, FeatureRDDFactory}
+
 
 object SummaryMain
-    extends CommandApp(
-      name = "geotrellis-summary-stats",
-      header = "Compute summary statistics for GFW data",
-      main = {
+  extends CommandApp(
+    name = "geotrellis-summary-stats",
+    header = "Compute summary statistics for GFW data",
+    main = {
 
-        val analysisOpt =
-          Opts.option[String]("analysis", "Type of analysis to run")
+      val analysisOpt =
+        Opts.option[String]("analysis", "Type of analysis to run")
 
         val featuresOpt =
           Opts.options[String]("features", "URI of features in TSV format")
