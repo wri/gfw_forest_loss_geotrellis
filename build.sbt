@@ -37,6 +37,9 @@ resolvers ++= Seq(
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
   "LT-snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
   "OSGeo" at "https://repo.osgeo.org/repository/release/",
+  "Open Source Geospatial Foundation Repository" at "https://repo.osgeo.org/repository/release/",
+  "Apache Software Foundation Snapshots" at "https://repository.apache.org/content/groups/snapshots",
+  "Java.net repository" at "https://download.java.net/maven/2",
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
@@ -63,6 +66,9 @@ libraryDependencies ++= Seq(
   logging,
   decline,
   scalatest % Test,
+  sedonaCore,
+  sedonaSQL,
+  jtsCore,
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
@@ -71,8 +77,8 @@ libraryDependencies ++= Seq(
   "org.scalanlp" %% "breeze-viz" % "0.13.2",
 )
 
-libraryDependencies += "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
-libraryDependencies += "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
+//libraryDependencies += "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
+//libraryDependencies += "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
 

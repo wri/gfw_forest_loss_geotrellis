@@ -1,18 +1,14 @@
 package org.globalforestwatch.features
 
-import java.util.HashSet
-
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.{Geometry, Point}
 import geotrellis.vector
-import org.apache.spark.api.java.JavaRDD
+import org.apache.sedona.core.enums.GridType
+import org.apache.sedona.sql.utils.Adapter
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.datasyslab.geospark.enums.GridType
-import org.datasyslab.geospark.spatialRDD.{PointRDD, SpatialRDD}
-import org.datasyslab.geosparksql.utils.Adapter
 import org.globalforestwatch.util.GeometryReducer
 import org.globalforestwatch.util.Util._
+import org.locationtech.jts.geom.Point
 
 object FeatureRDDFactory {
   def apply(analysis: String,
