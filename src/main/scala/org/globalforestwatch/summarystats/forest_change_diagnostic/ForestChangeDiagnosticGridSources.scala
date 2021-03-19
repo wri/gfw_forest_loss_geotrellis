@@ -13,7 +13,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile)
     extends GridSources {
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensity2000(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
   val isPrimaryForest = PrimaryForest(gridTile)
   val isPeatlands = Peatlands(gridTile)
   val isIntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile)
