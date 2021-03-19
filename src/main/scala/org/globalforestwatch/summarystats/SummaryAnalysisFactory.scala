@@ -4,11 +4,9 @@ import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.summarystats.annualupdate.AnnualUpdateAnalysis
 import org.globalforestwatch.summarystats.annualupdate_minimal.AnnualUpdateMinimalAnalysis
 import org.globalforestwatch.summarystats.carbon_sensitivity.CarbonSensitivityAnalysis
 import org.globalforestwatch.summarystats.carbonflux.CarbonFluxAnalysis
-import org.globalforestwatch.summarystats.carbonflux_minimal.CarbonFluxMinimalAnalysis
 import org.globalforestwatch.summarystats.firealerts.FireAlertsAnalysis
 import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticAnalysis
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsAnalysis
@@ -22,13 +20,6 @@ case class SummaryAnalysisFactory(analysis: String,
 
   val runAnalysis: Unit =
       analysis match {
-        case "annualupdate" =>
-          AnnualUpdateAnalysis(
-            featureRDD: RDD[Feature[Geometry, FeatureId]],
-            featureType: String,
-            spark: SparkSession,
-            kwargs: Map[String, Any]
-          )
         case "annualupdate_minimal" =>
           AnnualUpdateMinimalAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
@@ -38,13 +29,6 @@ case class SummaryAnalysisFactory(analysis: String,
           )
         case "carbonflux" =>
           CarbonFluxAnalysis(
-            featureRDD: RDD[Feature[Geometry, FeatureId]],
-            featureType: String,
-            spark: SparkSession,
-            kwargs: Map[String, Any]
-          )
-        case "carbonflux_minimal" =>
-          CarbonFluxMinimalAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,

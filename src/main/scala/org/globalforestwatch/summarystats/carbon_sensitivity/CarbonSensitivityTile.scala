@@ -11,7 +11,7 @@ import org.globalforestwatch.layers._
 case class CarbonSensitivityTile(
                                   loss: TreeCoverLoss#ITile,
                                   gain: TreeCoverGain#ITile,
-                                  tcd2000: TreeCoverDensity#ITile,
+                                  tcd2000: TreeCoverDensityThreshold#ITile,
                                   biomass: BiomassPerHectar#OptionalDTile,
                                   grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2#OptionalFTile,
                                   grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2#OptionalFTile,
@@ -27,7 +27,7 @@ case class CarbonSensitivityTile(
                                   mangroveBiomassExtent: MangroveBiomassExtent#OptionalDTile,
                                   drivers: TreeCoverLossDrivers#OptionalITile,
                                   ecozones: Ecozones#OptionalITile,
-                                  landRights: LandRights#OptionalITile,
+                                  landmark: Landmark#OptionalITile,
                                   wdpa: ProtectedAreas#OptionalITile,
                                   intactForestLandscapes: IntactForestLandscapes#OptionalITile,
                                   plantationsTypeFluxModel: PlantationsTypeFluxModel#OptionalITile,

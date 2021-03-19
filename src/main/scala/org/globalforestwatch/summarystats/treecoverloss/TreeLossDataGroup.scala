@@ -4,5 +4,6 @@ case class TreeLossDataGroup(
                               threshold: Integer,
                               tcdYear: Int,
                               isPrimaryForest: Boolean,
-                              isPlantations: Boolean
+                              isPlantations: Boolean,
+                              isGain: Boolean
                         )

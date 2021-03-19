@@ -16,12 +16,10 @@
 
 import sbt._
 
-// Change the dependency scope to "provided" when you run "sbt assembly"
-
 object Version {
   val breeze = "0.13.2"
   val scala = "2.12.12"
-  val geotrellis = "3.5.0"
+  val geotrellis = "3.5.2"
   val hadoop = "3.2.1"
   val jackson = "2.10.0"
   val spark = "3.0.0"

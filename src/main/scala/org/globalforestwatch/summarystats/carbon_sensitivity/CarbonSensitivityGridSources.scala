@@ -16,7 +16,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String,
   val model: String = getAnyMapValue[String](kwargs,"sensitivityType")
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityThreshold2000(gridTile)
   val biomassPerHectar = BiomassPerHectar(gridTile)
   val grossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile, model)
   val grossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile, model)
@@ -34,7 +34,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String,
   val treeCoverLossDrivers = TreeCoverLossDrivers(gridTile)
   val ecozones = Ecozones(gridTile)
   val protectedAreas = ProtectedAreas(gridTile)
-  val landRights = LandRights(gridTile)
+  val landmark = Landmark(gridTile)
   val intactForestLandscapes = IntactForestLandscapes(gridTile)
   val plantationsTypeFluxModel = PlantationsTypeFluxModel(gridTile)
   val intactPrimaryForest = IntactPrimaryForest(gridTile)
@@ -79,7 +79,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String,
       val mangroveBiomassExtentTile = mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)
       val driversTile = treeCoverLossDrivers.fetchWindow(windowKey, windowLayout)
       val ecozonesTile = ecozones.fetchWindow(windowKey, windowLayout)
-      val landRightsTile = landRights.fetchWindow(windowKey, windowLayout)
+      val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapesTile = intactForestLandscapes.fetchWindow(windowKey, windowLayout)
       val plantationsTypeFluxTile = plantationsTypeFluxModel.fetchWindow(windowKey, windowLayout)
@@ -116,7 +116,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile, kwargs:  Map[String,
         mangroveBiomassExtentTile,
         driversTile,
         ecozonesTile,
-        landRightsTile,
+        landmarkTile,
         wdpaTile,
         intactForestLandscapesTile,
         plantationsTypeFluxTile,

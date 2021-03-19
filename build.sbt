@@ -224,35 +224,36 @@ sparkEmrConfigs := List(
     // spark.executor.instances = (number of executors per instance * number of core instances) minus 1 for the driver
     // spark.default.parallelism = spark.executor.instances * spark.executors.cores * 2
     // spark.sql.shuffle.partitions = spark.default.parallelism
-    "spark.dynamicAllocation.enabled" -> "false",
-    "spark.executor.cores" -> "1", //5",
-    "spark.executor.memory" -> "5652m", //37G
-    "spark.executor.memoryOverhead" -> "2g", //5G
-    "spark.driver.cores" -> "1",
-    "spark.driver.memory" -> "6652m",
-    "spark.executor.instances" -> "159", // 1599 for carbonflux and carbon_sensitivity
-    "spark.default.parallelism" -> "1590", // 15990 for carbonflux and carbon_sensitivity
-    "spark.sql.shuffle.partitions" -> "1590", // 15990 for carbonflux and carbon_sensitivity
-    "spark.driver.maxResultSize" -> "3g",
-    "spark.shuffle.service.enabled" -> "true",
-    "spark.shuffle.compress" -> "true",
+
+//    "spark.dynamicAllocation.enabled" -> "false",
+//    "spark.executor.cores" -> "1", //5",
+//    "spark.executor.memory" -> "5652m", //37G
+//    "spark.executor.memoryOverhead" -> "2g", //5G
+//    "spark.driver.cores" -> "1",
+//    "spark.driver.memory" -> "6652m",
+//    "spark.executor.instances" -> "159", // 1599 for carbonflux and carbon_sensitivity
+//    "spark.default.parallelism" -> "1590", // 15990 for carbonflux and carbon_sensitivity
+//    "spark.sql.shuffle.partitions" -> "1590", // 15990 for carbonflux and carbon_sensitivity
+
     "spark.shuffle.spill.compress" -> "true",
+    "spark.driver.maxResultSize" -> "3G",
+    "spark.shuffle.compress" -> "true",
+    "spark.yarn.appMasterEnv.LD_LIBRARY_PATH" -> "/usr/local/miniconda/lib/:/usr/local/lib",
     "spark.rdd.compress" -> "true",
+    "spark.shuffle.service.enabled" -> "true",
+    "spark.executorEnv.LD_LIBRARY_PATH" -> "/usr/local/miniconda/lib/:/usr/local/lib",
+    "spark.dynamicAllocation.enabled" -> "true",
+
+   // Use these GC strategy as default
+   "spark.driver.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
+   "spark.executor.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
+
     //    "spark.kryoserializer.buffer.max" -> "2047m",
 
     //     Best practice 4: Always set up a garbage collector when handling large volume of data through Spark.
-
     // Use these GC strategy to avoid java.lang.OutOfMemoryError: GC overhead limit exceeded
-    //    "spark.executor.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
-    //    "spark.driver.extraJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'"
-
-    // Use these GC strategy as default
-    "spark.driver.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
-    "spark.executor.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
-
-    // Need to set these env variables so the bootstrap script for GDAL can use conda to install
-    "spark.yarn.appMasterEnv.LD_LIBRARY_PATH" ->"/usr/local/miniconda/lib/:/usr/local/lib",
-    "spark.executorEnv.LD_LIBRARY_PATH"->  "/usr/local/miniconda/lib/:/usr/local/lib",
+    // "spark.executor.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
+    // "spark.driver.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
 
     // set this environment variable for GDAL to use request payer method for S3 files
     "spark.appMasterEnv.AWS_REQUEST_PAYER"->  "requester",

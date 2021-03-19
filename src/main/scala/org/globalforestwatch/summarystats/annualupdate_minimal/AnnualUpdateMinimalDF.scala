@@ -26,7 +26,8 @@ object AnnualUpdateMinimalDF {
     "is__idn_forest_moratorium",
     "is__gfw_wood_fiber",
     "is__gfw_resource_right",
-    "is__gfw_managed_forest"
+    "is__gfw_managed_forest",
+    "is__umd_tree_cover_gain_2000-2012"
   )
 
   def unpackValues(cols: List[Column],
@@ -58,15 +59,23 @@ object AnnualUpdateMinimalDF {
         $"data_group.woodFiber" as "is__gfw_wood_fiber",
         $"data_group.resourceRights" as "is__gfw_resource_right",
         $"data_group.logging" as "is__gfw_managed_forest",
+        $"data_group.isGain" as "is__umd_tree_cover_gain_2000-2012",
         $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
         $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
         $"data.totalArea" as "area__ha",
         $"data.totalGainArea" as "umd_tree_cover_gain_2000-2012__ha",
         $"data.totalBiomass" as "whrc_aboveground_biomass_stock_2000__Mg",
-        $"data.totalCo2" as "whrc_aboveground_co2_stock_2000__Mg",
         $"data.treecoverLoss" as "umd_tree_cover_loss__ha",
         $"data.biomassLoss" as "whrc_aboveground_biomass_loss__Mg",
-        $"data.co2Emissions" as "whrc_aboveground_co2_emissions__Mg"
+        $"data.co2Emissions" as "whrc_aboveground_co2_emissions__Mg",
+        $"data.totalCo2" as "whrc_aboveground_co2_stock_2000__Mg",
+        $"data.totalGrossCumulAbovegroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_co2_removals__Mg",
+        $"data.totalGrossCumulBelowgroundRemovalsCo2" as "gfw_gross_cumulative_belowground_co2_removals__Mg",
+        $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
+        $"data.totalNetFluxCo2" as "gfw_net_flux_co2e__Mg",
+        $"data.totalGrossEmissionsCo2eCo2Only" as "gfw_gross_emissions_co2e_co2_only__Mg",
+        $"data.totalGrossEmissionsCo2eNonCo2" as "gfw_gross_emissions_co2e_non_co2__Mg",
+        $"data.totalGrossEmissionsCo2e" as "gfw_gross_emissions_co2e_all_gases__Mg"
       )
 
     val unpackCols = {
@@ -100,9 +109,15 @@ object AnnualUpdateMinimalDF {
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
         sum("whrc_aboveground_co2_stock_2000__Mg") as "whrc_aboveground_co2_stock_2000__Mg",
-        sum("umd_tree_cover_loss__ha") as "umd_tree_cover_loss_2001-2019__ha",
-        sum("whrc_aboveground_biomass_loss__Mg") as "whrc_aboveground_biomass_loss_2001-2019__Mg",
-        sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions_2001-2019__Mg"
+        sum("umd_tree_cover_loss__ha") as "umd_tree_cover_loss_2001-2020__ha",
+        sum("whrc_aboveground_biomass_loss__Mg") as "whrc_aboveground_biomass_loss_2001-2020__Mg",
+        sum("gfw_gross_cumulative_aboveground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
+        sum("gfw_gross_cumulative_belowground_co2_removals__Mg") as "gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg",
+        sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals_2001-2020__Mg",
+        sum("gfw_net_flux_co2e__Mg") as "gfw_net_flux_co2e_2001-2020__Mg",
+        sum("gfw_gross_emissions_co2e_co2_only__Mg") as "gfw_gross_emissions_co2e_co2_only_2001-2020__Mg",
+        sum("gfw_gross_emissions_co2e_non_co2__Mg") as "gfw_gross_emissions_co2e_non_co2_2001-2020__Mg",
+        sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases_2001-2020__Mg",
       )
   }
 
@@ -124,9 +139,15 @@ object AnnualUpdateMinimalDF {
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
         sum("whrc_aboveground_co2_stock_2000__Mg") as "whrc_aboveground_co2_stock_2000__Mg",
-        sum("umd_tree_cover_loss_2001-2019__ha") as "umd_tree_cover_loss_2001-2019__ha",
-        sum("whrc_aboveground_biomass_loss_2001-2019__Mg") as "whrc_aboveground_biomass_loss_2001-2019__Mg",
-        sum("whrc_aboveground_co2_emissions_2001-2019__Mg") as "whrc_aboveground_co2_emissions_2001-2019__Mg"
+        sum("umd_tree_cover_loss_2001-2020__ha") as "umd_tree_cover_loss_2001-2020__ha",
+        sum("whrc_aboveground_biomass_loss_2001-2020__Mg") as "whrc_aboveground_biomass_loss_2001-2020__Mg",
+        sum("gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg") as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
+        sum("gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg") as "gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg",
+        sum("gfw_gross_cumulative_aboveground_belowground_co2_removals_2001-2020__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals_2001-2020__Mg",
+        sum("gfw_net_flux_co2e_2001-2020__Mg") as "gfw_net_flux_co2e_2001-2020__Mg",
+        sum("gfw_gross_emissions_co2e_co2_only_2001-2020__Mg") as "gfw_gross_emissions_co2e_co2_only_2001-2020__Mg",
+        sum("gfw_gross_emissions_co2e_non_co2_2001-2020__Mg") as "gfw_gross_emissions_co2e_non_co2_2001-2020__Mg",
+        sum("gfw_gross_emissions_co2e_all_gases_2001-2020__Mg") as "gfw_gross_emissions_co2e_all_gases_2001-2020__Mg",
       )
   }
 
@@ -144,7 +165,10 @@ object AnnualUpdateMinimalDF {
       .agg(
         sum("umd_tree_cover_loss__ha") as "umd_tree_cover_loss__ha",
         sum("whrc_aboveground_biomass_loss__Mg") as "whrc_aboveground_biomass_loss__Mg",
-        sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions__Mg"
+        sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions__Mg",
+        sum("gfw_gross_emissions_co2e_co2_only__Mg") as "gfw_gross_emissions_co2e_co2_only__Mg",
+        sum("gfw_gross_emissions_co2e_non_co2__Mg") as "gfw_gross_emissions_co2e_non_co2__Mg",
+        sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg"
       )
   }
 
@@ -176,7 +200,8 @@ object AnnualUpdateMinimalDF {
       max($"is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
       max($"is__gfw_resource_right") as "is__gfw_resource_right",
-      max($"is__gfw_managed_forest") as "is__gfw_managed_forest"
+      max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
+      max($"is__umd_tree_cover_gain_2000-2012") as "is__umd_tree_cover_gain_2000-2012"
     )
 
     val aggCols =
@@ -217,7 +242,8 @@ object AnnualUpdateMinimalDF {
       max($"is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
       max($"is__gfw_resource_right") as "is__gfw_resource_right",
-      max($"is__gfw_managed_forest") as "is__gfw_managed_forest"
+      max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
+      max($"is__umd_tree_cover_gain_2000-2012") as "is__umd_tree_cover_gain_2000-2012"
     )
 
     val aggCols = if (!wdpa)

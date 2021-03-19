@@ -14,11 +14,18 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
   val treeCoverGain = TreeCoverGain(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensity2000(gridTile)
-  val treeCoverDensity2010 = TreeCoverDensity2010(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
+  val treeCoverDensity2010 = TreeCoverDensityPercent2010(gridTile)
   val biomassPerHectar = BiomassPerHectar(gridTile)
   val primaryForest = PrimaryForest(gridTile)
   val plantationsBool = PlantationsBool(gridTile)
+
+  val grossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile)
+  val grossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile)
+  val grossEmissionsCo2eNonCo2 = GrossEmissionsNonCo2Co2e(gridTile)
+  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridTile)
+  val netFluxCo2 = NetFluxCo2e(gridTile)
+  val fluxModelExtent = FluxModelExtent(gridTile)
 
 
   def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[TreeLossTile]] = {
@@ -41,6 +48,12 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val plantationsBoolTile = plantationsBool.fetchWindow(windowKey, windowLayout)
 
+      val grossCumulAbovegroundRemovalsCo2Tile = grossCumulAbovegroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
+      val grossCumulBelowgroundRemovalsCo2Tile = grossCumulBelowgroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eNonCo2Tile = grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
+      val netFluxCo2Tile = netFluxCo2.fetchWindow(windowKey, windowLayout)
+      val fluxModelExtentTile = fluxModelExtent.fetchWindow(windowKey, windowLayout)
 
       val tile = TreeLossTile(
         lossTile,
@@ -49,7 +62,13 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
         tcd2010Tile,
         biomassTile,
         primaryForestTile,
-        plantationsBoolTile
+        plantationsBoolTile,
+        grossCumulAbovegroundRemovalsCo2Tile,
+        grossCumulBelowgroundRemovalsCo2Tile,
+        netFluxCo2Tile,
+        grossEmissionsCo2eNonCo2Tile,
+        grossEmissionsCo2eCo2OnlyTile,
+        fluxModelExtentTile
       )
 
       Raster(tile, windowKey.extent(windowLayout))

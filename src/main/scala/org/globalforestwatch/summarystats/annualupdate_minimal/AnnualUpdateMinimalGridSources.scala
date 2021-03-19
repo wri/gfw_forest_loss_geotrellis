@@ -14,8 +14,8 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile) extends GridSource
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
   val treeCoverGain = TreeCoverGain(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
-  val treeCoverDensity2010 = TreeCoverDensityPercent2010(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityThreshold2000(gridTile)
+  val treeCoverDensity2010 = TreeCoverDensityThreshold2010(gridTile)
   val biomassPerHectar = BiomassPerHectar(gridTile)
 
   //  val mangroveBiomass = MangroveBiomass(gridTile)
@@ -60,6 +60,11 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile) extends GridSource
   val resourceRights = ResourceRights(gridTile)
   val logging = Logging(gridTile)
   //  val oilGas = OilGas(gridTile)
+  val grossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile)
+  val grossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile)
+  val netFluxCo2 = NetFluxCo2e(gridTile)
+  val grossEmissionsCo2eNonCo2 = GrossEmissionsNonCo2Co2e(gridTile)
+  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridTile)
 
   def readWindow(
                   windowKey: SpatialKey, windowLayout: LayoutDefinition
@@ -126,6 +131,11 @@ val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
       val resourceRightsTile = resourceRights.fetchWindow(windowKey, windowLayout)
       val loggingTile = logging.fetchWindow(windowKey, windowLayout)
 //      val oilGasTile = oilGas.fetchWindow(windowKey, windowLayout)
+      val grossCumulAbovegroundRemovalsCo2Tile = grossCumulAbovegroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
+      val grossCumulBelowgroundRemovalsCo2Tile = grossCumulBelowgroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
+      val netFluxCo2Tile = netFluxCo2.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eNonCo2Tile = grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
 
       val tile = AnnualUpdateMinimalTile(
         lossTile,
@@ -171,7 +181,12 @@ val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
 //        braBiomesTile,
         woodFiberTile,
         resourceRightsTile,
-        loggingTile
+        loggingTile,
+        grossEmissionsCo2eNonCo2Tile,
+        grossEmissionsCo2eCo2OnlyTile,
+        grossCumulAbovegroundRemovalsCo2Tile,
+        grossCumulBelowgroundRemovalsCo2Tile,
+        netFluxCo2Tile
 //        oilGasTile
       )
 

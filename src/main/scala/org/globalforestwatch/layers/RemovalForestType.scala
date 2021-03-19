@@ -9,7 +9,7 @@ case class RemovalForestType(gridTile: GridTile, model: String = "standard")
 
   val uri: String =
 //    s"$basePath/gfw_removal_forest_type$model_suffix/v20150601/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/geotiff/${gridTile.tileId}.tif"
-    s"s3://gfw-files/flux_2_1_0/removal_forest_type/$model_suffix/${gridTile.tileId}.tif"
+    s"s3://gfw-files/flux_1_2_1/removal_forest_type/$model_suffix/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Not applicable"
 
