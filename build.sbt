@@ -73,13 +73,13 @@ libraryDependencies ++= Seq(
   sedonaSQL,
   //  jtsCore,
   //  jts2geojson,
-  "org.geotools" % "gt-ogr-bridj" % Version.geotools
-    exclude("com.nativelibs4java", "bridj"),
-  "com.nativelibs4java" % "bridj" % "0.6.1",
-  "org.scalanlp" %% "breeze" % "0.13.2",
-  "org.scalanlp" %% "breeze-natives" % "0.13.2",
-  "org.scalanlp" %% "breeze-viz" % "0.13.2",
-  "com.github.mrpowers" % "spark-daria_2.12" % "0.38.2"
+  geoToolsOGRBridj,
+  bridj,
+  breeze,
+  breezeNatives,
+  breezeViz,
+  sparkDaria
+
 )
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
@@ -131,7 +131,7 @@ assemblyMergeStrategy in assembly := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat
   // both GeoSpark and Geotrellis bring in this library, need to use GeoSpark version
-  case PathList("org", "geotools", xs @ _*) => MergeStrategy.last
+  case PathList("org", "geotools", xs@_*) => MergeStrategy.first
   case PathList("META-INF", xs@_*) =>
     xs match {
       case ("MANIFEST.MF" :: Nil) => MergeStrategy.discard

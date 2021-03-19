@@ -1,25 +1,25 @@
 /*
-   * Copyright (c) 2019 Azavea.
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   * http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   */
+ * Copyright (c) 2019 Azavea.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import sbt._
 
 // Change the dependency scope to "provided" when you run "sbt assembly"
 
-
 object Version {
+  val breeze = "0.13.2"
   val scala = "2.12.12"
   val geotrellis = "3.5.0"
   val hadoop = "3.2.1"
@@ -30,8 +30,10 @@ object Version {
   val sedona = "1.0.0-incubating"
 }
 
-
 object Dependencies {
+
+  private val dependencyScope = "provided"
+
   val sparkJts = "org.locationtech.geomesa" %% "geomesa-spark-jts" % "2.3.1"
 
   val geotrellisSpark = "org.locationtech.geotrellis" %% "geotrellis-spark" % Version.geotrellis
@@ -46,7 +48,6 @@ object Dependencies {
   val geotrellisSparkTestKit = "org.locationtech.geotrellis" %% "geotrellis-spark-testkit" % Version.geotrellis
   val geotrellisRasterTestkit = "org.locationtech.geotrellis" %% "geotrellis-raster-testkit" % Version.geotrellis
   val geotrellisGdal = "org.locationtech.geotrellis" %% "geotrellis-gdal" % Version.geotrellis
-  val sedonaCore = "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
 
   val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.9.1"
   val logging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
@@ -72,10 +73,14 @@ object Dependencies {
   //  val sedonaSQL = "org.apache.sedona" %% "sedona-sql-".concat(
   //    Version.sparkCompatible
   //  ) % Version.sedona
+  val sedonaCore = "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
   val sedonaSQL = "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
-  private val dependencyScope = "provided"
-
   //  val jts2geojson = "org.wololo" % "jts2geojson" % "0.14.3" % "compile"
   //  val jtsCore = "org.locationtech.jts" % "jts-core" % "1.16.1" % "compile"  // 1.18.0 ?
-
+  val geoToolsOGRBridj = "org.geotools" % "gt-ogr-bridj" % Version.geotools exclude("com.nativelibs4java", "bridj")
+  val bridj = "com.nativelibs4java" % "bridj" % "0.6.1"
+  val breeze = "org.scalanlp" %% "breeze" % Version.breeze
+  val breezeNatives = "org.scalanlp" %% "breeze-natives" % Version.breeze
+  val breezeViz = "org.scalanlp" %% "breeze-viz" % Version.breeze
+  val sparkDaria = "com.github.mrpowers" % "spark-daria_2.12" % "0.38.2"
 }
