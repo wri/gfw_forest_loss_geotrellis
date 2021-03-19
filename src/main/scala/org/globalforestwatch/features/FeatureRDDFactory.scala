@@ -2,8 +2,10 @@ package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
 import geotrellis.vector
-import org.apache.sedona.core.enums.GridType
-import org.apache.sedona.sql.utils.Adapter
+import org.datasyslab.geospark.enums.GridType
+import org.datasyslab.geosparksql.utils.Adapter
+//import org.apache.sedona.core.enums.GridType
+//import org.apache.sedona.sql.utils.Adapter
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.util.GeometryReducer

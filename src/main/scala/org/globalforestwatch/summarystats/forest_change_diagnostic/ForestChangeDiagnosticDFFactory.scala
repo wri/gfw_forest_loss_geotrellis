@@ -10,7 +10,8 @@ import scala.collection.immutable.SortedMap
 case class ForestChangeDiagnosticDFFactory(
                                             featureType: String,
                                             summaryRDD: RDD[(FeatureId, ForestChangeDiagnosticSummary)],
-                                            spark: SparkSession
+                                            spark: SparkSession,
+                                            kwargs: Map[String, Any]
                                           ) {
 
   import spark.implicits._
@@ -24,24 +25,28 @@ case class ForestChangeDiagnosticDFFactory(
   }
 
   private def getFeatureDataFrame: DataFrame = {
-    summaryRDD
+    val analysisRDD: RDD[(SimpleFeatureId, ForestChangeDiagnosticData)] = summaryRDD
       .flatMap {
         case (id, summary) =>
           // We need to convert the Map to a List in order to correctly flatmap the data
           summary.stats.toList.map {
             case (dataGroup, data) =>
-              (
-                id,
-                ForestChangeDiagnosticData(
-                  treeCoverLossTcd30Yearly =
-                    ForestChangeDiagnosticDataLossYearly.fill(
-                      dataGroup.umdTreeCoverLossYear,
-                      data.totalArea,
-                      dataGroup.isUMDLoss
-                    ),
-                  treeCoverLossTcd90Yearly =
-                    ForestChangeDiagnosticDataLossYearly.fill(
-                      dataGroup.umdTreeCoverLossYear,
+              id match {
+                case featureId: SimpleFeatureId =>
+
+
+                  (
+                    featureId,
+                    ForestChangeDiagnosticData(
+                      treeCoverLossTcd30Yearly =
+                        ForestChangeDiagnosticDataLossYearly.fill(
+                          dataGroup.umdTreeCoverLossYear,
+                          data.totalArea,
+                          dataGroup.isUMDLoss
+                        ),
+                      treeCoverLossTcd90Yearly =
+                        ForestChangeDiagnosticDataLossYearly.fill(
+                          dataGroup.umdTreeCoverLossYear,
                       data.totalArea,
                       dataGroup.isUMDLoss && dataGroup.isTreeCoverExtent90
                     ),
@@ -219,16 +224,19 @@ case class ForestChangeDiagnosticDFFactory(
                   peatValueIndicator = ForestChangeDiagnosticDataDouble.empty,
                   protectedAreaValueIndicator =
                     ForestChangeDiagnosticDataDouble.empty,
-                  deforestationThreatIndicator =
-                    ForestChangeDiagnosticDataLossYearly.empty,
-                  peatThreatIndicator =
-                    ForestChangeDiagnosticDataLossYearly.empty,
-                  protectedAreaThreatIndicator =
-                    ForestChangeDiagnosticDataLossYearly.empty,
-                  fireThreatIndicator =
-                    ForestChangeDiagnosticDataLossYearly.empty
-                )
-              )
+                      deforestationThreatIndicator =
+                        ForestChangeDiagnosticDataLossYearly.empty,
+                      peatThreatIndicator =
+                        ForestChangeDiagnosticDataLossYearly.empty,
+                      protectedAreaThreatIndicator =
+                        ForestChangeDiagnosticDataLossYearly.empty,
+                      fireThreatIndicator =
+                        ForestChangeDiagnosticDataLossYearly.empty
+                    )
+                  )
+                case _ =>
+                  throw new IllegalArgumentException("Not a SimpleFeatureId")
+              }
 
           }
       }
@@ -321,6 +329,12 @@ case class ForestChangeDiagnosticDFFactory(
           )
           (id, new_data)
       }
+    val fireCount: RDD[(SimpleFeatureId, ForestChangeDiagnosticDataLossYearly)] = ForestChangeDiagnosticAnalysis.fireStats(featureType, spark, kwargs)
+
+
+    analysisRDD.leftOuterJoin(fireCount).mapValues {
+      case (data, fire) => data.update(fireThreatIndicator = fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty))
+    }
       .map {
         case (id, data) =>
           id match {

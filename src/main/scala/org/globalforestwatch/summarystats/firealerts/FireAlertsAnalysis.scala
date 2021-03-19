@@ -10,8 +10,7 @@ import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId}
 import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
-import org.apache.spark.sql.functions.{split, struct}
-import org.apache.spark.sql.sedona_sql.expressions.{ST_Point, ST_Intersects}
+
 
 object FireAlertsAnalysis {
   def apply(featureRDD: RDD[Feature[vector.Geometry, FeatureId]],

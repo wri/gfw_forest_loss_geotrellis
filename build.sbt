@@ -71,8 +71,8 @@ libraryDependencies ++= Seq(
   scalatest % Test,
   sedonaCore,
   sedonaSQL,
-  jtsCore,
-  jts2geojson,
+  //  jtsCore,
+  //  jts2geojson,
   "org.geotools" % "gt-ogr-bridj" % Version.geotools
     exclude("com.nativelibs4java", "bridj"),
   "com.nativelibs4java" % "bridj" % "0.6.1",
@@ -175,7 +175,7 @@ sparkS3JarFolder := "s3://gfw-pipelines-dev/geotrellis/jars"
 sparkS3LogUri := Some("s3://gfw-pipelines-dev/geotrellis/logs")
 sparkSubnetId := Some("subnet-067b91868bc3a8ff1")
 sparkSecurityGroupIds := Seq("sg-07c11c0c9189c0a7a", "sg-068c422162d468700")
-sparkInstanceCount := 101 // 201 for carbonflux and carbon_sensitivity
+sparkInstanceCount := 21 // 201 for carbonflux and carbon_sensitivity
 sparkMasterType := "r4.2xlarge"
 sparkCoreType := "r4.2xlarge"
 sparkMasterEbsSize := Some(10)
@@ -230,9 +230,9 @@ sparkEmrConfigs := List(
     "spark.executor.memoryOverhead" -> "2g", //5G
     "spark.driver.cores" -> "1",
     "spark.driver.memory" -> "6652m",
-    "spark.executor.instances" -> "799", // 1599 for carbonflux and carbon_sensitivity
-    "spark.default.parallelism" -> "7990", // 15990 for carbonflux and carbon_sensitivity
-    "spark.sql.shuffle.partitions" -> "7990", // 15990 for carbonflux and carbon_sensitivity
+    "spark.executor.instances" -> "159", // 1599 for carbonflux and carbon_sensitivity
+    "spark.default.parallelism" -> "1590", // 15990 for carbonflux and carbon_sensitivity
+    "spark.sql.shuffle.partitions" -> "1590", // 15990 for carbonflux and carbon_sensitivity
     "spark.driver.maxResultSize" -> "3g",
     "spark.shuffle.service.enabled" -> "true",
     "spark.shuffle.compress" -> "true",
