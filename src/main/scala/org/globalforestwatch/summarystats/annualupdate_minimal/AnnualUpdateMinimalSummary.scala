@@ -193,8 +193,7 @@ object AnnualUpdateMinimalSummary {
               summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
               summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
               summary.totalNetFluxCo2 += netFluxCo2Pixel
-            }
-            else if (gain) {
+            } else if (gain) {
               // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
               // the correct flux model outputs (TCD>=threshold OR Hansen gain=TRUE)
               summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
