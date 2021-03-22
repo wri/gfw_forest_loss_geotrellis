@@ -26,8 +26,7 @@ object AnnualUpdateMinimalDF {
     "is__idn_forest_moratorium",
     "is__gfw_wood_fiber",
     "is__gfw_resource_right",
-    "is__gfw_managed_forest",
-    "is__umd_tree_cover_gain_2000-2012"
+    "is__gfw_managed_forest"
   )
 
   def unpackValues(cols: List[Column],
@@ -59,7 +58,6 @@ object AnnualUpdateMinimalDF {
         $"data_group.woodFiber" as "is__gfw_wood_fiber",
         $"data_group.resourceRights" as "is__gfw_resource_right",
         $"data_group.logging" as "is__gfw_managed_forest",
-        $"data_group.isGain" as "is__umd_tree_cover_gain_2000-2012",
         $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
         $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
         $"data.totalArea" as "area__ha",
@@ -200,8 +198,7 @@ object AnnualUpdateMinimalDF {
       max($"is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
       max($"is__gfw_resource_right") as "is__gfw_resource_right",
-      max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
-      max($"is__umd_tree_cover_gain_2000-2012") as "is__umd_tree_cover_gain_2000-2012"
+      max($"is__gfw_managed_forest") as "is__gfw_managed_forest"
     )
 
     val aggCols =
@@ -242,8 +239,7 @@ object AnnualUpdateMinimalDF {
       max($"is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
       max($"is__gfw_resource_right") as "is__gfw_resource_right",
-      max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
-      max($"is__umd_tree_cover_gain_2000-2012") as "is__umd_tree_cover_gain_2000-2012"
+      max($"is__gfw_managed_forest") as "is__gfw_managed_forest"
     )
 
     val aggCols = if (!wdpa)
