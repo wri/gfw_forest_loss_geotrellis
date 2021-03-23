@@ -6,7 +6,9 @@ import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 object AnnualUpdateMinimalDownloadDF {
   val treecoverLossMinYear = 2001
   val treecoverLossMaxYear = 2020
-  val treecoverLossTotalYears = (treecoverLossMaxYear - treecoverLossMinYear) + 1
+//  val fluxModelTotalYears = (treecoverLossMaxYear - treecoverLossMinYear) + 1
+  // fluxModelTotalYears is temporarily using 19 instead of 20 because the model version being used in 2001-2019
+  val fluxModelTotalYears = 19
 
   def sumDownload(df: DataFrame): DataFrame = {
 
@@ -36,9 +38,9 @@ object AnnualUpdateMinimalDownloadDF {
         sum("whrc_aboveground_biomass_stock_2000__Mg") / sum(
           "umd_tree_cover_extent_2000__ha"
         ) as "avg_whrc_aboveground_biomass_2000_Mg_ha-1",
-        sum($"gfw_gross_emissions_co2e_all_gases__Mg") / treecoverLossTotalYears as "gfw_gross_emissions_co2e_all_gases__Mg_yr-1",
-        sum($"gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") / treecoverLossTotalYears as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg_yr-1",
-        sum($"gfw_net_flux_co2e__Mg") / treecoverLossTotalYears as "gfw_net_flux_co2e__Mg_yr-1"
+        sum($"gfw_gross_emissions_co2e_all_gases__Mg") / fluxModelTotalYears as "gfw_gross_emissions_co2e_all_gases__Mg_yr-1",
+        sum($"gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") / fluxModelTotalYears as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg_yr-1",
+        sum($"gfw_net_flux_co2e__Mg") / fluxModelTotalYears as "gfw_net_flux_co2e__Mg_yr-1"
       )
       .as("total")
       .na.fill(0, Seq("adm1", "adm2"))
