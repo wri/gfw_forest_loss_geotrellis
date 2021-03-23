@@ -97,7 +97,8 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     import spark.implicits._
 
     val adm2ApiDF = df
-      .filter($"umd_tree_cover_loss__year".isNotNull && $"umd_tree_cover_loss__ha" > 0)
+      .filter($"umd_tree_cover_loss__year".isNotNull &&
+        ($"umd_tree_cover_loss__ha" > 0 || $"gfw_gross_emissions_co2e_all_gases__Mg" > 0))
       .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2")))
       .coalesce(133) // this should result in an avg file size of 100MB
 

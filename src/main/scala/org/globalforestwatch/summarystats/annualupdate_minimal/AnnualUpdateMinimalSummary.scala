@@ -193,6 +193,20 @@ object AnnualUpdateMinimalSummary {
               summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
               summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
               summary.totalNetFluxCo2 += netFluxCo2Pixel
+            } else if (gain) {
+              // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
+              // the correct flux model outputs (TCD>=threshold OR Hansen gain=TRUE)
+              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
+              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
+              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+
+              summary.totalNetFluxCo2 += netFluxCo2Pixel
+
+              if (loss != null) {
+                summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+                summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
+              }
             }
 
             if (tcd2010 >= thresholds.head) {
