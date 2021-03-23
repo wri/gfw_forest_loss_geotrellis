@@ -8,7 +8,8 @@ case class GrossEmissionsNodeCodes(gridTile: GridTile, model: String = "standard
 
   val uri: String =
 //    s"$basePath/gfw_emissions_node_codes$model_suffix/v20200824/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"
-    s"s3://gfw-files/flux_1_2_1/gross_emissions_node_codes/$model_suffix/${gridTile.tileId}.tif"
+//    s"s3://gfw-files/flux_1_2_1/gross_emissions_node_codes/$model_suffix/${gridTile.tileId}.tif"
+    s"s3://gfw-files/flux_1_2_0/gross_emissions_node_codes/$model_suffix/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Not applicable"
 
