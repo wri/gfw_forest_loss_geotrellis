@@ -9,6 +9,7 @@ import org.globalforestwatch.summarystats.carbon_sensitivity.CarbonSensitivityAn
 import org.globalforestwatch.summarystats.carbonflux.CarbonFluxAnalysis
 import org.globalforestwatch.summarystats.firealerts.FireAlertsAnalysis
 import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticAnalysis
+import org.globalforestwatch.summarystats.gfwpro_dashboard.GfwProDashboardAnalysis
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsAnalysis
 import org.globalforestwatch.summarystats.treecoverloss.TreeLossAnalysis
 
@@ -64,6 +65,13 @@ case class SummaryAnalysisFactory(analysis: String,
           )
         case "forest_change_diagnostic" =>
           ForestChangeDiagnosticAnalysis(
+            featureRDD: RDD[Feature[Geometry, FeatureId]],
+            featureType: String,
+            spark: SparkSession,
+            kwargs: Map[String, Any]
+          )
+        case "gfwpro_dashboard" =>
+          GfwProDashboardAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,

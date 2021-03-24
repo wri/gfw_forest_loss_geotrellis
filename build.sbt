@@ -78,8 +78,7 @@ libraryDependencies ++= Seq(
   breeze,
   breezeNatives,
   breezeViz,
-  sparkDaria
-
+  sparkDaria,
 )
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
