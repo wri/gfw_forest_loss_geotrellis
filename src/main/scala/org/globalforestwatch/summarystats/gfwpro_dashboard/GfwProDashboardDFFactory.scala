@@ -74,7 +74,9 @@ case class GfwProDashboardDFFactory(
             case simpleId: SimpleFeatureId =>
               GfwProDashboardRowSimple(
                 simpleId.featureId.asJson.noSpaces,
+                data.gladAlertsCoverage.toString,
                 data.gladAlertsDaily.toJson,
+                data.gladAlertsWeekly.toJson,
                 data.gladAlertsMonthly.toJson,
                 data.viirsAlertsDaily.toJson
               )
@@ -84,7 +86,9 @@ case class GfwProDashboardDFFactory(
       }
       .toDF(
         "location_id",
+        "glad_alerts_coverage", // gladAlertsCoverage
         "glad_alerts_daily", // gladAlertsDaily
+        "glad_alerts_weekly", // gladAlertsWeekly
         "glad_alerts_monthly", // gladAlertsMonthly
         "viirs_alerts_daily", // viirsAlertsDaily
 

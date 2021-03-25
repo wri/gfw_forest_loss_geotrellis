@@ -1,6 +1,6 @@
 package org.globalforestwatch.summarystats.gladalerts
 
-import geotrellis.raster.{CellGrid, CellType}
+import geotrellis.raster.{CellGrid, CellType, IntCellType}
 import org.globalforestwatch.layers._
 
 /**
@@ -32,9 +32,10 @@ case class GladAlertsTile(
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
                            brazilBiomes: BrazilBiomes#OptionalITile
                          ) extends CellGrid[Int] {
-  def cellType: CellType = glad.cellType
 
-  def cols: Int = glad.cols
+  def cellType: CellType = glad.cellType.getOrElse(IntCellType)
 
-  def rows: Int = glad.rows
+  def cols: Int = glad.cols.getOrElse(GladAlertsGrid.blockSize)
+
+  def rows: Int = glad.rows.getOrElse(GladAlertsGrid.blockSize)
 }

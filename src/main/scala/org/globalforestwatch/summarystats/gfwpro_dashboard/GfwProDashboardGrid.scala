@@ -6,7 +6,7 @@ import org.globalforestwatch.grids.{GridTile, TenByTen30mGrid}
 object GfwProDashboardGrid
   extends TenByTen30mGrid[GfwProDashboardGridSources] {
 
-  val gridExtent: Extent = Extent(-180.0000, -30.0000, 180.0000, 30.0000)
+  val gridExtent: Extent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
 
   def getSources(gridTile: GridTile,
                  kwargs: Map[String, Any]): GfwProDashboardGridSources =

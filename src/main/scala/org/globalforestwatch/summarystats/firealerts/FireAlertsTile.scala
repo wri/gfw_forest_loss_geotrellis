@@ -1,6 +1,6 @@
 package org.globalforestwatch.summarystats.firealerts
 
-import geotrellis.raster.{CellGrid, CellType}
+import geotrellis.raster.{CellGrid, CellType, IntCellType}
 import org.globalforestwatch.grids.GridTile
 import org.globalforestwatch.layers._
 
@@ -9,7 +9,8 @@ import org.globalforestwatch.layers._
   * Tile-like structure to hold tiles from datasets required for our summary.
   * We can not use GeoTrellis MultibandTile because it requires all bands share a CellType.
   */
-case class FireAlertsTile(gridTile: GridTile,
+case class FireAlertsTile(
+                           gridTile: GridTile,
                            primaryForest: PrimaryForest#OptionalITile,
                            protectedAreas: ProtectedAreas#OptionalITile,
                            aze: Aze#OptionalITile,
@@ -30,7 +31,8 @@ case class FireAlertsTile(gridTile: GridTile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
                            brazilBiomes: BrazilBiomes#OptionalITile
                          ) extends CellGrid[Int] {
-  def cellType: CellType = protectedAreas.cellType // TODO all optional, any guaranteed to exist everywhere?
+
+  def cellType: CellType = IntCellType
 
   def cols: Int = gridTile.blockSize
 

@@ -1,15 +1,25 @@
 package org.globalforestwatch.layers
 
 import java.io.FileNotFoundException
-
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
-import geotrellis.raster.{CellType, Tile, isNoData}
+import geotrellis.raster.{
+  CellType,
+  IntCellType,
+  IntCells,
+  NoDataHandling,
+  Tile,
+  isNoData
+}
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
+import software.amazon.awssdk.services.s3.model.{
+  HeadObjectRequest,
+  NoSuchKeyException,
+  RequestPayer
+}
 
 trait Layer {
 
@@ -58,17 +68,27 @@ trait ILayer extends Layer {
       t.map(_.get(col, row)).isDefined
     }
 
-    def cellType: CellType = t.cellType
+    type I = IntCells with NoDataHandling
 
-    def cols: Int = t.cols
+    def cellType: Option[CellType] = t match {
+      case Some(tile) => Some(tile.cellType)
+      case _ => None
+    }
 
-    def rows: Int = t.rows
+    def cols: Option[Int] = t match {
+      case Some(tile) => Some(tile.cols)
+      case _ => None
+    }
+
+    def rows: Option[Int] = t match {
+      case Some(tile) => Some(tile.rows)
+      case _ => None
+    }
 
     val noDataValue: B = externalNoDataValue
   }
 
 }
-
 
 trait DLayer extends Layer {
 
@@ -157,7 +177,8 @@ trait RequiredLayer extends Layer {
     try {
       val keyExists =
         try {
-          val headRequest = HeadObjectRequest.builder()
+          val headRequest = HeadObjectRequest
+            .builder()
             .bucket(s3uri.getBucket)
             .key(s3uri.getKey)
             .requestPayer(RequestPayer.REQUESTER)
@@ -184,7 +205,8 @@ trait RequiredILayer extends RequiredLayer with ILayer {
   /**
     * Define how to fetch data for required Integer rasters
     */
-  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): ITile = {
+  def fetchWindow(windowKey: SpatialKey,
+                  windowLayout: LayoutDefinition): ITile = {
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
     val tile = source.synchronized {
       layoutSource.read(windowKey).get.band(0)
@@ -199,7 +221,8 @@ trait RequiredDLayer extends RequiredLayer with DLayer {
   /**
     * Define how to fetch data for required Double rasters
     */
-  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): DTile = {
+  def fetchWindow(windowKey: SpatialKey,
+                  windowLayout: LayoutDefinition): DTile = {
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
     val tile = source.synchronized {
       layoutSource.read(windowKey).get.band(0)
@@ -209,13 +232,13 @@ trait RequiredDLayer extends RequiredLayer with DLayer {
 
 }
 
-
 trait RequiredFLayer extends RequiredLayer with FLayer {
 
   /**
     * Define how to fetch data for required Double rasters
     */
-  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): FTile = {
+  def fetchWindow(windowKey: SpatialKey,
+                  windowLayout: LayoutDefinition): FTile = {
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
     val tile = source.synchronized {
       layoutSource.read(windowKey).get.band(0)
@@ -238,7 +261,8 @@ trait OptionalLayer extends Layer {
     try {
       val keyExists =
         try {
-          val headRequest = HeadObjectRequest.builder()
+          val headRequest = HeadObjectRequest
+            .builder()
             .bucket(s3uri.getBucket)
             .key(s3uri.getKey)
             .requestPayer(RequestPayer.REQUESTER)
@@ -270,14 +294,18 @@ trait OptionalILayer extends OptionalLayer with ILayer {
   /**
     * Define how to fetch data for optional Integer rasters
     */
-  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalITile = {
+  def fetchWindow(windowKey: SpatialKey,
+                  windowLayout: LayoutDefinition): OptionalITile = {
     new OptionalITile(for {
       source <- source
       raster <- Either
-        .catchNonFatal(
-          source.synchronized {
-            LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
-          })
+        .catchNonFatal(source.synchronized {
+          LayoutTileSource
+            .spatial(source, windowLayout)
+            .read(windowKey)
+            .get
+            .band(0)
+        })
         .toOption
     } yield raster)
   }
@@ -288,12 +316,17 @@ trait OptionalDLayer extends OptionalLayer with DLayer {
   /**
     * Define how to fetch data for optional double rasters
     */
-  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalDTile =
+  def fetchWindow(windowKey: SpatialKey,
+                  windowLayout: LayoutDefinition): OptionalDTile =
     new OptionalDTile(for {
       source <- source
       raster <- Either
         .catchNonFatal(source.synchronized {
-          LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
+          LayoutTileSource
+            .spatial(source, windowLayout)
+            .read(windowKey)
+            .get
+            .band(0)
         })
         .toOption
     } yield raster)
@@ -304,12 +337,17 @@ trait OptionalFLayer extends OptionalLayer with FLayer {
   /**
     * Define how to fetch data for optional double rasters
     */
-  def fetchWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): OptionalFTile =
+  def fetchWindow(windowKey: SpatialKey,
+                  windowLayout: LayoutDefinition): OptionalFTile =
     new OptionalFTile(for {
       source <- source
       raster <- Either
         .catchNonFatal(source.synchronized {
-          LayoutTileSource.spatial(source, windowLayout).read(windowKey).get.band(0)
+          LayoutTileSource
+            .spatial(source, windowLayout)
+            .read(windowKey)
+            .get
+            .band(0)
         })
         .toOption
     } yield raster)
@@ -380,7 +418,6 @@ trait FIntegerLayer extends FLayer {
   val externalNoDataValue: Integer = null
 
 }
-
 
 trait DBooleanLayer extends DLayer {
 

@@ -51,7 +51,7 @@ object GfwProDashboardDataDateCount {
             val minDate = now.getTime
 
             val alertDateFmt =
-              s"${alertDateCalendar.get(Calendar.YEAR)}-${alertDateCalendar.get(Calendar.MONTH)}"
+              f"${alertDateCalendar.get(Calendar.YEAR)}-${alertDateCalendar.get(Calendar.MONTH)}%02d"
 
             (maxDate, minDate, alertDateFmt)
           } else if (weekly) {
@@ -63,7 +63,7 @@ object GfwProDashboardDataDateCount {
             val minDate = now.getTime
 
             val alertDateFmt =
-              s"${alertDateCalendar.get(Calendar.YEAR)}-${alertDateCalendar.get(Calendar.WEEK_OF_YEAR)}"
+              f"${alertDateCalendar.get(Calendar.YEAR)}-${alertDateCalendar.get(Calendar.WEEK_OF_YEAR)}%02d"
 
             (maxDate, minDate, alertDateFmt)
           } else if (viirs) {
@@ -79,7 +79,7 @@ object GfwProDashboardDataDateCount {
             val maxDate = now.getTime
 
             now.add(Calendar.DATE, -now.get(Calendar.DAY_OF_WEEK))
-            now.add(Calendar.WEEK_OF_YEAR, -3)
+            now.add(Calendar.WEEK_OF_YEAR, -4)
             val minDate = now.getTime
 
             val alertDateFmt = date
