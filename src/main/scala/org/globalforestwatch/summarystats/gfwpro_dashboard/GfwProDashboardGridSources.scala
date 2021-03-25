@@ -19,15 +19,15 @@ case class GfwProDashboardGridSources(gridTile: GridTile) extends GridSources {
   ): Either[Throwable, Raster[GfwProDashboardTile]] = {
 
     for {
-      // Failure for any of these reads will result in function returning Left[Throwable]
-      // These are effectively required fields without which we can't make sense of the analysis
+      // Glad alerts are Optional Tiles, but we keep it this way to avoid signature changes
       gladAlertsTile <- Either
         .catchNonFatal(gladAlerts.fetchWindow(windowKey, windowLayout))
         .right
 
     } yield {
 
-      val tile = GfwProDashboardTile(gladAlertsTile, )
+
+      val tile = GfwProDashboardTile(gladAlertsTile)
 
       Raster(tile, windowKey.extent(windowLayout))
     }

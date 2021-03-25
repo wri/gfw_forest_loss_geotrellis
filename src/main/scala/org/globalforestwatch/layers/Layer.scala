@@ -53,13 +53,22 @@ trait ILayer extends Layer {
       if (isNoData(value) || value == internalNoDataValue) externalNoDataValue
       else lookup(value)
     }
+
+    def getCoverage(col: Int, row: Int): Boolean = {
+      t.map(_.get(col, row)).isDefined
+    }
+
     def cellType: CellType = t.cellType
+
     def cols: Int = t.cols
+
     def rows: Int = t.rows
 
     val noDataValue: B = externalNoDataValue
   }
+
 }
+
 
 trait DLayer extends Layer {
 

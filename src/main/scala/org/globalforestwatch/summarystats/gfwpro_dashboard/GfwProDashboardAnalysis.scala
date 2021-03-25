@@ -130,7 +130,7 @@ object GfwProDashboardAnalysis {
               (z, point) => {
                 // extract year from acq_date column
                 val alertDate = point.getUserData.asInstanceOf[String].split("\t")(2)
-                z.merge(GfwProDashboardDataDateCount.fill(alertDate, 1, viirs = true))
+                z.merge(GfwProDashboardDataDateCount.fill(Some(alertDate), 1, viirs = true))
 
               }
             }

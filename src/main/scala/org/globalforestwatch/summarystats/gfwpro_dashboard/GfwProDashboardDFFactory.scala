@@ -35,8 +35,11 @@ case class GfwProDashboardDFFactory(
                   (
                     featureId,
                     GfwProDashboardData(
+                      dataGroup.alertCoverage,
                       gladAlertsDaily = GfwProDashboardDataDateCount
                         .fill(dataGroup.alertDate, data.alertCount),
+                      gladAlertsWeekly = GfwProDashboardDataDateCount
+                        .fill(dataGroup.alertDate, data.alertCount, weekly = true),
                       gladAlertsMonthly = GfwProDashboardDataDateCount.fill(
                         dataGroup.alertDate,
                         data.alertCount,

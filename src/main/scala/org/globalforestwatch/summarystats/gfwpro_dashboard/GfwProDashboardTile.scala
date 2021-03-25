@@ -9,7 +9,7 @@ import org.globalforestwatch.layers._
   * We can not use GeoTrellis MultibandTile because it requires all bands share a CellType.
   */
 case class GfwProDashboardTile(
-                                gladAlerts: GladAlerts#ITile,
+                                gladAlerts: GladAlerts#OptionalITile,
 
 
                               ) extends CellGrid[Int] {

@@ -7,7 +7,9 @@ import cats.Semigroup
   * Note: This case class contains mutable values
   */
 case class GfwProDashboardData(
+                                gladAlertsCoverage: Boolean,
                                 gladAlertsDaily: GfwProDashboardDataDateCount,
+                                gladAlertsWeekly: GfwProDashboardDataDateCount,
                                 gladAlertsMonthly: GfwProDashboardDataDateCount,
                                 viirsAlertsDaily: GfwProDashboardDataDateCount,
 
@@ -17,7 +19,9 @@ case class GfwProDashboardData(
   def merge(other: GfwProDashboardData): GfwProDashboardData = {
 
     GfwProDashboardData(
+      gladAlertsCoverage || other.gladAlertsCoverage,
       gladAlertsDaily.merge(other.gladAlertsDaily),
+      gladAlertsWeekly.merge(other.gladAlertsWeekly),
       gladAlertsMonthly.merge(other.gladAlertsMonthly),
       viirsAlertsDaily.merge(
         other.viirsAlertsDaily
@@ -25,13 +29,17 @@ case class GfwProDashboardData(
     )
   }
 
-  def update(gladAlertsDaily: GfwProDashboardDataDateCount = this.gladAlertsDaily,
+  def update(gladAlertsCoverage: Boolean = this.gladAlertsCoverage,
+             gladAlertsDaily: GfwProDashboardDataDateCount = this.gladAlertsDaily,
+             gladAlertsWeekly: GfwProDashboardDataDateCount = this.gladAlertsWeekly,
              gladAlertsMonthly: GfwProDashboardDataDateCount = this.gladAlertsMonthly,
              viirsAlertsDaily: GfwProDashboardDataDateCount = this.viirsAlertsDaily,
             ): GfwProDashboardData = {
 
     GfwProDashboardData(
+      gladAlertsCoverage,
       gladAlertsDaily,
+      gladAlertsWeekly,
       gladAlertsMonthly,
       viirsAlertsDaily
     )
@@ -44,10 +52,11 @@ object GfwProDashboardData {
 
   def empty: GfwProDashboardData =
     GfwProDashboardData(
+      gladAlertsCoverage = false,
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,
-
+      GfwProDashboardDataDateCount.empty,
     )
 
   implicit val gfwProDashboardDataSemigroup: Semigroup[GfwProDashboardData] =

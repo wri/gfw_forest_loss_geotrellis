@@ -9,7 +9,7 @@ import org.globalforestwatch.layers._
   * We can not use GeoTrellis MultibandTile because it requires all bands share a CellType.
   */
 case class GladAlertsTile(
-                           glad: GladAlerts#ITile,
+                           glad: GladAlerts#OptionalITile,
                            biomass: BiomassPerHectar#OptionalDTile,
                            climateMask: ClimateMask#OptionalITile,
                            primaryForest: PrimaryForest#OptionalITile,
