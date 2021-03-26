@@ -143,7 +143,7 @@ object ForestChangeDiagnosticAnalysis {
                   z.updated(year, count)
                 }
               }
-            //TODO make own data class for fires using int and starting in 2000?
+
             ForestChangeDiagnosticDataLossYearly.prefilled
               .merge(ForestChangeDiagnosticDataLossYearly(fireCount))
           })
@@ -153,7 +153,7 @@ object ForestChangeDiagnosticAnalysis {
         case fires =>
           val minLossYear = fires.value.keysIterator.min
           val maxLossYear = fires.value.keysIterator.max
-          val years: List[Int] = List.range(minLossYear, maxLossYear + 1)
+          val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
 
           ForestChangeDiagnosticDataLossYearly(
             SortedMap(
