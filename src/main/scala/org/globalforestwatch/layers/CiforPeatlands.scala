@@ -7,5 +7,5 @@ case class CiforPeatlands(gridTile: GridTile)
     with OptionalILayer {
   // TODO use final data lake source
   val uri: String =
-    s"s3://gfw-data-lake-dev/cifor_peatlands/v2/raster/epsg-4326/10/40000/is/gdal-geotiff/${gridTile.tileId}.tif"
+    s"s3://gfw-data-lake-dev/cifor_peatlands/v2/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
 }
