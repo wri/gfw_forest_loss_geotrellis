@@ -3,15 +3,15 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
 
-case class ForestChangeDiagnosticDataExtentYearly(value: SortedMap[Int, Double])
+case class ForestChangeDiagnosticDataValueYearly(value: SortedMap[Int, Double])
   extends ForestChangeDiagnosticDataParser[
-    ForestChangeDiagnosticDataExtentYearly
+    ForestChangeDiagnosticDataValueYearly
   ] {
   def merge(
-             other: ForestChangeDiagnosticDataExtentYearly
-           ): ForestChangeDiagnosticDataExtentYearly = {
+             other: ForestChangeDiagnosticDataValueYearly
+           ): ForestChangeDiagnosticDataValueYearly = {
 
-    ForestChangeDiagnosticDataExtentYearly(value ++ other.value.map {
+    ForestChangeDiagnosticDataValueYearly(value ++ other.value.map {
       case (key, otherValue) =>
         key ->
           (value.getOrElse(key, 0.0) + otherValue)
@@ -27,10 +27,10 @@ case class ForestChangeDiagnosticDataExtentYearly(value: SortedMap[Int, Double])
   }
 }
 
-object ForestChangeDiagnosticDataExtentYearly {
+object ForestChangeDiagnosticDataValueYearly {
   def fill(lossYear: Int,
            areaHa: Double,
-           include: Boolean = true): ForestChangeDiagnosticDataExtentYearly = {
+           include: Boolean = true): ForestChangeDiagnosticDataValueYearly = {
 
     // Only except lossYear values within range of default map or 0
     val minExtentYear: Int = this.prefilled.value.keysIterator.min
@@ -38,8 +38,8 @@ object ForestChangeDiagnosticDataExtentYearly {
     val years: List[Int] = List.range(minExtentYear, maxExtentYear + 1)
 
     if (lossYear == 0 && include) {
-      ForestChangeDiagnosticDataExtentYearly.prefilled.merge(
-        ForestChangeDiagnosticDataExtentYearly(
+      ForestChangeDiagnosticDataValueYearly.prefilled.merge(
+        ForestChangeDiagnosticDataValueYearly(
           SortedMap(years.map(year => (year, areaHa)): _*)
         )
       )
@@ -57,20 +57,18 @@ object ForestChangeDiagnosticDataExtentYearly {
         ): _*
       )
 
-      ForestChangeDiagnosticDataExtentYearly(values)
+      ForestChangeDiagnosticDataValueYearly(values)
 
     } else
       this.empty
   }
 
-  def empty: ForestChangeDiagnosticDataExtentYearly =
-    ForestChangeDiagnosticDataExtentYearly(SortedMap())
+  def empty: ForestChangeDiagnosticDataValueYearly =
+    ForestChangeDiagnosticDataValueYearly(SortedMap())
 
-  def prefilled: ForestChangeDiagnosticDataExtentYearly =
-    ForestChangeDiagnosticDataExtentYearly(
+  def prefilled: ForestChangeDiagnosticDataValueYearly =
+    ForestChangeDiagnosticDataValueYearly(
       SortedMap(
-        2000 -> 0,
-        2001 -> 0,
         2002 -> 0,
         2003 -> 0,
         2004 -> 0,

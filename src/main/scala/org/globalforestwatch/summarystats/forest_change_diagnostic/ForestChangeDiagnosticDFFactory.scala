@@ -199,7 +199,7 @@ case class ForestChangeDiagnosticDFFactory(
                           dataGroup.idnPresence
                         ),
                         filteredTreeCoverExtentYearly =
-                          ForestChangeDiagnosticDataExtentYearly.fill(
+                          ForestChangeDiagnosticDataValueYearly.fill(
                             dataGroup.umdTreeCoverLossYear,
                             data.totalArea,
                             dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation
@@ -238,9 +238,9 @@ case class ForestChangeDiagnosticDFFactory(
                         forestValueIndicator =
                           ForestChangeDiagnosticDataLossYearly.empty,
                         peatValueIndicator =
-                          ForestChangeDiagnosticDataExtentYearly.empty,
+                          ForestChangeDiagnosticDataValueYearly.empty,
                         protectedAreaValueIndicator =
-                          ForestChangeDiagnosticDataExtentYearly.empty,
+                          ForestChangeDiagnosticDataValueYearly.empty,
                         deforestationThreatIndicator =
                           ForestChangeDiagnosticDataLossYearly.empty,
                         peatThreatIndicator =
@@ -264,18 +264,18 @@ case class ForestChangeDiagnosticDFFactory(
               data.treeCoverLossTcd90Yearly.value.keysIterator.min
             val maxLossYear =
               data.treeCoverLossTcd90Yearly.value.keysIterator.max
-            val years: List[Int] = List.range(minLossYear, maxLossYear + 1)
+            val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
 
             val forestValueIndicator: SortedMap[Int, Double] =
               data.filteredTreeCoverExtentYearly.value
-            val peatValueIndicator: ForestChangeDiagnosticDataExtentYearly =
-              ForestChangeDiagnosticDataExtentYearly.fill(
+            val peatValueIndicator: ForestChangeDiagnosticDataValueYearly =
+              ForestChangeDiagnosticDataValueYearly.fill(
                 0,
                 data.peatlandsArea.value
               )
             val protectedAreaValueIndicator
-            : ForestChangeDiagnosticDataExtentYearly =
-              ForestChangeDiagnosticDataExtentYearly.fill(
+            : ForestChangeDiagnosticDataValueYearly =
+              ForestChangeDiagnosticDataValueYearly.fill(
                 0,
                 data.protectedAreasArea.value
               )

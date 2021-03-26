@@ -43,7 +43,7 @@ case class ForestChangeDiagnosticData(
                                        cerradoBiomesPresence: ForestChangeDiagnosticDataBoolean,
                                        seAsiaPresence: ForestChangeDiagnosticDataBoolean,
                                        idnPresence: ForestChangeDiagnosticDataBoolean,
-                                       filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataExtentYearly,
+                                       filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataValueYearly,
                                        filteredTreeCoverLossYearly: ForestChangeDiagnosticDataLossYearly,
                                        filteredTreeCoverLossPeatYearly: ForestChangeDiagnosticDataLossYearly,
                                        filteredTreeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly,
@@ -51,8 +51,8 @@ case class ForestChangeDiagnosticData(
                                        plantationOnPeatArea: ForestChangeDiagnosticDataDouble,
                                        plantationInProtectedAreasArea: ForestChangeDiagnosticDataDouble,
                                        forestValueIndicator: ForestChangeDiagnosticDataLossYearly,
-                                       peatValueIndicator: ForestChangeDiagnosticDataExtentYearly,
-                                       protectedAreaValueIndicator: ForestChangeDiagnosticDataExtentYearly,
+                                       peatValueIndicator: ForestChangeDiagnosticDataValueYearly,
+                                       protectedAreaValueIndicator: ForestChangeDiagnosticDataValueYearly,
                                        deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly,
                                        peatThreatIndicator: ForestChangeDiagnosticDataLossYearly,
                                        protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly,
@@ -207,7 +207,7 @@ case class ForestChangeDiagnosticData(
               this.cerradoBiomesPresence,
               seAsiaPresence: ForestChangeDiagnosticDataBoolean = this.seAsiaPresence,
               idnPresence: ForestChangeDiagnosticDataBoolean = this.idnPresence,
-              filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataExtentYearly =
+              filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataValueYearly =
               this.filteredTreeCoverExtentYearly,
               filteredTreeCoverLossYearly: ForestChangeDiagnosticDataLossYearly =
               this.filteredTreeCoverLossYearly,
@@ -222,9 +222,9 @@ case class ForestChangeDiagnosticData(
               this.plantationInProtectedAreasArea,
               forestValueIndicator: ForestChangeDiagnosticDataLossYearly =
               this.forestValueIndicator,
-              peatValueIndicator: ForestChangeDiagnosticDataExtentYearly =
+              peatValueIndicator: ForestChangeDiagnosticDataValueYearly =
               this.peatValueIndicator,
-              protectedAreaValueIndicator: ForestChangeDiagnosticDataExtentYearly =
+              protectedAreaValueIndicator: ForestChangeDiagnosticDataValueYearly =
               this.protectedAreaValueIndicator,
               deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly =
               this.deforestationThreatIndicator,
@@ -332,7 +332,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataBoolean.empty,
       ForestChangeDiagnosticDataBoolean.empty,
       ForestChangeDiagnosticDataBoolean.empty,
-      ForestChangeDiagnosticDataExtentYearly.empty,
+      ForestChangeDiagnosticDataValueYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
@@ -340,8 +340,8 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
-      ForestChangeDiagnosticDataExtentYearly.empty,
-      ForestChangeDiagnosticDataExtentYearly.empty,
+      ForestChangeDiagnosticDataValueYearly.empty,
+      ForestChangeDiagnosticDataValueYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,

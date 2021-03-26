@@ -162,7 +162,7 @@ object ForestChangeDiagnosticAnalysis {
 
                 val lastYearLoss: Double = fires.value.getOrElse(year - 1, 0)
 
-                thisYearLoss + lastYearLoss / 2
+                (thisYearLoss + lastYearLoss) / 2
               })): _*))
 
       }
