@@ -51,13 +51,12 @@ case class ForestChangeDiagnosticData(
                                        plantationOnPeatArea: ForestChangeDiagnosticDataDouble,
                                        plantationInProtectedAreasArea: ForestChangeDiagnosticDataDouble,
                                        forestValueIndicator: ForestChangeDiagnosticDataLossYearly,
-                                       peatValueIndicator: ForestChangeDiagnosticDataDouble,
-                                       protectedAreaValueIndicator: ForestChangeDiagnosticDataDouble,
+                                       peatValueIndicator: ForestChangeDiagnosticDataExtentYearly,
+                                       protectedAreaValueIndicator: ForestChangeDiagnosticDataExtentYearly,
                                        deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly,
                                        peatThreatIndicator: ForestChangeDiagnosticDataLossYearly,
                                        protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly,
                                        fireThreatIndicator: ForestChangeDiagnosticDataLossYearly
-
                                      ) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
@@ -121,11 +120,17 @@ case class ForestChangeDiagnosticData(
       idnPresence.merge(other.idnPresence),
       filteredTreeCoverExtentYearly.merge(other.filteredTreeCoverExtentYearly),
       filteredTreeCoverLossYearly.merge(other.filteredTreeCoverLossYearly),
-      filteredTreeCoverLossPeatYearly.merge(other.filteredTreeCoverLossPeatYearly),
-      filteredTreeCoverLossProtectedAreasYearly.merge(other.filteredTreeCoverLossProtectedAreasYearly),
+      filteredTreeCoverLossPeatYearly.merge(
+        other.filteredTreeCoverLossPeatYearly
+      ),
+      filteredTreeCoverLossProtectedAreasYearly.merge(
+        other.filteredTreeCoverLossProtectedAreasYearly
+      ),
       plantationArea.merge(other.plantationArea),
       plantationOnPeatArea.merge(other.plantationOnPeatArea),
-      plantationInProtectedAreasArea.merge(other.plantationInProtectedAreasArea),
+      plantationInProtectedAreasArea.merge(
+        other.plantationInProtectedAreasArea
+      ),
       forestValueIndicator.merge(other.forestValueIndicator),
       peatValueIndicator.merge(other.peatValueIndicator),
       protectedAreaValueIndicator.merge(other.protectedAreaValueIndicator),
@@ -136,56 +141,100 @@ case class ForestChangeDiagnosticData(
     )
   }
 
-  def update(treeCoverLossTcd30Yearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossTcd30Yearly,
-             treeCoverLossTcd90Yearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossTcd90Yearly,
-             treeCoverLossPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossPrimaryForestYearly,
-             treeCoverLossPeatLandYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossPeatLandYearly,
-             treeCoverLossIntactForestYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossProtectedAreasYearly,
-             treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossProtectedAreasYearly,
-             treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory = this.treeCoverLossSEAsiaLandCoverYearly,
-             treeCoverLossIDNLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory = this.treeCoverLossIDNLandCoverYearly,
-             treeCoverLossSoyPlanedAreasYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossSoyPlanedAreasYearly,
-             treeCoverLossIDNForestAreaYearly: ForestChangeDiagnosticDataLossYearlyCategory = this.treeCoverLossIDNForestAreaYearly,
-             treeCoverLossIDNForestMoratoriumYearly: ForestChangeDiagnosticDataLossYearly = this.treeCoverLossIDNForestMoratoriumYearly,
-             prodesLossYearly: ForestChangeDiagnosticDataLossYearly = this.prodesLossYearly,
-             prodesLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly = this.prodesLossProtectedAreasYearly,
-             prodesLossProdesPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly = this.prodesLossProdesPrimaryForestYearly,
-             treeCoverLossBRABiomesYearly: ForestChangeDiagnosticDataLossYearlyCategory = this.treeCoverLossBRABiomesYearly,
-             treeCoverExtent: ForestChangeDiagnosticDataDouble = this.treeCoverExtent,
-             treeCoverExtentPrimaryForest: ForestChangeDiagnosticDataDouble = this.treeCoverExtentPrimaryForest,
-             treeCoverExtentProtectedAreas: ForestChangeDiagnosticDataDouble = this.treeCoverExtentProtectedAreas,
-             treeCoverExtentPeatlands: ForestChangeDiagnosticDataDouble = this.treeCoverExtentPeatlands,
-             treeCoverExtentIntactForests: ForestChangeDiagnosticDataDouble = this.treeCoverExtentIntactForests,
-             primaryForestArea: ForestChangeDiagnosticDataDouble = this.primaryForestArea,
-             intactForest2016Area: ForestChangeDiagnosticDataDouble = this.intactForest2016Area,
-             totalArea: ForestChangeDiagnosticDataDouble = this.totalArea,
-             protectedAreasArea: ForestChangeDiagnosticDataDouble = this.protectedAreasArea,
-             peatlandsArea: ForestChangeDiagnosticDataDouble = this.peatlandsArea,
-             braBiomesArea: ForestChangeDiagnosticDataDoubleCategory = this.braBiomesArea,
-             idnForestAreaArea: ForestChangeDiagnosticDataDoubleCategory = this.idnForestAreaArea,
-             seAsiaLandCoverArea: ForestChangeDiagnosticDataDoubleCategory = this.seAsiaLandCoverArea,
-             idnLandCoverArea: ForestChangeDiagnosticDataDoubleCategory = this.idnLandCoverArea,
-             idnForestMoratoriumArea: ForestChangeDiagnosticDataDouble = this.idnForestMoratoriumArea,
-             southAmericaPresence: ForestChangeDiagnosticDataBoolean = this.southAmericaPresence,
-             legalAmazonPresence: ForestChangeDiagnosticDataBoolean = this.legalAmazonPresence,
-             braBiomesPresence: ForestChangeDiagnosticDataBoolean = this.braBiomesPresence,
-             cerradoBiomesPresence: ForestChangeDiagnosticDataBoolean = this.cerradoBiomesPresence,
-             seAsiaPresence: ForestChangeDiagnosticDataBoolean = this.seAsiaPresence,
-             idnPresence: ForestChangeDiagnosticDataBoolean = this.idnPresence,
-             filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataExtentYearly = this.filteredTreeCoverExtentYearly,
-             filteredTreeCoverLossYearly: ForestChangeDiagnosticDataLossYearly = this.filteredTreeCoverLossYearly,
-             filteredTreeCoverLossPeatYearly: ForestChangeDiagnosticDataLossYearly = this.filteredTreeCoverLossPeatYearly,
-             filteredTreeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly = this.filteredTreeCoverLossProtectedAreasYearly,
-             plantationArea: ForestChangeDiagnosticDataDouble = this.plantationArea,
-             plantationOnPeatArea: ForestChangeDiagnosticDataDouble = this.plantationOnPeatArea,
-             plantationInProtectedAreasArea: ForestChangeDiagnosticDataDouble = this.plantationInProtectedAreasArea,
-             forestValueIndicator: ForestChangeDiagnosticDataLossYearly = this.forestValueIndicator,
-             peatValueIndicator: ForestChangeDiagnosticDataDouble = this.peatValueIndicator,
-             protectedAreaValueIndicator: ForestChangeDiagnosticDataDouble = this.protectedAreaValueIndicator,
-             deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly = this.deforestationThreatIndicator,
-             peatThreatIndicator: ForestChangeDiagnosticDataLossYearly = this.peatThreatIndicator,
-             protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly = this.protectedAreaThreatIndicator,
-             fireThreatIndicator: ForestChangeDiagnosticDataLossYearly = this.fireThreatIndicator): ForestChangeDiagnosticData = {
+  def update(
+              treeCoverLossTcd30Yearly: ForestChangeDiagnosticDataLossYearly =
+              this.treeCoverLossTcd30Yearly,
+              treeCoverLossTcd90Yearly: ForestChangeDiagnosticDataLossYearly =
+              this.treeCoverLossTcd90Yearly,
+              treeCoverLossPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly =
+              this.treeCoverLossPrimaryForestYearly,
+              treeCoverLossPeatLandYearly: ForestChangeDiagnosticDataLossYearly =
+              this.treeCoverLossPeatLandYearly,
+              treeCoverLossIntactForestYearly: ForestChangeDiagnosticDataLossYearly =
+              this.treeCoverLossProtectedAreasYearly,
+              treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly =
+              this.treeCoverLossProtectedAreasYearly,
+              treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory =
+              this.treeCoverLossSEAsiaLandCoverYearly,
+              treeCoverLossIDNLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory =
+              this.treeCoverLossIDNLandCoverYearly,
+              treeCoverLossSoyPlanedAreasYearly: ForestChangeDiagnosticDataLossYearly =
+              this.treeCoverLossSoyPlanedAreasYearly,
+              treeCoverLossIDNForestAreaYearly: ForestChangeDiagnosticDataLossYearlyCategory =
+              this.treeCoverLossIDNForestAreaYearly,
+              treeCoverLossIDNForestMoratoriumYearly: ForestChangeDiagnosticDataLossYearly =
+              this.treeCoverLossIDNForestMoratoriumYearly,
+              prodesLossYearly: ForestChangeDiagnosticDataLossYearly =
+              this.prodesLossYearly,
+              prodesLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly =
+              this.prodesLossProtectedAreasYearly,
+              prodesLossProdesPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly =
+              this.prodesLossProdesPrimaryForestYearly,
+              treeCoverLossBRABiomesYearly: ForestChangeDiagnosticDataLossYearlyCategory =
+              this.treeCoverLossBRABiomesYearly,
+              treeCoverExtent: ForestChangeDiagnosticDataDouble = this.treeCoverExtent,
+              treeCoverExtentPrimaryForest: ForestChangeDiagnosticDataDouble =
+              this.treeCoverExtentPrimaryForest,
+              treeCoverExtentProtectedAreas: ForestChangeDiagnosticDataDouble =
+              this.treeCoverExtentProtectedAreas,
+              treeCoverExtentPeatlands: ForestChangeDiagnosticDataDouble =
+              this.treeCoverExtentPeatlands,
+              treeCoverExtentIntactForests: ForestChangeDiagnosticDataDouble =
+              this.treeCoverExtentIntactForests,
+              primaryForestArea: ForestChangeDiagnosticDataDouble = this.primaryForestArea,
+              intactForest2016Area: ForestChangeDiagnosticDataDouble =
+              this.intactForest2016Area,
+              totalArea: ForestChangeDiagnosticDataDouble = this.totalArea,
+              protectedAreasArea: ForestChangeDiagnosticDataDouble =
+              this.protectedAreasArea,
+              peatlandsArea: ForestChangeDiagnosticDataDouble = this.peatlandsArea,
+              braBiomesArea: ForestChangeDiagnosticDataDoubleCategory = this.braBiomesArea,
+              idnForestAreaArea: ForestChangeDiagnosticDataDoubleCategory =
+              this.idnForestAreaArea,
+              seAsiaLandCoverArea: ForestChangeDiagnosticDataDoubleCategory =
+              this.seAsiaLandCoverArea,
+              idnLandCoverArea: ForestChangeDiagnosticDataDoubleCategory =
+              this.idnLandCoverArea,
+              idnForestMoratoriumArea: ForestChangeDiagnosticDataDouble =
+              this.idnForestMoratoriumArea,
+              southAmericaPresence: ForestChangeDiagnosticDataBoolean =
+              this.southAmericaPresence,
+              legalAmazonPresence: ForestChangeDiagnosticDataBoolean =
+              this.legalAmazonPresence,
+              braBiomesPresence: ForestChangeDiagnosticDataBoolean =
+              this.braBiomesPresence,
+              cerradoBiomesPresence: ForestChangeDiagnosticDataBoolean =
+              this.cerradoBiomesPresence,
+              seAsiaPresence: ForestChangeDiagnosticDataBoolean = this.seAsiaPresence,
+              idnPresence: ForestChangeDiagnosticDataBoolean = this.idnPresence,
+              filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataExtentYearly =
+              this.filteredTreeCoverExtentYearly,
+              filteredTreeCoverLossYearly: ForestChangeDiagnosticDataLossYearly =
+              this.filteredTreeCoverLossYearly,
+              filteredTreeCoverLossPeatYearly: ForestChangeDiagnosticDataLossYearly =
+              this.filteredTreeCoverLossPeatYearly,
+              filteredTreeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly =
+              this.filteredTreeCoverLossProtectedAreasYearly,
+              plantationArea: ForestChangeDiagnosticDataDouble = this.plantationArea,
+              plantationOnPeatArea: ForestChangeDiagnosticDataDouble =
+              this.plantationOnPeatArea,
+              plantationInProtectedAreasArea: ForestChangeDiagnosticDataDouble =
+              this.plantationInProtectedAreasArea,
+              forestValueIndicator: ForestChangeDiagnosticDataLossYearly =
+              this.forestValueIndicator,
+              peatValueIndicator: ForestChangeDiagnosticDataExtentYearly =
+              this.peatValueIndicator,
+              protectedAreaValueIndicator: ForestChangeDiagnosticDataExtentYearly =
+              this.protectedAreaValueIndicator,
+              deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly =
+              this.deforestationThreatIndicator,
+              peatThreatIndicator: ForestChangeDiagnosticDataLossYearly =
+              this.peatThreatIndicator,
+              protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly =
+              this.protectedAreaThreatIndicator,
+              fireThreatIndicator: ForestChangeDiagnosticDataLossYearly =
+              this.fireThreatIndicator
+            ): ForestChangeDiagnosticData = {
 
     ForestChangeDiagnosticData(
       treeCoverLossTcd30Yearly,
@@ -291,8 +340,8 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
-      ForestChangeDiagnosticDataDouble.empty,
-      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataExtentYearly.empty,
+      ForestChangeDiagnosticDataExtentYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,

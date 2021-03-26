@@ -35,14 +35,15 @@ object ForestChangeDiagnosticDataExtentYearly {
     // Only except lossYear values within range of default map or 0
     val minExtentYear: Int = this.prefilled.value.keysIterator.min
     val maxExtentYear: Int = this.prefilled.value.keysIterator.max
+    val years: List[Int] = List.range(minExtentYear, maxExtentYear + 1)
 
-    if (lossYear == 0) {
+    if (lossYear == 0 && include) {
       ForestChangeDiagnosticDataExtentYearly.prefilled.merge(
-        ForestChangeDiagnosticDataExtentYearly(SortedMap(2000 -> areaHa))
+        ForestChangeDiagnosticDataExtentYearly(
+          SortedMap(years.map(year => (year, areaHa)): _*)
+        )
       )
     } else if (minExtentYear <= lossYear && lossYear <= maxExtentYear && include) {
-
-      val years: List[Int] = List.range(minExtentYear, maxExtentYear + 1)
 
       // convert a list of tuples to a sorted map
       val values: SortedMap[Int, Double] = SortedMap(

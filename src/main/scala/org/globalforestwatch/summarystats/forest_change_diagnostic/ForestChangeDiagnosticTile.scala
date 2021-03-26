@@ -12,7 +12,7 @@ case class ForestChangeDiagnosticTile(
                                        loss: TreeCoverLoss#ITile,
                                        tcd2000: TreeCoverDensityPercent2000#ITile,
                                        isPrimaryForest: PrimaryForest#OptionalITile,
-                                       isPeatlands: Peatlands#OptionalITile,
+                                       isPeatlands: CiforPeatlands#OptionalITile,
                                        isIntactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
                                        wdpaProtectedAreas: ProtectedAreas#OptionalITile,
                                        seAsiaLandCover: SEAsiaLandCover#OptionalITile,
