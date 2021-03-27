@@ -2,11 +2,10 @@ package org.globalforestwatch.summarystats.firealerts
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 import geotrellis.vector.Feature
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId}
+import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, SpatialFeatureDF}
 import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
@@ -58,7 +57,7 @@ object FireAlertsAnalysis {
     val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
-    val featureDF = FeatureDF(featureUris, featureObj, featureType, kwargs, spark, "geom")
+    val featureDF = SpatialFeatureDF(featureUris, featureObj, featureType, kwargs, spark, "geom")
 
     firePointDF
       .join(featureDF)

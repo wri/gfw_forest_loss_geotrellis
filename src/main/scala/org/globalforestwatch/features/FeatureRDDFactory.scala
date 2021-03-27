@@ -3,14 +3,13 @@ package org.globalforestwatch.features
 import cats.data.NonEmptyList
 import geotrellis.vector
 import org.datasyslab.geospark.enums.GridType
-import org.datasyslab.geosparksql.utils.Adapter
-import com.vividsolutions.jts.geom.Point
+import com.vividsolutions.jts.geom.Geometry
+import org.datasyslab.geospark.spatialRDD.SpatialRDD
 //import org.apache.sedona.core.enums.GridType
 //import org.apache.sedona.sql.utils.Adapter
 //import org.locationtech.jts.geom.Point
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.globalforestwatch.util.GeometryReducer
 import org.globalforestwatch.util.Util._
 
 
@@ -24,35 +23,17 @@ object FeatureRDDFactory {
 
     analysis match {
       case "firealerts" =>
-        // get fire alerts and partition using GeoSpark quadtree
-        // this makes the geotrellis analysis significantly faster
+
+        val fireRDD: SpatialRDD[Geometry] = FireAlertRDD(spark, kwargs)
         val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
-        val fireSrcUris: NonEmptyList[String] = getAnyMapValue[Option[NonEmptyList[String]]](kwargs, "fireAlertSource") match {
-          case None => throw new java.lang.IllegalAccessException("fire_alert_source parameter required for fire alerts analysis")
-          case Some(s: NonEmptyList[String]) => s
-        }
+        val fireAlertObj =
+          FeatureFactory("firealerts", Some(fireAlertType)).featureObj
 
-        val fireFeatureObj = FeatureFactory("firealerts", Some(fireAlertType)).featureObj
+        fireRDD.spatialPartitioning(GridType.QUADTREE)
 
-        val pointFeatureDF = FeatureDF(fireSrcUris, fireFeatureObj, kwargs, spark, "longitude", "latitude")
-        val pointFeatureRDD = Adapter.toSpatialRdd(pointFeatureDF, "pointshape")
+        FeatureRDD(fireAlertObj, fireRDD, kwargs)
 
-        pointFeatureRDD.analyze()
-        pointFeatureRDD.spatialPartitioning(GridType.QUADTREE)
 
-        // convert to an RDD usable by geotrellis
-        val scalaRDD = org.apache.spark.api.java.JavaRDD.toRDD(pointFeatureRDD.spatialPartitionedRDD)
-        scalaRDD.map {
-          case pt: Point =>
-            val pointFeatureData = pt.getUserData.asInstanceOf[String].split('\t')
-
-            val geom = GeometryReducer.reduce(GeometryReducer.gpr)(
-              vector.Point(pt.getX, pt.getY)
-            )
-
-            val pointFeatureId: FeatureId = fireFeatureObj.getFeatureId(pointFeatureData)
-            vector.Feature(geom, pointFeatureId)
-        }
       case _ =>
         FeatureRDD(featureUris, featureObj, kwargs, spark)
     }

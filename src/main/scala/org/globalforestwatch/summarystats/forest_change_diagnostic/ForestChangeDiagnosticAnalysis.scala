@@ -5,11 +5,19 @@ import cats.data.NonEmptyList
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import geotrellis.vector.{Feature, Geometry}
+import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
 import org.apache.log4j.Logger
 import org.datasyslab.geospark.enums.{GridType, IndexType}
 import org.datasyslab.geospark.spatialOperator.JoinQuery
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.features.FeatureIdFactory
+import org.globalforestwatch.features.{
+  FeatureIdFactory,
+  FireAlertRDD,
+  SpatialFeatureDF
+}
+
+import java.util
+
 //import org.apache.sedona.core.enums.{FileDataSplitter, GridType, IndexType}
 //import org.apache.sedona.core.spatialOperator.JoinQuery
 //import org.apache.sedona.core.spatialRDD.PointRDD
@@ -46,9 +54,8 @@ object ForestChangeDiagnosticAnalysis {
     val fireCount: RDD[(FeatureId, ForestChangeDiagnosticDataLossYearly)] =
       ForestChangeDiagnosticAnalysis.fireStats(featureType, spark, kwargs)
 
-    val dataRDD: RDD[(FeatureId, ForestChangeDiagnosticData)] = reformatData(
-      summaryRDD
-    )
+    val dataRDD: RDD[(FeatureId, ForestChangeDiagnosticData)] =
+      reformatSummaryData(summaryRDD)
 
     dataRDD
       .reduceByKey(_ merge _)
@@ -85,43 +92,26 @@ object ForestChangeDiagnosticAnalysis {
                ): RDD[(FeatureId, ForestChangeDiagnosticDataLossYearly)] = {
 
     // FIRE RDD
-    val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
-    val fireAlertUris
-    : NonEmptyList[String] = getAnyMapValue[Option[NonEmptyList[String]]](
-      kwargs,
-      "fireAlertSource"
-    ) match {
-      case None =>
-        throw new java.lang.IllegalAccessException(
-          "fire_alert_source parameter required for fire alerts analysis"
-        )
-      case Some(s: NonEmptyList[String]) => s
-    }
-    val fireAlertObj =
-      FeatureFactory("firealerts", Some(fireAlertType)).featureObj
-    val fireAlertPointDF = FeatureDF(
-      fireAlertUris,
-      fireAlertObj,
-      kwargs,
-      spark,
-      "longitude",
-      "latitude"
-    )
-    val fireAlertSpatialRDD =
-      Adapter.toSpatialRdd(fireAlertPointDF, "pointshape")
-
-    fireAlertSpatialRDD.analyze()
+    val fireAlertSpatialRDD = FireAlertRDD(spark, kwargs)
 
     // Feature RDD
     val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] =
       getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
     val featurePolygonDF =
-      FeatureDF(featureUris, featureObj, featureType, kwargs, spark, "geom")
+      SpatialFeatureDF(
+        featureUris,
+        featureObj,
+        featureType,
+        kwargs,
+        spark,
+        "geom"
+      )
     val featureSpatialRDD = Adapter.toSpatialRdd(featurePolygonDF, "polyshape")
 
     featureSpatialRDD.analyze()
 
+    // Join Fire and Feature RDD
     val buildOnSpatialPartitionedRDD = true // Set to TRUE only if run join query
     val considerBoundaryIntersection = false // Only return gemeotries fully covered by each query window in queryWindowRDD
     val usingIndex = false
@@ -144,60 +134,49 @@ object ForestChangeDiagnosticAnalysis {
     pairRDD.rdd
       .map {
         case (poly, points) =>
-          ( {
-            val id = {
-              poly.getUserData.asInstanceOf[String].filterNot("[]".toSet).toInt
-
-            }
-            FeatureIdFactory(featureType).featureId(id)
-
-          }, {
-            val fireCount =
-              points.asScala.toList.foldLeft(SortedMap[Int, Double]()) {
-                (z: SortedMap[Int, Double], point) => {
-                  // extract year from acq_date column
-                  val year = point.getUserData
-                    .asInstanceOf[String]
-                    .split("\t")(2)
-                    .substring(0, 4)
-                    .toInt
-                  val count = z.getOrElse(year, 0.0) + 1.0
-                  z.updated(year, count)
-                }
-              }
-
-            ForestChangeDiagnosticDataLossYearly.prefilled
-              .merge(ForestChangeDiagnosticDataLossYearly(fireCount))
-          })
+          toForestChangeDiagnosticFireData(featureType, poly, points)
       }
       .reduceByKey(_ merge _)
       .mapValues { fires =>
-        val minLossYear = fires.value.keysIterator.min
-        val maxLossYear = fires.value.keysIterator.max
-        val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
-
-        ForestChangeDiagnosticDataLossYearly(
-          SortedMap(
-            years.map(
-              year =>
-                (year, { // I hence declare them here explicitly to help him out.
-                  val thisYearLoss: Double = fires.value.getOrElse(year, 0)
-
-                  val lastYearLoss: Double = fires.value.getOrElse(year - 1, 0)
-
-                  (thisYearLoss + lastYearLoss) / 2
-                })
-            ): _*
-          )
-        )
-
+        aggregateFireData(fires)
       }
-
   }
 
-  def reformatData(
-                    summaryRDD: RDD[(FeatureId, ForestChangeDiagnosticSummary)]
-                  ): RDD[(FeatureId, ForestChangeDiagnosticData)] = {
+  private def toForestChangeDiagnosticFireData(
+                                                featureType: String,
+                                                poly: GeoSparkGeometry,
+                                                points: util.HashSet[GeoSparkGeometry]
+                                              ): (FeatureId, ForestChangeDiagnosticDataLossYearly) = {
+    ( {
+      val id = {
+        poly.getUserData.asInstanceOf[String].filterNot("[]".toSet).toInt
+
+      }
+      FeatureIdFactory(featureType).featureId(id)
+
+    }, {
+      val fireCount =
+        points.asScala.toList.foldLeft(SortedMap[Int, Double]()) {
+          (z: SortedMap[Int, Double], point) => {
+            // extract year from acq_date column
+            val year = point.getUserData
+              .asInstanceOf[String]
+              .split("\t")(2)
+              .substring(0, 4)
+              .toInt
+            val count = z.getOrElse(year, 0.0) + 1.0
+            z.updated(year, count)
+          }
+        }
+
+      ForestChangeDiagnosticDataLossYearly.prefilled
+        .merge(ForestChangeDiagnosticDataLossYearly(fireCount))
+    })
+  }
+
+  private def reformatSummaryData(
+                                   summaryRDD: RDD[(FeatureId, ForestChangeDiagnosticSummary)]
+                                 ): RDD[(FeatureId, ForestChangeDiagnosticData)] = {
 
     summaryRDD
       .flatMap {
@@ -215,6 +194,29 @@ object ForestChangeDiagnosticAnalysis {
           }
       }
 
+  }
+
+  private def aggregateFireData(
+                                 fires: ForestChangeDiagnosticDataLossYearly
+                               ): ForestChangeDiagnosticDataLossYearly = {
+    val minLossYear = fires.value.keysIterator.min
+    val maxLossYear = fires.value.keysIterator.max
+    val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
+
+    ForestChangeDiagnosticDataLossYearly(
+      SortedMap(
+        years.map(
+          year =>
+            (year, { // I hence declare them here explicitly to help him out.
+              val thisYearLoss: Double = fires.value.getOrElse(year, 0)
+
+              val lastYearLoss: Double = fires.value.getOrElse(year - 1, 0)
+
+              (thisYearLoss + lastYearLoss) / 2
+            })
+        ): _*
+      )
+    )
   }
 
   private def toForestChangeDiagnosticData(

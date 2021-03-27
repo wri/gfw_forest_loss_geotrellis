@@ -6,6 +6,7 @@ import org.apache.log4j.Logger
 import org.datasyslab.geospark.enums.{GridType, IndexType}
 import org.datasyslab.geospark.spatialOperator.JoinQuery
 import org.datasyslab.geosparksql.utils.Adapter
+import org.globalforestwatch.features.SpatialFeatureDF
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -19,7 +20,7 @@ import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, Sim
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 import scala.collection.JavaConverters._
-import scala.collection.immutable.SortedMap
+
 
 object GfwProDashboardAnalysis {
 
@@ -75,7 +76,7 @@ object GfwProDashboardAnalysis {
     }
     val fireAlertObj =
       FeatureFactory("firealerts", Some(fireAlertType)).featureObj
-    val fireAlertPointDF = FeatureDF(
+    val fireAlertPointDF = SpatialFeatureDF(
       fireAlertUris,
       fireAlertObj,
       kwargs,
@@ -93,7 +94,7 @@ object GfwProDashboardAnalysis {
     val featureUris: NonEmptyList[String] =
       getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
     val featurePolygonDF =
-      FeatureDF(featureUris, featureObj, featureType, kwargs, spark, "geom")
+      SpatialFeatureDF(featureUris, featureObj, featureType, kwargs, spark, "geom")
     val featureSpatialRDD = Adapter.toSpatialRdd(featurePolygonDF, "polyshape")
 
     featureSpatialRDD.analyze()
