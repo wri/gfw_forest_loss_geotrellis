@@ -4,7 +4,6 @@ import org.globalforestwatch.grids.GridTile
 case class RemovalForestType(gridTile: GridTile, model: String = "standard")
   extends StringLayer
     with OptionalILayer {
-  //      val model_suffix = if (model == "standard") "" else s"__$model"
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
 
   val uri: String =
