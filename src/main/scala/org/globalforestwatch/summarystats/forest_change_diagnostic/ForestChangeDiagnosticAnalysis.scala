@@ -9,6 +9,7 @@ import org.apache.log4j.Logger
 import org.datasyslab.geospark.enums.{GridType, IndexType}
 import org.datasyslab.geospark.spatialOperator.JoinQuery
 import org.datasyslab.geosparksql.utils.Adapter
+import org.globalforestwatch.features.FeatureIdFactory
 //import org.apache.sedona.core.enums.{FileDataSplitter, GridType, IndexType}
 //import org.apache.sedona.core.spatialOperator.JoinQuery
 //import org.apache.sedona.core.spatialRDD.PointRDD
@@ -35,7 +36,6 @@ object ForestChangeDiagnosticAnalysis {
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
-
     val summaryRDD: RDD[(FeatureId, ForestChangeDiagnosticSummary)] =
       ForestChangeDiagnosticRDD(
         featureRDD,
@@ -43,8 +43,27 @@ object ForestChangeDiagnosticAnalysis {
         kwargs
       )
 
+    val fireCount: RDD[(FeatureId, ForestChangeDiagnosticDataLossYearly)] =
+      ForestChangeDiagnosticAnalysis.fireStats(featureType, spark, kwargs)
+
+    val dataRDD: RDD[(FeatureId, ForestChangeDiagnosticData)] = reformatData(
+      summaryRDD
+    )
+
+    dataRDD
+      .reduceByKey(_ merge _)
+      .map { case (id, data) => updateCommodityRisk(id, data) }
+      .leftOuterJoin(fireCount)
+      .mapValues {
+        case (data, fire) =>
+          data.update(
+            fireThreatIndicator =
+              fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty)
+          )
+      }
+
     val summaryDF =
-      ForestChangeDiagnosticDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
+      ForestChangeDiagnosticDFFactory(featureType, dataRDD, spark, kwargs).getDataFrame
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
       "/forest_change_diagnostic_" + DateTimeFormatter
@@ -63,7 +82,7 @@ object ForestChangeDiagnosticAnalysis {
                  featureType: String,
                  spark: SparkSession,
                  kwargs: Map[String, Any]
-               ): RDD[(SimpleFeatureId, ForestChangeDiagnosticDataLossYearly)] = {
+               ): RDD[(FeatureId, ForestChangeDiagnosticDataLossYearly)] = {
 
     // FIRE RDD
     val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
@@ -126,9 +145,12 @@ object ForestChangeDiagnosticAnalysis {
       .map {
         case (poly, points) =>
           ( {
-            val id =
+            val id = {
               poly.getUserData.asInstanceOf[String].filterNot("[]".toSet).toInt
-            SimpleFeatureId(id)
+
+            }
+            FeatureIdFactory(featureType).featureId(id)
+
           }, {
             val fireCount =
               points.asScala.toList.foldLeft(SortedMap[Int, Double]()) {
@@ -149,23 +171,343 @@ object ForestChangeDiagnosticAnalysis {
           })
       }
       .reduceByKey(_ merge _)
-      .mapValues {
-        case fires =>
-          val minLossYear = fires.value.keysIterator.min
-          val maxLossYear = fires.value.keysIterator.max
-          val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
+      .mapValues { fires =>
+        val minLossYear = fires.value.keysIterator.min
+        val maxLossYear = fires.value.keysIterator.max
+        val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
 
-          ForestChangeDiagnosticDataLossYearly(
-            SortedMap(
-              years.map(year => (year, { // I hence declare them here explicitly to help him out.
-                val thisYearLoss: Double = fires.value.getOrElse(year, 0)
+        ForestChangeDiagnosticDataLossYearly(
+          SortedMap(
+            years.map(
+              year =>
+                (year, { // I hence declare them here explicitly to help him out.
+                  val thisYearLoss: Double = fires.value.getOrElse(year, 0)
 
-                val lastYearLoss: Double = fires.value.getOrElse(year - 1, 0)
+                  val lastYearLoss: Double = fires.value.getOrElse(year - 1, 0)
 
-                (thisYearLoss + lastYearLoss) / 2
-              })): _*))
+                  (thisYearLoss + lastYearLoss) / 2
+                })
+            ): _*
+          )
+        )
 
       }
 
+  }
+
+  def reformatData(
+                    summaryRDD: RDD[(FeatureId, ForestChangeDiagnosticSummary)]
+                  ): RDD[(FeatureId, ForestChangeDiagnosticData)] = {
+
+    summaryRDD
+      .flatMap {
+        case (id, summary) =>
+          // We need to convert the Map to a List in order to correctly flatmap the data
+          summary.stats.toList.map {
+            case (dataGroup, data) =>
+              id match {
+                case featureId: SimpleFeatureId =>
+                  toForestChangeDiagnosticData(featureId, dataGroup, data)
+                case _ =>
+                  throw new IllegalArgumentException("Not a SimpleFeatureId")
+              }
+
+          }
+      }
+
+  }
+
+  private def toForestChangeDiagnosticData(
+                                            featureId: FeatureId,
+                                            dataGroup: ForestChangeDiagnosticRawDataGroup,
+                                            data: ForestChangeDiagnosticRawData
+                                          ): (FeatureId, ForestChangeDiagnosticData) = {
+    (
+      featureId,
+      ForestChangeDiagnosticData(
+        treeCoverLossTcd30Yearly = ForestChangeDiagnosticDataLossYearly.fill(
+          dataGroup.umdTreeCoverLossYear,
+          data.totalArea,
+          dataGroup.isUMDLoss
+        ),
+        treeCoverLossTcd90Yearly = ForestChangeDiagnosticDataLossYearly.fill(
+          dataGroup.umdTreeCoverLossYear,
+          data.totalArea,
+          dataGroup.isUMDLoss && dataGroup.isTreeCoverExtent90
+        ),
+        treeCoverLossPrimaryForestYearly =
+          ForestChangeDiagnosticDataLossYearly.fill(
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            dataGroup.isPrimaryForest && dataGroup.isUMDLoss
+          ),
+        treeCoverLossPeatLandYearly = ForestChangeDiagnosticDataLossYearly.fill(
+          dataGroup.umdTreeCoverLossYear,
+          data.totalArea,
+          dataGroup.isPeatlands && dataGroup.isUMDLoss
+        ),
+        treeCoverLossIntactForestYearly =
+          ForestChangeDiagnosticDataLossYearly.fill(
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            dataGroup.isIntactForestLandscapes2016 && dataGroup.isUMDLoss
+          ),
+        treeCoverLossProtectedAreasYearly =
+          ForestChangeDiagnosticDataLossYearly.fill(
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            dataGroup.isProtectedArea && dataGroup.isUMDLoss
+          ),
+        treeCoverLossSEAsiaLandCoverYearly =
+          ForestChangeDiagnosticDataLossYearlyCategory.fill(
+            dataGroup.seAsiaLandCover,
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            include = dataGroup.isUMDLoss
+          ),
+        treeCoverLossIDNLandCoverYearly =
+          ForestChangeDiagnosticDataLossYearlyCategory.fill(
+            dataGroup.idnLandCover,
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            include = dataGroup.isUMDLoss
+          ),
+        treeCoverLossSoyPlanedAreasYearly =
+          ForestChangeDiagnosticDataLossYearly.fill(
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            dataGroup.isSoyPlantedAreas && dataGroup.isUMDLoss
+          ),
+        treeCoverLossIDNForestAreaYearly =
+          ForestChangeDiagnosticDataLossYearlyCategory.fill(
+            dataGroup.idnForestArea,
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            include = dataGroup.isUMDLoss
+          ),
+        treeCoverLossIDNForestMoratoriumYearly =
+          ForestChangeDiagnosticDataLossYearly.fill(
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            dataGroup.isIdnForestMoratorium && dataGroup.isUMDLoss
+          ),
+        prodesLossYearly = ForestChangeDiagnosticDataLossYearly.fill(
+          dataGroup.prodesLossYear,
+          data.totalArea,
+          dataGroup.isProdesLoss
+        ),
+        prodesLossProtectedAreasYearly =
+          ForestChangeDiagnosticDataLossYearly.fill(
+            dataGroup.prodesLossYear,
+            data.totalArea,
+            dataGroup.isProdesLoss && dataGroup.isProtectedArea
+          ),
+        prodesLossProdesPrimaryForestYearly =
+          ForestChangeDiagnosticDataLossYearly.fill(
+            dataGroup.prodesLossYear,
+            data.totalArea,
+            dataGroup.isProdesLoss && dataGroup.isPrimaryForest
+          ),
+        treeCoverLossBRABiomesYearly =
+          ForestChangeDiagnosticDataLossYearlyCategory.fill(
+            dataGroup.braBiomes,
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            include = dataGroup.isUMDLoss
+          ),
+        treeCoverExtent = ForestChangeDiagnosticDataDouble
+          .fill(data.totalArea, dataGroup.isTreeCoverExtent30),
+        treeCoverExtentPrimaryForest = ForestChangeDiagnosticDataDouble.fill(
+          data.totalArea,
+          dataGroup.isTreeCoverExtent30 && dataGroup.isPrimaryForest
+        ),
+        treeCoverExtentProtectedAreas = ForestChangeDiagnosticDataDouble.fill(
+          data.totalArea,
+          dataGroup.isTreeCoverExtent30 && dataGroup.isProtectedArea
+        ),
+        treeCoverExtentPeatlands = ForestChangeDiagnosticDataDouble.fill(
+          data.totalArea,
+          dataGroup.isTreeCoverExtent30 && dataGroup.isPeatlands
+        ),
+        treeCoverExtentIntactForests = ForestChangeDiagnosticDataDouble.fill(
+          data.totalArea,
+          dataGroup.isTreeCoverExtent30 && dataGroup.isIntactForestLandscapes2016
+        ),
+        primaryForestArea = ForestChangeDiagnosticDataDouble
+          .fill(data.totalArea, dataGroup.isPrimaryForest),
+        intactForest2016Area = ForestChangeDiagnosticDataDouble
+          .fill(data.totalArea, dataGroup.isIntactForestLandscapes2016),
+        totalArea = ForestChangeDiagnosticDataDouble.fill(data.totalArea),
+        protectedAreasArea = ForestChangeDiagnosticDataDouble
+          .fill(data.totalArea, dataGroup.isProtectedArea),
+        peatlandsArea = ForestChangeDiagnosticDataDouble
+          .fill(data.totalArea, dataGroup.isPeatlands),
+        braBiomesArea = ForestChangeDiagnosticDataDoubleCategory
+          .fill(dataGroup.braBiomes, data.totalArea),
+        idnForestAreaArea = ForestChangeDiagnosticDataDoubleCategory
+          .fill(dataGroup.idnForestArea, data.totalArea),
+        seAsiaLandCoverArea = ForestChangeDiagnosticDataDoubleCategory
+          .fill(dataGroup.seAsiaLandCover, data.totalArea),
+        idnLandCoverArea = ForestChangeDiagnosticDataDoubleCategory
+          .fill(dataGroup.idnLandCover, data.totalArea),
+        idnForestMoratoriumArea = ForestChangeDiagnosticDataDouble
+          .fill(data.totalArea, dataGroup.isIdnForestMoratorium),
+        southAmericaPresence = ForestChangeDiagnosticDataBoolean
+          .fill(dataGroup.southAmericaPresence),
+        legalAmazonPresence = ForestChangeDiagnosticDataBoolean
+          .fill(dataGroup.legalAmazonPresence),
+        braBiomesPresence = ForestChangeDiagnosticDataBoolean
+          .fill(dataGroup.braBiomesPresence),
+        cerradoBiomesPresence = ForestChangeDiagnosticDataBoolean
+          .fill(dataGroup.cerradoBiomesPresence),
+        seAsiaPresence =
+          ForestChangeDiagnosticDataBoolean.fill(dataGroup.seAsiaPresence),
+        idnPresence =
+          ForestChangeDiagnosticDataBoolean.fill(dataGroup.idnPresence),
+        filteredTreeCoverExtentYearly =
+          ForestChangeDiagnosticDataValueYearly.fill(
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation
+          ),
+        filteredTreeCoverLossYearly = ForestChangeDiagnosticDataLossYearly.fill(
+          dataGroup.umdTreeCoverLossYear,
+          data.totalArea,
+          dataGroup.isUMDLoss && dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation
+        ),
+        filteredTreeCoverLossPeatYearly =
+          ForestChangeDiagnosticDataLossYearly.fill(
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            dataGroup.isUMDLoss && dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation && dataGroup.isPeatlands
+          ),
+        filteredTreeCoverLossProtectedAreasYearly =
+          ForestChangeDiagnosticDataLossYearly.fill(
+            dataGroup.umdTreeCoverLossYear,
+            data.totalArea,
+            dataGroup.isUMDLoss && dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation && dataGroup.isProtectedArea
+          ),
+        plantationArea = ForestChangeDiagnosticDataDouble
+          .fill(data.totalArea, dataGroup.isPlantation),
+        plantationOnPeatArea = ForestChangeDiagnosticDataDouble
+          .fill(
+            data.totalArea,
+            dataGroup.isPlantation && dataGroup.isPeatlands
+          ),
+        plantationInProtectedAreasArea = ForestChangeDiagnosticDataDouble
+          .fill(
+            data.totalArea,
+            dataGroup.isPlantation && dataGroup.isProtectedArea
+          ),
+        forestValueIndicator = ForestChangeDiagnosticDataValueYearly.empty,
+        peatValueIndicator = ForestChangeDiagnosticDataValueYearly.empty,
+        protectedAreaValueIndicator =
+          ForestChangeDiagnosticDataValueYearly.empty,
+        deforestationThreatIndicator =
+          ForestChangeDiagnosticDataLossYearly.empty,
+        peatThreatIndicator = ForestChangeDiagnosticDataLossYearly.empty,
+        protectedAreaThreatIndicator =
+          ForestChangeDiagnosticDataLossYearly.empty,
+        fireThreatIndicator = ForestChangeDiagnosticDataLossYearly.empty
+      )
+    )
+
+  }
+
+  private def updateCommodityRisk(
+                                   featureId: FeatureId,
+                                   data: ForestChangeDiagnosticData
+                                 ): (FeatureId, ForestChangeDiagnosticData) = {
+
+    val minLossYear =
+      data.treeCoverLossTcd90Yearly.value.keysIterator.min
+    val maxLossYear =
+      data.treeCoverLossTcd90Yearly.value.keysIterator.max
+    val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
+
+    val forestValueIndicator: ForestChangeDiagnosticDataValueYearly =
+      data.filteredTreeCoverExtentYearly
+    val peatValueIndicator: ForestChangeDiagnosticDataValueYearly =
+      ForestChangeDiagnosticDataValueYearly.fill(0, data.peatlandsArea.value)
+    val protectedAreaValueIndicator: ForestChangeDiagnosticDataValueYearly =
+      ForestChangeDiagnosticDataValueYearly.fill(
+        0,
+        data.protectedAreasArea.value
+      )
+    val deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly =
+      ForestChangeDiagnosticDataLossYearly(
+        SortedMap(
+          years.map(
+            year =>
+              (year, {
+
+                // Somehow the compiler cannot infer the types correctly
+                // I hence declare them here explicitly to help him out.
+                val thisYearLoss: Double =
+                data.filteredTreeCoverLossYearly.value
+                  .getOrElse(year, 0)
+
+                val lastYearLoss: Double =
+                  data.filteredTreeCoverLossYearly.value
+                    .getOrElse(year - 1, 0)
+
+                thisYearLoss + lastYearLoss
+              })
+          ): _*
+        )
+      )
+    val peatThreatIndicator: ForestChangeDiagnosticDataLossYearly =
+      ForestChangeDiagnosticDataLossYearly(
+        SortedMap(
+          years.map(
+            year =>
+              (year, {
+                // Somehow the compiler cannot infer the types correctly
+                // I hence declare them here explicitly to help him out.
+                val thisYearPeatLoss: Double =
+                data.filteredTreeCoverLossPeatYearly.value
+                  .getOrElse(year, 0)
+
+                val lastYearPeatLoss: Double =
+                  data.filteredTreeCoverLossPeatYearly.value
+                    .getOrElse(year - 1, 0)
+
+                thisYearPeatLoss + lastYearPeatLoss + data.plantationOnPeatArea.value
+
+              })
+          ): _*
+        )
+      )
+    val protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly =
+      ForestChangeDiagnosticDataLossYearly(
+        SortedMap(
+          years.map(
+            year =>
+              (year, {
+                // Somehow the compiler cannot infer the types correctly
+                // I hence declare them here explicitly to help him out.
+                val thisYearProtectedAreaLoss: Double =
+                data.filteredTreeCoverLossProtectedAreasYearly.value
+                  .getOrElse(year, 0)
+
+                val lastYearProtectedAreaLoss: Double =
+                  data.filteredTreeCoverLossProtectedAreasYearly.value
+                    .getOrElse(year - 1, 0)
+
+                thisYearProtectedAreaLoss + lastYearProtectedAreaLoss + data.plantationInProtectedAreasArea.value
+              })
+          ): _*
+        )
+      )
+
+    val new_data = data.update(
+      forestValueIndicator = forestValueIndicator,
+      peatValueIndicator = peatValueIndicator,
+      protectedAreaValueIndicator = protectedAreaValueIndicator,
+      deforestationThreatIndicator = deforestationThreatIndicator,
+      peatThreatIndicator = peatThreatIndicator,
+      protectedAreaThreatIndicator = protectedAreaThreatIndicator
+    )
+    (featureId, new_data)
   }
 }

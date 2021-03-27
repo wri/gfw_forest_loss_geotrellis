@@ -50,7 +50,7 @@ case class ForestChangeDiagnosticData(
                                        plantationArea: ForestChangeDiagnosticDataDouble,
                                        plantationOnPeatArea: ForestChangeDiagnosticDataDouble,
                                        plantationInProtectedAreasArea: ForestChangeDiagnosticDataDouble,
-                                       forestValueIndicator: ForestChangeDiagnosticDataLossYearly,
+                                       forestValueIndicator: ForestChangeDiagnosticDataValueYearly,
                                        peatValueIndicator: ForestChangeDiagnosticDataValueYearly,
                                        protectedAreaValueIndicator: ForestChangeDiagnosticDataValueYearly,
                                        deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly,
@@ -220,7 +220,7 @@ case class ForestChangeDiagnosticData(
               this.plantationOnPeatArea,
               plantationInProtectedAreasArea: ForestChangeDiagnosticDataDouble =
               this.plantationInProtectedAreasArea,
-              forestValueIndicator: ForestChangeDiagnosticDataLossYearly =
+              forestValueIndicator: ForestChangeDiagnosticDataValueYearly =
               this.forestValueIndicator,
               peatValueIndicator: ForestChangeDiagnosticDataValueYearly =
               this.peatValueIndicator,
@@ -339,7 +339,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
-      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataValueYearly.empty,
       ForestChangeDiagnosticDataValueYearly.empty,
       ForestChangeDiagnosticDataValueYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
