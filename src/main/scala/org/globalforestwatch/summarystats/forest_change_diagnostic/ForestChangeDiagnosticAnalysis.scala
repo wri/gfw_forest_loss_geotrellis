@@ -56,18 +56,16 @@ object ForestChangeDiagnosticAnalysis {
 
     val dataRDD: RDD[(FeatureId, ForestChangeDiagnosticData)] =
       reformatSummaryData(summaryRDD)
-
-    dataRDD
-      .reduceByKey(_ merge _)
-      .map { case (id, data) => updateCommodityRisk(id, data) }
-      .leftOuterJoin(fireCount)
-      .mapValues {
-        case (data, fire) =>
-          data.update(
-            fireThreatIndicator =
-              fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty)
-          )
-      }
+        .reduceByKey(_ merge _)
+        .map { case (id, data) => updateCommodityRisk(id, data) }
+        .leftOuterJoin(fireCount)
+        .mapValues {
+          case (data, fire) =>
+            data.update(
+              fireThreatIndicator =
+                fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty)
+            )
+        }
 
     val summaryDF =
       ForestChangeDiagnosticDFFactory(featureType, dataRDD, spark, kwargs).getDataFrame
@@ -190,7 +188,6 @@ object ForestChangeDiagnosticAnalysis {
                 case _ =>
                   throw new IllegalArgumentException("Not a SimpleFeatureId")
               }
-
           }
       }
 
@@ -209,9 +206,7 @@ object ForestChangeDiagnosticAnalysis {
           year =>
             (year, { // I hence declare them here explicitly to help him out.
               val thisYearLoss: Double = fires.value.getOrElse(year, 0)
-
               val lastYearLoss: Double = fires.value.getOrElse(year - 1, 0)
-
               (thisYearLoss + lastYearLoss) / 2
             })
         ): _*

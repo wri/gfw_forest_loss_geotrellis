@@ -8,7 +8,7 @@ import org.globalforestwatch.features.{FeatureId, SimpleFeatureId}
 
 case class GfwProDashboardDFFactory(
                                      featureType: String,
-                                     summaryRDD: RDD[(FeatureId, GfwProDashboardSummary)],
+                                     dataRDD: RDD[(FeatureId, GfwProDashboardData)],
                                      spark: SparkSession,
                                      kwargs: Map[String, Any]
                                    ) {
@@ -24,50 +24,7 @@ case class GfwProDashboardDFFactory(
   }
 
   private def getFeatureDataFrame: DataFrame = {
-    val analysisRDD: RDD[(SimpleFeatureId, GfwProDashboardData)] = summaryRDD
-      .flatMap {
-        case (id, summary) =>
-          // We need to convert the Map to a List in order to correctly flatmap the data
-          summary.stats.toList.map {
-            case (dataGroup, data) =>
-              id match {
-                case featureId: SimpleFeatureId =>
-                  (
-                    featureId,
-                    GfwProDashboardData(
-                      dataGroup.alertCoverage,
-                      gladAlertsDaily = GfwProDashboardDataDateCount
-                        .fill(dataGroup.alertDate, data.alertCount),
-                      gladAlertsWeekly = GfwProDashboardDataDateCount
-                        .fill(dataGroup.alertDate, data.alertCount, weekly = true),
-                      gladAlertsMonthly = GfwProDashboardDataDateCount.fill(
-                        dataGroup.alertDate,
-                        data.alertCount,
-                        monthly = true
-                      ),
-                      viirsAlertsDaily = GfwProDashboardDataDateCount.empty
-                    )
-                  )
-                case _ =>
-                  throw new IllegalArgumentException("Not a SimpleFeatureId")
-              }
-
-          }
-      }
-      .reduceByKey(_ merge _)
-
-    val fireCount: RDD[(SimpleFeatureId, GfwProDashboardDataDateCount)] =
-      GfwProDashboardAnalysis.fireStats(featureType, spark, kwargs)
-
-    analysisRDD
-      .leftOuterJoin(fireCount)
-      .mapValues {
-        case (data, fire) =>
-          data.update(
-            viirsAlertsDaily =
-              fire.getOrElse(GfwProDashboardDataDateCount.empty)
-          )
-      }
+    dataRDD
       .map {
         case (id, data) =>
           id match {
