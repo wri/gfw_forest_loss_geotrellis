@@ -43,6 +43,7 @@ case class ForestChangeDiagnosticData(
                                        cerradoBiomesPresence: ForestChangeDiagnosticDataBoolean,
                                        seAsiaPresence: ForestChangeDiagnosticDataBoolean,
                                        idnPresence: ForestChangeDiagnosticDataBoolean,
+                                       filteredTreeCoverExtent: ForestChangeDiagnosticDataDouble,
                                        filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataValueYearly,
                                        filteredTreeCoverLossYearly: ForestChangeDiagnosticDataLossYearly,
                                        filteredTreeCoverLossPeatYearly: ForestChangeDiagnosticDataLossYearly,
@@ -118,6 +119,7 @@ case class ForestChangeDiagnosticData(
       cerradoBiomesPresence.merge(other.cerradoBiomesPresence),
       seAsiaPresence.merge(other.seAsiaPresence),
       idnPresence.merge(other.idnPresence),
+      filteredTreeCoverExtent.merge(other.filteredTreeCoverExtent),
       filteredTreeCoverExtentYearly.merge(other.filteredTreeCoverExtentYearly),
       filteredTreeCoverLossYearly.merge(other.filteredTreeCoverLossYearly),
       filteredTreeCoverLossPeatYearly.merge(
@@ -207,6 +209,7 @@ case class ForestChangeDiagnosticData(
               this.cerradoBiomesPresence,
               seAsiaPresence: ForestChangeDiagnosticDataBoolean = this.seAsiaPresence,
               idnPresence: ForestChangeDiagnosticDataBoolean = this.idnPresence,
+              filteredTreeCoverExtent: ForestChangeDiagnosticDataDouble = this.filteredTreeCoverExtent,
               filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataValueYearly =
               this.filteredTreeCoverExtentYearly,
               filteredTreeCoverLossYearly: ForestChangeDiagnosticDataLossYearly =
@@ -273,6 +276,7 @@ case class ForestChangeDiagnosticData(
       cerradoBiomesPresence,
       seAsiaPresence,
       idnPresence,
+      filteredTreeCoverExtent,
       filteredTreeCoverExtentYearly,
       filteredTreeCoverLossYearly,
       filteredTreeCoverLossPeatYearly,
@@ -332,6 +336,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataBoolean.empty,
       ForestChangeDiagnosticDataBoolean.empty,
       ForestChangeDiagnosticDataBoolean.empty,
+      ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataValueYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,

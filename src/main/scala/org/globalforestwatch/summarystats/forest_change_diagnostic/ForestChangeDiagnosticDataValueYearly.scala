@@ -28,39 +28,27 @@ case class ForestChangeDiagnosticDataValueYearly(value: SortedMap[Int, Double])
 }
 
 object ForestChangeDiagnosticDataValueYearly {
-  def fill(lossYear: Int,
-           areaHa: Double,
-           include: Boolean = true): ForestChangeDiagnosticDataValueYearly = {
+  def fill(
+            baseValue: Double,
+            diff: SortedMap[Int, Double] =
+            ForestChangeDiagnosticDataValueYearly.prefilled.value,
+            shift: Int = 0
+          ): ForestChangeDiagnosticDataValueYearly = {
 
     // Only except lossYear values within range of default map or 0
     val minExtentYear: Int = this.prefilled.value.keysIterator.min
     val maxExtentYear: Int = this.prefilled.value.keysIterator.max
     val years: List[Int] = List.range(minExtentYear, maxExtentYear + 1)
 
-    if (lossYear == 0 && include) {
-      ForestChangeDiagnosticDataValueYearly.prefilled.merge(
-        ForestChangeDiagnosticDataValueYearly(
-          SortedMap(years.map(year => (year, areaHa)): _*)
-        )
-      )
-    } else if (minExtentYear <= lossYear && lossYear <= maxExtentYear && include) {
+    ForestChangeDiagnosticDataValueYearly.prefilled.merge(
+      ForestChangeDiagnosticDataValueYearly(SortedMap(years.map(year => {
 
-      // convert a list of tuples to a sorted map
-      val values: SortedMap[Int, Double] = SortedMap(
-        years.map(
-          year =>
-            (
-              year,
-              if (year < lossYear) areaHa
-              else 0
-            )
-        ): _*
-      )
+        val diffYears: List[Int] = List.range(minExtentYear, year + 1)
+        val diffValue: Double = diffYears.foldLeft(0.0)((acc, diffYear) => acc + diff.getOrElse(diffYear - shift, 0.0))
+        (year, baseValue - diffValue)
+      }): _*))
+    )
 
-      ForestChangeDiagnosticDataValueYearly(values)
-
-    } else
-      this.empty
   }
 
   def empty: ForestChangeDiagnosticDataValueYearly =

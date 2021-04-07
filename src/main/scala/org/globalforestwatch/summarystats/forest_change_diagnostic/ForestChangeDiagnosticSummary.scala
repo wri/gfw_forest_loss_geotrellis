@@ -21,7 +21,7 @@ case class ForestChangeDiagnosticSummary(
 }
 
 object ForestChangeDiagnosticSummary {
-  // ForestChangeDiagnosticSummary form Raster[ForestChangeDiagnosticTile] -- cell types may not be the same
+  // ForestChangeDiagnosticSummary from Raster[ForestChangeDiagnosticTile] -- cell types may not be the same
 
   def getGridVisitor(
     kwargs: Map[String, Any]
@@ -96,8 +96,6 @@ object ForestChangeDiagnosticSummary {
         val seAsiaPresence = gfwProCoverage.getOrElse("South East Asia", false)
         val idnPresence = gfwProCoverage.getOrElse("Indonesia", false)
 
-        //        summartStats: Map[ForestChangeDiagnosticRawDataGroup, ForestChangeDiagnosticRawData] =
-
         val groupKey = ForestChangeDiagnosticRawDataGroup(
           umdTreeCoverLossYear,
           isUMDLoss,
@@ -134,11 +132,6 @@ object ForestChangeDiagnosticSummary {
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
         acc = ForestChangeDiagnosticSummary(new_stats)
-
-        //        acc = ForestChangeDiagnosticSummary(acc.stats.updated(groupKey, summaryData))
-
-        //
-        //        acc = ForestChangeDiagnosticSummary(acc.stats.merge(newStats))
 
       }
     }

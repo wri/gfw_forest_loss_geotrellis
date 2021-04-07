@@ -7,14 +7,8 @@ import java.time.format.DateTimeFormatter
 import geotrellis.vector.{Feature, Geometry}
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
 import org.apache.log4j.Logger
-import org.datasyslab.geospark.enums.{GridType, IndexType}
-import org.datasyslab.geospark.spatialOperator.JoinQuery
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.features.{
-  FeatureIdFactory,
-  FireAlertRDD,
-  SpatialFeatureDF
-}
+import org.globalforestwatch.features.{FeatureIdFactory, FireAlertRDD, JoinedRDD, SpatialFeatureDF}
 
 import java.util
 
@@ -25,7 +19,6 @@ import java.util
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.{
-  FeatureDF,
   FeatureFactory,
   FeatureId,
   SimpleFeatureId
@@ -109,27 +102,10 @@ object ForestChangeDiagnosticAnalysis {
 
     featureSpatialRDD.analyze()
 
-    // Join Fire and Feature RDD
-    val buildOnSpatialPartitionedRDD = true // Set to TRUE only if run join query
-    val considerBoundaryIntersection = false // Only return gemeotries fully covered by each query window in queryWindowRDD
-    val usingIndex = false
+    val joinedRDD = JoinedRDD(fireAlertSpatialRDD,
+      featureSpatialRDD)
 
-    fireAlertSpatialRDD.spatialPartitioning(GridType.QUADTREE)
-
-    featureSpatialRDD.spatialPartitioning(fireAlertSpatialRDD.getPartitioner)
-    featureSpatialRDD.buildIndex(
-      IndexType.QUADTREE,
-      buildOnSpatialPartitionedRDD
-    )
-
-    val pairRDD = JoinQuery.SpatialJoinQuery(
-      fireAlertSpatialRDD,
-      featureSpatialRDD,
-      usingIndex,
-      considerBoundaryIntersection
-    )
-
-    pairRDD.rdd
+    joinedRDD.rdd
       .map {
         case (poly, points) =>
           toForestChangeDiagnosticFireData(featureType, poly, points)
@@ -196,18 +172,18 @@ object ForestChangeDiagnosticAnalysis {
   private def aggregateFireData(
                                  fires: ForestChangeDiagnosticDataLossYearly
                                ): ForestChangeDiagnosticDataLossYearly = {
-    val minLossYear = fires.value.keysIterator.min
-    val maxLossYear = fires.value.keysIterator.max
-    val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
+    val minFireYear = fires.value.keysIterator.min
+    val maxFireYear = fires.value.keysIterator.max
+    val years: List[Int] = List.range(minFireYear + 1, maxFireYear + 1)
 
     ForestChangeDiagnosticDataLossYearly(
       SortedMap(
         years.map(
           year =>
-            (year, { // I hence declare them here explicitly to help him out.
-              val thisYearLoss: Double = fires.value.getOrElse(year, 0)
-              val lastYearLoss: Double = fires.value.getOrElse(year - 1, 0)
-              (thisYearLoss + lastYearLoss) / 2
+            (year, {
+              val thisYearFireCount: Double = fires.value.getOrElse(year, 0)
+              val lastYearFireCount: Double = fires.value.getOrElse(year - 1, 0)
+              (thisYearFireCount + lastYearFireCount) / 2
             })
         ): _*
       )
@@ -361,12 +337,9 @@ object ForestChangeDiagnosticAnalysis {
           ForestChangeDiagnosticDataBoolean.fill(dataGroup.seAsiaPresence),
         idnPresence =
           ForestChangeDiagnosticDataBoolean.fill(dataGroup.idnPresence),
-        filteredTreeCoverExtentYearly =
-          ForestChangeDiagnosticDataValueYearly.fill(
-            dataGroup.umdTreeCoverLossYear,
-            data.totalArea,
-            dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation
-          ),
+        filteredTreeCoverExtent = ForestChangeDiagnosticDataDouble
+          .fill(data.totalArea, dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation),
+        filteredTreeCoverExtentYearly = ForestChangeDiagnosticDataValueYearly.empty,
         filteredTreeCoverLossYearly = ForestChangeDiagnosticDataLossYearly.fill(
           dataGroup.umdTreeCoverLossYear,
           data.totalArea,
@@ -423,12 +396,12 @@ object ForestChangeDiagnosticAnalysis {
     val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
 
     val forestValueIndicator: ForestChangeDiagnosticDataValueYearly =
-      data.filteredTreeCoverExtentYearly
+      ForestChangeDiagnosticDataValueYearly.fill(data.filteredTreeCoverExtent.value, data.filteredTreeCoverLossYearly.value, 2)
     val peatValueIndicator: ForestChangeDiagnosticDataValueYearly =
-      ForestChangeDiagnosticDataValueYearly.fill(0, data.peatlandsArea.value)
+      ForestChangeDiagnosticDataValueYearly.fill(data.peatlandsArea.value)
     val protectedAreaValueIndicator: ForestChangeDiagnosticDataValueYearly =
       ForestChangeDiagnosticDataValueYearly.fill(
-        0,
+
         data.protectedAreasArea.value
       )
     val deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly =

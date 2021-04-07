@@ -1,6 +1,5 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-import org.globalforestwatch.util.Implicits._
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
 

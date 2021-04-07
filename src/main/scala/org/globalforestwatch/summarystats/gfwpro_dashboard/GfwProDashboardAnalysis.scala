@@ -4,14 +4,8 @@ import cats.data.NonEmptyList
 import geotrellis.vector.{Feature, Geometry}
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
 import org.apache.log4j.Logger
-import org.datasyslab.geospark.enums.{GridType, IndexType}
-import org.datasyslab.geospark.spatialOperator.JoinQuery
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.features.{
-  FeatureIdFactory,
-  FireAlertRDD,
-  SpatialFeatureDF
-}
+import org.globalforestwatch.features.{FeatureIdFactory, FireAlertRDD, JoinedRDD, SpatialFeatureDF}
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -22,12 +16,7 @@ import java.util
 //import org.apache.sedona.sql.utils.{Adapter, SedonaSQLRegistrator}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.globalforestwatch.features.{
-  FeatureDF,
-  FeatureFactory,
-  FeatureId,
-  SimpleFeatureId
-}
+import org.globalforestwatch.features.{FeatureFactory, FeatureId}
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 import scala.collection.JavaConverters._
@@ -97,26 +86,10 @@ object GfwProDashboardAnalysis {
 
     featureSpatialRDD.analyze()
 
-    val buildOnSpatialPartitionedRDD = true // Set to TRUE only if run join query
-    val considerBoundaryIntersection = false // Only return gemeotries fully covered by each query window in queryWindowRDD
-    val usingIndex = false
+    val joinedRDD = JoinedRDD(fireAlertSpatialRDD,
+      featureSpatialRDD)
 
-    fireAlertSpatialRDD.spatialPartitioning(GridType.QUADTREE)
-
-    featureSpatialRDD.spatialPartitioning(fireAlertSpatialRDD.getPartitioner)
-    featureSpatialRDD.buildIndex(
-      IndexType.QUADTREE,
-      buildOnSpatialPartitionedRDD
-    )
-
-    val pairRDD = JoinQuery.SpatialJoinQuery(
-      fireAlertSpatialRDD,
-      featureSpatialRDD,
-      usingIndex,
-      considerBoundaryIntersection
-    )
-
-    pairRDD.rdd
+    joinedRDD.rdd
       .map {
         case (poly, points) =>
           toGfwProDashboardFireData(featureType, poly, points)

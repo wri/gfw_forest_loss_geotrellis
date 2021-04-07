@@ -20,7 +20,7 @@ case class GfwProDashboardSummary(
 }
 
 object GfwProDashboardSummary {
-  // GfwProDashboardSummary form Raster[GfwProDashboardTile] -- cell types may not be the same
+  // GfwProDashboardSummary from Raster[GfwProDashboardTile] -- cell types may not be the same
 
   def getGridVisitor(
                       kwargs: Map[String, Any]
@@ -36,20 +36,11 @@ object GfwProDashboardSummary {
                 row: Int): Unit = {
 
         // This is a pixel by pixel operation
-
-        // This is a pixel by pixel operation
         val gladAlertsCoverage: Boolean =
           raster.tile.gladAlerts.getCoverage(col, row)
         raster.tile.gladAlerts.getData(col, row)
         val gladAlerts: Option[(String, Boolean)] =
           raster.tile.gladAlerts.getData(col, row)
-
-        //        if (gladAlerts.isDefined) {
-
-        // pixel Area
-        //          val lat: Double = raster.rasterExtent.gridRowToMap(row)
-        //          val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
-        //          val areaHa = area / 10000.0
 
         val alertDate: Option[String] = {
           gladAlerts match {
@@ -57,13 +48,6 @@ object GfwProDashboardSummary {
             case _ => None
           }
         }
-
-        //          val confidence: Option[Boolean] = {
-        //            glad match {
-        //              case Some((_, conf)) => Some(conf)
-        //              case _ => null
-        //            }
-        //          }
 
         val groupKey =
           GfwProDashboardRawDataGroup(gladAlertsCoverage, alertDate)

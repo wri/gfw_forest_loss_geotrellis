@@ -22,7 +22,6 @@ object GfwProDashboardExport extends SummaryExport {
     summaryDF
       .coalesce(1)
       .write
-      //      .json(path = outputUrl)
       .options(csvOptions)
       .csv(path = outputUrl)
 

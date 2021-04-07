@@ -2,7 +2,7 @@ package org.globalforestwatch.summarystats.gfwpro_dashboard
 
 import io.circe.syntax._
 
-import java.util.{Calendar, Date}
+import java.util.Calendar
 import scala.collection.immutable.SortedMap
 
 case class GfwProDashboardDataDateCount(value: SortedMap[String, Int]) {
