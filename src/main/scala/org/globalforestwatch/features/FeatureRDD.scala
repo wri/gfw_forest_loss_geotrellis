@@ -6,11 +6,19 @@ import com.vividsolutions.jts.geom.{
   Point => GeoSparkPoint
 }
 import geotrellis.vector
-import geotrellis.vector.Geometry
+import geotrellis.vector.{Geometry, Polygon}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
+import org.geotools.data.simple.SimpleFeatureIterator
 import org.globalforestwatch.util.GeometryReducer
+import org.globalforestwatch.util.IntersectGeometry.{
+  getIntersecting1x1Grid,
+  intersectGeometries
+}
+import org.opengis.feature.simple.SimpleFeature
+
+import scala.annotation.tailrec
 
 object FeatureRDD {
   def apply(
@@ -22,14 +30,18 @@ object FeatureRDD {
     val featuresDF: DataFrame =
       FeatureDF(input, featureObj, kwargs, spark)
 
-    featuresDF.rdd.mapPartitions({ iter: Iterator[Row] =>
-      for {
-        i <- iter
-        if featureObj.isValidGeom(i)
-      } yield {
-        featureObj.get(i)
+    featuresDF.rdd
+      .mapPartitions({ iter: Iterator[Row] =>
+        for {
+          i <- iter
+          if featureObj.isValidGeom(i)
+        } yield {
+          featureObj.get(i)
+        }
+      }, preservesPartitioning = true)
+      .flatMap { feature =>
+        splitGeometry(feature)
       }
-    }, preservesPartitioning = true)
   }
 
   def apply(
@@ -41,19 +53,53 @@ object FeatureRDD {
     val scalaRDD =
       org.apache.spark.api.java.JavaRDD.toRDD(spatialRDD.spatialPartitionedRDD)
 
-    scalaRDD.map {
-      case pt: GeoSparkPoint =>
-        val pointFeatureData = pt.getUserData.asInstanceOf[String].split('\t')
+    scalaRDD
+      .map {
+        case pt: GeoSparkPoint =>
+          val pointFeatureData = pt.getUserData.asInstanceOf[String].split('\t')
 
-        val geom = GeometryReducer.reduce(GeometryReducer.gpr)(
-          vector.Point(pt.getX, pt.getY)
-        )
+          val geom = GeometryReducer.reduce(GeometryReducer.gpr)(
+            vector.Point(pt.getX, pt.getY)
+          )
 
-        val pointFeatureId: FeatureId =
-          featureObj.getFeatureId(pointFeatureData)
-        vector.Feature(geom, pointFeatureId)
-      case _ => throw new NotImplementedError("Cannot convert geometry type to Geotrellis RDD")
-    }
+          val pointFeatureId: FeatureId =
+            featureObj.getFeatureId(pointFeatureData)
+          vector.Feature(geom, pointFeatureId)
+        case _ =>
+          throw new NotImplementedError(
+            "Cannot convert geometry type to Geotrellis RDD"
+          )
+      }
+    // In case we implement this method for other geometry types we will have to split geometries
+    //      .flatMap { feature =>
+    //        splitGeometry(feature)
+    //      }
 
   }
+
+  private def splitGeometry(
+                             feature: geotrellis.vector.Feature[Geometry, FeatureId]
+                           ): List[geotrellis.vector.Feature[Geometry, FeatureId]] = {
+
+    @tailrec def loop(geom: Geometry,
+                      gridGeoms: IndexedSeq[Polygon],
+                      acc: List[Geometry]): List[Geometry] = {
+      if (gridGeoms.isEmpty) acc
+      else {
+
+        val gridGeom = gridGeoms.head;
+
+        val intersections: List[Geometry] =
+          intersectGeometries(feature.geom, gridGeom)
+
+        loop(geom, gridGeoms.tail, acc ::: intersections)
+      }
+    }
+
+    val gridGeoms = getIntersecting1x1Grid(feature.geom)
+
+    loop(feature.geom, gridGeoms, List()).map(vector.Feature(_, feature.data))
+
+  }
+
 }
