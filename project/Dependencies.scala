@@ -18,6 +18,7 @@ import sbt._
 
 object Version {
   val breeze = "0.13.2"
+  val decline = "1.3.0"
   val scala = "2.12.12"
   val geotrellis = "3.5.2"
   val hadoop = "3.2.1"
@@ -51,7 +52,7 @@ object Dependencies {
   val logging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
   val scalatest = "org.scalatest" %% "scalatest" % "3.0.5"
   val scalactic = "org.scalactic" %% "scalactic" % "3.0.5"
-  val decline = "com.monovore" %% "decline" % "0.5.1"
+  val decline = "com.monovore" %% "decline" % Version.decline
 
   val jacksonDatabind = "com.fasterxml.jackson.core" % "jackson-databind" % Version.jackson % dependencyScope
   val jacksonCore = "com.fasterxml.jackson.core" % "jackson-core" % Version.jackson % dependencyScope

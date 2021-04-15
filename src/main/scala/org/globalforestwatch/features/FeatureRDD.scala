@@ -10,13 +10,12 @@ import geotrellis.vector.{Geometry, Polygon}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.geotools.data.simple.SimpleFeatureIterator
 import org.globalforestwatch.util.GeometryReducer
 import org.globalforestwatch.util.IntersectGeometry.{
   getIntersecting1x1Grid,
   intersectGeometries
 }
-import org.opengis.feature.simple.SimpleFeature
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 import scala.annotation.tailrec
 
@@ -30,7 +29,7 @@ object FeatureRDD {
     val featuresDF: DataFrame =
       FeatureDF(input, featureObj, kwargs, spark)
 
-    featuresDF.rdd
+    val featureRdd = featuresDF.rdd
       .mapPartitions({ iter: Iterator[Row] =>
         for {
           i <- iter
@@ -39,9 +38,12 @@ object FeatureRDD {
           featureObj.get(i)
         }
       }, preservesPartitioning = true)
-      .flatMap { feature =>
-        splitGeometry(feature)
-      }
+
+    val splitFeatures = getAnyMapValue[Boolean](kwargs, "splitFeatures")
+
+    if (splitFeatures) featureRdd.flatMap { feature =>
+      splitGeometry(feature)
+    } else featureRdd
   }
 
   def apply(

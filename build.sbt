@@ -44,6 +44,7 @@ resolvers ++= Seq(
   "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/",
   "jitpack" at "https://jitpack.io",
   "maven2" at "https://repo1.maven.org/maven2",
+//  "Geotools Wrapper" at "https://mvnrepository.com/artifact/org.datasyslab/geotools-wrapper",
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
