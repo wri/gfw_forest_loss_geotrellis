@@ -5,11 +5,23 @@ import org.locationtech.jts.geom.Coordinate
 
 object IntersectGeometry {
 
+  def createPolygon(minX: Double, minY: Double): Polygon = {
+    val polygon: Polygon = Polygon(
+      Point(minX, minY),
+      Point(minX + 1, minY),
+      Point(minX + 1, minY + 1),
+      Point(minX, minY + 1),
+      Point(minX, minY)
+    )
+    polygon.setSRID(4326)
+    polygon
+  }
+
   def getIntersecting1x1Grid(geometry: Geometry): IndexedSeq[Polygon] = {
 
     /**
       * Return grid of 1x1 degree polygons intersecting with input geometry
-      *   */
+      * */
     val coords: Array[Coordinate] = geometry.getEnvelope.getCoordinates
     val (minX, minY, maxX, maxY) = coords.foldLeft(180.0, 90.0, -180.0, -90.0)(
       (z, coord) =>
@@ -19,16 +31,16 @@ object IntersectGeometry {
     for {
       x <- minX.floor.toInt until maxX.ceil.toInt
       y <- minY.floor.toInt until maxY.ceil.toInt
+      if {
+        val polygon = createPolygon(x, y)
+        polygon.within(TreeCoverLossExtent.geometry) && polygon.intersects(
+          geometry
+        )
+      }
+
     } yield {
-      val polygon: Polygon = Polygon(
-        Point(x, y),
-        Point(x + 1, y),
-        Point(x + 1, y + 1),
-        Point(x, y + 1),
-        Point(x, y)
-      )
-      polygon.setSRID(4326)
-      polygon
+      createPolygon(x, y)
+
     }
 
   }

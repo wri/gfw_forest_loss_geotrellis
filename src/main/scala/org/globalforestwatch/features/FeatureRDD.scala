@@ -29,17 +29,17 @@ object FeatureRDD {
     val featuresDF: DataFrame =
       FeatureDF(input, featureObj, kwargs, spark)
 
+    val splitFeatures = getAnyMapValue[Boolean](kwargs, "splitFeatures")
+
     val featureRdd = featuresDF.rdd
       .mapPartitions({ iter: Iterator[Row] =>
         for {
           i <- iter
-          if featureObj.isValidGeom(i)
+          if splitFeatures || featureObj.isValidGeom(i)
         } yield {
           featureObj.get(i)
         }
       }, preservesPartitioning = true)
-
-    val splitFeatures = getAnyMapValue[Boolean](kwargs, "splitFeatures")
 
     if (splitFeatures) featureRdd.flatMap { feature =>
       splitGeometry(feature)
