@@ -223,7 +223,7 @@ object ForestChangeDiagnosticAnalysis {
           ForestChangeDiagnosticDataLossYearly.fill(
             dataGroup.umdTreeCoverLossYear,
             data.totalArea,
-            dataGroup.isIntactForestLandscapes2016 && dataGroup.isUMDLoss
+            dataGroup.isIntactForestLandscapes2000 && dataGroup.isUMDLoss
           ),
         treeCoverLossProtectedAreasYearly =
           ForestChangeDiagnosticDataLossYearly.fill(
@@ -304,12 +304,12 @@ object ForestChangeDiagnosticAnalysis {
         ),
         treeCoverExtentIntactForests = ForestChangeDiagnosticDataDouble.fill(
           data.totalArea,
-          dataGroup.isTreeCoverExtent30 && dataGroup.isIntactForestLandscapes2016
+          dataGroup.isTreeCoverExtent30 && dataGroup.isIntactForestLandscapes2000
         ),
         primaryForestArea = ForestChangeDiagnosticDataDouble
           .fill(data.totalArea, dataGroup.isPrimaryForest),
         intactForest2016Area = ForestChangeDiagnosticDataDouble
-          .fill(data.totalArea, dataGroup.isIntactForestLandscapes2016),
+          .fill(data.totalArea, dataGroup.isIntactForestLandscapes2000),
         totalArea = ForestChangeDiagnosticDataDouble.fill(data.totalArea),
         protectedAreasArea = ForestChangeDiagnosticDataDouble
           .fill(data.totalArea, dataGroup.isProtectedArea),

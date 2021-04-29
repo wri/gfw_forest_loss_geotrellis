@@ -59,8 +59,8 @@ object ForestChangeDiagnosticSummary {
         val isPrimaryForest: Boolean =
           raster.tile.isPrimaryForest.getData(col, row)
         val isPeatlands: Boolean = raster.tile.isPeatlands.getData(col, row)
-        val isIntactForestLandscapes2016: Boolean =
-          raster.tile.isIntactForestLandscapes2016.getData(col, row)
+        val isIntactForestLandscapes2000: Boolean =
+          raster.tile.isIntactForestLandscapes2000.getData(col, row)
         val wdpa: String = raster.tile.wdpaProtectedAreas.getData(col, row)
         val prodesLossYear: Int = {
           val loss = raster.tile.prodesLossYear.getData(col, row)
@@ -105,7 +105,7 @@ object ForestChangeDiagnosticSummary {
           isTreeCoverExtent90,
           isPrimaryForest,
           isPeatlands,
-          isIntactForestLandscapes2016,
+          isIntactForestLandscapes2000,
           isProtectedArea,
           seAsiaLandCover,
           idnLandCover,
