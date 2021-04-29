@@ -203,6 +203,7 @@ sparkRunJobFlowRequest := sparkRunJobFlowRequest.value
 sparkEmrConfigs := List(
   // reference to example by geotrellis: https://github.com/geotrellis/geotrellis-spark-job.g8/blob/master/src/main/g8/build.sbt#L70-L91
   EmrConfig("spark").withProperties("maximizeResourceAllocation" -> "true"),
+  EmrConfig("emrfs-site").withProperties("fs.s3.useRequesterPaysHeader" -> "true"),
   EmrConfig("spark-defaults").withProperties(
     // https://aws.amazon.com/blogs/big-data/best-practices-for-successfully-managing-memory-for-apache-spark-applications-on-amazon-emr/
     //    Best practice 1: Choose the right type of instance for each of the node types in an Amazon EMR cluster.
@@ -256,8 +257,8 @@ sparkEmrConfigs := List(
     // "spark.driver.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
 
     // set this environment variable for GDAL to use request payer method for S3 files
-    "spark.appMasterEnv.AWS_REQUEST_PAYER"->  "requester",
-    "spark.executorEnv.AWS_REQUEST_PAYER"->  "requester",
+    "spark.yarn.appMasterEnv.AWS_REQUEST_PAYER" -> "requester",
+    "spark.yarn.executorEnv.AWS_REQUEST_PAYER" -> "requester",
 
   ),
   //  EmrConfig("spark-env").withProperties(
