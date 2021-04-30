@@ -236,7 +236,7 @@ sparkEmrConfigs := List(
 
     // set this environment variable for GDAL to use request payer method for S3 files
     "spark.yarn.appMasterEnv.AWS_REQUEST_PAYER" -> "requester",
-    "spark.yarn.executorEnv.AWS_REQUEST_PAYER" -> "requester",
+    "spark.executorEnv.AWS_REQUEST_PAYER" -> "requester",
 
   ),
   //  EmrConfig("spark-env").withProperties(
