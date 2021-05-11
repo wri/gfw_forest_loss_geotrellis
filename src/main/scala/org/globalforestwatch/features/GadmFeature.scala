@@ -12,6 +12,7 @@ object GadmFeature extends Feature {
   val adm1Pos = 2
   val adm2Pos = 3
   val geomPos = 7
+  val featureCount = 3
 
   val featureIdExpr =
     "gid_0 as iso, split(split(gid_1, '\\\\.')[1], '_')[0] as adm1, split(split(gid_2, '\\\\.')[2], '_')[0] as adm2"

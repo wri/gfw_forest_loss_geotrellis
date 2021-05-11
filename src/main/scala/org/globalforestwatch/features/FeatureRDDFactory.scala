@@ -23,7 +23,6 @@ object FeatureRDDFactory {
 
     analysis match {
       case "firealerts" =>
-
         val fireRDD: SpatialRDD[Geometry] = FireAlertRDD(spark, kwargs)
         val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
         val fireAlertObj =
@@ -33,7 +32,27 @@ object FeatureRDDFactory {
 
         FeatureRDD(fireAlertObj, fireRDD, kwargs)
 
+      case "burned_areas" =>
+        val burnedAreasUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](
+            kwargs,
+            "burnedAreasSource"
+        )
 
+        val burnedAreasFeatureObj = FeatureFactory("burned_areas").featureObj
+
+        val spatialRDD: SpatialRDD[Geometry] = PolygonIntersectionRDD(
+          featureUris,
+          featureObj,
+          featureType,
+          burnedAreasUris,
+          burnedAreasFeatureObj,
+          "burned_areas",
+          spark,
+          kwargs
+        )
+        spatialRDD.spatialPartitioning(GridType.QUADTREE)
+
+        FeatureRDD(featureObj, spatialRDD, kwargs)
       case _ =>
         FeatureRDD(featureUris, featureObj, kwargs, spark)
     }

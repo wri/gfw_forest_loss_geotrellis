@@ -41,5 +41,4 @@ object FireAlertsRDD extends SummaryRDD {
       options = options
     )
   }
-
 }

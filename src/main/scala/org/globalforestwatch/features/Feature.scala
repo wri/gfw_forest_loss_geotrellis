@@ -6,8 +6,8 @@ import org.globalforestwatch.util.GeometryReducer
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 trait Feature extends java.io.Serializable {
-
   val geomPos: Int
+  val featureCount: Int
   val featureIdExpr: String
 
   def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId]

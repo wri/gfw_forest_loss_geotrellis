@@ -1,21 +1,17 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.{
-  Geometry => GeoSparkGeometry,
-  Point => GeoSparkPoint
-}
+import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, Point => GeoSparkPoint, Polygon => GeoSparkPolygon}
+import com.vividsolutions.jts.io.WKTWriter
 import geotrellis.vector
 import geotrellis.vector.{Geometry, Polygon}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.globalforestwatch.util.GeometryReducer
-import org.globalforestwatch.util.IntersectGeometry.{
-  getIntersecting1x1Grid,
-  intersectGeometries
-}
+import org.globalforestwatch.util.IntersectGeometry.{getIntersecting1x1Grid, intersectGeometries}
 import org.globalforestwatch.util.Util.getAnyMapValue
+import org.locationtech.jts.io.WKTReader
 
 import scala.annotation.tailrec
 
@@ -24,7 +20,7 @@ object FeatureRDD {
              input: NonEmptyList[String],
              featureObj: Feature,
              kwargs: Map[String, Any],
-             spark: SparkSession
+             spark: SparkSession,
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
     val featuresDF: DataFrame =
       FeatureDF(input, featureObj, kwargs, spark)
@@ -49,7 +45,8 @@ object FeatureRDD {
   def apply(
              featureObj: Feature,
              spatialRDD: SpatialRDD[GeoSparkGeometry],
-             kwargs: Map[String, Any]
+             kwargs: Map[String, Any] ,
+             feature2Obj: Option[Feature] = None,
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
     val scalaRDD =
@@ -67,6 +64,29 @@ object FeatureRDD {
           val pointFeatureId: FeatureId =
             featureObj.getFeatureId(pointFeatureData)
           vector.Feature(geom, pointFeatureId)
+        case shp: GeoSparkPolygon =>
+          val featureData = shp.getUserData.asInstanceOf[String].split('\t')
+          val writer: WKTWriter = new WKTWriter()
+          val wkt = writer.write(shp)
+
+          val reader: WKTReader = new WKTReader()
+          val geom = GeometryReducer.reduce(GeometryReducer.gpr)(
+            reader.read(wkt)
+          )
+
+          val feature1Id: FeatureId =
+            featureObj.getFeatureId(featureData.slice(0, featureObj.featureCount))
+
+          val feature2Id: FeatureId =
+            feature2Obj match {
+              case Some(obj) =>
+                obj.getFeatureId(featureData.slice(0, featureObj.featureCount))
+              case None =>
+                throw new IllegalArgumentException("Must have two feature objects for polygon-polygon intersections.")
+            }
+
+          // TODO do we need to split the geometries always here?
+          vector.Feature(geom, CombinedFeatureId(feature1Id, feature2Id))
         case _ =>
           throw new NotImplementedError(
             "Cannot convert geometry type to Geotrellis RDD"

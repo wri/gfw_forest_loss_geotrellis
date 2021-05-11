@@ -10,6 +10,7 @@ object SimpleFeature extends Feature {
 
   val idPos = 0
   val geomPos = 1
+  val featureCount = 1
 
   val featureIdExpr = "cast(fid as int) as featureId"
 

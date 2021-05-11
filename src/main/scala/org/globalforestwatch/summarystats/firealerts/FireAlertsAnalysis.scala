@@ -19,6 +19,7 @@ object FireAlertsAnalysis {
 
     import spark.implicits._
 
+    // under if
     val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
     val layoutDefinition = fireAlertType match {
       case "viirs" => ViirsGrid.blockTileGrid
@@ -28,10 +29,12 @@ object FireAlertsAnalysis {
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
       FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = false)
 
+    // under if
     val joinedDF = joinWithFeatures(summaryRDD, featureType, spark, kwargs)
 
     joinedDF.repartition(partitionExprs = $"featureId")
 
+    // get name?
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
       s"/firealerts_${fireAlertType}_" + DateTimeFormatter
       .ofPattern("yyyyMMdd_HHmm")
@@ -57,7 +60,7 @@ object FireAlertsAnalysis {
     val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
-    val featureDF = SpatialFeatureDF(featureUris, featureObj, featureType, kwargs, spark, "geom")
+    val featureDF = SpatialFeatureDF(featureUris, featureObj, kwargs, spark, "geom")
 
     firePointDF
       .join(featureDF)

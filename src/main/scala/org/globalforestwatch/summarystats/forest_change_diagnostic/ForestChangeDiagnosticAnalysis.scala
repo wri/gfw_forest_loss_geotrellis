@@ -93,7 +93,6 @@ object ForestChangeDiagnosticAnalysis {
       SpatialFeatureDF(
         featureUris,
         featureObj,
-        featureType,
         kwargs,
         spark,
         "geom"

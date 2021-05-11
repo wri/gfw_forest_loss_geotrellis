@@ -77,7 +77,6 @@ object GfwProDashboardAnalysis {
       SpatialFeatureDF(
         featureUris,
         featureObj,
-        featureType,
         kwargs,
         spark,
         "geom"
