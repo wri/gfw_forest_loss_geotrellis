@@ -45,7 +45,7 @@ object FireAlertsCommand extends SummaryCommand {
           "glad" -> defaultFilter._3
         )
 
-        runAnalysis("carbonflux", default._1, default._2, kwargs)
+        runAnalysis("firealerts", default._1, default._2, kwargs)
 
     }
   }
