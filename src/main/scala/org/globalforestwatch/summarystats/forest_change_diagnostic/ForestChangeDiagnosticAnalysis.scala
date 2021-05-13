@@ -389,10 +389,10 @@ object ForestChangeDiagnosticAnalysis {
                                    data: ForestChangeDiagnosticData
                                  ): (FeatureId, ForestChangeDiagnosticData) = {
 
-    val minLossYear =
-      data.treeCoverLossTcd90Yearly.value.keysIterator.min
-    val maxLossYear =
-      data.treeCoverLossTcd90Yearly.value.keysIterator.max
+    val minLossYear = ForestChangeDiagnosticDataLossYearly.prefilled.value.keysIterator.min
+
+    val maxLossYear = ForestChangeDiagnosticDataLossYearly.prefilled.value.keysIterator.max
+
     val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
 
     val forestValueIndicator: ForestChangeDiagnosticDataValueYearly =
