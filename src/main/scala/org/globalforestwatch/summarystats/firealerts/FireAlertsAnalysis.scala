@@ -19,22 +19,25 @@ object FireAlertsAnalysis {
 
     import spark.implicits._
 
-    // under if
     val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
     val layoutDefinition = fireAlertType match {
       case "viirs" => ViirsGrid.blockTileGrid
-      case "modis" => ModisGrid.blockTileGrid
+      case "modis" | "burned_areas" => ModisGrid.blockTileGrid
     }
 
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
       FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = false)
 
-    // under if
-    val joinedDF = joinWithFeatures(summaryRDD, featureType, spark, kwargs)
+    val summaryDF = fireAlertType match {
+      case "modis" | "viirs" =>
+        joinWithFeatures(summaryRDD, featureType, spark, kwargs)
+      case "burned_areas" =>
+        FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
+    }
 
-    joinedDF.repartition(partitionExprs = $"featureId")
+    summaryDF.show()
+    summaryDF.repartition(partitionExprs = $"featureId")
 
-    // get name?
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
       s"/firealerts_${fireAlertType}_" + DateTimeFormatter
       .ofPattern("yyyyMMdd_HHmm")
@@ -42,7 +45,7 @@ object FireAlertsAnalysis {
 
     FireAlertsExport.export(
       featureType,
-      joinedDF,
+      summaryDF,
       runOutputUrl,
       kwargs
     )
@@ -52,7 +55,7 @@ object FireAlertsAnalysis {
                        featureType: String,
                        spark: SparkSession,
                        kwargs: Map[String, Any]): DataFrame = {
-    val fireDF = FireAlertsDFFactory(summaryRDD, spark, kwargs).getDataFrame
+    val fireDF = FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
 
     val firePointDF = fireDF
       .selectExpr("ST_Point(CAST(fireId.lon AS Decimal(24,10)),CAST(fireId.lat AS Decimal(24,10))) AS pointshape", "*")

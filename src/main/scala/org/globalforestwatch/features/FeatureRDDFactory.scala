@@ -23,36 +23,38 @@ object FeatureRDDFactory {
 
     analysis match {
       case "firealerts" =>
-        val fireRDD: SpatialRDD[Geometry] = FireAlertRDD(spark, kwargs)
         val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
         val fireAlertObj =
           FeatureFactory("firealerts", Some(fireAlertType)).featureObj
 
-        fireRDD.spatialPartitioning(GridType.QUADTREE)
+        fireAlertType match {
+          case "viirs" | "modis" =>
+            val fireRDD: SpatialRDD[Geometry] = FireAlertRDD(spark, kwargs)
+            fireRDD.spatialPartitioning(GridType.QUADTREE)
 
-        FeatureRDD(fireAlertObj, fireRDD, kwargs)
+            FeatureRDD(fireAlertObj, fireRDD, kwargs)
+          case "burned_areas" =>
+            val burnedAreasUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](
+              kwargs,
+              "fireAlertSource"
+            )
 
-      case "burned_areas" =>
-        val burnedAreasUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](
-            kwargs,
-            "burnedAreasSource"
-        )
+            val spatialRDD: SpatialRDD[Geometry] = PolygonIntersectionRDD(
+              featureUris,
+              featureObj,
+              featureType,
+              burnedAreasUris,
+              fireAlertObj,
+              "burned_areas",
+              spark,
+              kwargs
+            )
 
-        val burnedAreasFeatureObj = FeatureFactory("burned_areas").featureObj
+            spatialRDD.analyze()
+            spatialRDD.spatialPartitioning(GridType.QUADTREE)
 
-        val spatialRDD: SpatialRDD[Geometry] = PolygonIntersectionRDD(
-          featureUris,
-          featureObj,
-          featureType,
-          burnedAreasUris,
-          burnedAreasFeatureObj,
-          "burned_areas",
-          spark,
-          kwargs
-        )
-        spatialRDD.spatialPartitioning(GridType.QUADTREE)
-
-        FeatureRDD(featureObj, spatialRDD, kwargs)
+            FeatureRDD(featureObj, spatialRDD, kwargs, Some(fireAlertObj))
+        }
       case _ =>
         FeatureRDD(featureUris, featureObj, kwargs, spark)
     }

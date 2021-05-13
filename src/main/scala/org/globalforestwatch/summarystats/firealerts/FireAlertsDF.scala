@@ -55,7 +55,6 @@ object FireAlertsDF {
         $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscape_2016",
         $"data_group.braBiomes" as "bra_biome__name",
-        $"data.totalAlerts" as "alert__count"
       )
 
     val cols =
@@ -67,12 +66,13 @@ object FireAlertsDF {
   }
 
   def aggChangeDaily(groupByCols: List[String],
+                     aggCol: String,
                      wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
 
-    val fireCols = List("alert__date", "confidence__cat")
+    val fireCols = List("alert__date") //, "confidence__cat")
     val cols =
       if (!wdpa)
         groupByCols ::: fireCols ::: "wdpa_protected_area__iucn_cat" :: contextualLayers
@@ -82,11 +82,12 @@ object FireAlertsDF {
     df.filter($"alert__date".isNotNull)
       .groupBy(cols.head, cols.tail: _*)
       .agg(
-        sum("alert__count") as "alert__count"
+        sum(aggCol) as aggCol
       )
   }
 
   def aggChangeWeekly(cols: List[String],
+                      aggCol: String,
                       wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
@@ -95,37 +96,37 @@ object FireAlertsDF {
     val fireCols = List(
       year($"alert__date") as "alert__year",
       weekofyear($"alert__date") as "alert__week",
-      $"confidence__cat"
+      //$"confidence__cat"
     )
-    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, fireCols, wdpa)
+    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, fireCols, aggCol, wdpa)
   }
 
   def aggChangeWeekly2(cols: List[String],
+                       aggCol: String,
                        wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
 
-    val fireCols = List($"alert__year", $"alert__week", $"confidence__cat")
-    _aggChangeWeekly(df, cols, fireCols, wdpa)
+    val fireCols = List($"alert__year", $"alert__week")//, $"confidence__cat")
+    _aggChangeWeekly(df, cols, fireCols, aggCol, wdpa)
   }
 
   private def _aggChangeWeekly(df: DataFrame,
                                cols: List[String],
                                fireCols: List[Column],
+                               aggCol: String,
                                wdpa: Boolean = false): DataFrame = {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val fireCols2 = List("alert__year", "alert__week", "confidence__cat")
-
-    val aggCols = List($"alert__count")
+    val fireCols2 = List("alert__year", "alert__week")//, "confidence__cat")
+    val aggCols = List(col(aggCol))
 
     val contextLayers: List[String] =
       if (!wdpa) "wdpa_protected_area__iucn_cat" :: contextualLayers
       else contextualLayers
 
-    // TODO what the heck is this doing?
     val selectCols: List[Column] = cols.foldRight(Nil: List[Column])(
       col(_) :: _
     ) ::: fireCols ::: contextLayers
@@ -136,7 +137,7 @@ object FireAlertsDF {
     df.select(selectCols: _*)
       .groupBy(groupByCols.head, groupByCols.tail: _*)
       .agg(
-        sum("alert__count") as "alert__count"
+        sum(aggCol) as aggCol
       )
   }
 

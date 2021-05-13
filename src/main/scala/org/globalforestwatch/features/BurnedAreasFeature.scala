@@ -6,9 +6,9 @@ import org.apache.spark.sql.Row
 import org.globalforestwatch.util.GeometryReducer
 
 object BurnedAreasFeature extends Feature {
-  override val geomPos: Int = 0
+  override val geomPos: Int = 1
 
-  val featureIdExpr = "burn_date as burnDate"
+  val featureIdExpr = "alert__date as alertDate"
   val featureCount = 1
 
   def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
@@ -22,7 +22,7 @@ object BurnedAreasFeature extends Feature {
   }
 
   def getFeatureId(i: Array[String]): FeatureId = {
-    val alertDate = i(1)
+    val alertDate = i(0)
     BurnedAreasFeatureId(alertDate)
   }
 }
