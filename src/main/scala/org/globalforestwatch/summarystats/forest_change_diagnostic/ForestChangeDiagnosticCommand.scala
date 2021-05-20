@@ -19,7 +19,7 @@ object ForestChangeDiagnosticCommand extends SummaryCommand {
       val kwargs = Map(
         "featureUris" -> default._2,
         "outputUrl" -> default._3,
-        "splitFeatures" -> default._4,
+        "splitFeatures" -> true, // force to split features
         "fireAlertType" -> fireAlert._1,
         "fireAlertSource" -> fireAlert._2,
         "idStart" -> featureFilter._1,

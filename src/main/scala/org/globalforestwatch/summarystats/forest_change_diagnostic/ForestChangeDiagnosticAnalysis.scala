@@ -8,7 +8,14 @@ import geotrellis.vector.{Feature, Geometry}
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
 import org.apache.log4j.Logger
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.features.{FeatureIdFactory, FireAlertRDD, JoinedRDD, SpatialFeatureDF}
+import org.globalforestwatch.features.{
+  FeatureIdFactory,
+  FireAlertRDD,
+  GridFeatureId,
+  JoinedRDD,
+  SpatialFeatureDF
+}
+import org.globalforestwatch.grids.GridId.pointGridId
 
 import java.util
 
@@ -32,10 +39,14 @@ object ForestChangeDiagnosticAnalysis {
 
   val logger = Logger.getLogger("ForestChangeDiagnosticAnalysis")
 
-  def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
+  def apply(mainRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
+
+
+    val featureRDD: RDD[Feature[Geometry, FeatureId]] = toFeatureRdd(mainRDD)
+
 
     val summaryRDD: RDD[(FeatureId, ForestChangeDiagnosticSummary)] =
       ForestChangeDiagnosticRDD(
@@ -76,6 +87,42 @@ object ForestChangeDiagnosticAnalysis {
     )
   }
 
+  private def toFeatureRdd(mainRDD: RDD[Feature[Geometry, FeatureId]]): RDD[Feature[Geometry, FeatureId]] = {
+
+    val gridFilter: List[String] =
+      mainRDD
+        .filter {
+          case f: Feature[Geometry, SimpleFeatureId]
+            if f.data.featureId == -2 =>
+            true
+          case _ => false
+        }
+        .map(f => pointGridId(f.geom.getCentroid, 1))
+        .collect
+        .toList
+
+
+    mainRDD
+      .filter {
+        case f: Feature[Geometry, SimpleFeatureId] if f.data.featureId >= 0 =>
+          true
+        case f: Feature[Geometry, SimpleFeatureId]
+          if f.data.featureId == -1 =>
+          if (gridFilter.isEmpty) true
+          else gridFilter.contains(pointGridId(f.geom.getCentroid, 1))
+        case _ => false
+      }
+      .map {
+        case f: Feature[Geometry, SimpleFeatureId] if f.data.featureId >= 0 =>
+          f
+        case f =>
+          f.setUserData(
+            GridFeatureId(f.data, pointGridId(f.geom.getCentroid, 1))
+          )
+          f
+      }
+  }
+
   def fireStats(
                  featureType: String,
                  spark: SparkSession,
@@ -102,8 +149,7 @@ object ForestChangeDiagnosticAnalysis {
 
     featureSpatialRDD.analyze()
 
-    val joinedRDD = JoinedRDD(fireAlertSpatialRDD,
-      featureSpatialRDD)
+    val joinedRDD = JoinedRDD(fireAlertSpatialRDD, featureSpatialRDD)
 
     joinedRDD.rdd
       .map {
@@ -338,8 +384,12 @@ object ForestChangeDiagnosticAnalysis {
         idnPresence =
           ForestChangeDiagnosticDataBoolean.fill(dataGroup.idnPresence),
         filteredTreeCoverExtent = ForestChangeDiagnosticDataDouble
-          .fill(data.totalArea, dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation),
-        filteredTreeCoverExtentYearly = ForestChangeDiagnosticDataValueYearly.empty,
+          .fill(
+            data.totalArea,
+            dataGroup.isTreeCoverExtent90 && !dataGroup.isPlantation
+          ),
+        filteredTreeCoverExtentYearly =
+          ForestChangeDiagnosticDataValueYearly.empty,
         filteredTreeCoverLossYearly = ForestChangeDiagnosticDataLossYearly.fill(
           dataGroup.umdTreeCoverLossYear,
           data.totalArea,
@@ -389,21 +439,24 @@ object ForestChangeDiagnosticAnalysis {
                                    data: ForestChangeDiagnosticData
                                  ): (FeatureId, ForestChangeDiagnosticData) = {
 
-    val minLossYear = ForestChangeDiagnosticDataLossYearly.prefilled.value.keysIterator.min
+    val minLossYear =
+      ForestChangeDiagnosticDataLossYearly.prefilled.value.keysIterator.min
 
-    val maxLossYear = ForestChangeDiagnosticDataLossYearly.prefilled.value.keysIterator.max
+    val maxLossYear =
+      ForestChangeDiagnosticDataLossYearly.prefilled.value.keysIterator.max
 
     val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
 
     val forestValueIndicator: ForestChangeDiagnosticDataValueYearly =
-      ForestChangeDiagnosticDataValueYearly.fill(data.filteredTreeCoverExtent.value, data.filteredTreeCoverLossYearly.value, 2)
+      ForestChangeDiagnosticDataValueYearly.fill(
+        data.filteredTreeCoverExtent.value,
+        data.filteredTreeCoverLossYearly.value,
+        2
+      )
     val peatValueIndicator: ForestChangeDiagnosticDataValueYearly =
       ForestChangeDiagnosticDataValueYearly.fill(data.peatlandsArea.value)
     val protectedAreaValueIndicator: ForestChangeDiagnosticDataValueYearly =
-      ForestChangeDiagnosticDataValueYearly.fill(
-
-        data.protectedAreasArea.value
-      )
+      ForestChangeDiagnosticDataValueYearly.fill(data.protectedAreasArea.value)
     val deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly =
       ForestChangeDiagnosticDataLossYearly(
         SortedMap(
