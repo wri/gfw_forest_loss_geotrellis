@@ -6,13 +6,16 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import geotrellis.vector.{Feature, Geometry}
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
+import geotrellis.vector
 import org.apache.log4j.Logger
 import org.datasyslab.geosparksql.utils.Adapter
 import org.globalforestwatch.features.{
+  FeatureDF,
   FeatureIdFactory,
   FireAlertRDD,
   GridFeatureId,
   JoinedRDD,
+  SimpleFeature,
   SpatialFeatureDF
 }
 import org.globalforestwatch.grids.GridId.pointGridId
@@ -37,16 +40,36 @@ import scala.collection.immutable.SortedMap
 
 object ForestChangeDiagnosticAnalysis {
 
-  val logger = Logger.getLogger("ForestChangeDiagnosticAnalysis")
+  val logger: Logger = Logger.getLogger("ForestChangeDiagnosticAnalysis")
 
   def apply(mainRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
+    val intermediateListSource = getAnyMapValue[Option[NonEmptyList[String]]](
+      kwargs,
+      "intermediateListSource"
+    )
 
-    val featureRDD: RDD[Feature[Geometry, FeatureId]] = toFeatureRdd(mainRDD)
+    mainRDD.cache()
 
+    val gridFilter: List[String] =
+      mainRDD
+        .filter {
+          case f: Feature[Geometry, SimpleFeatureId]
+            if f.data.featureId == -2 =>
+            true
+          case _ => false
+        }
+        .map(f => pointGridId(f.geom.getCentroid, 1))
+        .collect
+        .toList
+
+    val featureRDD: RDD[Feature[Geometry, FeatureId]] =
+      toFeatureRdd(mainRDD, gridFilter, intermediateListSource.isDefined)
+
+    mainRDD.unpersist()
 
     val summaryRDD: RDD[(FeatureId, ForestChangeDiagnosticSummary)] =
       ForestChangeDiagnosticRDD(
@@ -71,13 +94,17 @@ object ForestChangeDiagnosticAnalysis {
             )
         }
 
-    val summaryDF =
-      ForestChangeDiagnosticDFFactory(featureType, dataRDD, spark, kwargs).getDataFrame
+    dataRDD.cache()
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
       "/forest_change_diagnostic_" + DateTimeFormatter
       .ofPattern("yyyyMMdd_HHmm")
       .format(LocalDateTime.now)
+
+    val finalRDD = combineIntermediateList(dataRDD, gridFilter, runOutputUrl, spark, kwargs)
+
+    val summaryDF =
+      ForestChangeDiagnosticDFFactory(featureType, finalRDD, spark, kwargs).getDataFrame
 
     ForestChangeDiagnosticExport.export(
       featureType,
@@ -87,28 +114,31 @@ object ForestChangeDiagnosticAnalysis {
     )
   }
 
-  private def toFeatureRdd(mainRDD: RDD[Feature[Geometry, FeatureId]]): RDD[Feature[Geometry, FeatureId]] = {
+  /**
+    * GFW Pro hand of a input features in a TSV file
+    * TSV file contains the individual list items, the merged list geometry and the geometric difference from the current merged list geometry and the former one.
+    * Individual list items have location IDs >= 0
+    * Merged list geometry has location ID -1
+    * Geometric difference to previous version has location ID -2
+    *
+    * Merged list and geometric difference may or may be not present.
+    * If geometric difference is present, we only need to process chunks of the merged list which fall into the same grid cells as the geometric difference.
+    * Later in the analysis we will then read cached values for the remaining chunks and use them to aggregate list level results.
+    * */
+  private def toFeatureRdd(
+                            mainRDD: RDD[Feature[Geometry, FeatureId]],
+                            gridFilter: List[String],
+                            useFilter: Boolean
+                          ): RDD[Feature[Geometry, FeatureId]] = {
 
-    val gridFilter: List[String] =
-      mainRDD
-        .filter {
-          case f: Feature[Geometry, SimpleFeatureId]
-            if f.data.featureId == -2 =>
-            true
-          case _ => false
-        }
-        .map(f => pointGridId(f.geom.getCentroid, 1))
-        .collect
-        .toList
-
-
-    mainRDD
+    val featureRDD: RDD[Feature[Geometry, FeatureId]] = mainRDD
       .filter {
         case f: Feature[Geometry, SimpleFeatureId] if f.data.featureId >= 0 =>
           true
-        case f: Feature[Geometry, SimpleFeatureId]
-          if f.data.featureId == -1 =>
-          if (gridFilter.isEmpty) true
+        case f: Feature[Geometry, SimpleFeatureId] if f.data.featureId == -1 =>
+          // If no geometric difference or intermediate result table is present process entire merged list geometry
+          if (gridFilter.isEmpty || !useFilter) true
+          // Otherwise only process chunks which fall into the same grid cells as the geometric difference
           else gridFilter.contains(pointGridId(f.geom.getCentroid, 1))
         case _ => false
       }
@@ -116,11 +146,98 @@ object ForestChangeDiagnosticAnalysis {
         case f: Feature[Geometry, SimpleFeatureId] if f.data.featureId >= 0 =>
           f
         case f =>
-          f.setUserData(
-            GridFeatureId(f.data, pointGridId(f.geom.getCentroid, 1))
-          )
-          f
+          val grid = pointGridId(f.geom.getCentroid, 1)
+          // For merged list, update data to contain the GridFeatureId
+          vector.Feature(f.geom, GridFeatureId(f.data, grid))
       }
+
+    featureRDD
+
+  }
+
+  def combineIntermediateList(
+                               dataRDD: RDD[(FeatureId, ForestChangeDiagnosticData)],
+                               gridFilter: List[String],
+                               outputUrl: String,
+                               spark: SparkSession,
+                               kwargs: Map[String, Any]
+                             ): RDD[(FeatureId, ForestChangeDiagnosticData)] = {
+
+    val intermediateListSource = getAnyMapValue[Option[NonEmptyList[String]]](
+      kwargs,
+      "intermediateListSource"
+    )
+
+    // Get merged list RDD
+    val listRDD: RDD[(FeatureId, ForestChangeDiagnosticData)] = {
+      dataRDD.filter({
+        case a: (FeatureId, ForestChangeDiagnosticData) =>
+          a._1 match {
+            case _: GridFeatureId => true
+            case _ => false
+          }
+        case _ => false
+      })
+    }
+
+    // Get row RDD
+    val rowRDD = dataRDD.filter({
+      case a: (FeatureId, ForestChangeDiagnosticData) =>
+        a._1 match {
+          case _: SimpleFeatureId => true
+          case _ => false
+        }
+      case _ => false
+    })
+
+    // combine filtered List with filtered intermediate results
+    val combinedListRDD = {
+      if (intermediateListSource.isDefined) {
+        val intermediateRDD: RDD[(FeatureId, ForestChangeDiagnosticData)] =
+          getIntermediateRDD(intermediateListSource.get, spark, kwargs)
+
+        listRDD ++
+          intermediateRDD.filter({
+            case (id, _) =>
+              id match {
+                case gridId: GridFeatureId =>
+                  !gridFilter.contains(gridId.gridId)
+                case _ => false
+              }
+            case _ => false
+          })
+
+      } else listRDD
+    }
+
+    // EXPORT new intermediate results
+    val combinedListDF = ForestChangeDiagnosticDFFactory(
+      "grid",
+      combinedListRDD,
+      spark,
+      kwargs
+    ).getDataFrame
+
+    ForestChangeDiagnosticExport.exportIntermediateList(
+      combinedListDF,
+      outputUrl
+    )
+
+    // Reduce by feature ID and update commodity risk
+    val updatedListRDD = combinedListRDD
+      .map {
+        case (id, data) =>
+          id match {
+            case gridFeatureId: GridFeatureId =>
+              (gridFeatureId.featureId, data)
+          }
+      }
+      .reduceByKey(_ merge _)
+      .map { case (id, data) => updateCommodityRisk(id, data) }
+
+    // Merge with row RDD
+    rowRDD ++ updatedListRDD
+
   }
 
   def fireStats(
@@ -204,12 +321,12 @@ object ForestChangeDiagnosticAnalysis {
           // We need to convert the Map to a List in order to correctly flatmap the data
           summary.stats.toList.map {
             case (dataGroup, data) =>
-              id match {
-                case featureId: SimpleFeatureId =>
-                  toForestChangeDiagnosticData(featureId, dataGroup, data)
-                case _ =>
-                  throw new IllegalArgumentException("Not a SimpleFeatureId")
-              }
+              //              id match {
+              //                case featureId: SimpleFeatureId =>
+              toForestChangeDiagnosticData(id, dataGroup, data)
+            //                case _ =>
+            //                  throw new IllegalArgumentException("Not a SimpleFeatureId")
+            //              }
           }
       }
 
@@ -532,5 +649,188 @@ object ForestChangeDiagnosticAnalysis {
       protectedAreaThreatIndicator = protectedAreaThreatIndicator
     )
     (featureId, new_data)
+  }
+
+  private def getIntermediateRDD(
+                                  intermediateListSource: NonEmptyList[String],
+                                  spark: SparkSession,
+                                  kwargs: Map[String, Any]
+                                ): RDD[(FeatureId, ForestChangeDiagnosticData)] = {
+    val intermediateDF = {
+      FeatureDF(intermediateListSource, SimpleFeature, kwargs, spark)
+    }
+
+    intermediateDF.rdd.map(row => {
+      val simpleFeatureId = SimpleFeatureId(row.getString(0).toInt)
+      val gridId = row.getString(1)
+      val treeCoverLossTcd30Yearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(2))
+      val treeCoverLossPrimaryForestYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(3))
+      val treeCoverLossPeatLandYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(4))
+      val treeCoverLossIntactForestYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(5))
+      val treeCoverLossProtectedAreasYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(6))
+      val treeCoverLossSEAsiaLandCoverYearly =
+        ForestChangeDiagnosticDataLossYearlyCategory.fromString(
+          row.getString(7)
+        )
+      val treeCoverLossIDNLandCoverYearly =
+        ForestChangeDiagnosticDataLossYearlyCategory.fromString(
+          row.getString(8)
+        )
+      val treeCoverLossSoyPlanedAreasYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(9))
+      val treeCoverLossIDNForestAreaYearly =
+        ForestChangeDiagnosticDataLossYearlyCategory.fromString(
+          row.getString(10)
+        )
+      val treeCoverLossIDNForestMoratoriumYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(11))
+      val prodesLossYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(12))
+      val prodesLossProtectedAreasYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(13))
+      val prodesLossProdesPrimaryForestYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(14))
+      val treeCoverLossBRABiomesYearly =
+        ForestChangeDiagnosticDataLossYearlyCategory.fromString(
+          row.getString(15)
+        )
+      val treeCoverExtent =
+        ForestChangeDiagnosticDataDouble(row.getString(16).toDouble)
+      val treeCoverExtentPrimaryForest =
+        ForestChangeDiagnosticDataDouble(row.getString(17).toDouble)
+      val treeCoverExtentProtectedAreas =
+        ForestChangeDiagnosticDataDouble(row.getString(18).toDouble)
+      val treeCoverExtentPeatlands =
+        ForestChangeDiagnosticDataDouble(row.getString(19).toDouble)
+      val treeCoverExtentIntactForests =
+        ForestChangeDiagnosticDataDouble(row.getString(20).toDouble)
+      val primaryForestArea =
+        ForestChangeDiagnosticDataDouble(row.getString(21).toDouble)
+      val intactForest2016Area =
+        ForestChangeDiagnosticDataDouble(row.getString(22).toDouble)
+      val totalArea =
+        ForestChangeDiagnosticDataDouble(row.getString(23).toDouble)
+      val protectedAreasArea =
+        ForestChangeDiagnosticDataDouble(row.getString(24).toDouble)
+      val peatlandsArea =
+        ForestChangeDiagnosticDataDouble(row.getString(25).toDouble)
+      val braBiomesArea =
+        ForestChangeDiagnosticDataDoubleCategory.fromString(row.getString(26))
+      val idnForestAreaArea =
+        ForestChangeDiagnosticDataDoubleCategory.fromString(row.getString(27))
+      val seAsiaLandCoverArea =
+        ForestChangeDiagnosticDataDoubleCategory.fromString(row.getString(28))
+      val idnLandCoverArea =
+        ForestChangeDiagnosticDataDoubleCategory.fromString(row.getString(29))
+      val idnForestMoratoriumArea =
+        ForestChangeDiagnosticDataDouble(row.getString(30).toDouble)
+      val southAmericaPresence =
+        ForestChangeDiagnosticDataBoolean(row.getString(31).toBoolean)
+      val legalAmazonPresence =
+        ForestChangeDiagnosticDataBoolean(row.getString(32).toBoolean)
+      val braBiomesPresence =
+        ForestChangeDiagnosticDataBoolean(row.getString(33).toBoolean)
+      val cerradoBiomesPresence =
+        ForestChangeDiagnosticDataBoolean(row.getString(34).toBoolean)
+      val seAsiaPresence =
+        ForestChangeDiagnosticDataBoolean(row.getString(35).toBoolean)
+      val idnPresence =
+        ForestChangeDiagnosticDataBoolean(row.getString(36).toBoolean)
+      val forestValueIndicator =
+        ForestChangeDiagnosticDataValueYearly.fromString(row.getString(37))
+      val peatValueIndicator =
+        ForestChangeDiagnosticDataValueYearly.fromString(row.getString(38))
+      val protectedAreaValueIndicator =
+        ForestChangeDiagnosticDataValueYearly.fromString(row.getString(39))
+      val deforestationThreatIndicator =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(40))
+      val peatThreatIndicator =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(41))
+      val protectedAreaThreatIndicator =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(42))
+      val fireThreatIndicator =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(43))
+
+      val treeCoverLossTcd90Yearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(44))
+      val filteredTreeCoverExtent =
+        ForestChangeDiagnosticDataDouble(row.getString(45).toDouble)
+      val filteredTreeCoverExtentYearly =
+        ForestChangeDiagnosticDataValueYearly.fromString(row.getString(46))
+      val filteredTreeCoverLossYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(47))
+      val filteredTreeCoverLossPeatYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(48))
+      val filteredTreeCoverLossProtectedAreasYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(49))
+      val plantationArea =
+        ForestChangeDiagnosticDataDouble(row.getString(50).toDouble)
+      val plantationOnPeatArea =
+        ForestChangeDiagnosticDataDouble(row.getString(51).toDouble)
+      val plantationInProtectedAreasArea =
+        ForestChangeDiagnosticDataDouble(row.getString(52).toDouble)
+
+      (
+        GridFeatureId(simpleFeatureId, gridId),
+        ForestChangeDiagnosticData(
+          treeCoverLossTcd30Yearly,
+          treeCoverLossTcd90Yearly,
+          treeCoverLossPrimaryForestYearly,
+          treeCoverLossPeatLandYearly,
+          treeCoverLossIntactForestYearly,
+          treeCoverLossProtectedAreasYearly,
+          treeCoverLossSEAsiaLandCoverYearly,
+          treeCoverLossIDNLandCoverYearly,
+          treeCoverLossSoyPlanedAreasYearly,
+          treeCoverLossIDNForestAreaYearly,
+          treeCoverLossIDNForestMoratoriumYearly,
+          prodesLossYearly,
+          prodesLossProtectedAreasYearly,
+          prodesLossProdesPrimaryForestYearly,
+          treeCoverLossBRABiomesYearly,
+          treeCoverExtent,
+          treeCoverExtentPrimaryForest,
+          treeCoverExtentProtectedAreas,
+          treeCoverExtentPeatlands,
+          treeCoverExtentIntactForests,
+          primaryForestArea,
+          intactForest2016Area,
+          totalArea,
+          protectedAreasArea,
+          peatlandsArea,
+          braBiomesArea,
+          idnForestAreaArea,
+          seAsiaLandCoverArea,
+          idnLandCoverArea,
+          idnForestMoratoriumArea,
+          southAmericaPresence,
+          legalAmazonPresence,
+          braBiomesPresence,
+          cerradoBiomesPresence,
+          seAsiaPresence,
+          idnPresence,
+          filteredTreeCoverExtent,
+          filteredTreeCoverExtentYearly,
+          filteredTreeCoverLossYearly,
+          filteredTreeCoverLossPeatYearly,
+          filteredTreeCoverLossProtectedAreasYearly,
+          plantationArea,
+          plantationOnPeatArea,
+          plantationInProtectedAreasArea,
+          forestValueIndicator,
+          peatValueIndicator,
+          protectedAreaValueIndicator,
+          deforestationThreatIndicator,
+          peatThreatIndicator,
+          protectedAreaThreatIndicator,
+          fireThreatIndicator
+        )
+      )
+    })
   }
 }

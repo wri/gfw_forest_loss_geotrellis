@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
+import io.circe.parser.decode
 
 case class ForestChangeDiagnosticDataValueYearly(value: SortedMap[Int, Double])
   extends ForestChangeDiagnosticDataParser[
@@ -78,4 +79,8 @@ object ForestChangeDiagnosticDataValueYearly {
       )
     )
 
+  def fromString(value: String): ForestChangeDiagnosticDataValueYearly = {
+    val sortedMap = decode[SortedMap[Int, Double]](value)
+    ForestChangeDiagnosticDataValueYearly(sortedMap.getOrElse(SortedMap()))
+  }
 }

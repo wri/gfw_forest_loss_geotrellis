@@ -90,15 +90,15 @@ dependencyOverrides += "com.google.guava" % "guava" % "20.0"
 initialCommands in console :=
   """
 import java.net._
-import geotrellis.raster._
-import geotrellis.vector._
-import geotrellis.vector.io._
-import geotrellis.spark._
-import geotrellis.spark.tiling._
-import geotrellis.contrib.vlm._
-import geotrellis.contrib.vlm.gdal._
-import geotrellis.contrib.vlm.geotiff._
-import geotrellis.vector.io.wkt.WKT
+//import geotrellis.raster._
+//import geotrellis.vector._
+//import geotrellis.vector.io._
+//import geotrellis.spark._
+//import geotrellis.spark.tiling._
+//import geotrellis.contrib.vlm._
+//import geotrellis.contrib.vlm.gdal._
+//import geotrellis.contrib.vlm.geotiff._
+//import geotrellis.vector.io.wkt.WKT
 
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
@@ -107,14 +107,14 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.globalforestwatch.summarystats.treecoverloss._
 import org.globalforestwatch.util._
 
-
-val conf = new SparkConf().
-setAppName("Tree Cover Loss Console").
-set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
-set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
-
-implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
-implicit val sc: SparkContext = spark.sparkContext
+//
+//val conf = new SparkConf().
+//setAppName("Tree Cover Loss Console").
+//set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+////.set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
+//
+//implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
+//implicit val sc: SparkContext = spark.sparkContext
 """
 
 // settings for local testing

@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import io.circe.syntax._
 import org.globalforestwatch.util.Implicits._
+import io.circe.parser.decode
 
 case class ForestChangeDiagnosticDataDoubleCategory(
   value: Map[String, ForestChangeDiagnosticDataDouble]
@@ -38,13 +39,21 @@ object ForestChangeDiagnosticDataDoubleCategory {
             areaHa: Double,
             noData: List[String] = List("", "Unknown", "Not applicable"),
             include: Boolean = true
-  ): ForestChangeDiagnosticDataDoubleCategory = {
+          ): ForestChangeDiagnosticDataDoubleCategory = {
     if (noData.contains(className))
       ForestChangeDiagnosticDataDoubleCategory.empty
     else
       ForestChangeDiagnosticDataDoubleCategory(
         Map(className -> ForestChangeDiagnosticDataDouble.fill(areaHa, include))
       )
+  }
+
+  def fromString(value: String): ForestChangeDiagnosticDataDoubleCategory = {
+
+    val categories: Map[String, String] = decode[Map[String, String]](value).getOrElse(Map())
+    val newValue: Map[String, ForestChangeDiagnosticDataDouble] = categories.map { case (k, v) => (k, ForestChangeDiagnosticDataDouble(v.toDouble)) }
+    ForestChangeDiagnosticDataDoubleCategory(newValue)
+
   }
 
 }
