@@ -50,8 +50,8 @@ object Dependencies {
 
   val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.9.1"
   val logging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
-  val scalatest = "org.scalatest" %% "scalatest" % "3.0.5"
-  val scalactic = "org.scalactic" %% "scalactic" % "3.0.5"
+  val scalatest = "org.scalatest" %% "scalatest" % "3.0.8"
+  val scalactic = "org.scalactic" %% "scalactic" % "3.0.8"
   val decline = "com.monovore" %% "decline" % Version.decline
 
   val jacksonDatabind = "com.fasterxml.jackson.core" % "jackson-databind" % Version.jackson % dependencyScope

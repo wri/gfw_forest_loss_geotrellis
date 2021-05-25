@@ -32,6 +32,7 @@ addCompilerPlugin(
 addCompilerPlugin(
   "org.scalamacros" %% "paradise" % "2.1.1" cross CrossVersion.full
 )
+
 resolvers ++= Seq(
   "GeoSolutions" at "https://maven.geo-solutions.it/",
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
@@ -44,7 +45,8 @@ resolvers ++= Seq(
   "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/",
   "jitpack" at "https://jitpack.io",
   "maven2" at "https://repo1.maven.org/maven2",
-//  "Geotools Wrapper" at "https://mvnrepository.com/artifact/org.datasyslab/geotools-wrapper",
+  //  "Geotools Wrapper" at "https://mvnrepository.com/artifact/org.datasyslab/geotools-wrapper",
+  "Geotools Metadata" at "https://mvnrepository.com/artifact/org.geotools/gt-metadata",
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
@@ -60,6 +62,7 @@ libraryDependencies ++= Seq(
   decline,
   paranamer,
   scalatest % Test,
+  scalactic % Test,
   geotrellisSpark,
   geotrellisSparkTestKit % Test,
   geotrellisS3,
@@ -69,7 +72,6 @@ libraryDependencies ++= Seq(
   geotrellisGdal,
   logging,
   decline,
-  scalatest % Test,
   sedonaCore,
   sedonaSQL,
   //  jtsCore,
@@ -83,7 +85,6 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
-
 
 // auto imports for local SBT console
 // can be used with `test:console` command
