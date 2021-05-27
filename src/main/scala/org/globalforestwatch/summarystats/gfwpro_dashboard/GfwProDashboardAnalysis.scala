@@ -78,8 +78,8 @@ object GfwProDashboardAnalysis {
         featureUris,
         featureObj,
         kwargs,
+        "geom",
         spark,
-        "geom"
       )
     val featureSpatialRDD = Adapter.toSpatialRdd(featurePolygonDF, "polyshape")
 

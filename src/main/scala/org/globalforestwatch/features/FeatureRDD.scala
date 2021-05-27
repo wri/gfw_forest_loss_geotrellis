@@ -74,13 +74,15 @@ object FeatureRDD {
             reader.read(wkt)
           )
 
+          val feature1Data = featureData.head.drop(1).dropRight(1).split(',')
           val feature1Id: FeatureId =
-            featureObj.getFeatureId(featureData.slice(0, featureObj.featureCount))
+            featureObj.getFeatureId(feature1Data, parsed=true)
 
           val feature2Id: FeatureId =
             feature2Obj match {
               case Some(obj) =>
-                obj.getFeatureId(featureData.slice(0, featureObj.featureCount))
+                val feature2Data = featureData.tail.head.drop(1).dropRight(1).split(',')
+                obj.getFeatureId(feature2Data, parsed=true)
               case None =>
                 throw new IllegalArgumentException("Must have two feature objects for polygon-polygon intersections.")
             }

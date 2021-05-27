@@ -23,7 +23,7 @@ object SimpleFeature extends Feature {
     geotrellis.vector.Feature(geom, featureId)
   }
 
-  def getFeatureId(i: Array[String]): FeatureId = {
+  def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     val feature_id: Int = i(idPos).toInt
     SimpleFeatureId(feature_id)
   }

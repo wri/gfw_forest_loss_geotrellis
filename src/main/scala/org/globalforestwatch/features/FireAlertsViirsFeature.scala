@@ -44,7 +44,7 @@ object FireAlertsViirsFeature extends Feature {
     geotrellis.vector.Feature(geom, featureId)
   }
 
-  override def getFeatureId(i: Array[String]): FeatureId = {
+  override def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     val lat: Double = i(0).toDouble
     val lon: Double = i(1).toDouble
     val acqDate: String = i(2)

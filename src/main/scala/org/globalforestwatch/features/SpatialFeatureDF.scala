@@ -31,10 +31,11 @@ object SpatialFeatureDF {
   def apply(input: NonEmptyList[String],
             featureObj: Feature,
             filters: Map[String, Any],
+            wkbField: String,
             spark: SparkSession,
-            wkbField: String): DataFrame = {
+            delimiter: String = "\t"): DataFrame = {
 
-    val featureDF: DataFrame = FeatureDF.apply(input, featureObj, filters, spark)
+    val featureDF: DataFrame = FeatureDF.apply(input, featureObj, filters, spark, delimiter)
     val emptyPolygonWKB = "0106000020E610000000000000"
 
     featureDF

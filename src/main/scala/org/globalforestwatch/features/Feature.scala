@@ -7,7 +7,6 @@ import org.globalforestwatch.util.Util.getAnyMapValue
 
 trait Feature extends java.io.Serializable {
   val geomPos: Int
-  val featureCount: Int
   val featureIdExpr: String
 
   def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId]
@@ -16,7 +15,7 @@ trait Feature extends java.io.Serializable {
     getFeatureId(i.toSeq.map(_.asInstanceOf[String]).toArray)
   }
 
-  def getFeatureId(i: Array[String]): FeatureId
+  def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId
 
   def isValidGeom(i: Row): Boolean = {
     GeometryReducer.isValidGeom(i.getString(geomPos))

@@ -21,7 +21,7 @@ object BurnedAreasFeature extends Feature {
     geotrellis.vector.Feature(geom, featureId)
   }
 
-  def getFeatureId(i: Array[String]): FeatureId = {
+  def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     val alertDate = i(0)
     BurnedAreasFeatureId(alertDate)
   }

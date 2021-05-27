@@ -30,7 +30,7 @@ object WdpaFeature extends Feature {
       .Feature(geom, featureId)
   }
 
-  def getFeatureId(i: Array[String]): FeatureId = {
+  def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     val wdpaId: Int = i(wdpaIdPos).toInt
     val name: String = i(namePos)
     val iucnCat: String = i(iucnCatPos)

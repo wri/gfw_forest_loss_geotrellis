@@ -29,6 +29,8 @@ object FireAlertsExport extends SummaryExport {
 
     val gadmDF =
       summaryDF.transform(FireAlertsDF.unpackValues(cols))
+
+    gadmDF.show()
     summaryDF.unpersist()
 
     gadmDF.cache()
@@ -76,7 +78,6 @@ object FireAlertsExport extends SummaryExport {
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/whitelist")
-
   }
 
   private def exportChange(df: DataFrame, aggCol: String, outputUrl: String, numPartitions: Int): Unit = {
@@ -131,7 +132,7 @@ object FireAlertsExport extends SummaryExport {
       "wdpa_protected_area__name",
       "wdpa_protected_area__iucn_cat",
       "wdpa_protected_area__iso",
-      "wdpa_protected_area__status"
+      "wdpa_protected_area__status",
     )
     val unpackCols = List(
       $"featureId.wdpaId" as "wdpa_protected_area__id",

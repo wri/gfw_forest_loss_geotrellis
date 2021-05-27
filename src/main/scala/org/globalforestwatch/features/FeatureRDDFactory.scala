@@ -47,7 +47,8 @@ object FeatureRDDFactory {
               fireAlertObj,
               "burned_areas",
               spark,
-              kwargs
+              kwargs,
+              feature2Delimiter = ","
             )
 
             spatialRDD.analyze()

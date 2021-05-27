@@ -7,6 +7,7 @@ import org.apache.spark.sql.{Column, DataFrame}
 object FireAlertsDF {
 
   val contextualLayers: List[String] = List(
+    "umd_tree_cover_density__threshold",
     "is__umd_regional_primary_forest_2001",
     "is__birdlife_alliance_for_zero_extinction_site",
     "is__birdlife_key_biodiversity_area",
@@ -37,6 +38,7 @@ object FireAlertsDF {
 
     def defaultCols =
       List(
+        $"data_group.threshold" as "umd_tree_cover_density__threshold",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_area",
@@ -72,7 +74,9 @@ object FireAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val fireCols = List("alert__date") //, "confidence__cat")
+    val confCols = if (!aggCol.equals("burned_area__ha")) List("confidence__cat")  else List()
+    val fireCols = List("alert__date") ::: confCols
+
     val cols =
       if (!wdpa)
         groupByCols ::: fireCols ::: "wdpa_protected_area__iucn_cat" :: contextualLayers
@@ -93,11 +97,13 @@ object FireAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
+    val confCols = if (!aggCol.equals("burned_area__ha")) List($"confidence__cat")  else List()
+
     val fireCols = List(
       year($"alert__date") as "alert__year",
       weekofyear($"alert__date") as "alert__week",
-      //$"confidence__cat"
-    )
+    ) ::: confCols
+
     _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, fireCols, aggCol, wdpa)
   }
 
@@ -108,7 +114,8 @@ object FireAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val fireCols = List($"alert__year", $"alert__week")//, $"confidence__cat")
+    val confCols = if (!aggCol.equals("burned_area__ha")) List($"confidence__cat")  else List()
+    val fireCols = List($"alert__year", $"alert__week") ::: confCols
     _aggChangeWeekly(df, cols, fireCols, aggCol, wdpa)
   }
 
@@ -120,7 +127,8 @@ object FireAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val fireCols2 = List("alert__year", "alert__week")//, "confidence__cat")
+    val confCols = if (!aggCol.equals("burned_area__ha")) List("confidence__cat")  else List()
+    val fireCols2 = List("alert__year", "alert__week") ::: confCols
     val aggCols = List(col(aggCol))
 
     val contextLayers: List[String] =

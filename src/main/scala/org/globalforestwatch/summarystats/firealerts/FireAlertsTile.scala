@@ -2,7 +2,7 @@ package org.globalforestwatch.summarystats.firealerts
 
 import geotrellis.raster.{CellGrid, CellType, IntCellType}
 import org.globalforestwatch.grids.GridTile
-import org.globalforestwatch.layers._
+import org.globalforestwatch.layers.{TreeCoverDensityThreshold2000, _}
 
 /**
   *
@@ -29,7 +29,8 @@ case class FireAlertsTile(
                            oilGas: OilGas#OptionalITile,
                            mangroves2016: Mangroves2016#OptionalITile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
-                           brazilBiomes: BrazilBiomes#OptionalITile
+                           brazilBiomes: BrazilBiomes#OptionalITile,
+                           tcd2000: TreeCoverDensityThreshold2000#ITile
                          ) extends CellGrid[Int] {
 
   def cellType: CellType = IntCellType
