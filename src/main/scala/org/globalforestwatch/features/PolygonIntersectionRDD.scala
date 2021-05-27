@@ -23,19 +23,15 @@ object PolygonIntersectionRDD {
     val features1DF: DataFrame =
       SpatialFeatureDF(feature1Uris, feature1Obj, kwargs, "geom", spark, feature1Delimiter).as(feature1Type)
 
-    features1DF.show()
-
     val features2DF: DataFrame =
       SpatialFeatureDF(feature2Uris, feature2Obj, kwargs, "geom", spark, feature2Delimiter).as(feature2Type)
 
-    features2DF.show()
     val joinedDF = features1DF
       .join(features2DF)
       .where(s"ST_Intersects(${feature1Type}.polyshape, ${feature2Type}.polyshape)")
       .withColumn("intersectedshape", expr(s"ST_Intersection(${feature1Type}.polyshape, ${feature2Type}.polyshape)"))
       .select(col(s"${feature1Type}.featureId") as "featureId1", col(s"${feature2Type}.featureId") as "featureId2", col("intersectedshape"))
 
-    joinedDF.show()
     Adapter.toSpatialRdd(joinedDF, "intersectedshape")
   }
 }

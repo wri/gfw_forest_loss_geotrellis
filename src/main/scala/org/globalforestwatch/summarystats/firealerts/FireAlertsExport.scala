@@ -30,7 +30,6 @@ object FireAlertsExport extends SummaryExport {
     val gadmDF =
       summaryDF.transform(FireAlertsDF.unpackValues(cols))
 
-    gadmDF.show()
     summaryDF.unpersist()
 
     gadmDF.cache()

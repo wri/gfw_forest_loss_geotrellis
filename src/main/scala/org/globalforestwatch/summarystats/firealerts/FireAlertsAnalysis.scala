@@ -35,7 +35,6 @@ object FireAlertsAnalysis {
         BurnedAreasDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
     }
 
-    summaryDF.show()
     summaryDF.repartition(partitionExprs = $"featureId")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
