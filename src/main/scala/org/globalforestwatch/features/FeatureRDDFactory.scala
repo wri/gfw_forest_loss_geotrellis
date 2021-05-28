@@ -45,7 +45,7 @@ object FeatureRDDFactory {
               featureType,
               burnedAreasUris,
               fireAlertObj,
-              "burned_areas",
+              fireAlertType,
               spark,
               kwargs,
               feature2Delimiter = ","

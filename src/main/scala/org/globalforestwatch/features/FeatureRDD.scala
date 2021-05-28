@@ -2,7 +2,7 @@ package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
 import org.apache.log4j.Logger
-import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, Point => GeoSparkPoint, Polygonal, Polygon => GeoSparkPolygon, MultiPolygon => GeoSparkMultiPolygon, LineString => GeoSparkLineString, MultiLineString => GeoSparkMultiLineString }
+import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, Point => GeoSparkPoint, Polygonal => GeoSparkPolygonal }
 import com.vividsolutions.jts.io.WKTWriter
 import geotrellis.vector
 import geotrellis.vector.{Geometry, Polygon}
@@ -95,7 +95,7 @@ object FeatureRDD {
 
     scalaRDD
       .flatMap {
-        case shp: Polygonal =>
+        case shp: GeoSparkPolygonal =>
           val featureData = shp.getUserData.asInstanceOf[String].split('\t')
           val writer: WKTWriter = new WKTWriter()
           val wkt = writer.write(shp)
