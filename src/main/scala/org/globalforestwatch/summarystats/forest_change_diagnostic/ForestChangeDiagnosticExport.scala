@@ -22,8 +22,17 @@ object ForestChangeDiagnosticExport extends SummaryExport {
       .coalesce(1)
       .write
       .options(csvOptions)
-      .csv(path = outputUrl)
+      .csv(path = outputUrl + "/final")
 
   }
 
+  def exportIntermediateList(intermediateListDF: DataFrame,
+                             outputUrl: String): Unit = {
+
+    intermediateListDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/intermediate")
+  }
 }

@@ -1,10 +1,14 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import io.circe.syntax._
+import io.circe.parser.decode
+import scala.reflect.internal.pickling.ByteCodecs
 
 case class ForestChangeDiagnosticDataLossYearlyCategory(
                                                          value: Map[String, ForestChangeDiagnosticDataLossYearly]
-                                                       ) extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataLossYearlyCategory] {
+                                                       ) extends ForestChangeDiagnosticDataParser[
+  ForestChangeDiagnosticDataLossYearlyCategory
+] {
   def merge(
              other: ForestChangeDiagnosticDataLossYearlyCategory
            ): ForestChangeDiagnosticDataLossYearlyCategory = {
@@ -45,9 +49,24 @@ object ForestChangeDiagnosticDataLossYearlyCategory {
     else
       ForestChangeDiagnosticDataLossYearlyCategory(
         Map(
-          className -> ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, include)
+          className -> ForestChangeDiagnosticDataLossYearly
+            .fill(lossYear, areaHa, include)
         )
       )
+  }
+
+  def fromString(
+                  value: String
+                ): ForestChangeDiagnosticDataLossYearlyCategory = {
+
+    val categories: Map[String, String] =
+      decode[Map[String, String]](value).getOrElse(Map())
+    val newValues = categories.map {
+      case (k, v) => (k, ForestChangeDiagnosticDataLossYearly.fromString(v))
+    }
+
+    ForestChangeDiagnosticDataLossYearlyCategory(newValues)
+
   }
 
 }

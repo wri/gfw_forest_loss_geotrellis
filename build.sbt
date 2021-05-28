@@ -32,6 +32,7 @@ addCompilerPlugin(
 addCompilerPlugin(
   "org.scalamacros" %% "paradise" % "2.1.1" cross CrossVersion.full
 )
+
 resolvers ++= Seq(
   "GeoSolutions" at "https://maven.geo-solutions.it/",
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
@@ -44,7 +45,8 @@ resolvers ++= Seq(
   "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/",
   "jitpack" at "https://jitpack.io",
   "maven2" at "https://repo1.maven.org/maven2",
-//  "Geotools Wrapper" at "https://mvnrepository.com/artifact/org.datasyslab/geotools-wrapper",
+  //  "Geotools Wrapper" at "https://mvnrepository.com/artifact/org.datasyslab/geotools-wrapper",
+  "Geotools Metadata" at "https://mvnrepository.com/artifact/org.geotools/gt-metadata",
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
@@ -60,6 +62,7 @@ libraryDependencies ++= Seq(
   decline,
   paranamer,
   scalatest % Test,
+  scalactic % Test,
   geotrellisSpark,
   geotrellisSparkTestKit % Test,
   geotrellisS3,
@@ -69,7 +72,6 @@ libraryDependencies ++= Seq(
   geotrellisGdal,
   logging,
   decline,
-  scalatest % Test,
   sedonaCore,
   sedonaSQL,
   //  jtsCore,
@@ -84,21 +86,20 @@ libraryDependencies ++= Seq(
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
 
-
 // auto imports for local SBT console
 // can be used with `test:console` command
 initialCommands in console :=
   """
 import java.net._
-import geotrellis.raster._
-import geotrellis.vector._
-import geotrellis.vector.io._
-import geotrellis.spark._
-import geotrellis.spark.tiling._
-import geotrellis.contrib.vlm._
-import geotrellis.contrib.vlm.gdal._
-import geotrellis.contrib.vlm.geotiff._
-import geotrellis.vector.io.wkt.WKT
+//import geotrellis.raster._
+//import geotrellis.vector._
+//import geotrellis.vector.io._
+//import geotrellis.spark._
+//import geotrellis.spark.tiling._
+//import geotrellis.contrib.vlm._
+//import geotrellis.contrib.vlm.gdal._
+//import geotrellis.contrib.vlm.geotiff._
+//import geotrellis.vector.io.wkt.WKT
 
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
@@ -107,14 +108,14 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.globalforestwatch.summarystats.treecoverloss._
 import org.globalforestwatch.util._
 
-
-val conf = new SparkConf().
-setAppName("Tree Cover Loss Console").
-set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
-set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
-
-implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
-implicit val sc: SparkContext = spark.sparkContext
+//
+//val conf = new SparkConf().
+//setAppName("Tree Cover Loss Console").
+//set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+////.set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
+//
+//implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
+//implicit val sc: SparkContext = spark.sparkContext
 """
 
 // settings for local testing
@@ -204,6 +205,7 @@ sparkRunJobFlowRequest := sparkRunJobFlowRequest.value
 sparkEmrConfigs := List(
   // reference to example by geotrellis: https://github.com/geotrellis/geotrellis-spark-job.g8/blob/master/src/main/g8/build.sbt#L70-L91
   EmrConfig("spark").withProperties("maximizeResourceAllocation" -> "true"),
+  EmrConfig("emrfs-site").withProperties("fs.s3.useRequesterPaysHeader" -> "true"),
   EmrConfig("spark-defaults").withProperties(
     // https://aws.amazon.com/blogs/big-data/best-practices-for-successfully-managing-memory-for-apache-spark-applications-on-amazon-emr/
     //    Best practice 1: Choose the right type of instance for each of the node types in an Amazon EMR cluster.
@@ -257,8 +259,8 @@ sparkEmrConfigs := List(
     // "spark.driver.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
 
     // set this environment variable for GDAL to use request payer method for S3 files
-    "spark.appMasterEnv.AWS_REQUEST_PAYER"->  "requester",
-    "spark.executorEnv.AWS_REQUEST_PAYER"->  "requester",
+    "spark.yarn.appMasterEnv.AWS_REQUEST_PAYER" -> "requester",
+    "spark.yarn.executorEnv.AWS_REQUEST_PAYER" -> "requester",
 
   ),
   //  EmrConfig("spark-env").withProperties(
