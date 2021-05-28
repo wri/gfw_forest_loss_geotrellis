@@ -18,7 +18,11 @@ object FireAlertsExport extends SummaryExport {
     val spark = summaryDF.sparkSession
     import spark.implicits._
 
-    val numPartitions = summaryDF.rdd.getNumPartitions
+    val numPartitions = try {
+      summaryDF.rdd.getNumPartitions
+    } catch {
+      case _: Exception => 1
+    }
 
     val featureCols =
       List($"featureId.iso" as "iso", $"featureId.adm1" as "adm1", $"featureId.adm2" as "adm2")
@@ -193,7 +197,11 @@ object FireAlertsExport extends SummaryExport {
       FireAlertsDF.unpackValues(unpackAllCols, wdpa = wdpa)
     )
 
-    val numPartitions = summaryDF.rdd.getNumPartitions
+    val numPartitions = try {
+      summaryDF.rdd.getNumPartitions
+    } catch {
+      case _: Exception => 1
+    }
 
     df.cache()
     // for now only export VIIRS GADM all

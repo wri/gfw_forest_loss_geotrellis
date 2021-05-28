@@ -32,7 +32,7 @@ object FireAlertsAnalysis {
       case "modis" | "viirs" =>
         joinWithFeatures(summaryRDD, featureType, spark, kwargs)
       case "burned_areas" =>
-        BurnedAreasDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
+        FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
     }
 
     summaryDF.repartition(partitionExprs = $"featureId")
@@ -54,7 +54,7 @@ object FireAlertsAnalysis {
                        featureType: String,
                        spark: SparkSession,
                        kwargs: Map[String, Any]): DataFrame = {
-    val fireDF = BurnedAreasDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
+    val fireDF = FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
 
     val firePointDF = fireDF
       .selectExpr("ST_Point(CAST(fireId.lon AS Decimal(24,10)),CAST(fireId.lat AS Decimal(24,10))) AS pointshape", "*")
