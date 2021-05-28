@@ -1,7 +1,8 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, Point => GeoSparkPoint, Polygon => GeoSparkPolygon}
+import org.apache.log4j.Logger
+import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, Point => GeoSparkPoint, Polygonal, Polygon => GeoSparkPolygon, MultiPolygon => GeoSparkMultiPolygon, LineString => GeoSparkLineString, MultiLineString => GeoSparkMultiLineString }
 import com.vividsolutions.jts.io.WKTWriter
 import geotrellis.vector
 import geotrellis.vector.{Geometry, Polygon}
@@ -16,6 +17,8 @@ import org.locationtech.jts.io.WKTReader
 import scala.annotation.tailrec
 
 object FeatureRDD {
+  val logger = Logger.getLogger("FeatureRDD")
+
   def apply(
              input: NonEmptyList[String],
              featureObj: Feature,
@@ -42,11 +45,13 @@ object FeatureRDD {
     } else featureRdd
   }
 
+  /*
+    Convert point-in-polygon join to feature RDD
+  */
   def apply(
              featureObj: Feature,
              spatialRDD: SpatialRDD[GeoSparkGeometry],
-             kwargs: Map[String, Any] ,
-             feature2Obj: Option[Feature] = None,
+             kwargs: Map[String, Any],
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
     val scalaRDD =
@@ -64,7 +69,33 @@ object FeatureRDD {
           val pointFeatureId: FeatureId =
             featureObj.getFeatureId(pointFeatureData)
           vector.Feature(geom, pointFeatureId)
-        case shp: GeoSparkPolygon =>
+        case _ =>
+          throw new IllegalArgumentException("Point-in-polygon intersection must be points.")
+      }
+
+    // In case we implement this method for other geometry types we will have to split geometries
+    //      .flatMap { feature =>
+    //        splitGeometry(feature)
+    //      }
+
+  }
+
+
+  /*
+    Convert polygon-polygon intersection join to feature RDD
+   */
+  def apply(
+             feature1Obj: Feature,
+             feature2Obj: Feature,
+             spatialRDD: SpatialRDD[GeoSparkGeometry],
+             kwargs: Map[String, Any],
+           ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
+    val scalaRDD =
+      org.apache.spark.api.java.JavaRDD.toRDD(spatialRDD.spatialPartitionedRDD)
+
+    scalaRDD
+      .flatMap {
+        case shp: Polygonal =>
           val featureData = shp.getUserData.asInstanceOf[String].split('\t')
           val writer: WKTWriter = new WKTWriter()
           val wkt = writer.write(shp)
@@ -76,29 +107,20 @@ object FeatureRDD {
 
           val feature1Data = featureData.head.drop(1).dropRight(1).split(',')
           val feature1Id: FeatureId =
-            featureObj.getFeatureId(feature1Data, parsed=true)
+            feature1Obj.getFeatureId(feature1Data, parsed = true)
 
+          val feature2Data = featureData.tail.head.drop(1).dropRight(1).split(',')
           val feature2Id: FeatureId =
-            feature2Obj match {
-              case Some(obj) =>
-                val feature2Data = featureData.tail.head.drop(1).dropRight(1).split(',')
-                obj.getFeatureId(feature2Data, parsed=true)
-              case None =>
-                throw new IllegalArgumentException("Must have two feature objects for polygon-polygon intersections.")
-            }
+            feature2Obj.getFeatureId(feature2Data, parsed = true)
 
-          // TODO do we need to split the geometries always here?
-          vector.Feature(geom, CombinedFeatureId(feature1Id, feature2Id))
+          Some(vector.Feature(geom, CombinedFeatureId(feature1Id, feature2Id)))
         case _ =>
-          throw new NotImplementedError(
-            "Cannot convert geometry type to Geotrellis RDD"
+          // Polygon-polygon intersections can generate points or lines, which we just want to ignore
+          logger.warn(
+            "Cannot process geometry type"
           )
+          None
       }
-    // In case we implement this method for other geometry types we will have to split geometries
-    //      .flatMap { feature =>
-    //        splitGeometry(feature)
-    //      }
-
   }
 
   private def splitGeometry(

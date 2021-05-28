@@ -54,7 +54,7 @@ object FeatureRDDFactory {
             spatialRDD.analyze()
             spatialRDD.spatialPartitioning(GridType.QUADTREE)
 
-            FeatureRDD(featureObj, spatialRDD, kwargs, Some(fireAlertObj))
+            FeatureRDD(featureObj, fireAlertObj, spatialRDD, kwargs)
         }
       case _ =>
         FeatureRDD(featureUris, featureObj, kwargs, spark)

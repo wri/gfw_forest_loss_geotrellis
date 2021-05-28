@@ -29,7 +29,20 @@ object GadmFeature extends Feature {
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     if (parsed) {
-      GadmFeatureId(i(0), i(1).toInt, i(2).toInt)
+      val countryCode = i(0)
+      val admin1: Integer = try {
+        i(1).toInt
+      } catch {
+        case e: Exception => null
+      }
+
+      val admin2: Integer = try {
+        i(2).toInt
+      } catch {
+        case e: Exception => null
+      }
+
+      GadmFeatureId(countryCode, admin1, admin2)
     } else {
       val countryCode = i(countryPos)
       val admin1: Integer = try {
