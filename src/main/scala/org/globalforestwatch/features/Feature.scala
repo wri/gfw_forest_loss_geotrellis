@@ -19,7 +19,7 @@ trait Feature extends java.io.Serializable {
   def getFeatureId(i: Array[String]): FeatureId
 
   def isValidGeom(i: Row): Boolean = {
-    GeometryReducer.isValidGeom(i.getString(geomPos))
+    GeometryReducer.isNonEmptyGeom(i.getString(geomPos))
   }
 
   def filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {

@@ -19,7 +19,7 @@ object FeatureRDDFactory {
             featureUris: NonEmptyList[String],
             kwargs: Map[String, Any],
             spark: SparkSession): RDD[vector.Feature[vector.Geometry, FeatureId]] = {
-    val featureObj = FeatureFactory(featureType).featureObj
+//    val featureObj = FeatureFactory(featureType).featureObj
 
     analysis match {
       case "firealerts" =>
@@ -35,7 +35,7 @@ object FeatureRDDFactory {
 
 
       case _ =>
-        FeatureRDD(featureUris, featureObj, kwargs, spark)
+        FeatureRDD(featureUris, featureType, kwargs, spark)
     }
   }
 }

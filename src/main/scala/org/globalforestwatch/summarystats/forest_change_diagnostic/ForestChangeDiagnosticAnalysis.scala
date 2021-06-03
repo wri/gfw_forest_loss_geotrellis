@@ -9,16 +9,9 @@ import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
 import geotrellis.vector
 import org.apache.log4j.Logger
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.features.{
-  FeatureDF,
-  FeatureIdFactory,
-  FireAlertRDD,
-  GridFeatureId,
-  JoinedRDD,
-  SimpleFeature,
-  SpatialFeatureDF
-}
+import org.globalforestwatch.features.{FeatureDF, FeatureIdFactory, FireAlertRDD, GridFeatureId, SimpleFeature, SpatialFeatureDF}
 import org.globalforestwatch.grids.GridId.pointGridId
+import org.globalforestwatch.util.SpatialJoinRDD
 
 import java.util
 
@@ -29,7 +22,6 @@ import java.util
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.{
-  FeatureFactory,
   FeatureId,
   SimpleFeatureId
 }
@@ -250,13 +242,11 @@ object ForestChangeDiagnosticAnalysis {
     val fireAlertSpatialRDD = FireAlertRDD(spark, kwargs)
 
     // Feature RDD
-    val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] =
       getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
     val featurePolygonDF =
       SpatialFeatureDF(
         featureUris,
-        featureObj,
         featureType,
         kwargs,
         spark,
@@ -266,7 +256,7 @@ object ForestChangeDiagnosticAnalysis {
 
     featureSpatialRDD.analyze()
 
-    val joinedRDD = JoinedRDD(fireAlertSpatialRDD, featureSpatialRDD)
+    val joinedRDD = SpatialJoinRDD.spatialjoin(fireAlertSpatialRDD, featureSpatialRDD)
 
     joinedRDD.rdd
       .map {

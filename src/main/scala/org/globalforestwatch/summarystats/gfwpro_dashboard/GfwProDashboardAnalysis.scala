@@ -5,7 +5,8 @@ import geotrellis.vector.{Feature, Geometry}
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
 import org.apache.log4j.Logger
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.features.{FeatureIdFactory, FireAlertRDD, JoinedRDD, SpatialFeatureDF}
+import org.globalforestwatch.features.{FeatureIdFactory, FireAlertRDD, SpatialFeatureDF}
+import org.globalforestwatch.util.SpatialJoinRDD
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -70,13 +71,11 @@ object GfwProDashboardAnalysis {
     val fireAlertSpatialRDD = FireAlertRDD(spark, kwargs)
 
     // Feature RDD
-    val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] =
       getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
     val featurePolygonDF =
       SpatialFeatureDF(
         featureUris,
-        featureObj,
         featureType,
         kwargs,
         spark,
@@ -86,8 +85,7 @@ object GfwProDashboardAnalysis {
 
     featureSpatialRDD.analyze()
 
-    val joinedRDD = JoinedRDD(fireAlertSpatialRDD,
-      featureSpatialRDD)
+    val joinedRDD = SpatialJoinRDD.spatialjoin(fireAlertSpatialRDD, featureSpatialRDD)
 
     joinedRDD.rdd
       .map {

@@ -19,13 +19,13 @@ object GeometryReducer extends java.io.Serializable {
   )
 
   def reduce(
-    gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
-  )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
+              gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
+            )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
     geotrellis.vector.GeomFactory.factory.createGeometry(gpr.reduce(g))
 
-  def isValidGeom(wkb: String): Boolean = {
-    val geom: Option[Geometry] = try {
-      Some(reduce(gpr)(WKB.read(wkb)))
+  def isNonEmptyGeom(geom: Geometry): Boolean = {
+    val maybeGeom: Option[Geometry] = try {
+      Some(reduce(gpr)(geom))
     } catch {
       case ae: java.lang.AssertionError =>
         println("There was an empty geometry")
@@ -33,9 +33,35 @@ object GeometryReducer extends java.io.Serializable {
       case t: Throwable => throw t
     }
 
-    geom match {
+    maybeGeom match {
       case Some(g) => true
-      case None    => false
+      case None => false
     }
+  }
+
+  def isNonEmptyGeom(wkb: String): Boolean = {
+    val geom: Geometry = WKB.read(wkb)
+    isNonEmptyGeom(geom)
+
+  }
+
+  def makeValidGeom(geom: Geometry): Geometry = {
+    // try to make geometry valid. This is a basic trick, we might need to make this more sophisticated
+    // There are some code samples here for JTS
+    // https://stackoverflow.com/a/31474580/1410317
+    val validGeom = {
+      if (!geom.isValid) geom.buffer(0.0001).buffer(-0.0001)
+      else geom
+    }
+
+    val normalizedGeom = reduce(gpr)(validGeom)
+    normalizedGeom.normalize()
+    normalizedGeom
+
+  }
+
+  def makeValidGeom(wkb: String): Geometry = {
+    val geom: Geometry = WKB.read(wkb)
+    makeValidGeom(geom)
   }
 }

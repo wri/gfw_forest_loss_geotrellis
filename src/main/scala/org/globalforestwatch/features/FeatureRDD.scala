@@ -1,49 +1,48 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.{
-  Geometry => GeoSparkGeometry,
-  Point => GeoSparkPoint
-}
+import com.vividsolutions.jts.geom.{Envelope, Geometry => GeoSparkGeometry, Point => GeoSparkPoint}
 import geotrellis.vector
-import geotrellis.vector.{Geometry, Polygon}
+import geotrellis.vector.Geometry
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.globalforestwatch.util.GeometryReducer
-import org.globalforestwatch.util.IntersectGeometry.{
-  getIntersecting1x1Grid,
-  intersectGeometries
-}
+import org.datasyslab.geosparksql.utils.Adapter
+import org.globalforestwatch.util.{GeometryReducer, GridRDD, SpatialJoinRDD}
+import org.globalforestwatch.util.IntersectGeometry.{intersectGeometries, toGeotrellisGeometry}
 import org.globalforestwatch.util.Util.getAnyMapValue
-
-import scala.annotation.tailrec
 
 object FeatureRDD {
   def apply(
              input: NonEmptyList[String],
-             featureObj: Feature,
+             featureType: String,
              kwargs: Map[String, Any],
              spark: SparkSession
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
-    val featuresDF: DataFrame =
-      FeatureDF(input, featureObj, kwargs, spark)
 
     val splitFeatures = getAnyMapValue[Boolean](kwargs, "splitFeatures")
+    //    val geomFieldName = getAnyMapValue[String](kwargs, "geomFieldName")
 
-    val featureRdd = featuresDF.rdd
-      .mapPartitions({ iter: Iterator[Row] =>
-        for {
-          i <- iter
-          if splitFeatures || featureObj.isValidGeom(i)
-        } yield {
-          featureObj.get(i)
-        }
-      }, preservesPartitioning = true)
+    if (splitFeatures) splitGeometries(input, featureType, kwargs, spark)
+    else {
+      val featureObj: Feature = FeatureFactory(featureType).featureObj
+      val featuresDF: DataFrame =
+        FeatureDF(input, featureObj, kwargs, spark)
 
-    if (splitFeatures) featureRdd.flatMap { feature =>
-      splitGeometry(feature)
-    } else featureRdd
+      val splitFeatures = getAnyMapValue[Boolean](kwargs, "splitFeatures")
+
+      featuresDF.rdd
+        .mapPartitions({ iter: Iterator[Row] =>
+          for {
+            i <- iter
+            if splitFeatures || featureObj.isValidGeom(i)
+          } yield {
+            featureObj.get(i)
+          }
+        }, preservesPartitioning = true)
+
+    }
+
   }
 
   def apply(
@@ -79,29 +78,45 @@ object FeatureRDD {
 
   }
 
-  private def splitGeometry(
-                             feature: geotrellis.vector.Feature[Geometry, FeatureId]
-                           ): List[geotrellis.vector.Feature[Geometry, FeatureId]] = {
+  private def splitGeometries(
+                               input: NonEmptyList[String],
+                               featureType: String,
+                               kwargs: Map[String, Any],
+                               spark: SparkSession
+                             ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
-    @tailrec def loop(geom: Geometry,
-                      gridGeoms: IndexedSeq[Polygon],
-                      acc: List[Geometry]): List[Geometry] = {
-      if (gridGeoms.isEmpty) acc
-      else {
+    val featureDF: DataFrame =
+      SpatialFeatureDF(input, featureType, kwargs, spark, "geom")
 
-        val gridGeom = gridGeoms.head;
+    val spatialFeatureRDD: SpatialRDD[GeoSparkGeometry] =
+      Adapter.toSpatialRdd(featureDF, "polyshape")
+    spatialFeatureRDD.analyze()
 
-        val intersections: List[Geometry] =
-          intersectGeometries(feature.geom, gridGeom)
+    val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
 
-        loop(geom, gridGeoms.tail, acc ::: intersections)
+    val spatialGridRDD = GridRDD(envelope, spark)
+
+    val flatJoin = SpatialJoinRDD.flatSpatialJoin(
+      spatialGridRDD,
+      spatialFeatureRDD,
+      considerBoundaryIntersection = true
+    )
+
+    flatJoin.rdd
+      .flatMap {
+        case (geom, gridCell) =>
+          val geometries = intersectGeometries(geom, gridCell)
+          geometries
+            .map { intersection =>
+              val geotrellisGeom = toGeotrellisGeometry(intersection)
+              geotrellis.vector.Feature(
+                geotrellisGeom,
+                FeatureIdFactory(featureType)
+                  .fromUserData(geom.getUserData.asInstanceOf[String])
+              )
+            }
+
       }
-    }
-
-    val gridGeoms = getIntersecting1x1Grid(feature.geom)
-
-    loop(feature.geom, gridGeoms, List()).map(vector.Feature(_, feature.data))
-
   }
 
 }

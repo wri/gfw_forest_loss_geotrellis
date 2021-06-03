@@ -54,10 +54,9 @@ object FireAlertsAnalysis {
     val firePointDF = fireDF
       .selectExpr("ST_Point(CAST(fireId.lon AS Decimal(24,10)),CAST(fireId.lat AS Decimal(24,10))) AS pointshape", "*")
 
-    val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
-    val featureDF = SpatialFeatureDF(featureUris, featureObj, featureType, kwargs, spark, "geom")
+    val featureDF = SpatialFeatureDF(featureUris, featureType, kwargs, spark, "geom")
 
     firePointDF
       .join(featureDF)

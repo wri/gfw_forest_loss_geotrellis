@@ -4,7 +4,7 @@ import geotrellis.raster.CellSize
 import org.globalforestwatch.util.Geodesy.pixelArea
 import org.scalatest.funsuite.AnyFunSuite
 
-class GeodesySuits extends AnyFunSuite {
+class GeodesySuite extends AnyFunSuite {
 
   val cellSize = CellSize(0.00025, 0.00025)
 
