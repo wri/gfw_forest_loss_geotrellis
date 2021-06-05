@@ -2,6 +2,9 @@ package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
 import com.vividsolutions.jts.geom.{Envelope, Geometry => GeoSparkGeometry, Point => GeoSparkPoint}
+import org.apache.log4j.Logger
+import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, Point => GeoSparkPoint, Polygonal => GeoSparkPolygonal }
+import com.vividsolutions.jts.io.WKTWriter
 import geotrellis.vector
 import geotrellis.vector.Geometry
 import org.apache.spark.rdd.RDD
@@ -10,14 +13,21 @@ import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geosparksql.utils.Adapter
 import org.globalforestwatch.util.{GeometryReducer, GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.{intersectGeometries, toGeotrellisGeometry}
+import org.globalforestwatch.util.GeometryReducer
+import org.globalforestwatch.util.IntersectGeometry.{getIntersecting1x1Grid, intersectGeometries}
 import org.globalforestwatch.util.Util.getAnyMapValue
+import org.locationtech.jts.io.WKTReader
+
+import scala.annotation.tailrec
 
 object FeatureRDD {
+  val logger = Logger.getLogger("FeatureRDD")
+
   def apply(
              input: NonEmptyList[String],
              featureType: String,
              kwargs: Map[String, Any],
-             spark: SparkSession
+             spark: SparkSession,
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
     val splitFeatures = getAnyMapValue[Boolean](kwargs, "splitFeatures")
@@ -45,10 +55,13 @@ object FeatureRDD {
 
   }
 
+  /*
+    Convert point-in-polygon join to feature RDD
+  */
   def apply(
              featureObj: Feature,
              spatialRDD: SpatialRDD[GeoSparkGeometry],
-             kwargs: Map[String, Any]
+             kwargs: Map[String, Any],
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
     val scalaRDD =
@@ -67,15 +80,57 @@ object FeatureRDD {
             featureObj.getFeatureId(pointFeatureData)
           vector.Feature(geom, pointFeatureId)
         case _ =>
-          throw new NotImplementedError(
-            "Cannot convert geometry type to Geotrellis RDD"
-          )
+          throw new IllegalArgumentException("Point-in-polygon intersection must be points.")
       }
+
     // In case we implement this method for other geometry types we will have to split geometries
     //      .flatMap { feature =>
     //        splitGeometry(feature)
     //      }
 
+  }
+
+
+  /*
+    Convert polygon-polygon intersection join to feature RDD
+   */
+  def apply(
+             feature1Obj: Feature,
+             feature2Obj: Feature,
+             spatialRDD: SpatialRDD[GeoSparkGeometry],
+             kwargs: Map[String, Any],
+           ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
+    val scalaRDD =
+      org.apache.spark.api.java.JavaRDD.toRDD(spatialRDD.spatialPartitionedRDD)
+
+    scalaRDD
+      .flatMap {
+        case shp: GeoSparkPolygonal =>
+          val featureData = shp.getUserData.asInstanceOf[String].split('\t')
+          val writer: WKTWriter = new WKTWriter()
+          val wkt = writer.write(shp)
+
+          val reader: WKTReader = new WKTReader()
+          val geom = GeometryReducer.reduce(GeometryReducer.gpr)(
+            reader.read(wkt)
+          )
+
+          val feature1Data = featureData.head.drop(1).dropRight(1).split(',')
+          val feature1Id: FeatureId =
+            feature1Obj.getFeatureId(feature1Data, parsed = true)
+
+          val feature2Data = featureData.tail.head.drop(1).dropRight(1).split(',')
+          val feature2Id: FeatureId =
+            feature2Obj.getFeatureId(feature2Data, parsed = true)
+
+          Some(vector.Feature(geom, CombinedFeatureId(feature1Id, feature2Id)))
+        case _ =>
+          // Polygon-polygon intersections can generate points or lines, which we just want to ignore
+          logger.warn(
+            "Cannot process geometry type"
+          )
+          None
+      }
   }
 
   private def splitGeometries(

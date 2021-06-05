@@ -8,6 +8,7 @@ import org.globalforestwatch.util.GeometryReducer
 object FireAlertsViirsFeature extends Feature {
   override val geomPos: Int = 0
 
+  val featureCount = 8
   val featureIdExpr =
     "latitude as lat, longitude as lon, acq_date as acqDate, acq_time as acqTime, confidence, " +
       "bright_ti4 as brightTi4, bright_ti5 as brightTi5, frp"
@@ -43,7 +44,7 @@ object FireAlertsViirsFeature extends Feature {
     geotrellis.vector.Feature(geom, featureId)
   }
 
-  override def getFeatureId(i: Array[String]): FeatureId = {
+  override def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     val lat: Double = i(0).toDouble
     val lon: Double = i(1).toDouble
     val acqDate: String = i(2)

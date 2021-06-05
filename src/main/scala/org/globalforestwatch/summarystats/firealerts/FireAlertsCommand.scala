@@ -5,6 +5,8 @@ import cats.implicits._
 import com.monovore.decline.Opts
 
 object FireAlertsCommand extends SummaryCommand {
+  val changeOnlyOpt: Opts[Boolean] =
+    Opts.flag("change_only", "Process change only").orFalse
 
   val fireAlertsCommand: Opts[Unit] = Opts.subcommand(
     name = "firealerts",
@@ -12,6 +14,7 @@ object FireAlertsCommand extends SummaryCommand {
   ) {
     (
       defaultOptions,
+      changeOnlyOpt,
       fireAlertOptions,
       defaultFilterOptions,
       gdamFilterOptions,
@@ -19,6 +22,7 @@ object FireAlertsCommand extends SummaryCommand {
       featureFilterOptions,
       ).mapN {
       (default,
+       changeOnly,
        fireAlert,
        defaultFilter,
        gadmFilter,
@@ -28,6 +32,7 @@ object FireAlertsCommand extends SummaryCommand {
           "featureUris" -> default._2,
           "outputUrl" -> default._3,
           "splitFeatures" -> default._4,
+          "changeOnly" -> changeOnly,
           "fireAlertType" -> fireAlert._1,
           "fireAlertSource" -> fireAlert._2,
           "iso" -> gadmFilter._1,
@@ -46,7 +51,6 @@ object FireAlertsCommand extends SummaryCommand {
         )
 
         runAnalysis("firealerts", default._1, default._2, kwargs)
-
     }
   }
 

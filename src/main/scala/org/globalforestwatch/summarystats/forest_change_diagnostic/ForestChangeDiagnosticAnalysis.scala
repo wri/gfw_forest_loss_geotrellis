@@ -249,8 +249,8 @@ object ForestChangeDiagnosticAnalysis {
         featureUris,
         featureType,
         kwargs,
+        "geom",
         spark,
-        "geom"
       )
     val featureSpatialRDD = Adapter.toSpatialRdd(featurePolygonDF, "polyshape")
 

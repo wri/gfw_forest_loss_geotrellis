@@ -22,15 +22,20 @@ object FireAlertsAnalysis {
     val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
     val layoutDefinition = fireAlertType match {
       case "viirs" => ViirsGrid.blockTileGrid
-      case "modis" => ModisGrid.blockTileGrid
+      case "modis" | "burned_areas" => ModisGrid.blockTileGrid
     }
 
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
       FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = false)
 
-    val joinedDF = joinWithFeatures(summaryRDD, featureType, spark, kwargs)
+    val summaryDF = fireAlertType match {
+      case "modis" | "viirs" =>
+        joinWithFeatures(summaryRDD, featureType, spark, kwargs)
+      case "burned_areas" =>
+        FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
+    }
 
-    joinedDF.repartition(partitionExprs = $"featureId")
+    summaryDF.repartition(partitionExprs = $"featureId")
 
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
       s"/firealerts_${fireAlertType}_" + DateTimeFormatter
@@ -39,7 +44,7 @@ object FireAlertsAnalysis {
 
     FireAlertsExport.export(
       featureType,
-      joinedDF,
+      summaryDF,
       runOutputUrl,
       kwargs
     )
@@ -49,14 +54,14 @@ object FireAlertsAnalysis {
                        featureType: String,
                        spark: SparkSession,
                        kwargs: Map[String, Any]): DataFrame = {
-    val fireDF = FireAlertsDFFactory(summaryRDD, spark, kwargs).getDataFrame
+    val fireDF = FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
 
     val firePointDF = fireDF
       .selectExpr("ST_Point(CAST(fireId.lon AS Decimal(24,10)),CAST(fireId.lat AS Decimal(24,10))) AS pointshape", "*")
 
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
-    val featureDF = SpatialFeatureDF(featureUris, featureType, kwargs, spark, "geom")
+    val featureDF = SpatialFeatureDF(featureUris, featureType, kwargs,"geom", spark)
 
     firePointDF
       .join(featureDF)

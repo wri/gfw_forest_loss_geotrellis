@@ -124,6 +124,7 @@ Test / fork := true
 Test / parallelExecution := false
 Test / testOptions += Tests.Argument("-oD")
 Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m")
+Test / envVars := Map("AWS_REQUEST_PAYER" -> "requester")
 
 // Settings for sbt-assembly plugin which builds fat jars for use by spark jobs
 test in assembly := {}
