@@ -42,8 +42,13 @@ object SpatialJoinRDD {
                                                      usingIndex: Boolean = false
                                                    ): JavaPairRDD[B, A] = {
 
-
-    largerSpatialRDD.spatialPartitioning(GridType.QUADTREE)
+    try {
+      largerSpatialRDD.spatialPartitioning(GridType.QUADTREE)
+    } catch {
+      // Number of partitions cannot be larger than half of total records num
+      // This can be an issue for small datasets, so only then we will attempt to count features
+      case e: java.lang.IllegalArgumentException => largerSpatialRDD.spatialPartitioning(GridType.QUADTREE, List(1, (largerSpatialRDD.countWithoutDuplicates() / 2).toInt).max)
+    }
 
     smallerSpatialRDD.spatialPartitioning(largerSpatialRDD.getPartitioner)
     smallerSpatialRDD.buildIndex(
