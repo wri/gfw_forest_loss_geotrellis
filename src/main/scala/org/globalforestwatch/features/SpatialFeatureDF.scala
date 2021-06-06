@@ -30,8 +30,8 @@ object SpatialFeatureDF {
   def apply(input: NonEmptyList[String],
             featureType: String,
             filters: Map[String, Any],
-            spark: SparkSession,
-            wkbField: String): DataFrame = {
+            wkbField: String,
+            spark: SparkSession): DataFrame = {
 
     val featureObj: Feature = FeatureFactory(featureType).featureObj
     SpatialFeatureDF(input, featureObj, filters, wkbField, spark)

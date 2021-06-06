@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.{Coordinate, Envelope, GeometryFactory, Polyg
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.spatialRDD.PolygonRDD
+import org.globalforestwatch.grids.GridId.pointGridId
 
 object GridRDD {
   def apply(envelope: Envelope, spark: SparkSession): PolygonRDD = {
@@ -45,6 +46,7 @@ object GridRDD {
 
     // Somehow this doesn't work
     polygon.setSRID(geomFactory.getSRID)
+    // polygon.setUserData(pointGridId(minX, minY+1, 1))
     polygon
   }
 

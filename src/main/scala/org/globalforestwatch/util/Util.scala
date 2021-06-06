@@ -1,7 +1,6 @@
 package org.globalforestwatch.util
 
 import java.io.File
-
 import com.amazonaws.services.s3.AmazonS3URI
 import geotrellis.raster.RasterExtent
 import geotrellis.store.index.zcurve.Z2
@@ -10,6 +9,7 @@ import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.vector.{Extent, Feature, Geometry, Point}
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
@@ -66,5 +66,14 @@ object Util {
       sb.append(String.format("%02x", Byte.box(b)))
     }
     sb.toString
+  }
+
+  def countRecordsPerPartition[T](rdd: RDD[T], spark: SparkSession): Unit = {
+    import spark.implicits._
+
+    rdd
+      .mapPartitionsWithIndex { case (i, rows) => Iterator((i, rows.size)) }
+      .toDF("partition_number", "number_of_records")
+      .show(100, false)
   }
 }
