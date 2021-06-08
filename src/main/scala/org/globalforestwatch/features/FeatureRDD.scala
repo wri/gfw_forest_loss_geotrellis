@@ -1,21 +1,31 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.{Envelope => GeoSparkEnvelope, Geometry => GeoSparkGeometry, Point => GeoSparkPoint, Polygon => GeoSparkPolygon, Polygonal => GeoSparkPolygonal}
+import com.vividsolutions.jts.geom.{
+  Envelope => GeoSparkEnvelope,
+  Geometry => GeoSparkGeometry,
+  Point => GeoSparkPoint,
+  Polygon => GeoSparkPolygon,
+  Polygonal => GeoSparkPolygonal
+}
 import org.apache.log4j.Logger
 import com.vividsolutions.jts.io.WKTWriter
 import geotrellis.vector
-import geotrellis.vector.Geometry
+import geotrellis.vector.{Geometry, MultiPolygon}
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.util.{GeotrellisGeometryReducer, GeotrellisGeometryValidator, GridRDD, SpatialJoinRDD}
+import org.globalforestwatch.util.{
+  GeotrellisGeometryReducer,
+  GridRDD,
+  SpatialJoinRDD
+}
 import org.globalforestwatch.util.IntersectGeometry.intersectGeometries
 import org.globalforestwatch.util.Util.getAnyMapValue
-import org.globalforestwatch.util.GeometryConverter.toGeotrellisGeometry
 import org.locationtech.jts.io.WKTReader
+import org.globalforestwatch.util.ImplicitGeometryConverter._
 
 object FeatureRDD {
   val logger = Logger.getLogger("FeatureRDD")
@@ -103,9 +113,9 @@ object FeatureRDD {
 
           val reader: WKTReader = new WKTReader()
           val geom =
-            GeotrellisGeometryReducer.reduce(
-              GeotrellisGeometryReducer.gpr
-            )(reader.read(wkt))
+            GeotrellisGeometryReducer.reduce(GeotrellisGeometryReducer.gpr)(
+              reader.read(wkt)
+            )
 
           val feature1Data = featureData.head.drop(1).dropRight(1).split(',')
           val feature1Id: FeatureId =
@@ -155,7 +165,8 @@ object FeatureRDD {
           geometries
       }
       .map { intersection =>
-        val geotrellisGeom = toGeotrellisGeometry(intersection)
+        // use implicit converter to covert to Geotrellis Geometry
+        val geotrellisGeom: MultiPolygon = intersection
         geotrellis.vector.Feature(
           geotrellisGeom,
           FeatureIdFactory(featureType)

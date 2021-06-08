@@ -14,6 +14,24 @@ object ForestChangeDiagnosticExport extends SummaryExport {
     "nullValue" -> null,
     "emptyValue" -> null
   )
+
+  override def export(featureType: String,
+                      summaryDF: DataFrame,
+                      outputUrl: String,
+                      kwargs: Map[String, Any]): Unit = {
+
+    featureType match {
+
+      case "feature" => exportFeature(summaryDF, outputUrl, kwargs)
+      case "intermediate" => exportIntermediateList(summaryDF, outputUrl)
+      case "inputFeatures" => exportInputFeatures(summaryDF, outputUrl)
+      case _ =>
+        throw new IllegalArgumentException(
+          "Feature type must be one of 'feature', 'intermediate', 'inputFeatures'"
+        )
+    }
+  }
+
   override protected def exportFeature(summaryDF: DataFrame,
                                        outputUrl: String,
                                        kwargs: Map[String, Any]): Unit = {
@@ -34,5 +52,15 @@ object ForestChangeDiagnosticExport extends SummaryExport {
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/intermediate")
+  }
+
+  def exportInputFeatures(inputFeatureDF: DataFrame,
+                          outputUrl: String): Unit = {
+
+    inputFeatureDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/input")
   }
 }

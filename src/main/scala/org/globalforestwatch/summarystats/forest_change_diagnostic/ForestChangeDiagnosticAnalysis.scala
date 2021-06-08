@@ -7,11 +7,14 @@ import java.time.format.DateTimeFormatter
 import geotrellis.vector.{Feature, Geometry}
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
 import geotrellis.vector
+import geotrellis.vector.io.wkb.WKB
 import org.apache.log4j.Logger
+import org.apache.spark.sql.DataFrame
 import org.datasyslab.geosparksql.utils.Adapter
 import org.globalforestwatch.features.{FeatureDF, FeatureIdFactory, FireAlertRDD, GridFeatureId, SimpleFeature, SpatialFeatureDF}
 import org.globalforestwatch.grids.GridId.pointGridId
 import org.globalforestwatch.util.SpatialJoinRDD
+import org.globalforestwatch.util.Util.convertBytesToHex
 
 import java.util
 
@@ -21,10 +24,7 @@ import java.util
 //import org.apache.sedona.sql.utils.{Adapter, SedonaSQLRegistrator}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.globalforestwatch.features.{
-  FeatureId,
-  SimpleFeatureId
-}
+import org.globalforestwatch.features.{FeatureId, SimpleFeatureId}
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 import scala.collection.JavaConverters._
@@ -45,6 +45,31 @@ object ForestChangeDiagnosticAnalysis {
     )
 
     mainRDD.cache()
+    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
+      "/forest_change_diagnostic_" + DateTimeFormatter
+      .ofPattern("yyyyMMdd_HHmm")
+      .format(LocalDateTime.now)
+
+    import spark.implicits._
+    val inputFeatureDF = mainRDD
+      .map { feature: Feature[Geometry, FeatureId] =>
+        feature.data match {
+          case simpleId: SimpleFeatureId =>
+            (simpleId.featureId, convertBytesToHex(WKB.write(feature.geom)))
+          case _ => throw new RuntimeException("unexpected ID")
+        }
+      }
+      .toDF("location_id", "wkb")
+
+    inputFeatureDF.collect()
+    inputFeatureDF.head(5)
+
+    ForestChangeDiagnosticExport.export(
+      "inputFeatures",
+      inputFeatureDF,
+      runOutputUrl,
+      kwargs
+    )
 
     val gridFilter: List[String] =
       mainRDD
@@ -88,12 +113,8 @@ object ForestChangeDiagnosticAnalysis {
 
     dataRDD.cache()
 
-    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      "/forest_change_diagnostic_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
-
-    val finalRDD = combineIntermediateList(dataRDD, gridFilter, runOutputUrl, spark, kwargs)
+    val finalRDD =
+      combineIntermediateList(dataRDD, gridFilter, runOutputUrl, spark, kwargs)
 
     val summaryDF =
       ForestChangeDiagnosticDFFactory(featureType, finalRDD, spark, kwargs).getDataFrame
@@ -245,18 +266,13 @@ object ForestChangeDiagnosticAnalysis {
     val featureUris: NonEmptyList[String] =
       getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
     val featurePolygonDF =
-      SpatialFeatureDF(
-        featureUris,
-        featureType,
-        kwargs,
-        "geom",
-        spark,
-      )
+      SpatialFeatureDF(featureUris, featureType, kwargs, "geom", spark)
     val featureSpatialRDD = Adapter.toSpatialRdd(featurePolygonDF, "polyshape")
 
     featureSpatialRDD.analyze()
 
-    val joinedRDD = SpatialJoinRDD.spatialjoin(fireAlertSpatialRDD, featureSpatialRDD)
+    val joinedRDD =
+      SpatialJoinRDD.spatialjoin(fireAlertSpatialRDD, featureSpatialRDD)
 
     joinedRDD.rdd
       .map {

@@ -1,13 +1,10 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
+import geotrellis.vector.{Feature, Geometry}
 import io.circe.syntax._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{
-  FeatureId,
-  GridFeatureId,
-  SimpleFeatureId
-}
+import org.globalforestwatch.features.{FeatureId, GridFeatureId, SimpleFeatureId}
 import org.globalforestwatch.util.CaseClassConstrutor.createCaseClassFromMap
 
 case class ForestChangeDiagnosticDFFactory(
@@ -29,6 +26,8 @@ case class ForestChangeDiagnosticDFFactory(
   }
 
   private def getFeatureDataFrame: DataFrame = {
+
+    import geotrellis.vector.Geometry
 
     dataRDD
       .map {
