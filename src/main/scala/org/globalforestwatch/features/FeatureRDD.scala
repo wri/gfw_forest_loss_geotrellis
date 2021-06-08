@@ -10,8 +10,10 @@ import com.vividsolutions.jts.geom.{
 }
 import org.apache.log4j.Logger
 import com.vividsolutions.jts.io.WKTWriter
+import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector
 import geotrellis.vector.{Geometry, MultiPolygon}
+import org.apache.spark.HashPartitioner
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
@@ -158,6 +160,8 @@ object FeatureRDD {
         considerBoundaryIntersection = true
       )
 
+    val hashPartitioner = new HashPartitioner(flatJoin.getNumPartitions)
+
     flatJoin.rdd
       .flatMap {
         case (geom, gridCell) =>
@@ -167,12 +171,28 @@ object FeatureRDD {
       .map { intersection =>
         // use implicit converter to covert to Geotrellis Geometry
         val geotrellisGeom: MultiPolygon = intersection
-        geotrellis.vector.Feature(
-          geotrellisGeom,
-          FeatureIdFactory(featureType)
-            .fromUserData(intersection.getUserData.asInstanceOf[String])
+
+        (
+          Z2(
+            (intersection.getCentroid.getX * 100).toInt,
+            (intersection.getCentroid.getY * 100).toInt
+          ).z,
+          geotrellis.vector.Feature(
+            geotrellisGeom,
+            FeatureIdFactory(featureType)
+              .fromUserData(intersection.getUserData.asInstanceOf[String])
+          )
         )
       }
+      .partitionBy(hashPartitioner)
+      .mapPartitions({
+        iter: Iterator[(Long, vector.Feature[Geometry, FeatureId])] =>
+          for {
+            i <- iter
+          } yield {
+            i._2
+          }
+      }, preservesPartitioning = true)
 
   }
 

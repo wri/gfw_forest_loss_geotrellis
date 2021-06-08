@@ -13,8 +13,11 @@ import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
-import org.globalforestwatch.util.Util.countRecordsPerPartition
+import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticExport
+import org.globalforestwatch.util.Util.{countRecordsPerPartition, getAnyMapValue}
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import scala.reflect.ClassTag
 
 
@@ -51,6 +54,17 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
           (z, (key, feature))
         }
       }
+
+    val countPerZ: RDD[(Long, Int)] = keyedFeatureRDD.aggregateByKey(0)((acc: Int, _: (SpatialKey, Feature[Geometry, FEATUREID])) => acc + 1, _ + _)
+
+    val spark = SummarySparkSession("tmp")
+    import spark.implicits._
+    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
+      "/forest_change_diagnostic_XXXX_" + DateTimeFormatter
+      .ofPattern("yyyyMMdd_HHmm")
+      .format(LocalDateTime.now)
+    ForestChangeDiagnosticExport.exportZcount(countPerZ.toDF, runOutputUrl)
+
 
     /*
      * Use a Range Partitioner based on the Z curve value to efficiently and evenly partition RDD for analysis,

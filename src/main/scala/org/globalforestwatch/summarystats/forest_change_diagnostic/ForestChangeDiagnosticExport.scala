@@ -63,4 +63,14 @@ object ForestChangeDiagnosticExport extends SummaryExport {
       .options(csvOptions)
       .csv(path = outputUrl + "/input")
   }
+
+  def exportZcount(inputFeatureDF: DataFrame,
+                   outputUrl: String): Unit = {
+
+    inputFeatureDF
+      .coalesce(1)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/zcount")
+  }
 }
