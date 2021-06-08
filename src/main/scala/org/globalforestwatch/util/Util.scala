@@ -10,6 +10,7 @@ import geotrellis.vector.{Extent, Feature, Geometry, Point}
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.col
 import org.globalforestwatch.features.FeatureId
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
@@ -74,6 +75,14 @@ object Util {
     rdd
       .mapPartitionsWithIndex { case (i, rows) => Iterator((i, rows.size)) }
       .toDF("partition_number", "number_of_records")
+      .orderBy("number_of_records")
+      .show(100, false)
+
+
+    rdd
+      .mapPartitionsWithIndex { case (i, rows) => Iterator((i, rows.size)) }
+      .toDF("partition_number", "number_of_records")
+      .orderBy(col("number_of_records").desc)
       .show(100, false)
   }
 }

@@ -2,7 +2,7 @@ package org.globalforestwatch.features
 
 import geotrellis.vector.Geometry
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.globalforestwatch.util.GeometryReducer
+import org.globalforestwatch.util.GeotrellisGeometryValidator
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 trait Feature extends java.io.Serializable {
@@ -18,7 +18,7 @@ trait Feature extends java.io.Serializable {
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId
 
   def isValidGeom(i: Row): Boolean = {
-    GeometryReducer.isNonEmptyGeom(i.getString(geomPos))
+    GeotrellisGeometryValidator.isNonEmptyGeom(i.getString(geomPos))
   }
 
   def filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {

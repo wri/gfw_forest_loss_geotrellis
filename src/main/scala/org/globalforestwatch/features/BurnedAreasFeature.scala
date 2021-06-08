@@ -3,7 +3,7 @@ package org.globalforestwatch.features
 import geotrellis.vector.Geometry
 import geotrellis.vector.io.wkb.WKB
 import org.apache.spark.sql.Row
-import org.globalforestwatch.util.GeometryReducer
+import org.globalforestwatch.util.GeotrellisGeometryReducer
 
 object BurnedAreasFeature extends Feature {
   override val geomPos: Int = 1
@@ -14,7 +14,7 @@ object BurnedAreasFeature extends Feature {
   def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
     val featureId = getFeatureId(i)
     val geom: Geometry =
-      GeometryReducer.reduce(GeometryReducer.gpr)(
+      GeotrellisGeometryReducer.reduce(GeotrellisGeometryReducer.gpr)(
         WKB.read(i.getString(geomPos))
       )
 

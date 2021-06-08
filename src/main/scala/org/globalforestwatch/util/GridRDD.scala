@@ -1,10 +1,11 @@
 package org.globalforestwatch.util
 
-import com.vividsolutions.jts.geom.{Coordinate, Envelope, GeometryFactory, Polygon, PrecisionModel}
+import com.vividsolutions.jts.geom.{Envelope, Polygon}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.spatialRDD.PolygonRDD
 import org.globalforestwatch.grids.GridId.pointGridId
+import org.globalforestwatch.util.GeoSparkGeometryConstructor.createPolygon1x1
 
 object GridRDD {
   def apply(envelope: Envelope, spark: SparkSession): PolygonRDD = {
@@ -18,7 +19,12 @@ object GridRDD {
     val gridRDD: RDD[Polygon] = {
       spark.sparkContext
         .parallelize(gridCells)
-        .map(p => createPolygon(minX = p._1, minY = p._2))
+        .map { p =>
+          val poly = createPolygon1x1(minX = p._1, minY = p._2)
+          val gridId = pointGridId(p._1, p._2 + 1, 1)
+          poly.setUserData(gridId)
+          poly
+        }
 
     }
     val spatialGridRDD = new PolygonRDD(gridRDD)
@@ -26,28 +32,5 @@ object GridRDD {
     spatialGridRDD
   }
 
-  private def createPolygon(minX: Double, minY: Double): Polygon = {
-
-    val geomFactory = new GeometryFactory(new PrecisionModel(), 4326)
-
-    val coordSeqFactory = geomFactory.getCoordinateSequenceFactory
-
-    val polygon = geomFactory.createPolygon(
-      coordSeqFactory.create(
-        Array(
-          new Coordinate(minX, minY),
-          new Coordinate(minX + 1, minY),
-          new Coordinate(minX + 1, minY + 1),
-          new Coordinate(minX, minY + 1),
-          new Coordinate(minX, minY)
-        )
-      )
-    )
-
-    // Somehow this doesn't work
-    polygon.setSRID(geomFactory.getSRID)
-    // polygon.setUserData(pointGridId(minX, minY+1, 1))
-    polygon
-  }
 
 }

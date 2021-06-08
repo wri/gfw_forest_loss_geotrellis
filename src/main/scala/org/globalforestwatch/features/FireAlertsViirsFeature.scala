@@ -3,7 +3,7 @@ package org.globalforestwatch.features
 import geotrellis.vector
 import geotrellis.vector.Geometry
 import org.apache.spark.sql.Row
-import org.globalforestwatch.util.GeometryReducer
+import org.globalforestwatch.util.{GeotrellisGeometryReducer, GeotrellisGeometryValidator}
 
 object FireAlertsViirsFeature extends Feature {
   override val geomPos: Int = 0
@@ -37,7 +37,7 @@ object FireAlertsViirsFeature extends Feature {
         lat - 0.00001
       else lat
 
-    val geom = GeometryReducer.reduce(GeometryReducer.gpr)(
+    val geom = GeotrellisGeometryReducer.reduce(GeotrellisGeometryReducer.gpr)(
       vector.Point(adjustedLon, adjustedLat)
     )
 

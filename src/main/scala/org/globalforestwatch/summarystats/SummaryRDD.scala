@@ -7,14 +7,13 @@ import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResult}
 import geotrellis.raster.summary.polygonal
-import org.apache.commons.lang.NotImplementedException
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector._
-import org.apache.spark.{HashPartitioner, RangePartitioner}
+import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
-import org.globalforestwatch.util.Util.{countRecordsPerPartition, getAnyMapValue}
+import org.globalforestwatch.util.Util.countRecordsPerPartition
 
 import scala.reflect.ClassTag
 
@@ -36,16 +35,6 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                                      windowLayout: LayoutDefinition,
                                      kwargs: Map[String, Any],
                                      partition: Boolean = true)(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
-
-    //    // Don't partition data if input data were split. They should come already partitioned.
-    //    // Allow user to overwrite this setting
-    //    val partition_default = {
-    //      partition match {
-    //        case Some(value) => value
-    //        case _ => !getAnyMapValue[Boolean](kwargs, "splitFeatures" )
-    //      }
-    //    }
-
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.
      * Then create a key based off the Z curve value from the grid cell, to use for partitioning.
@@ -73,7 +62,6 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
       val inputPartitionMultiplier = 64
       val rangePartitioner =
         new RangePartitioner(featureRDD.getNumPartitions * inputPartitionMultiplier, keyedFeatureRDD)
-      //      new HashPartitioner(featureRDD.getNumPartitions * inputPartitionMultiplier)
       keyedFeatureRDD.partitionBy(rangePartitioner)
     } else {
       keyedFeatureRDD

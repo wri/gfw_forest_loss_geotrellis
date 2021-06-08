@@ -1,14 +1,7 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.{
-  Envelope,
-  MultiPolygon,
-  Polygon,
-  Geometry => GeoSparkGeometry,
-  Point => GeoSparkPoint,
-  Polygonal => GeoSparkPolygonal
-}
+import com.vividsolutions.jts.geom.{Envelope => GeoSparkEnvelope, Geometry => GeoSparkGeometry, Point => GeoSparkPoint, Polygon => GeoSparkPolygon, Polygonal => GeoSparkPolygonal}
 import org.apache.log4j.Logger
 import com.vividsolutions.jts.io.WKTWriter
 import geotrellis.vector
@@ -16,23 +9,12 @@ import geotrellis.vector.Geometry
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.datasyslab.geospark.enums.GridType
-import org.datasyslab.geospark.spatialRDD.{PolygonRDD, SpatialRDD}
+import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.util.{
-  GeometryReducer,
-  GridDF,
-  GridRDD,
-  SpatialJoinRDD
-}
-import org.globalforestwatch.util.IntersectGeometry.{
-  intersectGeometries,
-  toGeotrellisGeometry
-}
-import org.globalforestwatch.util.Util.{
-  countRecordsPerPartition,
-  getAnyMapValue
-}
+import org.globalforestwatch.util.{GeotrellisGeometryReducer, GeotrellisGeometryValidator, GridRDD, SpatialJoinRDD}
+import org.globalforestwatch.util.IntersectGeometry.intersectGeometries
+import org.globalforestwatch.util.Util.getAnyMapValue
+import org.globalforestwatch.util.GeometryConverter.toGeotrellisGeometry
 import org.locationtech.jts.io.WKTReader
 
 object FeatureRDD {
@@ -81,9 +63,9 @@ object FeatureRDD {
         case pt: GeoSparkPoint =>
           val pointFeatureData = pt.getUserData.asInstanceOf[String].split('\t')
 
-          val geom = GeometryReducer.reduce(GeometryReducer.gpr)(
-            vector.Point(pt.getX, pt.getY)
-          )
+          val geom = GeotrellisGeometryReducer.reduce(
+            GeotrellisGeometryReducer.gpr
+          )(vector.Point(pt.getX, pt.getY))
 
           val pointFeatureId: FeatureId =
             featureObj.getFeatureId(pointFeatureData)
@@ -121,7 +103,9 @@ object FeatureRDD {
 
           val reader: WKTReader = new WKTReader()
           val geom =
-            GeometryReducer.reduce(GeometryReducer.gpr)(reader.read(wkt))
+            GeotrellisGeometryReducer.reduce(
+              GeotrellisGeometryReducer.gpr
+            )(reader.read(wkt))
 
           val feature1Data = featureData.head.drop(1).dropRight(1).split(',')
           val feature1Id: FeatureId =
@@ -154,63 +138,22 @@ object FeatureRDD {
       Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialFeatureRDD.analyze()
 
-    val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
-
-    //    val gridDF = GridDF(envelope, spark)
-    //
-    //    featureDF.show(5)
-    //
-    //    gridDF.show(5)
-    //
-    //
-    //    val intersectionRDD = PolygonIntersectionRDD(featureDF, gridDF, spark, kwargs)
-    //
-    //    // TODO: refactor to remove duplicate code
-    //    intersectionRDD.analyze()
-    //    intersectionRDD.spatialPartitioning(GridType.QUADTREE)
-    //    val scalaRDD =
-    //      org.apache.spark.api.java.JavaRDD.toRDD(intersectionRDD.spatialPartitionedRDD)
-    //
-    //    scalaRDD.flatMap {
-    //      case shp: GeoSparkPolygonal =>
-    //        val featureData = shp.getUserData.asInstanceOf[String].split('\t')
-    //        val geom = toGeotrellisGeometry(shp)
-    //        val feature1Data = featureData.head.drop(1).dropRight(1).split(',')
-    //        val featureObj: Feature = FeatureFactory(featureType).featureObj
-    //        val featureId: FeatureId =
-    //          featureObj.getFeatureId(feature1Data, parsed = true)
-    //
-    //        Some(vector.Feature(geom, featureId))
-    //      case _ =>
-    //        // Polygon-polygon intersections can generate points or lines, which we just want to ignore
-    //        logger.warn(
-    //          "Cannot process geometry type"
-    //        )
-    //        None
-    //    }
+    val envelope: GeoSparkEnvelope = spatialFeatureRDD.boundaryEnvelope
 
     val spatialGridRDD = GridRDD(envelope, spark)
-    val flatJoin: JavaPairRDD[GeoSparkGeometry, Polygon] =
+    val flatJoin: JavaPairRDD[GeoSparkGeometry, GeoSparkPolygon] =
       SpatialJoinRDD.flatSpatialJoin(
         spatialGridRDD,
         spatialFeatureRDD,
         considerBoundaryIntersection = true
       )
 
-    val intersectionRDD = flatJoin.rdd.flatMap {
-      case (geom, gridCell) =>
-        val geometries = intersectGeometries(geom, gridCell)
-        geometries
-    }.toJavaRDD
-
-    val polygonRDD = new PolygonRDD(intersectionRDD)
-    polygonRDD.analyze()
-    //    List(1, (polygonRDD.countWithoutDuplicates / 2).toInt).max
-    polygonRDD.spatialPartitioning(GridType.RTREE, List(1, (polygonRDD.countWithoutDuplicates / 2).toInt).max)
-
-    countRecordsPerPartition(polygonRDD.rawSpatialRDD, spark)
-
-    val finalRDD = polygonRDD.rawSpatialRDD
+    flatJoin.rdd
+      .flatMap {
+        case (geom, gridCell) =>
+          val geometries = intersectGeometries(geom, gridCell)
+          geometries
+      }
       .map { intersection =>
         val geotrellisGeom = toGeotrellisGeometry(intersection)
         geotrellis.vector.Feature(
@@ -219,9 +162,6 @@ object FeatureRDD {
             .fromUserData(intersection.getUserData.asInstanceOf[String])
         )
       }
-
-    countRecordsPerPartition(finalRDD, spark)
-    finalRDD
 
   }
 
