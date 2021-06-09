@@ -4,7 +4,6 @@ import geotrellis.vector
 import geotrellis.vector.Geometry
 import org.apache.spark.sql.Row
 import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
-import org.globalforestwatch.util.{GeotrellisGeometryReducer, GeotrellisGeometryValidator}
 
 object FireAlertViirsFeature extends Feature {
   override val geomPos: Int = 0

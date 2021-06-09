@@ -1,10 +1,8 @@
 package org.globalforestwatch.features
 
 import geotrellis.vector.Geometry
-import geotrellis.vector.io.wkb.WKB
 import org.apache.spark.sql.Row
 import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
-import org.globalforestwatch.util.{GeotrellisGeometryReducer, GeotrellisGeometryValidator}
 
 object GeostoreFeature extends Feature {
 
