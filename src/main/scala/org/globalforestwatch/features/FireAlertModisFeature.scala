@@ -4,6 +4,7 @@ import geotrellis.vector
 import geotrellis.vector.Geometry
 import org.apache.spark.sql.Row
 import org.globalforestwatch.util.GeotrellisGeometryReducer
+import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 
 object FireAlertModisFeature extends Feature {
   override val geomPos: Int = 0
@@ -37,9 +38,7 @@ object FireAlertModisFeature extends Feature {
         lat - 0.00001
       else lat
 
-    val geom = GeotrellisGeometryReducer.reduce(GeotrellisGeometryReducer.gpr)(
-      vector.Point(adjustedLon, adjustedLat)
-    )
+    val geom = makeValidGeom(vector.Point(adjustedLon, adjustedLat))
 
     geotrellis.vector.Feature(geom, featureId)
   }

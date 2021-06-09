@@ -1,10 +1,9 @@
 package org.globalforestwatch.features
 
 import geotrellis.vector.Geometry
-import geotrellis.vector.io.wkb.WKB
 import org.apache.spark.sql.functions.substring
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.globalforestwatch.util.{GeotrellisGeometryReducer, GeotrellisGeometryValidator}
+import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 import org.globalforestwatch.util.Util._
 
 object GadmFeature extends Feature {
@@ -19,10 +18,7 @@ object GadmFeature extends Feature {
 
   def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
     val featureId = getFeatureId(i)
-    val geom: Geometry =
-      GeotrellisGeometryReducer.reduce(GeotrellisGeometryReducer.gpr)(
-        WKB.read(i.getString(geomPos))
-      )
+    val geom: Geometry = makeValidGeom(i.getString(geomPos))
 
     geotrellis.vector.Feature(geom, featureId)
   }
