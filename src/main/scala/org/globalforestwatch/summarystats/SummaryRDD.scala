@@ -66,7 +66,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
       keyedFeatureRDD
     }
 
-    countRecordsPerPartition(partitionedFeatureRDD, SummarySparkSession("tmp"))
+    // countRecordsPerPartition(partitionedFeatureRDD, SummarySparkSession("tmp"))
 
     /*
      * Here we're going to work with the features one partition at a time.

@@ -18,26 +18,80 @@ case class FeatureIdFactory(featureType: String) {
         ) =>
         WdpaFeatureId(wdpaId, name, iucnCat, iso, status)
       case ("geostore", geostore: String) => GeostoreFeatureId(geostore)
+      case ("burned_areas", alertDate: String) =>
+        BurnedAreasFeatureId(alertDate)
+      case (
+        "viirs",
+        (
+          lon: Double,
+          lat: Double,
+          alertDate: String,
+          alertTime: Int,
+          confidence: String,
+          brightTi4: Float,
+          brightTi5: Float,
+          frp: Float
+          )
+        ) =>
+        FireAlertViirsFeatureId(
+          lon,
+          lat,
+          alertDate,
+          alertTime,
+          confidence,
+          brightTi4,
+          brightTi5,
+          frp
+        )
+      case (
+        "modis",
+        (
+          lon: Double,
+          lat: Double,
+          alertDate: String,
+          alertTime: Int,
+          confidencePerc: Int,
+          confidenceCat: String,
+          brightness: Float,
+          brightT31: Float,
+          frp: Float
+          )
+        ) =>
+        FireAlertModisFeatureId(
+          lon,
+          lat,
+          alertDate,
+          alertTime,
+          confidencePerc,
+          confidenceCat,
+          brightness,
+          brightT31,
+          frp
+        )
       case _ =>
         throw new IllegalArgumentException(
           "Feature type must be one of 'gadm', 'wdpa', 'geostore' or 'feature'"
         )
     }
 
-  def fromUserData(value: String): FeatureId = {
+  def fromUserData(value: String, delimiter: String = "\t"): FeatureId = {
 
-    val values = value.filterNot("[]".toSet).split(",").map(_.trim)
+    val values = value.filterNot("[]".toSet).split(delimiter).map(_.trim)
+    //    val values = value.drop(0).dropRight(1).split(delimiter).map(_.trim)
 
     featureType match {
-      case "gadm" => ???
+      case "gadm" => GadmFeature.getFeatureId(values, true)
 
       case "feature" => SimpleFeatureId(values(0).toInt)
-      case "wdpa" => ???
+      case "wdpa" => GadmFeature.getFeatureId(values, true)
 
-      case "geostore" => ???
+      case "geostore" => GeostoreFeature.getFeatureId(values, true)
+      case "burned_areas" => BurnedAreasFeature.getFeatureId(values, true)
+      case "viirs" => FireAlertViirsFeature.getFeatureId(values, true)
+      case "modis" => FireAlertModisFeature.getFeatureId(values, true)
       case _ =>
         throw new IllegalArgumentException(
-          "Feature type must be one of 'gadm', 'wdpa', 'geostore' or 'feature'"
+          "Feature type must be one of 'gadm', 'wdpa', 'geostore', 'feature', 'burned_areas'"
         )
     }
   }

@@ -31,6 +31,7 @@ object WdpaFeature extends Feature {
   }
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
+
     val wdpaId: Int = i(wdpaIdPos).toInt
     val name: String = i(namePos)
     val iucnCat: String = i(iucnCatPos)

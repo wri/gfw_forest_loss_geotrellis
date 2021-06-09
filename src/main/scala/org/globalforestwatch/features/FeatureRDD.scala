@@ -6,10 +6,10 @@ import com.vividsolutions.jts.geom.{
   Geometry => GeoSparkGeometry,
   Point => GeoSparkPoint,
   Polygon => GeoSparkPolygon,
-  Polygonal => GeoSparkPolygonal
+  Polygonal => GeoSparkPolygonal,
+  GeometryCollection => GeoSparkGeometryCollection
 }
 import org.apache.log4j.Logger
-import com.vividsolutions.jts.io.WKTWriter
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector
 import geotrellis.vector.{Geometry, MultiPolygon}
@@ -19,14 +19,12 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.util.{
-  GeotrellisGeometryReducer,
-  GridRDD,
-  SpatialJoinRDD
+import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
+import org.globalforestwatch.util.IntersectGeometry.{
+  extractPolygons,
+  intersectGeometries
 }
-import org.globalforestwatch.util.IntersectGeometry.intersectGeometries
 import org.globalforestwatch.util.Util.getAnyMapValue
-import org.locationtech.jts.io.WKTReader
 import org.globalforestwatch.util.ImplicitGeometryConverter._
 
 object FeatureRDD {
@@ -62,7 +60,7 @@ object FeatureRDD {
   /*
     Convert point-in-polygon join to feature RDD
    */
-  def apply(featureObj: Feature,
+  def apply(featureType: String,
             spatialRDD: SpatialRDD[GeoSparkGeometry],
             kwargs: Map[String, Any],
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
@@ -73,14 +71,14 @@ object FeatureRDD {
     scalaRDD
       .map {
         case pt: GeoSparkPoint =>
-          val pointFeatureData = pt.getUserData.asInstanceOf[String].split('\t')
+          val pointFeatureData = pt.getUserData.asInstanceOf[String] //.split('\t')
 
-          val geom = GeotrellisGeometryReducer.reduce(
-            GeotrellisGeometryReducer.gpr
-          )(vector.Point(pt.getX, pt.getY))
+          // use implicit geometry converter
+          val geom: vector.Point = pt
 
           val pointFeatureId: FeatureId =
-            featureObj.getFeatureId(pointFeatureData)
+            FeatureIdFactory(featureType).fromUserData(pointFeatureData)
+
           vector.Feature(geom, pointFeatureId)
         case _ =>
           throw new IllegalArgumentException(
@@ -88,47 +86,43 @@ object FeatureRDD {
           )
       }
 
-    // In case we implement this method for other geometry types we will have to split geometries
-    //      .flatMap { feature =>
-    //        splitGeometry(feature)
-    //      }
-
   }
 
   /*
     Convert polygon-polygon intersection join to feature RDD
    */
-  def apply(feature1Obj: Feature,
-            feature2Obj: Feature,
+  def apply(feature1Type: String,
+            feature2Type: String,
             spatialRDD: SpatialRDD[GeoSparkGeometry],
             kwargs: Map[String, Any],
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
+
+    def toGeotrellisFeature(poly: Geometry) = {
+      val featureData = poly.getUserData.asInstanceOf[String].split('\t')
+
+      // use implicit geometry converter
+      val geom: Geometry = poly
+
+      val feature1Id: FeatureId =
+        FeatureIdFactory(feature1Type)
+          .fromUserData(featureData.head, delimiter = ",")
+      val feature2Id: FeatureId =
+        FeatureIdFactory(feature2Type)
+          .fromUserData(featureData.tail.head, delimiter = ",")
+
+      List(vector.Feature(geom, CombinedFeatureId(feature1Id, feature2Id)))
+    }
+
     val scalaRDD =
       org.apache.spark.api.java.JavaRDD.toRDD(spatialRDD.spatialPartitionedRDD)
 
     scalaRDD
       .flatMap {
-        case shp: GeoSparkPolygonal =>
-          val featureData = shp.getUserData.asInstanceOf[String].split('\t')
-          val writer: WKTWriter = new WKTWriter()
-          val wkt = writer.write(shp)
-
-          val reader: WKTReader = new WKTReader()
-          val geom =
-            GeotrellisGeometryReducer.reduce(GeotrellisGeometryReducer.gpr)(
-              reader.read(wkt)
-            )
-
-          val feature1Data = featureData.head.drop(1).dropRight(1).split(',')
-          val feature1Id: FeatureId =
-            feature1Obj.getFeatureId(feature1Data, parsed = true)
-
-          val feature2Data =
-            featureData.tail.head.drop(1).dropRight(1).split(',')
-          val feature2Id: FeatureId =
-            feature2Obj.getFeatureId(feature2Data, parsed = true)
-
-          List(vector.Feature(geom, CombinedFeatureId(feature1Id, feature2Id)))
+        case geomCol: GeoSparkGeometryCollection =>
+          val poly = extractPolygons(geomCol)
+          toGeotrellisFeature(poly)
+        case poly: GeoSparkPolygonal =>
+          toGeotrellisFeature(poly)
         case _ =>
           // Polygon-polygon intersections can generate points or lines, which we just want to ignore
           logger.warn("Cannot process geometry type")
@@ -153,53 +147,44 @@ object FeatureRDD {
     val envelope: GeoSparkEnvelope = spatialFeatureRDD.boundaryEnvelope
 
     val spatialGridRDD = GridRDD(envelope, spark)
-    val flatJoin: JavaPairRDD[GeoSparkGeometry, GeoSparkPolygon] =
+    val flatJoin: JavaPairRDD[GeoSparkPolygon, GeoSparkGeometry] =
       SpatialJoinRDD.flatSpatialJoin(
-        spatialGridRDD,
         spatialFeatureRDD,
+        spatialGridRDD,
         considerBoundaryIntersection = true
       )
 
-    val hashPartitioner = new HashPartitioner(flatJoin.getNumPartitions)
-
-    flatJoin.rdd
-      .flatMap {
-        case (geom, gridCell) =>
-          val geometries = intersectGeometries(geom, gridCell)
-          geometries
-      }
-      /*
+    /*
       partitions will come back very skewed and we will need to even them out for any downstream analysis
       For the summary analysis we will eventually use a range partitioner.
       However, the range partitioner uses sampling to come up with the  break points for the different partitions.
       If the input RDD is already heavily skewed, sampling will be off and the range partitioner won't do a good job.
-      */
+     */
+    val hashPartitioner = new HashPartitioner(flatJoin.getNumPartitions)
+
+    flatJoin.rdd
+      .keyBy({ pair: (GeoSparkPolygon, GeoSparkGeometry) =>
+        Z2(
+          (pair._1.getCentroid.getX * 100).toInt,
+          (pair._1.getCentroid.getY * 100).toInt
+        ).z
+      })
+      .partitionBy(hashPartitioner)
+      .flatMap {
+        case (_, (gridCell, geom)) =>
+          val geometries = intersectGeometries(geom, gridCell)
+          geometries
+      }
       .map { intersection =>
         // use implicit converter to covert to Geotrellis Geometry
         val geotrellisGeom: MultiPolygon = intersection
 
-        (
-          Z2(
-            (intersection.getCentroid.getX * 100).toInt,
-            (intersection.getCentroid.getY * 100).toInt
-          ).z,
-          geotrellis.vector.Feature(
-            geotrellisGeom,
-            FeatureIdFactory(featureType)
-              .fromUserData(intersection.getUserData.asInstanceOf[String])
-          )
+        geotrellis.vector.Feature(
+          geotrellisGeom,
+          FeatureIdFactory(featureType)
+            .fromUserData(intersection.getUserData.asInstanceOf[String])
         )
       }
-      .partitionBy(hashPartitioner)
-      .mapPartitions({
-        iter: Iterator[(Long, vector.Feature[Geometry, FeatureId])] =>
-          for {
-            i <- iter
-          } yield {
-            i._2
-          }
-      }, preservesPartitioning = true)
-
   }
 
 }
