@@ -50,27 +50,6 @@ object ForestChangeDiagnosticAnalysis {
       .ofPattern("yyyyMMdd_HHmm")
       .format(LocalDateTime.now)
 
-    import spark.implicits._
-    val inputFeatureDF = mainRDD
-      .map { feature: Feature[Geometry, FeatureId] =>
-        feature.data match {
-          case simpleId: SimpleFeatureId =>
-            (simpleId.featureId, convertBytesToHex(WKB.write(feature.geom)))
-          case _ => throw new RuntimeException("unexpected ID")
-        }
-      }
-      .toDF("location_id", "wkb")
-
-    inputFeatureDF.collect()
-    inputFeatureDF.head(5)
-
-    ForestChangeDiagnosticExport.export(
-      "inputFeatures",
-      inputFeatureDF,
-      runOutputUrl,
-      kwargs
-    )
-
     val gridFilter: List[String] =
       mainRDD
         .filter {

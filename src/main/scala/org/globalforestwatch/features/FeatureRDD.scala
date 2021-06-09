@@ -168,6 +168,12 @@ object FeatureRDD {
           val geometries = intersectGeometries(geom, gridCell)
           geometries
       }
+      /*
+      partitions will come back very skewed and we will need to even them out for any downstream analysis
+      For the summary analysis we will eventually use a range partitioner.
+      However, the range partitioner uses sampling to come up with the  break points for the different partitions.
+      If the input RDD is already heavily skewed, sampling will be off and the range partitioner won't do a good job.
+      */
       .map { intersection =>
         // use implicit converter to covert to Geotrellis Geometry
         val geotrellisGeom: MultiPolygon = intersection

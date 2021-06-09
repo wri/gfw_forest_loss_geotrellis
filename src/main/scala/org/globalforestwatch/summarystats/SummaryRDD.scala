@@ -13,11 +13,7 @@ import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
-import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticExport
-import org.globalforestwatch.util.Util.{countRecordsPerPartition, getAnyMapValue}
-
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import org.globalforestwatch.util.Util.countRecordsPerPartition
 import scala.reflect.ClassTag
 
 
@@ -38,12 +34,12 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                                      windowLayout: LayoutDefinition,
                                      kwargs: Map[String, Any],
                                      partition: Boolean = true)(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
+
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.
      * Then create a key based off the Z curve value from the grid cell, to use for partitioning.
      * Later we will calculate partial result for each intersection and merge them.
      */
-
 
     val keyedFeatureRDD: RDD[(Long, (SpatialKey, Feature[Geometry, FEATUREID]))] = featureRDD
       .flatMap { feature: Feature[Geometry, FEATUREID] =>
@@ -54,17 +50,6 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
           (z, (key, feature))
         }
       }
-
-    val countPerZ: RDD[(Long, Int)] = keyedFeatureRDD.aggregateByKey(0)((acc: Int, _: (SpatialKey, Feature[Geometry, FEATUREID])) => acc + 1, _ + _)
-
-    val spark = SummarySparkSession("tmp")
-    import spark.implicits._
-    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      "/forest_change_diagnostic_XXXX_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
-    ForestChangeDiagnosticExport.exportZcount(countPerZ.toDF, runOutputUrl)
-
 
     /*
      * Use a Range Partitioner based on the Z curve value to efficiently and evenly partition RDD for analysis,
@@ -80,9 +65,11 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
     } else {
       keyedFeatureRDD
     }
+
     countRecordsPerPartition(partitionedFeatureRDD, SummarySparkSession("tmp"))
 
-    /* Here we're going to work with the features one partition at a time.
+    /*
+     * Here we're going to work with the features one partition at a time.
      * We're going to use the tile key from windowLayout to read pixels from appropriate raster.
      * Each record in this RDD may still represent only a partial result for that feature.
      *
@@ -95,7 +82,6 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
         ] =>
           // Code inside .mapPartitions works in an Iterator of records
           // Doing things this way allows us to reuse resources and perform other optimizations
-
           // Grouping by spatial key allows us to minimize read thrashing from record to record
 
           val windowFeature = featurePartition.map {
@@ -192,6 +178,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
   def getSources(key: SpatialKey, windowLayout: LayoutDefinition, kwargs: Map[String, Any]): Either[Throwable, SOURCES]
 
   def readWindow(rs: SOURCES, windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[TILE]]
+
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,

@@ -24,10 +24,9 @@ object ForestChangeDiagnosticExport extends SummaryExport {
 
       case "feature" => exportFeature(summaryDF, outputUrl, kwargs)
       case "intermediate" => exportIntermediateList(summaryDF, outputUrl)
-      case "inputFeatures" => exportInputFeatures(summaryDF, outputUrl)
       case _ =>
         throw new IllegalArgumentException(
-          "Feature type must be one of 'feature', 'intermediate', 'inputFeatures'"
+          "Feature type must be one of 'feature', 'intermediate'"
         )
     }
   }
@@ -54,23 +53,4 @@ object ForestChangeDiagnosticExport extends SummaryExport {
       .csv(path = outputUrl + "/intermediate")
   }
 
-  def exportInputFeatures(inputFeatureDF: DataFrame,
-                          outputUrl: String): Unit = {
-
-    inputFeatureDF
-      .coalesce(1)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/input")
-  }
-
-  def exportZcount(inputFeatureDF: DataFrame,
-                   outputUrl: String): Unit = {
-
-    inputFeatureDF
-      .coalesce(1)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/zcount")
-  }
 }
