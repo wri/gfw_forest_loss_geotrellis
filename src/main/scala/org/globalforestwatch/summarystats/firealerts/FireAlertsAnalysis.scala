@@ -25,8 +25,13 @@ object FireAlertsAnalysis {
       case "modis" | "burned_areas" => ModisGrid.blockTileGrid
     }
 
+    val partition = fireAlertType match {
+      case "modis" | "viirs" => false
+      case _ => true
+    }
+
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
-      FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = false)
+      FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = partition)
 
     val summaryDF = fireAlertType match {
       case "modis" | "viirs" =>
