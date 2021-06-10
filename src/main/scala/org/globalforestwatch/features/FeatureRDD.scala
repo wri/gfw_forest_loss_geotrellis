@@ -91,14 +91,15 @@ object FeatureRDD {
   /*
     Convert polygon-polygon intersection join to feature RDD
    */
-  def apply(feature1Type: String,
-            feature1Uris: NonEmptyList[String],
-            feature1Delimiter: String,
-            feature2Type: String,
-            feature2Uris: NonEmptyList[String],
-            feature2Delimiter: String,
-            kwargs: Map[String, Any],
-            spark: SparkSession
+  def apply(
+             feature1Type: String,
+             feature1Uris: NonEmptyList[String],
+             feature1Delimiter: String,
+             feature2Type: String,
+             feature2Uris: NonEmptyList[String],
+             feature2Delimiter: String,
+             kwargs: Map[String, Any],
+             spark: SparkSession
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
     val spatialDF: DataFrame = PolygonIntersectionDF(
@@ -111,17 +112,27 @@ object FeatureRDD {
       feature2Delimiter = ","
     )
 
-    spatialDF.rdd.map {
-      row: Row =>
+    val pairedRDD = spatialDF.rdd.map { row: Row =>
+      val featureId1: FeatureId = FeatureIdFactory(feature1Type)
+        .fromUserData(row.getAs[Row](0).toString, ",")
+      val featureId2: FeatureId = FeatureIdFactory(feature2Type)
+        .fromUserData(row.getAs[Row](1).toString, ",")
+      val geom = row.getAs[GeoSparkGeometry](2)
 
-        val featureId1: FeatureId = FeatureIdFactory(feature1Type).fromUserData(row.getAs[Row](0).toString, ",")
-        val featureId2: FeatureId = FeatureIdFactory(feature2Type).fromUserData(row.getAs[Row](1).toString, ",")
-        val geom = row.getAs[GeoSparkGeometry](2)
-
-        (CombinedFeatureId(featureId1, featureId2), geom)
+      (CombinedFeatureId(featureId1, featureId2), geom)
     }
+
+    val hashPartitioner = new HashPartitioner(pairedRDD.getNumPartitions)
+    pairedRDD
+      .keyBy({ pair: (CombinedFeatureId, GeoSparkGeometry) =>
+        Z2(
+          (pair._2.getCentroid.getX * 100).toInt,
+          (pair._2.getCentroid.getY * 100).toInt
+        ).z
+      })
+      .partitionBy(hashPartitioner)
       .flatMap {
-        case (id, geom) =>
+        case (_, (id, geom)) =>
           geom match {
             case geomCol: GeoSparkGeometryCollection =>
               val poly = extractPolygons(geomCol)
