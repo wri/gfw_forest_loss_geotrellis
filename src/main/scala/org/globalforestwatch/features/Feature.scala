@@ -3,13 +3,19 @@ package org.globalforestwatch.features
 import geotrellis.vector.Geometry
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.globalforestwatch.util.GeotrellisGeometryValidator
+import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 trait Feature extends java.io.Serializable {
   val geomPos: Int
   val featureIdExpr: String
 
-  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId]
+  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
+    val featureId = getFeatureId(i)
+    val geom: Geometry = makeValidGeom(i.getString(geomPos))
+
+    geotrellis.vector.Feature(geom, featureId)
+  }
 
   def getFeatureId(i: Row): FeatureId = {
     getFeatureId(i.toSeq.map(_.asInstanceOf[String]).toArray)
@@ -34,7 +40,9 @@ trait Feature extends java.io.Serializable {
 
     val customFilterDF = df.transform(custom_filter(filters))
 
-    val gladDF = if (glad) customFilterDF.filter($"glad".isin(trueValues: _*)) else customFilterDF
+    val gladDF =
+      if (glad) customFilterDF.filter($"glad".isin(trueValues: _*))
+      else customFilterDF
 
     val tclDF = if (tcl) gladDF.filter($"tcl".isin(trueValues: _*)) else gladDF
 

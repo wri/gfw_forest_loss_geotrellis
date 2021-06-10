@@ -16,13 +16,6 @@ object GadmFeature extends Feature {
     "gid_0 as iso, split(split(gid_1, '\\\\.')[1], '_')[0] as adm1, split(split(gid_2, '\\\\.')[2], '_')[0] as adm2"
 
 
-  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
-    val featureId = getFeatureId(i)
-    val geom: Geometry = makeValidGeom(i.getString(geomPos))
-
-    geotrellis.vector.Feature(geom, featureId)
-  }
-
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     if (parsed) {
       val countryCode = i(0)

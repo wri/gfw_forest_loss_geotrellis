@@ -3,7 +3,6 @@ package org.globalforestwatch.features
 import geotrellis.vector
 import geotrellis.vector.Geometry
 import org.apache.spark.sql.Row
-import org.globalforestwatch.util.GeotrellisGeometryReducer
 import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 
 object FireAlertModisFeature extends Feature {

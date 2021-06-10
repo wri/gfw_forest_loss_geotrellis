@@ -13,11 +13,6 @@ object SimpleFeature extends Feature {
 
   val featureIdExpr = "cast(fid as int) as featureId"
 
-  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
-    val featureId = getFeatureId(i)
-    val geom: Geometry = makeValidGeom(i.getString(geomPos))
-    geotrellis.vector.Feature(geom, featureId)
-  }
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     val feature_id: Int = i(idPos).toInt

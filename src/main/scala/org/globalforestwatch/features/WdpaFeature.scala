@@ -16,15 +16,8 @@ object WdpaFeature extends Feature {
   val geomPos = 7
   val featureCount = 4
 
-  val featureIdExpr =  "cast(wdpaid as int) as wdpaId, name as name, iucn_cat as iucnCat, iso3 as iso, status"
-
-  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
-    val featureId = getFeatureId(i)
-    val geom: Geometry = makeValidGeom(i.getString(geomPos))
-
-    geotrellis.vector
-      .Feature(geom, featureId)
-  }
+  val featureIdExpr =
+    "cast(wdpaid as int) as wdpaId, name as name, iucn_cat as iucnCat, iso3 as iso, status"
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
 
@@ -79,7 +72,7 @@ object WdpaFeature extends Feature {
       wdpaIdEnd.foldLeft(wdpaIdEndtDF)(
         (acc, i) => acc.filter($"iucn_cat" === i)
       )
-    */
+     */
 
     wdpaStatus.foldLeft(isoDF)((acc, i) => acc.filter($"status" === i))
   }
