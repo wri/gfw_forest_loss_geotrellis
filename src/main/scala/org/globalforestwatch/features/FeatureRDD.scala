@@ -92,41 +92,47 @@ object FeatureRDD {
     Convert polygon-polygon intersection join to feature RDD
    */
   def apply(feature1Type: String,
+            feature1Uris: NonEmptyList[String],
+            feature1Delimiter: String,
             feature2Type: String,
-            spatialRDD: SpatialRDD[GeoSparkGeometry],
+            feature2Uris: NonEmptyList[String],
+            feature2Delimiter: String,
             kwargs: Map[String, Any],
+            spark: SparkSession
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
-    def toGeotrellisFeature(poly: Geometry) = {
-      val featureData = poly.getUserData.asInstanceOf[String].split('\t')
+    val spatialDF: DataFrame = PolygonIntersectionDF(
+      feature1Uris,
+      feature1Type,
+      feature2Uris,
+      feature2Type,
+      spark,
+      kwargs,
+      feature2Delimiter = ","
+    )
 
-      // use implicit geometry converter
-      val geom: Geometry = poly
+    spatialDF.rdd.map {
+      row: Row =>
 
-      val feature1Id: FeatureId =
-        FeatureIdFactory(feature1Type)
-          .fromUserData(featureData.head, delimiter = ",")
-      val feature2Id: FeatureId =
-        FeatureIdFactory(feature2Type)
-          .fromUserData(featureData.tail.head, delimiter = ",")
+        val featureId1: FeatureId = FeatureIdFactory(feature1Type).fromUserData(row.getAs[Row](0).toString, ",")
+        val featureId2: FeatureId = FeatureIdFactory(feature2Type).fromUserData(row.getAs[Row](1).toString, ",")
+        val geom = row.getAs[GeoSparkGeometry](2)
 
-      List(vector.Feature(geom, CombinedFeatureId(feature1Id, feature2Id)))
+        (CombinedFeatureId(featureId1, featureId2), geom)
     }
-
-    val scalaRDD =
-      org.apache.spark.api.java.JavaRDD.toRDD(spatialRDD.spatialPartitionedRDD)
-
-    scalaRDD
       .flatMap {
-        case geomCol: GeoSparkGeometryCollection =>
-          val poly = extractPolygons(geomCol)
-          toGeotrellisFeature(poly)
-        case poly: GeoSparkPolygonal =>
-          toGeotrellisFeature(poly)
-        case _ =>
-          // Polygon-polygon intersections can generate points or lines, which we just want to ignore
-          logger.warn("Cannot process geometry type")
-          List()
+        case (id, geom) =>
+          geom match {
+            case geomCol: GeoSparkGeometryCollection =>
+              val poly = extractPolygons(geomCol)
+              List(vector.Feature(poly, id))
+            case poly: GeoSparkPolygonal =>
+              List(vector.Feature(poly, id))
+            case _ =>
+              // Polygon-polygon intersections can generate points or lines, which we just want to ignore
+              logger.warn("Cannot process geometry type")
+              List()
+          }
       }
   }
 

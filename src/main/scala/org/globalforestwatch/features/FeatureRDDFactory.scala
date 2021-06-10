@@ -4,6 +4,8 @@ import cats.data.NonEmptyList
 import geotrellis.vector
 import org.datasyslab.geospark.enums.GridType
 import com.vividsolutions.jts.geom.Geometry
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.{DataFrame, Row}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 //import org.apache.sedona.core.enums.GridType
 //import org.apache.sedona.sql.utils.Adapter
@@ -35,20 +37,16 @@ object FeatureRDDFactory {
             val burnedAreasUris: NonEmptyList[String] =
               getAnyMapValue[NonEmptyList[String]](kwargs, "fireAlertSource")
 
-            val spatialRDD: SpatialRDD[Geometry] = PolygonIntersectionRDD(
-              featureUris,
+            FeatureRDD(
               featureType,
-              burnedAreasUris,
+              featureUris,
+              "\t",
               fireAlertType,
-              spark,
+              burnedAreasUris,
+              ",",
               kwargs,
-              feature2Delimiter = ","
+              spark
             )
-
-            spatialRDD.analyze()
-            spatialRDD.spatialPartitioning(GridType.QUADTREE)
-
-            FeatureRDD(featureType, fireAlertType, spatialRDD, kwargs)
         }
       case _ =>
         FeatureRDD(featureUris, featureType, kwargs, spark)
