@@ -68,9 +68,9 @@ case class FeatureIdFactory(featureType: String) {
           brightT31,
           frp
         )
-      case _ =>
+      case value =>
         throw new IllegalArgumentException(
-          "Feature type must be one of 'gadm', 'wdpa', 'geostore' or 'feature'"
+          s"FeatureType must be one of 'gadm', 'wdpa', 'geostore', 'feature', 'viirs', 'modis', or 'burned_areas'. Got $value."
         )
     }
 
