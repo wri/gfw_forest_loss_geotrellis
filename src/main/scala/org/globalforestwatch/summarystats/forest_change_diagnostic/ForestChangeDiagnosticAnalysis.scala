@@ -4,31 +4,33 @@ import cats.data.NonEmptyList
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util
+import scala.collection.JavaConverters._
+import scala.collection.immutable.SortedMap
 import geotrellis.vector.{Feature, Geometry}
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
-import geotrellis.vector
-import geotrellis.vector.io.wkb.WKB
 import org.apache.log4j.Logger
-import org.apache.spark.sql.DataFrame
-import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.features.{FeatureDF, FeatureIdFactory, FireAlertRDD, GridFeatureId, SimpleFeature, SpatialFeatureDF}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
+import org.datasyslab.geospark.spatialRDD.SpatialRDD
+import org.globalforestwatch.features.{
+  CombinedFeatureId,
+  FeatureDF,
+  FeatureId,
+  FireAlertRDD,
+  GridId,
+  SimpleFeature,
+  SimpleFeatureId
+}
 import org.globalforestwatch.grids.GridId.pointGridId
 import org.globalforestwatch.util.SpatialJoinRDD
-import org.globalforestwatch.util.Util.convertBytesToHex
-
-import java.util
+import org.globalforestwatch.util.ImplicitGeometryConverter._
+import org.globalforestwatch.util.Util.{getAnyMapValue, sortByZIndex}
 
 //import org.apache.sedona.core.enums.{FileDataSplitter, GridType, IndexType}
 //import org.apache.sedona.core.spatialOperator.JoinQuery
 //import org.apache.sedona.core.spatialRDD.PointRDD
 //import org.apache.sedona.sql.utils.{Adapter, SedonaSQLRegistrator}
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
-import org.globalforestwatch.features.{FeatureId, SimpleFeatureId}
-import org.globalforestwatch.util.Util.getAnyMapValue
-
-import scala.collection.JavaConverters._
-import scala.collection.immutable.SortedMap
 
 object ForestChangeDiagnosticAnalysis {
 
@@ -43,20 +45,20 @@ object ForestChangeDiagnosticAnalysis {
       kwargs,
       "intermediateListSource"
     )
-
-    mainRDD.cache()
     val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
       "/forest_change_diagnostic_" + DateTimeFormatter
       .ofPattern("yyyyMMdd_HHmm")
       .format(LocalDateTime.now)
 
+    mainRDD.cache()
+
     val gridFilter: List[String] =
       mainRDD
-        .filter {
-          case f: Feature[Geometry, SimpleFeatureId]
-            if f.data.featureId == -2 =>
-            true
-          case _ => false
+        .filter { feature: Feature[Geometry, FeatureId] =>
+          feature.data match {
+            case simpleId: SimpleFeatureId => simpleId.featureId == -2
+            case _ => false
+          }
         }
         .map(f => pointGridId(f.geom.getCentroid, 1))
         .collect
@@ -66,6 +68,7 @@ object ForestChangeDiagnosticAnalysis {
       toFeatureRdd(mainRDD, gridFilter, intermediateListSource.isDefined)
 
     mainRDD.unpersist()
+    featureRDD.cache()
 
     val summaryRDD: RDD[(FeatureId, ForestChangeDiagnosticSummary)] =
       ForestChangeDiagnosticRDD(
@@ -75,7 +78,9 @@ object ForestChangeDiagnosticAnalysis {
       )
 
     val fireCount: RDD[(FeatureId, ForestChangeDiagnosticDataLossYearly)] =
-      ForestChangeDiagnosticAnalysis.fireStats(featureType, spark, kwargs)
+      ForestChangeDiagnosticAnalysis.fireStats(featureRDD, spark, kwargs)
+
+    featureRDD.unpersist()
 
     val dataRDD: RDD[(FeatureId, ForestChangeDiagnosticData)] =
       reformatSummaryData(summaryRDD)
@@ -124,23 +129,26 @@ object ForestChangeDiagnosticAnalysis {
                           ): RDD[Feature[Geometry, FeatureId]] = {
 
     val featureRDD: RDD[Feature[Geometry, FeatureId]] = mainRDD
-      .filter {
-        case f: Feature[Geometry, SimpleFeatureId] if f.data.featureId >= 0 =>
-          true
-        case f: Feature[Geometry, SimpleFeatureId] if f.data.featureId == -1 =>
-          // If no geometric difference or intermediate result table is present process entire merged list geometry
-          if (gridFilter.isEmpty || !useFilter) true
-          // Otherwise only process chunks which fall into the same grid cells as the geometric difference
-          else gridFilter.contains(pointGridId(f.geom.getCentroid, 1))
-        case _ => false
+      .filter { feature: Feature[Geometry, FeatureId] =>
+        feature.data match {
+          case simpleId: SimpleFeatureId if simpleId.featureId >= 0 => true
+          case simpleId: SimpleFeatureId if simpleId.featureId == -1 =>
+            // If no geometric difference or intermediate result table is present process entire merged list geometry
+            if (gridFilter.isEmpty || !useFilter) true
+            // Otherwise only process chunks which fall into the same grid cells as the geometric difference
+            else gridFilter.contains(pointGridId(feature.geom.getCentroid, 1))
+          case _ => false
+        }
+
       }
-      .map {
-        case f: Feature[Geometry, SimpleFeatureId] if f.data.featureId >= 0 =>
-          f
-        case f =>
-          val grid = pointGridId(f.geom.getCentroid, 1)
-          // For merged list, update data to contain the GridFeatureId
-          vector.Feature(f.geom, GridFeatureId(f.data, grid))
+      .map { feature: Feature[Geometry, FeatureId] =>
+        feature.data match {
+          case simpleId: SimpleFeatureId if simpleId.featureId >= 0 => feature
+          case _ =>
+            val grid = pointGridId(feature.geom.getCentroid, 1)
+            // For merged list, update data to contain the Combine Feature ID including the Grid ID
+            Feature(feature.geom, CombinedFeatureId(feature.data, GridId(grid)))
+        }
       }
 
     featureRDD
@@ -162,25 +170,22 @@ object ForestChangeDiagnosticAnalysis {
 
     // Get merged list RDD
     val listRDD: RDD[(FeatureId, ForestChangeDiagnosticData)] = {
-      dataRDD.filter({
-        case a: (FeatureId, ForestChangeDiagnosticData) =>
-          a._1 match {
-            case _: GridFeatureId => true
-            case _ => false
-          }
-        case _ => false
-      })
+      dataRDD.filter { data: (FeatureId, ForestChangeDiagnosticData) =>
+        data._1 match {
+          case _: CombinedFeatureId => true
+          case _ => false
+        }
+      }
     }
 
     // Get row RDD
-    val rowRDD = dataRDD.filter({
-      case a: (FeatureId, ForestChangeDiagnosticData) =>
-        a._1 match {
-          case _: SimpleFeatureId => true
-          case _ => false
+    val rowRDD = dataRDD.filter {
+      data: (FeatureId, ForestChangeDiagnosticData) =>
+        data._1 match {
+          case _: CombinedFeatureId => false
+          case _ => true
         }
-      case _ => false
-    })
+    }
 
     // combine filtered List with filtered intermediate results
     val combinedListRDD = {
@@ -189,16 +194,14 @@ object ForestChangeDiagnosticAnalysis {
           getIntermediateRDD(intermediateListSource.get, spark, kwargs)
 
         listRDD ++
-          intermediateRDD.filter({
-            case (id, _) =>
-              id match {
-                case gridId: GridFeatureId =>
-                  !gridFilter.contains(gridId.gridId)
+          intermediateRDD.filter {
+            data: (FeatureId, ForestChangeDiagnosticData) =>
+              data._1 match {
+                case combinedId: CombinedFeatureId =>
+                  !gridFilter.contains(combinedId.featureId2.toString)
                 case _ => false
               }
-            case _ => false
-          })
-
+          }
       } else listRDD
     }
 
@@ -220,8 +223,8 @@ object ForestChangeDiagnosticAnalysis {
       .map {
         case (id, data) =>
           id match {
-            case gridFeatureId: GridFeatureId =>
-              (gridFeatureId.featureId, data)
+            case combinedId: CombinedFeatureId =>
+              (combinedId.featureId1, data)
           }
       }
       .reduceByKey(_ merge _)
@@ -233,7 +236,7 @@ object ForestChangeDiagnosticAnalysis {
   }
 
   def fireStats(
-                 featureType: String,
+                 featureRDD: RDD[Feature[Geometry, FeatureId]],
                  spark: SparkSession,
                  kwargs: Map[String, Any]
                ): RDD[(FeatureId, ForestChangeDiagnosticDataLossYearly)] = {
@@ -241,22 +244,25 @@ object ForestChangeDiagnosticAnalysis {
     // FIRE RDD
     val fireAlertSpatialRDD = FireAlertRDD(spark, kwargs)
 
-    // Feature RDD
-    val featureUris: NonEmptyList[String] =
-      getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
-    val featurePolygonDF =
-      SpatialFeatureDF(featureUris, featureType, kwargs, "geom", spark)
-    val featureSpatialRDD = Adapter.toSpatialRdd(featurePolygonDF, "polyshape")
-
-    featureSpatialRDD.analyze()
+    // Convert FeatureRDD to SpatialRDD
+    val polyRDD = featureRDD.map { feature =>
+      // Implicitly convert to GeoSparkGeometry
+      val geom: GeoSparkGeometry = feature.geom
+      geom.setUserData(feature.data)
+      geom
+    }
+    val spatialFeatureRDD = new SpatialRDD[GeoSparkGeometry]
+    spatialFeatureRDD.rawSpatialRDD = polyRDD.toJavaRDD()
+    spatialFeatureRDD.fieldNames = seqAsJavaList(List("FeatureId"))
+    spatialFeatureRDD.analyze()
 
     val joinedRDD =
-      SpatialJoinRDD.spatialjoin(fireAlertSpatialRDD, featureSpatialRDD)
+      SpatialJoinRDD.spatialjoin(fireAlertSpatialRDD, spatialFeatureRDD)
 
     joinedRDD.rdd
       .map {
         case (poly, points) =>
-          toForestChangeDiagnosticFireData(featureType, poly, points)
+          toForestChangeDiagnosticFireData(poly, points)
       }
       .reduceByKey(_ merge _)
       .mapValues { fires =>
@@ -265,18 +271,10 @@ object ForestChangeDiagnosticAnalysis {
   }
 
   private def toForestChangeDiagnosticFireData(
-                                                featureType: String,
                                                 poly: GeoSparkGeometry,
                                                 points: util.HashSet[GeoSparkGeometry]
                                               ): (FeatureId, ForestChangeDiagnosticDataLossYearly) = {
-    ( {
-      val id = {
-        poly.getUserData.asInstanceOf[String].filterNot("[]".toSet).toInt
-
-      }
-      FeatureIdFactory(featureType).featureId(id)
-
-    }, {
+    (poly.getUserData.asInstanceOf[FeatureId], {
       val fireCount =
         points.asScala.toList.foldLeft(SortedMap[Int, Double]()) {
           (z: SortedMap[Int, Double], point) => {
@@ -647,7 +645,7 @@ object ForestChangeDiagnosticAnalysis {
 
     intermediateDF.rdd.map(row => {
       val simpleFeatureId = SimpleFeatureId(row.getString(0).toInt)
-      val gridId = row.getString(1)
+      val gridId = GridId(row.getString(1))
       val treeCoverLossTcd30Yearly =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(2))
       val treeCoverLossPrimaryForestYearly =
@@ -761,7 +759,7 @@ object ForestChangeDiagnosticAnalysis {
         ForestChangeDiagnosticDataDouble(row.getString(52).toDouble)
 
       (
-        GridFeatureId(simpleFeatureId, gridId),
+        CombinedFeatureId(simpleFeatureId, gridId),
         ForestChangeDiagnosticData(
           treeCoverLossTcd30Yearly,
           treeCoverLossTcd90Yearly,

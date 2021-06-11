@@ -4,7 +4,12 @@ import geotrellis.vector.{Feature, Geometry}
 import io.circe.syntax._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{FeatureId, GridFeatureId, SimpleFeatureId}
+import org.globalforestwatch.features.{
+  CombinedFeatureId,
+  FeatureId,
+  GridId,
+  SimpleFeatureId
+}
 import org.globalforestwatch.util.CaseClassConstrutor.createCaseClassFromMap
 
 case class ForestChangeDiagnosticDFFactory(
@@ -26,8 +31,6 @@ case class ForestChangeDiagnosticDFFactory(
   }
 
   private def getFeatureDataFrame: DataFrame = {
-
-    import geotrellis.vector.Geometry
 
     dataRDD
       .map {
@@ -52,25 +55,20 @@ case class ForestChangeDiagnosticDFFactory(
       .map {
         case (id, data) =>
           id match {
-            case gridId: GridFeatureId =>
-              val grid = gridId.gridId
-              gridId.featureId match {
-                case simpleId: SimpleFeatureId =>
-                  createCaseClassFromMap[ForestChangeDiagnosticRowGrid](
-                    Map(
-                      "id" -> simpleId.featureId.asJson.noSpaces,
-                      "grid" -> grid.asJson.noSpaces
-                    ) ++
-                      featureFieldMap(data)
-                      ++
-                      gridFieldMap(data)
-                  )
-                case _ =>
-                  throw new IllegalArgumentException("Not a SimpleFeatureId")
-              }
+            case CombinedFeatureId(simpleId: SimpleFeatureId, gridId: GridId) =>
+              createCaseClassFromMap[ForestChangeDiagnosticRowGrid](
+                Map(
+                  "id" -> simpleId.featureId.asJson.noSpaces,
+                  "grid" -> gridId.gridId.asJson.noSpaces
+                ) ++
+                  featureFieldMap(data)
+                  ++
+                  gridFieldMap(data)
+              )
             case _ =>
-              throw new IllegalArgumentException("Not a SimpleFeatureId")
+              throw new IllegalArgumentException("Not a CombinedFeatureId")
           }
+
       }
       .toDF("id" :: "grid" :: featureFieldNames ++ gridFieldNames: _*)
   }
