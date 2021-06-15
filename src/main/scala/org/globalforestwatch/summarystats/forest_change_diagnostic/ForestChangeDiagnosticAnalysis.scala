@@ -257,7 +257,7 @@ object ForestChangeDiagnosticAnalysis {
     spatialFeatureRDD.analyze()
 
     val joinedRDD =
-      SpatialJoinRDD.spatialjoin(fireAlertSpatialRDD, spatialFeatureRDD)
+      SpatialJoinRDD.spatialjoin(spatialFeatureRDD, fireAlertSpatialRDD, usingIndex = true)
 
     joinedRDD.rdd
       .map {

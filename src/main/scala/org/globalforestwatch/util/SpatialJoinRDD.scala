@@ -10,25 +10,26 @@ import java.util
 object SpatialJoinRDD {
 
   def spatialjoin[A <: Geometry, B <: Geometry](
-                                                 largerSpatialRDD: SpatialRDD[A],
-                                                 smallerSpatialRDD: SpatialRDD[B],
+                                                 querySpatialRDD: SpatialRDD[A],
+                                                 valueSpatialRDD: SpatialRDD[B],
+
                                                  buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
                                                  considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
                                                  usingIndex: Boolean = false
-                                               ): JavaPairRDD[B, util.HashSet[A]] = {
+                                               ): JavaPairRDD[A, util.HashSet[B]] = {
 
 
-    largerSpatialRDD.spatialPartitioning(GridType.QUADTREE)
+    querySpatialRDD.spatialPartitioning(GridType.QUADTREE)
 
-    smallerSpatialRDD.spatialPartitioning(largerSpatialRDD.getPartitioner)
-    smallerSpatialRDD.buildIndex(
+    valueSpatialRDD.spatialPartitioning(querySpatialRDD.getPartitioner)
+    valueSpatialRDD.buildIndex(
       IndexType.QUADTREE,
       buildOnSpatialPartitionedRDD
     )
 
     JoinQuery.SpatialJoinQuery(
-      largerSpatialRDD,
-      smallerSpatialRDD,
+      valueSpatialRDD,
+      querySpatialRDD,
       usingIndex,
       considerBoundaryIntersection
     )

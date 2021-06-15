@@ -22,23 +22,27 @@ object IntersectGeometry {
 
     val intersection: Geometry = thisGeom intersection thatGeom
     intersection match {
-      case collection: GeometryCollection =>
-        val multi = extractPolygons(collection)
+      case poly: Polygon =>
+        val multi = createMultiPolygon(Array(poly))
         multi.setUserData(userData)
         List(multi)
       case multi: MultiPolygon =>
         multi.setUserData(userData)
         List(multi)
-      case poly: Polygon =>
-        val multi = createMultiPolygon(Array(poly))
-        multi.setUserData(userData)
-        List(multi)
+      case collection: GeometryCollection =>
+        val maybe_multi = extractPolygons(collection)
+        maybe_multi match {
+          case Some(multi) =>
+            multi.setUserData(userData)
+            List(multi)
+          case _ => List()
+        }
       case _ => List()
     }
 
   }
 
-  def extractPolygons(multiGeometry: Geometry): MultiPolygon = {
+  def extractPolygons(multiGeometry: Geometry): Option[MultiPolygon] = {
     def loop(multiGeometry: Geometry): List[Polygon] = {
 
       val geomRange: List[Int] =
@@ -51,13 +55,16 @@ object IntersectGeometry {
         multiGeometry.getGeometryN(i) match {
           case geom: Polygon => List(geom)
           case multiGeom: MultiPolygon => loop(multiGeom)
+          case _ => List()
         }
       }
       nested_polygons.flatten
     }
 
     val polygons: List[Polygon] = loop(multiGeometry)
-    createMultiPolygon(polygons.toArray)
+
+    if (polygons.isEmpty) None
+    else Some(createMultiPolygon(polygons.toArray))
 
   }
 

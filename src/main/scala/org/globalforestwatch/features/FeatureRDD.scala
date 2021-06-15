@@ -135,8 +135,12 @@ object FeatureRDD {
         case (_, (id, geom)) =>
           geom match {
             case geomCol: GeoSparkGeometryCollection =>
-              val poly = extractPolygons(geomCol)
-              List(vector.Feature(poly, id))
+
+              val maybe_poly = extractPolygons(geomCol)
+              maybe_poly match {
+                case Some(poly) => List(vector.Feature(poly, id))
+                case _ => List()
+              }
             case poly: GeoSparkPolygonal =>
               List(vector.Feature(poly, id))
             case _ =>
@@ -163,7 +167,7 @@ object FeatureRDD {
 
     val envelope: GeoSparkEnvelope = spatialFeatureRDD.boundaryEnvelope
 
-    val spatialGridRDD = GridRDD(envelope, spark)
+    val spatialGridRDD = GridRDD(envelope, spark, clip = true)
     val flatJoin: JavaPairRDD[GeoSparkPolygon, GeoSparkGeometry] =
       SpatialJoinRDD.flatSpatialJoin(
         spatialFeatureRDD,

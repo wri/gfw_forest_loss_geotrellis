@@ -50,7 +50,7 @@ object TreeCoverLossCommand extends SummaryCommand {
         "glad" -> defaultFilter._3
       )
 
-      runAnalysis("gladalerts", default._1, default._2, kwargs)
+      runAnalysis("treecoverloss", default._1, default._2, kwargs)
 
     }
   }

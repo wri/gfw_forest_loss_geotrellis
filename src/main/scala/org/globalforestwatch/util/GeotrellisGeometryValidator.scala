@@ -1,6 +1,14 @@
 package org.globalforestwatch.util
 
-import geotrellis.vector.Geometry
+import geotrellis.vector.{
+  Geometry,
+  LineString,
+  MultiPoint,
+  Point,
+  Polygon,
+  MultiLineString,
+  MultiPolygon
+}
 import geotrellis.vector.io.wkb.WKB
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
 
@@ -33,8 +41,20 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
     // There are some code samples here for JTS
     // https://stackoverflow.com/a/31474580/1410317
     val validGeom = {
-      if (!geom.isValid) geom.buffer(0.0001).buffer(-0.0001)
-      else geom
+      if (!geom.isValid) {
+        val bufferedGeom = geom.buffer(0.0001).buffer(-0.0001)
+
+        // the buffer can alter the geometry type and convert multi geometries to single geometries.
+        // we want to preserve the original geometry type if possible.
+        if (geom.getGeometryType == bufferedGeom.getGeometryType) bufferedGeom
+        else if (geom.getGeometryType != bufferedGeom.getGeometryType && geom.getGeometryType
+          .contains(bufferedGeom.getGeometryType))
+          makeMultiGeom(bufferedGeom)
+        else
+          throw new RuntimeException(
+            s"Faied to create a valid geometry: ${geom}"
+          )
+      } else geom
     }
 
     val normalizedGeom = reduce(gpr)(validGeom)
@@ -46,5 +66,17 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
   def makeValidGeom(wkb: String): Geometry = {
     val geom: Geometry = WKB.read(wkb)
     makeValidGeom(geom)
+  }
+
+  def makeMultiGeom(geom: Geometry): Geometry = {
+    geom match {
+      case point: Point => MultiPoint(point)
+      case line: LineString => MultiLineString(line)
+      case polygon: Polygon => MultiPolygon(polygon)
+      case _ =>
+        throw new IllegalArgumentException(
+          "Can only convert Point, LineString and Polygon to Multipart Geometries."
+        )
+    }
   }
 }

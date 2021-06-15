@@ -85,7 +85,7 @@ object GfwProDashboardAnalysis {
 
     featureSpatialRDD.analyze()
 
-    val joinedRDD = SpatialJoinRDD.spatialjoin(fireAlertSpatialRDD, featureSpatialRDD)
+    val joinedRDD = SpatialJoinRDD.spatialjoin(featureSpatialRDD, fireAlertSpatialRDD)
 
     joinedRDD.rdd
       .map {
