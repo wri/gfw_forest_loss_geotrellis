@@ -8,6 +8,7 @@ import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticAnalysis
 
 import java.util
+import scala.reflect.ClassTag
 
 object SpatialJoinRDD {
 
@@ -37,13 +38,13 @@ object SpatialJoinRDD {
     )
   }
 
-  def flatSpatialJoin[A <: Geometry, B <: Geometry](
-                                                     largerSpatialRDD: SpatialRDD[A],
-                                                     smallerSpatialRDD: SpatialRDD[B],
-                                                     buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
-                                                     considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
-                                                     usingIndex: Boolean = false
-                                                   ): JavaPairRDD[B, A] = {
+  def flatSpatialJoin[A <: Geometry : ClassTag, B <: Geometry : ClassTag](
+                                                                           largerSpatialRDD: SpatialRDD[A],
+                                                                           smallerSpatialRDD: SpatialRDD[B],
+                                                                           buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
+                                                                           considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
+                                                                           usingIndex: Boolean = false
+                                                                         ): JavaPairRDD[B, A] = {
 
     try {
       largerSpatialRDD.spatialPartitioning(GridType.QUADTREE)
