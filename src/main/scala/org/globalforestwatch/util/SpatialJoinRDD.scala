@@ -53,20 +53,27 @@ object SpatialJoinRDD {
           IndexType.QUADTREE,
           buildOnSpatialPartitionedRDD
         )
+
+      JoinQuery.SpatialJoinQueryFlat(
+        largerSpatialRDD,
+        smallerSpatialRDD,
+        usingIndex,
+        considerBoundaryIntersection
+      )
     } catch {
       case _: java.lang.IllegalArgumentException =>
         ForestChangeDiagnosticAnalysis.logger.warn(
           "Skip spatial partitioning. Dataset too small."
         )
+        // Use brute force to create paired rdd
+        JavaPairRDD.fromRDD(
+          smallerSpatialRDD.rawSpatialRDD.rdd
+            .cartesian(largerSpatialRDD.rawSpatialRDD.rdd)
+            .filter((pair: (Geometry, Geometry)) => pair._1.intersects(pair._2))
+        )
 
     }
 
-    JoinQuery.SpatialJoinQueryFlat(
-      largerSpatialRDD,
-      smallerSpatialRDD,
-      usingIndex,
-      considerBoundaryIntersection
-    )
   }
 
 }
