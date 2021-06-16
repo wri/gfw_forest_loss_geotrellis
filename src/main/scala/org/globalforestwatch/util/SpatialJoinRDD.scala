@@ -8,72 +8,163 @@ import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticAnalysis
 
 import java.util
+import scala.collection.immutable.HashSet
 import scala.reflect.ClassTag
+import scala.collection.JavaConverters._
 
 object SpatialJoinRDD {
 
-  def spatialjoin[A <: Geometry, B <: Geometry](
-                                                 querySpatialRDD: SpatialRDD[A],
-                                                 valueSpatialRDD: SpatialRDD[B],
-                                                 buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
-                                                 considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
-                                                 usingIndex: Boolean = false
-                                               ): JavaPairRDD[A, util.HashSet[B]] = {
+  def spatialjoin[A <: Geometry : ClassTag, B <: Geometry : ClassTag](
+                                                                       queryWindowRDD: SpatialRDD[A],
+                                                                       valueRDD: SpatialRDD[B],
+                                                                       buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
+                                                                       considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
+                                                                       usingIndex: Boolean = false
+                                                                     ): JavaPairRDD[A, util.HashSet[B]] = {
 
-    querySpatialRDD.spatialPartitioning(GridType.QUADTREE)
+    try {
+      queryWindowRDD.spatialPartitioning(GridType.QUADTREE)
 
-    valueSpatialRDD.spatialPartitioning(querySpatialRDD.getPartitioner)
+      valueRDD.spatialPartitioning(queryWindowRDD.getPartitioner)
 
-    if (usingIndex)
-      querySpatialRDD.buildIndex(
-        IndexType.QUADTREE,
-        buildOnSpatialPartitionedRDD
+      if (usingIndex)
+        queryWindowRDD.buildIndex(
+          IndexType.QUADTREE,
+          buildOnSpatialPartitionedRDD
+        )
+
+      JoinQuery.SpatialJoinQuery(
+        valueRDD,
+        queryWindowRDD,
+        usingIndex,
+        considerBoundaryIntersection
       )
+    } catch {
+      case _: java.lang.IllegalArgumentException =>
+        try {
+          valueRDD.spatialPartitioning(GridType.QUADTREE)
 
-    JoinQuery.SpatialJoinQuery(
-      valueSpatialRDD,
-      querySpatialRDD,
-      usingIndex,
-      considerBoundaryIntersection
-    )
+          queryWindowRDD.spatialPartitioning(valueRDD.getPartitioner)
+
+          if (usingIndex)
+            valueRDD.buildIndex(
+              IndexType.QUADTREE,
+              buildOnSpatialPartitionedRDD
+            )
+
+          JoinQuery.SpatialJoinQuery(
+            valueRDD,
+            queryWindowRDD,
+            usingIndex,
+            considerBoundaryIntersection
+          )
+        } catch {
+          case _: java.lang.IllegalArgumentException =>
+            ForestChangeDiagnosticAnalysis.logger.warn(
+              "Skip spatial partitioning. Dataset too small."
+            )
+            // Use brute force
+            bruteForceJoin(queryWindowRDD, valueRDD)
+
+        }
+    }
   }
 
   def flatSpatialJoin[A <: Geometry : ClassTag, B <: Geometry : ClassTag](
-                                                                           largerSpatialRDD: SpatialRDD[A],
-                                                                           smallerSpatialRDD: SpatialRDD[B],
+                                                                           queryWindowRDD: SpatialRDD[A],
+                                                                           valueRDD: SpatialRDD[B],
                                                                            buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
                                                                            considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
                                                                            usingIndex: Boolean = false
                                                                          ): JavaPairRDD[B, A] = {
 
+    val queryWindowCount = queryWindowRDD.approximateTotalCount
+    val queryWindowPartitions = queryWindowRDD.rawSpatialRDD.getNumPartitions
+    val valueCount = valueRDD.approximateTotalCount
+    val valuePartitions = valueRDD.rawSpatialRDD.getNumPartitions
+
     try {
-      largerSpatialRDD.spatialPartitioning(GridType.QUADTREE)
-      smallerSpatialRDD.spatialPartitioning(largerSpatialRDD.getPartitioner)
+      queryWindowRDD.spatialPartitioning(
+        GridType.QUADTREE,
+        Seq(queryWindowPartitions, (queryWindowCount / 2).toInt).min
+      )
+      valueRDD.spatialPartitioning(queryWindowRDD.getPartitioner)
       if (usingIndex)
-        largerSpatialRDD.buildIndex(
+        queryWindowRDD.buildIndex(
           IndexType.QUADTREE,
           buildOnSpatialPartitionedRDD
         )
 
       JoinQuery.SpatialJoinQueryFlat(
-        largerSpatialRDD,
-        smallerSpatialRDD,
+        queryWindowRDD,
+        valueRDD,
         usingIndex,
         considerBoundaryIntersection
       )
     } catch {
       case _: java.lang.IllegalArgumentException =>
         ForestChangeDiagnosticAnalysis.logger.warn(
-          "Skip spatial partitioning. Dataset too small."
+          "Try to partition using valueRDD."
         )
-        // Use brute force to create paired rdd
-        JavaPairRDD.fromRDD(
-          smallerSpatialRDD.rawSpatialRDD.rdd
-            .cartesian(largerSpatialRDD.rawSpatialRDD.rdd)
-            .filter((pair: (Geometry, Geometry)) => pair._1.intersects(pair._2))
-        )
+        try {
+          valueRDD.spatialPartitioning(
+            GridType.QUADTREE,
+            Seq(valuePartitions, (valueCount / 2).toInt).min
+          )
+          queryWindowRDD.spatialPartitioning(valueRDD.getPartitioner)
+          if (usingIndex)
+            valueRDD.buildIndex(
+              IndexType.QUADTREE,
+              buildOnSpatialPartitionedRDD
+            )
+
+          JoinQuery.SpatialJoinQueryFlat(
+            queryWindowRDD,
+            valueRDD,
+            usingIndex,
+            considerBoundaryIntersection
+          )
+        } catch {
+          case _: java.lang.IllegalArgumentException =>
+            ForestChangeDiagnosticAnalysis.logger.warn(
+              "Skip spatial partitioning. Dataset too small."
+            )
+            // need to flip rdd order in order to match response pattern
+            bruteForceFlatJoin(valueRDD, queryWindowRDD)
+
+        }
 
     }
+  }
+
+  private def bruteForceJoin[A <: Geometry : ClassTag, B <: Geometry : ClassTag](
+                                                                                  leftRDD: SpatialRDD[A],
+                                                                                  rightRDD: SpatialRDD[B]
+                                                                                ): JavaPairRDD[A, util.HashSet[B]] = {
+    JavaPairRDD.fromRDD(
+      leftRDD.rawSpatialRDD.rdd
+        .cartesian(rightRDD.rawSpatialRDD.rdd)
+        .filter((pair: (Geometry, Geometry)) => pair._1.intersects(pair._2))
+        .aggregateByKey(new util.HashSet[B]())({ (h: util.HashSet[B], v: B) =>
+          h.add(v)
+          h
+        }, { (left: util.HashSet[B], right: util.HashSet[B]) =>
+          left.addAll(right)
+          left
+        })
+    )
+  }
+
+  private def bruteForceFlatJoin[A <: Geometry : ClassTag,
+    B <: Geometry : ClassTag](
+                               leftRDD: SpatialRDD[A],
+                               rightRDD: SpatialRDD[B]
+                             ): JavaPairRDD[A, B] = {
+    JavaPairRDD.fromRDD(
+      leftRDD.rawSpatialRDD.rdd
+        .cartesian(rightRDD.rawSpatialRDD.rdd)
+        .filter((pair: (Geometry, Geometry)) => pair._1.intersects(pair._2))
+    )
 
   }
 

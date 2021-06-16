@@ -17,7 +17,7 @@ import java.util
 //import org.apache.sedona.sql.utils.{Adapter, SedonaSQLRegistrator}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.globalforestwatch.features.{FeatureFactory, FeatureId}
+import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 import scala.collection.JavaConverters._
