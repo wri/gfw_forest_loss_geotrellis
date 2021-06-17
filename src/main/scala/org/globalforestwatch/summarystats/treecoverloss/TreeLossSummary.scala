@@ -118,9 +118,16 @@ object TreeLossSummary {
             summary.totalArea += areaHa
             summary.totalGainArea += gainArea
 
+            if (tcd2010 >= thresholds.head) {
+              summary.treecoverExtent2010 += areaHa
+            }
+
+            if (tcd2000 >= thresholds.head) {
+              summary.treecoverExtent2000 += areaHa
+            }
+
             if (((thresholds.head == 0 || tcd2000 > thresholds.head) && tcdYear == 2000) || ((thresholds.head == 0 || tcd2010 > thresholds.head) && tcdYear == 2010))
             {
-
               if (loss != null) {
                 summary.lossYear(loss).treecoverLoss += areaHa
                 summary.lossYear(loss).biomassLoss += biomassPixel
@@ -131,10 +138,6 @@ object TreeLossSummary {
 
               // TODO: use extent2010 to calculate avg biomass incase year is selected
               summary.avgBiomass = ((summary.avgBiomass * summary.treecoverExtent2000) + (biomass * areaHa)) / (summary.treecoverExtent2000 + areaHa)
-              tcdYear match {
-                case 2000 => summary.treecoverExtent2000 += areaHa
-                case 2010 => summary.treecoverExtent2010 += areaHa
-              }
               summary.totalBiomass += biomassPixel
 
               summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
