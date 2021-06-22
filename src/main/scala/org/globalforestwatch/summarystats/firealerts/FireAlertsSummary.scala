@@ -73,7 +73,7 @@ object FireAlertsSummary {
             else {
               val pKey =
                 FireAlertsDataGroup(
-                  tcd2000,
+                  thresholds.head,
                   primaryForest,
                   protectedAreas,
                   aze,

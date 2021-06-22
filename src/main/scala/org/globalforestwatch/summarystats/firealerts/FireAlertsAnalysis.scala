@@ -21,12 +21,12 @@ object FireAlertsAnalysis {
 
     val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
     val layoutDefinition = fireAlertType match {
-      case "viirs" => ViirsGrid.blockTileGrid
-      case "modis" | "burned_areas" => ModisGrid.blockTileGrid
+      case "viirs" | "burned_areas" => ViirsGrid.blockTileGrid
+      case "modis" => ModisGrid.blockTileGrid
     }
 
     val partition = fireAlertType match {
-      case "modis" | "viirs" => false
+      case "modis" | "viirs" | "burned_areas" => false
       case _ => true
     }
 
