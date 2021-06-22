@@ -8,9 +8,7 @@ import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticAnalysis
 
 import java.util
-import scala.collection.immutable.HashSet
 import scala.reflect.ClassTag
-import scala.collection.JavaConverters._
 
 object SpatialJoinRDD {
 

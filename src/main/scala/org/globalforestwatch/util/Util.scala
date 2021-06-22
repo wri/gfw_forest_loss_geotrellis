@@ -15,14 +15,16 @@ import org.globalforestwatch.features.FeatureId
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
+import java.util.NoSuchElementException
+
 
 object Util {
   def uploadFile(file: File, uri: AmazonS3URI): Unit = {
     val body = RequestBody.fromFile(file)
     val putObjectRequest = PutObjectRequest.builder()
-        .bucket(uri.getBucket)
-        .key(uri.getKey)
-        .build()
+      .bucket(uri.getBucket)
+      .key(uri.getKey)
+      .build()
     S3ClientProducer.get().putObject(putObjectRequest, body)
   }
 
@@ -55,11 +57,13 @@ object Util {
       .partitionBy(partitioner)
   }
 
-  def getAnyMapValue[T: Manifest](map: Map[String, Any], key: String): T =
+  def getAnyMapValue[T: Manifest](map: Map[String, Any], key: String): T = {
     map(key) match {
       case v: T => v
       case _ => throw new IllegalArgumentException("Wrong type")
     }
+
+  }
 
   def convertBytesToHex(bytes: Seq[Byte]): String = {
     val sb = new StringBuilder

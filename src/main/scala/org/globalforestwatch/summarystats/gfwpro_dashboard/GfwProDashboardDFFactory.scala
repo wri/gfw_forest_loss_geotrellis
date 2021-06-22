@@ -3,7 +3,7 @@ package org.globalforestwatch.summarystats.gfwpro_dashboard
 import io.circe.syntax._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{FeatureId, SimpleFeatureId}
+import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GadmFeatureId, GfwProFeatureId}
 
 
 case class GfwProDashboardDFFactory(
@@ -17,9 +17,9 @@ case class GfwProDashboardDFFactory(
 
   def getDataFrame: DataFrame = {
     featureType match {
-      case "feature" => getFeatureDataFrame
+      case "gfwpro" => getFeatureDataFrame
       case _ =>
-        throw new IllegalArgumentException("Not a valid FeatureId")
+        throw new IllegalArgumentException("Not a valid GfwProFeatureId")
     }
   }
 
@@ -28,9 +28,21 @@ case class GfwProDashboardDFFactory(
       .map {
         case (id, data) =>
           id match {
-            case simpleId: SimpleFeatureId =>
+            case combinedId: CombinedFeatureId =>
+
+              val gfwproFeatureId = combinedId.featureId1 match {
+                case f: GfwProFeatureId => f
+                case _ => throw new RuntimeException("Not a GfwProFeatureId")
+              }
+              val gadmId = combinedId.featureId2 match {
+                case f: GadmFeatureId => f
+                case _ => throw new RuntimeException("Not a GadmFeatureId")
+              }
+
               GfwProDashboardRowSimple(
-                simpleId.featureId.asJson.noSpaces,
+                gfwproFeatureId.listId.asJson.noSpaces,
+                gfwproFeatureId.locationId.asJson.noSpaces,
+                gadmId.toString,
                 data.gladAlertsCoverage.toString,
                 data.gladAlertsDaily.toJson,
                 data.gladAlertsWeekly.toJson,
@@ -38,11 +50,13 @@ case class GfwProDashboardDFFactory(
                 data.viirsAlertsDaily.toJson
               )
             case _ =>
-              throw new IllegalArgumentException("Not a SimpleFeatureId")
+              throw new IllegalArgumentException("Not a CombinedFeatureId[GfwProFeatureId, GadmFeatureId]")
           }
       }
       .toDF(
+        "list_id",
         "location_id",
+        "gadm_id",
         "glad_alerts_coverage", // gladAlertsCoverage
         "glad_alerts_daily", // gladAlertsDaily
         "glad_alerts_weekly", // gladAlertsWeekly

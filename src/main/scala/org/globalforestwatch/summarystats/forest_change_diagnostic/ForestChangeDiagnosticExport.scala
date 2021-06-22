@@ -22,7 +22,7 @@ object ForestChangeDiagnosticExport extends SummaryExport {
 
     featureType match {
 
-      case "gfwpro" => exportFeature(summaryDF, outputUrl, kwargs)
+      case "gfwpro" => exportGfwPro(summaryDF, outputUrl, kwargs)
       case "intermediate" => exportIntermediateList(summaryDF, outputUrl)
       case _ =>
         throw new IllegalArgumentException(
@@ -31,9 +31,9 @@ object ForestChangeDiagnosticExport extends SummaryExport {
     }
   }
 
-  override protected def exportFeature(summaryDF: DataFrame,
-                                       outputUrl: String,
-                                       kwargs: Map[String, Any]): Unit = {
+  override protected def exportGfwPro(summaryDF: DataFrame,
+                                      outputUrl: String,
+                                      kwargs: Map[String, Any]): Unit = {
 
     summaryDF
       .coalesce(1)
