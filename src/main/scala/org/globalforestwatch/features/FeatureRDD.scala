@@ -109,7 +109,8 @@ object FeatureRDD {
       feature2Type,
       spark,
       kwargs,
-      feature2Delimiter = ","
+      feature1Delimiter,
+      feature2Delimiter,
     )
 
     val pairedRDD = spatialDF.rdd.map { row: Row =>
@@ -122,20 +123,10 @@ object FeatureRDD {
       (CombinedFeatureId(featureId1, featureId2), geom)
     }
 
-    val hashPartitioner = new HashPartitioner(pairedRDD.getNumPartitions)
-    pairedRDD
-      .keyBy({ pair: (CombinedFeatureId, GeoSparkGeometry) =>
-        Z2(
-          (pair._2.getCentroid.getX * 100).toInt,
-          (pair._2.getCentroid.getY * 100).toInt
-        ).z
-      })
-      .partitionBy(hashPartitioner)
-      .flatMap {
-        case (_, (id, geom)) =>
+    pairedRDD.flatMap {
+        case (id, geom) =>
           geom match {
             case geomCol: GeoSparkGeometryCollection =>
-
               val maybe_poly = extractPolygons(geomCol)
               maybe_poly match {
                 case Some(poly) => List(vector.Feature(poly, id))

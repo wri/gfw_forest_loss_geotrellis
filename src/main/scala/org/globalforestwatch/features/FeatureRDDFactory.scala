@@ -39,12 +39,12 @@ object FeatureRDDFactory {
               getAnyMapValue[NonEmptyList[String]](kwargs, "fireAlertSource")
 
             FeatureRDD(
-              featureType,
-              featureUris,
-              "\t",
               fireAlertType,
               burnedAreasUris,
               ",",
+              featureType,
+              featureUris,
+              "\t",
               kwargs,
               spark
             )

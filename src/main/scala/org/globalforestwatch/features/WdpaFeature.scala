@@ -59,7 +59,7 @@ object WdpaFeature extends Feature {
     val isoEndDF: DataFrame =
       isoEnd.foldLeft(isoStartDF)((acc, i) => acc.filter($"iso" < i))
     val isoDF: DataFrame =
-      iso.foldLeft(isoEndDF)((acc, i) => acc.filter($"iso" === i))
+      iso.foldLeft(isoEndDF)((acc, i) => acc.filter($"iso3" === i))
 
     val wdpaIdStartDF =
       wdpaIdStart.foldLeft(isoDF)((acc, i) => acc.filter($"wdpaid" >= i))
