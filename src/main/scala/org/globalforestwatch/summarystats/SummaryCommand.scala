@@ -19,7 +19,7 @@ trait SummaryCommand {
   val featureTypeOpt: Opts[String] = Opts
     .option[String](
       "feature_type",
-      help = "Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature'"
+      help = "Feature type: one of 'gadm', 'wdpa', 'geostore', 'gfwpro' or 'feature'"
     )
     .withDefault("feature")
 

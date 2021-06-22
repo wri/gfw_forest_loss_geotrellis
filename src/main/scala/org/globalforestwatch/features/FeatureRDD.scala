@@ -194,7 +194,7 @@ object FeatureRDD {
         geotrellis.vector.Feature(
           geotrellisGeom,
           FeatureIdFactory(featureType)
-            .fromUserData(intersection.getUserData.asInstanceOf[String])
+            .fromUserData(intersection.getUserData.asInstanceOf[String], delimiter = ",")
         )
       }
   }

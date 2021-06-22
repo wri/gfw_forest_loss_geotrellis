@@ -22,11 +22,11 @@ object ForestChangeDiagnosticExport extends SummaryExport {
 
     featureType match {
 
-      case "feature" => exportFeature(summaryDF, outputUrl, kwargs)
+      case "gfwpro" => exportFeature(summaryDF, outputUrl, kwargs)
       case "intermediate" => exportIntermediateList(summaryDF, outputUrl)
       case _ =>
         throw new IllegalArgumentException(
-          "Feature type must be one of 'feature', 'intermediate'"
+          "Feature type must be one of 'gfwpro', 'intermediate'"
         )
     }
   }
