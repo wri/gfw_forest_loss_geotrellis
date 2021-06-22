@@ -2,14 +2,16 @@ package org.globalforestwatch.summarystats.gladalerts
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
+import org.globalforestwatch.summarystats.SummaryAnalysis
 import org.globalforestwatch.util.Util._
 
-object GladAlertsAnalysis {
+object GladAlertsAnalysis extends SummaryAnalysis {
+  val name = "gladalerts"
+
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
@@ -29,10 +31,7 @@ object GladAlertsAnalysis {
 
     summaryDF.repartition($"id", $"data_group")
 
-    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      "/gladalerts_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
+    val runOutputUrl: String = getOutputUrl(kwargs)
 
     GladAlertsExport.export(
       featureType,

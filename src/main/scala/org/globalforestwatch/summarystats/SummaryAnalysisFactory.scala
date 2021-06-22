@@ -21,56 +21,56 @@ case class SummaryAnalysisFactory(analysis: String,
 
   val runAnalysis: Unit =
       analysis match {
-        case "annualupdate_minimal" =>
+        case AnnualUpdateMinimalAnalysis.name =>
           AnnualUpdateMinimalAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
-        case "carbonflux" =>
+        case CarbonFluxAnalysis.name =>
           CarbonFluxAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
-        case "carbon_sensitivity" =>
+        case CarbonSensitivityAnalysis.name =>
           CarbonSensitivityAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
-        case "gladalerts" =>
+        case GladAlertsAnalysis.name =>
           GladAlertsAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
-        case "treecoverloss" =>
+        case TreeLossAnalysis.name =>
           TreeLossAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
-        case "firealerts" =>
+        case FireAlertsAnalysis.name =>
           FireAlertsAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
-        case "forest_change_diagnostic" =>
+        case ForestChangeDiagnosticAnalysis.name =>
           ForestChangeDiagnosticAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
             kwargs: Map[String, Any]
           )
-        case "gfwpro_dashboard" =>
+        case GfwProDashboardAnalysis.name =>
           GfwProDashboardAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,

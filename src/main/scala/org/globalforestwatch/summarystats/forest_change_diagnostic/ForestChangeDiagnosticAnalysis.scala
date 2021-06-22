@@ -15,6 +15,7 @@ import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.globalforestwatch.features.{CombinedFeatureId, FeatureDF, FeatureId, FireAlertRDD, GfwProFeature, GfwProFeatureId, GridId}
 import org.globalforestwatch.grids.GridId.pointGridId
+import org.globalforestwatch.summarystats.SummaryAnalysis
 import org.globalforestwatch.util.SpatialJoinRDD
 import org.globalforestwatch.util.ImplicitGeometryConverter._
 import org.globalforestwatch.util.Util.{getAnyMapValue, sortByZIndex}
@@ -24,9 +25,9 @@ import org.globalforestwatch.util.Util.{getAnyMapValue, sortByZIndex}
 //import org.apache.sedona.core.spatialRDD.PointRDD
 //import org.apache.sedona.sql.utils.{Adapter, SedonaSQLRegistrator}
 
-object ForestChangeDiagnosticAnalysis {
+object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
-  val logger: Logger = Logger.getLogger("ForestChangeDiagnosticAnalysis")
+  val name = "forest_change_diagnostic"
 
   def apply(mainRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
@@ -37,10 +38,7 @@ object ForestChangeDiagnosticAnalysis {
       kwargs,
       "intermediateListSource"
     )
-    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      "/forest_change_diagnostic_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
+    val runOutputUrl: String = getOutputUrl(kwargs)
 
     mainRDD.cache()
 

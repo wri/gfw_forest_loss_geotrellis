@@ -7,6 +7,7 @@ import com.vividsolutions.jts.geom.Geometry
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, Row}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
+import org.globalforestwatch.summarystats.firealerts.FireAlertsAnalysis
 //import org.apache.sedona.core.enums.GridType
 //import org.apache.sedona.sql.utils.Adapter
 //import org.locationtech.jts.geom.Point
@@ -24,7 +25,7 @@ object FeatureRDDFactory {
            ): RDD[vector.Feature[vector.Geometry, FeatureId]] = {
 
     analysis match {
-      case "firealerts" =>
+      case FireAlertsAnalysis.name =>
         val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
 
         fireAlertType match {

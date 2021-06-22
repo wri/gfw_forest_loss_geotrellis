@@ -9,9 +9,13 @@ import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, Spa
 import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
+import org.globalforestwatch.summarystats.SummaryAnalysis
 
 
-object FireAlertsAnalysis {
+object FireAlertsAnalysis extends SummaryAnalysis {
+
+  val name = "firealerts"
+
   def apply(featureRDD: RDD[Feature[vector.Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
@@ -42,10 +46,8 @@ object FireAlertsAnalysis {
 
     summaryDF.repartition(partitionExprs = $"featureId")
 
-    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      s"/firealerts_${fireAlertType}_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
+    val runOutputUrl: String = getOutputUrl(kwargs, s"${name}_${fireAlertType}")
+
 
     FireAlertsExport.export(
       featureType,

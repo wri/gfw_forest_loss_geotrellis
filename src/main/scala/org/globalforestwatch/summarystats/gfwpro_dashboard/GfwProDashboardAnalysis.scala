@@ -7,6 +7,7 @@ import org.apache.log4j.Logger
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geosparksql.utils.Adapter
 import org.globalforestwatch.features.{CombinedFeatureId, FeatureIdFactory, FeatureRDDFactory, FireAlertRDD, GfwProFeatureId, SpatialFeatureDF}
+import org.globalforestwatch.summarystats.SummaryAnalysis
 import org.globalforestwatch.util.IntersectGeometry.intersectGeometries
 import org.globalforestwatch.util.SpatialJoinRDD
 
@@ -24,9 +25,9 @@ import org.globalforestwatch.util.Util.getAnyMapValue
 
 import scala.collection.JavaConverters._
 
-object GfwProDashboardAnalysis {
+object GfwProDashboardAnalysis extends SummaryAnalysis {
 
-  val logger = Logger.getLogger("GfwProDashboardAnalysis")
+  val name = "gfwpro_dashboard"
 
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
@@ -56,10 +57,7 @@ object GfwProDashboardAnalysis {
     val summaryDF =
       GfwProDashboardDFFactory(featureType, dataRDD, spark, kwargs).getDataFrame
 
-    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      "/gfwpro_dashboard_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
+    val runOutputUrl: String = getOutputUrl(kwargs)
 
     GfwProDashboardExport.export(featureType, summaryDF, runOutputUrl, kwargs)
   }

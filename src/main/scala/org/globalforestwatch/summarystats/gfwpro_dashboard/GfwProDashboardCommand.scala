@@ -20,7 +20,7 @@ object GfwProDashboardCommand extends SummaryCommand {
     )
 
   val gfwProDashboardCommand: Opts[Unit] = Opts.subcommand(
-    name = "gfwpro_dashboard",
+    name = GfwProDashboardAnalysis.name,
     help = "Compute summary statistics for GFW Pro Dashboard."
   ) {
     (
@@ -36,6 +36,7 @@ object GfwProDashboardCommand extends SummaryCommand {
         "featureUris" -> default._2,
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
+        "noOutputPathSuffix" -> default._5,
         "fireAlertType" -> fireAlert._1,
         "fireAlertSource" -> fireAlert._2,
         "idStart" -> featureFilter._1,
@@ -53,7 +54,7 @@ object GfwProDashboardCommand extends SummaryCommand {
         "admin2" -> gadmFilter._6,
       )
 
-      runAnalysis("gfwpro_dashboard", default._1, default._2, kwargs)
+      runAnalysis(GfwProDashboardAnalysis.name, default._1, default._2, kwargs)
 
     }
   }
