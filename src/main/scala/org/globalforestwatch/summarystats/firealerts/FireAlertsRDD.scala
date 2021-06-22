@@ -22,8 +22,8 @@ object FireAlertsRDD extends SummaryRDD {
 
     Either.catchNonFatal {
       fireAlertType match {
-        case "viirs" => ViirsGrid.getRasterSource(windowKey, windowLayout, kwargs)
-        case "modis" | "burned_areas" => ModisGrid.getRasterSource(windowKey, windowLayout, kwargs)
+        case "viirs" | "burned_areas" => ViirsGrid.getRasterSource(windowKey, windowLayout, kwargs)
+        case "modis" => ModisGrid.getRasterSource(windowKey, windowLayout, kwargs)
       }
     }
   }

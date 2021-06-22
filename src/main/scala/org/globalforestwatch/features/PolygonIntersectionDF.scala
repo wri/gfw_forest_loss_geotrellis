@@ -9,6 +9,13 @@ import org.globalforestwatch.util.Util.getAnyMapValue
 import org.apache.spark.sql.functions.{col, expr}
 
 object PolygonIntersectionDF {
+  /*
+    Applies a spatial join between two polygonal datasets using GeoSpark, returning the
+    intersecting polygons with combined attributes.
+
+    NOTE: The spatial join will partition/index on feature 1, so typically feature 1 should
+    be the larger dataset.
+   */
   def apply(feature1Uris: NonEmptyList[String],
             feature1Type: String,
             feature2Uris: NonEmptyList[String],
@@ -35,7 +42,6 @@ object PolygonIntersectionDF {
 
     feature1DF.createOrReplaceTempView("left")
     feature2DF.createOrReplaceTempView("right")
-
 
     spark.sql(
       "SELECT " +

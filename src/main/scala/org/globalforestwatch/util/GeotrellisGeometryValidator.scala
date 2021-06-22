@@ -50,9 +50,13 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
         else if (geom.getGeometryType != bufferedGeom.getGeometryType && geom.getGeometryType
           .contains(bufferedGeom.getGeometryType))
           makeMultiGeom(bufferedGeom)
-        else
+        else if (geom.getGeometryType != bufferedGeom.getGeometryType && bufferedGeom.getGeometryType
+          .contains(geom.getGeometryType)) {
+          // sometimes it can even turn a Polygon to a MultiPolygon, can't go back though
+          bufferedGeom
+        } else
           throw new RuntimeException(
-            s"Faied to create a valid geometry: ${geom}"
+            s"Failed to create a valid geometry: ${geom}"
           )
       } else geom
     }
