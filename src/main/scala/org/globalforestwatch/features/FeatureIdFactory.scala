@@ -18,6 +18,7 @@ case class FeatureIdFactory(featureType: String) {
         ) =>
         WdpaFeatureId(wdpaId, name, iucnCat, iso, status)
       case ("geostore", geostore: String) => GeostoreFeatureId(geostore)
+      case ("gfwpro", (listId: String, locationId: Int)) => GfwProFeatureId(listId, locationId)
       case ("burned_areas", alertDate: String) =>
         BurnedAreasFeatureId(alertDate)
       case (
@@ -70,7 +71,7 @@ case class FeatureIdFactory(featureType: String) {
         )
       case value =>
         throw new IllegalArgumentException(
-          s"FeatureType must be one of 'gadm', 'wdpa', 'geostore', 'feature', 'viirs', 'modis', or 'burned_areas'. Got $value."
+          s"FeatureType must be one of 'gadm', 'wdpa', 'geostore', 'feature', 'gfwpro', 'viirs', 'modis', or 'burned_areas'. Got $value."
         )
     }
 
@@ -84,12 +85,13 @@ case class FeatureIdFactory(featureType: String) {
       case "feature" => SimpleFeatureId(values(0).toInt)
       case "wdpa" => GadmFeature.getFeatureId(values, true)
       case "geostore" => GeostoreFeature.getFeatureId(values, true)
+      case "gfwpro" => GfwProFeature.getFeatureId(values, true)
       case "burned_areas" => BurnedAreasFeature.getFeatureId(values, true)
       case "viirs" => FireAlertViirsFeature.getFeatureId(values, true)
       case "modis" => FireAlertModisFeature.getFeatureId(values, true)
       case value =>
         throw new IllegalArgumentException(
-          s"FeatureType must be one of 'gadm', 'wdpa', 'geostore', 'feature', 'viirs', 'modis', or 'burned_areas'. Got $value."
+          s"FeatureType must be one of 'gadm', 'wdpa', 'geostore', 'feature', 'gfwpro', 'viirs', 'modis', or 'burned_areas'. Got $value."
         )
     }
   }

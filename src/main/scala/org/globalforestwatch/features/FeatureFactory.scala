@@ -9,9 +9,10 @@ case class FeatureFactory(featureName: String) {
     case "viirs" => FireAlertViirsFeature
     case "modis" => FireAlertModisFeature
     case "burned_areas" => BurnedAreasFeature
+    case "gfwpro" => GfwProFeature
     case value =>
       throw new IllegalArgumentException(
-        s"FeatureType must be one of 'gadm', 'wdpa', 'geostore', 'feature', 'viirs', 'modis', or 'burned_areas'. Got $value."
+        s"FeatureType must be one of 'gadm', 'wdpa', 'geostore', 'gfwpro', 'feature', 'viirs', 'modis', or 'burned_areas'. Got $value."
       )
   }
 }

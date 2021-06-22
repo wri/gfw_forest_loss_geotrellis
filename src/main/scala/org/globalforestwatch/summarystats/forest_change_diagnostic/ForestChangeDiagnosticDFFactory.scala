@@ -1,15 +1,9 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-import geotrellis.vector.{Feature, Geometry}
 import io.circe.syntax._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{
-  CombinedFeatureId,
-  FeatureId,
-  GridId,
-  SimpleFeatureId
-}
+import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GfwProFeatureId, GridId}
 import org.globalforestwatch.util.CaseClassConstrutor.createCaseClassFromMap
 
 case class ForestChangeDiagnosticDFFactory(
@@ -23,10 +17,10 @@ case class ForestChangeDiagnosticDFFactory(
 
   def getDataFrame: DataFrame = {
     featureType match {
-      case "feature" => getFeatureDataFrame
+      case "gfwpro" => getFeatureDataFrame
       case "grid" => getGridFeatureDataFrame
       case _ =>
-        throw new IllegalArgumentException("Not a valid FeatureId")
+        throw new IllegalArgumentException("Not a valid GfwProFeatureId")
     }
   }
 
@@ -36,14 +30,14 @@ case class ForestChangeDiagnosticDFFactory(
       .map {
         case (id, data) =>
           id match {
-            case simpleId: SimpleFeatureId =>
+            case gfwproId: GfwProFeatureId =>
               createCaseClassFromMap[ForestChangeDiagnosticRowSimple](
-                Map("id" -> simpleId.featureId.asJson.noSpaces) ++
+                Map("id" -> gfwproId.locationId.asJson.noSpaces) ++
                   featureFieldMap(data)
               )
 
             case _ =>
-              throw new IllegalArgumentException("Not a SimpleFeatureId")
+              throw new IllegalArgumentException("Not a GfwProFeatureId")
           }
       }
       .toDF("location_id" :: featureFieldNames: _*)
@@ -55,10 +49,11 @@ case class ForestChangeDiagnosticDFFactory(
       .map {
         case (id, data) =>
           id match {
-            case CombinedFeatureId(simpleId: SimpleFeatureId, gridId: GridId) =>
+            case CombinedFeatureId(gfwproId: GfwProFeatureId, gridId: GridId) =>
               createCaseClassFromMap[ForestChangeDiagnosticRowGrid](
                 Map(
-                  "id" -> simpleId.featureId.asJson.noSpaces,
+                  "list_id" -> gfwproId.listId.asJson.noSpaces,
+                  "location_id" -> gfwproId.locationId.asJson.noSpaces,
                   "grid" -> gridId.gridId.asJson.noSpaces
                 ) ++
                   featureFieldMap(data)
@@ -70,7 +65,7 @@ case class ForestChangeDiagnosticDFFactory(
           }
 
       }
-      .toDF("id" :: "grid" :: featureFieldNames ++ gridFieldNames: _*)
+      .toDF("list_id" :: "location_id" :: "grid" :: featureFieldNames ++ gridFieldNames: _*)
   }
 
   private def featureFieldMap(data: ForestChangeDiagnosticData) = {
