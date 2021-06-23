@@ -124,22 +124,22 @@ object FeatureRDD {
     }
 
     pairedRDD.flatMap {
-        case (id, geom) =>
-          geom match {
-            case geomCol: GeoSparkGeometryCollection =>
-              val maybe_poly = extractPolygons(geomCol)
-              maybe_poly match {
-                case Some(poly) => List(vector.Feature(poly, id))
-                case _ => List()
-              }
-            case poly: GeoSparkPolygonal =>
-              List(vector.Feature(poly, id))
-            case _ =>
-              // Polygon-polygon intersections can generate points or lines, which we just want to ignore
-              logger.warn("Cannot process geometry type")
-              List()
-          }
-      }
+      case (id, geom) =>
+        geom match {
+          case geomCol: GeoSparkGeometryCollection =>
+            val maybe_poly = extractPolygons(geomCol)
+            maybe_poly match {
+              case Some(poly) => List(vector.Feature(poly, id))
+              case _ => List()
+            }
+          case poly: GeoSparkPolygonal =>
+            List(vector.Feature(poly, id))
+          case _ =>
+            // Polygon-polygon intersections can generate points or lines, which we just want to ignore
+            logger.warn("Cannot process geometry type")
+            List()
+        }
+    }
   }
 
   private def splitGeometries(
@@ -187,15 +187,22 @@ object FeatureRDD {
           val geometries = intersectGeometries(geom, gridCell)
           geometries
       }
-      .map { intersection =>
+      .flatMap { intersection =>
         // use implicit converter to covert to Geotrellis Geometry
         val geotrellisGeom: MultiPolygon = intersection
 
-        geotrellis.vector.Feature(
-          geotrellisGeom,
-          FeatureIdFactory(featureType)
-            .fromUserData(intersection.getUserData.asInstanceOf[String], delimiter = ",")
-        )
+        if (!geotrellisGeom.isEmpty)
+          Seq(
+            geotrellis.vector.Feature(
+              geotrellisGeom,
+              FeatureIdFactory(featureType)
+                .fromUserData(
+                  intersection.getUserData.asInstanceOf[String],
+                  delimiter = ","
+                )
+            )
+          )
+        else Seq()
       }
   }
 

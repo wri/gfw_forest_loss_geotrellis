@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter
 trait SummaryAnalysis {
 
   val name: String
-  //  val logger: Logger = Logger.getLogger(name)
+  val logger: Logger = Logger.getLogger("Summary Analysis")
 
   def getOutputUrl(kwargs: Map[String, Any], outputName: String = name): String = {
     val noOutputPathSuffix: Boolean = getAnyMapValue[Boolean](kwargs, "noOutputPathSuffix")

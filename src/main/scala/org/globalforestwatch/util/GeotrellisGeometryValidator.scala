@@ -1,5 +1,5 @@
 package org.globalforestwatch.util
-
+import org.apache.log4j.Logger
 import geotrellis.vector.{
   Geometry,
   LineString,
@@ -13,6 +13,7 @@ import geotrellis.vector.io.wkb.WKB
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
 
 object GeotrellisGeometryValidator extends java.io.Serializable {
+  val logger = Logger.getLogger("Geotrellis Geometry Validator")
 
   def isNonEmptyGeom(geom: Geometry): Boolean = {
     val maybeGeom: Option[Geometry] = try {
@@ -31,9 +32,7 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
   }
 
   def isNonEmptyGeom(wkb: String): Boolean = {
-    val geom: Geometry = WKB.read(wkb)
-    isNonEmptyGeom(geom)
-
+    isNonEmptyGeom(makeValidGeom(wkb))
   }
 
   def makeValidGeom(geom: Geometry): Geometry = {
@@ -51,7 +50,12 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
         if (geom.getGeometryType != fixedGeom.getGeometryType && geom.getGeometryType
           .contains(fixedGeom.getGeometryType))
           makeMultiGeom(fixedGeom)
-        else fixedGeom
+        else if (geom.getGeometryType != fixedGeom.getGeometryType) {
+          logger.warn(
+            s"Not able to preserve geometry type. Return ${fixedGeom.getGeometryType} instead of ${geom.getGeometryType}"
+          )
+          fixedGeom
+        } else fixedGeom
         //        else if (geom.getGeometryType != fixedGeom.getGeometryType && geom.getGeometryType
         //          .contains(fixedGeom.getGeometryType))
         //          makeMultiGeom(fixedGeom)
@@ -88,6 +92,5 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
         )
     }
   }
-
 
 }
