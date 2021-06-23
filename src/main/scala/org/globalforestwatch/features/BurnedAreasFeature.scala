@@ -1,9 +1,5 @@
 package org.globalforestwatch.features
 
-import geotrellis.vector.Geometry
-import org.apache.spark.sql.Row
-import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
-
 object BurnedAreasFeature extends Feature {
   override val geomPos: Int = 1
 

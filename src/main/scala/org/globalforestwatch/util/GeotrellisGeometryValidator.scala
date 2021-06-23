@@ -42,22 +42,27 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
     // https://stackoverflow.com/a/31474580/1410317
     val validGeom = {
       if (!geom.isValid) {
-        val bufferedGeom = geom.buffer(0) //.buffer(0.0001).buffer(-0.0001)
 
-        // the buffer can alter the geometry type and convert multi geometries to single geometries.
-        // we want to preserve the original geometry type if possible.
-        if (geom.getGeometryType == bufferedGeom.getGeometryType) bufferedGeom
-        else if (geom.getGeometryType != bufferedGeom.getGeometryType && geom.getGeometryType
-          .contains(bufferedGeom.getGeometryType))
-          makeMultiGeom(bufferedGeom)
-        else if (geom.getGeometryType != bufferedGeom.getGeometryType && bufferedGeom.getGeometryType
-          .contains(geom.getGeometryType)) {
-          // sometimes it can even turn a Polygon to a MultiPolygon, can't go back though
-          bufferedGeom
-        } else
-          throw new RuntimeException(
-            s"Failed to create a valid geometry: ${geom}"
-          )
+        val fixedGeom = GeometryFixer(geom).fix()
+
+        // Geometry fixer may alter the geometry type or even return an empty geometry
+        // We want to try to preserve the geometry type if possible
+
+        if (geom.getGeometryType != fixedGeom.getGeometryType && geom.getGeometryType
+          .contains(fixedGeom.getGeometryType))
+          makeMultiGeom(fixedGeom)
+        else fixedGeom
+        //        else if (geom.getGeometryType != fixedGeom.getGeometryType && geom.getGeometryType
+        //          .contains(fixedGeom.getGeometryType))
+        //          makeMultiGeom(fixedGeom)
+        //        else if (geom.getGeometryType != fixedGeom.getGeometryType && fixedGeom.getGeometryType
+        //          .contains(geom.getGeometryType)) {
+        //          // sometimes it can even turn a Polygon to a MultiPolygon, can't go back though
+        //          fixedGeom
+        //        } else
+        //          throw new RuntimeException(
+        //            s"Failed to create a valid geometry: ${geom}"
+        //          )
       } else geom
     }
 
@@ -83,4 +88,6 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
         )
     }
   }
+
+
 }

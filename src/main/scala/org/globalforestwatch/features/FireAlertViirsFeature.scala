@@ -13,7 +13,7 @@ object FireAlertViirsFeature extends Feature {
     "latitude as lat, longitude as lon, acq_date as acqDate, acq_time as acqTime, confidence, " +
       "bright_ti4 as brightTi4, bright_ti5 as brightTi5, frp"
 
-  override def isValidGeom(i: Row): Boolean = {
+  override def isNonEmptyGeom(i: Row): Boolean = {
     val lon = i.getString(geomPos + 1).toDouble
     val lat = i.getString(geomPos).toDouble
 

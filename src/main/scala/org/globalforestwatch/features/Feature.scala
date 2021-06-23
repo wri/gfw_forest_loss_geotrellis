@@ -23,7 +23,7 @@ trait Feature extends java.io.Serializable {
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId
 
-  def isValidGeom(i: Row): Boolean = {
+  def isNonEmptyGeom(i: Row): Boolean = {
     GeotrellisGeometryValidator.isNonEmptyGeom(i.getString(geomPos))
   }
 

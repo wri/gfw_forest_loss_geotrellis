@@ -49,7 +49,7 @@ object FeatureRDD {
         .mapPartitions({ iter: Iterator[Row] =>
           for {
             i <- iter
-            if featureObj.isValidGeom(i)
+            if featureObj.isNonEmptyGeom(i)
           } yield {
             featureObj.get(i)
           }

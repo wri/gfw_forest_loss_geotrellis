@@ -8,7 +8,6 @@ object GfwProFeature extends Feature {
   val listIdPos = 0
   val locationIdPos = 1
   val geomPos = 2
-  val featureCount = 1
 
   val featureIdExpr = "list_id as listId, cast(location_id as int) as locationId"
 

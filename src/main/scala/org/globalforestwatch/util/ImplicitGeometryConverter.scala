@@ -8,7 +8,6 @@ import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.util.GeoSparkGeometryConstructor.toWKB
 import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 
-import scala.reflect.ClassTag
 
 object ImplicitGeometryConverter {
   implicit def toGeotrellisGeometry[I <: GeoSparkGeometry, O <: Geometry](
