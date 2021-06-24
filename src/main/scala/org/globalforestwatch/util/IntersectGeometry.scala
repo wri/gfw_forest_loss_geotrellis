@@ -18,7 +18,7 @@ object IntersectGeometry {
       * Intersection can return GeometryCollections
       * Here we filter resulting geometries and only return those of the same type as thisGeom
       * */
-    val userData = thisGeom.getUserData.asInstanceOf[String]
+    val userData = thisGeom.getUserData
 
     val intersection: Geometry = thisGeom intersection thatGeom
     intersection match {
