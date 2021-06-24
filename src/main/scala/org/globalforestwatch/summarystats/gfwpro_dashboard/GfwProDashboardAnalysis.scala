@@ -6,6 +6,9 @@ import com.vividsolutions.jts.geom.{
   Geometry => GeoSparkGeometry,
   MultiPolygon => GeoSparkMultiPolygon
 }
+import geotrellis.store.index.zcurve.Z2
+import org.apache.spark.HashPartitioner
+
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geosparksql.utils.Adapter
 import org.globalforestwatch.features.{
@@ -19,6 +22,7 @@ import org.globalforestwatch.features.{
 import org.globalforestwatch.summarystats.SummaryAnalysis
 import org.globalforestwatch.util.IntersectGeometry.intersectGeometries
 import org.globalforestwatch.util.SpatialJoinRDD
+import org.globalforestwatch.util.ImplicitGeometryConverter._
 
 import java.util
 //import org.apache.sedona.core.enums.{FileDataSplitter, GridType, IndexType}
@@ -105,7 +109,6 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
                                             spark: SparkSession
                                           ): RDD[Feature[Geometry, FeatureId]] = {
 
-    import org.globalforestwatch.util.ImplicitGeometryConverter._
     val contextualFeatureUrl: NonEmptyList[String] =
       getAnyMapValue[NonEmptyList[String]](kwargs, "contextualFeatureUrl")
     val contextualFeatureType: String =
@@ -136,35 +139,55 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
       usingIndex = false
     )
 
-    joinedRDD.rdd.flatMap { pair: (GeoSparkGeometry, GeoSparkGeometry) =>
-      val featureGeom = pair._1
-      val featureId = featureGeom.getUserData.asInstanceOf[FeatureId]
-      val contextualGeom = pair._2
-      val contextualId = contextualGeom.getUserData.asInstanceOf[FeatureId]
+    val combinedFeatureRDD = joinedRDD.rdd.flatMap {
+      pair: (GeoSparkGeometry, GeoSparkGeometry) =>
+        val featureGeom = pair._1
+        val featureId = featureGeom.getUserData.asInstanceOf[FeatureId]
+        val contextualGeom = pair._2
+        val contextualId = contextualGeom.getUserData.asInstanceOf[FeatureId]
 
-      featureId match {
-        case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>
-          if (contextualGeom.contains(featureGeom.getCentroid))
-            List(
-              Feature(featureGeom, CombinedFeatureId(gfwproId, contextualId))
-            )
-          else List()
-        case gfwproId: GfwProFeatureId if gfwproId.locationId < 0 =>
-          val geometries = intersectGeometries(featureGeom, contextualGeom)
-          geometries.flatMap { intersection: GeoSparkMultiPolygon =>
-            // implicitly convert to Geotrellis geometry
-            val geom: MultiPolygon = intersection
-            if (geom.isEmpty) Seq()
-            else
-              Seq(
-                Feature[Geometry, CombinedFeatureId](
-                  geom,
-                  CombinedFeatureId(gfwproId, contextualId)
+        featureId match {
+          case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>
+            if (contextualGeom.contains(featureGeom.getCentroid)) {
+              Seq(Feature[Geometry, CombinedFeatureId](featureGeom, CombinedFeatureId(gfwproId, contextualId)))
+            } else Seq()
+          case gfwproId: GfwProFeatureId if gfwproId.locationId < 0 =>
+            val geometries = intersectGeometries(featureGeom, contextualGeom)
+            geometries.flatMap { intersection: GeoSparkMultiPolygon =>
+              // implicitly convert to Geotrellis geometry
+              val geom: MultiPolygon = intersection
+              if (geom.isEmpty) Seq()
+              else
+                Seq(
+                  Feature[Geometry, CombinedFeatureId](
+                    geom,
+                    CombinedFeatureId(gfwproId, contextualId)
+                  )
                 )
-              )
-          }
-      }
+            }
+        }
     }
+
+    // Reshuffle for later use in SummaryRDD with Range Partitioner
+    val hashPartitioner = new HashPartitioner(
+      combinedFeatureRDD.getNumPartitions
+    )
+    combinedFeatureRDD
+      .keyBy({ feature: Feature[Geometry, FeatureId] =>
+        Z2(
+          (feature.geom.getCentroid.getX * 100).toInt,
+          (feature.geom.getCentroid.getY * 100).toInt
+        ).z
+      })
+      .partitionBy(hashPartitioner)
+      .mapPartitions({ iter: Iterator[(Long, Feature[Geometry, FeatureId])] =>
+        for {
+          i <- iter
+        } yield {
+          i._2
+        }
+      }, preservesPartitioning = true)
+
   }
 
   private def toGfwProDashboardFireData(
