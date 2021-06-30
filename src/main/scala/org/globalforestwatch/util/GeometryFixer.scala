@@ -26,6 +26,7 @@ import org.locationtech.jts.geom.{
   CoordinateArrays
 }
 
+
 case class GeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
 
   val factory: GeometryFactory = geom.getFactory
@@ -180,6 +181,53 @@ case class GeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
       )
   }
 
+  private def fixHoles(geom: MultiPolygon): Option[Geometry] = {
+    val geomRange: List[Int] = List.range(0, geom.getNumGeometries)
+    val fixedHoles: Array[Option[Geometry]] = (for {
+      i <- geomRange
+    } yield fixHoles(geom.getGeometryN(i).asInstanceOf[Polygon])).toArray
+
+    val fix = fixedHoles.foldLeft(factory.createGeometry(factory.createPolygon())) {
+      (acc: Geometry, hole: Option[Geometry]) =>
+        hole match {
+          case Some(geom: Geometry) => acc.union(geom)
+          case _ => acc
+        }
+    }
+
+    fix match {
+      case geom if geom.isEmpty => None
+      case _ => Some(geom)
+    }
+
+  }
+
+  private def fixHoles(geom: GeometryCollection): Option[Geometry] = {
+    val geomRange: List[Int] = List.range(0, geom.getNumGeometries)
+    val fixedHoles: Array[Option[Geometry]] = (for {
+      i <- geomRange
+    } yield
+      geom.getGeometryN(i) match {
+        case poly: Polygon => fixHoles(poly)
+        case multi: MultiPolygon => fixHoles(multi)
+        case _ => None
+      }).toArray
+
+    val fix = fixedHoles.foldLeft(factory.createGeometry(factory.createPolygon())) {
+      (acc: Geometry, hole: Option[Geometry]) =>
+        hole match {
+          case Some(geom: Geometry) => acc.union(geom)
+          case _ => acc
+        }
+    }
+
+    fix match {
+      case geom if geom.isEmpty => None
+      case _ => Some(geom)
+    }
+
+  }
+
   private def fixHoles(geom: Polygon): Option[Geometry] = {
 
     val geomRange: List[Int] = List.range(0, geom.getNumInteriorRing)
@@ -238,7 +286,15 @@ case class GeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
     else if (geom.getNumInteriorRing == 0)
       Some(fixShell)
     else {
-      val fixedHoles: Option[Geometry] = fixHoles(geom)
+      // Using a trick here to eliminate sliver holes
+      val bufferedGeom = geom.buffer(0.0001).buffer(-0.0001)
+      val fixedHoles: Option[Geometry] = bufferedGeom match {
+        case poly: Polygon => fixHoles(poly)
+        case multi: MultiPolygon => fixHoles(multi)
+        case collection: GeometryCollection => fixHoles(collection)
+        case _ => None
+      }
+
       Some(removeHoles(fixShell, fixedHoles))
     }
   }

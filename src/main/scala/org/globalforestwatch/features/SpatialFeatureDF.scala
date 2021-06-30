@@ -51,7 +51,7 @@ object SpatialFeatureDF {
 
     featureDF
       .selectExpr(
-        s"ST_PrecisionReduce(ST_GeomFromWKB(${wkbField}), 13) AS polyshape",
+        s"ST_PrecisionReduce(ST_GeomFromWKB(${wkbField}), 11) AS polyshape",
         s"struct(${featureObj.featureIdExpr}) as featureId"
       )
       .where(s"${wkbField} != '${emptyPolygonWKB}'")

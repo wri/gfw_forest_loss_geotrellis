@@ -48,25 +48,17 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
         // We want to try to preserve the geometry type if possible
 
         if (geom.getGeometryType != fixedGeom.getGeometryType && geom.getGeometryType
-          .contains(fixedGeom.getGeometryType))
+          .contains(fixedGeom.getGeometryType)) {
+          logger.warn(
+            s"Fixed geometry of type ${fixedGeom.getGeometryType}. Cast to ${geom.getGeometryType}."
+          )
           makeMultiGeom(fixedGeom)
-        else if (geom.getGeometryType != fixedGeom.getGeometryType) {
+        } else if (geom.getGeometryType != fixedGeom.getGeometryType) {
           logger.warn(
             s"Not able to preserve geometry type. Return ${fixedGeom.getGeometryType} instead of ${geom.getGeometryType}"
           )
           fixedGeom
         } else fixedGeom
-        //        else if (geom.getGeometryType != fixedGeom.getGeometryType && geom.getGeometryType
-        //          .contains(fixedGeom.getGeometryType))
-        //          makeMultiGeom(fixedGeom)
-        //        else if (geom.getGeometryType != fixedGeom.getGeometryType && fixedGeom.getGeometryType
-        //          .contains(geom.getGeometryType)) {
-        //          // sometimes it can even turn a Polygon to a MultiPolygon, can't go back though
-        //          fixedGeom
-        //        } else
-        //          throw new RuntimeException(
-        //            s"Failed to create a valid geometry: ${geom}"
-        //          )
       } else geom
     }
 
