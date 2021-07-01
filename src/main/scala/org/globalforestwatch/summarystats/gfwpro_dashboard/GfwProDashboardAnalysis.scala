@@ -10,14 +10,12 @@ import geotrellis.store.index.zcurve.Z2
 import org.apache.spark.HashPartitioner
 
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.datasyslab.geosparksql.utils.Adapter
 import org.globalforestwatch.features.{
   CombinedFeatureId,
   FeatureIdFactory,
   FeatureRDDFactory,
   FireAlertRDD,
-  GfwProFeatureId,
-  SpatialFeatureDF
+  GfwProFeatureId
 }
 import org.globalforestwatch.summarystats.SummaryAnalysis
 import org.globalforestwatch.util.IntersectGeometry.intersectGeometries
@@ -45,13 +43,20 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
-    val enrichedRDD = intersectWithContextualLayer(featureRDD, kwargs, spark)
+    // only create this once for all analyses, analyze() can be slow
+    val spatialFeatureRDD = new SpatialRDD[GeoSparkGeometry]()
+    spatialFeatureRDD.rawSpatialRDD = featureRDD
+      .map(fromGeotrellisFeature[Geometry, FeatureId, GeoSparkGeometry])
+      .toJavaRDD()
+    spatialFeatureRDD.analyze()
+
+    val enrichedRDD = intersectWithContextualLayer(spatialFeatureRDD, kwargs, spark)
 
     val summaryRDD: RDD[(FeatureId, GfwProDashboardSummary)] =
       GfwProDashboardRDD(enrichedRDD, GfwProDashboardGrid.blockTileGrid, kwargs)
 
     val fireCount: RDD[(FeatureId, GfwProDashboardDataDateCount)] =
-      GfwProDashboardAnalysis.fireStats(featureType, spark, kwargs)
+      GfwProDashboardAnalysis.fireStats(spatialFeatureRDD, featureType, spark, kwargs)
 
     val dataRDD: RDD[(FeatureId, GfwProDashboardData)] =
       formatGfwProDashboardData(summaryRDD)
@@ -74,26 +79,17 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
   }
 
   def fireStats(
+                 spatialFeatureRDD: SpatialRDD[GeoSparkGeometry],
                  featureType: String,
                  spark: SparkSession,
                  kwargs: Map[String, Any]
                ): RDD[(FeatureId, GfwProDashboardDataDateCount)] = {
 
     // FIRE RDD
-
     val fireAlertSpatialRDD = FireAlertRDD(spark, kwargs)
 
-    // Feature RDD
-    val featureUris: NonEmptyList[String] =
-      getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
-    val featurePolygonDF =
-      SpatialFeatureDF(featureUris, featureType, kwargs, "geom", spark)
-    val featureSpatialRDD = Adapter.toSpatialRdd(featurePolygonDF, "polyshape")
-
-    featureSpatialRDD.analyze()
-
     val joinedRDD =
-      SpatialJoinRDD.spatialjoin(featureSpatialRDD, fireAlertSpatialRDD)
+      SpatialJoinRDD.spatialjoin(spatialFeatureRDD, fireAlertSpatialRDD, usingIndex = true)
 
     joinedRDD.rdd
       .map {
@@ -104,7 +100,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
   }
 
   private def intersectWithContextualLayer(
-                                            featureRDD: RDD[Feature[Geometry, FeatureId]],
+                                            spatialFeatureRDD: SpatialRDD[GeoSparkGeometry],
                                             kwargs: Map[String, Any],
                                             spark: SparkSession
                                           ): RDD[Feature[Geometry, FeatureId]] = {
@@ -125,12 +121,6 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     ).map(fromGeotrellisFeature[Geometry, FeatureId, GeoSparkGeometry])
       .toJavaRDD()
     spatialContextualRDD.analyze()
-
-    val spatialFeatureRDD = new SpatialRDD[GeoSparkGeometry]()
-    spatialFeatureRDD.rawSpatialRDD = featureRDD
-      .map(fromGeotrellisFeature[Geometry, FeatureId, GeoSparkGeometry])
-      .toJavaRDD()
-    spatialFeatureRDD.analyze()
 
     val joinedRDD = SpatialJoinRDD.flatSpatialJoin(
       spatialContextualRDD,
