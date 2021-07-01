@@ -46,17 +46,18 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
             kwargs: Map[String, Any]): Unit = {
 
     val enrichedRDD = intersectWithContextualLayer(featureRDD, kwargs, spark)
+    enrichedRDD.cache()
 
     val summaryRDD: RDD[(FeatureId, GfwProDashboardSummary)] =
       GfwProDashboardRDD(enrichedRDD, GfwProDashboardGrid.blockTileGrid, kwargs)
 
-    val fireCount: RDD[(FeatureId, GfwProDashboardDataDateCount)] =
+    val fireCountRDD: RDD[(FeatureId, GfwProDashboardDataDateCount)] =
       GfwProDashboardAnalysis.fireStats(featureType, spark, kwargs)
 
     val dataRDD: RDD[(FeatureId, GfwProDashboardData)] =
       formatGfwProDashboardData(summaryRDD)
         .reduceByKey(_ merge _)
-        .leftOuterJoin(fireCount)
+        .leftOuterJoin(fireCountRDD)
         .mapValues {
           case (data, fire) =>
             data.update(
