@@ -19,10 +19,9 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
     val maybeGeom: Option[Geometry] = try {
       Some(reduce(gpr)(geom))
     } catch {
-      case ae: java.lang.AssertionError =>
+      case _: java.lang.AssertionError =>
         println("There was an empty geometry")
         None
-      case t: Throwable => throw t
     }
 
     maybeGeom match {

@@ -4,8 +4,6 @@ import cats.data.NonEmptyList
 import geotrellis.vector
 import org.datasyslab.geospark.enums.GridType
 import com.vividsolutions.jts.geom.Geometry
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, Row}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.globalforestwatch.summarystats.firealerts.FireAlertsAnalysis
 //import org.apache.sedona.core.enums.GridType

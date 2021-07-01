@@ -127,8 +127,8 @@ object FeatureRDD {
       case (id, geom) =>
         geom match {
           case geomCol: GeoSparkGeometryCollection =>
-            val maybe_poly = extractPolygons(geomCol)
-            maybe_poly match {
+            val maybePoly = extractPolygons(geomCol)
+            maybePoly match {
               case Some(poly) => List(vector.Feature(poly, id))
               case _ => List()
             }

@@ -26,29 +26,27 @@ import org.locationtech.jts.geom.{
   CoordinateArrays
 }
 
-
 case class GeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
 
   val factory: GeometryFactory = geom.getFactory
 
   def fix(): Geometry = {
     if (geom.getNumGeometries == 0) {
-      return geom.copy();
+      geom.copy()
+    } else {
+      geom match {
+        case geom: Point => fixPoint(geom)
+        //  LinearRing must come before LineString
+        case geom: LinearRing => fixLinearRing(geom)
+        case geom: LineString => fixLineString(geom)
+        case geom: Polygon => fixPolygon(geom)
+        case geom: MultiPoint => fixMultiPoint(geom)
+        case geom: MultiLineString => fixMultiLineString(geom)
+        case geom: MultiPolygon => fixMultiPolygon(geom)
+        case geom: GeometryCollection => fixCollection(geom)
+        case _ => throw new UnsupportedOperationException(geom.getClass.getName)
+      }
     }
-
-    geom match {
-      case geom: Point => fixPoint(geom)
-      //  LinearRing must come before LineString
-      case geom: LinearRing => fixLinearRing(geom)
-      case geom: LineString => fixLineString(geom)
-      case geom: Polygon => fixPolygon(geom)
-      case geom: MultiPoint => fixMultiPoint(geom)
-      case geom: MultiLineString => fixMultiLineString(geom)
-      case geom: MultiPolygon => fixMultiPolygon(geom)
-      case geom: GeometryCollection => fixCollection(geom)
-      case _ => throw new UnsupportedOperationException(geom.getClass.getName)
-    }
-
   }
 
   private def fix(geom: Geometry): Geometry = {
@@ -187,13 +185,14 @@ case class GeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
       i <- geomRange
     } yield fixHoles(geom.getGeometryN(i).asInstanceOf[Polygon])).toArray
 
-    val fix = fixedHoles.foldLeft(factory.createGeometry(factory.createPolygon())) {
-      (acc: Geometry, hole: Option[Geometry]) =>
-        hole match {
-          case Some(geom: Geometry) => acc.union(geom)
-          case _ => acc
-        }
-    }
+    val fix =
+      fixedHoles.foldLeft(factory.createGeometry(factory.createPolygon())) {
+        (acc: Geometry, hole: Option[Geometry]) =>
+          hole match {
+            case Some(geom: Geometry) => acc.union(geom)
+            case _ => acc
+          }
+      }
 
     fix match {
       case geom if geom.isEmpty => None
@@ -213,13 +212,14 @@ case class GeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
         case _ => None
       }).toArray
 
-    val fix = fixedHoles.foldLeft(factory.createGeometry(factory.createPolygon())) {
-      (acc: Geometry, hole: Option[Geometry]) =>
-        hole match {
-          case Some(geom: Geometry) => acc.union(geom)
-          case _ => acc
-        }
-    }
+    val fix =
+      fixedHoles.foldLeft(factory.createGeometry(factory.createPolygon())) {
+        (acc: Geometry, hole: Option[Geometry]) =>
+          hole match {
+            case Some(geom: Geometry) => acc.union(geom)
+            case _ => acc
+          }
+      }
 
     fix match {
       case geom if geom.isEmpty => None

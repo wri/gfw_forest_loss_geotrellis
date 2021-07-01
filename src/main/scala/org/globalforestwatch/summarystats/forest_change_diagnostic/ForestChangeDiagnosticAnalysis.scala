@@ -613,7 +613,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
         )
       )
 
-    val new_data = data.update(
+    val newData = data.update(
       forestValueIndicator = forestValueIndicator,
       peatValueIndicator = peatValueIndicator,
       protectedAreaValueIndicator = protectedAreaValueIndicator,
@@ -621,7 +621,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       peatThreatIndicator = peatThreatIndicator,
       protectedAreaThreatIndicator = protectedAreaThreatIndicator
     )
-    (featureId, new_data)
+    (featureId, newData)
   }
 
   private def getIntermediateRDD(
