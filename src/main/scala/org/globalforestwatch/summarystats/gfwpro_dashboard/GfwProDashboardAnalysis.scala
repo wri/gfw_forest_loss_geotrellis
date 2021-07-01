@@ -2,23 +2,15 @@ package org.globalforestwatch.summarystats.gfwpro_dashboard
 
 import cats.data.NonEmptyList
 import geotrellis.vector.{Feature, Geometry, MultiPolygon}
-import com.vividsolutions.jts.geom.{
-  Geometry => GeoSparkGeometry,
-  MultiPolygon => GeoSparkMultiPolygon
-}
+import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, MultiPolygon => GeoSparkMultiPolygon}
 import geotrellis.store.index.zcurve.Z2
 import org.apache.spark.HashPartitioner
-import org.globalforestwatch.features.{
-  CombinedFeatureId,
-  FeatureRDDFactory,
-  FireAlertRDD,
-  GfwProFeatureId,
-}
+import org.globalforestwatch.features.{CombinedFeatureId, FeatureIdFactory, FeatureRDDFactory, FireAlertRDD, GfwProFeatureId, SpatialFeatureDF}
 import org.globalforestwatch.summarystats.SummaryAnalysis
 import org.globalforestwatch.util.IntersectGeometry.intersectGeometries
-import org.globalforestwatch.util.SpatialJoinRDD
+import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
 import org.globalforestwatch.util.ImplicitGeometryConverter._
-import org.globalforestwatch.util.RDDAdopter.toSpatialRDD
+import org.globalforestwatch.util.RDDAdapter.toSpatialRDD
 
 import java.util
 //import org.apache.sedona.core.enums.{FileDataSplitter, GridType, IndexType}
@@ -29,6 +21,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.util.Util.getAnyMapValue
+import org.datasyslab.geosparksql.utils.Adapter
 
 import scala.collection.JavaConverters._
 
@@ -106,15 +99,15 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
       getAnyMapValue[String](kwargs, "contextualFeatureType")
     val analysis: String = "gfwpro_dashboard"
 
-    val spatialContextualRDD = toSpatialRDD(
-      FeatureRDDFactory(
-        analysis,
-        contextualFeatureType,
-        contextualFeatureUrl,
-        kwargs,
-        spark
-      )
+    // Reading the contextual Layer directly as SpatialDF to avoid having to go via a FeatureRDD and back.
+    val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl,
+      contextualFeatureType,
+      kwargs,
+      "geom",
+      spark: SparkSession
     )
+
+    val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
 
     val spatialFeatureRDD = toSpatialRDD(featureRDD)
 
@@ -130,7 +123,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
         val featureGeom = pair._1
         val featureId = featureGeom.getUserData.asInstanceOf[FeatureId]
         val contextualGeom = pair._2
-        val contextualId = contextualGeom.getUserData.asInstanceOf[FeatureId]
+        val contextualId = FeatureIdFactory(contextualFeatureType).fromUserData(contextualGeom.getUserData.asInstanceOf[String], delimiter = ",")
 
         featureId match {
           case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>

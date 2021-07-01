@@ -7,7 +7,7 @@ import org.globalforestwatch.util.ImplicitGeometryConverter.fromGeotrellisFeatur
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 
-object RDDAdopter {
+object RDDAdapter {
 
 
   def toSpatialRDD(rdd: RDD[Feature[Geometry, FeatureId]]): SpatialRDD[GeoSparkGeometry] = {
