@@ -74,7 +74,7 @@ object ForestChangeDiagnosticSummary {
           raster.tile.seAsiaLandCover.getData(col, row)
         val idnLandCover: String = raster.tile.idnLandCover.getData(col, row)
         val isSoyPlantedAreas: Boolean =
-          raster.tile.isSoyPlantedArea.getData(col, row)
+          raster.tile.isSoyPlantedArea.getData(col, row).getOrElse("2020", false)
         val idnForestArea: String = raster.tile.idnForestArea.getData(col, row)
         val isIdnForestMoratorium: Boolean =
           raster.tile.isIDNForestMoratorium.getData(col, row)
