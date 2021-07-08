@@ -23,7 +23,7 @@ object GfwProDashboardExport extends SummaryExport {
       .coalesce(1)
       .write
       .options(csvOptions)
-      .csv(path = outputUrl)
+      .csv(path = outputUrl + "/final")
 
   }
 
