@@ -6,7 +6,7 @@ case class TreeCoverLossDrivers(gridTile: GridTile)
     extends StringLayer
     with OptionalILayer {
   val uri: String =
-    s"$basePath/umd_drivers/v2020/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/drivers/gdal-geotiff/${gridTile.tileId}.tif"
+    s"$basePath/umd_drivers/v2020/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/driver/gdal-geotiff/${gridTile.tileId}.tif"
 //    s"s3://gfw-files/flux_1_2_1/drivers/${gridTile.tileId}.tif"
 
   override val internalNoDataValue = 0

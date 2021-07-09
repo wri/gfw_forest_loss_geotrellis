@@ -6,7 +6,7 @@ case class IndonesiaForestArea(gridTile: GridTile)
     extends StringLayer
     with OptionalILayer {
 
-  val uri: String = s"$basePath/idn_forest_area/v201709/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/idn_forest_area/v201709/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/fungsikawa/gdal-geotiff/${gridTile.tileId}.tif"
 
   override val externalNoDataValue: String = ""
 
