@@ -25,6 +25,7 @@ object FireAlertsExport extends SummaryExport {
 
     val fireCols = _getFireCols(fireAlertType, spark)
     val cols = featureCols ++ fireCols
+    val sourceDataset = _getSourceDataset(fireAlertType)
 
     val gadmDF =
       summaryDF.transform(FireAlertsDF.unpackValues(cols))
@@ -41,7 +42,7 @@ object FireAlertsExport extends SummaryExport {
         .csv (path = outputUrl + "/all")
     }
 
-    exportChange(gadmDF, outputUrl, numPartitions)
+    exportChange(gadmDF, outputUrl, numPartitions, sourceDataset)
     if (!changeOnly) {
       exportWhitelist(gadmDF, outputUrl)
     }
@@ -78,9 +79,9 @@ object FireAlertsExport extends SummaryExport {
 
   }
 
-  private def exportChange(df: DataFrame, outputUrl: String, numPartitions: Int): Unit = {
+  private def exportChange(df: DataFrame, outputUrl: String, numPartitions: Int, sourceDataset: String): Unit = {
     val adm2DailyDF = df
-      .transform(FireAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
+      .transform(FireAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2"), sourceDataset))
 
     adm2DailyDF
       .coalesce(ceil(numPartitions / 80.0).toInt)
@@ -89,7 +90,7 @@ object FireAlertsExport extends SummaryExport {
       .csv(path = outputUrl + "/adm2/daily_alerts")
 
     val adm2DF = adm2DailyDF
-      .transform(FireAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2")))
+      .transform(FireAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2"), sourceDataset))
 
     adm2DF
       .coalesce(ceil(numPartitions / 100.0).toInt)
@@ -98,7 +99,7 @@ object FireAlertsExport extends SummaryExport {
       .csv(path = outputUrl + "/adm2/weekly_alerts")
 
     val adm1DF = adm2DF
-      .transform(FireAlertsDF.aggChangeWeekly2(List("iso", "adm1")))
+      .transform(FireAlertsDF.aggChangeWeekly2(List("iso", "adm1"), sourceDataset))
 
     adm1DF
       .coalesce(ceil(numPartitions / 150.0).toInt)
@@ -108,7 +109,7 @@ object FireAlertsExport extends SummaryExport {
 
 
     val isoDF = adm1DF
-      .transform(FireAlertsDF.aggChangeWeekly2(List("iso")))
+      .transform(FireAlertsDF.aggChangeWeekly2(List("iso"), sourceDataset))
 
 
     isoDF
@@ -184,8 +185,9 @@ object FireAlertsExport extends SummaryExport {
     val spark = summaryDF.sparkSession
 
     val cols = groupByCols
-    val fireCols = _getFireCols(fireAlertType, spark)
-    val unpackAllCols = unpackCols ++ fireCols
+    val fireUnpackCols = _getFireCols(fireAlertType, spark)
+    val unpackAllCols = unpackCols ++ fireUnpackCols
+    val sourceDataset = _getSourceDataset(fireAlertType)
 
     val df = summaryDF.transform(
       FireAlertsDF.unpackValues(unpackAllCols, wdpa = wdpa)
@@ -208,13 +210,13 @@ object FireAlertsExport extends SummaryExport {
         .csv(path = outputUrl + "/whitelist")
     }
 
-    df.transform(FireAlertsDF.aggChangeDaily(cols, wdpa = wdpa))
+    df.transform(FireAlertsDF.aggChangeDaily(cols, sourceDataset, wdpa = wdpa))
       .coalesce(ceil(numPartitions / 100.0).toInt)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
 
-    df.transform(FireAlertsDF.aggChangeWeekly(cols, wdpa = wdpa))
+    df.transform(FireAlertsDF.aggChangeWeekly(cols, sourceDataset, wdpa = wdpa))
       .coalesce(ceil(numPartitions / 150.0).toInt)
       .write
       .options(csvOptions)
@@ -249,6 +251,14 @@ object FireAlertsExport extends SummaryExport {
         $"fireId.brightT31" as "bright_t31__K",
         $"fireId.frp" as "frp__MW"
       )
+    }
+  }
+
+  private def _getSourceDataset(fireAlertType: String): String = {
+    fireAlertType match {
+      case "viirs" => "nasa_viirs_fire_alerts"
+      case "modis" => "nasa_modis_fire_alerts"
+      case "burned_areas" => "umd_modis_burned_areas"
     }
   }
 }

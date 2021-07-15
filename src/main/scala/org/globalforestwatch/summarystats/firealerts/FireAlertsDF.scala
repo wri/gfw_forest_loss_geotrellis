@@ -8,23 +8,23 @@ object FireAlertsDF {
 
   val contextualLayers: List[String] = List(
     "is__umd_regional_primary_forest_2001",
-    "is__birdlife_alliance_for_zero_extinction_site",
-    "is__birdlife_key_biodiversity_area",
-    "is__landmark_land_right",
-    "gfw_plantation__type",
+    "is__birdlife_alliance_for_zero_extinction_sites",
+    "is__birdlife_key_biodiversity_areas",
+    "is__landmark_indigenous_and_community_lands",
+    "gfw_plantations__type",
     "is__gfw_mining",
-    "is__gfw_managed_forest",
+    "is__gfw_managed_forests",
     "rspo_oil_palm__certification_status",
     "is__gfw_wood_fiber",
-    "is__peatland",
+    "is__gfw_peatlands",
     "is__idn_forest_moratorium",
     "is__gfw_oil_palm",
     "idn_forest_area__type",
-    "per_forest_concession__type",
+    "per_forest_concessions__type",
     "is__gfw_oil_gas",
     "is__gmw_mangroves_2016",
-    "is__ifl_intact_forest_landscape_2016",
-    "bra_biome__name"
+    "is__ifl_intact_forest_landscapes_2016",
+    "bra_biomes__name"
   )
 
   def unpackValues(unpackCols: List[Column],
@@ -50,7 +50,7 @@ object FireAlertsDF {
         $"data_group.indonesiaForestMoratorium" as "is__idn_forest_moratorium",
         $"data_group.oilPalm" as "is__gfw_oil_palm",
         $"data_group.indonesiaForestArea" as "idn_forest_area__type",
-        $"data_group.peruForestConcessions" as "per_forest_concession__type",
+        $"data_group.peruForestConcessions" as "per_forest_concessions__type",
         $"data_group.oilGas" as "is__gfw_oil_gas",
         $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscape_2016",
@@ -67,6 +67,7 @@ object FireAlertsDF {
   }
 
   def aggChangeDaily(groupByCols: List[String],
+                     sourceDataset: String,
                      wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
@@ -79,7 +80,11 @@ object FireAlertsDF {
       else
         groupByCols ::: fireCols ::: contextualLayers
 
-    df.filter($"alert__date".isNotNull)
+    df.select(
+        $"alert__date" as s"${sourceDataset}__date",
+        $"confidence_cat" as s"${sourceDataset}__confidence",
+      )
+      .filter($"alert__date".isNotNull)
       .groupBy(cols.head, cols.tail: _*)
       .agg(
         sum("alert__count") as "alert__count"
@@ -87,39 +92,50 @@ object FireAlertsDF {
   }
 
   def aggChangeWeekly(cols: List[String],
+                      sourceDataset: String,
                       wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
 
     val fireCols = List(
-      year($"alert__date") as "alert__year",
-      weekofyear($"alert__date") as "alert__week",
-      $"confidence__cat"
+      year(col(s"${sourceDataset}__date")) as s"${sourceDataset}__year",
+      weekofyear(col(s"${sourceDataset}__date")) as s"${sourceDataset}__week",
+      col(s"${sourceDataset}}__confidence")
     )
-    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, fireCols, wdpa)
+    _aggChangeWeekly(df.filter(col(s"${sourceDataset}__date").isNotNull), cols, sourceDataset, fireCols, wdpa)
   }
 
   def aggChangeWeekly2(cols: List[String],
+                       sourceDataset: String,
                        wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
 
-    val fireCols = List($"alert__year", $"alert__week", $"confidence__cat")
-    _aggChangeWeekly(df, cols, fireCols, wdpa)
+    val fireCols = List(
+      col(s"${sourceDataset}__year"),
+      col(s"${sourceDataset}__week"),
+      col(s"${sourceDataset}}__confidence")
+    )
+    _aggChangeWeekly(df, cols, sourceDataset, fireCols, wdpa)
   }
 
   private def _aggChangeWeekly(df: DataFrame,
                                cols: List[String],
+                               sourceDataset: String,
                                fireCols: List[Column],
                                wdpa: Boolean = false): DataFrame = {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val fireCols2 = List("alert__year", "alert__week", "confidence__cat")
+    val fireCols2 = List(
+      s"${sourceDataset}__year",
+      s"${sourceDataset}__week",
+      s"${sourceDataset}__confidence"
+    )
 
-    val aggCols = List($"alert__count")
+    val aggCols = List(col(s"${sourceDataset}__count"))
 
     val contextLayers: List[String] =
       if (!wdpa) "wdpa_protected_area__iucn_cat" :: contextualLayers
@@ -148,8 +164,8 @@ object FireAlertsDF {
 
     val defaultAggCols = List(
       max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
-      max("is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
-      max("is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
+      max("is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
+      max("is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
       max("is__landmark_land_right") as "is__landmark_land_right",
       max(length($"gfw_plantation__type"))
         .cast("boolean") as "gfw_plantation__type",
@@ -163,8 +179,8 @@ object FireAlertsDF {
       max("is__gfw_oil_palm") as "is__gfw_oil_palm",
       max(length($"idn_forest_area__type"))
         .cast("boolean") as "idn_forest_area__type",
-      max(length($"per_forest_concession__type"))
-        .cast("boolean") as "per_forest_concession__type",
+      max(length($"per_forest_concessions__type"))
+        .cast("boolean") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
       max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
       max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
@@ -188,21 +204,21 @@ object FireAlertsDF {
       max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max("is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
       max("is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
-      max("is__landmark_land_right") as "is__landmark_land_right",
-      max("gfw_plantation__type") as "gfw_plantation__type",
+      max("is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
+      max("gfw_plantations__type") as "gfw_plantations__type",
       max("is__gfw_mining") as "is__gfw_mining",
-      max("is__gfw_managed_forest") as "is__gfw_managed_forest",
+      max("is__gfw_managed_forests") as "is__gfw_managed_forests",
       max("rspo_oil_palm__certification_status") as "rspo_oil_palm__certification_status",
       max("is__gfw_wood_fiber") as "is__gfw_wood_fiber",
-      max("is__peatland") as "is__peatland",
+      max("is__gfw_peatlands") as "is__gfw_peatlands",
       max("is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max("is__gfw_oil_palm") as "is__gfw_oil_palm",
       max("idn_forest_area__type") as "idn_forest_area__type",
-      max("per_forest_concession__type") as "per_forest_concession__type",
+      max("per_forest_concessions__type") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
       max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
-      max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
-      max("bra_biome__name") as "bra_biome__name"
+      max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
+      max("bra_biomes__name") as "bra_biomes__name"
     )
 
     val aggCols =
