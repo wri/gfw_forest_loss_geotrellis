@@ -28,7 +28,8 @@ object FireAlertsExport extends SummaryExport {
       List($"featureId.iso" as "iso", $"featureId.adm1" as "adm1", $"featureId.adm2" as "adm2")
 
     val fireCols = _getFireCols(fireAlertType, spark)
-    val aggCol = _getAggCol(fireAlertType)
+    val sourceDataset = _getSourceDataset(fireAlertType)
+    val aggCol = _getAggCol(sourceDataset, fireAlertType)
     val cols = featureCols ++ fireCols
 
     val gadmDF =
@@ -47,7 +48,7 @@ object FireAlertsExport extends SummaryExport {
         .csv (path = outputUrl + "/all")
     }
 
-    exportChange(gadmDF, aggCol, outputUrl, numPartitions)
+    exportChange(gadmDF, aggCol, outputUrl, numPartitions, sourceDataset)
     if (!changeOnly) {
       exportWhitelist(gadmDF, outputUrl)
     }
@@ -83,9 +84,9 @@ object FireAlertsExport extends SummaryExport {
       .csv(path = outputUrl + "/iso/whitelist")
   }
 
-  private def exportChange(df: DataFrame, aggCol: String, outputUrl: String, numPartitions: Int): Unit = {
+  private def exportChange(df: DataFrame, aggCol: String, outputUrl: String, numPartitions: Int, sourceDataset: String): Unit = {
     val adm2DailyDF = df
-      .transform(FireAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2"), aggCol))
+      .transform(FireAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2"), sourceDataset, aggCol))
 
     adm2DailyDF
       .coalesce(ceil(numPartitions / 80.0).toInt)
@@ -94,7 +95,7 @@ object FireAlertsExport extends SummaryExport {
       .csv(path = outputUrl + "/adm2/daily_alerts")
 
     val adm2DF = adm2DailyDF
-      .transform(FireAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2"), aggCol))
+      .transform(FireAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2"), sourceDataset, aggCol))
 
     adm2DF
       .coalesce(ceil(numPartitions / 100.0).toInt)
@@ -103,7 +104,7 @@ object FireAlertsExport extends SummaryExport {
       .csv(path = outputUrl + "/adm2/weekly_alerts")
 
     val adm1DF = adm2DF
-      .transform(FireAlertsDF.aggChangeWeekly2(List("iso", "adm1"), aggCol))
+      .transform(FireAlertsDF.aggChangeWeekly2(List("iso", "adm1"), sourceDataset, aggCol))
 
     adm1DF
       .coalesce(ceil(numPartitions / 150.0).toInt)
@@ -113,7 +114,7 @@ object FireAlertsExport extends SummaryExport {
 
 
     val isoDF = adm1DF
-      .transform(FireAlertsDF.aggChangeWeekly2(List("iso"), aggCol))
+      .transform(FireAlertsDF.aggChangeWeekly2(List("iso"), sourceDataset, aggCol))
 
 
     isoDF
@@ -189,8 +190,10 @@ object FireAlertsExport extends SummaryExport {
     val spark = summaryDF.sparkSession
 
     val cols = groupByCols
+
     val fireCols = _getFireCols(fireAlertType, spark)
-    val aggCol = _getAggCol(fireAlertType)
+    val sourceDataset = _getSourceDataset(fireAlertType)
+    val aggCol = _getAggCol(sourceDataset, fireAlertType)
     val unpackAllCols = unpackCols ++ fireCols
 
     val df = summaryDF.transform(
@@ -218,13 +221,13 @@ object FireAlertsExport extends SummaryExport {
         .csv(path = outputUrl + "/whitelist")
     }
 
-    df.transform(FireAlertsDF.aggChangeDaily(cols, aggCol, wdpa = wdpa))
+    df.transform(FireAlertsDF.aggChangeDaily(cols, sourceDataset, aggCol, wdpa = wdpa))
       .coalesce(ceil(numPartitions / 100.0).toInt)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
 
-    df.transform(FireAlertsDF.aggChangeWeekly(cols, aggCol, wdpa = wdpa))
+    df.transform(FireAlertsDF.aggChangeWeekly(cols, sourceDataset, aggCol, wdpa = wdpa))
       .coalesce(ceil(numPartitions / 150.0).toInt)
       .write
       .options(csvOptions)
@@ -268,10 +271,19 @@ object FireAlertsExport extends SummaryExport {
     }
   }
 
-  def _getAggCol(fireAlertType: String): String = {
+
+  private def _getSourceDataset(fireAlertType: String): String = {
     fireAlertType match {
-      case "modis" | "viirs" => "alert__count"
-      case "burned_areas" => "burned_area__ha"
+      case "viirs" => "nasa_viirs_fire_alerts"
+      case "modis" => "nasa_modis_fire_alerts"
+      case "burned_areas" => "umd_modis_burned_areas"
+    }
+  }
+
+  private def _getAggCol(sourceDataset: String, fireAlertType: String): String = {
+    fireAlertType match {
+      case "modis" | "viirs" => s"${sourceDataset}__count"
+      case "burned_areas" => "umd_modis_burned_areas__ha"
     }
   }
 }
