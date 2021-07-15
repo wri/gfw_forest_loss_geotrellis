@@ -7,6 +7,7 @@ import org.apache.spark.sql.{Column, DataFrame}
 object FireAlertsDF {
 
   val contextualLayers: List[String] = List(
+    "umd_tree_cover_density_2000__threshold",
     "is__umd_regional_primary_forest_2001",
     "is__birdlife_alliance_for_zero_extinction_sites",
     "is__birdlife_key_biodiversity_areas",
@@ -37,25 +38,25 @@ object FireAlertsDF {
 
     def defaultCols =
       List(
+        $"data_group.threshold" as "umd_tree_cover_density_2000__threshold",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
-        $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
-        $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_area",
-        $"data_group.landmark" as "is__landmark_land_right",
-        $"data_group.plantations" as "gfw_plantation__type",
+        $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
+        $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_areas",
+        $"data_group.landmark" as "is__landmark_indigenous_and_community_lands",
+        $"data_group.plantations" as "gfw_plantations__type",
         $"data_group.mining" as "is__gfw_mining",
-        $"data_group.logging" as "is__gfw_managed_forest",
+        $"data_group.logging" as "is__gfw_managed_forests",
         $"data_group.rspo" as "rspo_oil_palm__certification_status",
         $"data_group.woodFiber" as "is__gfw_wood_fiber",
-        $"data_group.peatlands" as "is__peatland",
+        $"data_group.peatlands" as "is__gfw_peatlands",
         $"data_group.indonesiaForestMoratorium" as "is__idn_forest_moratorium",
         $"data_group.oilPalm" as "is__gfw_oil_palm",
         $"data_group.indonesiaForestArea" as "idn_forest_area__type",
         $"data_group.peruForestConcessions" as "per_forest_concessions__type",
         $"data_group.oilGas" as "is__gfw_oil_gas",
         $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
-        $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscape_2016",
-        $"data_group.braBiomes" as "bra_biome__name",
-        $"data.totalAlerts" as "alert__count"
+        $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscapes_2016",
+        $"data_group.braBiomes" as "bra_biomes__name",
       )
 
     val cols =
@@ -68,12 +69,15 @@ object FireAlertsDF {
 
   def aggChangeDaily(groupByCols: List[String],
                      sourceDataset: String,
+                     aggCol: String,
                      wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
 
-    val fireCols = List("alert__date", "confidence__cat")
+    val confCols = if (!aggCol.equals("umd_modis_burned_area__ha")) List("confidence_cat") else List()
+    val fireCols = List("alert__date") ::: confCols
+
     val cols =
       if (!wdpa)
         groupByCols ::: fireCols ::: "wdpa_protected_area__iucn_cat" :: contextualLayers
@@ -87,53 +91,60 @@ object FireAlertsDF {
       .filter($"alert__date".isNotNull)
       .groupBy(cols.head, cols.tail: _*)
       .agg(
-        sum("alert__count") as "alert__count"
+        sum(aggCol) as aggCol
       )
   }
 
   def aggChangeWeekly(cols: List[String],
                       sourceDataset: String,
+                      aggCol: String,
                       wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
 
+    val confCols = if (!aggCol.equals("umd_modis_burned_area__ha")) List(col(s"${sourceDataset}__confidence")) else List()
+
     val fireCols = List(
       year(col(s"${sourceDataset}__date")) as s"${sourceDataset}__year",
       weekofyear(col(s"${sourceDataset}__date")) as s"${sourceDataset}__week",
       col(s"${sourceDataset}}__confidence")
-    )
-    _aggChangeWeekly(df.filter(col(s"${sourceDataset}__date").isNotNull), cols, sourceDataset, fireCols, wdpa)
+    ) ::: confCols
+    _aggChangeWeekly(df.filter(col(s"${sourceDataset}__date").isNotNull), cols, sourceDataset, fireCols, aggCol, wdpa)
   }
 
   def aggChangeWeekly2(cols: List[String],
                        sourceDataset: String,
+                       aggCol: String,
                        wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
 
+    val confCols = if (!aggCol.equals("burned_area__ha")) List($"confidence__cat")  else List()
     val fireCols = List(
       col(s"${sourceDataset}__year"),
       col(s"${sourceDataset}__week"),
       col(s"${sourceDataset}}__confidence")
-    )
-    _aggChangeWeekly(df, cols, sourceDataset, fireCols, wdpa)
+    ) ::: confCols
+    _aggChangeWeekly(df, cols, sourceDataset, fireCols, aggCol, wdpa)
   }
 
   private def _aggChangeWeekly(df: DataFrame,
                                cols: List[String],
                                sourceDataset: String,
                                fireCols: List[Column],
+                               aggCol: String,
                                wdpa: Boolean = false): DataFrame = {
     val spark = df.sparkSession
     import spark.implicits._
 
+    val confCols = if (!aggCol.equals("umd_modis_burned_areass__ha")) List(s"${sourceDataset}__confidence")  else List()
     val fireCols2 = List(
       s"${sourceDataset}__year",
       s"${sourceDataset}__week",
       s"${sourceDataset}__confidence"
-    )
+    ) ::: confCols
 
     val aggCols = List(col(s"${sourceDataset}__count"))
 
@@ -141,7 +152,6 @@ object FireAlertsDF {
       if (!wdpa) "wdpa_protected_area__iucn_cat" :: contextualLayers
       else contextualLayers
 
-    // TODO what the heck is this doing?
     val selectCols: List[Column] = cols.foldRight(Nil: List[Column])(
       col(_) :: _
     ) ::: fireCols ::: contextLayers
@@ -152,7 +162,7 @@ object FireAlertsDF {
     df.select(selectCols: _*)
       .groupBy(groupByCols.head, groupByCols.tail: _*)
       .agg(
-        sum("alert__count") as "alert__count"
+        sum(aggCol) as aggCol
       )
   }
 

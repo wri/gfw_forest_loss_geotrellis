@@ -15,6 +15,7 @@ object WdpaFeature extends Feature {
   val isoPos = 3
   val statusPos = 4
   val geomPos = 7
+  val featureCount = 4
 
   val featureIdExpr =  "cast(wdpaid as int) as wdpaId, name as name, iucn_cat as iucnCat, iso3 as iso, status"
 
@@ -29,7 +30,7 @@ object WdpaFeature extends Feature {
       .Feature(geom, featureId)
   }
 
-  def getFeatureId(i: Array[String]): FeatureId = {
+  def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     val wdpaId: Int = i(wdpaIdPos).toInt
     val name: String = i(namePos)
     val iucnCat: String = i(iucnCatPos)

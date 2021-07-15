@@ -9,6 +9,7 @@ case class FeatureFactory(featureName: String, fireAlertType: Option[String] = N
     case "firealerts" => fireAlertType match {
       case Some("viirs") => FireAlertsViirsFeature
       case Some("modis") => FireAlertsModisFeature
+      case Some("burned_areas") => BurnedAreasFeature
       case _ => throw new IllegalArgumentException("Cannot provide fire alert feature type without selecting alert" +
         "type 'modis' or 'viirs'")
     }

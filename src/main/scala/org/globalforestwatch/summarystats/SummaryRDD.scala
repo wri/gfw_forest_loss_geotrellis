@@ -15,7 +15,9 @@ import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
 
+
 import scala.reflect.ClassTag
+
 
 trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
@@ -40,6 +42,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      * Then create a key based off the Z curve value from the grid cell, to use for partitioning.
      * Later we will calculate partial result for each intersection and merge them.
      */
+
 
     val keyedFeatureRDD: RDD[(Long, (SpatialKey, Feature[Geometry, FEATUREID]))] = featureRDD
       .flatMap { feature: Feature[Geometry, FEATUREID] =>
