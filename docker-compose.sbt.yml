@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  sbt:
+    container_name: sbt
+    image: mozilla/sbt:latest
+    environment:
+      - AWS_REGION=us-east-1
+    volumes:
+      - $PWD:/opt/app
+      - ~/.ivy2:/root/.ivy2
+      - ~/.sbt:/root/.sbt
+    working_dir: /opt/app
+    entrypoint: sbt
+

@@ -1,9 +1,13 @@
 package org.globalforestwatch.summarystats
 
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.SparkSession
+//import org.apache.sedona.core.serde.SedonaKryoRegistrator
+//import org.apache.sedona.sql.utils.SedonaSQLRegistrator
+
 import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
 import org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+
 
 object SummarySparkSession {
 

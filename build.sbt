@@ -32,28 +32,37 @@ addCompilerPlugin(
 addCompilerPlugin(
   "org.scalamacros" %% "paradise" % "2.1.1" cross CrossVersion.full
 )
+
 resolvers ++= Seq(
   "GeoSolutions" at "https://maven.geo-solutions.it/",
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
   "LT-snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
   "OSGeo" at "https://repo.osgeo.org/repository/release/",
+  "Open Source Geospatial Foundation Repository" at "https://repo.osgeo.org/repository/release/",
+  "Apache Software Foundation Snapshots" at "https://repository.apache.org/content/groups/snapshots",
+  "Java.net repository" at "https://download.java.net/maven/2",
+  "Artifacts" at "https://mvnrepository.com/artifact",
+  "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/",
+  "jitpack" at "https://jitpack.io",
+  "maven2" at "https://repo1.maven.org/maven2",
+  //  "Geotools Wrapper" at "https://mvnrepository.com/artifact/org.datasyslab/geotools-wrapper",
+  "Geotools Metadata" at "https://mvnrepository.com/artifact/org.geotools/gt-metadata",
   Resolver.bintrayRepo("azavea", "geotrellis")
 )
 
-resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/"
-
-libraryDependencies += "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
-libraryDependencies += "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
 
 libraryDependencies ++= Seq(
-  sparkCore % Provided,
-  sparkSQL % Provided,
-  sparkHive % Provided,
-  hadoopAws % Provided,
-  hadoopCommon % Provided,
+  sparkCore,
+  sparkSQL,
+  sparkHive,
+  hadoopAws,
+  hadoopCommon,
+  hadoopMapReduceClientCore,
   logging,
   decline,
+  paranamer,
   scalatest % Test,
+  scalactic % Test,
   geotrellisSpark,
   geotrellisSparkTestKit % Test,
   geotrellisS3,
@@ -63,37 +72,34 @@ libraryDependencies ++= Seq(
   geotrellisGdal,
   logging,
   decline,
-  scalatest % Test,
-  //"org.geotools" % "gt-ogr-bridj" % Version.geotools
-  //  exclude("com.nativelibs4java", "bridj"),
-  "com.nativelibs4java" % "bridj" % "0.6.1",
-  "org.scalanlp" %% "breeze" % "0.13.2",
-  "org.scalanlp" %% "breeze-natives" % "0.13.2",
-  "org.scalanlp" %% "breeze-viz" % "0.13.2"
+  sedonaCore,
+  sedonaSQL,
+  //  jtsCore,
+  //  jts2geojson,
+  geoToolsOGRBridj,
+  bridj,
+  breeze,
+  breezeNatives,
+  breezeViz,
+  sparkDaria,
 )
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
-
-// spark-daria
-resolvers += "jitpack" at "https://jitpack.io"
-resolvers += "maven2" at "https://repo1.maven.org/maven2"
-libraryDependencies += "com.github.mrpowers" % "spark-daria_2.12" % "0.38.2"
-
 
 // auto imports for local SBT console
 // can be used with `test:console` command
 initialCommands in console :=
   """
 import java.net._
-import geotrellis.raster._
-import geotrellis.vector._
-import geotrellis.vector.io._
-import geotrellis.spark._
-import geotrellis.spark.tiling._
-import geotrellis.contrib.vlm._
-import geotrellis.contrib.vlm.gdal._
-import geotrellis.contrib.vlm.geotiff._
-import geotrellis.vector.io.wkt.WKT
+//import geotrellis.raster._
+//import geotrellis.vector._
+//import geotrellis.vector.io._
+//import geotrellis.spark._
+//import geotrellis.spark.tiling._
+//import geotrellis.contrib.vlm._
+//import geotrellis.contrib.vlm.gdal._
+//import geotrellis.contrib.vlm.geotiff._
+//import geotrellis.vector.io.wkt.WKT
 
 import org.apache.spark.rdd._
 import org.apache.spark.sql._
@@ -102,14 +108,14 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.globalforestwatch.summarystats.treecoverloss._
 import org.globalforestwatch.util._
 
-
-val conf = new SparkConf().
-setAppName("Tree Cover Loss Console").
-set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
-set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
-
-implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
-implicit val sc: SparkContext = spark.sparkContext
+//
+//val conf = new SparkConf().
+//setAppName("Tree Cover Loss Console").
+//set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+////.set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
+//
+//implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
+//implicit val sc: SparkContext = spark.sparkContext
 """
 
 // settings for local testing
@@ -118,6 +124,7 @@ Test / fork := true
 Test / parallelExecution := false
 Test / testOptions += Tests.Argument("-oD")
 Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m")
+Test / envVars := Map("AWS_REQUEST_PAYER" -> "requester")
 
 // Settings for sbt-assembly plugin which builds fat jars for use by spark jobs
 test in assembly := {}
@@ -126,7 +133,7 @@ assemblyMergeStrategy in assembly := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat
   // both GeoSpark and Geotrellis bring in this library, need to use GeoSpark version
-  case PathList("org", "geotools", xs @ _*) => MergeStrategy.first
+  case PathList("org", "geotools", xs@_*) => MergeStrategy.first
   case PathList("META-INF", xs@_*) =>
     xs match {
       case ("MANIFEST.MF" :: Nil) => MergeStrategy.discard
@@ -166,22 +173,22 @@ import com.amazonaws.services.elasticmapreduce.model.Tag
 sparkEmrRelease := "emr-6.1.0"
 sparkAwsRegion := "us-east-1"
 sparkEmrApplications := Seq("Spark", "Zeppelin", "Ganglia")
-sparkS3JarFolder := "s3://gfw-files/2018_update/spark/jars"
-sparkS3LogUri := Some("s3://gfw-files/2018_update/spark/logs")
-sparkSubnetId := Some("subnet-8c2b5ea1")
-sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 101   // Trying 101 for carbonflux and carbon_sensitivity
+sparkS3JarFolder := "s3://gfw-pipelines-dev/geotrellis/jars"
+sparkS3LogUri := Some("s3://gfw-pipelines-dev/geotrellis/logs")
+sparkSubnetId := Some("subnet-067b91868bc3a8ff1")
+sparkSecurityGroupIds := Seq("sg-07c11c0c9189c0a7a", "sg-068c422162d468700")
+sparkInstanceCount := 21 // 201 for carbonflux and carbon_sensitivity
 sparkMasterType := "r4.2xlarge"
 sparkCoreType := "r4.2xlarge"
 sparkMasterEbsSize := Some(10)
 sparkCoreEbsSize := Some(10)
 //sparkMasterPrice := Some(3.0320)
 sparkCorePrice := Some(0.532)
-sparkClusterName := s"geotrellis-treecoverloss"
+sparkClusterName := s"geotrellis-forest-change-diagnostic"
 sparkEmrServiceRole := "EMR_DefaultRole"
 sparkInstanceRole := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
-  "tmaschler_wri2"
+  "tmaschler_gfw"
 )
 sparkEmrBootstrap := List(
   BootstrapAction(
@@ -198,6 +205,7 @@ sparkRunJobFlowRequest := sparkRunJobFlowRequest.value
 sparkEmrConfigs := List(
   // reference to example by geotrellis: https://github.com/geotrellis/geotrellis-spark-job.g8/blob/master/src/main/g8/build.sbt#L70-L91
   EmrConfig("spark").withProperties("maximizeResourceAllocation" -> "true"),
+  EmrConfig("emrfs-site").withProperties("fs.s3.useRequesterPaysHeader" -> "true"),
   EmrConfig("spark-defaults").withProperties(
     // https://aws.amazon.com/blogs/big-data/best-practices-for-successfully-managing-memory-for-apache-spark-applications-on-amazon-emr/
     //    Best practice 1: Choose the right type of instance for each of the node types in an Amazon EMR cluster.
@@ -220,6 +228,16 @@ sparkEmrConfigs := List(
     // spark.default.parallelism = spark.executor.instances * spark.executors.cores * 2
     // spark.sql.shuffle.partitions = spark.default.parallelism
 
+//    "spark.dynamicAllocation.enabled" -> "false",
+//    "spark.executor.cores" -> "1", //5",
+//    "spark.executor.memory" -> "5652m", //37G
+//    "spark.executor.memoryOverhead" -> "2g", //5G
+//    "spark.driver.cores" -> "1",
+//    "spark.driver.memory" -> "6652m",
+//    "spark.executor.instances" -> "159", // 1599 for carbonflux and carbon_sensitivity
+//    "spark.default.parallelism" -> "1590", // 15990 for carbonflux and carbon_sensitivity
+//    "spark.sql.shuffle.partitions" -> "1590", // 15990 for carbonflux and carbon_sensitivity
+
     "spark.shuffle.spill.compress" -> "true",
     "spark.driver.maxResultSize" -> "3G",
     "spark.shuffle.compress" -> "true",
@@ -241,8 +259,8 @@ sparkEmrConfigs := List(
     // "spark.driver.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
 
     // set this environment variable for GDAL to use request payer method for S3 files
-    "spark.appMasterEnv.AWS_REQUEST_PAYER"->  "requester",
-    "spark.executorEnv.AWS_REQUEST_PAYER"->  "requester",
+    "spark.yarn.appMasterEnv.AWS_REQUEST_PAYER" -> "requester",
+    "spark.yarn.executorEnv.AWS_REQUEST_PAYER" -> "requester",
 
   ),
   //  EmrConfig("spark-env").withProperties(

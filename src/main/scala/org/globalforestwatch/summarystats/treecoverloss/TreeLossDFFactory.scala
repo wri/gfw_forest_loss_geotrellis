@@ -54,7 +54,7 @@ case class TreeLossDFFactory(
                 case simpleId: SimpleFeatureId =>
                   TreeLossRowSimple(simpleId, dataGroup, data)
                 case _ =>
-                  throw new IllegalArgumentException("Not a WdpaFeatureId")
+                  throw new IllegalArgumentException("Not a SimpleFeatureId")
               }
             }
           }

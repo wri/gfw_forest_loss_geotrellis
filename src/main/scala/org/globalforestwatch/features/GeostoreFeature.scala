@@ -9,6 +9,7 @@ object GeostoreFeature extends Feature {
 
   val idPos = 0
   val geomPos = 1
+  val featureCount = 1
 
   val featureIdExpr = "geostore_id as geostoreId"
 
@@ -23,7 +24,7 @@ object GeostoreFeature extends Feature {
     geotrellis.vector.Feature(geom, featureId)
   }
 
-  def getFeatureId(i: Array[String]): FeatureId = {
+  def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     val geostoreId: String = i(idPos)
     GeostoreFeatureId(geostoreId)
   }

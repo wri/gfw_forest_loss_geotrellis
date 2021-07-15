@@ -34,8 +34,6 @@ object GladAlertsAnalysis {
       .ofPattern("yyyyMMdd_HHmm")
       .format(LocalDateTime.now)
 
-    summaryDF.show()
-
     GladAlertsExport.export(
       featureType,
       summaryDF,
