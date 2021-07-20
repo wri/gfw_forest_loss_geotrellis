@@ -2,23 +2,30 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import cats.data.NonEmptyList
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util
 import scala.collection.JavaConverters._
 import scala.collection.immutable.SortedMap
 import geotrellis.vector.{Feature, Geometry}
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
-import org.apache.log4j.Logger
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.globalforestwatch.features.{CombinedFeatureId, FeatureDF, FeatureId, FireAlertRDD, GfwProFeature, GfwProFeatureId, GridId}
+import org.globalforestwatch.features.{
+  CombinedFeatureId,
+  FeatureDF,
+  FeatureId,
+  FireAlertRDD,
+  GadmFeatureId,
+  GfwProFeature,
+  GfwProFeatureId,
+  GridId,
+  WdpaFeatureId
+}
 import org.globalforestwatch.grids.GridId.pointGridId
 import org.globalforestwatch.summarystats.SummaryAnalysis
 import org.globalforestwatch.util.SpatialJoinRDD
 import org.globalforestwatch.util.ImplicitGeometryConverter._
-import org.globalforestwatch.util.Util.{getAnyMapValue, sortByZIndex}
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 //import org.apache.sedona.core.enums.{FileDataSplitter, GridType, IndexType}
 //import org.apache.sedona.core.spatialOperator.JoinQuery
@@ -42,16 +49,20 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
     mainRDD.cache()
 
+    // For standard GFW Pro Feature IDs we create a Grid Filter
+    // This will allow us to only process those parts of the dissolved list geometry which were updated
+    // When using other Feature IDs such as WDPA or GADM,
+    // there will be no intermediate results and this part will be ignored
     val gridFilter: List[String] =
-      mainRDD
-        .filter { feature: Feature[Geometry, FeatureId] =>
-          feature.data match {
-            case gfwproId: GfwProFeatureId => gfwproId.locationId == -2
-            case _ => false
-          }
+    mainRDD
+      .filter { feature: Feature[Geometry, FeatureId] =>
+        feature.data match {
+          case gfwproId: GfwProFeatureId => gfwproId.locationId == -2
+          case _ => false
         }
-        .map(f => pointGridId(f.geom.getCentroid, 1))
-        .collect
+      }
+      .map(f => pointGridId(f.geom.getCentroid, 1))
+      .collect
         .toList
 
     val featureRDD: RDD[Feature[Geometry, FeatureId]] =
@@ -88,7 +99,15 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     dataRDD.cache()
 
     val finalRDD =
-      combineIntermediateList(dataRDD, gridFilter, runOutputUrl, spark, kwargs)
+      if (featureType == "gfwpro")
+        combineIntermediateList(
+          dataRDD,
+          gridFilter,
+          runOutputUrl,
+          spark,
+          kwargs
+        )
+      else dataRDD
 
     val summaryDF =
       ForestChangeDiagnosticDFFactory(featureType, finalRDD, spark, kwargs).getDataFrame
@@ -121,6 +140,8 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     val featureRDD: RDD[Feature[Geometry, FeatureId]] = mainRDD
       .filter { feature: Feature[Geometry, FeatureId] =>
         feature.data match {
+          case _: WdpaFeatureId => true
+          case _: GadmFeatureId => true
           case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 => true
           case gfwproId: GfwProFeatureId if gfwproId.locationId == -1 =>
             // If no geometric difference or intermediate result table is present process entire merged list geometry
@@ -133,6 +154,8 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       }
       .map { feature: Feature[Geometry, FeatureId] =>
         feature.data match {
+          case _: WdpaFeatureId => feature
+          case _: GadmFeatureId => feature
           case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 => feature
           case _ =>
             val grid = pointGridId(feature.geom.getCentroid, 1)
@@ -203,9 +226,11 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       kwargs
     ).getDataFrame
 
-    ForestChangeDiagnosticExport.exportIntermediateList(
+    ForestChangeDiagnosticExport.export(
+      "intermediate",
       combinedListDF,
-      outputUrl
+      outputUrl,
+      kwargs
     )
 
     // Reduce by feature ID and update commodity risk
@@ -247,7 +272,11 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     spatialFeatureRDD.analyze()
 
     val joinedRDD =
-      SpatialJoinRDD.spatialjoin(spatialFeatureRDD, fireAlertSpatialRDD, usingIndex = true)
+      SpatialJoinRDD.spatialjoin(
+        spatialFeatureRDD,
+        fireAlertSpatialRDD,
+        usingIndex = true
+      )
 
     joinedRDD.rdd
       .map {
@@ -634,7 +663,8 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     }
 
     intermediateDF.rdd.map(row => {
-      val gfwproFeatureId = GfwProFeatureId(row.getString(0), row.getString(1).toInt)
+      val gfwproFeatureId =
+        GfwProFeatureId(row.getString(0), row.getString(1).toInt)
       val gridId = GridId(row.getString(2))
       val treeCoverLossTcd30Yearly =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(3))

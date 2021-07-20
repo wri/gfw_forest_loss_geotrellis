@@ -3,7 +3,7 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 import io.circe.syntax._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GfwProFeatureId, GridId}
+import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GadmFeatureId, GfwProFeatureId, GridId, WdpaFeatureId}
 import org.globalforestwatch.util.CaseClassConstrutor.createCaseClassFromMap
 
 case class ForestChangeDiagnosticDFFactory(
@@ -19,8 +19,10 @@ case class ForestChangeDiagnosticDFFactory(
     featureType match {
       case "gfwpro" => getFeatureDataFrame
       case "grid" => getGridFeatureDataFrame
+      case "wdpa" => getWdpaFeatureDataFrame
+      case "gadm" => getGadmFeatureDataFrame
       case _ =>
-        throw new IllegalArgumentException("Not a valid GfwProFeatureId")
+        throw new IllegalArgumentException("Not a valid FeatureType")
     }
   }
 
@@ -41,6 +43,44 @@ case class ForestChangeDiagnosticDFFactory(
           }
       }
       .toDF("location_id" :: featureFieldNames: _*)
+  }
+
+  private def getGadmFeatureDataFrame: DataFrame = {
+
+    dataRDD
+      .map {
+        case (id, data) =>
+          id match {
+            case gadmId: GadmFeatureId =>
+              createCaseClassFromMap[ForestChangeDiagnosticRowSimple](
+                Map("id" -> gadmId.toString) ++
+                  featureFieldMap(data)
+              )
+
+            case _ =>
+              throw new IllegalArgumentException("Not a GadmFeatureId")
+          }
+      }
+      .toDF("gadm_id" :: featureFieldNames: _*)
+  }
+
+  private def getWdpaFeatureDataFrame: DataFrame = {
+
+    dataRDD
+      .map {
+        case (id, data) =>
+          id match {
+            case wdpaId: WdpaFeatureId =>
+              createCaseClassFromMap[ForestChangeDiagnosticRowSimple](
+                Map("id" -> wdpaId.toString) ++
+                  featureFieldMap(data)
+              )
+
+            case _ =>
+              throw new IllegalArgumentException("Not a WdpaFeatureId")
+          }
+      }
+      .toDF("wdpa_id" :: featureFieldNames: _*)
   }
 
   private def getGridFeatureDataFrame: DataFrame = {

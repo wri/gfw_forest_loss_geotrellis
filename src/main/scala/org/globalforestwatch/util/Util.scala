@@ -58,7 +58,7 @@ object Util {
   }
 
   def getAnyMapValue[T: Manifest](map: Map[String, Any], key: String): T = {
-    map(key) match {
+    map.getOrElse(key, None) match {
       case v: T => v
       case _ => throw new IllegalArgumentException("Wrong type")
     }
