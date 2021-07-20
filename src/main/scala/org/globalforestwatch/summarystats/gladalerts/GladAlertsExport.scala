@@ -124,8 +124,6 @@ object GladAlertsExport extends SummaryExport {
     val adm2DailyDF = df
       .transform(GladAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
 
-    adm2DailyDF.show()
-
     adm2DailyDF
       .coalesce(10)
       .write

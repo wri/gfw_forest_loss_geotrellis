@@ -9,10 +9,10 @@ import cats.Semigroup
   * @param totalAlerts
   *
   */
-case class FireAlertsData(var totalAlerts: Int) {
+case class FireAlertsData(var total: Double) {
   def merge(other: FireAlertsData): FireAlertsData = {
     FireAlertsData(
-      totalAlerts + other.totalAlerts
+      total + other.total
     )
   }
 }

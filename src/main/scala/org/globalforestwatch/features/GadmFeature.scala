@@ -1,10 +1,7 @@
 package org.globalforestwatch.features
 
-import geotrellis.vector.Geometry
-import geotrellis.vector.io.wkb.WKB
 import org.apache.spark.sql.functions.substring
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.globalforestwatch.util.GeometryReducer
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.util.Util._
 
 object GadmFeature extends Feature {
@@ -17,31 +14,38 @@ object GadmFeature extends Feature {
     "gid_0 as iso, split(split(gid_1, '\\\\.')[1], '_')[0] as adm1, split(split(gid_2, '\\\\.')[2], '_')[0] as adm2"
 
 
-  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
-    val featureId = getFeatureId(i)
-    val geom: Geometry =
-      GeometryReducer.reduce(GeometryReducer.gpr)(
-        WKB.read(i.getString(geomPos))
-      )
+  def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
+    if (parsed) {
+      val countryCode = i(0)
+      val admin1: Integer = try {
+        i(1).toInt
+      } catch {
+        case e: Exception => null
+      }
 
-    geotrellis.vector.Feature(geom, featureId)
-  }
+      val admin2: Integer = try {
+        i(2).toInt
+      } catch {
+        case e: Exception => null
+      }
 
-  def getFeatureId(i: Array[String]): FeatureId = {
-    val countryCode = i(countryPos)
-    val admin1: Integer = try {
-      i(adm1Pos).split("[.]")(1).split("[_]")(0).toInt
-    } catch {
-      case e: Exception => null
+      GadmFeatureId(countryCode, admin1, admin2)
+    } else {
+      val countryCode = i(countryPos)
+      val admin1: Integer = try {
+        i(adm1Pos).split("[.]")(1).split("[_]")(0).toInt
+      } catch {
+        case e: Exception => null
+      }
+
+      val admin2: Integer = try {
+        i(adm2Pos).split("[.]")(2).split("[_]")(0).toInt
+      } catch {
+        case e: Exception => null
+      }
+
+      GadmFeatureId(countryCode, admin1, admin2)
     }
-
-    val admin2: Integer = try {
-      i(adm2Pos).split("[.]")(2).split("[_]")(0).toInt
-    } catch {
-      case e: Exception => null
-    }
-
-    GadmFeatureId(countryCode, admin1, admin2)
   }
 
   override def custom_filter(

@@ -17,37 +17,69 @@
 import sbt._
 
 object Version {
-  val scala       = "2.12.12"
-  val geotrellis  = "3.5.2"
-  val hadoop      = "3.2.1"
-  val spark       = "3.0.0"
-  val geotools    = "23.1"
+  val breeze = "0.13.2"
+  val decline = "1.3.0"
+  val scala = "2.12.12"
+  val geotrellis = "3.5.2"
+  val hadoop = "3.2.1"
+  val jackson = "2.10.0"
+  val spark = "3.0.0"
+  val sparkCompatible = "3.0"
+  val geotools = "23.1"
+  val sedona = "1.0.0-incubating"
 }
 
 object Dependencies {
-  val geotrellisSpark         = "org.locationtech.geotrellis" %% "geotrellis-spark"          % Version.geotrellis
-  val geotrellisS3            = "org.locationtech.geotrellis" %% "geotrellis-s3"             % Version.geotrellis
-  val geotrellisRaster        = "org.locationtech.geotrellis" %% "geotrellis-raster"         % Version.geotrellis
-  val geotrellisVector        = "org.locationtech.geotrellis" %% "geotrellis-vector"         % Version.geotrellis
-  val geotrellisVectorTile    = "org.locationtech.geotrellis" %% "geotrellis-vectortile"     % Version.geotrellis
-  val geotrellisUtil          = "org.locationtech.geotrellis" %% "geotrellis-util"           % Version.geotrellis
-  val geotrellisShapefile     = "org.locationtech.geotrellis" %% "geotrellis-shapefile"      % Version.geotrellis
-  val geotrellisGeotools      = "org.locationtech.geotrellis" %% "geotrellis-geotools"       % Version.geotrellis
-  val geotrellisSparkTestKit  = "org.locationtech.geotrellis" %% "geotrellis-spark-testkit"  % Version.geotrellis
+
+  private val dependencyScope = "provided"
+
+  val sparkJts = "org.locationtech.geomesa" %% "geomesa-spark-jts" % "2.3.1"
+
+  val geotrellisSpark = "org.locationtech.geotrellis" %% "geotrellis-spark" % Version.geotrellis
+  val geotrellisS3 = "org.locationtech.geotrellis" %% "geotrellis-s3" % Version.geotrellis
+  val geotrellisRaster = "org.locationtech.geotrellis" %% "geotrellis-raster" % Version.geotrellis
+  val paranamer = "com.thoughtworks.paranamer" % "paranamer" % "2.8"
+  val geotrellisVector = "org.locationtech.geotrellis" %% "geotrellis-vector" % Version.geotrellis
+  val geotrellisVectorTile = "org.locationtech.geotrellis" %% "geotrellis-vectortile" % Version.geotrellis
+  val geotrellisUtil = "org.locationtech.geotrellis" %% "geotrellis-util" % Version.geotrellis
+  val geotrellisShapefile = "org.locationtech.geotrellis" %% "geotrellis-shapefile" % Version.geotrellis
+  val geotrellisGeotools = "org.locationtech.geotrellis" %% "geotrellis-geotools" % Version.geotrellis
+  val geotrellisSparkTestKit = "org.locationtech.geotrellis" %% "geotrellis-spark-testkit" % Version.geotrellis
   val geotrellisRasterTestkit = "org.locationtech.geotrellis" %% "geotrellis-raster-testkit" % Version.geotrellis
-  val geotrellisGdal          = "org.locationtech.geotrellis" %% "geotrellis-gdal"           % Version.geotrellis
-  val sparkJts                = "org.locationtech.geomesa"    %% "geomesa-spark-jts"         % "2.2.0"
+  val geotrellisGdal = "org.locationtech.geotrellis" %% "geotrellis-gdal" % Version.geotrellis
 
-  val pureconfig          = "com.github.pureconfig"      %% "pureconfig"               % "0.9.1"
-  val logging             = "com.typesafe.scala-logging" %% "scala-logging"            % "3.9.0"
-  val scalatest           = "org.scalatest"              %% "scalatest"                % "3.0.5"
-  val scalactic           = "org.scalactic"              %% "scalactic"                % "3.0.5"
-  val decline             = "com.monovore"               %% "decline"                  % "0.5.1"
+  val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.9.1"
+  val logging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
+  val scalatest = "org.scalatest" %% "scalatest" % "3.0.8"
+  val scalactic = "org.scalactic" %% "scalactic" % "3.0.8"
+  val decline = "com.monovore" %% "decline" % Version.decline
 
-  val sparkCore           = "org.apache.spark"           %% "spark-core"               % Version.spark
-  val sparkSQL            = "org.apache.spark"           %% "spark-sql"                % Version.spark
-  val sparkHive           = "org.apache.spark"           %% "spark-hive"               % Version.spark
-  val hadoopClient        = "org.apache.hadoop"           % "hadoop-client"            % Version.hadoop
-  val hadoopCommon        = "org.apache.hadoop"           % "hadoop-common"            % Version.hadoop
-  val hadoopAws           = "org.apache.hadoop"           % "hadoop-aws"               % Version.hadoop
+  val jacksonDatabind = "com.fasterxml.jackson.core" % "jackson-databind" % Version.jackson % dependencyScope
+  val jacksonCore = "com.fasterxml.jackson.core" % "jackson-core" % Version.jackson % dependencyScope
+
+  val sparkCore = "org.apache.spark" %% "spark-core" % Version.spark % dependencyScope exclude("org.apache.hadoop", "*")
+  val sparkSQL = "org.apache.spark" %% "spark-sql" % Version.spark % dependencyScope exclude("org.apache.hadoop", "*")
+  val sparkHive = "org.apache.spark" %% "spark-hive" % Version.spark % dependencyScope exclude("org.apache.hadoop", "*")
+
+  val hadoopClient = "org.apache.hadoop" % "hadoop-client" % Version.hadoop % dependencyScope
+  val hadoopMapReduceClientCore = "org.apache.hadoop" % "hadoop-mapreduce-client-core" % Version.hadoop % dependencyScope
+  val hadoopCommon = "org.apache.hadoop" % "hadoop-common" % Version.hadoop % dependencyScope
+  val hadoopAws = "org.apache.hadoop" % "hadoop-aws" % Version.hadoop % dependencyScope
+
+  //  val sedonaCore = "org.apache.sedona" %% "sedona-core-".concat(
+  //    Version.sparkCompatible
+  //  ) % Version.sedona
+  //  val sedonaSQL = "org.apache.sedona" %% "sedona-sql-".concat(
+  //    Version.sparkCompatible
+  //  ) % Version.sedona
+  val sedonaCore = "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
+  val sedonaSQL = "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
+  //  val jts2geojson = "org.wololo" % "jts2geojson" % "0.14.3" % "compile"
+  //  val jtsCore = "org.locationtech.jts" % "jts-core" % "1.16.1" % "compile"  // 1.18.0 ?
+  val geoToolsOGRBridj = "org.geotools" % "gt-ogr-bridj" % Version.geotools exclude("com.nativelibs4java", "bridj")
+  val bridj = "com.nativelibs4java" % "bridj" % "0.6.1"
+  val breeze = "org.scalanlp" %% "breeze" % Version.breeze
+  val breezeNatives = "org.scalanlp" %% "breeze-natives" % Version.breeze
+  val breezeViz = "org.scalanlp" %% "breeze-viz" % Version.breeze
+  val sparkDaria = "com.github.mrpowers" % "spark-daria_2.12" % "0.38.2"
 }

@@ -2,18 +2,20 @@ package org.globalforestwatch.summarystats.firealerts
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 import geotrellis.vector.Feature
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId}
+import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, SpatialFeatureDF}
 import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
-import org.apache.spark.sql.functions.{split, struct}
-import org.apache.spark.sql.geosparksql.expressions.{ST_Point, ST_Intersects}
+import org.globalforestwatch.summarystats.SummaryAnalysis
 
-object FireAlertsAnalysis {
+
+object FireAlertsAnalysis extends SummaryAnalysis {
+
+  val name = "firealerts"
+
   def apply(featureRDD: RDD[Feature[vector.Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
@@ -23,25 +25,33 @@ object FireAlertsAnalysis {
 
     val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
     val layoutDefinition = fireAlertType match {
-      case "viirs" => ViirsGrid.blockTileGrid
+      case "viirs" | "burned_areas" => ViirsGrid.blockTileGrid
       case "modis" => ModisGrid.blockTileGrid
     }
 
+    val partition = fireAlertType match {
+      case "modis" | "viirs" | "burned_areas" => false
+      case _ => true
+    }
+
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
-      FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = false)
+      FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = partition)
 
-    val joinedDF = joinWithFeatures(summaryRDD, featureType, spark, kwargs)
+    val summaryDF = fireAlertType match {
+      case "modis" | "viirs" =>
+        joinWithFeatures(summaryRDD, featureType, spark, kwargs)
+      case "burned_areas" =>
+        FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
+    }
 
-    joinedDF.repartition(partitionExprs = $"featureId")
+    summaryDF.repartition(partitionExprs = $"featureId")
 
-    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      s"/firealerts_${fireAlertType}_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
+    val runOutputUrl: String = getOutputUrl(kwargs, s"${name}_${fireAlertType}")
+
 
     FireAlertsExport.export(
       featureType,
-      joinedDF,
+      summaryDF,
       runOutputUrl,
       kwargs
     )
@@ -51,15 +61,14 @@ object FireAlertsAnalysis {
                        featureType: String,
                        spark: SparkSession,
                        kwargs: Map[String, Any]): DataFrame = {
-    val fireDF = FireAlertsDFFactory(summaryRDD, spark, kwargs).getDataFrame
+    val fireDF = FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
 
     val firePointDF = fireDF
       .selectExpr("ST_Point(CAST(fireId.lon AS Decimal(24,10)),CAST(fireId.lat AS Decimal(24,10))) AS pointshape", "*")
 
-    val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
-    val featureDF = FeatureDF(featureUris, featureObj, featureType, kwargs, spark, "geom")
+    val featureDF = SpatialFeatureDF(featureUris, featureType, kwargs,"geom", spark)
 
     firePointDF
       .join(featureDF)

@@ -16,8 +16,8 @@ trait Grid[T <: GridSources] {
   /** this represents the tile layout of 10x10 degrees */
   lazy val rasterFileGrid: LayoutDefinition = {
     val tileLayout = TileLayout(
-      layoutCols = (gridExtent.xmin until gridExtent.xmax by gridSize).length,
-      layoutRows = (gridExtent.ymin until gridExtent.ymax by gridSize).length,
+      layoutCols = (gridExtent.xmin.toInt until gridExtent.xmax.toInt by gridSize).length,
+      layoutRows = (gridExtent.ymin.toInt until gridExtent.ymax.toInt by gridSize).length,
       tileCols = math.round(gridSize / pixelSize).toInt,
       tileRows = math.round(gridSize / pixelSize).toInt
     )
@@ -29,8 +29,8 @@ trait Grid[T <: GridSources] {
     */
   lazy val stripedTileGrid: LayoutDefinition = {
     val tileLayout = TileLayout(
-      layoutCols = (gridExtent.xmin until gridExtent.xmax by gridSize).length,
-      layoutRows = (gridExtent.ymin until gridExtent.ymax by gridSize).length * (math
+      layoutCols = (gridExtent.xmin.toInt until gridExtent.xmax.toInt by gridSize).length,
+      layoutRows = (gridExtent.ymin.toInt until gridExtent.ymax.toInt by gridSize).length * (math
         .round(gridSize / pixelSize)
         .toInt / rowCount),
       tileCols = math.round(gridSize / pixelSize).toInt,
@@ -44,10 +44,10 @@ trait Grid[T <: GridSources] {
     */
   lazy val blockTileGrid: LayoutDefinition = {
     val tileLayout = TileLayout(
-      layoutCols = (gridExtent.xmin until gridExtent.xmax by gridSize).length * (math
+      layoutCols = (gridExtent.xmin.toInt until gridExtent.xmax.toInt by gridSize).length * (math
         .round(gridSize / pixelSize)
         .toInt / blockSize),
-      layoutRows = (gridExtent.ymin until gridExtent.ymax by gridSize).length * (math
+      layoutRows = (gridExtent.ymin.toInt until gridExtent.ymax.toInt by gridSize).length * (math
         .round(gridSize / pixelSize)
         .toInt / blockSize),
       tileCols = blockSize,
