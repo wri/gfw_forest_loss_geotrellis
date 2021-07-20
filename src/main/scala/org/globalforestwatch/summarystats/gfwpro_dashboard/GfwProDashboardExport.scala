@@ -15,15 +15,15 @@ object GfwProDashboardExport extends SummaryExport {
     "emptyValue" -> null
   )
 
-  override protected def exportFeature(summaryDF: DataFrame,
-                                       outputUrl: String,
-                                       kwargs: Map[String, Any]): Unit = {
+  override protected def exportGfwPro(summaryDF: DataFrame,
+                                      outputUrl: String,
+                                      kwargs: Map[String, Any]): Unit = {
 
     summaryDF
       .coalesce(1)
       .write
       .options(csvOptions)
-      .csv(path = outputUrl)
+      .csv(path = outputUrl + "/final")
 
   }
 

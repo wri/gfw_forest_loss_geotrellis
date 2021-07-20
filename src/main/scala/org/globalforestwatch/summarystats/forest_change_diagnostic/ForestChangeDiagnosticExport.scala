@@ -14,9 +14,26 @@ object ForestChangeDiagnosticExport extends SummaryExport {
     "nullValue" -> null,
     "emptyValue" -> null
   )
-  override protected def exportFeature(summaryDF: DataFrame,
-                                       outputUrl: String,
-                                       kwargs: Map[String, Any]): Unit = {
+
+  override def export(featureType: String,
+                      summaryDF: DataFrame,
+                      outputUrl: String,
+                      kwargs: Map[String, Any]): Unit = {
+
+    featureType match {
+
+      case "gfwpro" | "wdpa" | "gadm" => exportFinal(summaryDF, outputUrl, kwargs)
+      case "intermediate" => exportIntermediateList(summaryDF, outputUrl)
+      case _ =>
+        throw new IllegalArgumentException(
+          "Feature type must be one of 'gfwpro', 'intermediate', 'wdpa', or 'gadm'"
+        )
+    }
+  }
+
+  protected def exportFinal(summaryDF: DataFrame,
+                            outputUrl: String,
+                            kwargs: Map[String, Any]): Unit = {
 
     summaryDF
       .coalesce(1)
@@ -26,8 +43,8 @@ object ForestChangeDiagnosticExport extends SummaryExport {
 
   }
 
-  def exportIntermediateList(intermediateListDF: DataFrame,
-                             outputUrl: String): Unit = {
+  private def exportIntermediateList(intermediateListDF: DataFrame,
+                                     outputUrl: String): Unit = {
 
     intermediateListDF
       .coalesce(1)
@@ -35,4 +52,5 @@ object ForestChangeDiagnosticExport extends SummaryExport {
       .options(csvOptions)
       .csv(path = outputUrl + "/intermediate")
   }
+
 }

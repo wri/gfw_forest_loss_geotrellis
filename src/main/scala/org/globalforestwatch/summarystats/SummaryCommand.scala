@@ -19,7 +19,7 @@ trait SummaryCommand {
   val featureTypeOpt: Opts[String] = Opts
     .option[String](
       "feature_type",
-      help = "Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature'"
+      help = "Feature type: one of 'gadm', 'wdpa', 'geostore', 'gfwpro' or 'feature'"
     )
     .withDefault("feature")
 
@@ -100,8 +100,10 @@ trait SummaryCommand {
       help = "URI of fire alerts in TSV format"
     )
 
-  val defaultOptions: Opts[(String, NonEmptyList[String], String, Boolean)] =
-    (featureTypeOpt, featuresOpt, outputOpt, splitFeatures).tupled
+  val noOutputPathSuffixOpt: Opts[Boolean] = Opts.flag("no_output_path_suffix", help = "Do not autogenerate output path suffix at runtime").orFalse
+
+  val defaultOptions: Opts[(String, NonEmptyList[String], String, Boolean, Boolean)] =
+    (featureTypeOpt, featuresOpt, outputOpt, splitFeatures, noOutputPathSuffixOpt).tupled
   val fireAlertOptions: Opts[(String, NonEmptyList[String])] =
     (fireAlertTypeOpt, fireAlertSourceOpt).tupled
 

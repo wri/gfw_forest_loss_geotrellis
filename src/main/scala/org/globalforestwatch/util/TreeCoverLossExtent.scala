@@ -1,6 +1,5 @@
 package org.globalforestwatch.util
 
-import geotrellis.vector.MultiPolygon
 import geotrellis.vector._
 
 object TreeCoverLossExtent {

@@ -3,17 +3,17 @@ package org.globalforestwatch.features
 import geotrellis.vector
 import geotrellis.vector.Geometry
 import org.apache.spark.sql.Row
-import org.globalforestwatch.util.GeometryReducer
+import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 
-object FireAlertsModisFeature extends Feature {
+object FireAlertViirsFeature extends Feature {
   override val geomPos: Int = 0
 
   val featureCount = 8
   val featureIdExpr =
     "latitude as lat, longitude as lon, acq_date as acqDate, acq_time as acqTime, confidence, " +
-      "bright_t31 as brightT31, brightness, frp"
+      "bright_ti4 as brightTi4, bright_ti5 as brightTi5, frp"
 
-  override def isValidGeom(i: Row): Boolean = {
+  override def isNonEmptyGeom(i: Row): Boolean = {
     val lon = i.getString(geomPos + 1).toDouble
     val lat = i.getString(geomPos).toDouble
 
@@ -37,9 +37,7 @@ object FireAlertsModisFeature extends Feature {
         lat - 0.00001
       else lat
 
-    val geom = GeometryReducer.reduce(GeometryReducer.gpr)(
-      vector.Point(adjustedLon, adjustedLat)
-    )
+    val geom = makeValidGeom(vector.Point(adjustedLon, adjustedLat))
 
     geotrellis.vector.Feature(geom, featureId)
   }
@@ -49,16 +47,11 @@ object FireAlertsModisFeature extends Feature {
     val lon: Double = i(1).toDouble
     val acqDate: String = i(2)
     val acqTime: Int = i(3).toInt
-    val confidencePerc: Int = i(4).toInt
-    val confidenceCat: String = confidencePerc match {
-      case perc if perc >= 99 => "h"
-      case perc if perc >= 40 => "n"
-      case _ => "l"
-    }
-    val brightness: Float = i(5).toFloat
-    val brightT31: Float = i(6).toFloat
+    val confidence: String = i(4)
+    val brightTi4: Float = i(5).toFloat
+    val brightTi5: Float = i(6).toFloat
     val frp: Float = i(7).toFloat
 
-    FireAlertModisFeatureId(lon, lat, acqDate, acqTime, confidencePerc, confidenceCat, brightness, brightT31, frp)
+    FireAlertViirsFeatureId(lon, lat, acqDate, acqTime, confidence, brightTi4, brightTi5, frp)
   }
 }

@@ -14,7 +14,7 @@ object CarbonSensitivityCommand extends SummaryCommand {
     .withDefault("standard")
 
   val carbonSensitivityCommand: Opts[Unit] = Opts.subcommand(
-    name = "carbon_sensitivity",
+    name = CarbonSensitivityAnalysis.name,
     help = "Compute summary statistics for Carbon Sensitivity Models."
   ) {
 
@@ -27,6 +27,7 @@ object CarbonSensitivityCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
+        "noOutputPathSuffix" -> default._5,
         "sensitivityType" -> sensitivityType,
         "iso" -> gadmFilter._1,
         "isoFirst" -> gadmFilter._2,
@@ -39,7 +40,7 @@ object CarbonSensitivityCommand extends SummaryCommand {
         "glad" -> defaultFilter._3
       )
 
-      runAnalysis("carbon_sensitivity", default._1, default._2, kwargs)
+      runAnalysis(CarbonSensitivityAnalysis.name, default._1, default._2, kwargs)
 
     }
   }

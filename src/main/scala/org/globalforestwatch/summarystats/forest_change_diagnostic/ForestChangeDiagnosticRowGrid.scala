@@ -1,7 +1,8 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 case class ForestChangeDiagnosticRowGrid(
-                                          id: String,
+                                          list_id: String,
+                                          location_id: String,
                                           grid: String,
                                           treeCoverLossTcd30Yearly: String,
                                           treeCoverLossPrimaryForestYearly: String,

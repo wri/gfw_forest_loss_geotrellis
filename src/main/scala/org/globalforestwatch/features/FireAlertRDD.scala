@@ -17,8 +17,9 @@ object FireAlertRDD {
       kwargs,
       "fireAlertSource"
     )
+    // TODO: refactor to use fireAlertType only as input for FeatureFactory
     val fireAlertObj =
-      FeatureFactory("firealerts", Some(fireAlertType)).featureObj
+      FeatureFactory(fireAlertType).featureObj
     val fireAlertPointDF = SpatialFeatureDF(
       fireAlertUris,
       fireAlertObj,

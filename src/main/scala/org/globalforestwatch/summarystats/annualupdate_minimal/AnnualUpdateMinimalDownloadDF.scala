@@ -6,9 +6,7 @@ import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 object AnnualUpdateMinimalDownloadDF {
   val treecoverLossMinYear = 2001
   val treecoverLossMaxYear = 2020
-//  val fluxModelTotalYears = (treecoverLossMaxYear - treecoverLossMinYear) + 1
-  // fluxModelTotalYears is temporarily using 19 instead of 20 because the model version being used in 2001-2019
-  val fluxModelTotalYears = 19
+  val fluxModelTotalYears = (treecoverLossMaxYear - treecoverLossMinYear) + 1
 
   def sumDownload(df: DataFrame): DataFrame = {
 
