@@ -6,6 +6,8 @@ case class GFWProCoverage(gridTile: GridTile, kwargs: Map[String, Any])
   extends MapILayer
     with OptionalILayer {
 
+  val datasetName = "gfwpro_forest_change_regions"
+
   val uri: String =
     s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/bit_encoding/gdal-geotiff/${gridTile.tileId}.tif"
 
