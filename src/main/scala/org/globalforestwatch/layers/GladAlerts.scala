@@ -8,15 +8,14 @@ import org.globalforestwatch.grids.GridId.toGladGridId
 
 case class GladAlerts(gridTile: GridTile, kwargs: Map[String, Any]) extends DateConfLayer with OptionalILayer {
 
-  val datasetName = "Na"
-  override lazy val version = "Na"
+  val datasetName = "umd_glad_landsat_alerts"
 
   val gladGrid: String = toGladGridId(gridTile.tileId)
 
 //  val uri: String =
 //    s"s3://gfw2-data/forest_change/umd_landsat_alerts/prod/analysis/$gladGrid.tif"
 
-  val uri: String = s"$basePath/umd_glad_landsat_alerts/v20210715/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/date_conf/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/date_conf/gdal-geotiff/${gridTile.tileId}.tif"
 
   override def lookup(value: Int): Option[(String, Boolean)] = {
 
