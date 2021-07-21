@@ -6,7 +6,10 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import org.globalforestwatch.grids.GridId.toGladGridId
 
-case class GladAlerts(gridTile: GridTile) extends DateConfLayer with OptionalILayer {
+case class GladAlerts(gridTile: GridTile, kwargs: Map[String, Any]) extends DateConfLayer with OptionalILayer {
+
+  val datasetName = "Na"
+  override lazy val version = "Na"
 
   val gladGrid: String = toGladGridId(gridTile.tileId)
 

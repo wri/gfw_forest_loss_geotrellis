@@ -10,30 +10,30 @@ import org.globalforestwatch.layers._
 /**
   * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
-case class GladAlertsGridSources(gridTile: GridTile) extends GridSources {
+case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
 
-  val gladAlerts = GladAlerts(gridTile)
-  val biomassPerHectar = BiomassPerHectar(gridTile)
-  val climateMask = ClimateMask(gridTile)
-  val primaryForest = PrimaryForest(gridTile)
-  val protectedAreas = ProtectedAreas(gridTile)
-  val aze = Aze(gridTile)
-  val keyBiodiversityAreas = KeyBiodiversityAreas(gridTile)
-  val landmark = Landmark(gridTile)
-  val plantations = Plantations(gridTile)
-  val mining = Mining(gridTile)
-  val logging = Logging(gridTile)
-  val rspo = RSPO(gridTile)
-  val woodFiber = WoodFiber(gridTile)
-  val peatlands = Peatlands(gridTile)
-  val indonesiaForestMoratorium = IndonesiaForestMoratorium(gridTile)
-  val oilPalm = OilPalm(gridTile)
-  val indonesiaForestArea = IndonesiaForestArea(gridTile)
-  val peruForestConcessions = PeruForestConcessions(gridTile)
-  val oilGas = OilGas(gridTile)
-  val mangroves2016 = Mangroves2016(gridTile)
-  val intactForestLandscapes2016 = IntactForestLandscapes2016(gridTile)
-  val braBiomes = BrazilBiomes(gridTile)
+  val gladAlerts: GladAlerts = GladAlerts(gridTile, kwargs)
+  val biomassPerHectar: BiomassPerHectar = BiomassPerHectar(gridTile, kwargs)
+  val climateMask: ClimateMask = ClimateMask(gridTile, kwargs)
+  val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
+  val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
+  val aze: Aze = Aze(gridTile, kwargs)
+  val keyBiodiversityAreas: KeyBiodiversityAreas = KeyBiodiversityAreas(gridTile, kwargs)
+  val landmark: Landmark = Landmark(gridTile, kwargs)
+  val plantations: Plantations = Plantations(gridTile, kwargs)
+  val mining: Mining = Mining(gridTile, kwargs)
+  val logging: Logging = Logging(gridTile, kwargs)
+  val rspo: RSPO = RSPO(gridTile, kwargs)
+  val woodFiber: WoodFiber = WoodFiber(gridTile, kwargs)
+  val peatlands: Peatlands = Peatlands(gridTile, kwargs)
+  val indonesiaForestMoratorium: IndonesiaForestMoratorium = IndonesiaForestMoratorium(gridTile, kwargs)
+  val oilPalm: OilPalm = OilPalm(gridTile, kwargs)
+  val indonesiaForestArea: IndonesiaForestArea = IndonesiaForestArea(gridTile, kwargs)
+  val peruForestConcessions: PeruForestConcessions = PeruForestConcessions(gridTile, kwargs)
+  val oilGas: OilGas = OilGas(gridTile, kwargs)
+  val mangroves2016: Mangroves2016 = Mangroves2016(gridTile, kwargs)
+  val intactForestLandscapes2016: IntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile, kwargs)
+  val braBiomes: BrazilBiomes = BrazilBiomes(gridTile, kwargs)
 
   def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[GladAlertsTile]] = {
 
@@ -108,9 +108,9 @@ object GladAlertsGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, GladAlertsGridSources]
 
-  def getCachedSources(gridTile: GridTile): GladAlertsGridSources = {
+  def getCachedSources(gridTile: GridTile, kwargs: Map[String, Any]): GladAlertsGridSources = {
 
-    cache.getOrElseUpdate(gridTile.tileId, GladAlertsGridSources(gridTile))
+    cache.getOrElseUpdate(gridTile.tileId, GladAlertsGridSources(gridTile, kwargs))
 
   }
 

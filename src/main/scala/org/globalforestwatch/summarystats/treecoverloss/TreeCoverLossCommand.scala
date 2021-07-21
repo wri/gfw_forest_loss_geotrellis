@@ -41,6 +41,7 @@ object TreeCoverLossCommand extends SummaryCommand {
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
         "noOutputPathSuffix" -> default._5,
+        "pinnedVersions" -> default._6,
         "contextualLayers" -> treeCoverLoss._1,
         "tcdYear" -> treeCoverLoss._2,
         "thresholdFilter" -> treeCoverLoss._3,

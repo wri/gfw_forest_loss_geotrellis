@@ -2,12 +2,13 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class SEAsiaLandCover(gridTile: GridTile)
-    extends StringLayer
+case class SEAsiaLandCover(gridTile: GridTile, kwargs: Map[String, Any])
+  extends StringLayer
     with OptionalILayer {
 
+  val datasetName = "rspo_southeast_asia_land_cover_2010"
   val uri: String =
-    s"$basePath/rspo_southeast_asia_land_cover_2010/v2013/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/land_cover_class/gdal-geotiff/${gridTile.tileId}.tif"
+    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/land_cover_class/gdal-geotiff/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Unknown"
 

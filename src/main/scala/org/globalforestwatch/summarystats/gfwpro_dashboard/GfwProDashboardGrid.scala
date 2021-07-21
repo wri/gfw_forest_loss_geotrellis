@@ -10,6 +10,6 @@ object GfwProDashboardGrid
 
   def getSources(gridTile: GridTile,
                  kwargs: Map[String, Any]): GfwProDashboardGridSources =
-    GfwProDashboardGridSources.getCachedSources(gridTile)
+    GfwProDashboardGridSources.getCachedSources(gridTile, kwargs)
 
 }

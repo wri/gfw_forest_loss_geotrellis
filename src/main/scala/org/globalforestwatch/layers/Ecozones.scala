@@ -4,18 +4,21 @@ import org.globalforestwatch.grids.GridTile
 
 // NOTE: These appear to be the same boundaries as the FAO ecozones used in the forest carbon flux model
 // (based on comparison of some gfw-data-lake tiles against the FAO ecozone boundary shapefile)
-case class Ecozones(gridTile: GridTile) extends StringLayer with OptionalILayer {
+case class Ecozones(gridTile: GridTile, kwargs: Map[String, Any]) extends StringLayer with OptionalILayer {
 
-  val uri: String = s"$basePath/wwf_eco_regions/v2012/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/gdal-geotiff/${gridTile.tileId}.tif"
+  val datasetName = "wwf_eco_regions"
+
+  val uri: String = s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/gdal-geotiff/${gridTile.tileId}.tif"
+
   override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {
-    case 1  => "Boreal coniferous forest"
-    case 2  => "Boreal mountain system"
-    case 3  => "Boreal tundra woodland"
-    case 4  => "No data"
-    case 5  => "Polar"
-    case 6  => "Subtropical desert"
+    case 1 => "Boreal coniferous forest"
+    case 2 => "Boreal mountain system"
+    case 3 => "Boreal tundra woodland"
+    case 4 => "No data"
+    case 5 => "Polar"
+    case 6 => "Subtropical desert"
     case 7  => "Subtropical dry forest"
     case 8  => "Subtropical humid forest"
     case 9  => "Subtropical mountain system"

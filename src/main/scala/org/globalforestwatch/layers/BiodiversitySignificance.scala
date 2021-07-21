@@ -2,8 +2,9 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class BiodiversitySignificance(gridTile: GridTile) extends DBooleanLayer with OptionalDLayer {
-  val uri: String = s"$basePath/birdlife_biodiversity_significance/v201909/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/index/gdal-geotiff/${gridTile.tileId}.tif"
+case class BiodiversitySignificance(gridTile: GridTile, kwargs: Map[String, Any]) extends DBooleanLayer with OptionalDLayer {
+  val datasetName = "birdlife_biodiversity_significance"
+  val uri: String = s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/index/gdal-geotiff/${gridTile.tileId}.tif"
 
   def lookup(value: Double): Boolean =
     if (value > 6.3) true

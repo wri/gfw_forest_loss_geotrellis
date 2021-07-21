@@ -37,6 +37,7 @@ object GfwProDashboardCommand extends SummaryCommand {
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
         "noOutputPathSuffix" -> default._5,
+        "pinnedVersions" -> default._6,
         "fireAlertType" -> fireAlert._1,
         "fireAlertSource" -> fireAlert._2,
         "idStart" -> featureFilter._1,
