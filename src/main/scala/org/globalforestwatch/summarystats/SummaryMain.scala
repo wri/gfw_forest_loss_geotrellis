@@ -9,6 +9,7 @@ import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeD
 import org.globalforestwatch.summarystats.gfwpro_dashboard.GfwProDashboardCommand.gfwProDashboardCommand
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsCommand.gladAlertsCommand
 import org.globalforestwatch.summarystats.treecoverloss.TreeCoverLossCommand.treeCoverLossCommand
+import org.globalforestwatch.summarystats.integrated_alerts.IntegratedAlertsCommand.integratedAlertsCommand
 
 object SummaryMain
   extends CommandApp(
@@ -22,7 +23,7 @@ object SummaryMain
         forestChangeDiagnosticCommand orElse
         gfwProDashboardCommand orElse
         gladAlertsCommand orElse
-        treeCoverLossCommand
-
+        treeCoverLossCommand orElse
+        integratedAlertsCommand
     }
   )

@@ -11,6 +11,7 @@ import org.globalforestwatch.summarystats.firealerts.FireAlertsAnalysis
 import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticAnalysis
 import org.globalforestwatch.summarystats.gfwpro_dashboard.GfwProDashboardAnalysis
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsAnalysis
+import org.globalforestwatch.summarystats.integrated_alerts.IntegratedAlertsAnalysis
 import org.globalforestwatch.summarystats.treecoverloss.TreeLossAnalysis
 
 case class SummaryAnalysisFactory(analysis: String,
@@ -72,6 +73,13 @@ case class SummaryAnalysisFactory(analysis: String,
           )
         case GfwProDashboardAnalysis.name =>
           GfwProDashboardAnalysis(
+            featureRDD: RDD[Feature[Geometry, FeatureId]],
+            featureType: String,
+            spark: SparkSession,
+            kwargs: Map[String, Any]
+          )
+        case IntegratedAlertsAnalysis.name =>
+          IntegratedAlertsAnalysis(
             featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
