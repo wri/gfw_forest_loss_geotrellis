@@ -94,6 +94,8 @@ case class ForestChangeDiagnosticDFFactory(
                 Map(
                   "list_id" -> gfwproId.listId.asJson.noSpaces,
                   "location_id" -> gfwproId.locationId.asJson.noSpaces,
+                  "x" -> gfwproId.x.asJson.noSpaces,
+                  "y" -> gfwproId.y.asJson.noSpaces,
                   "grid" -> gridId.gridId.asJson.noSpaces
                 ) ++
                   featureFieldMap(data)

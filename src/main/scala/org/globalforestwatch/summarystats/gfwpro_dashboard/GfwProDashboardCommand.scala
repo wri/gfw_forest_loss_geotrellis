@@ -35,7 +35,7 @@ object GfwProDashboardCommand extends SummaryCommand {
       val kwargs = Map(
         "featureUris" -> default._2,
         "outputUrl" -> default._3,
-        "splitFeatures" -> default._4,
+        "splitFeatures" -> false, // We have to make sure that features are split after intersecting with contextual layer
         "noOutputPathSuffix" -> default._5,
         "fireAlertType" -> fireAlert._1,
         "fireAlertSource" -> fireAlert._2,

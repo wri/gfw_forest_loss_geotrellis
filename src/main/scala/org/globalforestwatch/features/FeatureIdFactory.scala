@@ -18,7 +18,7 @@ case class FeatureIdFactory(featureType: String) {
         ) =>
         WdpaFeatureId(wdpaId, name, iucnCat, iso, status)
       case ("geostore", geostore: String) => GeostoreFeatureId(geostore)
-      case ("gfwpro", (listId: String, locationId: Int)) => GfwProFeatureId(listId, locationId)
+      case ("gfwpro", (listId: String, locationId: Int, x: Double, y: Double)) => GfwProFeatureId(listId, locationId, x, y)
       case ("burned_areas", alertDate: String) =>
         BurnedAreasFeatureId(alertDate)
       case (

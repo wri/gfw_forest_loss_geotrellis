@@ -1,6 +1,8 @@
 package org.globalforestwatch.features
 
+import geotrellis.vector.Geometry
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 import org.globalforestwatch.util.Util._
 
 object GfwProFeature extends Feature {
@@ -9,14 +11,16 @@ object GfwProFeature extends Feature {
   val locationIdPos = 1
   val geomPos = 2
 
-  val featureIdExpr = "list_id as listId, cast(location_id as int) as locationId"
+  val featureIdExpr = "list_id as listId, cast(location_id as int) as locationId, ST_X(ST_Centroid(polyshape)) as x, ST_Y(ST_Centroid(polyshape)) as y"
 
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
 
     val listId: String = i(listIdPos)
     val locationId: Int = i(locationIdPos).toInt
-    GfwProFeatureId(listId, locationId)
+    val geom: Geometry = makeValidGeom(i(geomPos))
+
+    GfwProFeatureId(listId, locationId, geom.getCentroid.getX, geom.getCentroid.getY)
   }
 
   override def custom_filter(
