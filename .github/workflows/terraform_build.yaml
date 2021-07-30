@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Test with pytest
+      - name: Test with SBT
         run: |
           ./scripts/test
 
@@ -29,3 +29,7 @@ jobs:
           name: codecov-umbrella
           fail_ci_if_error: false
           verbose: false
+
+      - name: Build with ASSEMBLY
+        run: |
+          ./scripts/build

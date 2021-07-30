@@ -34,7 +34,8 @@ case class ForestChangeDiagnosticDFFactory(
           id match {
             case gfwproId: GfwProFeatureId =>
               createCaseClassFromMap[ForestChangeDiagnosticRowSimple](
-                Map("id" -> gfwproId.locationId.asJson.noSpaces) ++
+                Map("locationId" -> gfwproId.listId.asJson.noSpaces,
+                  "listId" -> gfwproId.locationId.asJson.noSpaces) ++
                   featureFieldMap(data)
               )
 
@@ -42,7 +43,7 @@ case class ForestChangeDiagnosticDFFactory(
               throw new IllegalArgumentException("Not a GfwProFeatureId")
           }
       }
-      .toDF("location_id" :: featureFieldNames: _*)
+      .toDF("list_id" :: "location_id" :: featureFieldNames: _*)
   }
 
   private def getGadmFeatureDataFrame: DataFrame = {
