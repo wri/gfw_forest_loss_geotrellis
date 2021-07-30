@@ -30,6 +30,6 @@ jobs:
           fail_ci_if_error: false
           verbose: false
 
-      - name: Build with ASSEMBLY
-        run: |
-          ./scripts/build
+#      - name: Build with ASSEMBLY
+#        run: |
+#          ./scripts/build
