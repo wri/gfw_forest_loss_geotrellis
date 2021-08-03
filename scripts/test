@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set +e
+
+# run Scala Unit Tests
+docker-compose -f docker-compose.sbt.yml run --rm --name sbt sbt clean coverage test coverageReport

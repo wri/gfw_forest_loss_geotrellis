@@ -27,21 +27,38 @@ object GadmFeature extends Feature {
     geotrellis.vector.Feature(geom, featureId)
   }
 
-  def getFeatureId(i: Array[String]): FeatureId = {
-    val countryCode = i(countryPos)
-    val admin1: Integer = try {
-      i(adm1Pos).split("[.]")(1).split("[_]")(0).toInt
-    } catch {
-      case e: Exception => null
-    }
+  def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
+    if (parsed) {
+      val countryCode = i(0)
+      val admin1: Integer = try {
+        i(1).toInt
+      } catch {
+        case e: Exception => null
+      }
 
-    val admin2: Integer = try {
-      i(adm2Pos).split("[.]")(2).split("[_]")(0).toInt
-    } catch {
-      case e: Exception => null
-    }
+      val admin2: Integer = try {
+        i(2).toInt
+      } catch {
+        case e: Exception => null
+      }
 
-    GadmFeatureId(countryCode, admin1, admin2)
+      GadmFeatureId(countryCode, admin1, admin2)
+    } else {
+      val countryCode = i(countryPos)
+      val admin1: Integer = try {
+        i(adm1Pos).split("[.]")(1).split("[_]")(0).toInt
+      } catch {
+        case e: Exception => null
+      }
+
+      val admin2: Integer = try {
+        i(adm2Pos).split("[.]")(2).split("[_]")(0).toInt
+      } catch {
+        case e: Exception => null
+      }
+
+      GadmFeatureId(countryCode, admin1, admin2)
+    }
   }
 
   override def custom_filter(

@@ -18,16 +18,22 @@ object FireAlertsExport extends SummaryExport {
     val spark = summaryDF.sparkSession
     import spark.implicits._
 
-    val numPartitions = summaryDF.rdd.getNumPartitions
+    val numPartitions = try {
+      summaryDF.rdd.getNumPartitions
+    } catch {
+      case _: Exception => 1
+    }
 
     val featureCols =
       List($"featureId.iso" as "iso", $"featureId.adm1" as "adm1", $"featureId.adm2" as "adm2")
 
     val fireCols = _getFireCols(fireAlertType, spark)
+    val aggCol = _getAggCol(fireAlertType)
     val cols = featureCols ++ fireCols
 
     val gadmDF =
       summaryDF.transform(FireAlertsDF.unpackValues(cols))
+
     summaryDF.unpersist()
 
     gadmDF.cache()
@@ -41,7 +47,7 @@ object FireAlertsExport extends SummaryExport {
         .csv (path = outputUrl + "/all")
     }
 
-    exportChange(gadmDF, outputUrl, numPartitions)
+    exportChange(gadmDF, aggCol, outputUrl, numPartitions)
     if (!changeOnly) {
       exportWhitelist(gadmDF, outputUrl)
     }
@@ -75,12 +81,11 @@ object FireAlertsExport extends SummaryExport {
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/whitelist")
-
   }
 
-  private def exportChange(df: DataFrame, outputUrl: String, numPartitions: Int): Unit = {
+  private def exportChange(df: DataFrame, aggCol: String, outputUrl: String, numPartitions: Int): Unit = {
     val adm2DailyDF = df
-      .transform(FireAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
+      .transform(FireAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2"), aggCol))
 
     adm2DailyDF
       .coalesce(ceil(numPartitions / 80.0).toInt)
@@ -89,7 +94,7 @@ object FireAlertsExport extends SummaryExport {
       .csv(path = outputUrl + "/adm2/daily_alerts")
 
     val adm2DF = adm2DailyDF
-      .transform(FireAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2")))
+      .transform(FireAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2"), aggCol))
 
     adm2DF
       .coalesce(ceil(numPartitions / 100.0).toInt)
@@ -98,7 +103,7 @@ object FireAlertsExport extends SummaryExport {
       .csv(path = outputUrl + "/adm2/weekly_alerts")
 
     val adm1DF = adm2DF
-      .transform(FireAlertsDF.aggChangeWeekly2(List("iso", "adm1")))
+      .transform(FireAlertsDF.aggChangeWeekly2(List("iso", "adm1"), aggCol))
 
     adm1DF
       .coalesce(ceil(numPartitions / 150.0).toInt)
@@ -108,7 +113,7 @@ object FireAlertsExport extends SummaryExport {
 
 
     val isoDF = adm1DF
-      .transform(FireAlertsDF.aggChangeWeekly2(List("iso")))
+      .transform(FireAlertsDF.aggChangeWeekly2(List("iso"), aggCol))
 
 
     isoDF
@@ -130,7 +135,7 @@ object FireAlertsExport extends SummaryExport {
       "wdpa_protected_area__name",
       "wdpa_protected_area__iucn_cat",
       "wdpa_protected_area__iso",
-      "wdpa_protected_area__status"
+      "wdpa_protected_area__status",
     )
     val unpackCols = List(
       $"featureId.wdpaId" as "wdpa_protected_area__id",
@@ -185,13 +190,18 @@ object FireAlertsExport extends SummaryExport {
 
     val cols = groupByCols
     val fireCols = _getFireCols(fireAlertType, spark)
+    val aggCol = _getAggCol(fireAlertType)
     val unpackAllCols = unpackCols ++ fireCols
 
     val df = summaryDF.transform(
       FireAlertsDF.unpackValues(unpackAllCols, wdpa = wdpa)
     )
 
-    val numPartitions = summaryDF.rdd.getNumPartitions
+    val numPartitions = try {
+      summaryDF.rdd.getNumPartitions
+    } catch {
+      case _: Exception => 1
+    }
 
     df.cache()
     // for now only export VIIRS GADM all
@@ -208,13 +218,13 @@ object FireAlertsExport extends SummaryExport {
         .csv(path = outputUrl + "/whitelist")
     }
 
-    df.transform(FireAlertsDF.aggChangeDaily(cols, wdpa = wdpa))
+    df.transform(FireAlertsDF.aggChangeDaily(cols, aggCol, wdpa = wdpa))
       .coalesce(ceil(numPartitions / 100.0).toInt)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
 
-    df.transform(FireAlertsDF.aggChangeWeekly(cols, wdpa = wdpa))
+    df.transform(FireAlertsDF.aggChangeWeekly(cols, aggCol, wdpa = wdpa))
       .coalesce(ceil(numPartitions / 150.0).toInt)
       .write
       .options(csvOptions)
@@ -236,7 +246,8 @@ object FireAlertsExport extends SummaryExport {
         $"fireId.confidence" as "confidence__cat",
         $"fireId.brightTi4" as "bright_ti4__K",
         $"fireId.brightTi5" as "bright_ti5__K",
-        $"fireId.frp" as "frp__MW"
+        $"fireId.frp" as "frp__MW",
+        $"data.total".cast("int") as "alert__count"
       )
       case "modis" => List(
         $"fireId.lon" as "longitude",
@@ -247,8 +258,20 @@ object FireAlertsExport extends SummaryExport {
         $"fireId.confidenceCat" as "confidence__cat",
         $"fireId.brightness" as "brightness__K",
         $"fireId.brightT31" as "bright_t31__K",
-        $"fireId.frp" as "frp__MW"
+        $"fireId.frp" as "frp__MW",
+        $"data.total".cast("int") as "alert__count"
       )
+      case "burned_areas" => List(
+        $"fireId.alertDate" as "alert__date",
+        $"data.total" as "burned_area__ha"
+      )
+    }
+  }
+
+  def _getAggCol(fireAlertType: String): String = {
+    fireAlertType match {
+      case "modis" | "viirs" => "alert__count"
+      case "burned_areas" => "burned_area__ha"
     }
   }
 }

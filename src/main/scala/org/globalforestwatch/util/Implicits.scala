@@ -1,9 +1,7 @@
 package org.globalforestwatch.util
 
 import cats.Monoid
-import geotrellis.raster.{CellGrid, Raster, RasterExtent}
 import geotrellis.raster.histogram.StreamingHistogram
-import geotrellis.util.GetComponent
 import org.apache.spark.sql.Encoder
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.globalforestwatch.features.FeatureId
