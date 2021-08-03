@@ -3,6 +3,7 @@ package org.globalforestwatch.summarystats.treecoverloss
 import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import cats.implicits._
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import org.globalforestwatch.grids.{GridSources, GridTile}
 import org.globalforestwatch.layers._
 
@@ -13,33 +14,46 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
 
   val treeCoverLoss = TreeCoverLoss(gridTile)
   val treeCoverGain = TreeCoverGain(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensity2000(gridTile)
-  val treeCoverDensity2010 = TreeCoverDensity2010(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
+  val treeCoverDensity2010 = TreeCoverDensityPercent2010(gridTile)
   val biomassPerHectar = BiomassPerHectar(gridTile)
   val primaryForest = PrimaryForest(gridTile)
   val plantationsBool = PlantationsBool(gridTile)
 
+  val grossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile)
+  val grossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile)
+  val grossEmissionsCo2eNonCo2 = GrossEmissionsNonCo2Co2e(gridTile)
+  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridTile)
+  val netFluxCo2 = NetFluxCo2e(gridTile)
+  val fluxModelExtent = FluxModelExtent(gridTile)
 
-  def readWindow(window: Extent): Either[Throwable, Raster[TreeLossTile]] = {
+
+  def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[TreeLossTile]] = {
 
     for {
       // Failure for any of these reads will result in function returning Left[Throwable]
       // These are effectively required fields without which we can't make sense of the analysis
-      lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(window)).right
-      gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(window)).right
+      lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(windowKey, windowLayout)).right
+      gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(windowKey, windowLayout)).right
       tcd2000Tile <- Either
-        .catchNonFatal(treeCoverDensity2000.fetchWindow(window))
+        .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
         .right
       tcd2010Tile <- Either
-        .catchNonFatal(treeCoverDensity2010.fetchWindow(window))
+        .catchNonFatal(treeCoverDensity2010.fetchWindow(windowKey, windowLayout))
         .right
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
-      val biomassTile = biomassPerHectar.fetchWindow(window)
-      val primaryForestTile = primaryForest.fetchWindow(window)
-      val plantationsBoolTile = plantationsBool.fetchWindow(window)
+      val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
+      val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
+      val plantationsBoolTile = plantationsBool.fetchWindow(windowKey, windowLayout)
 
+      val grossCumulAbovegroundRemovalsCo2Tile = grossCumulAbovegroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
+      val grossCumulBelowgroundRemovalsCo2Tile = grossCumulBelowgroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eNonCo2Tile = grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
+      val netFluxCo2Tile = netFluxCo2.fetchWindow(windowKey, windowLayout)
+      val fluxModelExtentTile = fluxModelExtent.fetchWindow(windowKey, windowLayout)
 
       val tile = TreeLossTile(
         lossTile,
@@ -48,10 +62,16 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
         tcd2010Tile,
         biomassTile,
         primaryForestTile,
-        plantationsBoolTile
+        plantationsBoolTile,
+        grossCumulAbovegroundRemovalsCo2Tile,
+        grossCumulBelowgroundRemovalsCo2Tile,
+        netFluxCo2Tile,
+        grossEmissionsCo2eNonCo2Tile,
+        grossEmissionsCo2eCo2OnlyTile,
+        fluxModelExtentTile
       )
 
-      Raster(tile, window)
+      Raster(tile, windowKey.extent(windowLayout))
     }
   }
 }

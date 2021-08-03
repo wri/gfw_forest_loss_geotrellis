@@ -4,9 +4,9 @@ import org.apache.spark.sql.functions.{col, round, sum, when}
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 object AnnualUpdateMinimalDownloadDF {
-
   val treecoverLossMinYear = 2001
-  val treecoverLossMaxYear = 2019
+  val treecoverLossMaxYear = 2020
+  val fluxModelTotalYears = (treecoverLossMaxYear - treecoverLossMinYear) + 1
 
   def sumDownload(df: DataFrame): DataFrame = {
 
@@ -20,8 +20,7 @@ object AnnualUpdateMinimalDownloadDF {
       .pivot("umd_tree_cover_loss__year", yearRange)
       .agg(
         sum("umd_tree_cover_loss__ha") as "umd_tree_cover_loss__ha",
-        sum("whrc_aboveground_biomass_loss__Mg") as "whrc_aboveground_biomass_loss__Mg",
-        sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions__Mg"
+        sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg"
       )
       .as("annual")
       .na.fill(0, Seq("adm1", "adm2"))
@@ -36,8 +35,10 @@ object AnnualUpdateMinimalDownloadDF {
         sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
         sum("whrc_aboveground_biomass_stock_2000__Mg") / sum(
           "umd_tree_cover_extent_2000__ha"
-        ) as "avg_whrc_aboveground_biomass_2000_Mt_ha-1",
-        sum("whrc_aboveground_co2_stock_2000__Mg") as "whrc_aboveground_co2_stock_2000__Mg"
+        ) as "avg_whrc_aboveground_biomass_2000_Mg_ha-1",
+        sum($"gfw_gross_emissions_co2e_all_gases__Mg") / fluxModelTotalYears as "gfw_gross_emissions_co2e_all_gases__Mg_yr-1",
+        sum($"gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") / fluxModelTotalYears as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg_yr-1",
+        sum($"gfw_net_flux_co2e__Mg") / fluxModelTotalYears as "gfw_net_flux_co2e__Mg_yr-1"
       )
       .as("total")
       .na.fill(0, Seq("adm1", "adm2"))
@@ -49,7 +50,7 @@ object AnnualUpdateMinimalDownloadDF {
         "inner"
       )
       .transform(setNullZero)
-
+      .transform(removeCarbonThresholds)
   }
 
   def sumDownload(groupByCols: List[String])(df: DataFrame): DataFrame = {
@@ -62,22 +63,16 @@ object AnnualUpdateMinimalDownloadDF {
         sum($"${i}_umd_tree_cover_loss__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
 
-    val abovegroundBiomassCols =
+    val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum($"${i}_whrc_aboveground_biomass_loss__Mg") as s"whrc_aboveground_biomass_loss_${i}__Mg"
+        sum($"${i}_gfw_gross_emissions_co2e_all_gases__Mg") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
       }).toList
 
-    val abovegroundCo2EmissionsCols =
-      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum($"${i}_whrc_aboveground_co2_emissions__Mg") as s"whrc_aboveground_co2_emissions_${i}__Mg"
-
-      }).toList
     _sumDownload(
       df,
       groupByCols,
       treecoverLossCols,
-      abovegroundBiomassCols,
-      abovegroundCo2EmissionsCols
+      totalGrossEmissionsCo2eAllGasesCols
     )
   }
 
@@ -91,23 +86,16 @@ object AnnualUpdateMinimalDownloadDF {
         sum($"umd_tree_cover_loss_${i}__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
 
-    val abovegroundBiomassCols =
+    val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum($"whrc_aboveground_biomass_loss_${i}__Mg") as s"whrc_aboveground_biomass_loss_${i}__Mg"
-      }).toList
-
-    val abovegroundCo2EmissionsCols =
-      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum($"whrc_aboveground_co2_emissions_${i}__Mg") as s"whrc_aboveground_co2_emissions_${i}__Mg"
-
+        sum($"gfw_gross_emissions_co2e_all_gases_${i}__Mg") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
       }).toList
 
     _sumDownload(
       df,
       groupByCols,
       treecoverLossCols,
-      abovegroundBiomassCols,
-      abovegroundCo2EmissionsCols
+      totalGrossEmissionsCo2eAllGasesCols
     )
   }
 
@@ -115,8 +103,7 @@ object AnnualUpdateMinimalDownloadDF {
                             df: DataFrame,
                             groupByCols: List[String],
                             treecoverLossCols: List[Column],
-                            abovegroundBiomassCols: List[Column],
-                            abovegroundCo2EmissionsCols: List[Column]
+                            totalGrossEmissionsCo2eAllGasesCols: List[Column]
                           ): DataFrame = {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
@@ -128,16 +115,18 @@ object AnnualUpdateMinimalDownloadDF {
       sum($"whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
       sum($"whrc_aboveground_biomass_stock_2000__Mg") / sum(
         $"umd_tree_cover_extent_2000__ha"
-      ) as "avg_whrc_aboveground_biomass_2000_Mt_ha-1",
-      sum($"whrc_aboveground_co2_stock_2000__Mg") as "whrc_aboveground_co2_stock_2000__Mg"
-    ) ::: treecoverLossCols ::: abovegroundBiomassCols ::: abovegroundCo2EmissionsCols
+      ) as "avg_whrc_aboveground_biomass_2000_Mg_ha-1",
+      sum($"gfw_gross_emissions_co2e_all_gases__Mg_yr-1") as "gfw_gross_emissions_co2e_all_gases__Mg_yr-1",
+      sum($"gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg_yr-1") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg_yr-1",
+      sum($"gfw_net_flux_co2e__Mg_yr-1") as "gfw_net_flux_co2e__Mg_yr-1"
+    ) ::: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
 
     df.groupBy(
       groupByCols.head,
       groupByCols.tail ::: List("umd_tree_cover_density__threshold"): _*
     )
       .agg(aggCols.head, aggCols.tail: _*)
-      .na.fill(0, Seq("avg_whrc_aboveground_biomass_2000_Mt_ha-1"))
+      .na.fill(0, Seq("avg_whrc_aboveground_biomass_2000_Mg_ha-1"))
   }
 
   def roundDownload(roundCols: List[Column])(df: DataFrame): DataFrame = {
@@ -150,22 +139,16 @@ object AnnualUpdateMinimalDownloadDF {
         round($"${i}_umd_tree_cover_loss__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
 
-    val abovegroundBiomassCols =
+    val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        round($"${i}_whrc_aboveground_biomass_loss__Mg") as s"whrc_aboveground_biomass_loss_${i}__Mg"
-      }).toList
-
-    val abovegroundCo2Emissions =
-      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        round($"${i}_whrc_aboveground_co2_emissions__Mg") as s"whrc_aboveground_co2_emissions_${i}__Mg"
+        round($"${i}_gfw_gross_emissions_co2e_all_gases__Mg") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
       }).toList
 
     _roundDownload(
       df,
       roundCols,
       treecoverLossCols,
-      abovegroundBiomassCols,
-      abovegroundCo2Emissions
+      totalGrossEmissionsCo2eAllGasesCols
     )
   }
 
@@ -179,22 +162,16 @@ object AnnualUpdateMinimalDownloadDF {
         round($"umd_tree_cover_loss_${i}__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
 
-    val abovegroundBiomassCols =
+    val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        round($"whrc_aboveground_biomass_loss_${i}__Mg") as s"whrc_aboveground_biomass_loss_${i}__Mg"
-      }).toList
-
-    val abovegroundCo2Emissions =
-      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        round($"whrc_aboveground_co2_emissions_${i}__Mg") as s"whrc_aboveground_co2_emissions_${i}__Mg"
+        round($"gfw_gross_emissions_co2e_all_gases_${i}__Mg") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
       }).toList
 
     _roundDownload(
       df,
       roundCols,
       treecoverLossCols,
-      abovegroundBiomassCols,
-      abovegroundCo2Emissions
+      totalGrossEmissionsCo2eAllGasesCols
     )
   }
 
@@ -202,8 +179,7 @@ object AnnualUpdateMinimalDownloadDF {
                               df: DataFrame,
                               roundCols: List[Column],
                               treecoverLossCols: List[Column],
-                              abovegroundBiomassCols: List[Column],
-                              abovegroundCo2Emissions: List[Column]
+                              totalGrossEmissionsCo2eAllGasesCols: List[Column],
                             ): DataFrame = {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
@@ -215,17 +191,18 @@ object AnnualUpdateMinimalDownloadDF {
       round($"area__ha") as "area__ha",
       round($"umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
       round($"whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
-      round($"avg_whrc_aboveground_biomass_2000_Mt_ha-1") as "avg_whrc_aboveground_biomass_2000_Mt_ha-1",
-      round($"whrc_aboveground_co2_stock_2000__Mg") as "whrc_aboveground_co2_stock_2000__Mg"
+      round($"avg_whrc_aboveground_biomass_2000_Mg_ha-1") as "avg_whrc_aboveground_biomass_2000_Mg_ha-1",
+      round($"gfw_gross_emissions_co2e_all_gases__Mg_yr-1") as "gfw_gross_emissions_co2e_all_gases__Mg_yr-1",
+      round($"gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg_yr-1") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg_yr-1",
+      round($"gfw_net_flux_co2e__Mg_yr-1") as "gfw_net_flux_co2e__Mg_yr-1"
     )
 
     df.select(
-      roundCols ::: cols ::: treecoverLossCols ::: abovegroundBiomassCols ::: abovegroundCo2Emissions: _*
+      roundCols ::: cols ::: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols : _*
     )
   }
 
   private def setNullZero(df: DataFrame): DataFrame = {
-
     def setZero(column: Column): Column =
       when(column.isNull || column.isNaN, 0).otherwise(column)
 
@@ -234,22 +211,37 @@ object AnnualUpdateMinimalDownloadDF {
         s"${i}_umd_tree_cover_loss__ha"
       }).toList
 
-    val abovegroundBiomassCols =
+    val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        s"${i}_whrc_aboveground_biomass_loss__Mg"
+        s"${i}_gfw_gross_emissions_co2e_all_gases__Mg"
       }).toList
 
-    val abovegroundCo2Emissions =
-      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        s"${i}_whrc_aboveground_co2_emissions__Mg"
-      }).toList
-
-    val cols = "avg_whrc_aboveground_biomass_2000_Mt_ha-1" :: treecoverLossCols ::: abovegroundBiomassCols ::: abovegroundCo2Emissions
+    val cols = "avg_whrc_aboveground_biomass_2000_Mg_ha-1" :: "gfw_gross_emissions_co2e_all_gases__Mg_yr-1" :: "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg_yr-1" :: "gfw_net_flux_co2e__Mg_yr-1" :: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
     val nullColumns = df
       .select(cols.head, cols.tail: _*)
       .columns
 
     nullColumns.foldLeft(df)((acc, column) => acc.withColumn(column, setZero(col(column))))
+  }
 
+  /*
+    Carbon analysis is only valid for thresholds >=30, so set those columns to null for other thresholds
+   */
+  private def removeCarbonThresholds(df: DataFrame): DataFrame = {
+    def setNull(column: Column): Column =
+      when(df("umd_tree_cover_density__threshold") < 30, null).otherwise(column)
+
+    val totalGrossEmissionsCo2eAllGasesCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        s"${i}_gfw_gross_emissions_co2e_all_gases__Mg"
+      }).toList
+
+    val cols = "gfw_gross_emissions_co2e_all_gases__Mg_yr-1" :: "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg_yr-1" :: "gfw_net_flux_co2e__Mg_yr-1" :: totalGrossEmissionsCo2eAllGasesCols
+
+    val carbonColumns = df
+      .select(cols.head, cols.tail: _*)
+      .columns
+
+    carbonColumns.foldLeft(df)((acc, column) => acc.withColumn(column, setNull(col(column))))
   }
 }

@@ -6,7 +6,7 @@ case class GlobalLandcover(gridTile: GridTile)
   extends StringLayer
     with OptionalILayer {
   val uri: String =
-    s"$basePath/esa_land_cover_2015/v20160111/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/class/geotiff/${gridTile.tileId}.tif"
+    s"$basePath/esa_land_cover_2015/v20160111/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/class/gdal-geotiff/${gridTile.tileId}.tif"
   override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {

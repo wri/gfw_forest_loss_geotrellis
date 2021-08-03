@@ -4,9 +4,11 @@ import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
-import geotrellis.spark.SpatialKey
-import geotrellis.spark.io.index.zcurve.Z2
-import geotrellis.spark.tiling.LayoutDefinition
+import geotrellis.layer.{LayoutDefinition, SpatialKey}
+import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResult}
+import geotrellis.raster.summary.polygonal
+import org.apache.commons.lang.NotImplementedException
+import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector._
 import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
@@ -19,7 +21,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
   type SOURCES <: GridSources
   type SUMMARY <: Summary[SUMMARY]
-  type TILE <: CellGrid
+  type TILE <: CellGrid[Int]
 
   /** Produce RDD of tree cover loss from RDD of areas of interest*
     *
@@ -93,15 +95,14 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
           groupedByKey.toIterator.flatMap {
             case (windowKey, keysAndFeatures) =>
-              val window: Extent = windowKey.extent(windowLayout)
               val maybeRasterSource: Either[Throwable, SOURCES] =
-                getSources(window, kwargs)
+                getSources(windowKey, windowLayout, kwargs)
 
               val features = keysAndFeatures map { case (_, feature) => feature }
 
               val maybeRaster: Either[Throwable, Raster[TILE]] =
                 maybeRasterSource.flatMap { rs: SOURCES =>
-                  readWindow(rs, window)
+                  readWindow(rs, windowKey, windowLayout)
                 }
 
               // flatMap here flattens out and ignores the errors
@@ -118,14 +119,17 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                     List.empty
 
                   case Right(raster) =>
-                    val summary: SUMMARY =
+                    val summary: Option[SUMMARY] =
                       try {
-                          runPolygonalSummary(
+                        runPolygonalSummary(
                           raster,
                           feature.geom,
                           rasterizeOptions,
                           kwargs
-                        )
+                        ) match {
+                          case polygonal.Summary(result: SUMMARY) => Some(result)
+                          case NoIntersection => None
+                        }
                       } catch {
                         case ise: java.lang.IllegalStateException => {
                           println(
@@ -148,7 +152,11 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                         case e: Throwable => throw e
 
                       }
-                    List((id, summary))
+
+                    summary match {
+                      case Some(result) => List((id, result))
+                      case None => List.empty
+                    }
                 }
               }
           }
@@ -164,13 +172,13 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
     featuresGroupedWithSummaries
   }
 
-  def getSources(window: Extent, kwargs: Map[String, Any]): Either[Throwable, SOURCES]
+  def getSources(key: SpatialKey, windowLayout: LayoutDefinition, kwargs: Map[String, Any]): Either[Throwable, SOURCES]
 
-  def readWindow(rs: SOURCES, window: Extent): Either[Throwable, Raster[TILE]]
+  def readWindow(rs: SOURCES, windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[TILE]]
   def runPolygonalSummary(raster: Raster[TILE],
                           geometry: Geometry,
                           options: Rasterizer.Options,
-                          kwargs: Map[String, Any]): SUMMARY
+                          kwargs: Map[String, Any]): PolygonalSummaryResult[SUMMARY]
 
 
   def reduceSummarybyKey[FEATUREID <: FeatureId](
@@ -180,6 +188,5 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
       case (summary1, summary2) =>
         summary1.merge(summary2)
     }
-
   }
 }

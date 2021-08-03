@@ -106,7 +106,7 @@ object CarbonFluxExport extends SummaryExport {
     val adm1ApiDF = adm2ApiDF
       .transform(CarbonFluxDF.aggChange(List("iso", "adm1")))
       .coalesce(60) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-    
+
 
     adm1ApiDF.write
       .options(csvOptions)
@@ -116,7 +116,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggChange(List("iso")))
       .coalesce(20) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
 
-    
+
     isoApiDF.write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/change")

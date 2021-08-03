@@ -39,5 +39,6 @@ case class AnnualUpdateMinimalDataGroup(lossYear: Integer,
                                         //                             braBiomes: String,
                                         woodFiber: Boolean,
                                         resourceRights: Boolean,
-                                        logging: Boolean)
+                                        logging: Boolean,
+                                        isGain: Boolean)
 //                             oilGas: Boolean)

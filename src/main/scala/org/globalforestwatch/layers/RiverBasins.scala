@@ -4,7 +4,7 @@ import org.globalforestwatch.grids.GridTile
 
 case class RiverBasins(gridTile: GridTile) extends StringLayer with OptionalILayer {
 
-  val uri: String =  s"$basePath/mapbox_river_basins/v2014/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"
+  val uri: String =  s"$basePath/mapbox_river_basins/v2014/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/gdal-geotiff/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Unknown"
 

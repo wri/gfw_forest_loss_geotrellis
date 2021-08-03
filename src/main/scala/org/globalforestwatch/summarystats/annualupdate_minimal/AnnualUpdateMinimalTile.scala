@@ -11,8 +11,8 @@ import org.globalforestwatch.layers._
 case class AnnualUpdateMinimalTile(
                                     loss: TreeCoverLoss#ITile,
                                     gain: TreeCoverGain#ITile,
-                                    tcd2000: TreeCoverDensity#ITile,
-                                    tcd2010: TreeCoverDensity#ITile,
+                                    tcd2000: TreeCoverDensityThreshold#ITile,
+                                    tcd2010: TreeCoverDensityThreshold#ITile,
                                     biomass: BiomassPerHectar#OptionalDTile,
                                     //                         mangroveBiomass: MangroveBiomass#OptionalDTile,
                                     drivers: TreeCoverLossDrivers#OptionalITile,
@@ -52,9 +52,14 @@ case class AnnualUpdateMinimalTile(
                                     //                         braBiomes: BrazilBiomes#OptionalITile,
                                     woodFiber: WoodFiber#OptionalITile,
                                     resourceRights: ResourceRights#OptionalITile,
-                                    logging: Logging#OptionalITile
+                                    logging: Logging#OptionalITile,
                                     //                         oilGas: OilGas#OptionalITile
-) extends CellGrid {
+                                    grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e#OptionalFTile,
+                                    grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e#OptionalFTile,
+                                    grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2#OptionalFTile,
+                                    grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2#OptionalFTile,
+                                    netFluxCo2: NetFluxCo2e#OptionalFTile
+) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
   def cols: Int = loss.cols
   def rows: Int = loss.rows

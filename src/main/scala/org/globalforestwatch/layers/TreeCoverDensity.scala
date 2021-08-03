@@ -2,7 +2,7 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-trait TreeCoverDensity extends IntegerLayer with RequiredILayer {
+trait TreeCoverDensityThreshold extends IntegerLayer with RequiredILayer {
 
   override val externalNoDataValue: Integer = 0
 
@@ -20,35 +20,35 @@ trait TreeCoverDensity extends IntegerLayer with RequiredILayer {
   }
 }
 
-case class TreeCoverDensityPercent2000(gridTile: GridTile)
-  extends TreeCoverDensity {
-  val uri: String = s"$basePath/umd_tree_cover_density_2000/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/geotiff/${gridTile.tileId}.tif"
+case class TreeCoverDensityThreshold2000(gridTile: GridTile)
+  extends TreeCoverDensityThreshold {
+  val uri: String = s"$basePath/umd_tree_cover_density_2000/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
 }
 
-case class TreeCoverDensityPercent2010(gridTile: GridTile)
-  extends TreeCoverDensity {
-  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/geotiff/${gridTile.tileId}.tif"
+case class TreeCoverDensityThreshold2010(gridTile: GridTile)
+  extends TreeCoverDensityThreshold {
+  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
 }
 
 case class TreeCoverDensity2010_60(gridTile: GridTile)
   extends BooleanLayer
     with RequiredILayer {
-  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
 
   override def lookup(value: Int): Boolean = value > 60
 
 }
 
-case class TreeCoverDensity2000(gridTile: GridTile)
+case class TreeCoverDensityPercent2000(gridTile: GridTile)
   extends IntegerLayer
     with RequiredILayer {
   override val externalNoDataValue: Integer = 0
-  val uri: String = s"$basePath/umd_tree_cover_density_2000/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/umd_tree_cover_density_2000/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
 }
 
-case class TreeCoverDensity2010(gridTile: GridTile)
+case class TreeCoverDensityPercent2010(gridTile: GridTile)
   extends IntegerLayer
     with RequiredILayer {
   override val externalNoDataValue: Integer = 0
-  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/geotiff/${gridTile.tileId}.tif"
+  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
 }

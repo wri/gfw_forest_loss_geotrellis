@@ -3,7 +3,7 @@ package org.globalforestwatch.layers
 import org.globalforestwatch.grids.GridTile
 
 case class BiodiversityIntactness(gridTile: GridTile) extends DBooleanLayer with OptionalDLayer {
-    val uri: String = s"$basePath/birdlife_biodiversity_intactness/v201909/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/index/geotiff/${gridTile.tileId}.tif"
+    val uri: String = s"$basePath/birdlife_biodiversity_intactness/v201909/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/index/gdal-geotiff/${gridTile.tileId}.tif"
 
   def lookup(value: Double): Boolean =
   // if (value == 0) null

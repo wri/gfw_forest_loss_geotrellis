@@ -60,7 +60,7 @@ object CarbonSensitivityExport extends SummaryExport {
 
     val adm2ApiDF = df
       .transform(CarbonSensitivityDF.aggSummary(List("iso", "adm1", "adm2")))
-      .coalesce(40) // this should result in an avg file size of 100MB.
+      .coalesce(80) // this should result in an avg file size of 100MB.
 
     adm2ApiDF.write
       .options(csvOptions)
@@ -68,7 +68,7 @@ object CarbonSensitivityExport extends SummaryExport {
 
     val adm1ApiDF = adm2ApiDF
       .transform(CarbonSensitivityDF.aggSummary2(List("iso", "adm1")))
-      .coalesce(12) // this should result in an avg file size of 100MB.
+      .coalesce(24) // this should result in an avg file size of 100MB.
 
     adm1ApiDF.write
       .options(csvOptions)
@@ -76,7 +76,7 @@ object CarbonSensitivityExport extends SummaryExport {
 
     val isoApiDF = adm1ApiDF
       .transform(CarbonSensitivityDF.aggSummary2(List("iso")))
-      .coalesce(4) // this should result in an avg file size of 100MB.
+      .coalesce(8) // this should result in an avg file size of 100MB.
 
     isoApiDF.write
       .options(csvOptions)
@@ -91,7 +91,7 @@ object CarbonSensitivityExport extends SummaryExport {
     val adm2ApiDF = df
       .filter($"umd_tree_cover_loss__year".isNotNull && $"umd_tree_cover_loss__ha" > 0)
       .transform(CarbonSensitivityDF.aggChange(List("iso", "adm1", "adm2")))
-      .coalesce(100) // this should result in an avg file size of 100MB.
+      .coalesce(200) // this should result in an avg file size of 100MB.
 
     adm2ApiDF.write
       .options(csvOptions)
@@ -99,7 +99,7 @@ object CarbonSensitivityExport extends SummaryExport {
 
     val adm1ApiDF = adm2ApiDF
       .transform(CarbonSensitivityDF.aggChange(List("iso", "adm1")))
-      .coalesce(30) // this should result in an avg file size of 100MB.
+      .coalesce(60) // this should result in an avg file size of 100MB.
 
     adm1ApiDF.write
       .options(csvOptions)
@@ -107,7 +107,7 @@ object CarbonSensitivityExport extends SummaryExport {
 
     val isoApiDF = adm1ApiDF
       .transform(CarbonSensitivityDF.aggChange(List("iso")))
-      .coalesce(10) // this should result in an avg file size of 100MB.
+      .coalesce(20) // this should result in an avg file size of 100MB.
 
     isoApiDF.write
       .options(csvOptions)

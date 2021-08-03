@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.gladalerts
 
 import cats.implicits._
-import geotrellis.contrib.polygonal.CellVisitor
+import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Util.getAnyMapValue
@@ -10,34 +10,31 @@ import org.globalforestwatch.util.{Geodesy, Mercantile}
 import scala.annotation.tailrec
 
 /** LossData Summary by year */
-case class GladAlertsSummary(stats: Map[GladAlertsDataGroup, GladAlertsData] =
-                             Map.empty,
-                             kwargs: Map[String, Any])
+case class GladAlertsSummary(stats: Map[GladAlertsDataGroup, GladAlertsData] = Map.empty)
   extends Summary[GladAlertsSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: GladAlertsSummary): GladAlertsSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    GladAlertsSummary(stats.combine(other.stats), kwargs)
+    GladAlertsSummary(stats.combine(other.stats))
   }
 }
 
 object GladAlertsSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
+  def getGridVisitor(kwargs: Map[String, Any]): GridVisitor[Raster[GladAlertsTile], GladAlertsSummary] = {
+    new GridVisitor[Raster[GladAlertsTile], GladAlertsSummary] {
+      private var acc: GladAlertsSummary = new GladAlertsSummary()
 
-  implicit val mdhCellRegisterForTreeLossRaster1
-    : CellVisitor[Raster[GladAlertsTile], GladAlertsSummary] =
-    new CellVisitor[Raster[GladAlertsTile], GladAlertsSummary] {
+      def result: GladAlertsSummary = acc
 
-      def register(raster: Raster[GladAlertsTile],
-                   col: Int,
-                   row: Int,
-                   acc: GladAlertsSummary): GladAlertsSummary = {
+      def visit(raster: Raster[GladAlertsTile],
+                col: Int,
+                row: Int): Unit = {
 
-        val changeOnly: Boolean =
-          getAnyMapValue[Boolean](acc.kwargs, "changeOnly")
+        val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
-        val buildDataCube: Boolean = false //getAnyMapValue[Boolean](acc.kwargs, "buildDataCube")
+        val buildDataCube: Boolean = false //getAnyMapValue[Boolean](kwargs, "buildDataCube")
 
         val maxZoom = 12
 
@@ -168,9 +165,9 @@ object GladAlertsSummary {
           val updatedSummary: Map[GladAlertsDataGroup, GladAlertsData] =
             updateSummary(tile, acc.stats)
 
-          GladAlertsSummary(updatedSummary, acc.kwargs)
-
-        } else acc
+          acc = GladAlertsSummary(updatedSummary)
+        }
       }
     }
+  }
 }

@@ -2,7 +2,7 @@ package org.globalforestwatch.summarystats.treecoverloss
 
 import cats.data.NonEmptyList
 import cats.implicits._
-import geotrellis.contrib.polygonal.CellVisitor
+import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
@@ -13,30 +13,30 @@ import scala.annotation.tailrec
 
 /** LossData Summary by year */
 case class TreeLossSummary(stats: Map[TreeLossDataGroup, TreeLossData] =
-                           Map.empty,
-                           kwargs: Map[String, Any])
+                           Map.empty)
   extends Summary[TreeLossSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: TreeLossSummary): TreeLossSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    TreeLossSummary(stats.combine(other.stats), kwargs)
+    TreeLossSummary(stats.combine(other.stats))
   }
 }
 
 object TreeLossSummary {
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
 
-  implicit val mdhCellRegisterForTreeLossRaster1
-  : CellVisitor[Raster[TreeLossTile], TreeLossSummary] =
-    new CellVisitor[Raster[TreeLossTile], TreeLossSummary] {
+  def getGridVisitor(kwargs: Map[String, Any]): GridVisitor[Raster[TreeLossTile], TreeLossSummary] =
+    new GridVisitor[Raster[TreeLossTile], TreeLossSummary] {
+      private var acc: TreeLossSummary = new TreeLossSummary()
 
-      def register(raster: Raster[TreeLossTile],
+      def result: TreeLossSummary = acc
+
+      def visit(raster: Raster[TreeLossTile],
                    col: Int,
-                   row: Int,
-                   acc: TreeLossSummary): TreeLossSummary = {
+                   row: Int): Unit = {
 
-        val tcdYear: Int = getAnyMapValue[Int](acc.kwargs, "tcdYear")
+        val tcdYear: Int = getAnyMapValue[Int](kwargs, "tcdYear")
 
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
@@ -45,8 +45,15 @@ object TreeLossSummary {
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
+        val grossCumulAbovegroundRemovalsCo2: Float = raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
+        val grossCumulBelowgroundRemovalsCo2: Float = raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
+        val grossEmissionsCo2eNonCo2: Float = raster.tile.grossEmissionsCo2eNonCo2.getData(col, row)
+        val grossEmissionsCo2eCo2Only: Float =  raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
+        val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
+        val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
+
         val contextualLayers: List[String] =
-          getAnyMapValue[NonEmptyList[String]](acc.kwargs, "contextualLayers").toList
+          getAnyMapValue[NonEmptyList[String]](kwargs, "contextualLayers").toList
 
         val isPrimaryForest: Boolean = {
           if (contextualLayers contains "is__umd_regional_primary_forest_2001")
@@ -60,20 +67,30 @@ object TreeLossSummary {
           else false
         }
 
+
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
-        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
+        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordinate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
         val areaHa = area / 10000.0
 
         val gainArea: Double = gain * areaHa
-
-        val co2Factor = 0.5 * 44 / 12
-
         val biomassPixel = biomass * areaHa
-        val co2Pixel = biomassPixel * co2Factor
+
+        val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
+        val grossCumulBelowgroundRemovalsCo2Pixel = grossCumulBelowgroundRemovalsCo2 * areaHa
+        val grossCumulAboveBelowgroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2Pixel + grossCumulBelowgroundRemovalsCo2Pixel
+
+        val grossEmissionsCo2eNonCo2Pixel = grossEmissionsCo2eNonCo2 * areaHa
+        val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
+        val grossEmissionsCo2eAllGasesPixel = grossEmissionsCo2eNonCo2Pixel + grossEmissionsCo2eCo2OnlyPixel
+
+        val netFluxCo2Pixel = netFluxCo2 * areaHa
+
+        val fluxModelExtentAreaInt: Integer = if (fluxModelExtent) 1 else 0
+        val fluxModelExtentAreaPixel: Double = fluxModelExtentAreaInt * areaHa
 
         val thresholds: List[Int] =
-          getAnyMapValue[NonEmptyList[Int]](acc.kwargs, "thresholdFilter").toList
+           getAnyMapValue[NonEmptyList[Int]](kwargs, "thresholdFilter").toList
 
         @tailrec
         def updateSummary(
@@ -87,25 +104,29 @@ object TreeLossSummary {
                 thresholds.head,
                 tcdYear,
                 isPrimaryForest,
-                isPlantations
+                isPlantations,
+                gain
               )
 
             val summary: TreeLossData =
               stats.getOrElse(
                 key = pKey,
                 default =
-                  TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0)
+                  TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
             summary.totalGainArea += gainArea
 
-            if ((tcd2000 >= thresholds.head && tcdYear == 2000) || (tcd2010 >= thresholds.head && tcdYear == 2010)) {
+            if (((thresholds.head == 0 || tcd2000 > thresholds.head) && tcdYear == 2000) || ((thresholds.head == 0 || tcd2010 > thresholds.head) && tcdYear == 2010))
+            {
 
               if (loss != null) {
                 summary.lossYear(loss).treecoverLoss += areaHa
                 summary.lossYear(loss).biomassLoss += biomassPixel
-                summary.lossYear(loss).carbonEmissions += co2Pixel
+                summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+                summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
               }
 
               // TODO: use extent2010 to calculate avg biomass incase year is selected
@@ -115,16 +136,38 @@ object TreeLossSummary {
                 case 2010 => summary.treecoverExtent2010 += areaHa
               }
               summary.totalBiomass += biomassPixel
-              summary.totalCo2 += co2Pixel
-            }
 
-            tcdYear match {
-              case 2000 =>
-                if (tcd2010 >= thresholds.head)
-                  summary.treecoverExtent2010 += areaHa
-              case 2010 =>
-                if (tcd2000 >= thresholds.head)
-                  summary.treecoverExtent2000 += areaHa
+              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
+              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
+              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+
+              summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+              summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+              summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
+
+              summary.totalNetFluxCo2 += netFluxCo2Pixel
+
+              summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
+            } else if (gain) {
+            // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
+            // the correct flux model outputs (TCD>=threshold OR Hansen gain)
+              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
+              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
+              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+
+              summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+              summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+              summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
+
+              summary.totalNetFluxCo2 += netFluxCo2Pixel
+
+              summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
+
+              if (loss != null) {
+                summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+                summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
+              }
             }
 
             updateSummary(thresholds.tail, stats.updated(pKey, summary))
@@ -134,8 +177,7 @@ object TreeLossSummary {
         val updatedSummary: Map[TreeLossDataGroup, TreeLossData] =
           updateSummary(thresholds, acc.stats)
 
-        TreeLossSummary(updatedSummary, acc.kwargs)
-
+        acc = TreeLossSummary(updatedSummary)
       }
     }
 }

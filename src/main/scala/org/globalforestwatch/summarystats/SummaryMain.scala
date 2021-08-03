@@ -26,7 +26,7 @@ object SummaryMain
 
         //        // Can be used to increase the level of job parallelism
         //        val intputPartitionsOpt = Opts
-        //          .option[Int]("input-partitions", "Partition multiplier for input")
+        //          .option[Int]("input.tsv-partitions", "Partition multiplier for input.tsv")
         //          .withDefault(16)
         //
         //        // Can be used to consolidate output into fewer files

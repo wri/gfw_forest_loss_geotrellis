@@ -17,11 +17,11 @@
 import sbt._
 
 object Version {
-  val scala       = "2.11.12"
-  val geotrellis  = "2.2.0"
-  val hadoop      = "2.8.0"
-  val spark       = "2.4.0"
-  val geotools    = "17.1"
+  val scala       = "2.12.12"
+  val geotrellis  = "3.5.2"
+  val hadoop      = "3.2.1"
+  val spark       = "3.0.0"
+  val geotools    = "23.1"
 }
 
 object Dependencies {
@@ -31,10 +31,11 @@ object Dependencies {
   val geotrellisVector        = "org.locationtech.geotrellis" %% "geotrellis-vector"         % Version.geotrellis
   val geotrellisVectorTile    = "org.locationtech.geotrellis" %% "geotrellis-vectortile"     % Version.geotrellis
   val geotrellisUtil          = "org.locationtech.geotrellis" %% "geotrellis-util"           % Version.geotrellis
-  val geotrellisShapefile     = "org.locationtech.geotrellis" %% "geotrellis-shapefile"        % Version.geotrellis
+  val geotrellisShapefile     = "org.locationtech.geotrellis" %% "geotrellis-shapefile"      % Version.geotrellis
   val geotrellisGeotools      = "org.locationtech.geotrellis" %% "geotrellis-geotools"       % Version.geotrellis
   val geotrellisSparkTestKit  = "org.locationtech.geotrellis" %% "geotrellis-spark-testkit"  % Version.geotrellis
   val geotrellisRasterTestkit = "org.locationtech.geotrellis" %% "geotrellis-raster-testkit" % Version.geotrellis
+  val geotrellisGdal          = "org.locationtech.geotrellis" %% "geotrellis-gdal"           % Version.geotrellis
   val sparkJts                = "org.locationtech.geomesa"    %% "geomesa-spark-jts"         % "2.2.0"
 
   val pureconfig          = "com.github.pureconfig"      %% "pureconfig"               % "0.9.1"
@@ -47,5 +48,6 @@ object Dependencies {
   val sparkSQL            = "org.apache.spark"           %% "spark-sql"                % Version.spark
   val sparkHive           = "org.apache.spark"           %% "spark-hive"               % Version.spark
   val hadoopClient        = "org.apache.hadoop"           % "hadoop-client"            % Version.hadoop
+  val hadoopCommon        = "org.apache.hadoop"           % "hadoop-common"            % Version.hadoop
   val hadoopAws           = "org.apache.hadoop"           % "hadoop-aws"               % Version.hadoop
 }
