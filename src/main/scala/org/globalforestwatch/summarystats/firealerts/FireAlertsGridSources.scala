@@ -30,6 +30,7 @@ case class FireAlertsGridSources(gridTile: GridTile) extends GridSources {
   val intactForestLandscapes2016 = IntactForestLandscapes2016(gridTile)
   val peruForestConcessions = PeruForestConcessions(gridTile)
   val protectedAreas = ProtectedAreas(gridTile)
+  val treeCoverDensityThreshold2000 = TreeCoverDensityThreshold2000(gridTile)
 
   def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[FireAlertsTile]] = {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
@@ -55,6 +56,8 @@ case class FireAlertsGridSources(gridTile: GridTile) extends GridSources {
         intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
       val braBiomesTile =
         braBiomes.fetchWindow(windowKey, windowLayout)
+      val tcd2000Tile =
+        treeCoverDensityThreshold2000.fetchWindow(windowKey, windowLayout)
 
       val tile = FireAlertsTile(
         gridTile,
@@ -76,7 +79,8 @@ case class FireAlertsGridSources(gridTile: GridTile) extends GridSources {
         oilGasTile,
         mangroves2016Tile,
         intactForestLandscapes2016Tile,
-        braBiomesTile
+        braBiomesTile,
+        tcd2000Tile,
       )
 
       Right(Raster(tile, windowKey.extent(windowLayout)))
