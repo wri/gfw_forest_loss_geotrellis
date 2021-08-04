@@ -5,6 +5,8 @@ import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 
 object AnnualUpdateMinimalCommand extends SummaryCommand {
+  val changeOnlyOpt: Opts[Boolean] =
+    Opts.flag("change_only", "Process change only").orFalse
 
   val annualupdateMinimalCommand: Opts[Unit] = Opts.subcommand(
     name = "annualupdate_minimal",
@@ -16,7 +18,8 @@ object AnnualUpdateMinimalCommand extends SummaryCommand {
       gdamFilterOptions,
       wdpaFilterOptions,
       featureFilterOptions,
-      ).mapN { (default, defaultFilter, gadmFilter, wdpaFilter, featureFilter) =>
+      changeOnlyOpt
+      ).mapN { (default, defaultFilter, gadmFilter, wdpaFilter, featureFilter, changeOnly) =>
       val kwargs = Map(
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
@@ -32,11 +35,11 @@ object AnnualUpdateMinimalCommand extends SummaryCommand {
         "iucnCat" -> wdpaFilter._2,
         "limit" -> defaultFilter._1,
         "tcl" -> defaultFilter._2,
-        "glad" -> defaultFilter._3
+        "glad" -> defaultFilter._3,
+        "changeOnly" -> changeOnly
       )
 
-      runAnalysis("annualupdate_minimum", default._1, default._2, kwargs)
-
+      runAnalysis("annualupdate_minimal", default._1, default._2, kwargs)
     }
   }
 }
