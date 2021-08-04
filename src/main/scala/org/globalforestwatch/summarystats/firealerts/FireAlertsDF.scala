@@ -7,7 +7,7 @@ import org.apache.spark.sql.{Column, DataFrame}
 object FireAlertsDF {
 
   val contextualLayers: List[String] = List(
-    "umd_tree_cover_density_2000__threshold",
+    "umd_tree_cover_density__threshold",
     "is__umd_regional_primary_forest_2001",
     "is__birdlife_alliance_for_zero_extinction_sites",
     "is__birdlife_key_biodiversity_areas",
@@ -38,7 +38,7 @@ object FireAlertsDF {
 
     def defaultCols =
       List(
-        $"data_group.threshold" as "umd_tree_cover_density_2000__threshold",
+        $"data_group.threshold" as "umd_tree_cover_density__threshold",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_areas",
@@ -61,40 +61,29 @@ object FireAlertsDF {
 
     val cols =
       if (!wdpa)
-        unpackCols ::: ($"data_group.protectedAreas" as "wdpa_protected_area__iucn_cat") :: defaultCols
+        unpackCols ::: ($"data_group.protectedAreas" as "wdpa_protected_areas__iucn_cat") :: defaultCols
       else unpackCols ::: defaultCols
 
     df.select(cols: _*)
   }
 
   def aggChangeDaily(groupByCols: List[String],
-                     sourceDataset: String,
                      aggCol: String,
                      wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
 
-    val confCols = if (!aggCol.equals("umd_modis_burned_areas__ha")) List("confidence_cat") else List()
+    val confCols = if (!aggCol.equals("burned_area__ha")) List("confidence__cat")  else List()
     val fireCols = List("alert__date") ::: confCols
 
     val cols =
       if (!wdpa)
-        groupByCols ::: fireCols ::: "wdpa_protected_area__iucn_cat" :: contextualLayers
+        groupByCols ::: fireCols ::: "wdpa_protected_areas__iucn_cat" :: contextualLayers
       else
         groupByCols ::: fireCols ::: contextualLayers
 
-    val selectors: List[Column] = List(
-        $"alert__date" as s"${sourceDataset}__date"
-      ) ::: (
-        if (!aggCol.equals("umd_modis_burned_areas__ha"))
-          List($"confidence_cat" as s"${sourceDataset}__confidence")
-        else
-          List()
-      ) ::: cols.foldRight(Nil: List[Column])(col(_) :: _) ::: List(col(aggCol))
-
-    df.select(selectors: _*)
-      .filter($"alert__date".isNotNull)
+    df.filter($"alert__date".isNotNull)
       .groupBy(cols.head, cols.tail: _*)
       .agg(
         sum(aggCol) as aggCol
@@ -102,25 +91,23 @@ object FireAlertsDF {
   }
 
   def aggChangeWeekly(cols: List[String],
-                      sourceDataset: String,
                       aggCol: String,
                       wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
     import spark.implicits._
 
-    val confCols = if (!aggCol.equals("umd_modis_burned_area__ha")) List(col(s"${sourceDataset}__confidence")) else List()
+    val confCols = if (!aggCol.equals("burned_area__ha")) List($"confidence__cat")  else List()
 
     val fireCols = List(
-      year(col(s"${sourceDataset}__date")) as s"${sourceDataset}__year",
-      weekofyear(col(s"${sourceDataset}__date")) as s"${sourceDataset}__week",
-      col(s"${sourceDataset}}__confidence")
+      year($"alert__date") as "alert__year",
+      weekofyear($"alert__date") as "alert__week",
     ) ::: confCols
-    _aggChangeWeekly(df.filter(col(s"${sourceDataset}__date").isNotNull), cols, sourceDataset, fireCols, aggCol, wdpa)
+
+    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, fireCols, aggCol, wdpa)
   }
 
   def aggChangeWeekly2(cols: List[String],
-                       sourceDataset: String,
                        aggCol: String,
                        wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
@@ -128,34 +115,24 @@ object FireAlertsDF {
     import spark.implicits._
 
     val confCols = if (!aggCol.equals("burned_area__ha")) List($"confidence__cat")  else List()
-    val fireCols = List(
-      col(s"${sourceDataset}__year"),
-      col(s"${sourceDataset}__week"),
-      col(s"${sourceDataset}}__confidence")
-    ) ::: confCols
-    _aggChangeWeekly(df, cols, sourceDataset, fireCols, aggCol, wdpa)
+    val fireCols = List($"alert__year", $"alert__week") ::: confCols
+    _aggChangeWeekly(df, cols, fireCols, aggCol, wdpa)
   }
 
   private def _aggChangeWeekly(df: DataFrame,
                                cols: List[String],
-                               sourceDataset: String,
                                fireCols: List[Column],
                                aggCol: String,
                                wdpa: Boolean = false): DataFrame = {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val confCols = if (!aggCol.equals("umd_modis_burned_areass__ha")) List(s"${sourceDataset}__confidence")  else List()
-    val fireCols2 = List(
-      s"${sourceDataset}__year",
-      s"${sourceDataset}__week",
-      s"${sourceDataset}__confidence"
-    ) ::: confCols
-
-    val aggCols = List(col(s"${sourceDataset}__count"))
+    val confCols = if (!aggCol.equals("burned_area__ha")) List("confidence__cat")  else List()
+    val fireCols2 = List("alert__year", "alert__week") ::: confCols
+    val aggCols = List(col(aggCol))
 
     val contextLayers: List[String] =
-      if (!wdpa) "wdpa_protected_area__iucn_cat" :: contextualLayers
+      if (!wdpa) "wdpa_protected_areas__iucn_cat" :: contextualLayers
       else contextualLayers
 
     val selectCols: List[Column] = cols.foldRight(Nil: List[Column])(
@@ -182,15 +159,15 @@ object FireAlertsDF {
       max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max("is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
       max("is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
-      max("is__landmark_land_rights") as "is__landmark_land_rights",
+      max("is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
       max(length($"gfw_plantations__type"))
         .cast("boolean") as "gfw_plantations__type",
       max("is__gfw_mining") as "is__gfw_mining",
-      max("is__gfw_managed_forest") as "is__gfw_managed_forest",
+      max("is__gfw_managed_forests") as "is__gfw_managed_forests",
       max(length($"rspo_oil_palm__certification_status"))
         .cast("boolean") as "rspo_oil_palm__certification_status",
       max("is__gfw_wood_fiber") as "is__gfw_wood_fiber",
-      max("is__peatland") as "is__peatland",
+      max("is__gfw_peatlands") as "is__gfw_peatlands",
       max("is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max("is__gfw_oil_palm") as "is__gfw_oil_palm",
       max(length($"idn_forest_area__type"))
@@ -199,14 +176,14 @@ object FireAlertsDF {
         .cast("boolean") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
       max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
-      max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
-      max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name"
+      max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
+      max(length($"bra_biomes__name")).cast("boolean") as "bra_biomes__name"
     )
 
     val aggCols =
       if (!wdpa)
-        (max(length($"wdpa_protected_area__iucn_cat"))
-          .cast("boolean") as "wdpa_protected_area__iucn_cat") :: defaultAggCols
+        (max(length($"wdpa_protected_areas__iucn_cat"))
+          .cast("boolean") as "wdpa_protected_areas__iucn_cat") :: defaultAggCols
       else defaultAggCols
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)
@@ -218,8 +195,8 @@ object FireAlertsDF {
 
     val defaultAggCols = List(
       max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
-      max("is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
-      max("is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
+      max("is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
+      max("is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
       max("is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
       max("gfw_plantations__type") as "gfw_plantations__type",
       max("is__gfw_mining") as "is__gfw_mining",
@@ -239,7 +216,7 @@ object FireAlertsDF {
 
     val aggCols =
       if (!wdpa)
-        (max("wdpa_protected_area__iucn_cat") as "wdpa_protected_area__iucn_cat") :: defaultAggCols
+        (max("wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat") :: defaultAggCols
       else defaultAggCols
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)

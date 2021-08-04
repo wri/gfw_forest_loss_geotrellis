@@ -66,7 +66,7 @@ object GladAlertsDF {
 
     val cols =
       if (!wdpa)
-        unpackCols ::: ($"data_group.protectedAreas" as "wdpa_protected_area__iucn_cat") :: defaultCols
+        unpackCols ::: ($"data_group.protectedAreas" as "wdpa_protected_areas__iucn_cat") :: defaultCols
       else unpackCols ::: defaultCols
 
     df.filter($"data_group.tile.z" === minZoom)
@@ -83,7 +83,7 @@ object GladAlertsDF {
 
     val cols =
       if (!wdpa)
-        groupByCols ::: gladCols ::: "wdpa_protected_area__iucn_cat" :: contextualLayers
+        groupByCols ::: gladCols ::: "wdpa_protected_areas__iucn_cat" :: contextualLayers
       else
         groupByCols ::: gladCols ::: contextualLayers
 
@@ -133,7 +133,7 @@ object GladAlertsDF {
       List($"alert__count", $"alert_area__ha", $"whrc_aboveground_co2_emissions__Mg")
 
     val contextLayers: List[String] =
-      if (!wdpa) "wdpa_protected_area__iucn_cat" :: contextualLayers
+      if (!wdpa) "wdpa_protected_areas__iucn_cat" :: contextualLayers
       else contextualLayers
 
     val selectCols: List[Column] = cols.foldRight(Nil: List[Column])(
@@ -157,7 +157,7 @@ object GladAlertsDF {
 
     val cols =
       if (!wdpa)
-        groupByCols ::: "wdpa_protected_area__iucn_cat" :: contextualLayers
+        groupByCols ::: "wdpa_protected_areas__iucn_cat" :: contextualLayers
       else
         groupByCols ::: contextualLayers
 
@@ -198,8 +198,8 @@ object GladAlertsDF {
 
     val aggCols =
       if (!wdpa)
-        (max(length($"wdpa_protected_area__iucn_cat"))
-          .cast("boolean") as "wdpa_protected_area__iucn_cat") :: defaultAggCols
+        (max(length($"wdpa_protected_areas__iucn_cat"))
+          .cast("boolean") as "wdpa_protected_areas__iucn_cat") :: defaultAggCols
       else defaultAggCols
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)
@@ -232,7 +232,7 @@ object GladAlertsDF {
 
     val aggCols =
       if (!wdpa)
-        (max("wdpa_protected_area__iucn_cat") as "wdpa_protected_area__iucn_cat") :: defaultAggCols
+        (max("wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat") :: defaultAggCols
       else defaultAggCols
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)

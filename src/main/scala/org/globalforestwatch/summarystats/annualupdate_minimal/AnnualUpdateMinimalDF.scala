@@ -81,7 +81,7 @@ object AnnualUpdateMinimalDF {
     val unpackCols = {
       if (!wdpa) {
         defaultUnpackCols ::: List(
-          $"data_group.wdpa" as "wdpa_protected_area__iucn_cat"
+          $"data_group.wdpa" as "wdpa_protected_areas__iucn_cat"
         )
       } else defaultUnpackCols
     }
@@ -97,7 +97,7 @@ object AnnualUpdateMinimalDF {
     val cols =
       if (!wdpa)
         groupByCols ::: contextualLayers ::: List(
-          "wdpa_protected_area__iucn_cat"
+          "wdpa_protected_areas__iucn_cat"
         )
       else groupByCols ::: contextualLayers
 
@@ -127,7 +127,7 @@ object AnnualUpdateMinimalDF {
     val cols =
       if (!wdpa)
         groupByCols ::: contextualLayers ::: List(
-          "wdpa_protected_area__iucn_cat"
+          "wdpa_protected_areas__iucn_cat"
         )
       else groupByCols ::: contextualLayers
 
@@ -157,7 +157,7 @@ object AnnualUpdateMinimalDF {
     val cols =
       if (!wdpa)
         groupByCols ::: List("umd_tree_cover_loss__year") ::: contextualLayers ::: List(
-          "wdpa_protected_area__iucn_cat"
+          "wdpa_protected_areas__iucn_cat"
         )
       else groupByCols ::: List("umd_tree_cover_loss__year") ::: contextualLayers
 
@@ -207,8 +207,8 @@ object AnnualUpdateMinimalDF {
     val aggCols =
       if (!wdpa)
         defaultAggCols ::: List(
-          max(length($"wdpa_protected_area__iucn_cat"))
-            .cast("boolean") as "wdpa_protected_area__iucn_cat"
+          max(length($"wdpa_protected_areas__iucn_cat"))
+            .cast("boolean") as "wdpa_protected_areas__iucn_cat"
         )
       else defaultAggCols
 
@@ -248,7 +248,7 @@ object AnnualUpdateMinimalDF {
 
     val aggCols = if (!wdpa)
       defaultAggCols ::: List(
-        max($"wdpa_protected_area__iucn_cat") as "wdpa_protected_area__iucn_cat"
+        max($"wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat"
       )
     else defaultAggCols
 
