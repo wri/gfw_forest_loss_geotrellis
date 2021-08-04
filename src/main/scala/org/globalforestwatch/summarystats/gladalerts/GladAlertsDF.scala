@@ -38,8 +38,8 @@ object GladAlertsDF {
 
     def defaultCols =
       List(
-        $"data_group.alertDate" as "umd_glad_landsat_alerts__date",
-        $"data_group.isConfirmed" as "umd_glad_landsat_alerts__confidence",
+        $"data_group.alertDate" as "alert__date",
+        $"data_group.isConfirmed" as "is__confirmed_alert",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_areas",
@@ -58,8 +58,8 @@ object GladAlertsDF {
         $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscapes_2016",
         $"data_group.braBiomes" as "bra_biomes__name",
-        $"data.totalAlerts" as "umd_glad_landsat_alerts__count",
-        $"data.alertArea" as "umd_glad_landsat_alerts__ha",
+        $"data.totalAlerts" as "alert__count",
+        $"data.alertArea" as "alert_area__ha",
         $"data.co2Emissions" as "whrc_aboveground_co2_emissions__Mg",
         $"data.totalArea" as "area__ha"
       )
@@ -79,7 +79,7 @@ object GladAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val gladCols = List("umd_glad_landsat_alerts__date", "umd_glad_landsat_alerts__confidence")
+    val gladCols = List("alert__date", "is__confirmed_alert")
 
     val cols =
       if (!wdpa)
@@ -90,8 +90,8 @@ object GladAlertsDF {
     df.filter($"alert__date".isNotNull)
       .groupBy(cols.head, cols.tail: _*)
       .agg(
-        sum("umd_glad_landsat_alerts__count") as "umd_glad_landsat_alerts__count",
-        sum("umd_glad_landsat_alerts__ha") as "umd_glad_landsat_alerts__ha",
+        sum("alert__count") as "alert__count",
+        sum("alert_area__ha") as "alert_area__ha",
         sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions__Mg"
       )
   }
@@ -103,11 +103,11 @@ object GladAlertsDF {
     import spark.implicits._
 
     val gladCols = List(
-      year($"umd_glad_landsat_alerts__date") as "umd_glad_landsat_alerts__year",
-      weekofyear($"umd_glad_landsat_alerts__date") as "umd_glad_landsat_alerts__week",
-      $"umd_glad_landsat_alerts__confidence"
+      year($"alert__date") as "alert__year",
+      weekofyear($"alert__date") as "alert__week",
+      $"is__confirmed_alert"
     )
-    _aggChangeWeekly(df.filter($"umd_glad_landsat_alerts__date".isNotNull), cols, gladCols, wdpa)
+    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, gladCols, wdpa)
   }
 
   def aggChangeWeekly2(cols: List[String],
@@ -116,7 +116,7 @@ object GladAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val gladCols = List($"umd_glad_landsat_alerts__year", $"umd_glad_landsat_alerts__week", $"umd_glad_landsat_alerts__confidence")
+    val gladCols = List($"alert__year", $"alert__week", $"is__confirmed_alert")
     _aggChangeWeekly(df, cols, gladCols, wdpa)
   }
 
@@ -127,10 +127,10 @@ object GladAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val gladCols2 = List("umd_glad_landsat_alerts__year", "umd_glad_landsat_alerts__week", "umd_glad_landsat_alerts__confidence")
+    val gladCols2 = List("alert__year", "alert__week", "is__confirmed_alert")
 
     val aggCols =
-      List($"umd_glad_landsat_alerts__count", $"umd_glad_landsat_alerts__ha", $"whrc_aboveground_co2_emissions__Mg")
+      List($"alert__count", $"alert_area__ha", $"whrc_aboveground_co2_emissions__Mg")
 
     val contextLayers: List[String] =
       if (!wdpa) "wdpa_protected_area__iucn_cat" :: contextualLayers
@@ -146,8 +146,8 @@ object GladAlertsDF {
     df.select(selectCols: _*)
       .groupBy(groupByCols.head, groupByCols.tail: _*)
       .agg(
-        sum("umd_glad_landsat_alerts__count") as "umd_glad_landsat_alerts__count",
-        sum("umd_glad_landsat_alerts__ha") as "umd_glad_landsat_alerts__ha",
+        sum("alert__count") as "alert__count",
+        sum("alert_area__ha") as "alert_area__ha",
         sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions__Mg"
       )
   }
@@ -162,7 +162,7 @@ object GladAlertsDF {
         groupByCols ::: contextualLayers
 
     df.groupBy(cols.head, cols.tail: _*)
-      .agg(sum("umd_glad_landsat_alerts__ha") as "umd_glad_landsat_alerts__ha")
+      .agg(sum("alert_area__ha") as "alert_area__ha")
   }
 
   def whitelist(groupByCols: List[String],
