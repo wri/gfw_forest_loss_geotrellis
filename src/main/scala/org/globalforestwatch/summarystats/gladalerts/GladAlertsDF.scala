@@ -175,15 +175,15 @@ object GladAlertsDF {
       max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max("is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
       max("is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
-      max("is__landmark_land_right") as "is__landmark_land_right",
-      max(length($"gfw_plantation__type"))
-        .cast("boolean") as "gfw_plantation__type",
+      max("is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
+      max(length($"gfw_plantations__type"))
+        .cast("boolean") as "gfw_plantations__type",
       max("is__gfw_mining") as "is__gfw_mining",
-      max("is__gfw_managed_forest") as "is__gfw_managed_forest",
+      max("is__gfw_managed_forests") as "is__gfw_managed_forests",
       max(length($"rspo_oil_palm__certification_status"))
         .cast("boolean") as "rspo_oil_palm__certification_status",
       max("is__gfw_wood_fiber") as "is__gfw_wood_fiber",
-      max("is__peatland") as "is__peatland",
+      max("is__gfw_peatlands") as "is__gfw_peatlands",
       max("is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max("is__gfw_oil_palm") as "is__gfw_oil_palm",
       max(length($"idn_forest_area__type"))
@@ -192,8 +192,8 @@ object GladAlertsDF {
         .cast("boolean") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
       max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
-      max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
-      max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name"
+      max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
+      max(length($"bra_biomes__name")).cast("boolean") as "bra_biomes__name"
     )
 
     val aggCols =
@@ -211,8 +211,8 @@ object GladAlertsDF {
 
     val defaultAggCols = List(
       max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
-      max("is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
-      max("is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
+      max("is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
+      max("is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
       max("is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
       max("gfw_plantations__type") as "gfw_plantations__type",
       max("is__gfw_mining") as "is__gfw_mining",
@@ -227,7 +227,7 @@ object GladAlertsDF {
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
       max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
-      max("bra_biomes__name") as "bra_biome__name"
+      max("bra_biomes__name") as "bra_biomes__name"
     )
 
     val aggCols =
