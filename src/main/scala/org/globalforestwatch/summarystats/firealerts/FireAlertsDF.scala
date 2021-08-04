@@ -75,7 +75,7 @@ object FireAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val confCols = if (!aggCol.equals("umd_modis_burned_area__ha")) List("confidence_cat") else List()
+    val confCols = if (!aggCol.equals("umd_modis_burned_areas__ha")) List("confidence_cat") else List()
     val fireCols = List("alert__date") ::: confCols
 
     val cols =
@@ -84,10 +84,16 @@ object FireAlertsDF {
       else
         groupByCols ::: fireCols ::: contextualLayers
 
-    df.select(
-        $"alert__date" as s"${sourceDataset}__date",
-        $"confidence_cat" as s"${sourceDataset}__confidence",
-      )
+    val selectors: List[Column] = List(
+        $"alert__date" as s"${sourceDataset}__date"
+      ) ::: (
+        if (!aggCol.equals("umd_modis_burned_areas__ha"))
+          List($"confidence_cat" as s"${sourceDataset}__confidence")
+        else
+          List()
+      ) ::: cols.foldRight(Nil: List[Column])(col(_) :: _) ::: List(col(aggCol))
+
+    df.select(selectors: _*)
       .filter($"alert__date".isNotNull)
       .groupBy(cols.head, cols.tail: _*)
       .agg(
@@ -176,9 +182,9 @@ object FireAlertsDF {
       max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max("is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
       max("is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
-      max("is__landmark_land_right") as "is__landmark_land_right",
-      max(length($"gfw_plantation__type"))
-        .cast("boolean") as "gfw_plantation__type",
+      max("is__landmark_land_rights") as "is__landmark_land_rights",
+      max(length($"gfw_plantations__type"))
+        .cast("boolean") as "gfw_plantations__type",
       max("is__gfw_mining") as "is__gfw_mining",
       max("is__gfw_managed_forest") as "is__gfw_managed_forest",
       max(length($"rspo_oil_palm__certification_status"))

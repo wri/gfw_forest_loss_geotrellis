@@ -266,7 +266,7 @@ object FireAlertsExport extends SummaryExport {
       )
       case "burned_areas" => List(
         $"fireId.alertDate" as "alert__date",
-        $"data.total" as "burned_area__ha"
+        $"data.total" as "umd_modis_burned_area__ha"
       )
     }
   }
