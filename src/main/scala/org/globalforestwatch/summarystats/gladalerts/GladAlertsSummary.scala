@@ -39,7 +39,7 @@ object GladAlertsSummary {
         val maxZoom = 12
 
         // This is a pixel by pixel operation
-        val glad: Option[(String, Boolean)] =
+        val glad: Option[(String, String)] =
           raster.tile.glad.getData(col, row)
 
         if (!(changeOnly && glad.isEmpty)) {
@@ -105,17 +105,17 @@ object GladAlertsSummary {
                 }
               }
 
-              val confidence: Option[Boolean] = {
+              val confidence: String = {
                 glad match {
-                  case Some((_, conf)) => Some(conf)
-                  case _ => null
+                  case Some((_, conf)) => conf
+                  case _ => "not_detected"
                 }
               }
 
               val pKey =
                 GladAlertsDataGroup(
                   alertDate,
-                  confidence,
+                  (confidence == "high"),
                   tile,
                   climateMask,
                   primaryForest,

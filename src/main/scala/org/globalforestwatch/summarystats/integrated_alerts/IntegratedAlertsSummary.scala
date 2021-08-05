@@ -35,11 +35,11 @@ object IntegratedAlertsSummary {
         val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
         // This is a pixel by pixel operation
-        val gladL: Option[(String, Boolean)] =
+        val gladL: Option[(String, String)] =
           raster.tile.gladL.getData(col, row)
-        val gladS2: Option[(String, Boolean)] =
+        val gladS2: Option[(String, String)] =
           raster.tile.gladS2.getData(col, row)
-        val radd: Option[(String, Boolean)] =
+        val radd: Option[(String, String)] =
           raster.tile.radd.getData(col, row)
 
         if (!(changeOnly && gladL.isEmpty && gladS2.isEmpty && radd.isEmpty)) {
@@ -108,10 +108,10 @@ object IntegratedAlertsSummary {
             }
           }
 
-          val gladLConfidence: Option[Boolean] = {
+          val gladLConfidence: String = {
             gladL match {
-              case Some((_, conf)) => Some(conf)
-              case _ => null
+              case Some((_, conf)) => conf
+              case _ => "not_detected"
             }
           }
 
@@ -122,10 +122,10 @@ object IntegratedAlertsSummary {
             }
           }
 
-          val gladS2Confidence: Option[Boolean] = {
+          val gladS2Confidence: String = {
             gladS2 match {
-              case Some((_, conf)) => Some(conf)
-              case _ => null
+              case Some((_, conf)) => conf
+              case _ => "not_detected"
             }
           }
 
@@ -136,10 +136,32 @@ object IntegratedAlertsSummary {
             }
           }
 
-          val raddConfidence: Option[Boolean] = {
+          val raddConfidence: String = {
             radd match {
-              case Some((_, conf)) => Some(conf)
-              case _ => null
+              case Some((_, conf)) => conf
+              case _ => "not_detected"
+            }
+          }
+
+          // get min date of alerts with valid date
+          val integratedAlertDate = Some(
+            List(gladLAlertDate, gladS2AlertDate, raddAlertDate).map {
+              case Some(date) => date
+              case _ => "9999-99-99"  // set to very high value if no date
+            }.min
+          )
+
+          val confidences = List(gladLConfidence, gladS2Confidence, raddConfidence)
+          val integratedConfidence = {
+            // highest if more than one system detected alert
+            if (confidences.filter(_ != "not_detected").size > 1) {
+              "highest"
+            } else if (confidences.contains("high")) {
+              "high"
+            } else if (confidences.contains("low")) {
+              "nominal"
+            } else {
+              "not_detected"
             }
           }
 
@@ -154,6 +176,8 @@ object IntegratedAlertsSummary {
                   gladLConfidence,
                   gladS2Confidence,
                   raddConfidence,
+                  integratedAlertDate,
+                  integratedConfidence,
                   climateMask,
                   primaryForest,
                   protectedAreas,
