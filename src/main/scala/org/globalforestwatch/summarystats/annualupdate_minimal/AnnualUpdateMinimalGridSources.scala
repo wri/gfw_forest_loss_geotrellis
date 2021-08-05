@@ -10,61 +10,38 @@ import org.globalforestwatch.layers._
 /**
   * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
-case class AnnualUpdateMinimalGridSources(gridTile: GridTile) extends GridSources {
+case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
 
-  val treeCoverLoss = TreeCoverLoss(gridTile)
-  val treeCoverGain = TreeCoverGain(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensityThreshold2000(gridTile)
-  val treeCoverDensity2010 = TreeCoverDensityThreshold2010(gridTile)
-  val biomassPerHectar = BiomassPerHectar(gridTile)
-
-  //  val mangroveBiomass = MangroveBiomass(gridTile)
-  val treeCoverLossDrivers = TreeCoverLossDrivers(gridTile)
-  val globalLandCover = GlobalLandcover(gridTile)
-  val primaryForest = PrimaryForest(gridTile)
-  //  val indonesiaPrimaryForest = IndonesiaPrimaryForest(gridTile)
-  //  val erosion = Erosion(gridTile)
-  //  val biodiversitySignificance = BiodiversitySignificance(gridTile)
-  //  val biodiversityIntactness = BiodiversityIntactness(gridTile)
-  val protectedAreas = ProtectedAreas(gridTile)
-  val aze = Aze(gridTile)
-  val plantations = Plantations(gridTile)
-  //  val riverBasins = RiverBasins(gridTile)
-  //  val ecozones = Ecozones(gridTile)
-  //  val urbanWatersheds = UrbanWatersheds(gridTile)
-  val mangroves1996 = Mangroves1996(gridTile)
-  val mangroves2016 = Mangroves2016(gridTile)
-  //  val waterStress = WaterStress(gridTile)
-  val intactForestLandscapes = IntactForestLandscapes(gridTile)
-  //  val endemicBirdAreas = EndemicBirdAreas(gridTile)
-  val tigerLandscapes = TigerLandscapes(gridTile)
-  val landmark = Landmark(gridTile)
-  val landRights = LandRights(gridTile)
-  val keyBiodiversityAreas = KeyBiodiversityAreas(gridTile)
-  val mining = Mining(gridTile)
-  //  val rspo = RSPO(gridTile)
-  val peatlands = Peatlands(gridTile)
-  val oilPalm = OilPalm(gridTile)
-  val indonesiaForestMoratorium = IndonesiaForestMoratorium(gridTile)
-  //  val indonesiaLandCover = IndonesiaLandCover(gridTile)
-  //  val indonesiaForestArea = IndonesiaForestArea(gridTile)
-  //  val mexicoProtectedAreas = MexicoProtectedAreas(gridTile)
-  //  val mexicoPaymentForEcosystemServices =
-//    MexicoPaymentForEcosystemServices(gridTile)
-  //  val mexicoForestZoning = MexicoForestZoning(gridTile)
-  //  val peruProductionForest = PeruProductionForest(gridTile)
-  //  val peruProtectedAreas = PeruProtectedAreas(gridTile)
-  //  val peruForestConcessions = PeruForestConcessions(gridTile)
-  //  val brazilBiomes = BrazilBiomes(gridTile)
-  val woodFiber = WoodFiber(gridTile)
-  val resourceRights = ResourceRights(gridTile)
-  val logging = Logging(gridTile)
-  //  val oilGas = OilGas(gridTile)
-  val grossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile)
-  val grossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile)
-  val netFluxCo2 = NetFluxCo2e(gridTile)
-  val grossEmissionsCo2eNonCo2 = GrossEmissionsNonCo2Co2e(gridTile)
-  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridTile)
+  val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
+  val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
+  val treeCoverDensity2000: TreeCoverDensityThreshold2000 = TreeCoverDensityThreshold2000(gridTile, kwargs)
+  val treeCoverDensity2010: TreeCoverDensityThreshold2010 = TreeCoverDensityThreshold2010(gridTile, kwargs)
+  val biomassPerHectar: BiomassPerHectar = BiomassPerHectar(gridTile, kwargs)
+  val treeCoverLossDrivers = TreeCoverLossDrivers(gridTile, kwargs)
+  val globalLandCover: GlobalLandcover = GlobalLandcover(gridTile, kwargs)
+  val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
+  val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
+  val aze: Aze = Aze(gridTile, kwargs)
+  val plantations: Plantations = Plantations(gridTile, kwargs)
+  val mangroves1996: Mangroves1996 = Mangroves1996(gridTile, kwargs)
+  val mangroves2016: Mangroves2016 = Mangroves2016(gridTile, kwargs)
+  val intactForestLandscapes: IntactForestLandscapes = IntactForestLandscapes(gridTile, kwargs)
+  val tigerLandscapes: TigerLandscapes = TigerLandscapes(gridTile, kwargs)
+  val landmark: Landmark = Landmark(gridTile, kwargs)
+  val landRights: LandRights = LandRights(gridTile, kwargs)
+  val keyBiodiversityAreas: KeyBiodiversityAreas = KeyBiodiversityAreas(gridTile, kwargs)
+  val mining: Mining = Mining(gridTile, kwargs)
+  val peatlands: Peatlands = Peatlands(gridTile, kwargs)
+  val oilPalm: OilPalm = OilPalm(gridTile, kwargs)
+  val indonesiaForestMoratorium: IndonesiaForestMoratorium = IndonesiaForestMoratorium(gridTile, kwargs)
+  val woodFiber: WoodFiber = WoodFiber(gridTile, kwargs)
+  val resourceRights: ResourceRights = ResourceRights(gridTile, kwargs)
+  val logging: Logging = Logging(gridTile, kwargs)
+  val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile, kwargs = kwargs)
+  val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile, kwargs = kwargs)
+  val netFluxCo2: NetFluxCo2e = NetFluxCo2e(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e = GrossEmissionsNonCo2Co2e(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e = GrossEmissionsCo2OnlyCo2e(gridTile, kwargs = kwargs)
 
   def readWindow(
                   windowKey: SpatialKey, windowLayout: LayoutDefinition
@@ -85,52 +62,26 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile) extends GridSource
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
       val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
-//      val mangroveBiomassTile = mangroveBiomass.fetchWindow(windowKey, windowLayout)
       val driversTile = treeCoverLossDrivers.fetchWindow(windowKey, windowLayout)
       val globalLandCoverTile = globalLandCover.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
-//      val idnPrimaryForestTile = indonesiaPrimaryForest.fetchWindow(windowKey, windowLayout)
-//      val erosionTile = erosion.fetchWindow(windowKey, windowLayout)
-//      val biodiversitySignificanceTile =
-//        biodiversitySignificance.fetchWindow(windowKey, windowLayout)
-//      val biodiversityIntactnessTile =
-//        biodiversityIntactness.fetchWindow(windowKey, windowLayout)
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val azeTile = aze.fetchWindow(windowKey, windowLayout)
       val plantationsTile = plantations.fetchWindow(windowKey, windowLayout)
-//      val riverBasinsTile = riverBasins.fetchWindow(windowKey, windowLayout)
-//      val ecozonesTile = ecozones.fetchWindow(windowKey, windowLayout)
-//      val urbanWatershedsTile = urbanWatersheds.fetchWindow(windowKey, windowLayout)
-val mangroves1996Tile = mangroves1996.fetchWindow(windowKey, windowLayout)
+      val mangroves1996Tile = mangroves1996.fetchWindow(windowKey, windowLayout)
       val mangroves2016Tile = mangroves2016.fetchWindow(windowKey, windowLayout)
-//      val waterStressTile = waterStress.fetchWindow(windowKey, windowLayout)
-      val intactForestLandscapesTile =
-        intactForestLandscapes.fetchWindow(windowKey, windowLayout)
-//      val endemicBirdAreasTile = endemicBirdAreas.fetchWindow(windowKey, windowLayout)
+      val intactForestLandscapesTile = intactForestLandscapes.fetchWindow(windowKey, windowLayout)
       val tigerLandscapesTile = tigerLandscapes.fetchWindow(windowKey, windowLayout)
       val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
       val landRightsTile = landRights.fetchWindow(windowKey, windowLayout)
       val keyBiodiversityAreasTile = keyBiodiversityAreas.fetchWindow(windowKey, windowLayout)
       val miningTile = mining.fetchWindow(windowKey, windowLayout)
-//      val rspoTile = rspo.fetchWindow(windowKey, windowLayout)
-val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
+      val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
       val oilPalmTile = oilPalm.fetchWindow(windowKey, windowLayout)
-      val idnForestMoratoriumTile =
-        indonesiaForestMoratorium.fetchWindow(windowKey, windowLayout)
-//      val idnLandCoverTile = indonesiaLandCover.fetchWindow(windowKey, windowLayout)
-//      val idnForestAreaTile = indonesiaForestArea.fetchWindow(windowKey, windowLayout)
-//      val mexProtectedAreasTile = mexicoProtectedAreas.fetchWindow(windowKey, windowLayout)
-//      val mexPaymentForEcosystemServicesTile =
-//        mexicoPaymentForEcosystemServices.fetchWindow(windowKey, windowLayout)
-//      val mexForestZoningTile = mexicoForestZoning.fetchWindow(windowKey, windowLayout)
-//      val perProductionForestTile = peruProductionForest.fetchWindow(windowKey, windowLayout)
-//      val perProtectedAreasTile = peruProtectedAreas.fetchWindow(windowKey, windowLayout)
-//      val perForestConcessionsTile = peruForestConcessions.fetchWindow(windowKey, windowLayout)
-//      val braBiomesTile = brazilBiomes.fetchWindow(windowKey, windowLayout)
+      val idnForestMoratoriumTile = indonesiaForestMoratorium.fetchWindow(windowKey, windowLayout)
       val woodFiberTile = woodFiber.fetchWindow(windowKey, windowLayout)
       val resourceRightsTile = resourceRights.fetchWindow(windowKey, windowLayout)
       val loggingTile = logging.fetchWindow(windowKey, windowLayout)
-//      val oilGasTile = oilGas.fetchWindow(windowKey, windowLayout)
       val grossCumulAbovegroundRemovalsCo2Tile = grossCumulAbovegroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
       val grossCumulBelowgroundRemovalsCo2Tile = grossCumulBelowgroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
       val netFluxCo2Tile = netFluxCo2.fetchWindow(windowKey, windowLayout)
@@ -143,42 +94,23 @@ val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
         tcd2000Tile,
         tcd2010Tile,
         biomassTile,
-//        mangroveBiomassTile,
         driversTile,
         globalLandCoverTile,
         primaryForestTile,
-//        idnPrimaryForestTile,
-//        erosionTile,
-//        biodiversitySignificanceTile,
-//        biodiversityIntactnessTile,
         wdpaTile,
         azeTile,
         plantationsTile,
-//        riverBasinsTile,
-//        ecozonesTile,
-//        urbanWatershedsTile,
         mangroves1996Tile,
         mangroves2016Tile,
-//        waterStressTile,
         intactForestLandscapesTile,
-//        endemicBirdAreasTile,
         tigerLandscapesTile,
         landmarkTile,
         landRightsTile,
         keyBiodiversityAreasTile,
         miningTile,
-//        rspoTile,
         peatlandsTile,
         oilPalmTile,
         idnForestMoratoriumTile,
-//        idnLandCoverTile,
-//        mexProtectedAreasTile,
-//        mexPaymentForEcosystemServicesTile,
-//        mexForestZoningTile,
-//        perProductionForestTile,
-//        perProtectedAreasTile,
-//        perForestConcessionsTile,
-//        braBiomesTile,
         woodFiberTile,
         resourceRightsTile,
         loggingTile,
@@ -187,7 +119,6 @@ val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
         grossCumulAbovegroundRemovalsCo2Tile,
         grossCumulBelowgroundRemovalsCo2Tile,
         netFluxCo2Tile
-//        oilGasTile
       )
 
       Raster(tile, windowKey.extent(windowLayout))
@@ -202,9 +133,9 @@ object AnnualUpdateMinimalGridSources {
     scala.collection.concurrent.TrieMap
       .empty[String, AnnualUpdateMinimalGridSources]
 
-  def getCachedSources(gridTile: GridTile): AnnualUpdateMinimalGridSources = {
+  def getCachedSources(gridTile: GridTile, kwargs: Map[String, Any]): AnnualUpdateMinimalGridSources = {
 
-    cache.getOrElseUpdate(gridTile.tileId, AnnualUpdateMinimalGridSources(gridTile))
+    cache.getOrElseUpdate(gridTile.tileId, AnnualUpdateMinimalGridSources(gridTile, kwargs: Map[String, Any]))
 
   }
 

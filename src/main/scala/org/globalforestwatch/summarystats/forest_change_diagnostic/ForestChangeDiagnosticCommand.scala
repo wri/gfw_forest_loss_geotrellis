@@ -30,6 +30,7 @@ object ForestChangeDiagnosticCommand extends SummaryCommand {
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
         "noOutputPathSuffix" -> default._5,
+        "pinnedVersions" -> default._6,
         "intermediateListSource" -> intermediateListSource,
         "fireAlertType" -> fireAlert._1,
         "fireAlertSource" -> fireAlert._2,

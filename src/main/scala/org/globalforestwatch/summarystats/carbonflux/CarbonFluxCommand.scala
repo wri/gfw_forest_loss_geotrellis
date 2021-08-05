@@ -21,6 +21,7 @@ object CarbonFluxCommand extends SummaryCommand {
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
         "noOutputPathSuffix" -> default._5,
+        "pinnedVersions" -> default._6,
         "iso" -> gadmFilter._1,
         "isoFirst" -> gadmFilter._2,
         "isoStart" -> gadmFilter._3,

@@ -30,7 +30,7 @@ object GfwProFeature extends Feature {
     //    val idEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
 
     //    val idStartDF: DataFrame =
-    idStart.foldLeft(df)((acc, i) => acc.filter($"locationId" >= i))
+    idStart.foldLeft(df)((acc, i) => acc.filter($"location_id" >= i))
 
     //    idEnd.foldLeft(idStartDF)((acc, i) => acc.filter($"fid" < i))
 

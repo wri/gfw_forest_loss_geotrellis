@@ -2,12 +2,13 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class PeruForestConcessions(gridTile: GridTile)
-    extends StringLayer
+case class PeruForestConcessions(gridTile: GridTile, kwargs: Map[String, Any])
+  extends StringLayer
     with OptionalILayer {
 
+  val datasetName = "per_forest_concessions"
   val uri: String =
-    s"$basePath/per_forest_concessions/v20161001/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
+    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
 
   override val externalNoDataValue: String = ""
 

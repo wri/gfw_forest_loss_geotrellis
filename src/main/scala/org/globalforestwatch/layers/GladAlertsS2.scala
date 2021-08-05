@@ -6,9 +6,13 @@ import org.globalforestwatch.grids.GridTile
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-case class GladAlertsS2(gridTile: GridTile) extends DateConfLayer with OptionalILayer {
+case class GladAlertsS2(gridTile: GridTile, kwargs: Map[String, Any])
+  extends DateConfLayer
+    with OptionalILayer {
 
-  val uri: String = s"$basePath/umd_glad_sentinel2_alerts/v20210707/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/date_conf/gdal-geotiff/${gridTile.tileId}.tif"
+  val datasetName = "umd_glad_sentinel2_alerts"
+  val uri: String =
+    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/date_conf/gdal-geotiff/${gridTile.tileId}.tif"
 
   override def lookup(value: Int): Option[(String, Boolean)] = {
 
@@ -17,6 +21,7 @@ case class GladAlertsS2(gridTile: GridTile) extends DateConfLayer with OptionalI
 
       def isLeapYear(year: Int): Boolean = {
         implicit def int2boolRev(i: Int): Boolean = i <= 0
+
         year % 4
       }
 

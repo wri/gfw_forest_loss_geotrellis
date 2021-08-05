@@ -2,10 +2,13 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class IntactForestLandscapes(gridTile: GridTile)
+case class IntactForestLandscapes(gridTile: GridTile, kwargs: Map[String, Any])
   extends StringLayer
     with OptionalILayer {
-  val uri: String = s"$basePath/ifl_intact_forest_landscapes/v20180628/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
+
+  val datasetName = "ifl_intact_forest_landscapes"
+  val uri: String =
+    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
 
   def lookup(value: Int): String = value match {
     case 0 => ""
@@ -14,11 +17,13 @@ case class IntactForestLandscapes(gridTile: GridTile)
   }
 }
 
-
-case class IntactForestLandscapes2000(gridTile: GridTile)
+case class IntactForestLandscapes2000(gridTile: GridTile, kwargs: Map[String, Any])
   extends BooleanLayer
     with OptionalILayer {
-  val uri: String = s"$basePath/ifl_intact_forest_landscapes/v20180628/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
+
+  val datasetName = "ifl_intact_forest_landscapes"
+  val uri: String =
+    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
 
   override def lookup(value: Int): Boolean = {
     value match {
@@ -28,11 +33,13 @@ case class IntactForestLandscapes2000(gridTile: GridTile)
   }
 }
 
-
-case class IntactForestLandscapes2013(gridTile: GridTile)
+case class IntactForestLandscapes2013(gridTile: GridTile, kwargs: Map[String, Any])
   extends BooleanLayer
     with OptionalILayer {
-  val uri: String = s"$basePath/ifl_intact_forest_landscapes/v20180628/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
+
+  val datasetName = "ifl_intact_forest_landscapes"
+  val uri: String =
+    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
 
   override def lookup(value: Int): Boolean = {
     value match {
@@ -43,11 +50,13 @@ case class IntactForestLandscapes2013(gridTile: GridTile)
   }
 }
 
-
-case class IntactForestLandscapes2016(gridTile: GridTile)
+case class IntactForestLandscapes2016(gridTile: GridTile, kwargs: Map[String, Any])
   extends BooleanLayer
     with OptionalILayer {
-  val uri: String = s"$basePath/ifl_intact_forest_landscapes/v20180628/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
+
+  val datasetName = "ifl_intact_forest_landscapes"
+  val uri: String =
+    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
 
   override def lookup(value: Int): Boolean = {
     value match {

@@ -12,10 +12,10 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.col
 import org.globalforestwatch.features.FeatureId
+import org.json4s.jackson.JsonMethods.parse
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
-import java.util.NoSuchElementException
 
 
 object Util {
@@ -58,7 +58,7 @@ object Util {
   }
 
   def getAnyMapValue[T: Manifest](map: Map[String, Any], key: String): T = {
-    map(key) match {
+    map.getOrElse(key, None) match {
       case v: T => v
       case _ => throw new IllegalArgumentException("Wrong type")
     }
@@ -88,5 +88,11 @@ object Util {
       .toDF("partition_number", "number_of_records")
       .orderBy(col("number_of_records").desc)
       .show(100, false)
+  }
+
+
+  def jsonStrToMap(jsonStr: String): Map[String, Any] = {
+    implicit val formats = org.json4s.DefaultFormats
+    parse(jsonStr).extract[Map[String, Any]]
   }
 }

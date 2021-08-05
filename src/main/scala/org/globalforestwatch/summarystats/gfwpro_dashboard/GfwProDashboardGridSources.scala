@@ -9,14 +9,14 @@ import org.globalforestwatch.layers._
 /**
   * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
-case class GfwProDashboardGridSources(gridTile: GridTile) extends GridSources {
+case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
 
-  val gladAlerts = GladAlerts(gridTile)
+  val gladAlerts: GladAlerts = GladAlerts(gridTile, kwargs)
 
   def readWindow(
-    windowKey: SpatialKey,
-    windowLayout: LayoutDefinition
-  ): Either[Throwable, Raster[GfwProDashboardTile]] = {
+                  windowKey: SpatialKey,
+                  windowLayout: LayoutDefinition
+                ): Either[Throwable, Raster[GfwProDashboardTile]] = {
 
     for {
       // Glad alerts are Optional Tiles, but we keep it this way to avoid signature changes
@@ -41,9 +41,9 @@ object GfwProDashboardGridSources {
     scala.collection.concurrent.TrieMap
       .empty[String, GfwProDashboardGridSources]
 
-  def getCachedSources(gridTile: GridTile): GfwProDashboardGridSources = {
+  def getCachedSources(gridTile: GridTile, kwargs: Map[String, Any]): GfwProDashboardGridSources = {
 
-    cache.getOrElseUpdate(gridTile.tileId, GfwProDashboardGridSources(gridTile))
+    cache.getOrElseUpdate(gridTile.tileId, GfwProDashboardGridSources(gridTile, kwargs))
 
   }
 

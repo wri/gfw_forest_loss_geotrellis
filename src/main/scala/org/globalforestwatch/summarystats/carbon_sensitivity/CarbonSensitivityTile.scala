@@ -24,7 +24,7 @@ case class CarbonSensitivityTile(
 
                                   fluxModelExtent: FluxModelExtent#OptionalITile,
                                   removalForestType: RemovalForestType#OptionalITile,
-                                  mangroveBiomassExtent: MangroveBiomassExtent#OptionalDTile,
+                                  mangroveBiomassExtent: MangroveBiomassExtent#OptionalITile,
                                   drivers: TreeCoverLossDrivers#OptionalITile,
                                   ecozones: Ecozones#OptionalITile,
                                   landmark: Landmark#OptionalITile,

@@ -2,12 +2,14 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class GFWProCoverage(gridTile: GridTile)
-    extends MapILayer
-      with OptionalILayer {
+case class GFWProCoverage(gridTile: GridTile, kwargs: Map[String, Any])
+  extends MapILayer
+    with OptionalILayer {
+
+  val datasetName = "gfwpro_forest_change_regions"
 
   val uri: String =
-    s"$basePath/gfwpro_forest_change_regions/v20210129/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/bit_encoding/gdal-geotiff/${gridTile.tileId}.tif"
+    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/bit_encoding/gdal-geotiff/${gridTile.tileId}.tif"
 
   def lookup(value: Int): Map[String, Boolean] = {
     val bits = "0000000" + value.toBinaryString takeRight 8

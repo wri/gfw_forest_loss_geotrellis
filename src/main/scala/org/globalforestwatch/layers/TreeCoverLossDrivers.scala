@@ -2,12 +2,13 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class TreeCoverLossDrivers(gridTile: GridTile)
-    extends StringLayer
+case class TreeCoverLossDrivers(gridTile: GridTile, kwargs: Map[String, Any])
+  extends StringLayer
     with OptionalILayer {
+
+  val datasetName = "tsc_tree_cover_loss_drivers"
   val uri: String =
-    s"$basePath/tsc_tree_cover_loss_drivers/v2020/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
-//    s"s3://gfw-files/flux_1_2_1/drivers/${gridTile.tileId}.tif"
+    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/drivers/gdal-geotiff/${gridTile.tileId}.tif"
 
   override val internalNoDataValue = 0
   override val externalNoDataValue = "Unknown"

@@ -10,6 +10,6 @@ object ForestChangeDiagnosticGrid
 
   def getSources(gridTile: GridTile,
                  kwargs: Map[String, Any]): ForestChangeDiagnosticGridSources =
-    ForestChangeDiagnosticGridSources.getCachedSources(gridTile)
+    ForestChangeDiagnosticGridSources.getCachedSources(gridTile, kwargs)
 
 }

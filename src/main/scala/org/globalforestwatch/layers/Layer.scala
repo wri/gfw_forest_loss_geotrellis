@@ -1,25 +1,23 @@
 package org.globalforestwatch.layers
 
+import cats.data.NonEmptyList
+
 import java.io.FileNotFoundException
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
-import geotrellis.raster.{
-  CellType,
-  IntCellType,
-  IntCells,
-  NoDataHandling,
-  Tile,
-  isNoData
-}
+import geotrellis.raster.{CellType, IntCells, NoDataHandling, Tile, isNoData}
+import org.globalforestwatch.util.Config
+import org.globalforestwatch.util.Util.{getAnyMapValue, jsonStrToMap}
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.{
   HeadObjectRequest,
   NoSuchKeyException,
   RequestPayer
 }
+import scalaj.http._
 
 trait Layer {
 
@@ -34,6 +32,51 @@ trait Layer {
   val internalNoDataValue: A
   val externalNoDataValue: B
   val basePath: String = s"s3://gfw-data-lake"
+
+  val kwargs: Map[String, Any]
+  val datasetName: String
+  val pinnedVersions: Map[String, String] = {
+    val pinnedVersionList: Option[NonEmptyList[Config]] =
+      getAnyMapValue[Option[NonEmptyList[Config]]](kwargs, "pinnedVersions")
+
+    pinnedVersionList match {
+      case Some(versions) =>
+        versions.foldLeft(Map(): Map[String, String])(
+          (acc, pinnedVersion) =>
+            acc + (pinnedVersion.key -> pinnedVersion.value)
+        )
+      case _ => Map()
+    }
+  }
+
+  lazy val version: String = {
+    pinnedVersions.getOrElse(datasetName, None) match {
+      case Some(value: String) => value
+      case _ =>
+        val response: HttpResponse[String] = Http(
+          s"https://data-api.globalforestwatch.org/dataset/${datasetName}/latest"
+        ).option(HttpOptions
+          .followRedirects(true)).asString
+        if (response.code != 200)
+          throw new IllegalArgumentException(
+            s"Dataset ${datasetName} has no latest version or does not exit. Data API responsen code: ${response.code}"
+          )
+
+        val json: Map[String, Any] = jsonStrToMap(response.body)
+
+        val data = json.get("data").asInstanceOf[Option[Map[String, Any]]]
+        data match {
+          case Some(map) =>
+            val version = map.get("version").asInstanceOf[Option[String]]
+            version match {
+              case Some(value) => value
+              case _ => throw new RuntimeException("Cannot understand Data API response.")
+            }
+          case _ => throw new RuntimeException("Cannot understand Data API response.")
+        }
+
+    }
+  }
 
   def lookup(a: A): B
 }

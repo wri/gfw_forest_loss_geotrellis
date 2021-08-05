@@ -10,22 +10,22 @@ import org.globalforestwatch.layers._
 /**
   * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
-case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
+case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
 
-  val treeCoverLoss = TreeCoverLoss(gridTile)
-  val treeCoverGain = TreeCoverGain(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
-  val treeCoverDensity2010 = TreeCoverDensityPercent2010(gridTile)
-  val biomassPerHectar = BiomassPerHectar(gridTile)
-  val primaryForest = PrimaryForest(gridTile)
-  val plantationsBool = PlantationsBool(gridTile)
+  val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
+  val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
+  val treeCoverDensity2000: TreeCoverDensityPercent2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
+  val treeCoverDensity2010: TreeCoverDensityPercent2010 = TreeCoverDensityPercent2010(gridTile, kwargs)
+  val biomassPerHectar: BiomassPerHectar = BiomassPerHectar(gridTile, kwargs)
+  val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
+  val plantationsBool: PlantationsBool = PlantationsBool(gridTile, kwargs)
 
-  val grossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile)
-  val grossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile)
-  val grossEmissionsCo2eNonCo2 = GrossEmissionsNonCo2Co2e(gridTile)
-  val grossEmissionsCo2eCo2Only = GrossEmissionsCo2OnlyCo2e(gridTile)
-  val netFluxCo2 = NetFluxCo2e(gridTile)
-  val fluxModelExtent = FluxModelExtent(gridTile)
+  val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile, kwargs = kwargs)
+  val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e = GrossEmissionsNonCo2Co2e(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e = GrossEmissionsCo2OnlyCo2e(gridTile, kwargs = kwargs)
+  val netFluxCo2: NetFluxCo2e = NetFluxCo2e(gridTile, kwargs = kwargs)
+  val fluxModelExtent: FluxModelExtent = FluxModelExtent(gridTile, kwargs = kwargs)
 
 
   def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[TreeLossTile]] = {
@@ -82,9 +82,9 @@ object TreeLossGridSources {
   private lazy val cache =
     scala.collection.concurrent.TrieMap.empty[String, TreeLossGridSources]
 
-  def getCachedSources(gridTile: GridTile): TreeLossGridSources = {
+  def getCachedSources(gridTile: GridTile, kwargs: Map[String, Any]): TreeLossGridSources = {
 
-    cache.getOrElseUpdate(gridTile.tileId, TreeLossGridSources(gridTile))
+    cache.getOrElseUpdate(gridTile.tileId, TreeLossGridSources(gridTile, kwargs))
 
   }
 
