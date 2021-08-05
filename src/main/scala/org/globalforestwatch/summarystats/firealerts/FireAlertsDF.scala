@@ -23,7 +23,7 @@ object FireAlertsDF {
     "idn_forest_area__type",
     "per_forest_concessions__type",
     "is__gfw_oil_gas",
-    "is__gmw_mangroves_2016",
+    "is__gmw_global_mangrove_extent_2016",
     "is__ifl_intact_forest_landscapes_2016",
     "ibge_bra_biomes__name"
   )
@@ -54,7 +54,7 @@ object FireAlertsDF {
         $"data_group.indonesiaForestArea" as "idn_forest_area__type",
         $"data_group.peruForestConcessions" as "per_forest_concessions__type",
         $"data_group.oilGas" as "is__gfw_oil_gas",
-        $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
+        $"data_group.mangroves2016" as "is__gmw_global_mangrove_extent_2016",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscapes_2016",
         $"data_group.braBiomes" as "ibge_bra_biomes__name",
       )
@@ -175,7 +175,7 @@ object FireAlertsDF {
       max(length($"per_forest_concessions__type"))
         .cast("boolean") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
-      max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
+      max("is__gmw_global_mangrove_extent_2016") as "is__gmw_global_mangrove_extent_2016",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
       max(length($"ibge_bra_biomes__name")).cast("boolean") as "ibge_bra_biomes__name"
     )
@@ -209,7 +209,7 @@ object FireAlertsDF {
       max("idn_forest_area__type") as "idn_forest_area__type",
       max("per_forest_concessions__type") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
-      max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
+      max("is__gmw_global_mangrove_extent_2016") as "is__gmw_global_mangrove_extent_2016",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
       max("ibge_bra_biomes__name") as "ibge_bra_biomes__name"
     )
