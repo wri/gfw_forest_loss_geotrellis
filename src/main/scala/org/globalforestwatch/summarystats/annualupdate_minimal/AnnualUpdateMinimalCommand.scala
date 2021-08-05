@@ -9,7 +9,7 @@ object AnnualUpdateMinimalCommand extends SummaryCommand {
     Opts.flag("change_only", "Process change only").orFalse
 
   val annualupdateMinimalCommand: Opts[Unit] = Opts.subcommand(
-    name = "annualupdate_minimal",
+    name = AnnualUpdateMinimalAnalysis.name,
     help = "Compute summary statistics for GFW dashboards."
   ) {
     (
@@ -23,6 +23,7 @@ object AnnualUpdateMinimalCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
+        "noOutputPathSuffix" -> default._5,
         "iso" -> gadmFilter._1,
         "isoFirst" -> gadmFilter._2,
         "isoStart" -> gadmFilter._3,
@@ -39,7 +40,12 @@ object AnnualUpdateMinimalCommand extends SummaryCommand {
         "changeOnly" -> changeOnly
       )
 
-      runAnalysis("annualupdate_minimal", default._1, default._2, kwargs)
+      runAnalysis(
+        AnnualUpdateMinimalAnalysis.name,
+        default._1,
+        default._2,
+        kwargs
+      )
     }
   }
 }

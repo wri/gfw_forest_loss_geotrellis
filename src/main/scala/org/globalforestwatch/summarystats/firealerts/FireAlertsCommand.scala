@@ -9,7 +9,7 @@ object FireAlertsCommand extends SummaryCommand {
     Opts.flag("change_only", "Process change only").orFalse
 
   val fireAlertsCommand: Opts[Unit] = Opts.subcommand(
-    name = "firealerts",
+    name = FireAlertsAnalysis.name,
     help = "Compute summary fire alert statistics for GFW dashboards."
   ) {
     (
@@ -32,6 +32,7 @@ object FireAlertsCommand extends SummaryCommand {
           "featureUris" -> default._2,
           "outputUrl" -> default._3,
           "splitFeatures" -> default._4,
+          "noOutputPathSuffix" -> default._5,
           "changeOnly" -> changeOnly,
           "fireAlertType" -> fireAlert._1,
           "fireAlertSource" -> fireAlert._2,
@@ -50,7 +51,7 @@ object FireAlertsCommand extends SummaryCommand {
           "glad" -> defaultFilter._3
         )
 
-        runAnalysis("firealerts", default._1, default._2, kwargs)
+        runAnalysis(FireAlertsAnalysis.name, default._1, default._2, kwargs)
     }
   }
 

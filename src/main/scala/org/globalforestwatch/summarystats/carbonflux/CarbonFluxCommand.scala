@@ -7,7 +7,7 @@ import com.monovore.decline.Opts
 object CarbonFluxCommand extends SummaryCommand {
 
   val carbonFluxCommand: Opts[Unit] = Opts.subcommand(
-    name = "carbonflux",
+    name = CarbonFluxAnalysis.name,
     help = "Compute summary statistics for GFW dashboards."
   ) {
     (
@@ -20,6 +20,7 @@ object CarbonFluxCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
+        "noOutputPathSuffix" -> default._5,
         "iso" -> gadmFilter._1,
         "isoFirst" -> gadmFilter._2,
         "isoStart" -> gadmFilter._3,
@@ -35,7 +36,7 @@ object CarbonFluxCommand extends SummaryCommand {
         "glad" -> defaultFilter._3
       )
 
-      runAnalysis("carbonflux", default._1, default._2, kwargs)
+      runAnalysis(CarbonFluxAnalysis.name, default._1, default._2, kwargs)
 
     }
   }

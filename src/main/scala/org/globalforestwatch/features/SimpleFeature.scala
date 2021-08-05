@@ -1,9 +1,6 @@
 package org.globalforestwatch.features
 
-import geotrellis.vector.Geometry
-import geotrellis.vector.io.wkb.WKB
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.globalforestwatch.util.GeometryReducer
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.util.Util._
 
 object SimpleFeature extends Feature {
@@ -14,14 +11,6 @@ object SimpleFeature extends Feature {
 
   val featureIdExpr = "cast(fid as int) as featureId"
 
-  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
-    val featureId = getFeatureId(i)
-    val geom: Geometry =
-      GeometryReducer.reduce(GeometryReducer.gpr)(
-        WKB.read(i.getString(geomPos))
-      )
-    geotrellis.vector.Feature(geom, featureId)
-  }
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     val feature_id: Int = i(idPos).toInt

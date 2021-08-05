@@ -15,7 +15,7 @@ object ForestChangeDiagnosticCommand extends SummaryCommand {
     ).orNone
 
   val forestChangeDiagnosticCommand: Opts[Unit] = Opts.subcommand(
-    name = "forest_change_diagnostic",
+    name = ForestChangeDiagnosticAnalysis.name,
     help = "Compute summary statistics for GFW Pro Forest Change Diagnostic."
   ) {
     (
@@ -28,7 +28,8 @@ object ForestChangeDiagnosticCommand extends SummaryCommand {
       val kwargs = Map(
         "featureUris" -> default._2,
         "outputUrl" -> default._3,
-        "splitFeatures" -> true, // force to split features
+        "splitFeatures" -> default._4,
+        "noOutputPathSuffix" -> default._5,
         "intermediateListSource" -> intermediateListSource,
         "fireAlertType" -> fireAlert._1,
         "fireAlertSource" -> fireAlert._2,
@@ -39,7 +40,7 @@ object ForestChangeDiagnosticCommand extends SummaryCommand {
         "glad" -> defaultFilter._3
       )
 
-      runAnalysis("forest_change_diagnostic", default._1, default._2, kwargs)
+      runAnalysis(ForestChangeDiagnosticAnalysis.name, default._1, default._2, kwargs)
 
     }
   }

@@ -3,8 +3,8 @@ package org.globalforestwatch.layers
 import org.globalforestwatch.grids.GridTile
 
 case class GFWProCoverage(gridTile: GridTile)
-    extends MapLayer
-    with OptionalILayer {
+    extends MapILayer
+      with OptionalILayer {
 
   val uri: String =
     s"$basePath/gfwpro_forest_change_regions/v20210129/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/bit_encoding/gdal-geotiff/${gridTile.tileId}.tif"

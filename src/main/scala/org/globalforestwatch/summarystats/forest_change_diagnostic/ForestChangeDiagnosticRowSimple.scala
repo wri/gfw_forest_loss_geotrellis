@@ -1,6 +1,7 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-case class ForestChangeDiagnosticRowSimple(id: String,
+case class ForestChangeDiagnosticRowSimple(locationId: String,
+                                           listId: String,
                                            treeCoverLossTcd30Yearly: String,
                                            treeCoverLossPrimaryForestYearly: String,
                                            treeCoverLossPeatLandYearly: String,

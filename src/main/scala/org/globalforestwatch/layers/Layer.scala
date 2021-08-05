@@ -483,7 +483,7 @@ trait StringLayer extends ILayer {
 
 }
 
-trait MapLayer extends ILayer {
+trait MapILayer extends ILayer {
 
   /**
     * Layers which return a String type
@@ -491,6 +491,18 @@ trait MapLayer extends ILayer {
   type B = Map[String, Boolean]
 
   val internalNoDataValue: Int = 0
+  val externalNoDataValue: Map[String, Boolean] = Map()
+
+}
+
+trait MapFLayer extends FLayer {
+
+  /**
+    * Layers which return a String type
+    */
+  type B = Map[String, Boolean]
+
+  val internalNoDataValue: Float = 0
   val externalNoDataValue: Map[String, Boolean] = Map()
 
 }
