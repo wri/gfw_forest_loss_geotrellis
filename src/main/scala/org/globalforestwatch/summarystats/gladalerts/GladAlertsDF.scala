@@ -19,7 +19,7 @@ object GladAlertsDF {
     "is__gfw_peatlands",
     "is__idn_forest_moratorium",
     "is__gfw_oil_palm",
-    "idn_forest_area__type",
+    "idn_forest_area__class",
     "per_forest_concessions__type",
     "is__gfw_oil_gas",
     "is__gmw_global_mangrove_extent_2016",
@@ -52,7 +52,7 @@ object GladAlertsDF {
         $"data_group.peatlands" as "is__gfw_peatlands",
         $"data_group.indonesiaForestMoratorium" as "is__idn_forest_moratorium",
         $"data_group.oilPalm" as "is__gfw_oil_palm",
-        $"data_group.indonesiaForestArea" as "idn_forest_area__type",
+        $"data_group.indonesiaForestArea" as "idn_forest_area__class",
         $"data_group.peruForestConcessions" as "per_forest_concessions__type",
         $"data_group.oilGas" as "is__gfw_oil_gas",
         $"data_group.mangroves2016" as "is__gmw_global_mangrove_extent_2016",
@@ -186,8 +186,8 @@ object GladAlertsDF {
       max("is__gfw_peatlands") as "is__gfw_peatlands",
       max("is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max("is__gfw_oil_palm") as "is__gfw_oil_palm",
-      max(length($"idn_forest_area__type"))
-        .cast("boolean") as "idn_forest_area__type",
+      max(length($"idn_forest_area__class"))
+        .cast("boolean") as "idn_forest_area__class",
       max(length($"per_forest_concessions__type"))
         .cast("boolean") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
@@ -222,7 +222,7 @@ object GladAlertsDF {
       max("is__gfw_peatlands") as "is__gfw_peatlands",
       max("is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max("is__gfw_oil_palm") as "is__gfw_oil_palm",
-      max("idn_forest_area__type") as "idn_forest_area__type",
+      max("idn_forest_area__class") as "idn_forest_area__class",
       max("per_forest_concessions__type") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
       max("is__gmw_global_mangrove_extent_2016") as "is__gmw_global_mangrove_extent_2016",
