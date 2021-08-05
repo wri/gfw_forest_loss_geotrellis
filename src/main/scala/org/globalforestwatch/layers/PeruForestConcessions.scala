@@ -7,7 +7,7 @@ case class PeruForestConcessions(gridTile: GridTile)
     with OptionalILayer {
 
   val uri: String =
-    s"$basePath/per_forest_concessions/v20161001/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
+    s"$basePath/per_forest_concessions/v201610/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
 
   override val externalNoDataValue: String = ""
 
