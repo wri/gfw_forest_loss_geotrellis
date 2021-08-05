@@ -664,119 +664,119 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
     intermediateDF.rdd.map(row => {
       val gfwproFeatureId =
-        GfwProFeatureId(row.getString(0), row.getString(1).toInt)
-      val gridId = GridId(row.getString(2))
+        GfwProFeatureId(row.getString(0), row.getString(1).toInt, row.getDouble(2), row.getDouble(3))
+      val gridId = GridId(row.getString(4))
       val treeCoverLossTcd30Yearly =
-        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(3))
-      val treeCoverLossPrimaryForestYearly =
-        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(4))
-      val treeCoverLossPeatLandYearly =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(5))
-      val treeCoverLossIntactForestYearly =
+      val treeCoverLossPrimaryForestYearly =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(6))
-      val treeCoverLossProtectedAreasYearly =
+      val treeCoverLossPeatLandYearly =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(7))
+      val treeCoverLossIntactForestYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(8))
+      val treeCoverLossProtectedAreasYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(9))
       val treeCoverLossSEAsiaLandCoverYearly =
         ForestChangeDiagnosticDataLossYearlyCategory.fromString(
-          row.getString(8)
+          row.getString(10)
         )
       val treeCoverLossIDNLandCoverYearly =
         ForestChangeDiagnosticDataLossYearlyCategory.fromString(
-          row.getString(9)
-        )
-      val treeCoverLossSoyPlanedAreasYearly =
-        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(10))
-      val treeCoverLossIDNForestAreaYearly =
-        ForestChangeDiagnosticDataLossYearlyCategory.fromString(
           row.getString(11)
         )
-      val treeCoverLossIDNForestMoratoriumYearly =
+      val treeCoverLossSoyPlanedAreasYearly =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(12))
-      val prodesLossYearly =
-        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(13))
-      val prodesLossProtectedAreasYearly =
+      val treeCoverLossIDNForestAreaYearly =
+        ForestChangeDiagnosticDataLossYearlyCategory.fromString(
+          row.getString(13)
+        )
+      val treeCoverLossIDNForestMoratoriumYearly =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(14))
-      val prodesLossProdesPrimaryForestYearly =
+      val prodesLossYearly =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(15))
+      val prodesLossProtectedAreasYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(16))
+      val prodesLossProdesPrimaryForestYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(17))
       val treeCoverLossBRABiomesYearly =
         ForestChangeDiagnosticDataLossYearlyCategory.fromString(
-          row.getString(16)
+          row.getString(18)
         )
       val treeCoverExtent =
-        ForestChangeDiagnosticDataDouble(row.getString(17).toDouble)
-      val treeCoverExtentPrimaryForest =
-        ForestChangeDiagnosticDataDouble(row.getString(18).toDouble)
-      val treeCoverExtentProtectedAreas =
         ForestChangeDiagnosticDataDouble(row.getString(19).toDouble)
-      val treeCoverExtentPeatlands =
+      val treeCoverExtentPrimaryForest =
         ForestChangeDiagnosticDataDouble(row.getString(20).toDouble)
-      val treeCoverExtentIntactForests =
+      val treeCoverExtentProtectedAreas =
         ForestChangeDiagnosticDataDouble(row.getString(21).toDouble)
-      val primaryForestArea =
+      val treeCoverExtentPeatlands =
         ForestChangeDiagnosticDataDouble(row.getString(22).toDouble)
-      val intactForest2016Area =
+      val treeCoverExtentIntactForests =
         ForestChangeDiagnosticDataDouble(row.getString(23).toDouble)
-      val totalArea =
+      val primaryForestArea =
         ForestChangeDiagnosticDataDouble(row.getString(24).toDouble)
-      val protectedAreasArea =
+      val intactForest2016Area =
         ForestChangeDiagnosticDataDouble(row.getString(25).toDouble)
-      val peatlandsArea =
+      val totalArea =
         ForestChangeDiagnosticDataDouble(row.getString(26).toDouble)
+      val protectedAreasArea =
+        ForestChangeDiagnosticDataDouble(row.getString(27).toDouble)
+      val peatlandsArea =
+        ForestChangeDiagnosticDataDouble(row.getString(28).toDouble)
       val braBiomesArea =
-        ForestChangeDiagnosticDataDoubleCategory.fromString(row.getString(27))
-      val idnForestAreaArea =
-        ForestChangeDiagnosticDataDoubleCategory.fromString(row.getString(28))
-      val seAsiaLandCoverArea =
         ForestChangeDiagnosticDataDoubleCategory.fromString(row.getString(29))
-      val idnLandCoverArea =
+      val idnForestAreaArea =
         ForestChangeDiagnosticDataDoubleCategory.fromString(row.getString(30))
+      val seAsiaLandCoverArea =
+        ForestChangeDiagnosticDataDoubleCategory.fromString(row.getString(31))
+      val idnLandCoverArea =
+        ForestChangeDiagnosticDataDoubleCategory.fromString(row.getString(32))
       val idnForestMoratoriumArea =
-        ForestChangeDiagnosticDataDouble(row.getString(31).toDouble)
+        ForestChangeDiagnosticDataDouble(row.getString(33).toDouble)
       val southAmericaPresence =
-        ForestChangeDiagnosticDataBoolean(row.getString(32).toBoolean)
-      val legalAmazonPresence =
-        ForestChangeDiagnosticDataBoolean(row.getString(33).toBoolean)
-      val braBiomesPresence =
         ForestChangeDiagnosticDataBoolean(row.getString(34).toBoolean)
-      val cerradoBiomesPresence =
+      val legalAmazonPresence =
         ForestChangeDiagnosticDataBoolean(row.getString(35).toBoolean)
-      val seAsiaPresence =
+      val braBiomesPresence =
         ForestChangeDiagnosticDataBoolean(row.getString(36).toBoolean)
-      val idnPresence =
+      val cerradoBiomesPresence =
         ForestChangeDiagnosticDataBoolean(row.getString(37).toBoolean)
+      val seAsiaPresence =
+        ForestChangeDiagnosticDataBoolean(row.getString(38).toBoolean)
+      val idnPresence =
+        ForestChangeDiagnosticDataBoolean(row.getString(39).toBoolean)
       val forestValueIndicator =
-        ForestChangeDiagnosticDataValueYearly.fromString(row.getString(38))
-      val peatValueIndicator =
-        ForestChangeDiagnosticDataValueYearly.fromString(row.getString(39))
-      val protectedAreaValueIndicator =
         ForestChangeDiagnosticDataValueYearly.fromString(row.getString(40))
+      val peatValueIndicator =
+        ForestChangeDiagnosticDataValueYearly.fromString(row.getString(41))
+      val protectedAreaValueIndicator =
+        ForestChangeDiagnosticDataValueYearly.fromString(row.getString(42))
       val deforestationThreatIndicator =
-        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(41))
-      val peatThreatIndicator =
-        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(42))
-      val protectedAreaThreatIndicator =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(43))
-      val fireThreatIndicator =
+      val peatThreatIndicator =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(44))
+      val protectedAreaThreatIndicator =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(45))
+      val fireThreatIndicator =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(46))
 
       val treeCoverLossTcd90Yearly =
-        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(45))
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(47))
       val filteredTreeCoverExtent =
-        ForestChangeDiagnosticDataDouble(row.getString(46).toDouble)
+        ForestChangeDiagnosticDataDouble(row.getString(48).toDouble)
       val filteredTreeCoverExtentYearly =
-        ForestChangeDiagnosticDataValueYearly.fromString(row.getString(47))
+        ForestChangeDiagnosticDataValueYearly.fromString(row.getString(49))
       val filteredTreeCoverLossYearly =
-        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(48))
-      val filteredTreeCoverLossPeatYearly =
-        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(49))
-      val filteredTreeCoverLossProtectedAreasYearly =
         ForestChangeDiagnosticDataLossYearly.fromString(row.getString(50))
+      val filteredTreeCoverLossPeatYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(51))
+      val filteredTreeCoverLossProtectedAreasYearly =
+        ForestChangeDiagnosticDataLossYearly.fromString(row.getString(52))
       val plantationArea =
-        ForestChangeDiagnosticDataDouble(row.getString(51).toDouble)
-      val plantationOnPeatArea =
-        ForestChangeDiagnosticDataDouble(row.getString(52).toDouble)
-      val plantationInProtectedAreasArea =
         ForestChangeDiagnosticDataDouble(row.getString(53).toDouble)
+      val plantationOnPeatArea =
+        ForestChangeDiagnosticDataDouble(row.getString(54).toDouble)
+      val plantationInProtectedAreasArea =
+        ForestChangeDiagnosticDataDouble(row.getString(55).toDouble)
 
       (
         CombinedFeatureId(gfwproFeatureId, gridId),

@@ -53,9 +53,9 @@ object WdpaFeature extends Feature {
       (acc, i) => acc.filter(substring($"iso", 0, 1) === i(0))
     )
     val isoStartDF: DataFrame =
-      isoStart.foldLeft(isoFirstDF)((acc, i) => acc.filter($"iso" >= i))
+      isoStart.foldLeft(isoFirstDF)((acc, i) => acc.filter($"iso3" >= i))
     val isoEndDF: DataFrame =
-      isoEnd.foldLeft(isoStartDF)((acc, i) => acc.filter($"iso" < i))
+      isoEnd.foldLeft(isoStartDF)((acc, i) => acc.filter($"iso3" < i))
     val isoDF: DataFrame =
       iso.foldLeft(isoEndDF)((acc, i) => acc.filter($"iso3" === i))
 

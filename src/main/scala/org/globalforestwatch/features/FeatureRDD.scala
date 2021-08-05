@@ -152,9 +152,25 @@ object FeatureRDD {
     val featureDF: DataFrame =
       SpatialFeatureDF(input, featureType, kwargs, "geom", spark)
 
-    val spatialFeatureRDD: SpatialRDD[GeoSparkGeometry] =
+    val spatialRDD: SpatialRDD[GeoSparkGeometry] =
       Adapter.toSpatialRdd(featureDF, "polyshape")
-    spatialFeatureRDD.analyze()
+    spatialRDD.analyze()
+
+
+    spatialRDD.rawSpatialRDD = spatialRDD.rawSpatialRDD.rdd.map { geom: GeoSparkGeometry =>
+      val featureId = FeatureIdFactory(featureType)
+        .fromUserData(geom.getUserData.asInstanceOf[String], delimiter = ",")
+      geom.setUserData(featureId)
+      geom
+    }
+
+    splitGeometries(spatialRDD, spark)
+  }
+
+  def splitGeometries(
+                       spatialFeatureRDD: SpatialRDD[GeoSparkGeometry],
+                       spark: SparkSession
+                     ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
     val envelope: GeoSparkEnvelope = spatialFeatureRDD.boundaryEnvelope
 
@@ -191,17 +207,20 @@ object FeatureRDD {
         // use implicit converter to covert to Geotrellis Geometry
         val geotrellisGeom: MultiPolygon = intersection
 
-        if (!geotrellisGeom.isEmpty)
+        if (!geotrellisGeom.isEmpty) {
+
+          val userData = intersection.getUserData
+          val featureId = userData match {
+            case fid: FeatureId => fid
+          }
+
           Seq(
             geotrellis.vector.Feature(
               geotrellisGeom,
-              FeatureIdFactory(featureType)
-                .fromUserData(
-                  intersection.getUserData.asInstanceOf[String],
-                  delimiter = ","
-                )
+              featureId
             )
           )
+        }
         else Seq()
       }
   }

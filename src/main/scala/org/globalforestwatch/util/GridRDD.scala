@@ -11,11 +11,7 @@ import org.globalforestwatch.util.ImplicitGeometryConverter._
 object GridRDD {
   def apply(envelope: Envelope, spark: SparkSession, clip: Boolean = false): PolygonRDD = {
 
-    val gridCells = {
-      for (x <- envelope.getMinX.floor.toInt until envelope.getMaxX.ceil.toInt;
-           y <- envelope.getMinY.floor.toInt until envelope.getMaxY.ceil.toInt)
-        yield (x, y)
-    }
+    val gridCells = getGridCells(envelope)
 
     val tcl_geom: MultiPolygon = TreeCoverLossExtent.geometry
 
@@ -36,6 +32,14 @@ object GridRDD {
     val spatialGridRDD = new PolygonRDD(gridRDD)
     spatialGridRDD.analyze()
     spatialGridRDD
+  }
+
+  private def getGridCells(envelope: Envelope): IndexedSeq[(Int, Int)] = {
+    {
+      for (x <- envelope.getMinX.floor.toInt until envelope.getMaxX.ceil.toInt;
+           y <- envelope.getMinY.floor.toInt until envelope.getMaxY.ceil.toInt)
+        yield (x, y)
+    }
   }
 
 }

@@ -7,6 +7,7 @@ import geotrellis.store.index.zcurve.Z2
 import org.apache.spark.HashPartitioner
 import org.globalforestwatch.features.{CombinedFeatureId, FeatureIdFactory, FeatureRDDFactory, FireAlertRDD, GfwProFeatureId, SpatialFeatureDF}
 import org.globalforestwatch.summarystats.SummaryAnalysis
+import org.globalforestwatch.util.GeoSparkGeometryConstructor.createPoint
 import org.globalforestwatch.util.IntersectGeometry.intersectGeometries
 import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
 import org.globalforestwatch.util.ImplicitGeometryConverter._
@@ -127,7 +128,9 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
         featureId match {
           case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>
-            if (contextualGeom.contains(featureGeom.getCentroid)) {
+
+            val featureCentroid = createPoint(gfwproId.x, gfwproId.y)
+            if (contextualGeom.contains(featureCentroid)) {
               Seq(
                 Feature[Geometry, CombinedFeatureId](
                   featureGeom,

@@ -24,7 +24,7 @@ object GladAlertsDF {
     "is__gfw_oil_gas",
     "is__gmw_mangroves_2016",
     "is__ifl_intact_forest_landscapes_2016",
-    "bra_biomes__name"
+    "ibge_bra_biomes__name"
   )
 
   def unpackValues(unpackCols: List[Column],
@@ -38,8 +38,8 @@ object GladAlertsDF {
 
     def defaultCols =
       List(
-        $"data_group.alertDate" as "umd_glad_landsat_alerts__date",
-        $"data_group.isConfirmed" as "umd_glad_landsat_alerts__confidence",
+        $"data_group.alertDate" as "alert__date",
+        $"data_group.isConfirmed" as "is__confirmed_alert",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_areas",
@@ -57,16 +57,16 @@ object GladAlertsDF {
         $"data_group.oilGas" as "is__gfw_oil_gas",
         $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscapes_2016",
-        $"data_group.braBiomes" as "bra_biomes__name",
-        $"data.totalAlerts" as "umd_glad_landsat_alerts__count",
-        $"data.alertArea" as "umd_glad_landsat_alerts__ha",
+        $"data_group.braBiomes" as "ibge_bra_biomes__name",
+        $"data.totalAlerts" as "alert__count",
+        $"data.alertArea" as "alert_area__ha",
         $"data.co2Emissions" as "whrc_aboveground_co2_emissions__Mg",
         $"data.totalArea" as "area__ha"
       )
 
     val cols =
       if (!wdpa)
-        unpackCols ::: ($"data_group.protectedAreas" as "wdpa_protected_area__iucn_cat") :: defaultCols
+        unpackCols ::: ($"data_group.protectedAreas" as "wdpa_protected_areas__iucn_cat") :: defaultCols
       else unpackCols ::: defaultCols
 
     df.filter($"data_group.tile.z" === minZoom)
@@ -79,19 +79,19 @@ object GladAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val gladCols = List("umd_glad_landsat_alerts__date", "umd_glad_landsat_alerts__confidence")
+    val gladCols = List("alert__date", "is__confirmed_alert")
 
     val cols =
       if (!wdpa)
-        groupByCols ::: gladCols ::: "wdpa_protected_area__iucn_cat" :: contextualLayers
+        groupByCols ::: gladCols ::: "wdpa_protected_areas__iucn_cat" :: contextualLayers
       else
         groupByCols ::: gladCols ::: contextualLayers
 
     df.filter($"alert__date".isNotNull)
       .groupBy(cols.head, cols.tail: _*)
       .agg(
-        sum("umd_glad_landsat_alerts__count") as "umd_glad_landsat_alerts__count",
-        sum("umd_glad_landsat_alerts__ha") as "umd_glad_landsat_alerts__ha",
+        sum("alert__count") as "alert__count",
+        sum("alert_area__ha") as "alert_area__ha",
         sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions__Mg"
       )
   }
@@ -103,11 +103,11 @@ object GladAlertsDF {
     import spark.implicits._
 
     val gladCols = List(
-      year($"umd_glad_landsat_alerts__date") as "umd_glad_landsat_alerts__year",
-      weekofyear($"umd_glad_landsat_alerts__date") as "umd_glad_landsat_alerts__week",
-      $"umd_glad_landsat_alerts__confidence"
+      year($"alert__date") as "alert__year",
+      weekofyear($"alert__date") as "alert__week",
+      $"is__confirmed_alert"
     )
-    _aggChangeWeekly(df.filter($"umd_glad_landsat_alerts__date".isNotNull), cols, gladCols, wdpa)
+    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, gladCols, wdpa)
   }
 
   def aggChangeWeekly2(cols: List[String],
@@ -116,7 +116,7 @@ object GladAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val gladCols = List($"umd_glad_landsat_alerts__year", $"umd_glad_landsat_alerts__week", $"umd_glad_landsat_alerts__confidence")
+    val gladCols = List($"alert__year", $"alert__week", $"is__confirmed_alert")
     _aggChangeWeekly(df, cols, gladCols, wdpa)
   }
 
@@ -127,13 +127,13 @@ object GladAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val gladCols2 = List("umd_glad_landsat_alerts__year", "umd_glad_landsat_alerts__week", "umd_glad_landsat_alerts__confidence")
+    val gladCols2 = List("alert__year", "alert__week", "is__confirmed_alert")
 
     val aggCols =
-      List($"umd_glad_landsat_alerts__count", $"umd_glad_landsat_alerts__ha", $"whrc_aboveground_co2_emissions__Mg")
+      List($"alert__count", $"alert_area__ha", $"whrc_aboveground_co2_emissions__Mg")
 
     val contextLayers: List[String] =
-      if (!wdpa) "wdpa_protected_area__iucn_cat" :: contextualLayers
+      if (!wdpa) "wdpa_protected_areas__iucn_cat" :: contextualLayers
       else contextualLayers
 
     val selectCols: List[Column] = cols.foldRight(Nil: List[Column])(
@@ -146,8 +146,8 @@ object GladAlertsDF {
     df.select(selectCols: _*)
       .groupBy(groupByCols.head, groupByCols.tail: _*)
       .agg(
-        sum("umd_glad_landsat_alerts__count") as "umd_glad_landsat_alerts__count",
-        sum("umd_glad_landsat_alerts__ha") as "umd_glad_landsat_alerts__ha",
+        sum("alert__count") as "alert__count",
+        sum("alert_area__ha") as "alert_area__ha",
         sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions__Mg"
       )
   }
@@ -157,12 +157,12 @@ object GladAlertsDF {
 
     val cols =
       if (!wdpa)
-        groupByCols ::: "wdpa_protected_area__iucn_cat" :: contextualLayers
+        groupByCols ::: "wdpa_protected_areas__iucn_cat" :: contextualLayers
       else
         groupByCols ::: contextualLayers
 
     df.groupBy(cols.head, cols.tail: _*)
-      .agg(sum("umd_glad_landsat_alerts__ha") as "umd_glad_landsat_alerts__ha")
+      .agg(sum("alert_area__ha") as "alert_area__ha")
   }
 
   def whitelist(groupByCols: List[String],
@@ -175,15 +175,15 @@ object GladAlertsDF {
       max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max("is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
       max("is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
-      max("is__landmark_land_right") as "is__landmark_land_right",
-      max(length($"gfw_plantation__type"))
-        .cast("boolean") as "gfw_plantation__type",
+      max("is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
+      max(length($"gfw_plantations__type"))
+        .cast("boolean") as "gfw_plantations__type",
       max("is__gfw_mining") as "is__gfw_mining",
-      max("is__gfw_managed_forest") as "is__gfw_managed_forest",
+      max("is__gfw_managed_forests") as "is__gfw_managed_forests",
       max(length($"rspo_oil_palm__certification_status"))
         .cast("boolean") as "rspo_oil_palm__certification_status",
       max("is__gfw_wood_fiber") as "is__gfw_wood_fiber",
-      max("is__peatland") as "is__peatland",
+      max("is__gfw_peatlands") as "is__gfw_peatlands",
       max("is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max("is__gfw_oil_palm") as "is__gfw_oil_palm",
       max(length($"idn_forest_area__type"))
@@ -192,14 +192,14 @@ object GladAlertsDF {
         .cast("boolean") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
       max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
-      max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
-      max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name"
+      max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
+      max(length($"ibge_bra_biomes__name")).cast("boolean") as "ibge_bra_biomes__name"
     )
 
     val aggCols =
       if (!wdpa)
-        (max(length($"wdpa_protected_area__iucn_cat"))
-          .cast("boolean") as "wdpa_protected_area__iucn_cat") :: defaultAggCols
+        (max(length($"wdpa_protected_areas__iucn_cat"))
+          .cast("boolean") as "wdpa_protected_areas__iucn_cat") :: defaultAggCols
       else defaultAggCols
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)
@@ -211,8 +211,8 @@ object GladAlertsDF {
 
     val defaultAggCols = List(
       max("is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
-      max("is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
-      max("is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
+      max("is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
+      max("is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
       max("is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
       max("gfw_plantations__type") as "gfw_plantations__type",
       max("is__gfw_mining") as "is__gfw_mining",
@@ -227,12 +227,12 @@ object GladAlertsDF {
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
       max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
-      max("bra_biomes__name") as "bra_biome__name"
+      max("ibge_bra_biomes__name") as "ibge_bra_biomes__name"
     )
 
     val aggCols =
       if (!wdpa)
-        (max("wdpa_protected_area__iucn_cat") as "wdpa_protected_area__iucn_cat") :: defaultAggCols
+        (max("wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat") :: defaultAggCols
       else defaultAggCols
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)

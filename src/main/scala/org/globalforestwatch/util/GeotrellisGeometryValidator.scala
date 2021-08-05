@@ -38,32 +38,23 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
     // try to make geometry valid. This is a basic trick, we might need to make this more sophisticated
     // There are some code samples here for JTS
     // https://stackoverflow.com/a/31474580/1410317
-    val validGeom = {
-      if (!geom.isValid) {
+    val reducedGeom = reduce(gpr)(geom)
 
-        val fixedGeom = GeometryFixer(geom).fix()
+    val validGeom = {
+      if (!reducedGeom.isValid) {
+
+        val fixedGeom = GeometryFixer(reducedGeom).fix()
 
         // Geometry fixer may alter the geometry type or even return an empty geometry
         // We want to try to preserve the geometry type if possible
 
-        if (geom.getGeometryType != fixedGeom.getGeometryType && geom.getGeometryType
-          .contains(fixedGeom.getGeometryType)) {
-          logger.warn(
-            s"Fixed geometry of type ${fixedGeom.getGeometryType}. Cast to ${geom.getGeometryType}."
-          )
-          makeMultiGeom(fixedGeom)
-        } else if (geom.getGeometryType != fixedGeom.getGeometryType) {
-          logger.warn(
-            s"Not able to preserve geometry type. Return ${fixedGeom.getGeometryType} instead of ${geom.getGeometryType}"
-          )
-          fixedGeom
-        } else fixedGeom
-      } else geom
+        preserveGeometryType(fixedGeom, geom.getGeometryType)
+
+      } else preserveGeometryType(reducedGeom, geom.getGeometryType)
     }
 
-    val normalizedGeom = reduce(gpr)(validGeom)
-    normalizedGeom.normalize()
-    normalizedGeom
+    validGeom.normalize()
+    validGeom
 
   }
 
@@ -82,6 +73,22 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
           "Can only convert Point, LineString and Polygon to Multipart Geometries."
         )
     }
+  }
+
+  private def preserveGeometryType(geom: Geometry,
+                                   desiredGeometryType: String): Geometry = {
+    if (desiredGeometryType != geom.getGeometryType && desiredGeometryType
+      .contains(geom.getGeometryType)) {
+      logger.warn(
+        s"Fixed geometry of type ${geom.getGeometryType}. Cast to ${desiredGeometryType}."
+      )
+      makeMultiGeom(geom)
+    } else if (desiredGeometryType != geom.getGeometryType) {
+      logger.warn(
+        s"Not able to preserve geometry type. Return ${geom.getGeometryType} instead of ${desiredGeometryType}"
+      )
+      geom
+    } else geom
   }
 
 }

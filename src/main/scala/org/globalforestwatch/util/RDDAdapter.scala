@@ -18,4 +18,5 @@ object RDDAdapter {
     spatialRDD
 
   }
+
 }

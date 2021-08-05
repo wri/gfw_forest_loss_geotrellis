@@ -34,7 +34,8 @@ case class ForestChangeDiagnosticDFFactory(
           id match {
             case gfwproId: GfwProFeatureId =>
               createCaseClassFromMap[ForestChangeDiagnosticRowSimple](
-                Map("id" -> gfwproId.locationId.asJson.noSpaces) ++
+                Map("locationId" -> gfwproId.listId.asJson.noSpaces,
+                  "listId" -> gfwproId.locationId.asJson.noSpaces) ++
                   featureFieldMap(data)
               )
 
@@ -42,7 +43,7 @@ case class ForestChangeDiagnosticDFFactory(
               throw new IllegalArgumentException("Not a GfwProFeatureId")
           }
       }
-      .toDF("location_id" :: featureFieldNames: _*)
+      .toDF("list_id" :: "location_id" :: featureFieldNames: _*)
   }
 
   private def getGadmFeatureDataFrame: DataFrame = {
@@ -53,7 +54,9 @@ case class ForestChangeDiagnosticDFFactory(
           id match {
             case gadmId: GadmFeatureId =>
               createCaseClassFromMap[ForestChangeDiagnosticRowSimple](
-                Map("id" -> gadmId.toString) ++
+                Map(
+                  "listId" -> "GADM 3.6",
+                  "locationId" -> gadmId.toString) ++
                   featureFieldMap(data)
               )
 
@@ -61,7 +64,7 @@ case class ForestChangeDiagnosticDFFactory(
               throw new IllegalArgumentException("Not a GadmFeatureId")
           }
       }
-      .toDF("gadm_id" :: featureFieldNames: _*)
+      .toDF("list_id" :: "location_id" :: featureFieldNames: _*)
   }
 
   private def getWdpaFeatureDataFrame: DataFrame = {
@@ -72,7 +75,9 @@ case class ForestChangeDiagnosticDFFactory(
           id match {
             case wdpaId: WdpaFeatureId =>
               createCaseClassFromMap[ForestChangeDiagnosticRowSimple](
-                Map("id" -> wdpaId.toString) ++
+                Map(
+                  "listId" -> "WDPA",
+                  "locationId" -> wdpaId.toString) ++
                   featureFieldMap(data)
               )
 
@@ -80,7 +85,7 @@ case class ForestChangeDiagnosticDFFactory(
               throw new IllegalArgumentException("Not a WdpaFeatureId")
           }
       }
-      .toDF("wdpa_id" :: featureFieldNames: _*)
+      .toDF("list_id" :: "location_id" :: featureFieldNames: _*)
   }
 
   private def getGridFeatureDataFrame: DataFrame = {
@@ -94,6 +99,8 @@ case class ForestChangeDiagnosticDFFactory(
                 Map(
                   "list_id" -> gfwproId.listId.asJson.noSpaces,
                   "location_id" -> gfwproId.locationId.asJson.noSpaces,
+                  "x" -> gfwproId.x.asJson.noSpaces,
+                  "y" -> gfwproId.y.asJson.noSpaces,
                   "grid" -> gridId.gridId.asJson.noSpaces
                 ) ++
                   featureFieldMap(data)

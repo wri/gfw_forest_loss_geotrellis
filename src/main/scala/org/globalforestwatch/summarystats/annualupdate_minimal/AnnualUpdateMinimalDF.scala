@@ -7,10 +7,10 @@ import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 object AnnualUpdateMinimalDF {
 
   val contextualLayers = List(
-    "umd_tree_cover_density_2000__threshold",
+    "umd_tree_cover_density__threshold",
     "tsc_tree_cover_loss_drivers__type",
     "esa_land_cover_2015__class",
-    "is__birdlife_alliance_for_zero_extinction_site",
+    "is__birdlife_alliance_for_zero_extinction_sites",
     "gfw_plantations__type",
     "is__gmw_mangroves_1996",
     "is__gmw_mangroves_2016",
@@ -26,7 +26,7 @@ object AnnualUpdateMinimalDF {
     "is__idn_forest_moratorium",
     "is__gfw_wood_fiber",
     "is__gfw_resource_rights",
-    "is__gfw_managed_forest",
+    "is__gfw_managed_forests",
     "is__umd_tree_cover_gain"
   )
 
@@ -39,11 +39,11 @@ object AnnualUpdateMinimalDF {
     def defaultUnpackCols =
       List(
         $"data_group.lossYear" as "umd_tree_cover_loss__year",
-        $"data_group.threshold" as "umd_tree_cover_density_2000__threshold",
+        $"data_group.threshold" as "umd_tree_cover_density__threshold",
         $"data_group.drivers" as "tsc_tree_cover_loss_drivers__type",
         $"data_group.globalLandCover" as "esa_land_cover_2015__class",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
-        $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
+        $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.plantations" as "gfw_plantations__type",
         $"data_group.mangroves1996" as "is__gmw_mangroves_1996",
         $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
@@ -57,11 +57,11 @@ object AnnualUpdateMinimalDF {
         $"data_group.oilPalm" as "is__gfw_oil_palm",
         $"data_group.idnForestMoratorium" as "is__idn_forest_moratorium",
         $"data_group.woodFiber" as "is__gfw_wood_fiber",
-        $"data_group.resourceRights" as "is__gfw_resource_right",
-        $"data_group.logging" as "is__gfw_managed_forest",
+        $"data_group.resourceRights" as "is__gfw_resource_rights",
+        $"data_group.logging" as "is__gfw_managed_forests",
         $"data_group.isGain" as "is__umd_tree_cover_gain",
-        $"data.treecoverExtent2000" as "umd_tree_cover_density_2000__ha",
-        $"data.treecoverExtent2010" as "umd_tree_cover_density_2010__ha",
+        $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
+        $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
         $"data.totalArea" as "area__ha",
         $"data.totalGainArea" as "umd_tree_cover_gain__ha",
         $"data.totalBiomass" as "whrc_aboveground_biomass_stock_2000__Mg",
@@ -81,7 +81,7 @@ object AnnualUpdateMinimalDF {
     val unpackCols = {
       if (!wdpa) {
         defaultUnpackCols ::: List(
-          $"data_group.wdpa" as "wdpa_protected_area__iucn_cat"
+          $"data_group.wdpa" as "wdpa_protected_areas__iucn_cat"
         )
       } else defaultUnpackCols
     }
@@ -97,14 +97,14 @@ object AnnualUpdateMinimalDF {
     val cols =
       if (!wdpa)
         groupByCols ::: contextualLayers ::: List(
-          "wdpa_protected_area__iucn_cat"
+          "wdpa_protected_areas__iucn_cat"
         )
       else groupByCols ::: contextualLayers
 
     df.groupBy(cols.head, cols.tail: _*)
       .agg(
-        sum("umd_tree_cover_density_2000__ha") as "umd_tree_cover_density_2000__ha",
-        sum("umd_tree_cover_density_2010__ha") as "umd_tree_cover_density_2010__ha",
+        sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
+        sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
         sum("area__ha") as "area__ha",
         sum("umd_tree_cover_gain__ha") as "umd_tree_cover_gain__ha",
         sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
@@ -127,14 +127,14 @@ object AnnualUpdateMinimalDF {
     val cols =
       if (!wdpa)
         groupByCols ::: contextualLayers ::: List(
-          "wdpa_protected_area__iucn_cat"
+          "wdpa_protected_areas__iucn_cat"
         )
       else groupByCols ::: contextualLayers
 
     df.groupBy(cols.head, cols.tail: _*)
       .agg(
-        sum("umd_tree_cover_density_2000__ha") as "umd_tree_cover_density_2000__ha",
-        sum("umd_tree_cover_density_2010__ha") as "umd_tree_cover_density_2010__ha",
+        sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
+        sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
         sum("area__ha") as "area__ha",
         sum("umd_tree_cover_gain__ha") as "umd_tree_cover_gain__ha",
         sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
@@ -157,7 +157,7 @@ object AnnualUpdateMinimalDF {
     val cols =
       if (!wdpa)
         groupByCols ::: List("umd_tree_cover_loss__year") ::: contextualLayers ::: List(
-          "wdpa_protected_area__iucn_cat"
+          "wdpa_protected_areas__iucn_cat"
         )
       else groupByCols ::: List("umd_tree_cover_loss__year") ::: contextualLayers
 
@@ -190,25 +190,25 @@ object AnnualUpdateMinimalDF {
       max($"is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
       max(length($"ifl_intact_forest_landscapes__year"))
         .cast("boolean") as "ifl_intact_forest_landscapes__year",
-      max($"is__gfw_tiger_landscape") as "is__gfw_tiger_landscape",
-      max($"is__landmark_land_right") as "is__landmark_land_right",
-      max($"is__gfw_land_right") as "is__gfw_land_right",
-      max($"is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
+      max($"is__gfw_tiger_landscapes") as "is__gfw_tiger_landscapes",
+      max($"is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
+      max($"is__gfw_land_rights") as "is__gfw_land_rights",
+      max($"is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
       max($"is__gfw_mining") as "is__gfw_mining",
-      max($"is__peatland") as "is__peatland",
+      max($"is__gfw_peatlands") as "is__gfw_peatlands",
       max($"is__gfw_oil_palm") as "is__gfw_oil_palm",
       max($"is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
-      max($"is__gfw_resource_right") as "is__gfw_resource_right",
-      max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
-      max($"is__umd_tree_cover_gain_2000-2012") as "is__umd_tree_cover_gain_2000-2012"
+      max($"is__gfw_resource_rights") as "is__gfw_resource_rights",
+      max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
+      max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain"
     )
 
     val aggCols =
       if (!wdpa)
         defaultAggCols ::: List(
-          max(length($"wdpa_protected_area__iucn_cat"))
-            .cast("boolean") as "wdpa_protected_area__iucn_cat"
+          max(length($"wdpa_protected_areas__iucn_cat"))
+            .cast("boolean") as "wdpa_protected_areas__iucn_cat"
         )
       else defaultAggCols
 
@@ -227,8 +227,8 @@ object AnnualUpdateMinimalDF {
       max($"tsc_tree_cover_loss_drivers__type") as "tsc_tree_cover_loss_drivers__type",
       max($"esa_land_cover_2015__class") as "esa_land_cover_2015__class",
       max($"is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
-      max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
-      max($"gfw_plantation__type") as "gfw_plantation__type",
+      max($"is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
+      max($"gfw_plantations__type") as "gfw_plantations__type",
       max($"is__gmw_mangroves_1996") as "is__gmw_mangroves_1996",
       max($"is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
       max($"ifl_intact_forest_landscapes__year") as "ifl_intact_forest_landscapes__year",
@@ -237,7 +237,7 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_land_rights") as "is__gfw_land_rights",
       max($"is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
       max($"is__gfw_mining") as "is__gfw_mining",
-      max($"is__gfw_peatland") as "is__gfw_peatland",
+      max($"is__gfw_peatlands") as "is__gfw_peatlands",
       max($"is__gfw_oil_palm") as "is__gfw_oil_palm",
       max($"is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
@@ -248,7 +248,7 @@ object AnnualUpdateMinimalDF {
 
     val aggCols = if (!wdpa)
       defaultAggCols ::: List(
-        max($"wdpa_protected_area__iucn_cat") as "wdpa_protected_area__iucn_cat"
+        max($"wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat"
       )
     else defaultAggCols
 
