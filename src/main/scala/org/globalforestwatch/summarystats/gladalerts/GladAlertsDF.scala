@@ -24,7 +24,7 @@ object GladAlertsDF {
     "is__gfw_oil_gas",
     "is__gmw_mangroves_2016",
     "is__ifl_intact_forest_landscapes_2016",
-    "bra_biomes__name"
+    "ibge_bra_biomes__name"
   )
 
   def unpackValues(unpackCols: List[Column],
@@ -57,7 +57,7 @@ object GladAlertsDF {
         $"data_group.oilGas" as "is__gfw_oil_gas",
         $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscapes_2016",
-        $"data_group.braBiomes" as "bra_biomes__name",
+        $"data_group.braBiomes" as "ibge_bra_biomes__name",
         $"data.totalAlerts" as "alert__count",
         $"data.alertArea" as "alert_area__ha",
         $"data.co2Emissions" as "whrc_aboveground_co2_emissions__Mg",
@@ -193,7 +193,7 @@ object GladAlertsDF {
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
       max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
-      max(length($"bra_biomes__name")).cast("boolean") as "bra_biomes__name"
+      max(length($"ibge_bra_biomes__name")).cast("boolean") as "ibge_bra_biomes__name"
     )
 
     val aggCols =
@@ -227,7 +227,7 @@ object GladAlertsDF {
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
       max("is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
-      max("bra_biomes__name") as "bra_biomes__name"
+      max("ibge_bra_biomes__name") as "ibge_bra_biomes__name"
     )
 
     val aggCols =
