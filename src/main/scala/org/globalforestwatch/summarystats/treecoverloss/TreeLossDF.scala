@@ -48,6 +48,9 @@ object TreeLossDF {
       $"data.totalGainArea" as "umd_tree_cover_gain_2000-2012__ha",
       $"data.totalBiomass" as "whrc_aboveground_biomass_stock_2000__Mg",
       $"data.avgBiomass" as "avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1",
+      $"data.totalAgc2000" as "gfw_aboveground_carbon_stock_2000__Mg",
+      $"data.totalBgc2000" as "gfw_belowground_carbon_stock_2000__Mg",
+      $"data.totalSoilCarbon2000" as "gfw_soil_carbon_stock_2000__Mg",
       $"data.totalGrossCumulAbovegroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
       $"data.totalGrossCumulBelowgroundRemovalsCo2" as "gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg",
       $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_belowground_co2_removals_2001-2020__Mg",
@@ -94,6 +97,9 @@ object TreeLossDF {
       sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
       sum($"avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1" * $"umd_tree_cover_extent_2000__ha") /
         sum($"umd_tree_cover_extent_2000__ha") as "avg_whrc_aboveground_biomass_density_2000__Mg_ha-1",
+      sum("gfw_aboveground_carbon_stock_2000__Mg") as "gfw_aboveground_carbon_stock_2000__Mg",
+      sum("gfw_belowground_carbon_stock_2000__Mg") as "gfw_belowground_carbon_stock_2000__Mg",
+      sum("gfw_soil_carbon_stock_2000__Mg") as "gfw_soil_carbon_stock_2000__Mg",
       sum("gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg")
         as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
       sum("gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg")

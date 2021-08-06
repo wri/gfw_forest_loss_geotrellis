@@ -47,7 +47,8 @@ object TreeCoverLossCommand extends SummaryCommand {
         "idEnd" -> featureFilter._2,
         "limit" -> defaultFilter._1,
         "tcl" -> defaultFilter._2,
-        "glad" -> defaultFilter._3
+        "glad" -> defaultFilter._3,
+        "changeOnly" -> false
       )
 
       runAnalysis("gladalerts", default._1, default._2, kwargs)

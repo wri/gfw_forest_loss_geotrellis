@@ -44,6 +44,9 @@ object TreeLossSummary {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
+        val agc2000: Float = raster.tile.agc2000.getData(col, row)
+        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
+        val soilCarbon2000: Float = raster.tile.soilCarbon2000.getData(col, row)
 
         val grossCumulAbovegroundRemovalsCo2: Float = raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
         val grossCumulBelowgroundRemovalsCo2: Float = raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
@@ -75,6 +78,9 @@ object TreeLossSummary {
 
         val gainArea: Double = gain * areaHa
         val biomassPixel = biomass * areaHa
+        val agc2000Pixel = agc2000 * areaHa
+        val bgc2000Pixel = bgc2000 * areaHa
+        val soilCarbon2000Pixel = soilCarbon2000 * areaHa
 
         val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
         val grossCumulBelowgroundRemovalsCo2Pixel = grossCumulBelowgroundRemovalsCo2 * areaHa
@@ -112,7 +118,7 @@ object TreeLossSummary {
               stats.getOrElse(
                 key = pKey,
                 default =
-                  TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                  TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -136,6 +142,9 @@ object TreeLossSummary {
                 case 2010 => summary.treecoverExtent2010 += areaHa
               }
               summary.totalBiomass += biomassPixel
+              summary.totalAgc2000 += agc2000Pixel
+              summary.totalBgc2000 += bgc2000Pixel
+              summary.totalSoilCarbon2000 += soilCarbon2000Pixel
 
               summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
               summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel

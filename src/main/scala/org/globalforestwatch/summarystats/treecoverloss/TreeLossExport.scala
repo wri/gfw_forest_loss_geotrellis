@@ -11,6 +11,11 @@ object TreeLossExport extends SummaryExport {
                                        outputUrl: String,
                                        kwargs: Map[String, Any]): Unit = {
 
+//    val changeOnly: Boolean = false
+  val changeOnly: Boolean =
+    getAnyMapValue[Boolean](kwargs, "changeOnly")
+
+
     val spark = summaryDF.sparkSession
     import spark.implicits._
 
