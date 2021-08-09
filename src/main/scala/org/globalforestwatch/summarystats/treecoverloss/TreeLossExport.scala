@@ -24,12 +24,11 @@ object TreeLossExport extends SummaryExport {
       )
     }
 
+
+
     summaryDF
       .transform(TreeLossDF.unpackValues)
-      .transform(
-        TreeLossDF
-          .contextualLayerFilter(includePrimaryForest, includePlantations)
-      )
+      .transform(TreeLossDF.contextualLayerFilter(includePrimaryForest, includePlantations))
       .coalesce(1)
       .orderBy($"feature__id", $"umd_tree_cover_density__threshold")
       .write

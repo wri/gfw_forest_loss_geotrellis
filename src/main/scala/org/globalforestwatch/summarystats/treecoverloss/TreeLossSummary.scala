@@ -44,9 +44,35 @@ object TreeLossSummary {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
-        val agc2000: Float = raster.tile.agc2000.getData(col, row)
-        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
-        val soilCarbon2000: Float = raster.tile.soilCarbon2000.getData(col, row)
+
+
+        // Optionally include carbon pools in analysis
+        val carbonPools: String =
+          getAnyMapValue[String](kwargs, "carbonPools")
+
+        val agc2000: Float = {
+          if (carbonPools == "include")
+            raster.tile.agc2000.getData(col, row)
+          else 0
+        }
+
+        val bgc2000: Float = {
+          if (carbonPools == "include")
+            raster.tile.bgc2000.getData(col, row)
+          else 0
+        }
+
+        val soilCarbon2000: Float = {
+          if (carbonPools == "include")
+            raster.tile.soilCarbon2000.getData(col, row)
+          else 0
+        }
+
+//        val agc2000: Float = raster.tile.agc2000.getData(col, row)
+//        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
+//        val soilCarbon2000: Float = raster.tile.soilCarbon2000.getData(col, row)
+
+
 
         val grossCumulAbovegroundRemovalsCo2: Float = raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
         val grossCumulBelowgroundRemovalsCo2: Float = raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
