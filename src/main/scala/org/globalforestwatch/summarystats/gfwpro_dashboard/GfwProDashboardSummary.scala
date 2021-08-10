@@ -39,7 +39,7 @@ object GfwProDashboardSummary {
         val gladAlertsCoverage: Boolean =
           raster.tile.gladAlerts.getCoverage(col, row)
         raster.tile.gladAlerts.getData(col, row)
-        val gladAlerts: Option[(String, Boolean)] =
+        val gladAlerts: Option[(String, String)] =
           raster.tile.gladAlerts.getData(col, row)
 
         val alertDate: Option[String] = {

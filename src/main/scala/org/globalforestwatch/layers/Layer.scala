@@ -50,7 +50,7 @@ trait Layer {
 
   lazy val version: String = {
     pinnedVersions.getOrElse(datasetName, None) match {
-      case Some(value: String) => value
+      case value: String => value
       case _ =>
         val response: HttpResponse[String] = Http(
           s"https://data-api.globalforestwatch.org/dataset/${datasetName}/latest"

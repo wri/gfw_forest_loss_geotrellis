@@ -33,6 +33,7 @@ object IntegratedAlertsSummary {
                 row: Int): Unit = {
 
         val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
+        val gladLStartDate: String = "2019-01-01"
 
         // This is a pixel by pixel operation
         val gladL: Option[(String, String)] =
@@ -103,7 +104,9 @@ object IntegratedAlertsSummary {
 
           val gladLAlertDate: Option[String] = {
             gladL match {
-              case Some((date, _)) => Some(date)
+              case Some((date, _)) =>
+                // ignore dates before 2 year rolling window
+                if (date >= gladLStartDate) Some(date) else None
               case _ => None
             }
           }
@@ -117,7 +120,7 @@ object IntegratedAlertsSummary {
 
           val gladS2AlertDate: Option[String] = {
             gladS2 match {
-              case Some((date, _)) => Some(date)
+              case Some((date, _)) =>Some(date)
               case _ => None
             }
           }
