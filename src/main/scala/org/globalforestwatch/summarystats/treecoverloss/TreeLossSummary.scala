@@ -46,33 +46,13 @@ object TreeLossSummary {
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
 
-        // Optionally include carbon pools in analysis
-        val carbonPools: String =
-          getAnyMapValue[String](kwargs, "carbonPools")
+        // Optionally calculate stocks in carbon pools in 2000
+        val carbonPools: Boolean =
+          getAnyMapValue[Boolean](kwargs, "carbonPools")
 
-        val agc2000: Float = {
-          if (carbonPools == "include")
-            raster.tile.agc2000.getData(col, row)
-          else 0
-        }
-
-        val bgc2000: Float = {
-          if (carbonPools == "include")
-            raster.tile.bgc2000.getData(col, row)
-          else 0
-        }
-
-        val soilCarbon2000: Float = {
-          if (carbonPools == "include")
-            raster.tile.soilCarbon2000.getData(col, row)
-          else 0
-        }
-
-//        val agc2000: Float = raster.tile.agc2000.getData(col, row)
-//        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
-//        val soilCarbon2000: Float = raster.tile.soilCarbon2000.getData(col, row)
-
-
+        val agc2000: Float = raster.tile.agc2000.getData(col, row)
+        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
+        val soilCarbon2000: Float = raster.tile.soilCarbon2000.getData(col, row)
 
         val grossCumulAbovegroundRemovalsCo2: Float = raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
         val grossCumulBelowgroundRemovalsCo2: Float = raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
@@ -168,9 +148,12 @@ object TreeLossSummary {
                 case 2010 => summary.treecoverExtent2010 += areaHa
               }
               summary.totalBiomass += biomassPixel
-              summary.totalAgc2000 += agc2000Pixel
-              summary.totalBgc2000 += bgc2000Pixel
-              summary.totalSoilCarbon2000 += soilCarbon2000Pixel
+
+              if (carbonPools) {
+                summary.totalAgc2000 += agc2000Pixel
+                summary.totalBgc2000 += bgc2000Pixel
+                summary.totalSoilCarbon2000 += soilCarbon2000Pixel
+              }
 
               summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
               summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel

@@ -23,16 +23,16 @@ object TreeCoverLossCommand extends SummaryCommand {
     )
     .withDefault(NonEmptyList.of(""))
 
-  val carbonPoolOpts: Opts[String] = Opts
-    .option[String](
+  val carbonPoolOpts: Opts[Boolean] = Opts
+    .flag(
       "carbon_pools",
       "Carbon pools to optionally include. Currently can include: gfw_aboveground_carbon_stock_2000__Mg, gfw_belowground_carbon_stock_2000__Mg, gfw_soil_carbon_stock_2000__Mg"
     )
-    .withDefault("exclude")
+    .orFalse
 
 
   val treeCoverLossOptions
-  : Opts[(NonEmptyList[String], Int, Product with Serializable, String)] =
+  : Opts[(NonEmptyList[String], Int, Product with Serializable, Boolean)] =
     (contextualLayersOpts, tcdOpt, thresholdOpts, carbonPoolOpts).tupled
 
   val treeCoverLossCommand: Opts[Unit] = Opts.subcommand(
