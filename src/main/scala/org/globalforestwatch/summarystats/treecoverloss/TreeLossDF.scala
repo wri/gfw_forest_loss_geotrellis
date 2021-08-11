@@ -61,12 +61,11 @@ object TreeLossDF {
 
     val carbonPoolCols = if (carbonPools) {
       List(
-      $"data.totalAgc2000" as "gfw_aboveground_carbon_stock_2000__Mg",
-      $"data.totalBgc2000" as "gfw_belowground_carbon_stock_2000__Mg",
-      $"data.totalSoilCarbon2000" as "gfw_soil_carbon_stock_2000__Mg"
+        $"data.totalAgc2000" as "gfw_aboveground_carbon_stock_2000__Mg",
+        $"data.totalBgc2000" as "gfw_belowground_carbon_stock_2000__Mg",
+        $"data.totalSoilCarbon2000" as "gfw_soil_carbon_stock_2000__Mg"
       )
-    }
-    else  {
+    } else {
       List()
     }
 
@@ -131,8 +130,7 @@ object TreeLossDF {
         sum("gfw_belowground_carbon_stock_2000__Mg") as "gfw_belowground_carbon_stock_2000__Mg",
         sum("gfw_soil_carbon_stock_2000__Mg") as "gfw_soil_carbon_stock_2000__Mg"
       )
-    }
-    else  {
+    } else {
       List()
     }
 
