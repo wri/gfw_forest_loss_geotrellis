@@ -8,7 +8,7 @@ This project performs a polygonal summary on tree cover loss and intersecting la
 
 Currently the following analysis are implemented
 
-*   Tree Cover Loss
+*   Tree Cover Loss (for ArcPy client)
 *   Annual Update
 *   Annual Update minimal
 *   Carbon Flux Full Standard Model
@@ -19,18 +19,20 @@ Currently the following analysis are implemented
 
 ### Tree Cover Loss
 
-A simple analysis which only looks at Tree Cover Loss, Tree Cover Density (2000 or 2010) and optionally Primary Forest.
+A simple analysis which only looks at tree cover loss, tree cover density (2000 or 2010), aboveground biomass,
+gross GHG emissions, gross carbon removals, and net GHG flux. Aboveground carbon, belowground carbon, and soil carbon can be optionally analyzed.
 Users can select one or many tree cover thresholds. Output will be a flat file, with one row per input feature and tree cover density threshold.
+Optional contextual analysis layers include plantations and humid tropical primary forests. 
 The emissions outputs (annual and total) are from the forest carbon flux model (Harris et al. 2021 Nature Climate Change) [forest carbon flux model](https://github.com/wri/carbon-budget).
-Outputs also include carbon removals and carbon net flux (total only). 
+Outputs also include carbon removals and carbon net flux (total only) (Harris et al. 2021). 
 Emissions, removals, and net flux are reported for (> tree cover density 2000 threshold OR Hansen gain) because the model results
 include not just pixels above a certain tree cover density threshold, but also Hansen gain pixels.
-Other outputs from this analysis (loss, gain, biomass, etc.) use the simple tree cover density threshold. 
+Other outputs from this analysis (loss, gain, biomass, carbon pools, etc.) use the simple tree cover density threshold. 
 
 This type of analysis only supports simple features as input. Best used together with the [ArcPY Client](https://github.com/wri/gfw_forest_loss_geotrellis_arcpy_client).
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis treecoverloss --feature_type feature --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain treecoverloss --feature_type feature --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --tcd 2000 --threshold 0 --threshold 30 --contextual layer is__gfw_plantations --carbon_pools
 ```
 
 ### Annual Update
@@ -69,7 +71,7 @@ sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annual
 
 Carbon Flux (full standard model) analysis is used to produce detailed statistics for carbon flux research, with additional model-specific contextual layers.
 It uses the same approach as the annual update analysis, but with all stock and flux outputs from the [forest carbon flux model](https://github.com/wri/carbon-budget). 
-It also analyzes several contextual layers that are unique to the carbon flux model and does not include many contextual layers used in the Tree Cover Loss analyses. 
+It also analyzes several contextual layers that are unique to the carbon flux model and does not include many contextual layers used in the annual update minimal analysis. 
 It currently only works with GADM features.
 
 ```sbt
@@ -165,9 +167,10 @@ The following options are supported:
 |admin2           |string|`gadm` features          |Filter by country Admin2 code                                                                                                    |
 |id_start         |int   |`feature` analysis       |Filter by IDs larger than or equal to given value                                                                                |
 |wdpa_status      |string|`wdpa` features          |Filter by WDPA Status                                                                                                            |
-|tcd              |int   |`treecover` analysis     |Select tree cover density year                                                                                                   |
-|threshold        |int   |`treecover` analysis     |Treecover threshold to apply (multiple)                                                                                          |
-|contextual_layer |string|`treecover` analysis     |Include (multiple) selected contextual layers: `is__umd_regional_primary_forest_2001`, `is__gfw_plantations`                     |
+|tcd              |int   |`treecoverloss` analysis |Select tree cover density year                                                                                                   |
+|threshold        |int   |`treecoverloss` analysis |Treecover threshold to apply (multiple)                                                                                          |
+|contextual_layer |string|`treecoverloss` analysis |Include (multiple) selected contextual layers: `is__umd_regional_primary_forest_2001`, `is__gfw_plantations`                     |
+|carbon_pools     |flag  |`treecoverloss` analysis |Optionally calculate stock sums for multiple carbon pools in 2000 (aboveground, belowground, soil)                                    |
 |tcl              |flag  |all                      |Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class                                     |
 |glad             |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class                                   |
 |change_only      |flag  |all except `treecover`   |Process change only                                                                                                              |

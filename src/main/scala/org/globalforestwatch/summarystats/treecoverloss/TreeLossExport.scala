@@ -24,12 +24,13 @@ object TreeLossExport extends SummaryExport {
       )
     }
 
+    val carbonPools: Boolean =
+      getAnyMapValue[Boolean](kwargs, "carbonPools")
+
+
     summaryDF
-      .transform(TreeLossDF.unpackValues)
-      .transform(
-        TreeLossDF
-          .contextualLayerFilter(includePrimaryForest, includePlantations)
-      )
+      .transform(TreeLossDF.unpackValues(carbonPools))
+      .transform(TreeLossDF.contextualLayerFilter(includePrimaryForest, includePlantations, carbonPools))
       .coalesce(1)
       .orderBy($"feature__id", $"umd_tree_cover_density__threshold")
       .write
