@@ -25,10 +25,6 @@ object IntegratedAlertsExport extends SummaryExport {
     summaryDF.unpersist()
 
     gadmDF.cache()
-    if (!changeOnly) {
-      exportWhitelist(gadmDF, outputUrl)
-      exportSummary(gadmDF, outputUrl)
-    }
     exportChange(gadmDF, outputUrl)
     gadmDF.unpersist()
   }
@@ -96,43 +92,32 @@ object IntegratedAlertsExport extends SummaryExport {
 
   private def exportChange(df: DataFrame, outputUrl: String): Unit = {
 
-    val adm2DailyDF = df
+    val adm2DF = df
       .transform(IntegratedAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
 
-    adm2DailyDF
-      .coalesce(10)
+    adm2DF
+      .coalesce(100)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/daily_alerts")
 
-//    val adm2DF = adm2DailyDF
-//      .transform(IntegratedAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2")))
-//
-//    adm2DF
-//      .coalesce(10)
-//      .write
-//      .options(csvOptions)
-//      .csv(path = outputUrl + "/adm2/weekly_alerts")
-//
-//    val adm1DF = adm2DF
-//      .transform(IntegratedAlertsDF.aggChangeWeekly2(List("iso", "adm1")))
-//
-//    adm1DF
-//      .coalesce(10)
-//      .write
-//      .options(csvOptions)
-//      .csv(path = outputUrl + "/adm1/weekly_alerts")
-//
-//
-//    val isoDF = adm1DF
-//      .transform(IntegratedAlertsDF.aggChangeWeekly2(List("iso")))
-//
-//
-//    isoDF
-//      .coalesce(10)
-//      .write
-//      .options(csvOptions)
-//      .csv(path = outputUrl + "/iso/weekly_alerts")
+    val adm1DF = df
+      .transform(IntegratedAlertsDF.aggChangeDaily(List("iso", "adm1")))
+
+    adm1DF
+      .coalesce(50)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/adm1/daily_alerts")
+
+    val isoDF = df
+      .transform(IntegratedAlertsDF.aggChangeDaily(List("iso")))
+
+    isoDF
+      .coalesce(25)
+      .write
+      .options(csvOptions)
+      .csv(path = outputUrl + "/iso/daily_alerts")
   }
 
   override protected def exportWdpa(summaryDF: DataFrame,
@@ -157,7 +142,7 @@ object IntegratedAlertsExport extends SummaryExport {
       $"id.status" as "wdpa_protected_areas__status"
     )
 
-    _export(summaryDF, outputUrl + "/wdpa", kwargs, groupByCols, unpackCols, wdpa = true)
+    _export(summaryDF, outputUrl + "/wdpa", kwargs, groupByCols, unpackCols, wdpa = true, numExportParts = 50)
   }
 
   override protected def exportFeature(summaryDF: DataFrame,
@@ -184,7 +169,7 @@ object IntegratedAlertsExport extends SummaryExport {
     val groupByCols = List("geostore__id")
     val unpackCols = List($"id.geostoreId" as "geostore__id")
 
-    _export(summaryDF, outputUrl + "/geostore", kwargs, groupByCols, unpackCols, numExportParts = 30)
+    _export(summaryDF, outputUrl + "/geostore", kwargs, groupByCols, unpackCols, numExportParts = 100)
 
   }
 
@@ -206,32 +191,11 @@ object IntegratedAlertsExport extends SummaryExport {
 
     df.cache()
 
-    if (!changeOnly) {
-
-      df.transform(IntegratedAlertsDF.whitelist(cols, wdpa = wdpa))
-        .coalesce(1)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/whitelist")
-
-      df.transform(IntegratedAlertsDF.aggSummary(cols, wdpa = wdpa))
-        .coalesce(numExportParts)
-        .write
-        .options(csvOptions)
-        .csv(path = outputUrl + "/summary")
-    }
-
     df.transform(IntegratedAlertsDF.aggChangeDaily(cols, wdpa = wdpa))
       .coalesce(numExportParts)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
-
-//    df.transform(IntegratedAlertsDF.aggChangeWeekly(cols, wdpa = wdpa))
-//      .coalesce(numExportParts)
-//      .write
-//      .options(csvOptions)
-//      .csv(path = outputUrl + "/weekly_alerts")
 
     df.unpersist()
     ()

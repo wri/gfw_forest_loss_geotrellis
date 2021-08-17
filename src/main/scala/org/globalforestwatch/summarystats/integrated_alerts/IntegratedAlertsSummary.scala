@@ -81,27 +81,6 @@ object IntegratedAlertsSummary {
           val areaHa = area / 10000.0
           val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
 
-//          val(gladLAlertDate: Option[String], gladLConfidence: Option[Boolean]) = {
-//            gladL match {
-//              case Some((date: String, conf: Boolean)) => (date, conf)
-//              case _ => (None, None)
-//            }
-//          }
-//
-//          val(gladS2AlertDate: Option[String], gladS2Confidence: Option[Boolean]) = {
-//            gladS2 match {
-//              case Some((date: String, conf: Boolean)) => (date, conf)
-//              case _ => (None, None)
-//            }
-//          }
-//
-//          val(raddAlertDate: Option[String], raddConfidence: Option[Boolean]) = {
-//            radd match {
-//              case Some((date: String, conf: Boolean)) => (date, conf)
-//              case _ => (None, None)
-//            }
-//          }
-
           val gladLAlertDate: Option[String] = {
             gladL match {
               case Some((date, _)) =>
@@ -146,13 +125,13 @@ object IntegratedAlertsSummary {
             }
           }
 
-          // get min date of alerts with valid date
-          val integratedAlertDate = Some(
-            List(gladLAlertDate, gladS2AlertDate, raddAlertDate).map {
-              case Some(date) => date
-              case _ => "9999-99-99"  // set to very high value if no date
-            }.min
-          )
+          // remove Nones from date
+          val alertDates: List[String] = List(gladLAlertDate, gladS2AlertDate, raddAlertDate).flatten
+
+          // return min if any date exists
+          val integratedAlertDate =
+            if (alertDates.isEmpty) None
+            else Some(alertDates.min)
 
           val confidences = List(gladLConfidence, gladS2Confidence, raddConfidence)
           val integratedConfidence = {
