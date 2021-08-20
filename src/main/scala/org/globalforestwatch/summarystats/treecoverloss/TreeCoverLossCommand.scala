@@ -36,7 +36,7 @@ object TreeCoverLossCommand extends SummaryCommand {
     (contextualLayersOpts, tcdOpt, thresholdOpts, carbonPoolOpts).tupled
 
   val treeCoverLossCommand: Opts[Unit] = Opts.subcommand(
-    name = "treecoverloss",
+    name = TreeLossAnalysis.name,
     help = "Compute Tree Cover Loss Statistics."
   ) {
     (
@@ -48,6 +48,7 @@ object TreeCoverLossCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
+        "noOutputPathSuffix" -> default._5,
         "contextualLayers" -> treeCoverLoss._1,
         "tcdYear" -> treeCoverLoss._2,
         "thresholdFilter" -> treeCoverLoss._3,
@@ -59,8 +60,7 @@ object TreeCoverLossCommand extends SummaryCommand {
         "glad" -> defaultFilter._3
       )
 
-      runAnalysis("treecoverloss", default._1, default._2, kwargs)
-
+      runAnalysis(TreeLossAnalysis.name, default._1, default._2, kwargs)
     }
   }
 }

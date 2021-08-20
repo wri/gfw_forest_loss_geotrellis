@@ -10,7 +10,7 @@ object GladAlertsCommand extends SummaryCommand {
     Opts.flag("change_only", "Process change only").orFalse
 
   val gladAlertsCommand: Opts[Unit] = Opts.subcommand(
-    name = "gladalerts",
+    name = GladAlertsAnalysis.name,
     help = "Compute GLAD summary statistics for GFW dashboards."
   ) {
     (
@@ -30,6 +30,7 @@ object GladAlertsCommand extends SummaryCommand {
         val kwargs = Map(
           "outputUrl" -> default._3,
           "splitFeatures" -> default._4,
+          "noOutputPathSuffix" -> default._5,
           "changeOnly" -> changeOnly,
           "iso" -> gadmFilter._1,
           "isoFirst" -> gadmFilter._2,
@@ -46,7 +47,7 @@ object GladAlertsCommand extends SummaryCommand {
           "glad" -> defaultFilter._3
         )
 
-        runAnalysis("gladalerts", default._1, default._2, kwargs)
+        runAnalysis(GladAlertsAnalysis.name, default._1, default._2, kwargs)
 
     }
   }

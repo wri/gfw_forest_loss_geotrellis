@@ -7,7 +7,7 @@ import cats.implicits._
 object AnnualUpdateMinimalCommand extends SummaryCommand {
 
   val annualupdateMinimalCommand: Opts[Unit] = Opts.subcommand(
-    name = "annualupdate_minimal",
+    name = AnnualUpdateMinimalAnalysis.name,
     help = "Compute summary statistics for GFW dashboards."
   ) {
     (
@@ -20,6 +20,7 @@ object AnnualUpdateMinimalCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default._3,
         "splitFeatures" -> default._4,
+        "noOutputPathSuffix" -> default._5,
         "iso" -> gadmFilter._1,
         "isoFirst" -> gadmFilter._2,
         "isoStart" -> gadmFilter._3,
@@ -35,7 +36,12 @@ object AnnualUpdateMinimalCommand extends SummaryCommand {
         "glad" -> defaultFilter._3
       )
 
-      runAnalysis("annualupdate_minimum", default._1, default._2, kwargs)
+      runAnalysis(
+        AnnualUpdateMinimalAnalysis.name,
+        default._1,
+        default._2,
+        kwargs
+      )
 
     }
   }

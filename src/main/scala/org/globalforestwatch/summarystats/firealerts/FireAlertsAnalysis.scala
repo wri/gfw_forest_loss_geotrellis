@@ -9,9 +9,13 @@ import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, Spa
 import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
+import org.globalforestwatch.summarystats.SummaryAnalysis
 
 
-object FireAlertsAnalysis {
+object FireAlertsAnalysis extends SummaryAnalysis {
+
+  val name = "firealerts"
+
   def apply(featureRDD: RDD[Feature[vector.Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
@@ -21,12 +25,17 @@ object FireAlertsAnalysis {
 
     val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
     val layoutDefinition = fireAlertType match {
-      case "viirs" => ViirsGrid.blockTileGrid
-      case "modis" | "burned_areas" => ModisGrid.blockTileGrid
+      case "viirs" | "burned_areas" => ViirsGrid.blockTileGrid
+      case "modis" => ModisGrid.blockTileGrid
+    }
+
+    val partition = fireAlertType match {
+      case "modis" | "viirs" | "burned_areas" => false
+      case _ => true
     }
 
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
-      FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = false)
+      FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = partition)
 
     val summaryDF = fireAlertType match {
       case "modis" | "viirs" =>
@@ -37,10 +46,8 @@ object FireAlertsAnalysis {
 
     summaryDF.repartition(partitionExprs = $"featureId")
 
-    val runOutputUrl: String = getAnyMapValue[String](kwargs, "outputUrl") +
-      s"/firealerts_${fireAlertType}_" + DateTimeFormatter
-      .ofPattern("yyyyMMdd_HHmm")
-      .format(LocalDateTime.now)
+    val runOutputUrl: String = getOutputUrl(kwargs, s"${name}_${fireAlertType}")
+
 
     FireAlertsExport.export(
       featureType,
@@ -59,10 +66,9 @@ object FireAlertsAnalysis {
     val firePointDF = fireDF
       .selectExpr("ST_Point(CAST(fireId.lon AS Decimal(24,10)),CAST(fireId.lat AS Decimal(24,10))) AS pointshape", "*")
 
-    val featureObj = FeatureFactory(featureType).featureObj
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
-    val featureDF = SpatialFeatureDF(featureUris, featureObj, kwargs, "geom", spark)
+    val featureDF = SpatialFeatureDF(featureUris, featureType, kwargs,"geom", spark)
 
     firePointDF
       .join(featureDF)

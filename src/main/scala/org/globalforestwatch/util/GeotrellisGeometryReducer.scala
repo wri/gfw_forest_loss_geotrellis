@@ -1,10 +1,8 @@
 package org.globalforestwatch.util
 
-import geotrellis.vector.Geometry
-import geotrellis.vector.io.wkb.WKB
 import org.locationtech.jts.precision.GeometryPrecisionReducer
 
-object GeometryReducer extends java.io.Serializable {
+object GeotrellisGeometryReducer extends java.io.Serializable {
 
   // We need to reduce geometry precision  a bit to avoid issues like reported here
   // https://github.com/locationtech/geotrellis/issues/2951
@@ -19,23 +17,7 @@ object GeometryReducer extends java.io.Serializable {
   )
 
   def reduce(
-    gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
-  )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
+              gpr: org.locationtech.jts.precision.GeometryPrecisionReducer
+            )(g: geotrellis.vector.Geometry): geotrellis.vector.Geometry =
     geotrellis.vector.GeomFactory.factory.createGeometry(gpr.reduce(g))
-
-  def isValidGeom(wkb: String): Boolean = {
-    val geom: Option[Geometry] = try {
-      Some(reduce(gpr)(WKB.read(wkb)))
-    } catch {
-      case ae: java.lang.AssertionError =>
-        println("There was an empty geometry")
-        None
-      case t: Throwable => throw t
-    }
-
-    geom match {
-      case Some(g) => true
-      case None    => false
-    }
-  }
 }

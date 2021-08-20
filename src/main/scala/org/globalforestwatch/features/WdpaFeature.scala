@@ -1,10 +1,7 @@
 package org.globalforestwatch.features
 
-import geotrellis.vector.Geometry
-import geotrellis.vector.io.wkb.WKB
 import org.apache.spark.sql.functions.substring
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.globalforestwatch.util.GeometryReducer
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.util.Util._
 
 object WdpaFeature extends Feature {
@@ -17,20 +14,11 @@ object WdpaFeature extends Feature {
   val geomPos = 7
   val featureCount = 4
 
-  val featureIdExpr =  "cast(wdpaid as int) as wdpaId, name as name, iucn_cat as iucnCat, iso3 as iso, status"
-
-  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
-    val featureId = getFeatureId(i)
-    val geom: Geometry =
-      GeometryReducer.reduce(GeometryReducer.gpr)(
-        WKB.read(i.getString(geomPos))
-      )
-
-    geotrellis.vector
-      .Feature(geom, featureId)
-  }
+  val featureIdExpr =
+    "cast(wdpaid as int) as wdpaId, name as name, iucn_cat as iucnCat, iso3 as iso, status"
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
+
     val wdpaId: Int = i(wdpaIdPos).toInt
     val name: String = i(namePos)
     val iucnCat: String = i(iucnCatPos)
@@ -69,7 +57,7 @@ object WdpaFeature extends Feature {
     val isoEndDF: DataFrame =
       isoEnd.foldLeft(isoStartDF)((acc, i) => acc.filter($"iso" < i))
     val isoDF: DataFrame =
-      iso.foldLeft(isoEndDF)((acc, i) => acc.filter($"iso" === i))
+      iso.foldLeft(isoEndDF)((acc, i) => acc.filter($"iso3" === i))
 
     val wdpaIdStartDF =
       wdpaIdStart.foldLeft(isoDF)((acc, i) => acc.filter($"wdpaid" >= i))
@@ -82,7 +70,7 @@ object WdpaFeature extends Feature {
       wdpaIdEnd.foldLeft(wdpaIdEndtDF)(
         (acc, i) => acc.filter($"iucn_cat" === i)
       )
-    */
+     */
 
     wdpaStatus.foldLeft(isoDF)((acc, i) => acc.filter($"status" === i))
   }
