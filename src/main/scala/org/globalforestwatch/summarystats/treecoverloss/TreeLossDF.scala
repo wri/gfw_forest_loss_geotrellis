@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats.treecoverloss
 
 import com.github.mrpowers.spark.daria.sql.DataFrameHelpers.validatePresenceOfColumns
 import org.apache.spark.sql.functions.sum
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object TreeLossDF {
@@ -9,7 +10,7 @@ object TreeLossDF {
   val treecoverLossMinYear = 2001
   val treecoverLossMaxYear = 2020
 
-  def unpackValues(df: DataFrame): DataFrame = {
+  def unpackValues(carbonPools: Boolean)(df: DataFrame): DataFrame = {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
@@ -21,6 +22,7 @@ object TreeLossDF {
           .getItem(i)
           .getItem("treecoverLoss") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
+
     val abovegroundBiomassLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
@@ -41,7 +43,6 @@ object TreeLossDF {
       $"data_group.tcdYear" as "umd_tree_cover_extent__year",
       $"data_group.isPrimaryForest" as "is__umd_regional_primary_forest_2001",
       $"data_group.isPlantations" as "is__gfw_plantations",
-//      $"data_group.isGain" as "is__umd_tree_cover_gain_2000-2012",
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
@@ -58,8 +59,19 @@ object TreeLossDF {
       $"data.totalFluxModelExtentArea" as "gfw_flux_model_extent__ha"
     )
 
+    val carbonPoolCols = if (carbonPools) {
+      List(
+        $"data.totalAgc2000" as "gfw_aboveground_carbon_stock_2000__Mg",
+        $"data.totalBgc2000" as "gfw_belowground_carbon_stock_2000__Mg",
+        $"data.totalSoilCarbon2000" as "gfw_soil_carbon_stock_2000__Mg"
+      )
+    } else {
+      List()
+    }
+
+
     df.select(
-      cols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: totalGrossEmissionsCo2eAllGasesCols: _*
+      cols ::: carbonPoolCols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: totalGrossEmissionsCo2eAllGasesCols : _*
     )
 
   }
@@ -67,6 +79,7 @@ object TreeLossDF {
   def contextualLayerFilter(
                              includePrimaryForest: Boolean,
                              includePlantations: Boolean,
+                             carbonPools: Boolean
                            )(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
@@ -94,6 +107,7 @@ object TreeLossDF {
       sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
       sum($"avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1" * $"umd_tree_cover_extent_2000__ha") /
         sum($"umd_tree_cover_extent_2000__ha") as "avg_whrc_aboveground_biomass_density_2000__Mg_ha-1",
+
       sum("gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg")
         as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
       sum("gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg")
@@ -109,6 +123,16 @@ object TreeLossDF {
       sum("gfw_net_flux_co2e_2001-2020__Mg") as "gfw_net_flux_co2e_2001-2020__Mg",
       sum("gfw_flux_model_extent__ha") as "gfw_flux_model_extent__ha"
     )
+
+    val carbonPoolCols = if (carbonPools) {
+      List(
+        sum("gfw_aboveground_carbon_stock_2000__Mg") as "gfw_aboveground_carbon_stock_2000__Mg",
+        sum("gfw_belowground_carbon_stock_2000__Mg") as "gfw_belowground_carbon_stock_2000__Mg",
+        sum("gfw_soil_carbon_stock_2000__Mg") as "gfw_soil_carbon_stock_2000__Mg"
+      )
+    } else {
+      List()
+    }
 
     val groupByCols = List(
       $"feature__id",
@@ -130,9 +154,11 @@ object TreeLossDF {
     df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol: _*)
       .agg(
         cols.head,
-        cols.tail ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: totalGrossEmissionsCo2eAllGasesCols: _*
+        cols.tail ::: carbonPoolCols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: totalGrossEmissionsCo2eAllGasesCols: _*
       )
 
   }
+
+
 
 }

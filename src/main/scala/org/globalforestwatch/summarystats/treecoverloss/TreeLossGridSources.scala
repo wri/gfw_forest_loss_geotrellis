@@ -17,6 +17,10 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
   val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
   val treeCoverDensity2010 = TreeCoverDensityPercent2010(gridTile)
   val biomassPerHectar = BiomassPerHectar(gridTile)
+  val agc2000 = Agc2000(gridTile)
+  val bgc2000 = Bgc2000(gridTile)
+  val soilCarbon2000 = SoilCarbon2000(gridTile)
+
   val primaryForest = PrimaryForest(gridTile)
   val plantationsBool = PlantationsBool(gridTile)
 
@@ -44,9 +48,13 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
-      val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val plantationsBoolTile = plantationsBool.fetchWindow(windowKey, windowLayout)
+
+      val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
+      val agc2000Tile = agc2000.fetchWindow(windowKey, windowLayout)
+      val bgc2000Tile = bgc2000.fetchWindow(windowKey, windowLayout)
+      val soilCarbon2000Tile = soilCarbon2000.fetchWindow(windowKey, windowLayout)
 
       val grossCumulAbovegroundRemovalsCo2Tile = grossCumulAbovegroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
       val grossCumulBelowgroundRemovalsCo2Tile = grossCumulBelowgroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
@@ -61,6 +69,9 @@ case class TreeLossGridSources(gridTile: GridTile) extends GridSources {
         tcd2000Tile,
         tcd2010Tile,
         biomassTile,
+        agc2000Tile,
+        bgc2000Tile,
+        soilCarbon2000Tile,
         primaryForestTile,
         plantationsBoolTile,
         grossCumulAbovegroundRemovalsCo2Tile,
