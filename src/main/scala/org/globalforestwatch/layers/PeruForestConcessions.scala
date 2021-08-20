@@ -10,6 +10,7 @@ case class PeruForestConcessions(gridTile: GridTile, kwargs: Map[String, Any])
   val uri: String =
     s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
 
+
   override val externalNoDataValue: String = ""
 
   def lookup(value: Int): String = value match {

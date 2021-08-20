@@ -11,14 +11,17 @@ import org.globalforestwatch.layers._
   * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
 case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
+  val treeCoverLoss = TreeCoverLoss(gridTile)
+  val treeCoverGain = TreeCoverGain(gridTile)
+  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
+  val treeCoverDensity2010 = TreeCoverDensityPercent2010(gridTile)
+  val biomassPerHectar = BiomassPerHectar(gridTile)
+  val agc2000 = Agc2000(gridTile)
+  val bgc2000 = Bgc2000(gridTile)
+  val soilCarbon2000 = SoilCarbon2000(gridTile)
 
-  val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
-  val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
-  val treeCoverDensity2000: TreeCoverDensityPercent2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
-  val treeCoverDensity2010: TreeCoverDensityPercent2010 = TreeCoverDensityPercent2010(gridTile, kwargs)
-  val biomassPerHectar: BiomassPerHectar = BiomassPerHectar(gridTile, kwargs)
-  val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
-  val plantationsBool: PlantationsBool = PlantationsBool(gridTile, kwargs)
+  val primaryForest = PrimaryForest(gridTile)
+  val plantationsBool = PlantationsBool(gridTile)
 
   val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile, kwargs = kwargs)
   val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile, kwargs = kwargs)
@@ -44,9 +47,13 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
-      val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val plantationsBoolTile = plantationsBool.fetchWindow(windowKey, windowLayout)
+
+      val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
+      val agc2000Tile = agc2000.fetchWindow(windowKey, windowLayout)
+      val bgc2000Tile = bgc2000.fetchWindow(windowKey, windowLayout)
+      val soilCarbon2000Tile = soilCarbon2000.fetchWindow(windowKey, windowLayout)
 
       val grossCumulAbovegroundRemovalsCo2Tile = grossCumulAbovegroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
       val grossCumulBelowgroundRemovalsCo2Tile = grossCumulBelowgroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
@@ -61,6 +68,9 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
         tcd2000Tile,
         tcd2010Tile,
         biomassTile,
+        agc2000Tile,
+        bgc2000Tile,
+        soilCarbon2000Tile,
         primaryForestTile,
         plantationsBoolTile,
         grossCumulAbovegroundRemovalsCo2Tile,

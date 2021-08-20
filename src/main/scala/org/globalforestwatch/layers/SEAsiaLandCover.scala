@@ -8,7 +8,7 @@ case class SEAsiaLandCover(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "rspo_southeast_asia_land_cover_2010"
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/land_cover_class/gdal-geotiff/${gridTile.tileId}.tif"
+    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/class/gdal-geotiff/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Unknown"
 

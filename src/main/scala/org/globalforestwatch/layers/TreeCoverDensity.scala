@@ -22,6 +22,7 @@ trait TreeCoverDensityThreshold extends IntegerLayer with RequiredILayer {
 
 case class TreeCoverDensityThreshold2000(gridTile: GridTile, kwargs: Map[String, Any])
   extends TreeCoverDensityThreshold {
+
   val datasetName = "umd_tree_cover_density_2000"
   val uri: String =
     s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
@@ -51,6 +52,7 @@ case class TreeCoverDensityPercent2000(gridTile: GridTile, kwargs: Map[String, A
     with RequiredILayer {
   val datasetName = "umd_tree_cover_density_2000"
   override val externalNoDataValue: Integer = 0
+
   val uri: String =
     s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
 }
@@ -60,6 +62,7 @@ case class TreeCoverDensityPercent2010(gridTile: GridTile, kwargs: Map[String, A
     with RequiredILayer {
   val datasetName = "umd_tree_cover_density_2010"
   override val externalNoDataValue: Integer = 0
+
   val uri: String =
-    s"$basePath/umd_tree_cover_density_2010/v1.8/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
+    s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
 }
