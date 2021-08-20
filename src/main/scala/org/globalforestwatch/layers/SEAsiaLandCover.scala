@@ -7,7 +7,7 @@ case class SEAsiaLandCover(gridTile: GridTile)
     with OptionalILayer {
 
   val uri: String =
-    s"$basePath/rspo_southeast_asia_land_cover_2010/v2013/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/land_cover_class/gdal-geotiff/${gridTile.tileId}.tif"
+    s"$basePath/rspo_southeast_asia_land_cover_2010/v2013/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/class/gdal-geotiff/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Unknown"
 

@@ -98,7 +98,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
     val adm2ApiDF = df
       .filter($"umd_tree_cover_loss__year".isNotNull &&
-        ($"umd_tree_cover_loss__ha" > 0 || $"gfw_gross_emissions_co2e_all_gases__Mg" > 0))
+        ($"umd_tree_cover_loss__ha" > 0 || $"gfw_forest_carbon_gross_emissions__Mg_CO2e" > 0))
       .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2")))
       .coalesce(133) // this should result in an avg file size of 100MB
 
@@ -194,11 +194,11 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     import spark.implicits._
 
     val idCols: List[String] = List(
-      "wdpa_protected_area__id",
-      "wdpa_protected_area__name",
-      "wdpa_protected_area__iucn_cat",
-      "wdpa_protected_area__iso",
-      "wdpa_protected_area__status"
+      "wdpa_protected_areas__id",
+      "wdpa_protected_areas__name",
+      "wdpa_protected_areas__iucn_cat",
+      "wdpa_protected_areas__iso",
+      "wdpa_protected_areas__status"
     )
 
     val changeOnly: Boolean =
@@ -208,11 +208,11 @@ object AnnualUpdateMinimalExport extends SummaryExport {
       .transform(
         AnnualUpdateMinimalDF.unpackValues(
           List(
-            $"id.wdpaId" as "wdpa_protected_area__id",
-            $"id.name" as "wdpa_protected_area__name",
-            $"id.iucnCat" as "wdpa_protected_area__iucn_cat",
-            $"id.iso" as "wdpa_protected_area__iso",
-            $"id.status" as "wdpa_protected_area__status"
+            $"id.wdpaId" as "wdpa_protected_areas__id",
+            $"id.name" as "wdpa_protected_areas__name",
+            $"id.iucnCat" as "wdpa_protected_areas__iucn_cat",
+            $"id.iso" as "wdpa_protected_areas__iso",
+            $"id.status" as "wdpa_protected_areas__status"
           ),
           wdpa = true
         )
