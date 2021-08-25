@@ -55,6 +55,7 @@ libraryDependencies ++= Seq(
   sparkCore,
   sparkSQL,
   sparkHive,
+  "org.typelevel" %% "frameless-dataset" % Version.frameless,
   hadoopAws,
   hadoopCommon,
   hadoopMapReduceClientCore,

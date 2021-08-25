@@ -2,296 +2,250 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import cats.Semigroup
 
-/** Summary data per class
+import scala.collection.immutable.SortedMap
+
+/** Summary per class
   *
   * Note: This case class contains mutable values
   */
 case class ForestChangeDiagnosticData(
-                                       treeCoverLossTcd30Yearly: ForestChangeDiagnosticDataLossYearly,
-                                       treeCoverLossTcd90Yearly: ForestChangeDiagnosticDataLossYearly,
-                                       treeCoverLossPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly,
-                                       treeCoverLossPeatLandYearly: ForestChangeDiagnosticDataLossYearly,
-                                       treeCoverLossIntactForestYearly: ForestChangeDiagnosticDataLossYearly,
-                                       treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly,
-                                       treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory,
-                                       treeCoverLossIDNLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory,
-                                       treeCoverLossSoyPlanedAreasYearly: ForestChangeDiagnosticDataLossYearly,
-                                       treeCoverLossIDNForestAreaYearly: ForestChangeDiagnosticDataLossYearlyCategory,
-                                       treeCoverLossIDNForestMoratoriumYearly: ForestChangeDiagnosticDataLossYearly,
-                                       prodesLossYearly: ForestChangeDiagnosticDataLossYearly,
-                                       prodesLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly,
-                                       prodesLossProdesPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly,
-                                       treeCoverLossBRABiomesYearly: ForestChangeDiagnosticDataLossYearlyCategory,
-                                       treeCoverExtent: ForestChangeDiagnosticDataDouble,
-                                       treeCoverExtentPrimaryForest: ForestChangeDiagnosticDataDouble,
-                                       treeCoverExtentProtectedAreas: ForestChangeDiagnosticDataDouble,
-                                       treeCoverExtentPeatlands: ForestChangeDiagnosticDataDouble,
-                                       treeCoverExtentIntactForests: ForestChangeDiagnosticDataDouble,
-                                       primaryForestArea: ForestChangeDiagnosticDataDouble,
-                                       intactForest2016Area: ForestChangeDiagnosticDataDouble,
-                                       totalArea: ForestChangeDiagnosticDataDouble,
-                                       protectedAreasArea: ForestChangeDiagnosticDataDouble,
-                                       peatlandsArea: ForestChangeDiagnosticDataDouble,
-                                       braBiomesArea: ForestChangeDiagnosticDataDoubleCategory,
-                                       idnForestAreaArea: ForestChangeDiagnosticDataDoubleCategory,
-                                       seAsiaLandCoverArea: ForestChangeDiagnosticDataDoubleCategory,
-                                       idnLandCoverArea: ForestChangeDiagnosticDataDoubleCategory,
-                                       idnForestMoratoriumArea: ForestChangeDiagnosticDataDouble,
-                                       southAmericaPresence: ForestChangeDiagnosticDataBoolean,
-                                       legalAmazonPresence: ForestChangeDiagnosticDataBoolean,
-                                       braBiomesPresence: ForestChangeDiagnosticDataBoolean,
-                                       cerradoBiomesPresence: ForestChangeDiagnosticDataBoolean,
-                                       seAsiaPresence: ForestChangeDiagnosticDataBoolean,
-                                       idnPresence: ForestChangeDiagnosticDataBoolean,
-                                       filteredTreeCoverExtent: ForestChangeDiagnosticDataDouble,
-                                       filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataValueYearly,
-                                       filteredTreeCoverLossYearly: ForestChangeDiagnosticDataLossYearly,
-                                       filteredTreeCoverLossPeatYearly: ForestChangeDiagnosticDataLossYearly,
-                                       filteredTreeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly,
-                                       plantationArea: ForestChangeDiagnosticDataDouble,
-                                       plantationOnPeatArea: ForestChangeDiagnosticDataDouble,
-                                       plantationInProtectedAreasArea: ForestChangeDiagnosticDataDouble,
-                                       forestValueIndicator: ForestChangeDiagnosticDataValueYearly,
-                                       peatValueIndicator: ForestChangeDiagnosticDataValueYearly,
-                                       protectedAreaValueIndicator: ForestChangeDiagnosticDataValueYearly,
-                                       deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly,
-                                       peatThreatIndicator: ForestChangeDiagnosticDataLossYearly,
-                                       protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly,
-                                       fireThreatIndicator: ForestChangeDiagnosticDataLossYearly
-                                     ) {
+  /** Tree Cover Loss TCD 30 */
+  tree_cover_loss_total_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_tcd90_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_primary_forest_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_peat_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_intact_forest_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_protected_areas_yearly: ForestChangeDiagnosticDataLossYearly,
+  /** Tree cover loss in south east asia */
+  tree_cover_loss_sea_landcover_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
+  tree_cover_loss_idn_landcover_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
+  /** treeCoverLossSoyPlanedAreasYearly */
+  tree_cover_loss_soy_yearly: ForestChangeDiagnosticDataLossYearly,
+  /** treeCoverLossIDNForestAreaYearly */
+  tree_cover_loss_idn_legal_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
+  tree_cover_loss_idn_forest_moratorium_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_prodes_yearly: ForestChangeDiagnosticDataLossYearly,
+  /** prodesLossProtectedAreasYearly */
+  tree_cover_loss_prodes_wdpa_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_prodes_primary_forest_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_brazil_biomes_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
+  tree_cover_extent_total: ForestChangeDiagnosticDataDouble,
+  tree_cover_extent_primary_forest: ForestChangeDiagnosticDataDouble,
+  tree_cover_extent_protected_areas: ForestChangeDiagnosticDataDouble,
+  tree_cover_extent_peat: ForestChangeDiagnosticDataDouble,
+  tree_cover_extent_intact_forest: ForestChangeDiagnosticDataDouble,
+  /** Primary Forest Area */
+  natural_habitat_primary: ForestChangeDiagnosticDataDouble,
+  /** Intact Forest 2016 Area */
+  natural_habitat_intact_forest: ForestChangeDiagnosticDataDouble,
+  total_area: ForestChangeDiagnosticDataDouble,
+  protected_areas_area: ForestChangeDiagnosticDataDouble,
+  /** Peatland Area */
+  peat_area: ForestChangeDiagnosticDataDouble,
+  brazil_biomes: ForestChangeDiagnosticDataDoubleCategory,
+  /** IDN Forest Area */
+  idn_legal_area: ForestChangeDiagnosticDataDoubleCategory,
+  /** Southeast Asia land cover area */
+  sea_landcover_area: ForestChangeDiagnosticDataDoubleCategory,
+  idn_landcover_area: ForestChangeDiagnosticDataDoubleCategory,
+  idn_forest_moratorium_area: ForestChangeDiagnosticDataDouble,
+  south_america_presence: ForestChangeDiagnosticDataBoolean,
+  legal_amazon_presence: ForestChangeDiagnosticDataBoolean,
+  brazil_biomes_presence: ForestChangeDiagnosticDataBoolean,
+  cerrado_biome_presence: ForestChangeDiagnosticDataBoolean,
+  southeast_asia_presence: ForestChangeDiagnosticDataBoolean,
+  indonesia_presence: ForestChangeDiagnosticDataBoolean,
+  filtered_tree_cover_extent: ForestChangeDiagnosticDataDouble,
+  filtered_tree_cover_extent_yearly: ForestChangeDiagnosticDataValueYearly,
+  filtered_tree_cover_loss_yearly: ForestChangeDiagnosticDataLossYearly,
+  filtered_tree_cover_loss_peat_yearly: ForestChangeDiagnosticDataLossYearly,
+  filtered_tree_cover_loss_protected_areas_yearly: ForestChangeDiagnosticDataLossYearly,
+  plantation_area: ForestChangeDiagnosticDataDouble,
+  plantation_on_peat_area: ForestChangeDiagnosticDataDouble,
+  plantation_in_protected_areas_area: ForestChangeDiagnosticDataDouble,
+  commodity_value_forest_extent: ForestChangeDiagnosticDataValueYearly,
+  commodity_value_peat: ForestChangeDiagnosticDataValueYearly,
+  commodity_value_protected_areas: ForestChangeDiagnosticDataValueYearly,
+  commodity_threat_deforestation: ForestChangeDiagnosticDataLossYearly,
+  commodity_threat_peat: ForestChangeDiagnosticDataLossYearly,
+  commodity_threat_protected_areas: ForestChangeDiagnosticDataLossYearly,
+  commodity_threat_fires: ForestChangeDiagnosticDataLossYearly
+) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
 
     ForestChangeDiagnosticData(
-      treeCoverLossTcd30Yearly.merge(other.treeCoverLossTcd30Yearly),
-      treeCoverLossTcd90Yearly.merge(other.treeCoverLossTcd90Yearly),
-      treeCoverLossPrimaryForestYearly.merge(
-        other.treeCoverLossPrimaryForestYearly
+      tree_cover_loss_total_yearly.merge(other.tree_cover_loss_total_yearly),
+      tree_cover_loss_tcd90_yearly.merge(other.tree_cover_loss_tcd90_yearly),
+      tree_cover_loss_primary_forest_yearly.merge(
+        other.tree_cover_loss_primary_forest_yearly
       ),
-      treeCoverLossPeatLandYearly.merge(other.treeCoverLossPeatLandYearly),
-      treeCoverLossIntactForestYearly.merge(
-        other.treeCoverLossIntactForestYearly
+      tree_cover_loss_peat_yearly.merge(other.tree_cover_loss_peat_yearly),
+      tree_cover_loss_intact_forest_yearly.merge(
+        other.tree_cover_loss_intact_forest_yearly
       ),
-      treeCoverLossProtectedAreasYearly.merge(
-        other.treeCoverLossProtectedAreasYearly
+      tree_cover_loss_protected_areas_yearly.merge(
+        other.tree_cover_loss_protected_areas_yearly
       ),
-      treeCoverLossSEAsiaLandCoverYearly.merge(
-        other.treeCoverLossSEAsiaLandCoverYearly
+      tree_cover_loss_sea_landcover_yearly.merge(
+        other.tree_cover_loss_sea_landcover_yearly
       ),
-      treeCoverLossIDNLandCoverYearly.merge(
-        other.treeCoverLossIDNLandCoverYearly
+      tree_cover_loss_idn_landcover_yearly.merge(
+        other.tree_cover_loss_idn_landcover_yearly
       ),
-      treeCoverLossSoyPlanedAreasYearly.merge(
-        other.treeCoverLossSoyPlanedAreasYearly
+      tree_cover_loss_soy_yearly.merge(
+        other.tree_cover_loss_soy_yearly
       ),
-      treeCoverLossIDNForestAreaYearly.merge(
-        other.treeCoverLossIDNForestAreaYearly
+      tree_cover_loss_idn_legal_yearly.merge(
+        other.tree_cover_loss_idn_legal_yearly
       ),
-      treeCoverLossIDNForestMoratoriumYearly.merge(
-        other.treeCoverLossIDNForestMoratoriumYearly
+      tree_cover_loss_idn_forest_moratorium_yearly.merge(
+        other.tree_cover_loss_idn_forest_moratorium_yearly
       ),
-      prodesLossYearly.merge(other.prodesLossYearly),
-      prodesLossProtectedAreasYearly.merge(
-        other.prodesLossProtectedAreasYearly
+      tree_cover_loss_prodes_yearly.merge(other.tree_cover_loss_prodes_yearly),
+      tree_cover_loss_prodes_wdpa_yearly.merge(
+        other.tree_cover_loss_prodes_wdpa_yearly
       ),
-      prodesLossProdesPrimaryForestYearly.merge(
-        other.prodesLossProdesPrimaryForestYearly
+      tree_cover_loss_prodes_primary_forest_yearly.merge(
+        other.tree_cover_loss_prodes_primary_forest_yearly
       ),
-      treeCoverLossBRABiomesYearly.merge(other.treeCoverLossBRABiomesYearly),
-      treeCoverExtent.merge(other.treeCoverExtent),
-      treeCoverExtentPrimaryForest.merge(other.treeCoverExtentPrimaryForest),
-      treeCoverExtentProtectedAreas.merge(other.treeCoverExtentProtectedAreas),
-      treeCoverExtentPeatlands.merge(other.treeCoverExtentPeatlands),
-      treeCoverExtentIntactForests.merge(other.treeCoverExtentIntactForests),
-      primaryForestArea.merge(other.primaryForestArea),
-      intactForest2016Area.merge(other.intactForest2016Area),
-      totalArea.merge(other.totalArea),
-      protectedAreasArea.merge(other.protectedAreasArea),
-      peatlandsArea.merge(other.peatlandsArea),
-      braBiomesArea.merge(other.braBiomesArea),
-      idnForestAreaArea.merge(other.idnForestAreaArea),
-      seAsiaLandCoverArea.merge(other.seAsiaLandCoverArea),
-      idnLandCoverArea.merge(other.idnLandCoverArea),
-      idnForestMoratoriumArea.merge(other.idnForestMoratoriumArea),
-      southAmericaPresence.merge(other.southAmericaPresence),
-      legalAmazonPresence.merge(other.legalAmazonPresence),
-      braBiomesPresence.merge(other.braBiomesPresence),
-      cerradoBiomesPresence.merge(other.cerradoBiomesPresence),
-      seAsiaPresence.merge(other.seAsiaPresence),
-      idnPresence.merge(other.idnPresence),
-      filteredTreeCoverExtent.merge(other.filteredTreeCoverExtent),
-      filteredTreeCoverExtentYearly.merge(other.filteredTreeCoverExtentYearly),
-      filteredTreeCoverLossYearly.merge(other.filteredTreeCoverLossYearly),
-      filteredTreeCoverLossPeatYearly.merge(
-        other.filteredTreeCoverLossPeatYearly
+      tree_cover_loss_brazil_biomes_yearly.merge(other.tree_cover_loss_brazil_biomes_yearly),
+      tree_cover_extent_total.merge(other.tree_cover_extent_total),
+      tree_cover_extent_primary_forest.merge(other.tree_cover_extent_primary_forest),
+      tree_cover_extent_protected_areas.merge(other.tree_cover_extent_protected_areas),
+      tree_cover_extent_peat.merge(other.tree_cover_extent_peat),
+      tree_cover_extent_intact_forest.merge(other.tree_cover_extent_intact_forest),
+      natural_habitat_primary.merge(other.natural_habitat_primary),
+      natural_habitat_intact_forest.merge(other.natural_habitat_intact_forest),
+      total_area.merge(other.total_area),
+      protected_areas_area.merge(other.protected_areas_area),
+      peat_area.merge(other.peat_area),
+      brazil_biomes.merge(other.brazil_biomes),
+      idn_legal_area.merge(other.idn_legal_area),
+      sea_landcover_area.merge(other.sea_landcover_area),
+      idn_landcover_area.merge(other.idn_landcover_area),
+      idn_forest_moratorium_area.merge(other.idn_forest_moratorium_area),
+      south_america_presence.merge(other.south_america_presence),
+      legal_amazon_presence.merge(other.legal_amazon_presence),
+      brazil_biomes_presence.merge(other.brazil_biomes_presence),
+      cerrado_biome_presence.merge(other.cerrado_biome_presence),
+      southeast_asia_presence.merge(other.southeast_asia_presence),
+      indonesia_presence.merge(other.indonesia_presence),
+      filtered_tree_cover_extent.merge(other.filtered_tree_cover_extent),
+      filtered_tree_cover_extent_yearly.merge(other.filtered_tree_cover_extent_yearly),
+      filtered_tree_cover_loss_yearly.merge(other.filtered_tree_cover_loss_yearly),
+      filtered_tree_cover_loss_peat_yearly.merge(
+        other.filtered_tree_cover_loss_peat_yearly
       ),
-      filteredTreeCoverLossProtectedAreasYearly.merge(
-        other.filteredTreeCoverLossProtectedAreasYearly
+      filtered_tree_cover_loss_protected_areas_yearly.merge(
+        other.filtered_tree_cover_loss_protected_areas_yearly
       ),
-      plantationArea.merge(other.plantationArea),
-      plantationOnPeatArea.merge(other.plantationOnPeatArea),
-      plantationInProtectedAreasArea.merge(
-        other.plantationInProtectedAreasArea
+      plantation_area.merge(other.plantation_area),
+      plantation_on_peat_area.merge(other.plantation_on_peat_area),
+      plantation_in_protected_areas_area.merge(
+        other.plantation_in_protected_areas_area
       ),
-      forestValueIndicator.merge(other.forestValueIndicator),
-      peatValueIndicator.merge(other.peatValueIndicator),
-      protectedAreaValueIndicator.merge(other.protectedAreaValueIndicator),
-      deforestationThreatIndicator.merge(other.deforestationThreatIndicator),
-      peatThreatIndicator.merge(other.peatThreatIndicator),
-      protectedAreaThreatIndicator.merge(other.protectedAreaThreatIndicator),
-      fireThreatIndicator.merge(other.fireThreatIndicator)
+      commodity_value_forest_extent.merge(other.commodity_value_forest_extent),
+      commodity_value_peat.merge(other.commodity_value_peat),
+      commodity_value_protected_areas.merge(other.commodity_value_protected_areas),
+      commodity_threat_deforestation.merge(other.commodity_threat_deforestation),
+      commodity_threat_peat.merge(other.commodity_threat_peat),
+      commodity_threat_protected_areas.merge(other.commodity_threat_protected_areas),
+      commodity_threat_fires.merge(other.commodity_threat_fires)
     )
   }
 
-  def update(
-              treeCoverLossTcd30Yearly: ForestChangeDiagnosticDataLossYearly =
-              this.treeCoverLossTcd30Yearly,
-              treeCoverLossTcd90Yearly: ForestChangeDiagnosticDataLossYearly =
-              this.treeCoverLossTcd90Yearly,
-              treeCoverLossPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly =
-              this.treeCoverLossPrimaryForestYearly,
-              treeCoverLossPeatLandYearly: ForestChangeDiagnosticDataLossYearly =
-              this.treeCoverLossPeatLandYearly,
-              treeCoverLossIntactForestYearly: ForestChangeDiagnosticDataLossYearly =
-              this.treeCoverLossProtectedAreasYearly,
-              treeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly =
-              this.treeCoverLossProtectedAreasYearly,
-              treeCoverLossSEAsiaLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory =
-              this.treeCoverLossSEAsiaLandCoverYearly,
-              treeCoverLossIDNLandCoverYearly: ForestChangeDiagnosticDataLossYearlyCategory =
-              this.treeCoverLossIDNLandCoverYearly,
-              treeCoverLossSoyPlanedAreasYearly: ForestChangeDiagnosticDataLossYearly =
-              this.treeCoverLossSoyPlanedAreasYearly,
-              treeCoverLossIDNForestAreaYearly: ForestChangeDiagnosticDataLossYearlyCategory =
-              this.treeCoverLossIDNForestAreaYearly,
-              treeCoverLossIDNForestMoratoriumYearly: ForestChangeDiagnosticDataLossYearly =
-              this.treeCoverLossIDNForestMoratoriumYearly,
-              prodesLossYearly: ForestChangeDiagnosticDataLossYearly =
-              this.prodesLossYearly,
-              prodesLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly =
-              this.prodesLossProtectedAreasYearly,
-              prodesLossProdesPrimaryForestYearly: ForestChangeDiagnosticDataLossYearly =
-              this.prodesLossProdesPrimaryForestYearly,
-              treeCoverLossBRABiomesYearly: ForestChangeDiagnosticDataLossYearlyCategory =
-              this.treeCoverLossBRABiomesYearly,
-              treeCoverExtent: ForestChangeDiagnosticDataDouble = this.treeCoverExtent,
-              treeCoverExtentPrimaryForest: ForestChangeDiagnosticDataDouble =
-              this.treeCoverExtentPrimaryForest,
-              treeCoverExtentProtectedAreas: ForestChangeDiagnosticDataDouble =
-              this.treeCoverExtentProtectedAreas,
-              treeCoverExtentPeatlands: ForestChangeDiagnosticDataDouble =
-              this.treeCoverExtentPeatlands,
-              treeCoverExtentIntactForests: ForestChangeDiagnosticDataDouble =
-              this.treeCoverExtentIntactForests,
-              primaryForestArea: ForestChangeDiagnosticDataDouble = this.primaryForestArea,
-              intactForest2016Area: ForestChangeDiagnosticDataDouble =
-              this.intactForest2016Area,
-              totalArea: ForestChangeDiagnosticDataDouble = this.totalArea,
-              protectedAreasArea: ForestChangeDiagnosticDataDouble =
-              this.protectedAreasArea,
-              peatlandsArea: ForestChangeDiagnosticDataDouble = this.peatlandsArea,
-              braBiomesArea: ForestChangeDiagnosticDataDoubleCategory = this.braBiomesArea,
-              idnForestAreaArea: ForestChangeDiagnosticDataDoubleCategory =
-              this.idnForestAreaArea,
-              seAsiaLandCoverArea: ForestChangeDiagnosticDataDoubleCategory =
-              this.seAsiaLandCoverArea,
-              idnLandCoverArea: ForestChangeDiagnosticDataDoubleCategory =
-              this.idnLandCoverArea,
-              idnForestMoratoriumArea: ForestChangeDiagnosticDataDouble =
-              this.idnForestMoratoriumArea,
-              southAmericaPresence: ForestChangeDiagnosticDataBoolean =
-              this.southAmericaPresence,
-              legalAmazonPresence: ForestChangeDiagnosticDataBoolean =
-              this.legalAmazonPresence,
-              braBiomesPresence: ForestChangeDiagnosticDataBoolean =
-              this.braBiomesPresence,
-              cerradoBiomesPresence: ForestChangeDiagnosticDataBoolean =
-              this.cerradoBiomesPresence,
-              seAsiaPresence: ForestChangeDiagnosticDataBoolean = this.seAsiaPresence,
-              idnPresence: ForestChangeDiagnosticDataBoolean = this.idnPresence,
-              filteredTreeCoverExtent: ForestChangeDiagnosticDataDouble = this.filteredTreeCoverExtent,
-              filteredTreeCoverExtentYearly: ForestChangeDiagnosticDataValueYearly =
-              this.filteredTreeCoverExtentYearly,
-              filteredTreeCoverLossYearly: ForestChangeDiagnosticDataLossYearly =
-              this.filteredTreeCoverLossYearly,
-              filteredTreeCoverLossPeatYearly: ForestChangeDiagnosticDataLossYearly =
-              this.filteredTreeCoverLossPeatYearly,
-              filteredTreeCoverLossProtectedAreasYearly: ForestChangeDiagnosticDataLossYearly =
-              this.filteredTreeCoverLossProtectedAreasYearly,
-              plantationArea: ForestChangeDiagnosticDataDouble = this.plantationArea,
-              plantationOnPeatArea: ForestChangeDiagnosticDataDouble =
-              this.plantationOnPeatArea,
-              plantationInProtectedAreasArea: ForestChangeDiagnosticDataDouble =
-              this.plantationInProtectedAreasArea,
-              forestValueIndicator: ForestChangeDiagnosticDataValueYearly =
-              this.forestValueIndicator,
-              peatValueIndicator: ForestChangeDiagnosticDataValueYearly =
-              this.peatValueIndicator,
-              protectedAreaValueIndicator: ForestChangeDiagnosticDataValueYearly =
-              this.protectedAreaValueIndicator,
-              deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly =
-              this.deforestationThreatIndicator,
-              peatThreatIndicator: ForestChangeDiagnosticDataLossYearly =
-              this.peatThreatIndicator,
-              protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly =
-              this.protectedAreaThreatIndicator,
-              fireThreatIndicator: ForestChangeDiagnosticDataLossYearly =
-              this.fireThreatIndicator
-            ): ForestChangeDiagnosticData = {
+  def withUpdatedCommodityRisk(): ForestChangeDiagnosticData = {
+    val minLossYear =
+      ForestChangeDiagnosticDataLossYearly.prefilled.value.keysIterator.min
 
-    ForestChangeDiagnosticData(
-      treeCoverLossTcd30Yearly,
-      treeCoverLossTcd90Yearly,
-      treeCoverLossPrimaryForestYearly,
-      treeCoverLossPeatLandYearly,
-      treeCoverLossIntactForestYearly,
-      treeCoverLossProtectedAreasYearly,
-      treeCoverLossSEAsiaLandCoverYearly,
-      treeCoverLossIDNLandCoverYearly,
-      treeCoverLossSoyPlanedAreasYearly,
-      treeCoverLossIDNForestAreaYearly,
-      treeCoverLossIDNForestMoratoriumYearly,
-      prodesLossYearly,
-      prodesLossProtectedAreasYearly,
-      prodesLossProdesPrimaryForestYearly,
-      treeCoverLossBRABiomesYearly,
-      treeCoverExtent,
-      treeCoverExtentPrimaryForest,
-      treeCoverExtentProtectedAreas,
-      treeCoverExtentPeatlands,
-      treeCoverExtentIntactForests,
-      primaryForestArea,
-      intactForest2016Area,
-      totalArea,
-      protectedAreasArea,
-      peatlandsArea,
-      braBiomesArea,
-      idnForestAreaArea,
-      seAsiaLandCoverArea,
-      idnLandCoverArea,
-      idnForestMoratoriumArea,
-      southAmericaPresence,
-      legalAmazonPresence,
-      braBiomesPresence,
-      cerradoBiomesPresence,
-      seAsiaPresence,
-      idnPresence,
-      filteredTreeCoverExtent,
-      filteredTreeCoverExtentYearly,
-      filteredTreeCoverLossYearly,
-      filteredTreeCoverLossPeatYearly,
-      filteredTreeCoverLossProtectedAreasYearly,
-      plantationArea,
-      plantationOnPeatArea,
-      plantationInProtectedAreasArea,
-      forestValueIndicator,
-      peatValueIndicator,
-      protectedAreaValueIndicator,
-      deforestationThreatIndicator,
-      peatThreatIndicator,
-      protectedAreaThreatIndicator,
-      fireThreatIndicator
-    )
+    val maxLossYear =
+      ForestChangeDiagnosticDataLossYearly.prefilled.value.keysIterator.max
+
+    val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
+
+    val forestValueIndicator: ForestChangeDiagnosticDataValueYearly =
+      ForestChangeDiagnosticDataValueYearly.fill(
+        filtered_tree_cover_extent.value,
+        filtered_tree_cover_loss_yearly.value,
+        2
+      )
+    val peatValueIndicator: ForestChangeDiagnosticDataValueYearly =
+      ForestChangeDiagnosticDataValueYearly.fill(peat_area.value)
+    val protectedAreaValueIndicator: ForestChangeDiagnosticDataValueYearly =
+      ForestChangeDiagnosticDataValueYearly.fill(protected_areas_area.value)
+    val deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly =
+      ForestChangeDiagnosticDataLossYearly(
+        SortedMap(
+          years.map(
+            year =>
+              (year, {
+                // Somehow the compiler cannot infer the types correctly
+                // I hence declare them here explicitly to help him out.
+                val thisYearLoss: Double =
+                filtered_tree_cover_loss_yearly.value
+                  .getOrElse(year, 0)
+
+                val lastYearLoss: Double =
+                  filtered_tree_cover_loss_yearly.value
+                    .getOrElse(year - 1, 0)
+
+                thisYearLoss + lastYearLoss
+              })
+          ): _*
+        )
+      )
+    val peatThreatIndicator: ForestChangeDiagnosticDataLossYearly =
+      ForestChangeDiagnosticDataLossYearly(
+        SortedMap(
+          years.map(
+            year =>
+              (year, {
+                // Somehow the compiler cannot infer the types correctly
+                // I hence declare them here explicitly to help him out.
+                val thisYearPeatLoss: Double =
+                filtered_tree_cover_loss_peat_yearly.value
+                  .getOrElse(year, 0)
+
+                val lastYearPeatLoss: Double =
+                  filtered_tree_cover_loss_peat_yearly.value
+                    .getOrElse(year - 1, 0)
+
+                thisYearPeatLoss + lastYearPeatLoss + plantation_on_peat_area.value
+
+              })
+          ): _*
+        )
+      )
+    val protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly =
+      ForestChangeDiagnosticDataLossYearly(
+        SortedMap(
+          years.map(
+            year =>
+              (year, {
+                // Somehow the compiler cannot infer the types correctly
+                // I hence declare them here explicitly to help him out.
+                val thisYearProtectedAreaLoss: Double =
+                filtered_tree_cover_loss_protected_areas_yearly.value
+                  .getOrElse(year, 0)
+
+                val lastYearProtectedAreaLoss: Double =
+                  filtered_tree_cover_loss_protected_areas_yearly.value
+                    .getOrElse(year - 1, 0)
+
+                thisYearProtectedAreaLoss + lastYearProtectedAreaLoss + plantation_in_protected_areas_area.value
+              })
+          ): _*
+        )
+      )
+
+    copy(
+      commodity_value_forest_extent = forestValueIndicator,
+      commodity_value_peat = peatValueIndicator,
+      commodity_value_protected_areas = commodity_value_protected_areas,
+      commodity_threat_deforestation = deforestationThreatIndicator,
+      commodity_threat_peat = peatThreatIndicator,
+      commodity_threat_protected_areas = protectedAreaThreatIndicator)
   }
 
 }
@@ -359,5 +313,4 @@ object ForestChangeDiagnosticData {
                   y: ForestChangeDiagnosticData): ForestChangeDiagnosticData =
         x.merge(y)
     }
-
 }

@@ -1,4 +1,5 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
+import frameless.{Injection, TypedEncoder}
 import org.globalforestwatch.util.Implicits._
 import io.circe.syntax._
 
@@ -24,5 +25,8 @@ object ForestChangeDiagnosticDataDouble {
            include: Boolean = true): ForestChangeDiagnosticDataDouble = {
     ForestChangeDiagnosticDataDouble(value * include)
   }
+
+  implicit def injection: Injection[ForestChangeDiagnosticDataDouble, String] =
+    Injection(_.toJson, s => ForestChangeDiagnosticDataDouble(s.toDouble))
 
 }
