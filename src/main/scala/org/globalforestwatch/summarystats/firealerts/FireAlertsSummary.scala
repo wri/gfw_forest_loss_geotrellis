@@ -17,6 +17,7 @@ case class FireAlertsSummary(stats: Map[FireAlertsDataGroup, FireAlertsData] =
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     FireAlertsSummary(stats.combine(other.stats))
   }
+  def isEmpty = stats.isEmpty
 }
 
 object FireAlertsSummary {

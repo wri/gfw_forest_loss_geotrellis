@@ -27,6 +27,7 @@ case class ForestChangeDiagnosticSummary(
       .map { case (group, data) => group.toForestChangeDiagnosticData(data.totalArea) }
       .foldLeft(ForestChangeDiagnosticData.empty)( _ merge _)
   }
+  def isEmpty = stats.isEmpty
 }
 
 object ForestChangeDiagnosticSummary {

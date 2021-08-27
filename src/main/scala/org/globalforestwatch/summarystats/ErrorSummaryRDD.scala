@@ -15,6 +15,7 @@ import org.globalforestwatch.grids.GridSources
 import scala.reflect.ClassTag
 import cats.kernel.Semigroup
 import cats.data.Validated.{Valid, Invalid}
+import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticSummary
 
 
 trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
@@ -152,9 +153,14 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
         .reduceByKey(Semigroup.combine)
         .mapValues{
           // If there was no intersection for any partial results, we consider this an invalid geometry
-          case Valid(NoIntersection) => Invalid(NoIntersectionError)
-          case Valid(GTSummary(result)) => Valid(result)
-          case r@Invalid(_) => r
+          case Valid(NoIntersection) =>
+            Invalid(NoIntersectionError)
+          case Valid(GTSummary(result)) if result.isEmpty =>
+            Invalid(NoIntersectionError)
+          case Valid(GTSummary(result)) =>
+            Valid(result)
+          case r@Invalid(_) =>
+            r
         }
 
     featuresGroupedWithSummaries
