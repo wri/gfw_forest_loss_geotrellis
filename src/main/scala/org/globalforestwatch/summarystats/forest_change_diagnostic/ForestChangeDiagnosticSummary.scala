@@ -25,7 +25,7 @@ case class ForestChangeDiagnosticSummary(
   def toForestChangeDiagnosticData(): ForestChangeDiagnosticData = {
     stats
       .map { case (group, data) => group.toForestChangeDiagnosticData(data.totalArea) }
-      .reduce( _ merge _)
+      .foldLeft(ForestChangeDiagnosticData.empty)( _ merge _)
   }
 }
 
