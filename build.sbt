@@ -86,6 +86,14 @@ libraryDependencies ++= Seq(
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
 
+assembly / assemblyShadeRules := {
+  val shadePackage = "org.globalforestwatch.shaded"
+  Seq(
+    ShadeRule.rename("shapeless.**" -> s"$shadePackage.shapeless.@1").inAll,
+    ShadeRule.rename("cats.kernel.**" -> s"$shadePackage.cats.kernel.@1").inAll
+  )
+}
+
 // auto imports for local SBT console
 // can be used with `test:console` command
 initialCommands in console :=
