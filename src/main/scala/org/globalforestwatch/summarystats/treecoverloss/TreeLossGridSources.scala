@@ -11,17 +11,17 @@ import org.globalforestwatch.layers._
   * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
 case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
-  val treeCoverLoss = TreeCoverLoss(gridTile)
-  val treeCoverGain = TreeCoverGain(gridTile)
-  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile)
-  val treeCoverDensity2010 = TreeCoverDensityPercent2010(gridTile)
-  val biomassPerHectar = BiomassPerHectar(gridTile)
-  val agc2000 = Agc2000(gridTile)
-  val bgc2000 = Bgc2000(gridTile)
-  val soilCarbon2000 = SoilCarbon2000(gridTile)
+  val treeCoverLoss = TreeCoverLoss(gridTile, kwargs)
+  val treeCoverGain = TreeCoverGain(gridTile, kwargs)
+  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
+  val treeCoverDensity2010 = TreeCoverDensityPercent2010(gridTile, kwargs)
+  val biomassPerHectar = BiomassPerHectar(gridTile, kwargs)
+  val agc2000 = Agc2000(gridTile, kwargs = kwargs)
+  val bgc2000 = Bgc2000(gridTile, kwargs = kwargs)
+  val soilCarbon2000 = SoilCarbon2000(gridTile, kwargs = kwargs)
 
-  val primaryForest = PrimaryForest(gridTile)
-  val plantationsBool = PlantationsBool(gridTile)
+  val primaryForest = PrimaryForest(gridTile, kwargs)
+  val plantationsBool = PlantationsBool(gridTile, kwargs)
 
   val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile, kwargs = kwargs)
   val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile, kwargs = kwargs)

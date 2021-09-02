@@ -437,7 +437,7 @@ trait DateConfLayer extends ILayer {
 
     val confidence = value match {
       case value if (value >= 30000) => "high"
-      case value if (value >= 20000) => "low"
+      case value if (value >= 20000) => "nominal"
       case _ => "not_detected"
     }
 
@@ -457,7 +457,7 @@ trait DateConfLayer extends ILayer {
       val julianDate = DateTimeFormatter.ofPattern("yyyyDDD")
       val days: Int = confidence match {
         case "high" => value - 30000
-        case "low" => value - 20000
+        case "nominal" => value - 20000
         case "not_detected" => -1
       }
 
