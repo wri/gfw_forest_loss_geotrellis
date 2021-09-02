@@ -28,68 +28,7 @@ object IntegratedAlertsExport extends SummaryExport {
     exportChange(gadmDF, outputUrl)
     gadmDF.unpersist()
   }
-
-  private def exportSummary(df: DataFrame, outputUrl: String): Unit = {
-
-    val adm2DF = df
-      .transform(IntegratedAlertsDF.aggSummary(List("iso", "adm1", "adm2")))
-
-    adm2DF
-      .coalesce(10)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/adm2/summary")
-
-    val adm1DF = adm2DF
-      .transform(IntegratedAlertsDF.aggSummary(List("iso", "adm1")))
-
-    adm1DF
-      .coalesce(10)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/adm1/summary")
-
-    val isoDF = adm1DF
-      .transform(IntegratedAlertsDF.aggSummary(List("iso")))
-
-    isoDF
-      .coalesce(10)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/iso/summary")
-
-  }
-
-  private def exportWhitelist(df: DataFrame, outputUrl: String): Unit = {
-    val adm2DF = df
-      .transform(IntegratedAlertsDF.whitelist(List("iso", "adm1", "adm2")))
-
-    adm2DF
-      .coalesce(1)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/adm2/whitelist")
-
-    val adm1DF = adm2DF
-      .transform(IntegratedAlertsDF.whitelist2(List("iso", "adm1")))
-
-    adm1DF
-      .coalesce(1)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/adm1/whitelist")
-
-    val isoDF = adm1DF
-      .transform(IntegratedAlertsDF.whitelist2(List("iso")))
-
-    isoDF
-      .coalesce(1)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/iso/whitelist")
-
-  }
-
+  
   private def exportChange(df: DataFrame, outputUrl: String): Unit = {
 
     val adm2DF = df
@@ -128,18 +67,18 @@ object IntegratedAlertsExport extends SummaryExport {
     import spark.implicits._
 
     val groupByCols = List(
-      "wdpa_protected_areas__id",
-      "wdpa_protected_areas__name",
-      "wdpa_protected_areas__iucn_cat",
-      "wdpa_protected_areas__iso",
-      "wdpa_protected_areas__status"
+      "wdpa_protected_area__id",
+      "wdpa_protected_area__name",
+      "wdpa_protected_area__iucn_cat",
+      "wdpa_protected_area__iso",
+      "wdpa_protected_area__status"
     )
     val unpackCols = List(
-      $"id.wdpaId" as "wdpa_protected_areas__id",
-      $"id.name" as "wdpa_protected_areas__name",
-      $"id.iucnCat" as "wdpa_protected_areas__iucn_cat",
-      $"id.iso" as "wdpa_protected_areas__iso",
-      $"id.status" as "wdpa_protected_areas__status"
+      $"id.wdpaId" as "wdpa_protected_area__id",
+      $"id.name" as "wdpa_protected_area__name",
+      $"id.iucnCat" as "wdpa_protected_area__iucn_cat",
+      $"id.iso" as "wdpa_protected_area__iso",
+      $"id.status" as "wdpa_protected_area__status"
     )
 
     _export(summaryDF, outputUrl + "/wdpa", kwargs, groupByCols, unpackCols, wdpa = true, numExportParts = 50)
