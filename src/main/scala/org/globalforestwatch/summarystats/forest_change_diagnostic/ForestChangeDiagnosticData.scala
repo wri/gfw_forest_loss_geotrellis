@@ -3,6 +3,7 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 import cats.Semigroup
 
 import scala.collection.immutable.SortedMap
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 
 /** Summary per class
   *
@@ -313,4 +314,8 @@ object ForestChangeDiagnosticData {
                   y: ForestChangeDiagnosticData): ForestChangeDiagnosticData =
         x.merge(y)
     }
+
+  implicit def dataExpressionEncoder: ExpressionEncoder[ForestChangeDiagnosticData] =
+    frameless.TypedExpressionEncoder[ForestChangeDiagnosticData]
+      .asInstanceOf[ExpressionEncoder[ForestChangeDiagnosticData]]
 }

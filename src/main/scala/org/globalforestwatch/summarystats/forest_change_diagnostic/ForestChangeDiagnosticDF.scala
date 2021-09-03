@@ -7,8 +7,9 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{CombinedFeatureId, FeatureDF, FeatureId, GadmFeatureId, GfwProFeature, GfwProFeatureId, GridId, WdpaFeatureId}
 import org.globalforestwatch.summarystats.{JobError, ValidatedRow}
 import org.globalforestwatch.util.Util.{colsFor, fieldsFromCol}
+import org.globalforestwatch.summarystats.FramelessEncoders
 
-object ForestChangeDiagnosticDF {
+object ForestChangeDiagnosticDF extends FramelessEncoders {
   def getFeatureDataFrame(
     dataRDD: RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticData])],
     spark: SparkSession
