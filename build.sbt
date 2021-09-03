@@ -128,7 +128,7 @@ import org.globalforestwatch.util._
 """
 
 // settings for local testing
-console / fork := true
+Compile / console / fork := true
 Test / fork := true
 Test / parallelExecution := false
 Test / testOptions += Tests.Argument("-oD")
