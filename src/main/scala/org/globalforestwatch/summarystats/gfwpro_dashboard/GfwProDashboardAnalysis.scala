@@ -45,19 +45,22 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
       GfwProDashboardAnalysis.fireStats(enrichedRDD, spark, kwargs)
 
     val dataRDD: RDD[(FeatureId, GfwProDashboardData)] =
-      formatGfwProDashboardData(summaryRDD)
-        .reduceByKey(_ merge _)
+      summaryRDD.flatMap { case (featureId, summary) =>
+        // We need to convert the Map to a List in order to correctly flatmap the data
+        summary.stats.toList.map {
+          case (dataGroup, data) => (featureId, dataGroup.toGfwProDashboardData(data.alertCount, data.totalArea))
+        }
+      }.reduceByKey(_ merge _)
         .leftOuterJoin(fireCountRDD)
         .mapValues {
           case (data, fire) =>
-            data.update(
-              viirsAlertsDaily =
+            data.copy(
+              viirs_alerts_daily =
                 fire.getOrElse(GfwProDashboardDataDateCount.empty)
             )
         }
 
-    val summaryDF =
-      GfwProDashboardDFFactory(featureType, dataRDD, spark, kwargs).getDataFrame
+    val summaryDF = GfwProDashboardDF.getFeatureDataFrame(dataRDD, spark)
 
     val runOutputUrl: String = getOutputUrl(kwargs)
 
@@ -201,9 +204,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     })
   }
 
-  private def formatGfwProDashboardData(
-                                         summaryRDD: RDD[(FeatureId, GfwProDashboardSummary)]
-                                       ): RDD[(FeatureId, GfwProDashboardData)] = {
+  private def formatGfwProDashboardData(summaryRDD: RDD[(FeatureId, GfwProDashboardSummary)]): RDD[(FeatureId, GfwProDashboardData)] = {
 
     summaryRDD
       .flatMap {
@@ -211,31 +212,8 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           // We need to convert the Map to a List in order to correctly flatmap the data
           summary.stats.toList.map {
             case (dataGroup, data) =>
-              toGfwProDashboardData(featureId, dataGroup, data)
-
+              (featureId, dataGroup.toGfwProDashboardData(data.alertCount, data.totalArea))
           }
       }
-  }
-
-  private def toGfwProDashboardData(
-                                     featureId: FeatureId,
-                                     dataGroup: GfwProDashboardRawDataGroup,
-                                     data: GfwProDashboardRawData
-                                   ): (FeatureId, GfwProDashboardData) = {
-
-    (
-      featureId,
-      GfwProDashboardData(
-        dataGroup.alertCoverage,
-        gladAlertsDaily = GfwProDashboardDataDateCount
-          .fill(dataGroup.alertDate, data.alertCount),
-        gladAlertsWeekly = GfwProDashboardDataDateCount
-          .fill(dataGroup.alertDate, data.alertCount, weekly = true),
-        gladAlertsMonthly = GfwProDashboardDataDateCount
-          .fill(dataGroup.alertDate, data.alertCount, monthly = true),
-        viirsAlertsDaily = GfwProDashboardDataDateCount.empty
-      )
-    )
-
   }
 }

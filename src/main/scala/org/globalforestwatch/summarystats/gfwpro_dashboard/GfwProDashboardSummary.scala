@@ -41,7 +41,7 @@ object GfwProDashboardSummary {
           raster.tile.gladAlerts.getCoverage(col, row)
         raster.tile.gladAlerts.getData(col, row)
         val gladAlerts: Option[(String, Boolean)] =
-          raster.tile.gladAlerts.getData(col, row)
+          raster.tile.gladAlerts.getData(col, row) // (date, confidence)
 
         val alertDate: Option[String] = {
           gladAlerts match {
@@ -50,18 +50,23 @@ object GfwProDashboardSummary {
           }
         }
 
-        val groupKey =
-          GfwProDashboardRawDataGroup(gladAlertsCoverage, alertDate)
+        val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
+        val isTreeCoverExtent30: Boolean = tcd2000 > 30
+
+        val groupKey = GfwProDashboardRawDataGroup(gladAlertsCoverage, alertDate, isTreeCoverExtent30)
 
         val summaryData: GfwProDashboardRawData =
-          acc.stats
-            .getOrElse(key = groupKey, default = GfwProDashboardRawData(0))
+          acc.stats.getOrElse(key = groupKey, default = GfwProDashboardRawData(0.0, 0))
 
-        if (alertDate.isDefined) summaryData.alertCount += 1
+        if (alertDate.isDefined) {
+          // pixel Area
+          val areaHa = Geodesy.pixelArea(lat = raster.rasterExtent.gridRowToMap(row), raster.cellSize) / 10000.0
+          summaryData.alertCount += 1
+          summaryData.totalArea += areaHa
+        }
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
         acc = GfwProDashboardSummary(new_stats)
-
       }
 
     }
