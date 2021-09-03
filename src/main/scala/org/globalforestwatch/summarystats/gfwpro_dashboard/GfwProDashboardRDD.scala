@@ -6,9 +6,9 @@ import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.raster.summary.polygonal._
 import geotrellis.vector._
-import org.globalforestwatch.summarystats.SummaryRDD
+import org.globalforestwatch.summarystats.ErrorSummaryRDD
 
-object GfwProDashboardRDD extends SummaryRDD {
+object GfwProDashboardRDD extends ErrorSummaryRDD {
 
   type SOURCES = GfwProDashboardGridSources
   type SUMMARY = GfwProDashboardSummary

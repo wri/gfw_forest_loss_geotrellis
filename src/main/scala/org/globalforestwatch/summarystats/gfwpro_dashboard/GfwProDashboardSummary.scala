@@ -18,6 +18,12 @@ case class GfwProDashboardSummary(
     GfwProDashboardSummary(stats.combine(other.stats))
   }
   def isEmpty = stats.isEmpty
+
+  def toGfwProDashboardData(): GfwProDashboardData = {
+    stats
+      .map { case (group, data) => group.toGfwProDashboardData(data.alertCount, data.totalArea) }
+      .foldLeft(GfwProDashboardData.empty)( _ merge _)
+  }
 }
 
 object GfwProDashboardSummary {
