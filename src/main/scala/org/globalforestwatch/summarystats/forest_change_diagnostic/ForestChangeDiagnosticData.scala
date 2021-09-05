@@ -242,7 +242,7 @@ case class ForestChangeDiagnosticData(
     copy(
       commodity_value_forest_extent = forestValueIndicator,
       commodity_value_peat = peatValueIndicator,
-      commodity_value_protected_areas = commodity_value_protected_areas,
+      commodity_value_protected_areas = protectedAreaValueIndicator,
       commodity_threat_deforestation = deforestationThreatIndicator,
       commodity_threat_peat = peatThreatIndicator,
       commodity_threat_protected_areas = protectedAreaThreatIndicator)
