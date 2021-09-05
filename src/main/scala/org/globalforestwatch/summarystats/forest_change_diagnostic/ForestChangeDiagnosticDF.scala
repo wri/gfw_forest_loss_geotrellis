@@ -1,0 +1,160 @@
+package org.globalforestwatch.summarystats.forest_change_diagnostic
+
+import cats.data.NonEmptyList
+import cats.data.Validated.{Invalid, Valid}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.globalforestwatch.features.{CombinedFeatureId, FeatureDF, FeatureId, GadmFeatureId, GfwProFeature, GfwProFeatureId, GridId, WdpaFeatureId}
+import org.globalforestwatch.summarystats.{JobError, ValidatedRow}
+import org.globalforestwatch.util.Util.{colsFor, fieldsFromCol}
+
+object ForestChangeDiagnosticDF {
+  def getFeatureDataFrame(
+    dataRDD: RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticData])],
+    spark: SparkSession
+  ): DataFrame = {
+    import spark.implicits._
+
+    dataRDD.mapValues {
+      case Valid(data) =>
+        (RowError.empty, data)
+      case Invalid(err) =>
+        (RowError.fromJobError(err), ForestChangeDiagnosticData.empty)
+    }.map {
+      case (id, (error, data)) =>
+        val rowId = id match {
+          case gfwproId: GfwProFeatureId =>
+            RowId(gfwproId.listId, gfwproId.locationId.toString)
+
+          case gadmId: GadmFeatureId =>
+            RowId("GADM 3.6", gadmId.toString)
+
+          case wdpaId: WdpaFeatureId =>
+            RowId("WDPA", wdpaId.toString)
+
+          case id =>
+            throw new IllegalArgumentException(s"Can't produce DataFrame for $id")
+        }
+        (rowId, error, data)
+    }
+      .toDF("id", "error", "data")
+      .select($"id.*" :: $"error.*" :: fieldsFromCol($"data", featureFields): _*)
+  }
+
+  def getGridFeatureDataFrame(
+    dataRDD: RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticData])],
+    spark: SparkSession
+  ): DataFrame = {
+    import spark.implicits._
+
+    dataRDD.mapValues {
+      case Valid(data) =>
+        (RowError.empty, data)
+      case Invalid(err) =>
+        (RowError.fromJobError(err), ForestChangeDiagnosticData.empty)
+    }.map {
+      case (CombinedFeatureId(gfwproId: GfwProFeatureId, gridId: GridId), (error, data)) =>
+        (RowGridId(gfwproId, gridId), error, data)
+      case _ =>
+        throw new IllegalArgumentException("Not a CombinedFeatureId")
+    }
+      .toDF("id", "error", "data")
+      .select($"id.*" :: $"error.*" :: fieldsFromCol($"data", featureFields) ::: fieldsFromCol($"data", gridFields): _*)
+  }
+
+  def readIntermidateRDD(
+    sources: NonEmptyList[String],
+    spark: SparkSession,
+  ): RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticData])] = {
+    val df = FeatureDF(sources, GfwProFeature, Map.empty, spark)
+    val ds = df.select(
+      colsFor[RowGridId].as[RowGridId],
+      colsFor[RowError].as[RowError],
+      colsFor[ForestChangeDiagnosticData].as[ForestChangeDiagnosticData])
+
+    ds.rdd.map { case (id, error, data) =>
+      if (error.status_code == 2) (id.toFeatureID, Valid(data))
+      else (id.toFeatureID, Invalid(JobError.fromErrorColumn(error.location_error).get))
+    }
+  }
+  case class RowId(list_id: String, location_id: String)
+
+  case class RowGridId(list_id: String, location_id: Int, x: Double, y: Double, grid: String) {
+    def toFeatureID = CombinedFeatureId(GfwProFeatureId(list_id, location_id , x, y), GridId(grid))
+  }
+  object RowGridId {
+    def apply(gfwProId: GfwProFeatureId, gridId: GridId): RowGridId = RowGridId (
+      list_id = gfwProId.listId,
+      location_id = gfwProId.locationId,
+      x = gfwProId.x,
+      y = gfwProId.y,
+      grid = gridId.gridId)
+  }
+
+  case class RowError(status_code: Int, location_error: String)
+  object RowError {
+    val empty: RowError = RowError(status_code = 2, location_error = null)
+    def fromJobError(err: JobError): RowError = RowError(
+      status_code = 3,
+      location_error = JobError.toErrorColumn(err)
+    )
+  }
+
+  val featureFields = List(
+    "tree_cover_loss_total_yearly", // treeCoverLossYearly
+    "tree_cover_loss_primary_forest_yearly", // treeCoverLossPrimaryForestYearly
+    "tree_cover_loss_peat_yearly", //treeCoverLossPeatLandYearly
+    "tree_cover_loss_intact_forest_yearly", // treeCoverLossIntactForestYearly
+    "tree_cover_loss_protected_areas_yearly", // treeCoverLossProtectedAreasYearly
+    "tree_cover_loss_sea_landcover_yearly", // treeCoverLossSEAsiaLandCoverYearly
+    "tree_cover_loss_idn_landcover_yearly", // treeCoverLossIDNLandCoverYearly
+    "tree_cover_loss_soy_yearly", // treeCoverLossSoyPlanedAreasYearly
+    "tree_cover_loss_idn_legal_yearly", // treeCoverLossIDNForestAreaYearly
+    "tree_cover_loss_idn_forest_moratorium_yearly", // treeCoverLossIDNForestMoratoriumYearly
+    "tree_cover_loss_prodes_yearly", // prodesLossYearly
+    "tree_cover_loss_prodes_wdpa_yearly", // prodesLossProtectedAreasYearly
+    "tree_cover_loss_prodes_primary_forest_yearly", // prodesLossProdesPrimaryForestYearly
+    "tree_cover_loss_brazil_biomes_yearly", // treeCoverLossBRABiomesYearly
+    "tree_cover_extent_total", // treeCoverExtent
+    "tree_cover_extent_primary_forest", // treeCoverExtentPrimaryForest
+    "tree_cover_extent_protected_areas", // treeCoverExtentProtectedAreas
+    "tree_cover_extent_peat", // treeCoverExtentPeatlands
+    "tree_cover_extent_intact_forest", // treeCoverExtentIntactForests
+    "natural_habitat_primary", // primaryForestArea
+    "natural_habitat_intact_forest", //intactForest2016Area
+    "total_area", // totalArea
+    "protected_areas_area", // protectedAreasArea
+    "peat_area", // peatlandsArea
+    "brazil_biomes", // braBiomesArea
+    "idn_legal_area", // idnForestAreaArea
+    "sea_landcover_area", // seAsiaLandCoverArea
+    "idn_landcover_area", // idnLandCoverArea
+    "idn_forest_moratorium_area", // idnForestMoratoriumArea
+    "south_america_presence", // southAmericaPresence,
+    "legal_amazon_presence", // legalAmazonPresence,
+    "brazil_biomes_presence", // braBiomesPresence,
+    "cerrado_biome_presence", // cerradoBiomesPresence,
+    "southeast_asia_presence", // seAsiaPresence,
+    "indonesia_presence", // idnPresence
+    "commodity_value_forest_extent", //  forestValueIndicator
+    "commodity_value_peat", // peatValueIndicator
+    "commodity_value_protected_areas", // protectedAreaValueIndicator
+    "commodity_threat_deforestation", // deforestationThreatIndicator
+    "commodity_threat_peat", // peatThreatIndicator
+    "commodity_threat_protected_areas", // protectedAreaThreatIndicator
+    "commodity_threat_fires" // fireThreatIndicator
+  )
+
+  val gridFields = List(
+    "tree_cover_loss_tcd90_yearly", // treeCoverLossTcd90Yearly
+    "filtered_tree_cover_extent", // filteredTreeCoverExtent
+    "filtered_tree_cover_extent_yearly", //filteredTreeCoverExtentYearly
+    "filtered_tree_cover_loss_yearly", //filteredTreeCoverLossYearly
+    "filtered_tree_cover_loss_peat_yearly", //filteredTreeCoverLossPeatYearly
+    "filtered_tree_cover_loss_protected_areas_yearly", // filteredTreeCoverLossProtectedAreasYearly
+    "plantation_area", // plantationArea
+    "plantation_on_peat_area", // plantationOnPeatArea
+    "plantation_in_protected_areas_area" //plantationInProtectedAreasArea
+  )
+
+}

@@ -18,6 +18,7 @@ case class GladAlertsSummary(stats: Map[GladAlertsDataGroup, GladAlertsData] = M
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     GladAlertsSummary(stats.combine(other.stats))
   }
+  def isEmpty = stats.isEmpty
 }
 
 object GladAlertsSummary {

@@ -1,5 +1,7 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
+import frameless.Injection
+
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
 import io.circe.parser.decode
@@ -83,4 +85,6 @@ object ForestChangeDiagnosticDataValueYearly {
     val sortedMap = decode[SortedMap[Int, Double]](value)
     ForestChangeDiagnosticDataValueYearly(sortedMap.getOrElse(SortedMap()))
   }
+
+  implicit def injection: Injection[ForestChangeDiagnosticDataValueYearly, String] = Injection(_.toJson, fromString)
 }

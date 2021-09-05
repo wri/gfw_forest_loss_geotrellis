@@ -1,5 +1,6 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
+import frameless.Injection
 import io.circe.syntax._
 
 case class ForestChangeDiagnosticDataBoolean(value: Boolean)
@@ -23,4 +24,6 @@ object ForestChangeDiagnosticDataBoolean {
     ForestChangeDiagnosticDataBoolean(value)
   }
 
+  implicit def injection: Injection[ForestChangeDiagnosticDataBoolean, String] =
+    Injection(_.toJson, s => ForestChangeDiagnosticDataBoolean(s.toBoolean))
 }

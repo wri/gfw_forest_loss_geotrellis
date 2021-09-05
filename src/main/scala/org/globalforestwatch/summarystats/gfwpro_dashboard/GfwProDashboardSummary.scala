@@ -17,6 +17,7 @@ case class GfwProDashboardSummary(
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     GfwProDashboardSummary(stats.combine(other.stats))
   }
+  def isEmpty = stats.isEmpty
 }
 
 object GfwProDashboardSummary {
