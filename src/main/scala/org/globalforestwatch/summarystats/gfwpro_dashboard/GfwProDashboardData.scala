@@ -1,70 +1,56 @@
 package org.globalforestwatch.summarystats.gfwpro_dashboard
 
 import cats.Semigroup
+import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticDataDouble
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 
 /** Summary data per class
   *
   * Note: This case class contains mutable values
   */
 case class GfwProDashboardData(
-                                gladAlertsCoverage: Boolean,
-                                gladAlertsDaily: GfwProDashboardDataDateCount,
-                                gladAlertsWeekly: GfwProDashboardDataDateCount,
-                                gladAlertsMonthly: GfwProDashboardDataDateCount,
-                                viirsAlertsDaily: GfwProDashboardDataDateCount,
-
-
-                              ) {
+  glad_alerts_coverage: Boolean,
+  tree_cover_extent_total: ForestChangeDiagnosticDataDouble,
+  glad_alerts_daily: GfwProDashboardDataDateCount,
+  glad_alerts_weekly: GfwProDashboardDataDateCount,
+  glad_alerts_monthly: GfwProDashboardDataDateCount,
+  viirs_alerts_daily: GfwProDashboardDataDateCount,
+) {
 
   def merge(other: GfwProDashboardData): GfwProDashboardData = {
 
     GfwProDashboardData(
-      gladAlertsCoverage || other.gladAlertsCoverage,
-      gladAlertsDaily.merge(other.gladAlertsDaily),
-      gladAlertsWeekly.merge(other.gladAlertsWeekly),
-      gladAlertsMonthly.merge(other.gladAlertsMonthly),
-      viirsAlertsDaily.merge(
-        other.viirsAlertsDaily
+      glad_alerts_coverage || other.glad_alerts_coverage,
+      tree_cover_extent_total.merge(other.tree_cover_extent_total),
+      glad_alerts_daily.merge(other.glad_alerts_daily),
+      glad_alerts_weekly.merge(other.glad_alerts_weekly),
+      glad_alerts_monthly.merge(other.glad_alerts_monthly),
+      viirs_alerts_daily.merge(
+        other.viirs_alerts_daily
       )
     )
   }
-
-  def update(gladAlertsCoverage: Boolean = this.gladAlertsCoverage,
-             gladAlertsDaily: GfwProDashboardDataDateCount = this.gladAlertsDaily,
-             gladAlertsWeekly: GfwProDashboardDataDateCount = this.gladAlertsWeekly,
-             gladAlertsMonthly: GfwProDashboardDataDateCount = this.gladAlertsMonthly,
-             viirsAlertsDaily: GfwProDashboardDataDateCount = this.viirsAlertsDaily,
-            ): GfwProDashboardData = {
-
-    GfwProDashboardData(
-      gladAlertsCoverage,
-      gladAlertsDaily,
-      gladAlertsWeekly,
-      gladAlertsMonthly,
-      viirsAlertsDaily
-    )
-  }
-
 }
-
 
 object GfwProDashboardData {
 
   def empty: GfwProDashboardData =
     GfwProDashboardData(
-      gladAlertsCoverage = false,
+      glad_alerts_coverage = false,
+      tree_cover_extent_total = ForestChangeDiagnosticDataDouble.empty,
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,
-      GfwProDashboardDataDateCount.empty,
+      GfwProDashboardDataDateCount.empty
     )
 
   implicit val gfwProDashboardDataSemigroup: Semigroup[GfwProDashboardData] =
     new Semigroup[GfwProDashboardData] {
-      def combine(x: GfwProDashboardData,
-                  y: GfwProDashboardData): GfwProDashboardData =
+      def combine(x: GfwProDashboardData, y: GfwProDashboardData): GfwProDashboardData =
         x.merge(y)
     }
 
+  implicit def dataExpressionEncoder: ExpressionEncoder[GfwProDashboardData] =
+    frameless.TypedExpressionEncoder[GfwProDashboardData]
+      .asInstanceOf[ExpressionEncoder[GfwProDashboardData]]
 }
-

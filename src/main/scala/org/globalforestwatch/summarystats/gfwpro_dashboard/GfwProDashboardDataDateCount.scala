@@ -4,25 +4,23 @@ import io.circe.syntax._
 
 import java.util.Calendar
 import scala.collection.immutable.SortedMap
+import frameless.Injection
 
 case class GfwProDashboardDataDateCount(value: SortedMap[String, Int]) {
-  def merge(
-             other: GfwProDashboardDataDateCount
-           ): GfwProDashboardDataDateCount = {
 
+  def merge(other: GfwProDashboardDataDateCount): GfwProDashboardDataDateCount = {
     GfwProDashboardDataDateCount(value ++ other.value.map {
       case (key, otherValue) =>
-        key ->
-          (value.getOrElse(key, 0) + otherValue)
+        key -> (value.getOrElse(key, 0) + otherValue)
     })
   }
 
-  def toJson: String = {
-    this.value.asJson.noSpaces
-  }
+  def toJson: String = this.value.asJson.noSpaces
 }
 
 object GfwProDashboardDataDateCount {
+  implicit def injection: Injection[GfwProDashboardDataDateCount, String] = Injection(_.toJson, fromString)
+
   def empty: GfwProDashboardDataDateCount =
     GfwProDashboardDataDateCount(SortedMap())
 
@@ -96,5 +94,10 @@ object GfwProDashboardDataDateCount {
 
       case _ => this.empty
     }
+  }
+
+  def fromString(value: String): GfwProDashboardDataDateCount = {
+    val sortedMap = io.circe.parser.decode[SortedMap[String, Int]](value)
+    GfwProDashboardDataDateCount(sortedMap.getOrElse(SortedMap()))
   }
 }

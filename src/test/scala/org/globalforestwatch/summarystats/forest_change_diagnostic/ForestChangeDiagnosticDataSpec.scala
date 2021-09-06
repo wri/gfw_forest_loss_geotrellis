@@ -3,6 +3,7 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 import org.globalforestwatch.TestEnvironment
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.types.StringType
+import org.globalforestwatch.summarystats.SummaryDF
 
 
 case class Boop(
@@ -12,7 +13,7 @@ case class Boop(
   d: ForestChangeDiagnosticDataValueYearly,
   e: ForestChangeDiagnosticDataDoubleCategory)
 
-class ForestChangeDiagnosticDataSpec extends TestEnvironment {
+class ForestChangeDiagnosticDataSpec extends TestEnvironment with SummaryDF {
 
   it ("implicit scope contains correct encoder") {
     val enc = implicitly[ExpressionEncoder[ForestChangeDiagnosticData]]

@@ -7,8 +7,11 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{CombinedFeatureId, FeatureDF, FeatureId, GadmFeatureId, GfwProFeature, GfwProFeatureId, GridId, WdpaFeatureId}
 import org.globalforestwatch.summarystats.{JobError, ValidatedRow}
 import org.globalforestwatch.util.Util.{colsFor, fieldsFromCol}
+import org.globalforestwatch.summarystats.SummaryDF
+import org.globalforestwatch.summarystats.SummaryDF.{RowError, RowId}
 
-object ForestChangeDiagnosticDF {
+object ForestChangeDiagnosticDF extends SummaryDF {
+
   def getFeatureDataFrame(
     dataRDD: RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticData])],
     spark: SparkSession
@@ -77,7 +80,6 @@ object ForestChangeDiagnosticDF {
       else (id.toFeatureID, Invalid(JobError.fromErrorColumn(error.location_error).get))
     }
   }
-  case class RowId(list_id: String, location_id: String)
 
   case class RowGridId(list_id: String, location_id: Int, x: Double, y: Double, grid: String) {
     def toFeatureID = CombinedFeatureId(GfwProFeatureId(list_id, location_id , x, y), GridId(grid))
@@ -89,15 +91,6 @@ object ForestChangeDiagnosticDF {
       x = gfwProId.x,
       y = gfwProId.y,
       grid = gridId.gridId)
-  }
-
-  case class RowError(status_code: Int, location_error: String)
-  object RowError {
-    val empty: RowError = RowError(status_code = 2, location_error = null)
-    def fromJobError(err: JobError): RowError = RowError(
-      status_code = 3,
-      location_error = JobError.toErrorColumn(err)
-    )
   }
 
   val featureFields = List(

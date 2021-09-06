@@ -6,20 +6,11 @@ import cats.Semigroup
   *
   * Note: This case class contains mutable values
   */
-case class GfwProDashboardRawData(
-                                   var alertCount: Int,
-
-                                 ) {
+case class GfwProDashboardRawData(var totalArea: Double, var alertCount: Int) {
   def merge(other: GfwProDashboardRawData): GfwProDashboardRawData = {
-
-    GfwProDashboardRawData(
-
-      alertCount + other.alertCount,
-
-    )
+    GfwProDashboardRawData(totalArea + other.totalArea, alertCount + other.alertCount)
   }
 }
-
 
 object GfwProDashboardRawData {
   implicit val lossDataSemigroup: Semigroup[GfwProDashboardRawData] =
@@ -30,4 +21,3 @@ object GfwProDashboardRawData {
     }
 
 }
-
