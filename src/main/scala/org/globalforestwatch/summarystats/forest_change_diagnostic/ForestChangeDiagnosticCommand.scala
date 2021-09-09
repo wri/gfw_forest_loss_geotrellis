@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
+import org.globalforestwatch.util.FeatureFlag
 import cats.implicits._
 import com.monovore.decline.Opts
 
@@ -39,6 +40,8 @@ object ForestChangeDiagnosticCommand extends SummaryCommand {
         "tcl" -> defaultFilter._2,
         "glad" -> defaultFilter._3
       )
+
+      FeatureFlag.GfwPro= default._6
 
       runAnalysis(ForestChangeDiagnosticAnalysis.name, default._1, default._2, kwargs)
 
