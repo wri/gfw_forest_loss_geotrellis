@@ -5,25 +5,21 @@ import com.vividsolutions.jts.geom.Geometry
 import org.apache.spark.sql.SparkSession
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.util.Util.getAnyMapValue
+import org.globalforestwatch.summarystats.SummaryCommand
+
 
 object FireAlertRDD {
-
-  def apply(spark: SparkSession,
-            kwargs: Map[String, Any]): SpatialRDD[Geometry] = {
-    val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
-    val fireAlertUris
-    : NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](
-      kwargs,
-      "fireAlertSource"
-    )
-    // TODO: refactor to use fireAlertType only as input for FeatureFactory
-    val fireAlertObj =
-      FeatureFactory(fireAlertType).featureObj
+  def apply(
+    spark: SparkSession,
+    fireAlertType: String,
+    fireAlertSource: NonEmptyList[String],
+    filters: FeatureFilter
+  ): SpatialRDD[Geometry] = {
+    val fireAlertObj = Feature(fireAlertType)
     val fireAlertPointDF = SpatialFeatureDF(
-      fireAlertUris,
+      fireAlertSource,
       fireAlertObj,
-      kwargs,
+      filters,
       spark,
       "longitude",
       "latitude"
