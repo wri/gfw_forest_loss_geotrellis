@@ -2,8 +2,11 @@ package org.globalforestwatch.features
 
 import geotrellis.vector.Geometry
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.col
 import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 import org.globalforestwatch.util.Util._
+import org.globalforestwatch.summarystats.SummaryCommand
+import org.apache.spark.sql.Column
 
 object GfwProFeature extends Feature {
 
@@ -24,20 +27,15 @@ object GfwProFeature extends Feature {
     GfwProFeatureId(listId, locationId, x, y)
   }
 
-  override def custom_filter(
-                              filters: Map[String, Any]
-                            )(df: DataFrame): DataFrame = {
-
-    val spark: SparkSession = df.sparkSession
-    import spark.implicits._
-
-    val idStart: Option[Int] = getAnyMapValue[Option[Int]](filters, "idStart")
-    //    val idEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
-
-    //    val idStartDF: DataFrame =
-    idStart.foldLeft(df)((acc, i) => acc.filter($"location_id" >= i))
-
-    //    idEnd.foldLeft(idStartDF)((acc, i) => acc.filter($"fid" < i))
-
+  case class Filter(
+    base: Option[SummaryCommand.BaseFilter],
+    id: Option[SummaryCommand.FeatureIdFilter]
+  ) extends FeatureFilter {
+    def filterConditions: List[Column] = {
+      // TODO: is "iso" column same as "iso3"? gadm.isoFirst was applied to "iso" before
+      // TODO: add wdpaID filter
+      base.toList.flatMap(_.filters()) ++
+        id.toList.flatMap(_.filters(idColumn=col("location_id")))
+    }
   }
 }

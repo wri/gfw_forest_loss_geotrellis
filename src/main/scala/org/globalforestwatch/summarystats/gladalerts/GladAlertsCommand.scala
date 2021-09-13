@@ -3,6 +3,7 @@ package org.globalforestwatch.summarystats.gladalerts
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
+import org.globalforestwatch.features._
 
 object GladAlertsCommand extends SummaryCommand {
 
@@ -16,40 +17,20 @@ object GladAlertsCommand extends SummaryCommand {
     (
       defaultOptions,
       changeOnlyOpt,
-      defaultFilterOptions,
-      gdamFilterOptions,
-      wdpaFilterOptions,
-      featureFilterOptions,
-      ).mapN {
-      (default,
-       changeOnly,
-       defaultFilter,
-       gadmFilter,
-       wdpaFilter,
-       featureFilter) =>
-        val kwargs = Map(
-          "outputUrl" -> default._3,
-          "splitFeatures" -> default._4,
-          "noOutputPathSuffix" -> default._5,
-          "changeOnly" -> changeOnly,
-          "iso" -> gadmFilter._1,
-          "isoFirst" -> gadmFilter._2,
-          "isoStart" -> gadmFilter._3,
-          "isoEnd" -> gadmFilter._4,
-          "admin1" -> gadmFilter._5,
-          "admin2" -> gadmFilter._6,
-          "idStart" -> featureFilter._1,
-          "idEnd" -> featureFilter._2,
-          "wdpaStatus" -> wdpaFilter._1,
-          "iucnCat" -> wdpaFilter._2,
-          "limit" -> defaultFilter._1,
-          "tcl" -> defaultFilter._2,
-          "glad" -> defaultFilter._3
-        )
+      featureFilterOptions
+    ).mapN { (default, changeOnly, filterOptions) =>
+      val kwargs = Map(
+        "outputUrl" -> default.outputUrl,
+        "noOutputPathSuffix" -> default.noOutputPathSuffix,
+        "changeOnly" -> changeOnly
+      )
 
-        runAnalysis(GladAlertsAnalysis.name, default._1, default._2, kwargs)
+      val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
+      runAnalysis { spark =>
+        val featureRDD = FeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures, spark)
+        GladAlertsAnalysis(featureRDD, default.featureType, spark, kwargs)
+      }
     }
   }
-
 }

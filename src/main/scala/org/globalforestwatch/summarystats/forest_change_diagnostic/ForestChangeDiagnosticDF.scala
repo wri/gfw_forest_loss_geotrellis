@@ -4,7 +4,7 @@ import cats.data.NonEmptyList
 import cats.data.Validated.{Invalid, Valid}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{CombinedFeatureId, FeatureDF, FeatureId, GadmFeatureId, GfwProFeature, GfwProFeatureId, GridId, WdpaFeatureId}
+import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats.{JobError, ValidatedRow}
 import org.globalforestwatch.util.Util.{colsFor, fieldsFromCol}
 import org.globalforestwatch.summarystats.SummaryDF
@@ -69,7 +69,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     sources: NonEmptyList[String],
     spark: SparkSession,
   ): RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticData])] = {
-    val df = FeatureDF(sources, GfwProFeature, Map.empty, spark)
+    val df = FeatureDF(sources, GfwProFeature, FeatureFilter.empty, spark)
     val ds = df.select(
       colsFor[RowGridId].as[RowGridId],
       colsFor[RowError].as[RowError],

@@ -12,7 +12,7 @@
  import org.apache.spark.rdd.RDD
  import org.apache.spark.sql.SparkSession
  import org.datasyslab.geospark.spatialRDD.SpatialRDD
- import org.globalforestwatch.features.{CombinedFeatureId, FeatureDF, FeatureId, FireAlertRDD, GadmFeatureId, GfwProFeature, GfwProFeatureId, GridId, WdpaFeatureId}
+ import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, FireAlertRDD, GadmFeatureId, GfwProFeature, GfwProFeatureId, GridId, WdpaFeatureId}
  import org.globalforestwatch.grids.GridId.pointGridId
  import org.globalforestwatch.summarystats.{JobError, MultiError, SummaryAnalysis, ValidatedRow}
  import org.globalforestwatch.util.SpatialJoinRDD
@@ -23,15 +23,15 @@
 
    val name = "forest_change_diagnostic"
 
-   def apply(mainRDD: RDD[Feature[Geometry, FeatureId]],
-             featureType: String,
-             spark: SparkSession,
-             kwargs: Map[String, Any]): Unit = {
+   def apply(
+     mainRDD: RDD[Feature[Geometry, FeatureId]],
+     featureType: String,
+     intermediateListSource: Option[NonEmptyList[String]],
+     fireAlertRDD: SpatialRDD[GeoSparkGeometry],
+     spark: SparkSession,
+     kwargs: Map[String, Any]
+   ): Unit = {
 
-     val intermediateListSource = getAnyMapValue[Option[NonEmptyList[String]]](
-       kwargs,
-       "intermediateListSource"
-     )
      val runOutputUrl: String = getOutputUrl(kwargs)
 
      mainRDD.cache()
@@ -64,7 +64,7 @@
          kwargs)
 
      val fireCount: RDD[(FeatureId, ForestChangeDiagnosticDataLossYearly)] =
-       ForestChangeDiagnosticAnalysis.fireStats(featureRDD, spark, kwargs)
+       ForestChangeDiagnosticAnalysis.fireStats(featureRDD, fireAlertRDD, spark)
 
      featureRDD.unpersist()
 
@@ -218,13 +218,9 @@
 
    def fireStats(
      featureRDD: RDD[Feature[Geometry, FeatureId]],
-     spark: SparkSession,
-     kwargs: Map[String, Any]
+     fireAlertRDD: SpatialRDD[GeoSparkGeometry],
+     spark: SparkSession
    ): RDD[(FeatureId, ForestChangeDiagnosticDataLossYearly)] = {
-
-     // FIRE RDD
-     val fireAlertSpatialRDD = FireAlertRDD(spark, kwargs)
-
      // Convert FeatureRDD to SpatialRDD
      val polyRDD = featureRDD.map { feature =>
        // Implicitly convert to GeoSparkGeometry
@@ -240,7 +236,7 @@
      val joinedRDD =
        SpatialJoinRDD.spatialjoin(
          spatialFeatureRDD,
-         fireAlertSpatialRDD,
+         fireAlertRDD,
          usingIndex = false
        )
 

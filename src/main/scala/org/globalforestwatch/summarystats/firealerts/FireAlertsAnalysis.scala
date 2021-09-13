@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter
 import geotrellis.vector.Feature
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{FeatureDF, FeatureFactory, FeatureId, SpatialFeatureDF}
+import org.globalforestwatch.features._
 import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
@@ -18,6 +18,7 @@ object FireAlertsAnalysis extends SummaryAnalysis {
 
   def apply(featureRDD: RDD[Feature[vector.Geometry, FeatureId]],
             featureType: String,
+            featureFilter: FeatureFilter,
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
@@ -39,7 +40,7 @@ object FireAlertsAnalysis extends SummaryAnalysis {
 
     val summaryDF = fireAlertType match {
       case "modis" | "viirs" =>
-        joinWithFeatures(summaryRDD, featureType, spark, kwargs)
+        joinWithFeatures(summaryRDD, featureType, featureFilter, spark, kwargs)
       case "burned_areas" =>
         FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
     }
@@ -59,6 +60,7 @@ object FireAlertsAnalysis extends SummaryAnalysis {
 
   def joinWithFeatures(summaryRDD: RDD[(FeatureId, FireAlertsSummary)],
                        featureType: String,
+                       featureFilter: FeatureFilter,
                        spark: SparkSession,
                        kwargs: Map[String, Any]): DataFrame = {
     val fireDF = FireAlertsDFFactory(featureType, summaryRDD, spark, kwargs).getDataFrame
@@ -68,7 +70,7 @@ object FireAlertsAnalysis extends SummaryAnalysis {
 
     val featureUris: NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](kwargs, "featureUris")
 
-    val featureDF = SpatialFeatureDF(featureUris, featureType, kwargs,"geom", spark)
+    val featureDF = SpatialFeatureDF(featureUris, featureType, featureFilter, "geom", spark)
 
     firePointDF
       .join(featureDF)

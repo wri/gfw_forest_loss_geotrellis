@@ -1,7 +1,10 @@
 package org.globalforestwatch.features
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.col
 import org.globalforestwatch.util.Util._
+import org.globalforestwatch.summarystats.SummaryCommand
+import org.apache.spark.sql.Column
 
 object SimpleFeature extends Feature {
 
@@ -17,20 +20,13 @@ object SimpleFeature extends Feature {
     SimpleFeatureId(feature_id)
   }
 
-  override def custom_filter(
-                              filters: Map[String, Any]
-                            )(df: DataFrame): DataFrame = {
-
-    val spark: SparkSession = df.sparkSession
-    import spark.implicits._
-
-    val idStart: Option[Int] = getAnyMapValue[Option[Int]](filters, "idStart")
-    //    val idEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
-
-    //    val idStartDF: DataFrame =
-    idStart.foldLeft(df)((acc, i) => acc.filter($"fid" >= i))
-
-    //    idEnd.foldLeft(idStartDF)((acc, i) => acc.filter($"fid" < i))
-
+  case class Filter(
+    base: Option[SummaryCommand.BaseFilter],
+    id: Option[SummaryCommand.FeatureIdFilter]
+  ) extends FeatureFilter {
+    def filterConditions: List[Column]= {
+      base.toList.flatMap(_.filters()) ++
+        id.toList.flatMap(_.filters(idColumn=col("fid")))
+    }
   }
 }
