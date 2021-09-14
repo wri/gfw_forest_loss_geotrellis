@@ -4,6 +4,7 @@ import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
+import org.globalforestwatch.config.GfwConfig
 
 object GfwProDashboardCommand extends SummaryCommand {
 
@@ -54,6 +55,7 @@ object GfwProDashboardCommand extends SummaryCommand {
         "admin2" -> gadmFilter._6,
       )
 
+      GfwConfig.setProFlag(default._6)
       runAnalysis(GfwProDashboardAnalysis.name, default._1, default._2, kwargs)
 
     }
