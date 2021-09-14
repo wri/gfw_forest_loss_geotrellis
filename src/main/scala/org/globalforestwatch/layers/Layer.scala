@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.s3.model.{
   NoSuchKeyException,
   RequestPayer
 }
+import org.globalforestwatch.grids.GridTile
 
 trait Layer {
 
@@ -34,6 +35,13 @@ trait Layer {
   val internalNoDataValue: A
   val externalNoDataValue: B
   val basePath: String = s"s3://gfw-data-lake"
+
+
+  protected def uriForGrid(template: String, grid: GridTile): String =
+    template
+      .replace("<gridSize>", grid.gridSize.toString)
+      .replace("<rowCount>", grid.rowCount.toString)
+      .replace("<tileId>", grid.tileId)
 
   def lookup(a: A): B
 }

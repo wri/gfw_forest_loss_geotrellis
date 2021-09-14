@@ -1,6 +1,7 @@
 package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
+import org.globalforestwatch.config.GfwConfig
 
 trait TreeCoverDensityThreshold extends IntegerLayer with RequiredILayer {
 
@@ -22,18 +23,18 @@ trait TreeCoverDensityThreshold extends IntegerLayer with RequiredILayer {
 
 case class TreeCoverDensityThreshold2000(gridTile: GridTile)
   extends TreeCoverDensityThreshold {
-  val uri: String = s"$basePath/umd_tree_cover_density_2000/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("TreeCoverDensity2000"), gridTile)
 }
 
 case class TreeCoverDensityThreshold2010(gridTile: GridTile)
   extends TreeCoverDensityThreshold {
-  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("TreeCoverDensity2010"), gridTile)
 }
 
 case class TreeCoverDensity2010_60(gridTile: GridTile)
   extends BooleanLayer
     with RequiredILayer {
-  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("TreeCoverDensity2010"), gridTile)
 
   override def lookup(value: Int): Boolean = value > 60
 
@@ -43,12 +44,12 @@ case class TreeCoverDensityPercent2000(gridTile: GridTile)
   extends IntegerLayer
     with RequiredILayer {
   override val externalNoDataValue: Integer = 0
-  val uri: String = s"$basePath/umd_tree_cover_density_2000/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("TreeCoverDensity2000"), gridTile)
 }
 
 case class TreeCoverDensityPercent2010(gridTile: GridTile)
   extends IntegerLayer
     with RequiredILayer {
   override val externalNoDataValue: Integer = 0
-  val uri: String = s"$basePath/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("TreeCoverDensity2010"), gridTile)
 }
