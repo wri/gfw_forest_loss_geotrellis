@@ -106,8 +106,8 @@ trait SummaryCommand {
 
   val noOutputPathSuffixOpt: Opts[Boolean] = Opts.flag("no_output_path_suffix", help = "Do not autogenerate output path suffix at runtime").orFalse
 
-  val defaultOptions: Opts[(String, NonEmptyList[String], String, Boolean, Boolean, Boolean)] =
-    (featureTypeOpt, featuresOpt, outputOpt, splitFeatures, noOutputPathSuffixOpt, gfwPro).tupled
+  val defaultOptions: Opts[(String, NonEmptyList[String], String, Boolean, Boolean)] =
+    (featureTypeOpt, featuresOpt, outputOpt, splitFeatures, noOutputPathSuffixOpt ).tupled
   val fireAlertOptions: Opts[(String, NonEmptyList[String])] =
     (fireAlertTypeOpt, fireAlertSourceOpt).tupled
 

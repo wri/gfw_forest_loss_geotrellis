@@ -55,7 +55,6 @@ object GfwProDashboardCommand extends SummaryCommand {
         "admin2" -> gadmFilter._6,
       )
 
-      GfwConfig.setProFlag(default._6)
       runAnalysis(GfwProDashboardAnalysis.name, default._1, default._2, kwargs)
 
     }

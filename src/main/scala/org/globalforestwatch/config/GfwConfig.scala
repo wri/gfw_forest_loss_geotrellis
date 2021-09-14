@@ -9,19 +9,15 @@ case class GfwConfig(
 )
 
 object GfwConfig extends LazyLogging {
-  private var featureFlag: String = null
-  def isGfwPro: Boolean = featureFlag == "pro"
-
-  def setProFlag(isPro: Boolean) = {
-    require(featureFlag == null, "Pro feature flag already set")
-    if (isPro) featureFlag = "pro"
-    else featureFlag = "flagship"
+  private val featureFlag: Option[String] = {
+    val flag = scala.util.Properties.envOrNone("GFW_FEATURE_FLAG").map(_.toLowerCase())
+    logger.info(s"GFW_FEATURE_FLAG=$flag")
+    flag
   }
 
-  lazy val get: GfwConfig = {
-    if (featureFlag == null) featureFlag = "flagship"
-    read(featureFlag)
-  }
+  def isGfwPro: Boolean = featureFlag == Some("pro")
+
+  lazy val get: GfwConfig = read(featureFlag.getOrElse("pro"))
 
   def read(flag: String): GfwConfig = {
     val confFile = s"feature-flag-$flag.conf"

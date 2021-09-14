@@ -41,8 +41,6 @@ object ForestChangeDiagnosticCommand extends SummaryCommand {
         "glad" -> defaultFilter._3
       )
 
-      GfwConfig.setProFlag(default._6)
-
       runAnalysis(ForestChangeDiagnosticAnalysis.name, default._1, default._2, kwargs)
 
     }
