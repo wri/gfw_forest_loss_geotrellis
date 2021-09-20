@@ -5,17 +5,13 @@ import frameless.Injection
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
 import io.circe.parser.decode
+import spire.algebra.Semigroup
 
-case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double]) extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataLossYearly] {
-  def merge(
-             other: ForestChangeDiagnosticDataLossYearly
-           ): ForestChangeDiagnosticDataLossYearly = {
+case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double])
+  extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataLossYearly] {
 
-    ForestChangeDiagnosticDataLossYearly(value ++ other.value.map {
-      case (key, otherValue) =>
-        key ->
-          (value.getOrElse(key, 0.0) + otherValue)
-    })
+  def merge(other: ForestChangeDiagnosticDataLossYearly): ForestChangeDiagnosticDataLossYearly = {
+    ForestChangeDiagnosticDataLossYearly(Semigroup[SortedMap[Int, Double]].combine(value, other.value))
   }
 
   def round: SortedMap[Int, Double] = this.value.map { case (key, value) => key -> this.round(value) }
@@ -52,7 +48,8 @@ object ForestChangeDiagnosticDataLossYearly {
         2016 -> 0,
         2017 -> 0,
         2018 -> 0,
-        2019 -> 0
+        2019 -> 0,
+        2020 -> 0
       )
     )
 
