@@ -5,7 +5,7 @@ import frameless.Injection
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
 import io.circe.parser.decode
-import spire.algebra.Semigroup
+import cats.kernel.Semigroup
 
 case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double])
   extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataLossYearly] {
