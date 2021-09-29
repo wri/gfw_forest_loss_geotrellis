@@ -29,9 +29,8 @@
      featureType: String,
      intermediateListSource: Option[NonEmptyList[String]],
      fireAlertRDD: SpatialRDD[GeoSparkGeometry],
-     spark: SparkSession,
      kwargs: Map[String, Any]
-   ): Unit = {
+   )(implicit spark: SparkSession): Unit = {
 
      val runOutputUrl: String = getOutputUrl(kwargs)
 
