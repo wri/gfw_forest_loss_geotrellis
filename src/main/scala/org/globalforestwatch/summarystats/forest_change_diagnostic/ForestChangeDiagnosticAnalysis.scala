@@ -102,6 +102,10 @@
        summaryDF,
        runOutputUrl,
        kwargs)
+
+      mainRDD.unpersist()
+      featureRDD.unpersist()
+      dataRDD.unpersist()
    }
 
    /**
