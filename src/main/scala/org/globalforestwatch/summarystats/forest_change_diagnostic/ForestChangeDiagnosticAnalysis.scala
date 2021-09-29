@@ -18,6 +18,7 @@
  import org.globalforestwatch.util.SpatialJoinRDD
  import org.globalforestwatch.util.ImplicitGeometryConverter._
  import org.globalforestwatch.util.Util.getAnyMapValue
+ import org.apache.spark.storage.StorageLevel
 
  object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
@@ -34,7 +35,8 @@
 
      val runOutputUrl: String = getOutputUrl(kwargs)
 
-     mainRDD.cache()
+     mainRDD.persist(StorageLevel.MEMORY_AND_DISK_2)
+
 
      // For standard GFW Pro Feature IDs we create a Grid Filter
      // This will allow us to only process those parts of the dissolved list geometry which were updated
@@ -55,8 +57,8 @@
      val featureRDD: RDD[Feature[Geometry, FeatureId]] =
        toFeatureRdd(mainRDD, gridFilter, intermediateListSource.isDefined)
 
-     mainRDD.unpersist()
-     featureRDD.cache()
+     featureRDD.persist(StorageLevel.MEMORY_AND_DISK_2)
+
      val summaryRDD: RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticSummary])] =
        ForestChangeDiagnosticRDD(
          featureRDD,
@@ -65,8 +67,6 @@
 
      val fireCount: RDD[(FeatureId, ForestChangeDiagnosticDataLossYearly)] =
        ForestChangeDiagnosticAnalysis.fireStats(featureRDD, fireAlertRDD, spark)
-
-     featureRDD.unpersist()
 
      val dataRDD: RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticData])] = {
        summaryRDD
@@ -83,7 +83,7 @@
          }
      }
 
-     dataRDD.cache()
+     dataRDD.persist(StorageLevel.MEMORY_AND_DISK_2)
 
      val finalRDD =
        if (featureType == "gfwpro")
@@ -95,13 +95,17 @@
            kwargs)
        else dataRDD
 
-     val summaryDF = ForestChangeDiagnosticDF.getFeatureDataFrame( finalRDD, spark)
+     val summaryDF = ForestChangeDiagnosticDF.getFeatureDataFrame(finalRDD, spark)
 
      ForestChangeDiagnosticExport.export(
        featureType,
        summaryDF,
        runOutputUrl,
        kwargs)
+
+      mainRDD.unpersist()
+      featureRDD.unpersist()
+      dataRDD.unpersist()
    }
 
    /**
@@ -237,7 +241,7 @@
        SpatialJoinRDD.spatialjoin(
          spatialFeatureRDD,
          fireAlertRDD,
-         usingIndex = false
+         usingIndex = true
        )
 
      joinedRDD.rdd
