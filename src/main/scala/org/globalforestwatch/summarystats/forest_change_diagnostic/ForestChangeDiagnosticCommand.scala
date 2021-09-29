@@ -39,10 +39,10 @@ object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
       if (! default.splitFeatures) logger.warn("Forcing splitFeatures = true")
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
-      runAnalysis { spark =>
+      runAnalysis { implicit spark =>
         val featureRDD = FeatureRDD(default.featureUris, default.featureType, featureFilter, splitFeatures = true, spark)
         val fireAlertRDD = FireAlertRDD(spark, fireAlert.alertType, fireAlert.alertSource, FeatureFilter.empty)
-        ForestChangeDiagnosticAnalysis(featureRDD, default.featureType, intermediateListSource, fireAlertRDD, spark, kwargs)
+        ForestChangeDiagnosticAnalysis(featureRDD, default.featureType, intermediateListSource, fireAlertRDD, kwargs)
       }
     }
   }
