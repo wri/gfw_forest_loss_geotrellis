@@ -32,7 +32,7 @@ trait SummaryCommand {
 
   val splitFeatures: Opts[Boolean] = Opts
     .flag("split_features", "Split input features along 1x1 degree grid")
-    .orTrue
+    .orFalse
 
   val limitOpt: Opts[Option[Int]] = Opts
     .option[Int]("limit", help = "Limit number of records processed")
