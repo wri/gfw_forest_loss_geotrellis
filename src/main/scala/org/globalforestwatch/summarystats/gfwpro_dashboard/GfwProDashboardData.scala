@@ -18,16 +18,13 @@ case class GfwProDashboardData(
 ) {
 
   def merge(other: GfwProDashboardData): GfwProDashboardData = {
-
     GfwProDashboardData(
       glad_alerts_coverage || other.glad_alerts_coverage,
       tree_cover_extent_total.merge(other.tree_cover_extent_total),
       glad_alerts_daily.merge(other.glad_alerts_daily),
       glad_alerts_weekly.merge(other.glad_alerts_weekly),
       glad_alerts_monthly.merge(other.glad_alerts_monthly),
-      viirs_alerts_daily.merge(
-        other.viirs_alerts_daily
-      )
+      viirs_alerts_daily.merge(other.viirs_alerts_daily)
     )
   }
 }

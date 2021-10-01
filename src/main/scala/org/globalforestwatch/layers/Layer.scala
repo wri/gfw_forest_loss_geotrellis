@@ -21,6 +21,7 @@ import software.amazon.awssdk.services.s3.model.{
   RequestPayer
 }
 import org.globalforestwatch.grids.GridTile
+import java.time.LocalDate
 
 trait Layer {
 
@@ -390,11 +391,7 @@ trait IntegerLayer extends ILayer {
 
 trait DateConfLayer extends ILayer {
 
-  /**
-    * Layers which return an Integer type
-    * (use java.lang.Integer to be able to use null)
-    */
-  type B = Option[(String, Boolean)]
+  type B = Option[(LocalDate, Boolean)]
 
   val internalNoDataValue: Int = 0
   val externalNoDataValue: B = None
