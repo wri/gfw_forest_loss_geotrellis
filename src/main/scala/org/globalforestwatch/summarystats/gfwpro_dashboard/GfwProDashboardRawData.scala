@@ -13,11 +13,5 @@ case class GfwProDashboardRawData(var totalArea: Double, var alertCount: Int) {
 }
 
 object GfwProDashboardRawData {
-  implicit val lossDataSemigroup: Semigroup[GfwProDashboardRawData] =
-    new Semigroup[GfwProDashboardRawData] {
-      def combine(x: GfwProDashboardRawData,
-                  y: GfwProDashboardRawData): GfwProDashboardRawData =
-        x.merge(y)
-    }
-
+  implicit val lossDataSemigroup: Semigroup[GfwProDashboardRawData] = Semigroup.instance(_ merge _)
 }

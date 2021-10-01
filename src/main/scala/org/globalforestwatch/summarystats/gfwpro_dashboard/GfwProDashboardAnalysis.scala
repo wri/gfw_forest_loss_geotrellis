@@ -26,6 +26,7 @@ import org.datasyslab.geosparksql.utils.Adapter
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 
 import scala.collection.JavaConverters._
+import java.time.LocalDate
 
 object GfwProDashboardAnalysis extends SummaryAnalysis {
 
@@ -173,14 +174,10 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
       points.asScala.toList.foldLeft(GfwProDashboardDataDateCount.empty) {
         (z, point) => {
-          // extract year from acq_date column
-          val alertDate =
-            point.getUserData.asInstanceOf[String].split("\t")(2)
-          z.merge(
-            GfwProDashboardDataDateCount
-              .fill(Some(alertDate), 1, viirs = true)
-          )
-
+          // extract year from acq_date column is YYYY-MM-DD
+          val acqDate = point.getUserData.asInstanceOf[String].split("\t")(2)
+          val alertDate = LocalDate.parse(acqDate)
+          z.merge(GfwProDashboardDataDateCount.fillDaily(Some(alertDate), 1))
         }
       }
 
