@@ -48,9 +48,11 @@ object SpatialFeatureDF {
       FeatureDF(input, featureObj, filters, spark, delimiter)
     val emptyPolygonWKB = "0106000020E610000000000000"
 
+    // ST_PrecisionReduce may create invalid geometry if it contains a "sliver" that is below the precision threshold
+    // ST_Buffer(0) fixes these invalid geometries
     featureDF
       .selectExpr(
-        s"ST_PrecisionReduce(ST_GeomFromWKB(${wkbField}), 11) AS polyshape",
+        s"ST_Buffer(ST_PrecisionReduce(ST_GeomFromWKB(${wkbField}), 11), 0) AS polyshape",
         s"struct(${featureObj.featureIdExpr}) as featureId"
       )
       .where(s"${wkbField} != '${emptyPolygonWKB}'")
