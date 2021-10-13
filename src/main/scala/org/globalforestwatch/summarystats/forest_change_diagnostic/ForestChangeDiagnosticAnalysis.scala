@@ -250,7 +250,7 @@
        }
        .reduceByKey(_ merge _)
        .mapValues { fires =>
-         aggregateFireData(fires)
+         aggregateFireData(fires).limitToMaxYear(2019)
        }
    }
 
