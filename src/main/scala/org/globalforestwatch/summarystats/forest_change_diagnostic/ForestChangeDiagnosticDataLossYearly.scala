@@ -16,6 +16,10 @@ case class ForestChangeDiagnosticDataLossYearly(value: SortedMap[Int, Double])
 
   def round: SortedMap[Int, Double] = this.value.map { case (key, value) => key -> this.round(value) }
 
+  def limitToMaxYear(maxYear: Int): ForestChangeDiagnosticDataLossYearly = {
+    ForestChangeDiagnosticDataLossYearly(value.filterKeys{ year => year <= maxYear })
+  }
+
   def toJson: String = {
     this.round.asJson.noSpaces
   }
