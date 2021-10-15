@@ -7,7 +7,7 @@ licenses := Seq(
 )
 
 scalaVersion := Version.scala
-scalaVersion in ThisBuild := Version.scala
+ThisBuild  / scalaVersion := Version.scala
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -136,9 +136,9 @@ Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m")
 Test / envVars := Map("AWS_REQUEST_PAYER" -> "requester")
 
 // Settings for sbt-assembly plugin which builds fat jars for use by spark jobs
-test in assembly := {}
-assemblyOption in assembly := (assemblyOption in assembly).value.copy(appendContentHash = true)
-assemblyMergeStrategy in assembly := {
+assembly / test := {}
+assembly / assemblyOption := (assembly / assemblyOption).value.withAppendContentHash(true)
+assembly / assemblyMergeStrategy  := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat
   // both GeoSpark and Geotrellis bring in this library, need to use GeoSpark version
