@@ -53,8 +53,8 @@ case class GeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
       // so we need to do this early on to avoid winding code. This block is not part of the original Java implementation.
       val preFixedGeometry =
       geom match {
-        case poly: Polygon => ironPolgons(poly)
-        case multi: MultiPolygon => ironPolgons(multi)
+        case poly: Polygon => ironPolygons(poly)
+        case multi: MultiPolygon => ironPolygons(multi)
         case _ => geom
       }
 
@@ -302,7 +302,7 @@ case class GeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
     factory.createGeometryCollection(fixed_parts)
   }
 
-  private def ironPolgons(geom: Geometry): Geometry = {
+  private def ironPolygons(geom: Geometry): Geometry = {
 
     /**
       * Ironing out potential sliver artifacts such as holes that resemble lines.
