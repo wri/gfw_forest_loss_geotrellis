@@ -1,5 +1,6 @@
 package org.globalforestwatch.util
 
+import org.locationtech.jts.geom.PrecisionModel
 import org.locationtech.jts.precision.GeometryPrecisionReducer
 
 object GeotrellisGeometryReducer extends java.io.Serializable {
@@ -13,7 +14,7 @@ object GeotrellisGeometryReducer extends java.io.Serializable {
   // and geometries already simplified to 1e11
 
   val gpr = new GeometryPrecisionReducer(
-    geotrellis.vector.GeomFactory.precisionModel
+    new PrecisionModel(1e10)
   )
 
   def reduce(
