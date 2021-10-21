@@ -6,9 +6,9 @@ import cats.Semigroup
   *
   * Note: This case class contains mutable values
   */
-case class GfwProDashboardRawData(var totalArea: Double, var alertCount: Int) {
+case class GfwProDashboardRawData(var treeCoverExtentArea: Double, var alertCount: Int) {
   def merge(other: GfwProDashboardRawData): GfwProDashboardRawData = {
-    GfwProDashboardRawData(totalArea + other.totalArea, alertCount + other.alertCount)
+    GfwProDashboardRawData(treeCoverExtentArea + other.treeCoverExtentArea, alertCount + other.alertCount)
   }
 }
 

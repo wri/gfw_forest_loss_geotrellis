@@ -22,7 +22,7 @@ case class GfwProDashboardSummary(
 
   def toGfwProDashboardData(): GfwProDashboardData = {
     stats
-      .map { case (group, data) => group.toGfwProDashboardData(data.alertCount, data.totalArea) }
+      .map { case (group, data) => group.toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
       .foldLeft(GfwProDashboardData.empty)( _ merge _)
   }
 }
@@ -39,27 +39,23 @@ object GfwProDashboardSummary {
       def visit(raster: Raster[GfwProDashboardTile], col: Int, row: Int): Unit = {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val gladAlertDate: Option[LocalDate] = raster.tile.gladAlerts.getData(col, row).map { case (date, _) => date }
+        val gladAlertCoverage = raster.tile.gladAlerts.t.isDefined
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
 
-        if (isTreeCoverExtent30 || gladAlertDate.isDefined) {
-          val groupKey = GfwProDashboardRawDataGroup(gladAlertDate)
-          val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(totalArea = 0.0, alertCount = 0))
+        val groupKey = GfwProDashboardRawDataGroup(gladAlertDate, gladAlertsCoverage = gladAlertCoverage)
+        val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(treeCoverExtentArea = 0.0, alertCount = 0))
 
-          if (isTreeCoverExtent30) {
-            val areaHa = Geodesy.pixelArea(lat = raster.rasterExtent.gridRowToMap(row), raster.cellSize) / 10000.0
-            summaryData.totalArea += areaHa
-          }
-
-          if (gladAlertDate.isDefined) {
-            summaryData.alertCount += 1
-          }
-
-          val new_stats = acc.stats.updated(groupKey, summaryData)
-          acc = GfwProDashboardSummary(new_stats)
+        if (isTreeCoverExtent30) {
+          val areaHa = Geodesy.pixelArea(lat = raster.rasterExtent.gridRowToMap(row), raster.cellSize) / 10000.0
+          summaryData.treeCoverExtentArea += areaHa
         }
 
+        if (gladAlertDate.isDefined) {
+          summaryData.alertCount += 1
+        }
+
+        val new_stats = acc.stats.updated(groupKey, summaryData)
+        acc = GfwProDashboardSummary(new_stats)
       }
-
     }
-
 }

@@ -5,6 +5,8 @@ import io.circe.syntax._
 import java.util.Calendar
 import scala.collection.immutable.SortedMap
 import frameless.Injection
+import cats.syntax._
+import cats.implicits._
 import java.time.LocalDate
 import java.time.format._
 import java.time.temporal._
@@ -15,10 +17,7 @@ import _root_.com.amazonaws.thirdparty.joda.time.DateTime
 case class GfwProDashboardDataDateCount(value: SortedMap[String, Int]) {
 
   def merge(other: GfwProDashboardDataDateCount): GfwProDashboardDataDateCount = {
-    GfwProDashboardDataDateCount(value ++ other.value.map {
-      case (key, otherValue) =>
-        key -> (value.getOrElse(key, 0) + otherValue)
-    })
+    GfwProDashboardDataDateCount(value combine other.value)
   }
 
   def toJson: String = this.value.asJson.noSpaces
