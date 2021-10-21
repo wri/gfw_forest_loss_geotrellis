@@ -4,11 +4,12 @@ import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeD
 import java.time.LocalDate
 
 case class GfwProDashboardRawDataGroup(
-  alertDate: Option[LocalDate]
+  alertDate: Option[LocalDate],
+  gladAlertsCoverage: Boolean
 ) {
     def toGfwProDashboardData(alertCount: Int, totalArea: Double): GfwProDashboardData = {
       GfwProDashboardData(
-        glad_alerts_coverage = alertDate.isDefined,
+        glad_alerts_coverage = gladAlertsCoverage,
         glad_alerts_daily = GfwProDashboardDataDateCount.fillDaily(alertDate, alertCount),
         glad_alerts_weekly = GfwProDashboardDataDateCount.fillWeekly(alertDate, alertCount),
         glad_alerts_monthly = GfwProDashboardDataDateCount.fillMonthly(alertDate, alertCount),

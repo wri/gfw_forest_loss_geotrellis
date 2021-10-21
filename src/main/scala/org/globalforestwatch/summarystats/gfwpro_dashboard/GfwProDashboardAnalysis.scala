@@ -192,7 +192,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           // We need to convert the Map to a List in order to correctly flatmap the data
           summary.stats.toList.map {
             case (dataGroup, data) =>
-              (featureId, dataGroup.toGfwProDashboardData(data.alertCount, data.totalArea))
+              (featureId, dataGroup.toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea))
           }
       }
   }
