@@ -65,10 +65,15 @@ case class ForestChangeDiagnosticData(
   plantation_on_peat_area: ForestChangeDiagnosticDataDouble,
   plantation_in_protected_areas_area: ForestChangeDiagnosticDataDouble,
   commodity_value_forest_extent: ForestChangeDiagnosticDataValueYearly,
+  /** Repeats the peat_area value for each year of diagnostic, ease of use for commodity threat calc */
   commodity_value_peat: ForestChangeDiagnosticDataValueYearly,
+  /** Repeats the protected_areas_area value for each year of diagnostic, ease of use for commodity threat calc */
   commodity_value_protected_areas: ForestChangeDiagnosticDataValueYearly,
+  /** Sum of moving two year window over filtered_tree_cover_loss_yearly */
   commodity_threat_deforestation: ForestChangeDiagnosticDataLossYearly,
+  /** Sum of moving two year window over filtered_tree_cover_loss_peat_yearly + plantation_peat_area */
   commodity_threat_peat: ForestChangeDiagnosticDataLossYearly,
+  /** Sum of moving to year window over filtered_tree_cover_loss_protected_areas_yearly + plantation_in_protected_areas_area */
   commodity_threat_protected_areas: ForestChangeDiagnosticDataLossYearly,
   commodity_threat_fires: ForestChangeDiagnosticDataLossYearly
 ) {
@@ -156,6 +161,9 @@ case class ForestChangeDiagnosticData(
     )
   }
 
+  /**
+    * @see https://docs.google.com/presentation/d/1nAq4mFNkv1q5vFvvXWReuLr4Znvr-1q-BDi6pl_5zTU/edit#slide=id.p
+    */
   def withUpdatedCommodityRisk(): ForestChangeDiagnosticData = {
 
     /* Exclude the last year, limit data to 2019 to sync with palm risk tool:
@@ -171,11 +179,14 @@ case class ForestChangeDiagnosticData(
         filtered_tree_cover_extent.value,
         filtered_tree_cover_loss_yearly.value,
         2
-      )
+      ).limitToMaxYear(maxLossYear)
+
     val peatValueIndicator: ForestChangeDiagnosticDataValueYearly =
-      ForestChangeDiagnosticDataValueYearly.fill(peat_area.value)
+      ForestChangeDiagnosticDataValueYearly.fill(peat_area.value).limitToMaxYear(maxLossYear)
+
     val protectedAreaValueIndicator: ForestChangeDiagnosticDataValueYearly =
-      ForestChangeDiagnosticDataValueYearly.fill(protected_areas_area.value)
+      ForestChangeDiagnosticDataValueYearly.fill(protected_areas_area.value).limitToMaxYear(maxLossYear)
+
     val deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly =
       ForestChangeDiagnosticDataLossYearly(
         SortedMap(
@@ -196,7 +207,8 @@ case class ForestChangeDiagnosticData(
               })
           ): _*
         )
-      )
+      ).limitToMaxYear(maxLossYear)
+
     val peatThreatIndicator: ForestChangeDiagnosticDataLossYearly =
       ForestChangeDiagnosticDataLossYearly(
         SortedMap(
@@ -218,7 +230,8 @@ case class ForestChangeDiagnosticData(
               })
           ): _*
         )
-      )
+      ).limitToMaxYear(maxLossYear)
+
     val protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly =
       ForestChangeDiagnosticDataLossYearly(
         SortedMap(
@@ -239,7 +252,7 @@ case class ForestChangeDiagnosticData(
               })
           ): _*
         )
-      )
+      ).limitToMaxYear(maxLossYear)
 
     copy(
       commodity_value_forest_extent = forestValueIndicator,
