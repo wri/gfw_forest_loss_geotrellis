@@ -14,6 +14,10 @@ case class ForestChangeDiagnosticDataValueYearly(value: SortedMap[Int, Double])
     ForestChangeDiagnosticDataValueYearly(Semigroup[SortedMap[Int, Double]].combine(value, other.value))
   }
 
+  def limitToMaxYear(maxYear: Int): ForestChangeDiagnosticDataValueYearly= {
+    ForestChangeDiagnosticDataValueYearly(value.filterKeys{ year => year <= maxYear })
+  }
+
   def toJson: String = {
     this.round.asJson.noSpaces
   }
