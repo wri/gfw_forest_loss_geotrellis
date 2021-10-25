@@ -32,7 +32,7 @@ object IntegratedAlertsSummary {
                 col: Int,
                 row: Int): Unit = {
 
-        val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
+        // val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
         // This is a pixel by pixel operation
         val gladL: Option[(String, String)] =
@@ -42,7 +42,7 @@ object IntegratedAlertsSummary {
         val radd: Option[(String, String)] =
           raster.tile.radd.getData(col, row)
 
-        if (!(changeOnly && gladL.isEmpty && gladS2.isEmpty && radd.isEmpty)) {
+        if (!(gladL.isEmpty && gladS2.isEmpty && radd.isEmpty)) {
           val biomass: Double = raster.tile.biomass.getData(col, row)
           val climateMask: Boolean = raster.tile.climateMask.getData(col, row)
           val primaryForest: Boolean =

@@ -14,7 +14,7 @@ object GeotrellisGeometryReducer extends java.io.Serializable {
   // and geometries already simplified to 1e11
 
   val gpr = new GeometryPrecisionReducer(
-    new PrecisionModel(1e10)
+    new PrecisionModel(1e9)
   )
 
   def reduce(
