@@ -5,8 +5,8 @@ import geotrellis.vector.{Feature, Geometry, MultiPolygon}
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, MultiPolygon => GeoSparkMultiPolygon}
 import geotrellis.store.index.zcurve.Z2
 import org.apache.spark.HashPartitioner
-import org.globalforestwatch.features.{CombinedFeatureId, FeatureIdFactory, FeatureRDDFactory, FireAlertRDD, GfwProFeatureId, SpatialFeatureDF}
-import org.globalforestwatch.summarystats.SummaryAnalysis
+import org.globalforestwatch.features._
+import org.globalforestwatch.summarystats._
 import org.globalforestwatch.util.GeoSparkGeometryConstructor.createPoint
 import org.globalforestwatch.util.IntersectGeometry.intersectGeometries
 import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
@@ -23,8 +23,10 @@ import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.util.Util.getAnyMapValue
 import org.datasyslab.geosparksql.utils.Adapter
+import org.datasyslab.geospark.spatialRDD.SpatialRDD
 
 import scala.collection.JavaConverters._
+import java.time.LocalDate
 
 object GfwProDashboardAnalysis extends SummaryAnalysis {
 
@@ -32,32 +34,37 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
+            contextualFeatureType: String,
+            contextualFeatureUrl: NonEmptyList[String],
+            fireAlertRDD: SpatialRDD[GeoSparkGeometry],
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
-    val enrichedRDD = intersectWithContextualLayer(featureRDD, kwargs, spark)
+    val enrichedRDD = intersectWithContextualLayer(featureRDD, contextualFeatureType, contextualFeatureUrl, kwargs, spark)
     enrichedRDD.cache()
 
-    val summaryRDD: RDD[(FeatureId, GfwProDashboardSummary)] =
+    val summaryRDD: RDD[(FeatureId, ValidatedRow[GfwProDashboardSummary])] =
       GfwProDashboardRDD(enrichedRDD, GfwProDashboardGrid.blockTileGrid, kwargs)
 
     val fireCountRDD: RDD[(FeatureId, GfwProDashboardDataDateCount)] =
-      GfwProDashboardAnalysis.fireStats(enrichedRDD, spark, kwargs)
+      GfwProDashboardAnalysis.fireStats(enrichedRDD, fireAlertRDD, spark)
 
-    val dataRDD: RDD[(FeatureId, GfwProDashboardData)] =
-      formatGfwProDashboardData(summaryRDD)
-        .reduceByKey(_ merge _)
+    val dataRDD: RDD[(FeatureId, ValidatedRow[GfwProDashboardData])] =
+      summaryRDD
+        .mapValues{ validated => validated.map(_.toGfwProDashboardData()) }
         .leftOuterJoin(fireCountRDD)
         .mapValues {
-          case (data, fire) =>
-            data.update(
-              viirsAlertsDaily =
-                fire.getOrElse(GfwProDashboardDataDateCount.empty)
-            )
+          case (validated, fire) =>
+             // Fire results are discarded if joined to error summary
+            validated.map { data =>
+              data.copy(
+                viirs_alerts_daily =
+                  fire.getOrElse(GfwProDashboardDataDateCount.empty)
+              )
+            }
         }
 
-    val summaryDF =
-      GfwProDashboardDFFactory(featureType, dataRDD, spark, kwargs).getDataFrame
+    val summaryDF = GfwProDashboardDF.getFeatureDataFrame(dataRDD, spark)
 
     val runOutputUrl: String = getOutputUrl(kwargs)
 
@@ -65,48 +72,28 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
   }
 
   def fireStats(
-                 featureRDD: RDD[Feature[Geometry, FeatureId]],
-                 spark: SparkSession,
-                 kwargs: Map[String, Any]
-               ): RDD[(FeatureId, GfwProDashboardDataDateCount)] = {
-
-    // FIRE RDD
-
-    val fireAlertSpatialRDD = FireAlertRDD(spark, kwargs)
-
-    // Feature RDD
+    featureRDD: RDD[Feature[Geometry, FeatureId]],
+    fireAlertRDD: SpatialRDD[GeoSparkGeometry],
+    spark: SparkSession
+  ): RDD[(FeatureId, GfwProDashboardDataDateCount)] = {
     val featureSpatialRDD = toSpatialRDD(featureRDD)
+    val joinedRDD = SpatialJoinRDD.spatialjoin(featureSpatialRDD, fireAlertRDD)
 
-    val joinedRDD =
-      SpatialJoinRDD.spatialjoin(featureSpatialRDD, fireAlertSpatialRDD)
-
-    joinedRDD.rdd
-      .map {
-        case (poly, points) =>
-          toGfwProDashboardFireData(poly, points)
-      }
-      .reduceByKey(_ merge _)
+    joinedRDD.rdd .map { case (poly, points) =>
+      toGfwProDashboardFireData(poly, points)
+    }.reduceByKey(_ merge _)
   }
 
   private def intersectWithContextualLayer(
-                                            featureRDD: RDD[Feature[Geometry, FeatureId]],
-                                            kwargs: Map[String, Any],
-                                            spark: SparkSession
-                                          ): RDD[Feature[Geometry, FeatureId]] = {
-
-    val contextualFeatureUrl: NonEmptyList[String] =
-      getAnyMapValue[NonEmptyList[String]](kwargs, "contextualFeatureUrl")
-    val contextualFeatureType: String =
-      getAnyMapValue[String](kwargs, "contextualFeatureType")
-    val analysis: String = "gfwpro_dashboard"
+    featureRDD: RDD[Feature[Geometry, FeatureId]],
+    contextualFeatureType: String,
+    contextualFeatureUrl: NonEmptyList[String],
+    kwargs: Map[String, Any],
+    spark: SparkSession
+  ): RDD[Feature[Geometry, FeatureId]] = {
 
     // Reading the contextual Layer directly as SpatialDF to avoid having to go via a FeatureRDD and back.
-    val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl,
-      contextualFeatureType,
-      kwargs,
-      "geom",
-      spark: SparkSession
-    )
+    val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl, contextualFeatureType, FeatureFilter.empty, "geom", spark)
 
     val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
 
@@ -124,7 +111,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
         val featureGeom = pair._1
         val featureId = featureGeom.getUserData.asInstanceOf[FeatureId]
         val contextualGeom = pair._2
-        val contextualId = FeatureIdFactory(contextualFeatureType).fromUserData(contextualGeom.getUserData.asInstanceOf[String], delimiter = ",")
+        val contextualId = FeatureId.fromUserData(contextualFeatureType, contextualGeom.getUserData.asInstanceOf[String], delimiter = ",")
 
         featureId match {
           case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>
@@ -187,23 +174,17 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
       points.asScala.toList.foldLeft(GfwProDashboardDataDateCount.empty) {
         (z, point) => {
-          // extract year from acq_date column
-          val alertDate =
-            point.getUserData.asInstanceOf[String].split("\t")(2)
-          z.merge(
-            GfwProDashboardDataDateCount
-              .fill(Some(alertDate), 1, viirs = true)
-          )
-
+          // extract year from acq_date column is YYYY-MM-DD
+          val acqDate = point.getUserData.asInstanceOf[String].split("\t")(2)
+          val alertDate = LocalDate.parse(acqDate)
+          z.merge(GfwProDashboardDataDateCount.fillDaily(Some(alertDate), 1))
         }
       }
 
     })
   }
 
-  private def formatGfwProDashboardData(
-                                         summaryRDD: RDD[(FeatureId, GfwProDashboardSummary)]
-                                       ): RDD[(FeatureId, GfwProDashboardData)] = {
+  private def formatGfwProDashboardData(summaryRDD: RDD[(FeatureId, GfwProDashboardSummary)]): RDD[(FeatureId, GfwProDashboardData)] = {
 
     summaryRDD
       .flatMap {
@@ -211,31 +192,8 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           // We need to convert the Map to a List in order to correctly flatmap the data
           summary.stats.toList.map {
             case (dataGroup, data) =>
-              toGfwProDashboardData(featureId, dataGroup, data)
-
+              (featureId, dataGroup.toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea))
           }
       }
-  }
-
-  private def toGfwProDashboardData(
-                                     featureId: FeatureId,
-                                     dataGroup: GfwProDashboardRawDataGroup,
-                                     data: GfwProDashboardRawData
-                                   ): (FeatureId, GfwProDashboardData) = {
-
-    (
-      featureId,
-      GfwProDashboardData(
-        dataGroup.alertCoverage,
-        gladAlertsDaily = GfwProDashboardDataDateCount
-          .fill(dataGroup.alertDate, data.alertCount),
-        gladAlertsWeekly = GfwProDashboardDataDateCount
-          .fill(dataGroup.alertDate, data.alertCount, weekly = true),
-        gladAlertsMonthly = GfwProDashboardDataDateCount
-          .fill(dataGroup.alertDate, data.alertCount, monthly = true),
-        viirsAlertsDaily = GfwProDashboardDataDateCount.empty
-      )
-    )
-
   }
 }

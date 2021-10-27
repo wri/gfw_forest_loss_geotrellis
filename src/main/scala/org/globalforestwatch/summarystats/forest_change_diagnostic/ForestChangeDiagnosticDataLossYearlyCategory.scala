@@ -1,7 +1,9 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
+import frameless.Injection
 import io.circe.syntax._
 import io.circe.parser.decode
+
 import scala.reflect.internal.pickling.ByteCodecs
 
 case class ForestChangeDiagnosticDataLossYearlyCategory(
@@ -69,4 +71,5 @@ object ForestChangeDiagnosticDataLossYearlyCategory {
 
   }
 
+  implicit def injection: Injection[ForestChangeDiagnosticDataLossYearlyCategory, String] = Injection(_.toJson, fromString)
 }

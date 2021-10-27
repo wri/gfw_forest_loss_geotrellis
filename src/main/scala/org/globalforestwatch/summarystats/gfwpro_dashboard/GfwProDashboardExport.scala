@@ -20,7 +20,7 @@ object GfwProDashboardExport extends SummaryExport {
                                       kwargs: Map[String, Any]): Unit = {
 
     summaryDF
-      .coalesce(1)
+      .repartition(1)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/final")

@@ -10,8 +10,8 @@ import org.globalforestwatch.layers._
   * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
 case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
-
-  val gladAlerts: GladAlerts = GladAlerts(gridTile, kwargs)
+  val gladAlerts = GladAlerts(gridTile, kwargs)
+  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,
@@ -23,12 +23,11 @@ case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, An
       gladAlertsTile <- Either
         .catchNonFatal(gladAlerts.fetchWindow(windowKey, windowLayout))
         .right
-
+      tcd2000Tile <- Either
+        .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
+        .right
     } yield {
-
-
-      val tile = GfwProDashboardTile(gladAlertsTile)
-
+      val tile = GfwProDashboardTile(gladAlertsTile, tcd2000Tile)
       Raster(tile, windowKey.extent(windowLayout))
     }
   }
@@ -42,9 +41,6 @@ object GfwProDashboardGridSources {
       .empty[String, GfwProDashboardGridSources]
 
   def getCachedSources(gridTile: GridTile, kwargs: Map[String, Any]): GfwProDashboardGridSources = {
-
     cache.getOrElseUpdate(gridTile.tileId, GfwProDashboardGridSources(gridTile, kwargs))
-
   }
-
 }

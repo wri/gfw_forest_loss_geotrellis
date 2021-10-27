@@ -30,7 +30,6 @@ class RequestPayerS3ClientFactory extends DefaultS3ClientFactory {
 
     awsConf.addHeader("x-amz-request-payer", "requester");
 
-    new AmazonS3Client(credentials, awsConf)
-
+    AmazonS3ClientBuilder.standard().withCredentials(credentials).withClientConfiguration(awsConf).build()
   }
 }

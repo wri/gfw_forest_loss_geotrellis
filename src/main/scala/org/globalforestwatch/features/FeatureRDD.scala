@@ -32,18 +32,17 @@ object FeatureRDD {
 
   def apply(input: NonEmptyList[String],
             featureType: String,
-            kwargs: Map[String, Any],
+            filters: FeatureFilter,
+            splitFeatures: Boolean,
             spark: SparkSession,
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
-    val splitFeatures = getAnyMapValue[Boolean](kwargs, "splitFeatures")
-    //    val geomFieldName = getAnyMapValue[String](kwargs, "geomFieldName")
-
-    if (splitFeatures) splitGeometries(input, featureType, kwargs, spark)
+    if (splitFeatures)
+      splitGeometries(input, featureType, filters, spark)
     else {
-      val featureObj: Feature = FeatureFactory(featureType).featureObj
+      val featureObj: Feature = Feature(featureType)
       val featuresDF: DataFrame =
-        FeatureDF(input, featureObj, kwargs, spark)
+        FeatureDF(input, featureObj, filters, spark)
 
       featuresDF.rdd
         .mapPartitions({ iter: Iterator[Row] =>
@@ -60,11 +59,10 @@ object FeatureRDD {
   /*
     Convert point-in-polygon join to feature RDD
    */
-  def apply(featureType: String,
-            spatialRDD: SpatialRDD[GeoSparkGeometry],
-            kwargs: Map[String, Any],
-           ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
-
+  def pointInPolygonJoinAsFeature(
+    featureType: String,
+    spatialRDD: SpatialRDD[GeoSparkGeometry]
+  ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
     val scalaRDD =
       org.apache.spark.api.java.JavaRDD.toRDD(spatialRDD.spatialPartitionedRDD)
 
@@ -77,7 +75,7 @@ object FeatureRDD {
           val geom: vector.Point = pt
 
           val pointFeatureId: FeatureId =
-            FeatureIdFactory(featureType).fromUserData(pointFeatureData)
+            FeatureId.fromUserData(featureType, pointFeatureData)
 
           vector.Feature(geom, pointFeatureId)
         case _ =>
@@ -98,7 +96,7 @@ object FeatureRDD {
              feature2Type: String,
              feature2Uris: NonEmptyList[String],
              feature2Delimiter: String,
-             kwargs: Map[String, Any],
+             filters: FeatureFilter,
              spark: SparkSession
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
@@ -108,16 +106,14 @@ object FeatureRDD {
       feature2Uris,
       feature2Type,
       spark,
-      kwargs,
+      filters,
       feature1Delimiter,
       feature2Delimiter,
     )
 
     val pairedRDD = spatialDF.rdd.map { row: Row =>
-      val featureId1: FeatureId = FeatureIdFactory(feature1Type)
-        .fromUserData(row.getAs[Row](0).toString, ",")
-      val featureId2: FeatureId = FeatureIdFactory(feature2Type)
-        .fromUserData(row.getAs[Row](1).toString, ",")
+      val featureId1: FeatureId = FeatureId.fromUserData(feature1Type, row.getAs[Row](0).toString, ",")
+      val featureId2: FeatureId = FeatureId.fromUserData(feature2Type, row.getAs[Row](1).toString, ",")
       val geom = row.getAs[GeoSparkGeometry](2)
 
       (CombinedFeatureId(featureId1, featureId2), geom)
@@ -145,12 +141,12 @@ object FeatureRDD {
   private def splitGeometries(
                                input: NonEmptyList[String],
                                featureType: String,
-                               kwargs: Map[String, Any],
+                               filters: FeatureFilter,
                                spark: SparkSession
                              ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
     val featureDF: DataFrame =
-      SpatialFeatureDF(input, featureType, kwargs, "geom", spark)
+      SpatialFeatureDF(input, featureType, filters, "geom", spark)
 
     val spatialRDD: SpatialRDD[GeoSparkGeometry] =
       Adapter.toSpatialRdd(featureDF, "polyshape")
@@ -158,8 +154,7 @@ object FeatureRDD {
 
 
     spatialRDD.rawSpatialRDD = spatialRDD.rawSpatialRDD.rdd.map { geom: GeoSparkGeometry =>
-      val featureId = FeatureIdFactory(featureType)
-        .fromUserData(geom.getUserData.asInstanceOf[String], delimiter = ",")
+      val featureId = FeatureId.fromUserData(featureType, geom.getUserData.asInstanceOf[String], delimiter = ",")
       geom.setUserData(featureId)
       geom
     }

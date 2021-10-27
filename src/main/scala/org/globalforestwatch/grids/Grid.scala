@@ -61,7 +61,7 @@ trait Grid[T <: GridSources] {
   def checkSources(gridTile: GridTile, windowExtent: Extent, windowKey: SpatialKey, windowLayout: LayoutDefinition, kwargs:  Map[String, Any]): T = {
 
     def ccToMap(cc: AnyRef): Map[String, Any] =
-      (Map[String, Any]() /: cc.getClass.getDeclaredFields) { (a, f) =>
+      cc.getClass.getDeclaredFields.foldLeft(Map.empty[String, Any]) { (a, f) =>
         f.setAccessible(true)
         a + (f.getName -> f.get(cc))
       }

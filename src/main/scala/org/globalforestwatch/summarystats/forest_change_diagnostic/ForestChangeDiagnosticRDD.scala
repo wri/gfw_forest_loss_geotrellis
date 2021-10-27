@@ -6,9 +6,9 @@ import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.raster.summary.polygonal._
 import geotrellis.vector._
-import org.globalforestwatch.summarystats.SummaryRDD
+import org.globalforestwatch.summarystats.ErrorSummaryRDD
 
-object ForestChangeDiagnosticRDD extends SummaryRDD {
+object ForestChangeDiagnosticRDD extends ErrorSummaryRDD {
 
   type SOURCES = ForestChangeDiagnosticGridSources
   type SUMMARY = ForestChangeDiagnosticSummary
@@ -23,7 +23,7 @@ object ForestChangeDiagnosticRDD extends SummaryRDD {
         windowLayout,
         kwargs
       )
-    }
+    }.left.map { ex => logger.error("Error in ErrorForestChangeDiagnosticRDD.getSources", ex); ex}
   }
 
   def readWindow(

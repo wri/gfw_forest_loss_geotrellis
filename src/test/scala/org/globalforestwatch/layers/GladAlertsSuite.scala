@@ -15,32 +15,32 @@ class GladAlertsSuits extends AnyFunSuite {
 
   test("Unconfirmed date 1") {
     assert(
-      glad.lookup(20001) == Some(("2015-01-01", false))
+      glad.lookup(20001) == Some((LocalDate.of(2015, 1, 1), false))
     )
   }
   test("Unconfirmed date 2") {
     assert(
-      glad.lookup(20366) === Some(("2016-01-01", false))
+      glad.lookup(20366) === Some((LocalDate.of(2016,1,1), false))
     )
   }
   test("Unconfirmed date 3") {
     assert(
-      glad.lookup(20732) === Some(("2017-01-01", false))
+      glad.lookup(20732) === Some((LocalDate.of(2017,1,1), false))
     )
   }
   test("Confirmed date 1") {
     assert(
-      glad.lookup(30001) === Some(("2015-01-01", true))
+      glad.lookup(30001) === Some((LocalDate.of(2015,1,1), true))
     )
   }
   test("Confirmed date 2") {
     assert(
-      glad.lookup(30366) === Some(("2016-01-01", true))
+      glad.lookup(30366) === Some((LocalDate.of(2016,1,1), true))
     )
   }
   test("Confirmed date 3") {
     assert(
-      glad.lookup(30732) === Some(("2017-01-01", true))
+      glad.lookup(30732) === Some((LocalDate.of(2017,1,1), true))
     )
   }
 }

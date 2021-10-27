@@ -3,6 +3,7 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 import cats.implicits._
 import geotrellis.raster._
 import geotrellis.raster.summary.GridVisitor
+import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 
@@ -19,6 +20,14 @@ case class ForestChangeDiagnosticSummary(
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     ForestChangeDiagnosticSummary(stats.combine(other.stats))
   }
+
+  /** Pivot raw data to ForestChangeDiagnosticData and aggregate across years */
+  def toForestChangeDiagnosticData(): ForestChangeDiagnosticData = {
+    stats
+      .map { case (group, data) => group.toForestChangeDiagnosticData(data.totalArea) }
+      .foldLeft(ForestChangeDiagnosticData.empty)( _ merge _)
+  }
+  def isEmpty = stats.isEmpty
 }
 
 object ForestChangeDiagnosticSummary {

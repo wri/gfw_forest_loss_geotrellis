@@ -7,7 +7,7 @@ licenses := Seq(
 )
 
 scalaVersion := Version.scala
-scalaVersion in ThisBuild := Version.scala
+ThisBuild  / scalaVersion := Version.scala
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -55,6 +55,7 @@ libraryDependencies ++= Seq(
   sparkCore,
   sparkSQL,
   sparkHive,
+  "org.typelevel" %% "frameless-dataset" % Version.frameless,
   hadoopAws,
   hadoopCommon,
   hadoopMapReduceClientCore,
@@ -85,6 +86,14 @@ libraryDependencies ++= Seq(
 )
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
+
+assembly / assemblyShadeRules := {
+  val shadePackage = "org.globalforestwatch.shaded"
+  Seq(
+    ShadeRule.rename("shapeless.**" -> s"$shadePackage.shapeless.@1").inAll,
+    ShadeRule.rename("cats.kernel.**" -> s"$shadePackage.cats.kernel.@1").inAll
+  )
+}
 
 // auto imports for local SBT console
 // can be used with `test:console` command
@@ -119,7 +128,7 @@ import org.globalforestwatch.util._
 """
 
 // settings for local testing
-console / fork := true
+Compile / console / fork := true
 Test / fork := true
 Test / parallelExecution := false
 Test / testOptions += Tests.Argument("-oD")
@@ -127,9 +136,9 @@ Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m")
 Test / envVars := Map("AWS_REQUEST_PAYER" -> "requester")
 
 // Settings for sbt-assembly plugin which builds fat jars for use by spark jobs
-test in assembly := {}
-assemblyOption in assembly := (assemblyOption in assembly).value.copy(appendContentHash = true)
-assemblyMergeStrategy in assembly := {
+assembly / test := {}
+assembly / assemblyOption := (assembly / assemblyOption).value.withAppendContentHash(true)
+assembly / assemblyMergeStrategy  := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat
   // both GeoSpark and Geotrellis bring in this library, need to use GeoSpark version

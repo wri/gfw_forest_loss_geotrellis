@@ -9,13 +9,15 @@ import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.vector.{Extent, Feature, Geometry, Point}
 import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.{Column, SparkSession}
+import org.apache.spark.sql.functions.{col, struct}
 import org.globalforestwatch.features.FeatureId
 import org.json4s.jackson.JsonMethods.parse
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
+import scala.reflect.runtime.universe._
+import java.util.NoSuchElementException
 
 
 object Util {
@@ -90,9 +92,20 @@ object Util {
       .show(100, false)
   }
 
-
   def jsonStrToMap(jsonStr: String): Map[String, Any] = {
     implicit val formats = org.json4s.DefaultFormats
     parse(jsonStr).extract[Map[String, Any]]
   }
+
+  /** Select columns with same names as case class fields and group them into a struct */
+  def colsFor[T: TypeTag]: Column = {
+    val cols = typeOf[T].members.collect {
+      case m: MethodSymbol if m.isCaseAccessor => col(m.name.toString)
+    }.toSeq
+    struct(cols: _*)
+  }
+
+  /** Select given fields from a struct column */
+  def fieldsFromCol(col: Column, fields: List[String]): List[Column] =
+    fields.map(name => col.getField(name).as(name))
 }

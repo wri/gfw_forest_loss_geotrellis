@@ -4,6 +4,7 @@ import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
+import org.globalforestwatch.features._
 
 object TreeCoverLossCommand extends SummaryCommand {
 
@@ -30,9 +31,7 @@ object TreeCoverLossCommand extends SummaryCommand {
     )
     .orFalse
 
-
-  val treeCoverLossOptions
-  : Opts[(NonEmptyList[String], Int, Product with Serializable, Boolean)] =
+  val treeCoverLossOptions: Opts[(NonEmptyList[String], Int, Product with Serializable, Boolean)] =
     (contextualLayersOpts, tcdOpt, thresholdOpts, carbonPoolOpts).tupled
 
   val treeCoverLossCommand: Opts[Unit] = Opts.subcommand(
@@ -42,26 +41,22 @@ object TreeCoverLossCommand extends SummaryCommand {
     (
       defaultOptions,
       treeCoverLossOptions,
-      defaultFilterOptions,
       featureFilterOptions
-      ).mapN { (default, treeCoverLoss, defaultFilter, featureFilter) =>
+    ).mapN { (default, treeCoverLoss, filterOptions) =>
       val kwargs = Map(
-        "outputUrl" -> default._3,
-        "splitFeatures" -> default._4,
-        "noOutputPathSuffix" -> default._5,
-        "pinnedVersions" -> default._6,
+        "outputUrl" -> default.outputUrl,
+        "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "contextualLayers" -> treeCoverLoss._1,
         "tcdYear" -> treeCoverLoss._2,
         "thresholdFilter" -> treeCoverLoss._3,
-        "carbonPools" -> treeCoverLoss._4,
-        "idStart" -> featureFilter._1,
-        "idEnd" -> featureFilter._2,
-        "limit" -> defaultFilter._1,
-        "tcl" -> defaultFilter._2,
-        "glad" -> defaultFilter._3
+        "carbonPools" -> treeCoverLoss._4
       )
+      val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
-      runAnalysis(TreeLossAnalysis.name, default._1, default._2, kwargs)
+      runAnalysis { spark =>
+        val featureRDD = FeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures, spark)
+        TreeLossAnalysis(featureRDD, default.featureType, spark, kwargs)
+      }
     }
   }
 }

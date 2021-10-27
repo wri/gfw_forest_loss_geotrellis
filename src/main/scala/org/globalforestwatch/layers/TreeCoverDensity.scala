@@ -1,6 +1,7 @@
 package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
+import org.globalforestwatch.config.GfwConfig
 
 trait TreeCoverDensityThreshold extends IntegerLayer with RequiredILayer {
 
@@ -22,7 +23,6 @@ trait TreeCoverDensityThreshold extends IntegerLayer with RequiredILayer {
 
 case class TreeCoverDensityThreshold2000(gridTile: GridTile, kwargs: Map[String, Any])
   extends TreeCoverDensityThreshold {
-
   val datasetName = "umd_tree_cover_density_2000"
   val uri: String =
     s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
@@ -44,7 +44,6 @@ case class TreeCoverDensity2010_60(gridTile: GridTile, kwargs: Map[String, Any])
     s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/percent/gdal-geotiff/${gridTile.tileId}.tif"
 
   override def lookup(value: Int): Boolean = value > 60
-
 }
 
 case class TreeCoverDensityPercent2000(gridTile: GridTile, kwargs: Map[String, Any])

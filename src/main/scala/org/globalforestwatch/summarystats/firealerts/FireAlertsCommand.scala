@@ -3,6 +3,9 @@ package org.globalforestwatch.summarystats.firealerts
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
+import org.globalforestwatch.features._
+import org.datasyslab.geospark.spatialRDD.SpatialRDD
+import org.datasyslab.geospark.enums.GridType
 
 object FireAlertsCommand extends SummaryCommand {
   val changeOnlyOpt: Opts[Boolean] =
@@ -16,43 +19,46 @@ object FireAlertsCommand extends SummaryCommand {
       defaultOptions,
       changeOnlyOpt,
       fireAlertOptions,
-      defaultFilterOptions,
-      gdamFilterOptions,
-      wdpaFilterOptions,
-      featureFilterOptions,
-      ).mapN {
-      (default,
-       changeOnly,
-       fireAlert,
-       defaultFilter,
-       gadmFilter,
-       wdpaFilter,
-       featureFilter) =>
-        val kwargs = Map(
-          "featureUris" -> default._2,
-          "outputUrl" -> default._3,
-          "splitFeatures" -> default._4,
-          "noOutputPathSuffix" -> default._5,
-          "pinnedVersions" -> default._6,
-          "changeOnly" -> changeOnly,
-          "fireAlertType" -> fireAlert._1,
-          "fireAlertSource" -> fireAlert._2,
-          "iso" -> gadmFilter._1,
-          "isoFirst" -> gadmFilter._2,
-          "isoStart" -> gadmFilter._3,
-          "isoEnd" -> gadmFilter._4,
-          "admin1" -> gadmFilter._5,
-          "admin2" -> gadmFilter._6,
-          "idStart" -> featureFilter._1,
-          "idEnd" -> featureFilter._2,
-          "wdpaStatus" -> wdpaFilter._1,
-          "iucnCat" -> wdpaFilter._2,
-          "limit" -> defaultFilter._1,
-          "tcl" -> defaultFilter._2,
-          "glad" -> defaultFilter._3
-        )
+      featureFilterOptions
+    ).mapN { (default, changeOnly, fireAlert, filterOptions) =>
+      val kwargs = Map(
+        "featureUris" -> default.featureUris,
+        "outputUrl" -> default.outputUrl,
+        "splitFeatures" -> default.splitFeatures,
+        "noOutputPathSuffix" -> default.noOutputPathSuffix,
+        "changeOnly" -> changeOnly
+      )
 
-        runAnalysis(FireAlertsAnalysis.name, default._1, default._2, kwargs)
+      val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
+
+      runAnalysis { spark =>
+        val featureRDD = fireAlert.alertType match {
+          case "viirs" | "modis" =>
+            val fireRDD = FireAlertRDD(spark, fireAlert.alertType, fireAlert.alertSource, FeatureFilter.empty)
+            fireRDD.spatialPartitioning(GridType.QUADTREE)
+            FeatureRDD.pointInPolygonJoinAsFeature(fireAlert.alertType, fireRDD)
+          case "burned_areas" =>
+            val burnedAreasUris = fireAlert.alertSource
+            FeatureRDD(
+              fireAlert.alertType,
+              burnedAreasUris,
+              ",",
+              default.featureType,
+              default.featureUris,
+              "\t",
+              featureFilter,
+              spark
+            )
+        }
+
+        FireAlertsAnalysis(
+          featureRDD,
+          default.featureType,
+          FeatureFilter.empty,
+          spark,
+          kwargs
+        )
+      }
     }
   }
 

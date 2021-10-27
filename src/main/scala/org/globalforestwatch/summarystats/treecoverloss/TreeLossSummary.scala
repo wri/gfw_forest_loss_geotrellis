@@ -21,6 +21,7 @@ case class TreeLossSummary(stats: Map[TreeLossDataGroup, TreeLossData] =
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     TreeLossSummary(stats.combine(other.stats))
   }
+  def isEmpty = stats.isEmpty
 }
 
 object TreeLossSummary {

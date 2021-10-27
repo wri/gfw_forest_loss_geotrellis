@@ -2,10 +2,17 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
+import org.globalforestwatch.config.GfwConfig
 import cats.implicits._
 import com.monovore.decline.Opts
+import org.globalforestwatch.summarystats.SummaryAnalysis
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.rdd.RDD
+import org.globalforestwatch.features._
+import org.locationtech.jts.geom.Geometry
+import com.typesafe.scalalogging.LazyLogging
 
-object ForestChangeDiagnosticCommand extends SummaryCommand {
+object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
 
 
   val intermediateListSourceOpt: Opts[Option[NonEmptyList[String]]] = Opts
@@ -22,27 +29,21 @@ object ForestChangeDiagnosticCommand extends SummaryCommand {
       defaultOptions,
       intermediateListSourceOpt,
       fireAlertOptions,
-      defaultFilterOptions,
-      featureFilterOptions,
-      ).mapN { (default, intermediateListSource, fireAlert, defaultFilter, featureFilter) =>
+      featureFilterOptions
+      ).mapN { (default, intermediateListSource, fireAlert, filterOptions) =>
       val kwargs = Map(
-        "featureUris" -> default._2,
-        "outputUrl" -> default._3,
-        "splitFeatures" -> default._4,
-        "noOutputPathSuffix" -> default._5,
-        "pinnedVersions" -> default._6,
-        "intermediateListSource" -> intermediateListSource,
-        "fireAlertType" -> fireAlert._1,
-        "fireAlertSource" -> fireAlert._2,
-        "idStart" -> featureFilter._1,
-        "idEnd" -> featureFilter._2,
-        "limit" -> defaultFilter._1,
-        "tcl" -> defaultFilter._2,
-        "glad" -> defaultFilter._3
+        "outputUrl" -> default.outputUrl,
+        "noOutputPathSuffix" -> default.noOutputPathSuffix
       )
 
-      runAnalysis(ForestChangeDiagnosticAnalysis.name, default._1, default._2, kwargs)
+      if (! default.splitFeatures) logger.warn("Forcing splitFeatures = true")
+      val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
+      runAnalysis { implicit spark =>
+        val featureRDD = FeatureRDD(default.featureUris, default.featureType, featureFilter, splitFeatures = true, spark)
+        val fireAlertRDD = FireAlertRDD(spark, fireAlert.alertType, fireAlert.alertSource, FeatureFilter.empty)
+        ForestChangeDiagnosticAnalysis(featureRDD, default.featureType, intermediateListSource, fireAlertRDD, kwargs)
+      }
     }
   }
 }

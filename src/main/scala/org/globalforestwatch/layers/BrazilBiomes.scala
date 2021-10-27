@@ -1,6 +1,7 @@
 package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
+import org.globalforestwatch.config.GfwConfig
 
 case class BrazilBiomes(gridTile: GridTile, kwargs: Map[String, Any]) extends StringLayer with OptionalILayer {
 

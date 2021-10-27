@@ -7,6 +7,8 @@ import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Util.getAnyMapValue
 import org.globalforestwatch.util.{Geodesy, Mercantile}
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.annotation.tailrec
 
 /** LossData Summary by year */
@@ -18,6 +20,8 @@ case class IntegratedAlertsSummary(stats: Map[IntegratedAlertsDataGroup, Integra
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     IntegratedAlertsSummary(stats.combine(other.stats))
   }
+
+  def isEmpty = stats.isEmpty
 }
 
 object IntegratedAlertsSummary {
@@ -35,11 +39,11 @@ object IntegratedAlertsSummary {
         // val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
 
         // This is a pixel by pixel operation
-        val gladL: Option[(String, String)] =
+        val gladL: Option[(LocalDate, Boolean)] =
           raster.tile.gladL.getData(col, row)
-        val gladS2: Option[(String, String)] =
+        val gladS2: Option[(LocalDate, Boolean)] =
           raster.tile.gladS2.getData(col, row)
-        val radd: Option[(String, String)] =
+        val radd: Option[(LocalDate, Boolean)] =
           raster.tile.radd.getData(col, row)
 
         if (!(gladL.isEmpty && gladS2.isEmpty && radd.isEmpty)) {
@@ -82,42 +86,45 @@ object IntegratedAlertsSummary {
 
           val gladLAlertDate: Option[String] = {
             gladL match {
-              case Some((date, _)) => Some(date)
+              case Some((date, _)) => Some(date.format(DateTimeFormatter.ISO_DATE))
               case _ => None
             }
           }
 
           val gladLConfidence: String = {
             gladL match {
-              case Some((_, conf)) => conf
+              case Some((_, conf)) =>
+                if (conf) "high" else "low"
               case _ => "not_detected"
             }
           }
 
           val gladS2AlertDate: Option[String] = {
             gladS2 match {
-              case Some((date, _)) => Some(date)
+              case Some((date, _)) => Some(date.format(DateTimeFormatter.ISO_DATE))
               case _ => None
             }
           }
 
           val gladS2Confidence: String = {
             gladS2 match {
-              case Some((_, conf)) => conf
+              case Some((_, conf)) =>
+                if (conf) "high" else "low"
               case _ => "not_detected"
             }
           }
 
           val raddAlertDate: Option[String] = {
             radd match {
-              case Some((date, _)) => Some(date)
+              case Some((date, _)) => Some(date.format(DateTimeFormatter.ISO_DATE))
               case _ => None
             }
           }
 
           val raddConfidence: String = {
             radd match {
-              case Some((_, conf)) => conf
+              case Some((_, conf)) =>
+                if (conf) "high" else "low"
               case _ => "not_detected"
             }
           }

@@ -23,10 +23,11 @@ object Version {
   val geotrellis = "3.5.2"
   val hadoop = "3.2.1"
   val jackson = "2.10.0"
-  val spark = "3.0.0"
+  val spark = "3.1.1"
   val sparkCompatible = "3.0"
   val geotools = "23.1"
   val sedona = "1.0.0-incubating"
+  val frameless = "0.9.0"
 }
 
 object Dependencies {

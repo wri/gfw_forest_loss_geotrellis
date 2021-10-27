@@ -12,11 +12,17 @@ import geotrellis.raster.{CellType, IntCells, NoDataHandling, Tile, isNoData}
 import org.globalforestwatch.util.Config
 import org.globalforestwatch.util.Util.{getAnyMapValue, jsonStrToMap}
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
 import scalaj.http._
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import software.amazon.awssdk.services.s3.model.{
+  HeadObjectRequest,
+  NoSuchKeyException,
+  RequestPayer
+}
+import org.globalforestwatch.grids.GridTile
+import java.time.LocalDate
 
 trait Layer {
 
@@ -76,6 +82,12 @@ trait Layer {
 
     }
   }
+
+  protected def uriForGrid(template: String, grid: GridTile): String =
+    template
+      .replace("<gridSize>", grid.gridSize.toString)
+      .replace("<rowCount>", grid.rowCount.toString)
+      .replace("<tileId>", grid.tileId)
 
   def lookup(a: A): B
 }
@@ -423,65 +435,21 @@ trait IntegerLayer extends ILayer {
 }
 
 trait DateConfLayer extends ILayer {
-
-  /**
-    * Layers which return an Integer type
-    * (use java.lang.Integer to be able to use null)
-    */
-  type B = Option[(String, String)]
+  type B = Option[(LocalDate, Boolean)]
 
   val internalNoDataValue: Int = 0
   val externalNoDataValue: B = None
 
-  override def lookup(value: Int): Option[(String, String)] = {
+  val baseDate = LocalDate.of(2014,12,31)
 
-    val confidence = value match {
-      case value if (value >= 30000) => "high"
-      case value if (value >= 20000) => "nominal"
-      case _ => "not_detected"
-    }
-
-    val alertDate: Option[String] = {
-
-      def isLeapYear(year: Int): Boolean = {
-        implicit def int2boolRev(i: Int): Boolean = i <= 0
-        year % 4
-      }
-
-      def getDateString(days: Int, year: Int): String = {
-        val daysInYear = if (isLeapYear(year)) 366 else 365
-        if (days <= daysInYear) s"$year" + "%03d".format(days)
-        else getDateString(days - daysInYear, year + 1)
-      }
-
-      val julianDate = DateTimeFormatter.ofPattern("yyyyDDD")
-      val days: Int = confidence match {
-        case "high" => value - 30000
-        case "nominal" => value - 20000
-        case "not_detected" => -1
-      }
-
-      days match {
-        case d if d < 0 => None
-        case d if d == 0 =>
-          Some(
-            LocalDate
-              .parse(getDateString(365, 2014), julianDate)
-              .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-          )
-        case _ =>
-          Some(
-            LocalDate
-              .parse(getDateString(days, 2015), julianDate)
-              .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-          )
-      }
-
-    }
-
-    alertDate match {
-      case Some(d) => Some(d, confidence)
-      case None => None
+  override def lookup(value: Int): Option[(LocalDate, Boolean)] = {
+    val confidence = value >= 30000
+    val days: Int = if (confidence) value - 30000 else value - 20000
+    if (days < 0) {
+      None
+    } else {
+      val date = baseDate.plusDays(days)
+      Some((date, confidence))
     }
   }
 }

@@ -1,6 +1,7 @@
 package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
+import org.globalforestwatch.config.GfwConfig
 
 case class Plantations(gridTile: GridTile, kwargs: Map[String, Any]) extends StringLayer with OptionalILayer {
 
@@ -12,7 +13,7 @@ case class Plantations(gridTile: GridTile, kwargs: Map[String, Any]) extends Str
   val datasetName = "Na"
   override lazy val version = "Na"
 
-  val uri: String = s"$basePath/gfw_plantations/v2014/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("Plantations"), gridTile)
 
   def lookup(value: Int): String = value match {
     case 1 => "Fruit"
@@ -35,6 +36,6 @@ case class PlantationsBool(gridTile: GridTile, kwargs: Map[String, Any]) extends
   val datasetName = "Na"
   override lazy val version = "Na"
 
-  val uri: String = s"$basePath/gfw_plantations/v2014/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("Plantations"), gridTile)
 
 }

@@ -37,4 +37,13 @@ object SummarySparkSession {
 
     spark
   }
+
+  def run(name: String)(job: SparkSession => Unit): Unit = {
+    val spark = apply(name)
+    try {
+      job(spark)
+    } finally {
+      spark.stop()
+    }
+  }
 }

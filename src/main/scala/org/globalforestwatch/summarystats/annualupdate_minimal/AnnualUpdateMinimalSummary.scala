@@ -19,6 +19,8 @@ case class AnnualUpdateMinimalSummary(
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     AnnualUpdateMinimalSummary(stats.combine(other.stats))
   }
+
+  def isEmpty = stats.isEmpty
 }
 
 object AnnualUpdateMinimalSummary {

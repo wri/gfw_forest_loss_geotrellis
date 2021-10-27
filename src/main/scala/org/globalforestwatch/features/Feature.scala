@@ -4,8 +4,9 @@ import geotrellis.vector.Geometry
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.globalforestwatch.util.GeotrellisGeometryValidator
 import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
-import org.globalforestwatch.util.Util.getAnyMapValue
+import geotrellis.raster.summary.polygonal.Summary
 
+/** This trait defiens how to read a Feature from DataFrame, from what columns to parse its FeatureId and how to read its geometry */
 trait Feature extends java.io.Serializable {
   val geomPos: Int
   val featureIdExpr: String
@@ -33,30 +34,28 @@ trait Feature extends java.io.Serializable {
     }
   }
 
-  def filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
-
-    val spark: SparkSession = df.sparkSession
-    import spark.implicits._
-
-    val trueValues: List[String] =
-      List("t", "T", "true", "True", "TRUE", "1", "Yes", "yes", "YES")
-    val limit: Option[Int] = getAnyMapValue[Option[Int]](filters, "limit")
-    val tcl: Boolean = getAnyMapValue[Boolean](filters, "tcl")
-    val glad: Boolean = getAnyMapValue[Boolean](filters, "glad")
-
-    val customFilterDF = df.transform(custom_filter(filters))
-
-    val gladDF =
-      if (glad) customFilterDF.filter($"glad".isin(trueValues: _*))
-      else customFilterDF
-
-    val tclDF = if (tcl) gladDF.filter($"tcl".isin(trueValues: _*)) else gladDF
-
-    limit.foldLeft(tclDF)(_.limit(_))
-
+  def filter(filters: FeatureFilter)(df: DataFrame): DataFrame = {
+    val conditions = filters.filterConditions()
+    if (conditions.isEmpty) df else {
+      val condition = conditions.reduce(_ and _)
+      df.filter(condition)
+    }
   }
+}
 
-  def custom_filter(filters: Map[String, Any])(df: DataFrame): DataFrame = {
-    df
+object Feature {
+  def apply(name: String): Feature = name match {
+    case "gadm" => GadmFeature
+    case "feature" => SimpleFeature
+    case "wdpa" => WdpaFeature
+    case "geostore" => GeostoreFeature
+    case "viirs" => FireAlertViirsFeature
+    case "modis" => FireAlertModisFeature
+    case "burned_areas" => BurnedAreasFeature
+    case "gfwpro" => GfwProFeature
+    case value =>
+      throw new IllegalArgumentException(
+        s"FeatureType must be one of 'gadm', 'wdpa', 'geostore', 'gfwpro', 'feature', 'viirs', 'modis', or 'burned_areas'. Got $value."
+      )
   }
 }

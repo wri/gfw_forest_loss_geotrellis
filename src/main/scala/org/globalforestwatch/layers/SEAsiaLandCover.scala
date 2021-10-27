@@ -1,6 +1,7 @@
 package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
+import org.globalforestwatch.config.GfwConfig
 
 case class SEAsiaLandCover(gridTile: GridTile, kwargs: Map[String, Any])
   extends StringLayer
@@ -19,7 +20,7 @@ case class SEAsiaLandCover(gridTile: GridTile, kwargs: Map[String, Any])
     case 8 => "Oil palm plantation"
     case 9 => "Timber plantation"
     case 10 => "Mixed tree crops"
-    case 11 | 15 => "Grassland/ shrub"
+    case 11 | 15 => "Grassland/shrub"
     case 12 | 16 => "Swamp"
     case 13 | 17 => "Agriculture"
     case 14 => "Settlements"
