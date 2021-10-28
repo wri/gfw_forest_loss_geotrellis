@@ -38,7 +38,7 @@
      val erroredLocationsRDD = validatedRDD.flatMap{ case (fid, feat) => feat.toEither.left.toOption.map { err => (fid, err) } }
      val mainRDD = validatedRDD.flatMap{ case (_, feat) => feat.toEither.right.toOption }
 
-     mainRDD.persist(StorageLevel.MEMORY_AND_DISK_2)
+     validatedRDD.persist(StorageLevel.MEMORY_AND_DISK_2)
 
      // For standard GFW Pro Feature IDs we create a Grid Filter
      // This will allow us to only process those parts of the dissolved list geometry which were updated
