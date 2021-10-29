@@ -26,7 +26,8 @@ object FireAlertsCommand extends SummaryCommand {
         "outputUrl" -> default.outputUrl,
         "splitFeatures" -> default.splitFeatures,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
-        "changeOnly" -> changeOnly
+        "changeOnly" -> changeOnly,
+        "fireAlertType" -> fireAlert.alertType
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
