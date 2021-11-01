@@ -23,6 +23,13 @@ trait SummaryCommand {
   val outputOpt: Opts[String] =
     Opts.option[String]("output", "URI of output dir for CSV files")
 
+  val overwriteOutputOpt: Opts[Boolean] = Opts
+    .flag(
+      "overwrite",
+      help = "Overwrite output location if already existing"
+    )
+    .orFalse
+
   val featureTypeOpt: Opts[String] = Opts
     .option[String](
       "feature_type",
@@ -110,7 +117,7 @@ trait SummaryCommand {
   val noOutputPathSuffixOpt: Opts[Boolean] = Opts.flag("no_output_path_suffix", help = "Do not autogenerate output path suffix at runtime").orFalse
 
   val defaultOptions: Opts[BaseOptions] =
-    (featureTypeOpt, featuresOpt, outputOpt, splitFeatures, noOutputPathSuffixOpt).mapN(BaseOptions)
+    (featureTypeOpt, featuresOpt, outputOpt, overwriteOutputOpt, splitFeatures, noOutputPathSuffixOpt).mapN(BaseOptions)
 
   val fireAlertOptions: Opts[FireAlert] =
     (fireAlertTypeOpt, fireAlertSourceOpt).mapN(FireAlert)
@@ -152,6 +159,7 @@ object SummaryCommand {
     featureType: String,
     featureUris: NonEmptyList[String],
     outputUrl: String,
+    overwriteOutput: Boolean,
     splitFeatures: Boolean,
     noOutputPathSuffix: Boolean)
 
