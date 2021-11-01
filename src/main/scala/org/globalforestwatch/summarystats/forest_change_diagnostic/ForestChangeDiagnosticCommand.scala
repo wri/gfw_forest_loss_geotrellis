@@ -33,7 +33,8 @@ object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
       ).mapN { (default, intermediateListSource, fireAlert, filterOptions) =>
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
-        "noOutputPathSuffix" -> default.noOutputPathSuffix
+        "noOutputPathSuffix" -> default.noOutputPathSuffix,
+        "overwriteOutput" -> default.overwriteOutput,
       )
 
       if (! default.splitFeatures) logger.warn("Forcing splitFeatures = true")
