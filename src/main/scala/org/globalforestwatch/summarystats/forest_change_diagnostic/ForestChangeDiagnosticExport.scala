@@ -1,6 +1,6 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.globalforestwatch.summarystats.SummaryExport
 
 object ForestChangeDiagnosticExport extends SummaryExport {
@@ -23,7 +23,11 @@ object ForestChangeDiagnosticExport extends SummaryExport {
     featureType match {
 
       case "gfwpro" | "wdpa" | "gadm" => exportFinal(summaryDF, outputUrl, kwargs)
-      case "intermediate" => exportIntermediateList(summaryDF, outputUrl)
+      case "intermediate" => exportIntermediateList(
+        summaryDF,
+        outputUrl,
+        kwargs.getOrElse("overwriteOutput", false).asInstanceOf[Boolean]
+      )
       case _ =>
         throw new IllegalArgumentException(
           "Feature type must be one of 'gfwpro', 'intermediate', 'wdpa', or 'gadm'"
@@ -35,20 +39,29 @@ object ForestChangeDiagnosticExport extends SummaryExport {
                             outputUrl: String,
                             kwargs: Map[String, Any]): Unit = {
 
-    summaryDF
-      .repartition(1)
-      .write
+    val writer =
+      if (kwargs.getOrElse("overwriteOutput", false).asInstanceOf[Boolean])
+        summaryDF.repartition(1).write.mode(SaveMode.Overwrite)
+      else
+        summaryDF.repartition(1).write
+
+    writer
       .options(csvOptions)
       .csv(path = outputUrl + "/final")
 
   }
 
   private def exportIntermediateList(intermediateListDF: DataFrame,
-                                     outputUrl: String): Unit = {
+                                     outputUrl: String,
+                                     overwrite: Boolean): Unit = {
 
-    intermediateListDF
-      .repartition(1)
-      .write
+    val writer =
+      if (overwrite)
+        intermediateListDF.repartition(1).write.mode(SaveMode.Overwrite)
+      else
+        intermediateListDF.repartition(1).write
+
+    writer
       .options(csvOptions)
       .csv(path = outputUrl + "/intermediate")
   }
