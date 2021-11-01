@@ -1,13 +1,18 @@
 package org.globalforestwatch.util
 
+import cats.data.Validated
+import cats.data.Validated.{Valid, Invalid}
 import com.vividsolutions.jts.geom.{
   Geometry,
   GeometryCollection,
   MultiPolygon,
   Polygon,
+  TopologyException,
 }
+import scala.util.{Try, Success, Failure}
 
 import org.globalforestwatch.util.GeoSparkGeometryConstructor.createMultiPolygon
+import org.globalforestwatch.summarystats.{GeometryError, ValidatedRow}
 
 object IntersectGeometry {
 
@@ -39,6 +44,45 @@ object IntersectGeometry {
         }
       case _ => List()
     }
+  }
+
+  def validatedIntersection(
+    thisGeom: Geometry,
+    thatGeom: Geometry
+  ): (Object, ValidatedRow[List[MultiPolygon]]) = {
+
+    /**
+      * Intersection can return GeometryCollections
+      * Here we filter resulting geometries and only return those of the same type as thisGeom
+      * */
+    val userData = thisGeom.getUserData
+
+    val attempt = Try {
+      val intersection: Geometry = thisGeom intersection thatGeom
+      intersection match {
+        case poly: Polygon =>
+          val multi = createMultiPolygon(Array(poly))
+          multi.setUserData(userData)
+          List(multi)
+        case multi: MultiPolygon =>
+          multi.setUserData(userData)
+          List(multi)
+        case collection: GeometryCollection =>
+          val maybe_multi = extractPolygons(collection)
+          maybe_multi match {
+            case Some(multi) =>
+              multi.setUserData(userData)
+              List(multi)
+            case _ => List()
+          }
+        case _ => List()
+      }
+    }
+
+    (userData, attempt match {
+      case Success(v) => Valid(v)
+      case Failure(e) => Invalid(GeometryError(s"Failed intersection with ${thatGeom}"))
+    })
 
   }
 

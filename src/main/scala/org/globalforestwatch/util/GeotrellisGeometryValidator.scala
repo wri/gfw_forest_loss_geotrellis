@@ -2,6 +2,7 @@ package org.globalforestwatch.util
 import org.apache.log4j.Logger
 import geotrellis.vector.{
   Geometry,
+  GeomFactory,
   LineString,
   MultiPoint,
   Point,
@@ -11,6 +12,7 @@ import geotrellis.vector.{
 }
 import geotrellis.vector.io.wkb.WKB
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
+import scala.util.Try
 
 object GeotrellisGeometryValidator extends java.io.Serializable {
   val logger = Logger.getLogger("Geotrellis Geometry Validator")
@@ -59,8 +61,8 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
   }
 
   def makeValidGeom(wkb: String): Geometry = {
-    val geom: Geometry = WKB.read(wkb)
-    makeValidGeom(geom)
+    val geom: Option[Geometry] = Try(WKB.read(wkb)).toOption
+    geom.map(makeValidGeom(_)).getOrElse(GeomFactory.factory.createPoint())
   }
 
   def makeMultiGeom(geom: Geometry): Geometry = {

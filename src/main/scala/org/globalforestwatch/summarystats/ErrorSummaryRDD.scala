@@ -14,7 +14,7 @@ import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
 import scala.reflect.ClassTag
 import cats.kernel.Semigroup
-import cats.data.Validated.{Valid, Invalid}
+import cats.data.Validated.{Valid, Invalid, valid, invalid}
 import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticSummary
 
 
@@ -35,7 +35,7 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
     windowLayout: LayoutDefinition,
     kwargs: Map[String, Any],
     partition: Boolean = true
-  )(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, ValidatedRow[SUMMARY])] = {
+  )(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID]): RDD[(FEATUREID, ValidatedRow[SUMMARY])] = {
 
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.

@@ -1,7 +1,7 @@
  package org.globalforestwatch.summarystats.forest_change_diagnostic
 
  import cats.data.NonEmptyList
- import cats.data.Validated.{Invalid, Valid}
+ import cats.data.Validated.{Invalid, Valid, invalid, valid}
  import cats.syntax._
 
  import java.util
@@ -25,7 +25,7 @@
    val name = "forest_change_diagnostic"
 
    def apply(
-     mainRDD: RDD[Feature[Geometry, FeatureId]],
+     validatedRDD: RDD[(FeatureId, ValidatedRow[Feature[Geometry, FeatureId]])],
      featureType: String,
      intermediateListSource: Option[NonEmptyList[String]],
      fireAlertRDD: SpatialRDD[GeoSparkGeometry],
@@ -34,24 +34,27 @@
 
      val runOutputUrl: String = getOutputUrl(kwargs)
 
-     mainRDD.persist(StorageLevel.MEMORY_AND_DISK_2)
+     // These locations can't be processed because of an error in handling their geometry
+     val erroredLocationsRDD = validatedRDD.flatMap{ case (fid, feat) => feat.toEither.left.toOption.map { err => (fid, err) } }
+     val mainRDD = validatedRDD.flatMap{ case (_, feat) => feat.toEither.right.toOption }
 
+     validatedRDD.persist(StorageLevel.MEMORY_AND_DISK_2)
 
      // For standard GFW Pro Feature IDs we create a Grid Filter
      // This will allow us to only process those parts of the dissolved list geometry which were updated
      // When using other Feature IDs such as WDPA or GADM,
      // there will be no intermediate results and this part will be ignored
      val gridFilter: List[String] =
-     mainRDD
-       .filter { feature: Feature[Geometry, FeatureId] =>
-         feature.data match {
-           case gfwproId: GfwProFeatureId => gfwproId.locationId == -2
-           case _ => false
+       mainRDD
+         .filter { feature: Feature[Geometry, FeatureId] =>
+           feature.data match {
+             case gfwproId: GfwProFeatureId => gfwproId.locationId == -2
+             case _ => false
+           }
          }
-       }
-       .map(f => pointGridId(f.geom.getCentroid, 1))
-       .collect
-         .toList
+         .map(f => pointGridId(f.geom.getCentroid, 1))
+         .collect
+           .toList
 
      val featureRDD: RDD[Feature[Geometry, FeatureId]] =
        toFeatureRdd(mainRDD, gridFilter, intermediateListSource.isDefined)
@@ -95,7 +98,10 @@
            kwargs)
        else dataRDD
 
-     val summaryDF = ForestChangeDiagnosticDF.getFeatureDataFrame(finalRDD, spark)
+     val rejoinedRDD = finalRDD
+       .union(erroredLocationsRDD.map{ case (fid, err) => (fid, invalid[JobError, ForestChangeDiagnosticData](err)) })
+
+     val summaryDF = ForestChangeDiagnosticDF.getFeatureDataFrame(rejoinedRDD, spark)
 
      ForestChangeDiagnosticExport.export(
        featureType,
