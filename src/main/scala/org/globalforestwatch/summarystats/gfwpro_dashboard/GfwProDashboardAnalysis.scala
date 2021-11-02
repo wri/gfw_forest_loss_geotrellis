@@ -1,6 +1,6 @@
 package org.globalforestwatch.summarystats.gfwpro_dashboard
 
-import cats.data.NonEmptyList
+import cats.data.{ NonEmptyList, Validated }
 import geotrellis.vector.{Feature, Geometry, MultiPolygon}
 import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, MultiPolygon => GeoSparkMultiPolygon}
 import geotrellis.store.index.zcurve.Z2
@@ -20,6 +20,7 @@ import java.util
 //import org.apache.sedona.sql.utils.{Adapter, SedonaSQLRegistrator}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+ import org.apache.spark.storage.StorageLevel
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.util.Util.getAnyMapValue
 import org.datasyslab.geosparksql.utils.Adapter
@@ -32,16 +33,36 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
   val name = "gfwpro_dashboard"
 
-  def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
-            featureType: String,
-            contextualFeatureType: String,
-            contextualFeatureUrl: NonEmptyList[String],
-            fireAlertRDD: SpatialRDD[GeoSparkGeometry],
-            spark: SparkSession,
-            kwargs: Map[String, Any]): Unit = {
+  def apply(
+    validatedFeatureRDD: RDD[(FeatureId, ValidatedRow[Feature[Geometry, FeatureId]])],
+    featureType: String,
+    contextualFeatureType: String,
+    contextualFeatureUrl: NonEmptyList[String],
+    fireAlertRDD: SpatialRDD[GeoSparkGeometry],
+    spark: SparkSession,
+    kwargs: Map[String, Any]
+  ): Unit = {
+    // validatedFeatureRDD is used multiple times for following actions:
+      // - spatial join with contextualFeatures, which requires .analyze step
+      // - joining of invalid geometries with output for final write
+    validatedFeatureRDD.persist(StorageLevel.MEMORY_AND_DISK_2)
+
+    val featureRDD: RDD[Feature[Geometry, FeatureId]] = validatedFeatureRDD.flatMap{
+      case (_, vr) if vr.isValid => vr.toEither.right.toOption
+      case _ => None
+    }
+
+    val invalidFeaturesRDD: RDD[(FeatureId, ValidatedRow[GfwProDashboardData])] =
+      validatedFeatureRDD.flatMap{
+        case (_, Validated.Valid(_)) =>
+          None
+        case (fid, Validated.Invalid(err)) =>
+          val row = Validated.invalid[JobError, GfwProDashboardData](err)
+          Some((fid, row))
+      }
 
     val enrichedRDD = intersectWithContextualLayer(featureRDD, contextualFeatureType, contextualFeatureUrl, kwargs, spark)
-    enrichedRDD.cache()
+    enrichedRDD.persist(StorageLevel.MEMORY_AND_DISK_2)
 
     val summaryRDD: RDD[(FeatureId, ValidatedRow[GfwProDashboardSummary])] =
       GfwProDashboardRDD(enrichedRDD, GfwProDashboardGrid.blockTileGrid, kwargs)
@@ -63,8 +84,9 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
               )
             }
         }
+    val joinedRDD = dataRDD.union(invalidFeaturesRDD)
 
-    val summaryDF = GfwProDashboardDF.getFeatureDataFrame(dataRDD, spark)
+    val summaryDF = GfwProDashboardDF.getFeatureDataFrame(joinedRDD, spark)
 
     val runOutputUrl: String = getOutputUrl(kwargs)
 

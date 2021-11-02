@@ -41,14 +41,18 @@ object GfwProDashboardCommand extends SummaryCommand {
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
       runAnalysis { spark =>
-        val featureRDD = FeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures, spark)
+        val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures, spark)
         val fireAlertRDD = FireAlertRDD(spark, fireAlert.alertType, fireAlert.alertSource, FeatureFilter.empty)
 
-        GfwProDashboardAnalysis(featureRDD, default.featureType,
+        GfwProDashboardAnalysis(
+          featureRDD,
+          default.featureType,
           contextualFeatureType = contextualFeatureType,
           contextualFeatureUrl = contextualFeatureUrl,
           fireAlertRDD,
-          spark, kwargs)
+          spark,
+          kwargs
+        )
       }
     }
   }
