@@ -24,6 +24,7 @@ object FireAlertRDD {
       "longitude",
       "latitude"
     )
+
     val fireAlertSpatialRDD =
       Adapter.toSpatialRdd(fireAlertPointDF, "pointshape")
 

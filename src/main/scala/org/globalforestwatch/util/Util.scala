@@ -78,12 +78,11 @@ object Util {
   def countRecordsPerPartition[T](rdd: RDD[T], spark: SparkSession): Unit = {
     import spark.implicits._
 
-    rdd
-      .mapPartitionsWithIndex { case (i, rows) => Iterator((i, rows.size)) }
-      .toDF("partition_number", "number_of_records")
-      .orderBy("number_of_records")
-      .show(100, false)
-
+//    rdd
+//      .mapPartitionsWithIndex { case (i, rows) => Iterator((i, rows.size)) }
+//      .toDF("partition_number", "number_of_records")
+//      .orderBy("number_of_records")
+//      .show(100, false)
 
     rdd
       .mapPartitionsWithIndex { case (i, rows) => Iterator((i, rows.size)) }

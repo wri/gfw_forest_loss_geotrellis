@@ -37,6 +37,7 @@ object FireAlertsCommand extends SummaryCommand {
           case "viirs" | "modis" =>
             val fireRDD = FireAlertRDD(spark, fireAlert.alertType, fireAlert.alertSource, FeatureFilter.empty)
             fireRDD.spatialPartitioning(GridType.QUADTREE)
+
             FeatureRDD.pointInPolygonJoinAsFeature(fireAlert.alertType, fireRDD)
           case "burned_areas" =>
             val burnedAreasUris = fireAlert.alertSource

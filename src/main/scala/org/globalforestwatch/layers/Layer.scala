@@ -61,7 +61,7 @@ trait Layer {
         val response: HttpResponse[String] = Http(
           s"https://data-api.globalforestwatch.org/dataset/${datasetName}/latest"
         ).option(HttpOptions
-          .followRedirects(true)).asString
+          .followRedirects(true)).option(HttpOptions.connTimeout(10000)).option(HttpOptions.readTimeout(50000)).asString
         if (response.code != 200)
           throw new IllegalArgumentException(
             s"Dataset ${datasetName} has no latest version or does not exit. Data API responsen code: ${response.code}"
