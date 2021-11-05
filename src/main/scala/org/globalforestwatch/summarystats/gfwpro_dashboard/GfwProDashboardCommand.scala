@@ -35,6 +35,7 @@ object GfwProDashboardCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
+        "overwriteOutput" -> default.overwriteOutput,
       )
       // TODO: move building the feature object into options
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

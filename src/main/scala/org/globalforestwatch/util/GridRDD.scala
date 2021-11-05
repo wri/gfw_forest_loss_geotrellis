@@ -13,7 +13,7 @@ object GridRDD {
 
     val gridCells = getGridCells(envelope)
 
-    val tcl_geom: MultiPolygon = TreeCoverLossExtent.geometry
+    lazy val tcl_geom: MultiPolygon = TreeCoverLossExtent.geometry
 
     val gridRDD: RDD[Polygon] = {
       spark.sparkContext
@@ -26,6 +26,32 @@ object GridRDD {
             if (poly coveredBy tcl_geom) List(poly)
             else List()
           else List(poly)
+        }
+
+    }
+    val spatialGridRDD = new PolygonRDD(gridRDD)
+    spatialGridRDD.analyze()
+    spatialGridRDD
+  }
+
+  /**
+   *  Finds grid cells in the given envelope which are outside of the tree cover loss
+   *  tracking area
+   */
+  def complement(envelope: Envelope, spark: SparkSession): PolygonRDD = {
+
+    val gridCells = getGridCells(envelope)
+
+    val tcl_geom: MultiPolygon = TreeCoverLossExtent.geometry
+
+    val gridRDD: RDD[Polygon] = {
+      spark.sparkContext
+        .parallelize(gridCells)
+        .flatMap { p =>
+          val poly = createPolygon1x1(minX = p._1, minY = p._2)
+          val gridId = pointGridId(p._1, p._2 + 1, 1)
+          poly.setUserData(gridId)
+          if (poly coveredBy tcl_geom) List() else List(poly)
         }
 
     }

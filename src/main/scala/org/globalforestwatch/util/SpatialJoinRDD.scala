@@ -13,12 +13,12 @@ import scala.reflect.ClassTag
 object SpatialJoinRDD {
 
   def spatialjoin[A <: Geometry : ClassTag, B <: Geometry : ClassTag](
-                                                                       queryWindowRDD: SpatialRDD[A],
-                                                                       valueRDD: SpatialRDD[B],
-                                                                       buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
-                                                                       considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
-                                                                       usingIndex: Boolean = false
-                                                                     ): JavaPairRDD[A, util.HashSet[B]] = {
+    queryWindowRDD: SpatialRDD[A],
+    valueRDD: SpatialRDD[B],
+    buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
+    considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
+    usingIndex: Boolean = false
+  ): JavaPairRDD[A, util.HashSet[B]] = {
 
     try {
       queryWindowRDD.spatialPartitioning(GridType.QUADTREE)
@@ -69,12 +69,12 @@ object SpatialJoinRDD {
   }
 
   def flatSpatialJoin[A <: Geometry : ClassTag, B <: Geometry : ClassTag](
-                                                                           queryWindowRDD: SpatialRDD[A],
-                                                                           valueRDD: SpatialRDD[B],
-                                                                           buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
-                                                                           considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
-                                                                           usingIndex: Boolean = false
-                                                                         ): JavaPairRDD[B, A] = {
+    queryWindowRDD: SpatialRDD[A],
+    valueRDD: SpatialRDD[B],
+    buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
+    considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
+    usingIndex: Boolean = false
+  ): JavaPairRDD[B, A] = {
 
     val queryWindowCount = queryWindowRDD.approximateTotalCount
     val queryWindowPartitions = queryWindowRDD.rawSpatialRDD.getNumPartitions
@@ -136,9 +136,9 @@ object SpatialJoinRDD {
   }
 
   private def bruteForceJoin[A <: Geometry : ClassTag, B <: Geometry : ClassTag](
-                                                                                  leftRDD: SpatialRDD[A],
-                                                                                  rightRDD: SpatialRDD[B]
-                                                                                ): JavaPairRDD[A, util.HashSet[B]] = {
+    leftRDD: SpatialRDD[A],
+    rightRDD: SpatialRDD[B]
+  ): JavaPairRDD[A, util.HashSet[B]] = {
     JavaPairRDD.fromRDD(
       leftRDD.rawSpatialRDD.rdd
         .cartesian(rightRDD.rawSpatialRDD.rdd)
@@ -153,17 +153,15 @@ object SpatialJoinRDD {
     )
   }
 
-  private def bruteForceFlatJoin[A <: Geometry : ClassTag,
-    B <: Geometry : ClassTag](
-                               leftRDD: SpatialRDD[A],
-                               rightRDD: SpatialRDD[B]
-                             ): JavaPairRDD[A, B] = {
+  private def bruteForceFlatJoin[A <: Geometry : ClassTag, B <: Geometry : ClassTag](
+    leftRDD: SpatialRDD[A],
+    rightRDD: SpatialRDD[B]
+  ): JavaPairRDD[A, B] = {
     JavaPairRDD.fromRDD(
       leftRDD.rawSpatialRDD.rdd
         .cartesian(rightRDD.rawSpatialRDD.rdd)
         .filter((pair: (Geometry, Geometry)) => pair._1.intersects(pair._2))
     )
-
   }
 
 }

@@ -243,22 +243,26 @@
      spatialFeatureRDD.fieldNames = seqAsJavaList(List("FeatureId"))
      spatialFeatureRDD.analyze()
 
-     val joinedRDD =
-       SpatialJoinRDD.spatialjoin(
-         spatialFeatureRDD,
-         fireAlertRDD,
-         usingIndex = true
-       )
+     if (spatialFeatureRDD.boundary != null) {
+       val joinedRDD =
+         SpatialJoinRDD.spatialjoin(
+           spatialFeatureRDD,
+           fireAlertRDD,
+           usingIndex = true
+         )
 
-     joinedRDD.rdd
-       .map {
-         case (poly, points) =>
-           toForestChangeDiagnosticFireData(poly, points)
-       }
-       .reduceByKey(_ merge _)
-       .mapValues { fires =>
-         aggregateFireData(fires).limitToMaxYear(2019)
-       }
+       joinedRDD.rdd
+         .map {
+           case (poly, points) =>
+             toForestChangeDiagnosticFireData(poly, points)
+         }
+         .reduceByKey(_ merge _)
+         .mapValues { fires =>
+           aggregateFireData(fires).limitToMaxYear(2019)
+         }
+     } else {
+       spark.sparkContext.emptyRDD
+     }
    }
 
    private def toForestChangeDiagnosticFireData(
