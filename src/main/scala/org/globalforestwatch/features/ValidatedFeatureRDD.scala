@@ -98,45 +98,6 @@ object ValidatedFeatureRDD {
             Some(fid -> validatedFeature)
         }
 
-    // val flatJoin: JavaPairRDD[GeoSparkPolygon, GeoSparkGeometry] =
-    //   SpatialJoinRDD.flatSpatialJoin(
-    //     spatialFeatureRDD,
-    //     spatialGridRDD,
-    //     considerBoundaryIntersection = true
-    //   )
-
-    /*
-      partitions will come back very skewed and we will need to even them out for any downstream analysis
-      For the summary analysis we will eventually use a range partitioner.
-      However, the range partitioner uses sampling to come up with the  break points for the different partitions.
-      If the input RDD is already heavily skewed, sampling will be off and the range partitioner won't do a good job.
-     */
-    // val hashPartitioner = new HashPartitioner(flatJoin.getNumPartitions)
-
-    // val matchedGeoms: RDD[(FeatureId, ValidatedRow[geotrellis.vector.Feature[Geometry, FeatureId]])] = flatJoin.rdd
-    //   .keyBy({ pair: (GeoSparkPolygon, GeoSparkGeometry) =>
-    //     Z2(
-    //       (pair._1.getCentroid.getX * 100).toInt,
-    //       (pair._1.getCentroid.getY * 100).toInt
-    //     ).z
-    //   })
-    //   .partitionBy(hashPartitioner)
-    //   .flatMap { case (_, (gridCell, geom)) =>
-    //     val (fid, geometries) = validatedIntersection(geom, gridCell)
-    //     geometries.traverse { geoms => geoms }.map { vg => (fid.asInstanceOf[FeatureId], vg) }
-    //   }
-    //   .flatMap {
-    //     case (_, Validated.Valid(mp)) if mp.isEmpty =>
-    //       // This is Valid result of intersection, but with no area == not an intersection
-    //       None // flatMap will drop the None,
-    //     case (fid, validated) =>
-    //       val validatedFeature = validated.map { intersection =>
-    //         val geotrellisGeom: MultiPolygon = intersection
-    //         geotrellis.vector.Feature(geotrellisGeom, fid)
-    //       }
-    //       Some(fid -> validatedFeature)
-    //   }
-
     val complementGridRDD = GridRDD.complement(envelope, spark)
     val droppedGeoms: RDD[(FeatureId, ValidatedRow[geotrellis.vector.Feature[Geometry, FeatureId]])] =
       joinToGrid(spatialFeatureRDD, complementGridRDD, spark)
@@ -153,44 +114,6 @@ object ValidatedFeatureRDD {
         }
         .distinct
         .map{ fid => (fid, Validated.invalid[JobError, geotrellis.vector.Feature[Geometry, FeatureId]](NoIntersectionError)) }
-
-      // if (complementGridRDD.approximateTotalCount > 0) {
-      //   // look for features entirely outside of the tree cover grid area
-      //   val complementJoin: JavaPairRDD[GeoSparkPolygon, GeoSparkGeometry] =
-      //     SpatialJoinRDD.flatSpatialJoin(
-      //       spatialFeatureRDD,
-      //       complementGridRDD,
-      //       considerBoundaryIntersection = false
-      //     )
-      //   val cHashPartitioner = new HashPartitioner(complementJoin.getNumPartitions)
-      //   complementJoin.rdd
-      //     .keyBy({ pair: (GeoSparkPolygon, GeoSparkGeometry) =>
-      //       Z2(
-      //         (pair._1.getCentroid.getX * 100).toInt,
-      //         (pair._1.getCentroid.getY * 100).toInt
-      //       ).z
-      //     })
-      //     .partitionBy(cHashPartitioner)
-      //     .flatMap { case (_, (gridCell, geom)) =>
-      //       val (fid, geometries) = validatedIntersection(geom, gridCell)
-      //       geometries.traverse { geoms => geoms }.map { vg => (fid.asInstanceOf[FeatureId], vg) }
-      //     }
-      //     .flatMap {
-      //       case (_, Validated.Valid(mp)) if mp.isEmpty =>
-      //         // Valid result of intersection with no area => not an intersection
-      //         None // flatMap will drop the None
-      //       case (fid, Validated.Valid(_)) =>
-      //         // There was a proper intersection; log the geometry as an out of bounds error
-      //         Some(fid)
-      //       case (fid, Validated.Invalid(_)) =>
-      //         // There was an intersection, but there was a JTS error in computing it; ignore
-      //         None
-      //     }
-      //     .distinct
-      //     .map{ fid => (fid, Validated.invalid[JobError, geotrellis.vector.Feature[Geometry, FeatureId]](NoIntersectionError)) }
-      // } else {
-      //   spark.sparkContext.emptyRDD[(FeatureId, ValidatedRow[geotrellis.vector.Feature[Geometry, FeatureId]])]
-      // }
 
     matchedGeoms.union(droppedGeoms)
   }
@@ -209,6 +132,13 @@ object ValidatedFeatureRDD {
           gridRdd,
           considerBoundaryIntersection
         )
+
+     /*
+       partitions will come back very skewed and we will need to even them out for any downstream analysis
+       For the summary analysis we will eventually use a range partitioner.
+       However, the range partitioner uses sampling to come up with the  break points for the different partitions.
+       If the input RDD is already heavily skewed, sampling will be off and the range partitioner won't do a good job.
+     */
       val hashPartitioner = new HashPartitioner(joined.getNumPartitions)
       joined.rdd
         .keyBy({ pair: (GeoSparkPolygon, GeoSparkGeometry) =>
