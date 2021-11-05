@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
 import geotrellis.raster.{CellType, IntCells, NoDataHandling, Tile, isNoData}
+import org.globalforestwatch.config.DataEnvironment
 import org.globalforestwatch.util.Config
 import org.globalforestwatch.util.Util.{getAnyMapValue, jsonStrToMap}
 import software.amazon.awssdk.services.s3.S3Client
@@ -16,12 +17,9 @@ import scalaj.http._
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import software.amazon.awssdk.services.s3.model.{
-  HeadObjectRequest,
-  NoSuchKeyException,
-  RequestPayer
-}
+import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
 import org.globalforestwatch.grids.GridTile
+
 import java.time.LocalDate
 
 trait Layer {
@@ -33,13 +31,18 @@ trait Layer {
   type B
 
   val s3Client: S3Client = geotrellis.store.s3.S3ClientProducer.get()
-  val uri: String
+  val dataEnvironment: DataEnvironment
+
   val internalNoDataValue: A
   val externalNoDataValue: B
   val basePath: String = s"s3://gfw-data-lake"
 
   val kwargs: Map[String, Any]
   val datasetName: String
+  val grid: GridTile
+
+  val uri: String = dataEnvironment.getSourceUri(datasetName, grid)
+
   val pinnedVersions: Map[String, String] = {
     val pinnedVersionList: Option[NonEmptyList[Config]] =
       getAnyMapValue[Option[NonEmptyList[Config]]](kwargs, "pinnedVersions")
