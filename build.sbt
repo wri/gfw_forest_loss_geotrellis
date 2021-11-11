@@ -19,10 +19,11 @@ scalacOptions ++= Seq(
   "-language:postfixOps",
   "-language:existentials",
   "-language:experimental.macros",
-  "-Ypartial-unification" // Required by Cats
+  "-Ypartial-unification", // Required by Cats
+  "-Yrangepos"
 )
 publishMavenStyle := true
-publishArtifact in Test := false
+Test / publishArtifact := false
 pomIncludeRepository := { _ =>
   false
 }
@@ -97,7 +98,7 @@ assembly / assemblyShadeRules := {
 
 // auto imports for local SBT console
 // can be used with `test:console` command
-initialCommands in console :=
+console / initialCommands :=
   """
 import java.net._
 //import geotrellis.raster._
@@ -128,7 +129,9 @@ import org.globalforestwatch.util._
 """
 
 // settings for local testing
-Compile / console / fork := true
+Compile / run := Defaults.runTask(Compile / fullClasspath, Compile / run / mainClass, Compile / run / runner).evaluated
+Compile / runMain := Defaults.runMainTask(Compile / fullClasspath , Compile / runMain / runner)
+
 Test / fork := true
 Test / parallelExecution := false
 Test / testOptions += Tests.Argument("-oD")

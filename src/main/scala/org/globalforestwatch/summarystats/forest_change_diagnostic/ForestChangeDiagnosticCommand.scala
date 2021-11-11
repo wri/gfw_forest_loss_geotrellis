@@ -11,6 +11,7 @@ import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features._
 import org.locationtech.jts.geom.Geometry
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.spark.sql.SaveMode
 
 object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
 
@@ -34,7 +35,7 @@ object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
-        "overwriteOutput" -> default.overwriteOutput,
+        "overwriteOutput" -> default.overwriteOutput
       )
 
       if (! default.splitFeatures) logger.warn("Forcing splitFeatures = true")
@@ -43,7 +44,7 @@ object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
       runAnalysis { implicit spark =>
         val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, splitFeatures = true, spark)
         val fireAlertRDD = FireAlertRDD(spark, fireAlert.alertType, fireAlert.alertSource, FeatureFilter.empty)
-        ForestChangeDiagnosticAnalysis(featureRDD, default.featureType, intermediateListSource, fireAlertRDD, kwargs)
+        ForestChangeDiagnosticAnalysis(default.featureType, featureRDD, intermediateListSource, fireAlertRDD, default.outputUrl, kwargs)
       }
     }
   }

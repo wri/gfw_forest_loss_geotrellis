@@ -8,18 +8,18 @@ import com.vividsolutions.jts.geom.{
 import org.apache.log4j.Logger
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector
-import geotrellis.vector.{Geometry, MultiPolygon}
+import geotrellis.vector.{Geometry, MultiPolygon, Feature => GTFeature}
 import org.apache.spark.HashPartitioner
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.datasyslab.geospark.spatialRDD.SpatialRDD
 import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.summarystats.{GeometryError, ValidatedRow}
+import org.globalforestwatch.summarystats.{GeometryError, ValidatedLocation}
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.{extractPolygons, validatedIntersection}
-import org.globalforestwatch.util.Util.getAnyMapValue
 import org.globalforestwatch.util.ImplicitGeometryConverter._
+import org.globalforestwatch.summarystats.Location
 
 object ValidatedFeatureRDD {
   val logger = Logger.getLogger("FeatureRDD")
@@ -35,7 +35,7 @@ object ValidatedFeatureRDD {
     filters: FeatureFilter,
     splitFeatures: Boolean,
     spark: SparkSession
-  ): RDD[(FeatureId, ValidatedRow[geotrellis.vector.Feature[Geometry, FeatureId]])] = {
+  ): RDD[ValidatedLocation[Geometry]] = {
 
     if (splitFeatures) {
       val featureObj: Feature = Feature(featureType)
@@ -52,8 +52,8 @@ object ValidatedFeatureRDD {
               i <- iter
               if featureObj.isNonEmptyGeom(i)
             } yield {
-              val feat = featureObj.get(i)
-              (feat.data, Validated.Valid(feat))
+              val GTFeature(geom, id) = featureObj.get(i)
+              Validated.Valid(Location(id, geom))
             }
           },
           preservesPartitioning = true
@@ -65,7 +65,7 @@ object ValidatedFeatureRDD {
     featureType: String,
     featureDF: DataFrame,
     spark: SparkSession
-  ): RDD[(FeatureId, ValidatedRow[geotrellis.vector.Feature[Geometry, FeatureId]])] = {
+  ): RDD[ValidatedLocation[Geometry]] = {
 
     val spatialFeatureRDD: SpatialRDD[GeoSparkGeometry] = Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialFeatureRDD.analyze()
@@ -102,19 +102,14 @@ object ValidatedFeatureRDD {
       })
       .partitionBy(hashPartitioner)
       .flatMap { case (_, (gridCell, geom)) =>
-        val (fid, geometries) = validatedIntersection(geom, gridCell)
-        geometries.traverse { geoms => geoms }.map { vg => (fid.asInstanceOf[FeatureId], vg) }
-      }
-      .flatMap {
-        case (_, Validated.Valid(mp)) if mp.isEmpty =>
-          // This is Valid result of intersection, but with no area == not an intersection
-          None // flatMap will drop the None,
-        case (fid, validated) =>
-          val validatedFeature = validated.map { intersection =>
-            val geotrellisGeom: MultiPolygon = intersection
-            geotrellis.vector.Feature(geotrellisGeom, fid)
-          }
-          Some(fid -> validatedFeature)
+        val fid = geom.getUserData.asInstanceOf[FeatureId]
+        validatedIntersection(geom, gridCell)
+          .leftMap { err => Location(fid, err) }
+          .map { geoms => geoms.map { geom =>
+            val gtGeom: Geometry = toGeotrellisGeometry(geom)
+            Location(fid, geom: Geometry)
+          } }
+          .traverse(identity)
       }
   }
 }
