@@ -17,7 +17,8 @@ trait SummaryExport {
   def export(featureType: String,
              summaryDF: DataFrame,
              outputUrl: String,
-             kwargs: Map[String, Any]): Unit = {
+             kwargs: Map[String, Any]
+             ): Unit = {
 
     featureType match {
       case "gadm" => exportGadm(summaryDF, outputUrl, kwargs)

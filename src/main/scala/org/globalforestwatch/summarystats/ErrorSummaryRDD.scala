@@ -14,6 +14,7 @@ import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
 import scala.reflect.ClassTag
 import cats.kernel.Semigroup
+import cats.data.Validated
 import cats.data.Validated.{Valid, Invalid, valid, invalid}
 import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticSummary
 
@@ -35,7 +36,7 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
     windowLayout: LayoutDefinition,
     kwargs: Map[String, Any],
     partition: Boolean = true
-  )(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID]): RDD[(FEATUREID, ValidatedRow[SUMMARY])] = {
+  )(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID]): RDD[ValidatedLocation[SUMMARY]] = {
 
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.
@@ -148,19 +149,21 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
     /* Group records by Id and combine their summaries
      * The features may have intersected multiple grid blocks
      */
-    val featuresGroupedWithSummaries: RDD[(FEATUREID, ValidatedRow[SUMMARY])] =
+    val featuresGroupedWithSummaries: RDD[ValidatedLocation[SUMMARY]] =
       featuresWithSummaries
         .reduceByKey(Semigroup.combine)
-        .mapValues{
-          // If there was no intersection for any partial results, we consider this an invalid geometry
-          case Valid(NoIntersection) =>
-            Invalid(NoIntersectionError)
-          case Valid(GTSummary(result)) if result.isEmpty =>
-            Invalid(NoIntersectionError)
-          case Valid(GTSummary(result)) =>
-            Valid(result)
-          case r@Invalid(_) =>
-            r
+        .map { case (fid, summary) =>
+          summary match {
+            // If there was no intersection for any partial results, we consider this an invalid geometry
+            case Valid(NoIntersection) =>
+              Invalid(Location(fid, NoIntersectionError))
+            case Valid(GTSummary(result)) if result.isEmpty =>
+              Invalid(Location(fid, NoIntersectionError))
+            case Invalid(error) =>
+              Invalid(Location(fid, error))
+            case Valid(GTSummary(result)) =>
+              Valid(Location(fid, result))
+          }
         }
 
     featuresGroupedWithSummaries

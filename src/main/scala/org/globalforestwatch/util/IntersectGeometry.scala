@@ -35,13 +35,12 @@ object IntersectGeometry {
         multi.setUserData(userData)
         List(multi)
       case collection: GeometryCollection =>
-        val maybe_multi = extractPolygons(collection)
-        maybe_multi match {
-          case Some(multi) =>
-            multi.setUserData(userData)
-            List(multi)
-          case _ => List()
-        }
+          extractPolygons(collection)
+            .filterNot(_.isEmpty)
+            .map{ geom =>
+              geom.setUserData(userData)
+              geom
+            }.toList
       case _ => List()
     }
   }
@@ -49,8 +48,7 @@ object IntersectGeometry {
   def validatedIntersection(
     thisGeom: Geometry,
     thatGeom: Geometry
-  ): (Object, ValidatedRow[List[MultiPolygon]]) = {
-
+  ): ValidatedRow[List[MultiPolygon]] = {
     /**
       * Intersection can return GeometryCollections
       * Here we filter resulting geometries and only return those of the same type as thisGeom
@@ -68,22 +66,20 @@ object IntersectGeometry {
           multi.setUserData(userData)
           List(multi)
         case collection: GeometryCollection =>
-          val maybe_multi = extractPolygons(collection)
-          maybe_multi match {
-            case Some(multi) =>
-              multi.setUserData(userData)
-              List(multi)
-            case _ => List()
-          }
+          extractPolygons(collection)
+            .filterNot(_.isEmpty)
+            .map{ geom =>
+              geom.setUserData(userData)
+              geom
+            }.toList
         case _ => List()
       }
     }
 
-    (userData, attempt match {
+    attempt match {
       case Success(v) => Valid(v)
       case Failure(e) => Invalid(GeometryError(s"Failed intersection with ${thatGeom}"))
-    })
-
+    }
   }
 
   def extractPolygons(multiGeometry: Geometry): Option[MultiPolygon] = {

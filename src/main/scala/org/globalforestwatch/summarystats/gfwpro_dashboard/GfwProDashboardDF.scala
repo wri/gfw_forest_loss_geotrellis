@@ -10,6 +10,28 @@ import cats.data.Validated.{Valid, Invalid}
 object GfwProDashboardDF extends SummaryDF {
   case class RowGadmId(list_id: String, location_id: String, gadm_id: String)
 
+  def getFeatureDataFrameFromVerifiedRdd(
+    dataRDD: RDD[ValidatedLocation[GfwProDashboardData]],
+    spark: SparkSession
+  ): DataFrame = {
+    import spark.implicits._
+
+    val rowId: FeatureId => RowGadmId = {
+      case CombinedFeatureId(proId: GfwProFeatureId, gadmId: GadmFeatureId) =>
+        RowGadmId(proId.listId, proId.locationId.toString, gadmId.toString())
+      case _ =>
+        throw new IllegalArgumentException("Not a CombinedFeatureId[GfwProFeatureId, GadmFeatureId]")
+    }
+    dataRDD.map {
+      case Valid(Location(id, data)) =>
+        (rowId(id), SummaryDF.RowError.empty, data)
+      case Invalid(Location(id, err)) =>
+        (rowId(id), SummaryDF.RowError.fromJobError(err), GfwProDashboardData.empty)
+    }
+    .toDF("id", "error", "data")
+    .select($"id.*", $"error.*", $"data.*")
+  }
+
   def getFeatureDataFrame(
     dataRDD: RDD[(FeatureId, ValidatedRow[GfwProDashboardData])],
     spark: SparkSession

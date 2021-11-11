@@ -24,7 +24,6 @@ import org.globalforestwatch.util.IntersectGeometry.{
   extractPolygons,
   intersectGeometries
 }
-import org.globalforestwatch.util.Util.getAnyMapValue
 import org.globalforestwatch.util.ImplicitGeometryConverter._
 
 object FeatureRDD {
