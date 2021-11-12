@@ -10,10 +10,10 @@ case class Plantations(gridTile: GridTile, kwargs: Map[String, Any]) extends Str
   //  However, for this dataset we would want to resample the data based on the raster asset using mode resampling method.
   //  We will first need to update data-api to make this possible
 
-  val datasetName = "Na"
+  val datasetName = "gfw_plantations"
   override lazy val version = "Na"
 
-  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("Plantations"), gridTile)
+  val uri: String = uriForGrid(gridTile)
 
   def lookup(value: Int): String = value match {
     case 1 => "Fruit"
@@ -36,6 +36,5 @@ case class PlantationsBool(gridTile: GridTile, kwargs: Map[String, Any]) extends
   val datasetName = "Na"
   override lazy val version = "Na"
 
-  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("Plantations"), gridTile)
-
+  val uri: String = uriForGrid(gridTile)
 }

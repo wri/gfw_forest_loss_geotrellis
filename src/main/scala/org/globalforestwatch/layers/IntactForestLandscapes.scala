@@ -8,7 +8,7 @@ case class IntactForestLandscapes(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "ifl_intact_forest_landscapes"
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 
 
   def lookup(value: Int): String = value match {
@@ -23,7 +23,7 @@ case class IntactForestLandscapes2000(gridTile: GridTile, kwargs: Map[String, An
     with OptionalILayer {
   val datasetName = "ifl_intact_forest_landscapes"
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 
   override def lookup(value: Int): Boolean = {
     value match {
@@ -38,7 +38,7 @@ case class IntactForestLandscapes2013(gridTile: GridTile, kwargs: Map[String, An
     with OptionalILayer {
   val datasetName = "ifl_intact_forest_landscapes"
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 
   override def lookup(value: Int): Boolean = {
     value match {
@@ -54,7 +54,7 @@ case class IntactForestLandscapes2016(gridTile: GridTile, kwargs: Map[String, An
     with OptionalILayer {
   val datasetName = "ifl_intact_forest_landscapes"
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 
   override def lookup(value: Int): Boolean = {
     value match {

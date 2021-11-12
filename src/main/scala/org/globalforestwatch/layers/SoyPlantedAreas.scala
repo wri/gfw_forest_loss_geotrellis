@@ -10,6 +10,6 @@ case class SoyPlantedAreas(gridTile: GridTile, kwargs: Map[String, Any])
   override lazy val version = "v1" //TODO: promote v1 to latest. Need to create the correct raster tile cache assets first
 
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is__year_2020/geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 
 }

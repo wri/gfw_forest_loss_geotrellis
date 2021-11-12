@@ -22,7 +22,8 @@ object GladAlertsCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
-        "changeOnly" -> changeOnly
+        "changeOnly" -> changeOnly,
+        "dataEnvironment" -> default.dataEnvironment,
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

@@ -6,5 +6,5 @@ case class Area(gridTile: GridTile, kwargs: Map[String, Any]) extends DoubleLaye
 
   val datasetName = "gfw_pixel_area"
 
-  val uri: String = s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/m2/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(gridTile)
 }

@@ -8,7 +8,7 @@ case class BrazilBiomes(gridTile: GridTile, kwargs: Map[String, Any]) extends St
   val datasetName = "ibge_bra_biomes"
 
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/gdal-geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 
   override val externalNoDataValue = "Not applicable"
 

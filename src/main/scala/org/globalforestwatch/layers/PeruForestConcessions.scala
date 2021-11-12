@@ -8,7 +8,7 @@ case class PeruForestConcessions(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "per_forest_concessions"
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/gdal-geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 
 
   override val externalNoDataValue: String = ""

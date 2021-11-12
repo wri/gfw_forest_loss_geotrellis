@@ -8,7 +8,7 @@ case class Ecozones(gridTile: GridTile, kwargs: Map[String, Any]) extends String
 
   val datasetName = "wwf_eco_regions"
 
-  val uri: String = s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(gridTile)
 
   override val externalNoDataValue = "Unknown"
 

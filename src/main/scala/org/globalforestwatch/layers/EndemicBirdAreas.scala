@@ -7,5 +7,5 @@ case class EndemicBirdAreas(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "birdlife_endemic_bird_areas"
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 }

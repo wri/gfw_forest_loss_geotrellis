@@ -9,7 +9,7 @@ case class GFWProCoverage(gridTile: GridTile, kwargs: Map[String, Any])
   val datasetName = "gfwpro_forest_change_regions"
 
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/bit_encoding/gdal-geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 
   def lookup(value: Int): Map[String, Boolean] = {
     val bits = "0000000" + value.toBinaryString takeRight 8

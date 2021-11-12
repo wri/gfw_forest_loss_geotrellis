@@ -8,7 +8,7 @@ case class TreeCoverLossDrivers(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "tsc_tree_cover_loss_drivers"
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/drivers/gdal-geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 
   override val internalNoDataValue = 0
   override val externalNoDataValue = "Unknown"

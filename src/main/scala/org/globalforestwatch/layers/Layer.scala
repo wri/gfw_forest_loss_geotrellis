@@ -15,8 +15,6 @@ import org.globalforestwatch.util.Util.{getAnyMapValue, jsonStrToMap}
 import software.amazon.awssdk.services.s3.S3Client
 import scalaj.http._
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
 import org.globalforestwatch.grids.GridTile
 
@@ -31,7 +29,6 @@ trait Layer {
   type B
 
   val s3Client: S3Client = geotrellis.store.s3.S3ClientProducer.get()
-  val dataEnvironment: DataEnvironment
 
   val internalNoDataValue: A
   val externalNoDataValue: B
@@ -39,9 +36,15 @@ trait Layer {
 
   val kwargs: Map[String, Any]
   val datasetName: String
-  val grid: GridTile
 
-  val uri: String = dataEnvironment.getSourceUri(datasetName, grid)
+  lazy val dataEnvironment: DataEnvironment = {
+    val dataEnvironmentConfig: String =
+      getAnyMapValue[String](kwargs, "dataEnvironment")
+
+    DataEnvironment.getDataEnvironment(dataEnvironmentConfig)
+  }
+
+  val uri: String
 
   val pinnedVersions: Map[String, String] = {
     val pinnedVersionList: Option[NonEmptyList[Config]] =
@@ -86,11 +89,10 @@ trait Layer {
     }
   }
 
-  protected def uriForGrid(template: String, grid: GridTile): String =
-    template
-      .replace("<gridSize>", grid.gridSize.toString)
-      .replace("<rowCount>", grid.rowCount.toString)
-      .replace("<tileId>", grid.tileId)
+  protected def uriForGrid(grid: GridTile): String = {
+    val baseUri = dataEnvironment.getSourceUri(datasetName, grid)
+    baseUri.replace("{tile_id}", grid.tileId)
+  }
 
   def lookup(a: A): B
 }

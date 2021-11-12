@@ -4,7 +4,7 @@ import org.globalforestwatch.grids.GridTile
 
 case class BiodiversityIntactness(gridTile: GridTile, kwargs: Map[String, Any]) extends DBooleanLayer with OptionalDLayer {
   val datasetName = "birdlife_biodiversity_intactness"
-  val uri: String = s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/index/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(gridTile)
 
   def lookup(value: Double): Boolean =
   // if (value == 0) null

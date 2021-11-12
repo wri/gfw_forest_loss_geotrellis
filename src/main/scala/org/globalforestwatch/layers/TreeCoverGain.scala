@@ -7,7 +7,7 @@ case class TreeCoverGain(gridTile: GridTile, kwargs: Map[String, Any])
     with RequiredILayer {
   val datasetName = "umd_tree_cover_gain"
   val uri: String =
-    s"$basePath/$datasetName/$version/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 
   override val internalNoDataValue: Int = 0
   override val externalNoDataValue: Boolean = false
