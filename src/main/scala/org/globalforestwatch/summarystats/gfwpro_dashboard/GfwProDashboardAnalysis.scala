@@ -61,8 +61,13 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
       // fold in fireStatsRDD after polygonal summary and accumulate the errors
       ValidatedWorkflow(enrichedRDD)
-        .mapValid { rdd =>
-          partitionByZIndex(rdd) { case (_, geom) => geom } // TODO: why is this helpful ?
+        .mapValidToValidated { rdd =>
+          rdd.map { case row@Location(fid, geom) =>
+            if (geom.isEmpty())
+              Validated.invalid[Location[JobError], Location[Geometry]](Location(fid, GeometryError(s"Empty Geometry")))
+            else
+              Validated.valid[Location[JobError], Location[Geometry]](row)
+          }
         }
         .mapValidToValidated { enrichedRDD =>
           val tmp = enrichedRDD.map { case Location(id, geom) => Feature(geom, id) }
