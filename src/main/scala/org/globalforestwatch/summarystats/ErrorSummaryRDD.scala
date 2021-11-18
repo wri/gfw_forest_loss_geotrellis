@@ -61,7 +61,7 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
      */
 
     val partitionedFeatureRDD = if (partition) {
-      val inputPartitionMultiplier = 64
+      val inputPartitionMultiplier = 8
       val rangePartitioner =
         new RangePartitioner(featureRDD.getNumPartitions * inputPartitionMultiplier, keyedFeatureRDD)
       keyedFeatureRDD.partitionBy(rangePartitioner)
