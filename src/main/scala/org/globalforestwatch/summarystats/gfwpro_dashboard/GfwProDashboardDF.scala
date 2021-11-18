@@ -19,6 +19,8 @@ object GfwProDashboardDF extends SummaryDF {
     val rowId: FeatureId => RowGadmId = {
       case CombinedFeatureId(proId: GfwProFeatureId, gadmId: GadmFeatureId) =>
         RowGadmId(proId.listId, proId.locationId.toString, gadmId.toString())
+      case proId: GfwProFeatureId =>
+        RowGadmId(proId.listId, proId.locationId.toString, "none")
       case _ =>
         throw new IllegalArgumentException("Not a CombinedFeatureId[GfwProFeatureId, GadmFeatureId]")
     }
