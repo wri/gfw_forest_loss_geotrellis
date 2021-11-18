@@ -61,10 +61,10 @@ object IntersectGeometry {
         case poly: Polygon =>
           val multi = createMultiPolygon(Array(poly))
           multi.setUserData(userData)
-          List(multi)
+          List(multi).filterNot(_.isEmpty)
         case multi: MultiPolygon =>
           multi.setUserData(userData)
-          List(multi)
+          List(multi).filterNot(_.isEmpty)
         case collection: GeometryCollection =>
           extractPolygons(collection)
             .filterNot(_.isEmpty)
