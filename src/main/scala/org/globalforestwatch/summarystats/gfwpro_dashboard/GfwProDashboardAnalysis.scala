@@ -40,7 +40,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     spark: SparkSession,
     kwargs: Map[String, Any]
   ): Unit = {
-    featureRDD.persist(StorageLevel.MEMORY_AND_DISK_2)
+    featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
     val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
       val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl, contextualFeatureType, FeatureFilter.empty, "geom", spark)
