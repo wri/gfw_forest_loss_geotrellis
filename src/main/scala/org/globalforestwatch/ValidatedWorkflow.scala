@@ -5,6 +5,7 @@ import cats.data.Validated
 import cats.data.Validated.{Valid, Invalid}
 import scala.reflect.ClassTag
 import org.apache.spark.rdd.RDD
+import org.apache.spark.storage.StorageLevel
 
 /**
  * Working with RDDs in context of Validated, where per-row operations can fail but errors must be preserved.
@@ -39,6 +40,7 @@ final case class ValidatedWorkflow[E, A](invalid: RDD[Validated.Invalid[E]], val
 
 object ValidatedWorkflow {
   def apply[E, A: ClassTag](rdd: RDD[Validated[E, A]]): ValidatedWorkflow[E, A] = {
+    rdd.persist(StorageLevel.MEMORY_AND_DISK)
     val valid = rdd.collect {
       case Valid(a) => a
     }

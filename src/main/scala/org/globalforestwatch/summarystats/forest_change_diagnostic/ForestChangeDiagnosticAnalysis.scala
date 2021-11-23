@@ -50,7 +50,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     runOutputUrl: String,
     kwargs: Map[String, Any]
   )(implicit spark: SparkSession): Unit = {
-    features.persist(StorageLevel.MEMORY_AND_DISK_2)
+    features.persist(StorageLevel.MEMORY_AND_DISK)
 
     val diffGridIds: List[GridId] =
       if (intermediateListSource.nonEmpty) collectDiffGridIds(features)
@@ -82,7 +82,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
           }
         }
         .unify
-        .persist(StorageLevel.MEMORY_AND_DISK_2)
+        .persist(StorageLevel.MEMORY_AND_DISK)
 
     val finalResult = intermediateListSource match {
       case Some(source) =>
