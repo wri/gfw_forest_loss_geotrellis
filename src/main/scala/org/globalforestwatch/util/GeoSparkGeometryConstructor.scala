@@ -1,10 +1,10 @@
 package org.globalforestwatch.util
 
-import com.vividsolutions.jts.geom.{Coordinate, CoordinateSequenceFactory, Geometry, GeometryFactory, MultiPolygon, Point, Polygon, PrecisionModel}
-import com.vividsolutions.jts.io.WKBWriter
+import org.locationtech.jts.geom.{Coordinate, CoordinateSequenceFactory, Geometry, GeometryFactory, MultiPolygon, Point, Polygon, PrecisionModel}
+import org.locationtech.jts.io.WKBWriter
 import org.globalforestwatch.util.Util.convertBytesToHex
 
-object GeoSparkGeometryConstructor {
+object GeometryConstructor {
   val geomFactory = new GeometryFactory(new PrecisionModel(), 0)
   val coordSeqFactory: CoordinateSequenceFactory =
     geomFactory.getCoordinateSequenceFactory

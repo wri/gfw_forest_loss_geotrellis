@@ -1,11 +1,9 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import geotrellis.vector.Geometry
-import com.vividsolutions.{jts => vs}
+import org.locationtech.jts
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions.{col, isnull, struct, udf}
-import org.globalforestwatch.util.GeometryFixer
+import org.apache.spark.sql.functions.{col, isnull, udf}
 import scala.util.Try
 
 object SpatialFeatureDF {
@@ -93,13 +91,13 @@ object SpatialFeatureDF {
       .where(!isnull('polyshape))
   }
 
-  private val threadLocalWkbReader = new ThreadLocal[vs.io.WKBReader]
+  private val threadLocalWkbReader = new ThreadLocal[jts.io.WKBReader]
 
-  def readOption(wkbHexString: String): Option[vs.geom.Geometry] = {
+  def readOption(wkbHexString: String): Option[jts.geom.Geometry] = {
     if (threadLocalWkbReader.get() == null) {
-      val precisionModel = new vs.geom.PrecisionModel(1e11)
-      val factory = new vs.geom.GeometryFactory(precisionModel)
-      val wkbReader = new vs.io.WKBReader(factory)
+      val precisionModel = new jts.geom.PrecisionModel(1e11)
+      val factory = new jts.geom.GeometryFactory(precisionModel)
+      val wkbReader = new jts.io.WKBReader(factory)
       threadLocalWkbReader.set(wkbReader)
     }
     val wkbReader = threadLocalWkbReader.get()

@@ -1,10 +1,10 @@
 package org.globalforestwatch.util
 
-import com.vividsolutions.jts.geom.Geometry
+import org.locationtech.jts.geom.Geometry
 import org.apache.spark.api.java.JavaPairRDD
-import org.datasyslab.geospark.enums.{GridType, IndexType}
-import org.datasyslab.geospark.spatialOperator.JoinQuery
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
+import org.apache.sedona.core.enums.{GridType, IndexType}
+import org.apache.sedona.core.spatialOperator.JoinQuery
+import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticAnalysis
 
 import java.util
@@ -18,7 +18,7 @@ object SpatialJoinRDD {
                                                                        buildOnSpatialPartitionedRDD: Boolean = true, // Set to TRUE only if run join query
                                                                        considerBoundaryIntersection: Boolean = false, // Only return gemeotries fully covered by each query window in queryWindowRDD
                                                                        usingIndex: Boolean = false
-                                                                     ): JavaPairRDD[A, util.HashSet[B]] = {
+                                                                     ): JavaPairRDD[A, util.List[B]] = {
 
     try {
       queryWindowRDD.spatialPartitioning(GridType.QUADTREE)
@@ -49,7 +49,6 @@ object SpatialJoinRDD {
               IndexType.QUADTREE,
               buildOnSpatialPartitionedRDD
             )
-
           JoinQuery.SpatialJoinQuery(
             valueRDD,
             queryWindowRDD,
@@ -63,7 +62,6 @@ object SpatialJoinRDD {
             )
             // Use brute force
             bruteForceJoin(queryWindowRDD, valueRDD)
-
         }
     }
   }
@@ -138,7 +136,7 @@ object SpatialJoinRDD {
   private def bruteForceJoin[A <: Geometry : ClassTag, B <: Geometry : ClassTag](
                                                                                   leftRDD: SpatialRDD[A],
                                                                                   rightRDD: SpatialRDD[B]
-                                                                                ): JavaPairRDD[A, util.HashSet[B]] = {
+                                                                                ): JavaPairRDD[A, util.List[B]] = {
     JavaPairRDD.fromRDD(
       leftRDD.rawSpatialRDD.rdd
         .cartesian(rightRDD.rawSpatialRDD.rdd)
@@ -149,7 +147,7 @@ object SpatialJoinRDD {
         }, { (left: util.HashSet[B], right: util.HashSet[B]) =>
           left.addAll(right)
           left
-        })
+        }).mapValues( hs => new util.ArrayList(hs))
     )
   }
 
