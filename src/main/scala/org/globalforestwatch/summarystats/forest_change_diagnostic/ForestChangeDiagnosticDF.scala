@@ -5,7 +5,7 @@ import cats.data.Validated.{Invalid, Valid}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features._
-import org.globalforestwatch.summarystats.{JobError, ValidatedRow, ValidatedLocation, Location}
+import org.globalforestwatch.summarystats.{JobError, ValidatedLocation, Location}
 import org.globalforestwatch.util.Util.{colsFor, fieldsFromCol}
 import org.globalforestwatch.summarystats.SummaryDF
 import org.globalforestwatch.summarystats.SummaryDF.{RowError, RowId}

@@ -13,7 +13,6 @@ import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
-import org.globalforestwatch.util.Util.countRecordsPerPartition
 import scala.reflect.ClassTag
 
 

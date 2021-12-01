@@ -1,7 +1,5 @@
 package org.globalforestwatch.summarystats.carbon_sensitivity
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession

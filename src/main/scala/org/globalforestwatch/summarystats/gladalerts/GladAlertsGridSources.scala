@@ -3,8 +3,7 @@ package org.globalforestwatch.summarystats.gladalerts
 import cats.implicits._
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.Raster
-import geotrellis.vector.Extent
-import org.globalforestwatch.grids.{GridId, GridSources, GridTile}
+import org.globalforestwatch.grids.{GridSources, GridTile}
 import org.globalforestwatch.layers._
 
 /**

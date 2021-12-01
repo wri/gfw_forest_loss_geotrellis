@@ -2,7 +2,7 @@ package org.globalforestwatch.grids
 
 import geotrellis.raster.TileLayout
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
-import geotrellis.vector.{Extent, Point}
+import geotrellis.vector.Extent
 import org.globalforestwatch.layers.{OptionalLayer, RequiredLayer}
 
 trait Grid[T <: GridSources] {

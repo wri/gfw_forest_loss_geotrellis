@@ -3,7 +3,6 @@ package org.globalforestwatch
 import cats.implicits._
 import com.monovore.decline._
 import java.io.File
-import cats.syntax._
 
 import geotrellis.raster._
 import geotrellis.layer._

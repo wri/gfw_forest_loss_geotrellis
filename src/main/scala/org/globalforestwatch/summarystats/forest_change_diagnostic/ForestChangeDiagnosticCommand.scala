@@ -2,16 +2,10 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
-import org.globalforestwatch.config.GfwConfig
 import cats.implicits._
 import com.monovore.decline.Opts
-import org.globalforestwatch.summarystats.SummaryAnalysis
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features._
-import org.locationtech.jts.geom.Geometry
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.spark.sql.SaveMode
 
 object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
 

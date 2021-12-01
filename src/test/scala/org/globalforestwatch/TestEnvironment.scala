@@ -5,7 +5,7 @@ import java.nio.file.{Files, Path}
 import com.typesafe.scalalogging.Logger
 import geotrellis.raster.testkit.RasterMatchers
 import org.apache.spark.sql._
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.SparkContext
 import org.globalforestwatch.summarystats.SummarySparkSession
 import org.scalactic.Tolerance
 import org.scalatest._

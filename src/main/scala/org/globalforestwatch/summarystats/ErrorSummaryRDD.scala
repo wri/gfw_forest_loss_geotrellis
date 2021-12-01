@@ -14,9 +14,7 @@ import org.globalforestwatch.grids.GridSources
 import org.globalforestwatch.util.RepartitionSkewedRDD
 import scala.reflect.ClassTag
 import cats.kernel.Semigroup
-import cats.data.Validated
-import cats.data.Validated.{Valid, Invalid, valid, invalid}
-import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticSummary
+import cats.data.Validated.{Valid, Invalid}
 
 
 trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {

@@ -2,7 +2,6 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import frameless.Injection
 import io.circe.syntax._
-import org.globalforestwatch.util.Implicits._
 import io.circe.parser.decode
 
 case class ForestChangeDiagnosticDataDoubleCategory(

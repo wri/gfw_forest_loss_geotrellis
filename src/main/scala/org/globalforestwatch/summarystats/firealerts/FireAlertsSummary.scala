@@ -5,7 +5,7 @@ import geotrellis.raster._
 import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Util.getAnyMapValue
-import org.globalforestwatch.util.{Geodesy, Mercantile}
+import org.globalforestwatch.util.Geodesy
 
 /** LossData Summary by year */
 case class FireAlertsSummary(stats: Map[FireAlertsDataGroup, FireAlertsData] =

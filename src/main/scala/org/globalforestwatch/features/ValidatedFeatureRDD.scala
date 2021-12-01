@@ -10,10 +10,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.apache.sedona.sql.utils.Adapter
-import org.globalforestwatch.summarystats.ValidatedLocation
+import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.validatedIntersection
-import org.globalforestwatch.summarystats.Location
 import org.locationtech.jts.geom._
 
 object ValidatedFeatureRDD {

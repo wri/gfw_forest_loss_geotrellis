@@ -1,10 +1,6 @@
 package org.globalforestwatch.features
 
-import geotrellis.vector.Geometry
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.col
-import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
-import org.globalforestwatch.util.Util._
 import org.globalforestwatch.summarystats.SummaryCommand
 import org.apache.spark.sql.Column
 

@@ -1,7 +1,6 @@
 package org.globalforestwatch.util
 
-import geotrellis.vector.io.wkb.WKB
-import geotrellis.vector.{Geometry, LineString, Polygon}
+import geotrellis.vector.{LineString, Polygon}
 import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 import org.scalatest.funsuite.AnyFunSuite
 

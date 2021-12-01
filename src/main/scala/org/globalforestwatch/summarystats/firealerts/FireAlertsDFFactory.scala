@@ -5,7 +5,6 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features._
 import org.globalforestwatch.util.Util.getAnyMapValue
 
-import scala.collection.immutable
 
 case class FireAlertsDFFactory(
                                 featureType: String,
