@@ -3,15 +3,11 @@ package org.globalforestwatch.summarystats.gladalerts
 import cats.implicits._
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.summary.polygonal._
-import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
 import org.globalforestwatch.summarystats.SummaryRDD
-import org.globalforestwatch.util.Util.getAnyMapValue
-import org.globalforestwatch.util.{Geodesy, Mercantile}
 
-import scala.annotation.tailrec
 
 object GladAlertsRDD extends SummaryRDD {
 

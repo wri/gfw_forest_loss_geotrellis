@@ -1,6 +1,5 @@
 package org.globalforestwatch.summarystats.gfwpro_dashboard
 
-import io.circe.syntax._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GadmFeatureId, GfwProFeatureId}

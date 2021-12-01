@@ -4,12 +4,7 @@ import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
-import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features._
-import cats.data.Validated._
-import geotrellis.vector.Feature
-import org.globalforestwatch.summarystats.Location
-import org.apache.spark.storage.StorageLevel
 
 object GfwProDashboardCommand extends SummaryCommand {
 

@@ -3,12 +3,8 @@ package org.globalforestwatch.summarystats
 import cats.data.NonEmptyList
 import cats.implicits._
 import com.monovore.decline.Opts
-import geotrellis.vector.{Feature, Geometry}
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{SparkSession, DataFrame, Column}
+import org.apache.spark.sql.{SparkSession, Column}
 import org.apache.spark.sql.functions.{substring, col}
-import org.globalforestwatch.features._
-import org.globalforestwatch.util.Util._
 
 trait SummaryCommand {
   import SummaryCommand._

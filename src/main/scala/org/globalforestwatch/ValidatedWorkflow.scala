@@ -1,8 +1,6 @@
 package org.globalforestwatch
 
-import cats._
 import cats.data.Validated
-import cats.data.Validated.{Valid, Invalid}
 import scala.reflect.ClassTag
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
@@ -42,10 +40,10 @@ object ValidatedWorkflow {
   def apply[E, A: ClassTag](rdd: RDD[Validated[E, A]]): ValidatedWorkflow[E, A] = {
     rdd.persist(StorageLevel.MEMORY_AND_DISK)
     val valid = rdd.collect {
-      case Valid(a) => a
+      case Validated.Valid(a) => a
     }
     val invalid = rdd.collect{
-      case row: Invalid[E] => row
+      case row: Validated.Invalid[E] => row
     }.repartition(math.max(1, math.log10(rdd.getNumPartitions).toInt))
     ValidatedWorkflow(invalid, valid)
   }

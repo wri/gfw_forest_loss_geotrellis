@@ -8,7 +8,6 @@ import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
 import geotrellis.raster.{
   CellType,
-  IntCellType,
   IntCells,
   NoDataHandling,
   Tile,

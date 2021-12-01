@@ -1,6 +1,5 @@
 package org.globalforestwatch.summarystats.firealerts
 
-import org.globalforestwatch.util.Mercantile
 
 case class FireAlertsDataGroup(threshold: Integer,
                                primaryForest: Boolean,

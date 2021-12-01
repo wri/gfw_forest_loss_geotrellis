@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.firealerts
 
 import geotrellis.vector.Extent
-import org.globalforestwatch.grids.{GridTile, NinetyByNinety1kmGrid, TenByTen30mGrid}
+import org.globalforestwatch.grids.{GridTile, NinetyByNinety1kmGrid}
 
 object ModisGrid extends NinetyByNinety1kmGrid[FireAlertsGridSources] {
 

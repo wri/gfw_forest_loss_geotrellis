@@ -1,12 +1,11 @@
 package org.globalforestwatch.util
 
-import com.vividsolutions.jts.geom.{Envelope, MultiPolygon, Polygon}
+import org.locationtech.jts.geom.{Envelope, MultiPolygon, Polygon}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.datasyslab.geospark.spatialRDD.PolygonRDD
+import org.apache.sedona.core.spatialRDD.PolygonRDD
 import org.globalforestwatch.grids.GridId.pointGridId
-import org.globalforestwatch.util.GeoSparkGeometryConstructor.createPolygon1x1
-import org.globalforestwatch.util.ImplicitGeometryConverter._
+import org.globalforestwatch.util.GeometryConstructor.createPolygon1x1
 
 object GridRDD {
   def apply(envelope: Envelope, spark: SparkSession, clip: Boolean = false): PolygonRDD = {

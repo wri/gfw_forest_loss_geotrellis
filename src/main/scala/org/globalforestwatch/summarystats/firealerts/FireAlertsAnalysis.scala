@@ -1,7 +1,5 @@
 package org.globalforestwatch.summarystats.firealerts
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import geotrellis.vector.Feature
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}

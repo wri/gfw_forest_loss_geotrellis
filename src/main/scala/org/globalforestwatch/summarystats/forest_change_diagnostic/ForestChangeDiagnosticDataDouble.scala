@@ -1,5 +1,5 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
-import frameless.{Injection, TypedEncoder}
+import frameless.Injection
 import org.globalforestwatch.util.Implicits._
 import io.circe.syntax._
 

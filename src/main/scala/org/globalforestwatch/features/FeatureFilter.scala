@@ -1,6 +1,5 @@
 package org.globalforestwatch.features
 
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.globalforestwatch.summarystats.SummaryCommand
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.sql.Column

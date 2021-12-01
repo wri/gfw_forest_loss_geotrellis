@@ -1,7 +1,6 @@
 package org.globalforestwatch.summarystats.treecoverloss
 
 import geotrellis.raster.Raster
-import geotrellis.vector.Extent
 import cats.implicits._
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import org.globalforestwatch.grids.{GridSources, GridTile}

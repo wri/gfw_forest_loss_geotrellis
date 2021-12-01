@@ -1,13 +1,10 @@
 package org.globalforestwatch.summarystats.carbonflux
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.summarystats.SummaryAnalysis
-import org.globalforestwatch.util.Util.getAnyMapValue
 
 object CarbonFluxAnalysis extends SummaryAnalysis {
   val name = "carbonflux"
