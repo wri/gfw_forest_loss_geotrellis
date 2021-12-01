@@ -1,14 +1,7 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.{
-  Envelope => GeoSparkEnvelope,
-  Geometry => GeoSparkGeometry,
-  Point => GeoSparkPoint,
-  Polygon => GeoSparkPolygon,
-  Polygonal => GeoSparkPolygonal,
-  GeometryCollection => GeoSparkGeometryCollection
-}
+import org.locationtech.jts.geom._
 import org.apache.log4j.Logger
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector
@@ -17,14 +10,13 @@ import org.apache.spark.HashPartitioner
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.datasyslab.geosparksql.utils.Adapter
+import org.apache.sedona.core.spatialRDD.SpatialRDD
+import org.apache.sedona.sql.utils.Adapter
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.{
   extractPolygons,
   intersectGeometries
 }
-import org.globalforestwatch.util.ImplicitGeometryConverter._
 
 object FeatureRDD {
   val logger = Logger.getLogger("FeatureRDD")
@@ -60,14 +52,14 @@ object FeatureRDD {
    */
   def pointInPolygonJoinAsFeature(
     featureType: String,
-    spatialRDD: SpatialRDD[GeoSparkGeometry]
+    spatialRDD: SpatialRDD[Geometry]
   ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
     val scalaRDD =
       org.apache.spark.api.java.JavaRDD.toRDD(spatialRDD.spatialPartitionedRDD)
 
     scalaRDD
       .map {
-        case pt: GeoSparkPoint =>
+        case pt: Point =>
           val pointFeatureData = pt.getUserData.asInstanceOf[String] //.split('\t')
 
           // use implicit geometry converter
@@ -113,7 +105,7 @@ object FeatureRDD {
     val pairedRDD = spatialDF.rdd.map { row: Row =>
       val featureId1: FeatureId = FeatureId.fromUserData(feature1Type, row.getAs[Row](0).toString, ",")
       val featureId2: FeatureId = FeatureId.fromUserData(feature2Type, row.getAs[Row](1).toString, ",")
-      val geom = row.getAs[GeoSparkGeometry](2)
+      val geom = row.getAs[Geometry](2)
 
       (CombinedFeatureId(featureId1, featureId2), geom)
     }
@@ -121,13 +113,13 @@ object FeatureRDD {
     pairedRDD.flatMap {
       case (id, geom) =>
         geom match {
-          case geomCol: GeoSparkGeometryCollection =>
+          case geomCol: GeometryCollection =>
             val maybePoly = extractPolygons(geomCol)
             maybePoly match {
               case Some(poly) => List(vector.Feature(poly, id))
               case _ => List()
             }
-          case poly: GeoSparkPolygonal =>
+          case poly: Polygonal =>
             List(vector.Feature(poly, id))
           case _ =>
             // Polygon-polygon intersections can generate points or lines, which we just want to ignore
@@ -147,12 +139,12 @@ object FeatureRDD {
     val featureDF: DataFrame =
       SpatialFeatureDF(input, featureType, filters, "geom", spark)
 
-    val spatialRDD: SpatialRDD[GeoSparkGeometry] =
+    val spatialRDD: SpatialRDD[Geometry] =
       Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialRDD.analyze()
 
 
-    spatialRDD.rawSpatialRDD = spatialRDD.rawSpatialRDD.rdd.map { geom: GeoSparkGeometry =>
+    spatialRDD.rawSpatialRDD = spatialRDD.rawSpatialRDD.rdd.map { geom: Geometry =>
       val featureId = FeatureId.fromUserData(featureType, geom.getUserData.asInstanceOf[String], delimiter = ",")
       geom.setUserData(featureId)
       geom
@@ -162,14 +154,14 @@ object FeatureRDD {
   }
 
   def splitGeometries(
-                       spatialFeatureRDD: SpatialRDD[GeoSparkGeometry],
+                       spatialFeatureRDD: SpatialRDD[Geometry],
                        spark: SparkSession
                      ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
-    val envelope: GeoSparkEnvelope = spatialFeatureRDD.boundaryEnvelope
+    val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
 
     val spatialGridRDD = GridRDD(envelope, spark, clip = true)
-    val flatJoin: JavaPairRDD[GeoSparkPolygon, GeoSparkGeometry] =
+    val flatJoin: JavaPairRDD[Polygon, Geometry] =
       SpatialJoinRDD.flatSpatialJoin(
         spatialFeatureRDD,
         spatialGridRDD,
@@ -185,7 +177,7 @@ object FeatureRDD {
     val hashPartitioner = new HashPartitioner(flatJoin.getNumPartitions)
 
     flatJoin.rdd
-      .keyBy({ pair: (GeoSparkPolygon, GeoSparkGeometry) =>
+      .keyBy({ pair: (Polygon, Geometry) =>
         Z2(
           (pair._1.getCentroid.getX * 100).toInt,
           (pair._1.getCentroid.getY * 100).toInt

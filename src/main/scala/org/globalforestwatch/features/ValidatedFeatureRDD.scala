@@ -1,25 +1,20 @@
 package org.globalforestwatch.features
 
 import cats.data.{NonEmptyList, Validated}
-import com.vividsolutions.jts.geom.{
-  Envelope => GeoSparkEnvelope, Geometry => GeoSparkGeometry, Point => GeoSparkPoint, Polygon => GeoSparkPolygon,
-  MultiPolygon => GeoSparkMultiPolygon, Polygonal => GeoSparkPolygonal, GeometryCollection => GeoSparkGeometryCollection
-}
 import org.apache.log4j.Logger
 import geotrellis.store.index.zcurve.Z2
-import geotrellis.vector
-import geotrellis.vector.{Geometry, MultiPolygon, Feature => GTFeature}
+import geotrellis.vector.{Geometry, Feature => GTFeature}
 import org.apache.spark.HashPartitioner
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.summarystats.{GeometryError, ValidatedLocation}
+import org.apache.sedona.core.spatialRDD.SpatialRDD
+import org.apache.sedona.sql.utils.Adapter
+import org.globalforestwatch.summarystats.ValidatedLocation
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
-import org.globalforestwatch.util.IntersectGeometry.{extractPolygons, validatedIntersection}
-import org.globalforestwatch.util.ImplicitGeometryConverter._
+import org.globalforestwatch.util.IntersectGeometry.validatedIntersection
 import org.globalforestwatch.summarystats.Location
+import org.locationtech.jts.geom._
 
 object ValidatedFeatureRDD {
   val logger = Logger.getLogger("FeatureRDD")
@@ -67,18 +62,18 @@ object ValidatedFeatureRDD {
     spark: SparkSession
   ): RDD[ValidatedLocation[Geometry]] = {
 
-    val spatialFeatureRDD: SpatialRDD[GeoSparkGeometry] = Adapter.toSpatialRdd(featureDF, "polyshape")
+    val spatialFeatureRDD: SpatialRDD[Geometry] = Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialFeatureRDD.analyze()
 
-    spatialFeatureRDD.rawSpatialRDD = spatialFeatureRDD.rawSpatialRDD.rdd.map { geom: GeoSparkGeometry =>
+    spatialFeatureRDD.rawSpatialRDD = spatialFeatureRDD.rawSpatialRDD.rdd.map { geom: Geometry =>
       val featureId = FeatureId.fromUserData(featureType, geom.getUserData.asInstanceOf[String], delimiter = ",")
       geom.setUserData(featureId)
       geom
     }
 
-    val envelope: GeoSparkEnvelope = spatialFeatureRDD.boundaryEnvelope
+    val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
     val spatialGridRDD = GridRDD(envelope, spark, clip = true)
-    val flatJoin: JavaPairRDD[GeoSparkPolygon, GeoSparkGeometry] =
+    val flatJoin: JavaPairRDD[Polygon, Geometry] =
       SpatialJoinRDD.flatSpatialJoin(
         spatialFeatureRDD,
         spatialGridRDD,
@@ -94,7 +89,7 @@ object ValidatedFeatureRDD {
     val hashPartitioner = new HashPartitioner(flatJoin.getNumPartitions)
 
      flatJoin.rdd
-      .keyBy({ pair: (GeoSparkPolygon, GeoSparkGeometry) =>
+      .keyBy({ pair: (Polygon, Geometry) =>
         Z2(
           (pair._1.getCentroid.getX * 100).toInt,
           (pair._1.getCentroid.getY * 100).toInt
@@ -106,8 +101,8 @@ object ValidatedFeatureRDD {
         validatedIntersection(geom, gridCell)
           .leftMap { err => Location(fid, err) }
           .map { geoms => geoms.map { geom =>
-            val gtGeom: Geometry = toGeotrellisGeometry(geom)
-            Location(fid, geom: Geometry)
+            // val gtGeom: Geometry = toGeotrellisGeometry(geom)
+            Location(fid, geom)
           } }
           .traverse(identity)
       }

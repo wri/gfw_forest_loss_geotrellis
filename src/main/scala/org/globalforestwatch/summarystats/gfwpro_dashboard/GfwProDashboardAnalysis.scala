@@ -1,26 +1,22 @@
 package org.globalforestwatch.summarystats.gfwpro_dashboard
 
 import cats.data.{NonEmptyList, Validated}
-import geotrellis.vector.{Feature, Geometry, MultiPolygon}
-import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, MultiPolygon => GeoSparkMultiPolygon}
+import geotrellis.vector.{Feature, Geometry}
 import geotrellis.store.index.zcurve.Z2
 import org.apache.spark.HashPartitioner
 import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats._
-import org.globalforestwatch.util.GeoSparkGeometryConstructor.createPoint
+import org.globalforestwatch.util.GeometryConstructor.createPoint
 import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
-import org.globalforestwatch.util.ImplicitGeometryConverter._
 import org.globalforestwatch.util.RDDAdapter
 import org.globalforestwatch.ValidatedWorkflow
 
-import java.util
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.util.Util.getAnyMapValue
-import org.datasyslab.geosparksql.utils.Adapter
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
+import org.apache.sedona.sql.utils.Adapter
+import org.apache.sedona.core.spatialRDD.SpatialRDD
 
 import scala.collection.JavaConverters._
 import java.time.LocalDate
@@ -36,7 +32,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     featureType: String,
     contextualFeatureType: String,
     contextualFeatureUrl: NonEmptyList[String],
-    fireAlertRDD: SpatialRDD[GeoSparkGeometry],
+    fireAlertRDD: SpatialRDD[Geometry],
     spark: SparkSession,
     kwargs: Map[String, Any]
   ): Unit = {
@@ -95,8 +91,8 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     *   - For dissolved geometry of list report all contextual areas it intersects
     */
   private def refineContextualIntersection(
-    featureGeom: GeoSparkGeometry,
-    contextualGeom: GeoSparkGeometry,
+    featureGeom: Geometry,
+    contextualGeom: Geometry,
     contextualFeatureType: String
   ): List[ValidatedLocation[Geometry]] = {
     val featureId = featureGeom.getUserData.asInstanceOf[FeatureId]
@@ -107,8 +103,8 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
         val featureCentroid = createPoint(gfwproId.x, gfwproId.y)
         if (contextualGeom.contains(featureCentroid)) {
           val fid = CombinedFeatureId(gfwproId, contextualId)
-          val gtGeom: Geometry = toGeotrellisGeometry(featureGeom)
-          List(Validated.Valid(Location(fid, gtGeom)))
+          // val gtGeom: Geometry = toGeotrellisGeometry(featureGeom)
+          List(Validated.Valid(Location(fid, featureGeom)))
         } else Nil
 
       case gfwproId: GfwProFeatureId if gfwproId.locationId < 0 =>
@@ -117,8 +113,8 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           .leftMap { err => Location(featureId, err) }
           .map { geometries =>
             geometries.map { geom =>
-              val gtGeom: Geometry = toGeotrellisGeometry(geom)
-              Location(CombinedFeatureId(gfwproId, contextualId), gtGeom)
+              // val gtGeom: Geometry = toGeotrellisGeometry(geom)
+              Location(CombinedFeatureId(gfwproId, contextualId), geom)
             }
           }
           .traverse(identity) // turn validated list of geometries into list of validated geometries
@@ -147,7 +143,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
   private def fireStats(
     featureRDD: RDD[Location[Geometry]],
-    fireAlertRDD: SpatialRDD[GeoSparkGeometry],
+    fireAlertRDD: SpatialRDD[Geometry],
     spark: SparkSession
   ): RDD[Location[GfwProDashboardDataDateCount]] = {
     val featureSpatialRDD = RDDAdapter.toSpatialRDDfromLocationRdd(featureRDD)

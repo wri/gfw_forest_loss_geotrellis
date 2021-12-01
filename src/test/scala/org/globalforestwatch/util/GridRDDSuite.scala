@@ -1,6 +1,6 @@
 package org.globalforestwatch.util
 
-import com.vividsolutions.jts.geom.Envelope
+import org.locationtech.jts.geom.Envelope
 import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.summarystats.SummarySparkSession
 import org.scalatest.funsuite.AnyFunSuite

@@ -3,8 +3,8 @@ package org.globalforestwatch.summarystats
 //import org.apache.sedona.core.serde.SedonaKryoRegistrator
 //import org.apache.sedona.sql.utils.SedonaSQLRegistrator
 
-import org.datasyslab.geospark.serde.GeoSparkKryoRegistrator
-import org.datasyslab.geosparksql.utils.GeoSparkSQLRegistrator
+import org.apache.sedona.core.serde.SedonaKryoRegistrator
+import org.apache.sedona.sql.utils.SedonaSQLRegistrator
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
@@ -16,9 +16,9 @@ object SummarySparkSession {
       .setAppName(name)
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
-      .set("spark.kryo.registrator", classOf[GeoSparkKryoRegistrator].getName)
+      .set("spark.kryo.registrator", classOf[SedonaKryoRegistrator].getName)
       .set("spark.debug.maxToStringFields", "255")
-      .set("geospark.join.gridtype", "kdbtree")
+      .set("sedona.join.gridtype", "kdbtree")
     //    .set("spark.sql.crossJoin.enabled", "true")
 
     val localConf: SparkConf = conf
@@ -33,7 +33,7 @@ object SummarySparkSession {
       case e: Throwable => throw e
     }
 
-    GeoSparkSQLRegistrator.registerAll(spark)
+    SedonaSQLRegistrator.registerAll(spark)
 
     spark
   }

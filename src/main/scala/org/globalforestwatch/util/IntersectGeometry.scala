@@ -1,17 +1,15 @@
 package org.globalforestwatch.util
 
-import cats.data.Validated
 import cats.data.Validated.{Valid, Invalid}
-import com.vividsolutions.jts.geom.{
+import org.locationtech.jts.geom.{
   Geometry,
   GeometryCollection,
   MultiPolygon,
-  Polygon,
-  TopologyException,
+  Polygon
 }
 import scala.util.{Try, Success, Failure}
 
-import org.globalforestwatch.util.GeoSparkGeometryConstructor.createMultiPolygon
+import org.globalforestwatch.util.GeometryConstructor.createMultiPolygon
 import org.globalforestwatch.summarystats.{GeometryError, ValidatedRow}
 
 object IntersectGeometry {

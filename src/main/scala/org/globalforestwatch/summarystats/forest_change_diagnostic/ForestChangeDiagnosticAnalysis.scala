@@ -1,28 +1,20 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import cats.data.NonEmptyList
-import cats.data.Validated.{Invalid, Valid, invalid, valid}
-import cats.syntax._
+import cats.data.Validated.{Invalid, Valid}
 import cats.implicits._
-
-import java.util
 import scala.collection.JavaConverters._
 import scala.collection.immutable.SortedMap
 import geotrellis.vector.{Feature, Geometry}
-import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry}
+import org.locationtech.jts.geom.Geometry
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.globalforestwatch.features.{
-  CombinedFeatureId, FeatureId, FireAlertRDD, GadmFeatureId, GfwProFeature, GfwProFeatureId, GridId, WdpaFeatureId
-}
+import org.apache.sedona.core.spatialRDD.SpatialRDD
+import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GfwProFeatureId, GridId }
 import org.globalforestwatch.grids.GridId.pointGridId
-import org.globalforestwatch.summarystats.{JobError, MultiError, SummaryAnalysis, ValidatedRow, ValidatedLocation, Location}
+import org.globalforestwatch.summarystats.{SummaryAnalysis, ValidatedLocation, Location}
 import org.globalforestwatch.util.SpatialJoinRDD
-import org.globalforestwatch.util.ImplicitGeometryConverter._
-import org.globalforestwatch.util.Util.getAnyMapValue
 import org.apache.spark.storage.StorageLevel
-import org.globalforestwatch.features.GadmFeature
 import org.globalforestwatch.ValidatedWorkflow
 
 object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
@@ -46,7 +38,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     featureType: String,
     features: RDD[ValidatedLocation[Geometry]],
     intermediateListSource: Option[NonEmptyList[String]],
-    fireAlerts: SpatialRDD[GeoSparkGeometry],
+    fireAlerts: SpatialRDD[Geometry],
     runOutputUrl: String,
     kwargs: Map[String, Any]
   )(implicit spark: SparkSession): Unit = {
@@ -182,16 +174,15 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
   def fireStats(
     featureRDD: RDD[Location[Geometry]],
-    fireAlertRDD: SpatialRDD[GeoSparkGeometry],
+    fireAlertRDD: SpatialRDD[Geometry],
     spark: SparkSession
   ): RDD[Location[ForestChangeDiagnosticDataLossYearly]] = {
     // Convert FeatureRDD to SpatialRDD
     val polyRDD = featureRDD.map { case Location(fid, geom) =>
-      val gsGeom = toGeoSparkGeometry[Geometry, GeoSparkGeometry](geom)
-      gsGeom.setUserData(fid)
-      gsGeom
+      geom.setUserData(fid)
+      geom
     }
-    val spatialFeatureRDD = new SpatialRDD[GeoSparkGeometry]
+    val spatialFeatureRDD = new SpatialRDD[Geometry]
     spatialFeatureRDD.rawSpatialRDD = polyRDD.toJavaRDD()
     spatialFeatureRDD.fieldNames = seqAsJavaList(List("FeatureId"))
     spatialFeatureRDD.analyze()

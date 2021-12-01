@@ -20,6 +20,7 @@ scalacOptions ++= Seq(
   "-language:existentials",
   "-language:experimental.macros",
   "-Ypartial-unification", // Required by Cats
+  "-Ywarn-unused-import",
   "-Yrangepos"
 )
 publishMavenStyle := true
@@ -56,7 +57,7 @@ libraryDependencies ++= Seq(
   sparkCore,
   sparkSQL,
   sparkHive,
-  "org.typelevel" %% "frameless-dataset" % Version.frameless,
+  frameless,
   hadoopAws,
   hadoopCommon,
   hadoopMapReduceClientCore,
@@ -68,22 +69,16 @@ libraryDependencies ++= Seq(
   geotrellisSpark,
   geotrellisSparkTestKit % Test,
   geotrellisS3,
-  geotrellisShapefile,
-  geotrellisGeotools,
-  geotrellisVectorTile,
   geotrellisGdal,
-  logging,
-  decline,
   sedonaCore,
   sedonaSQL,
-  //  jtsCore,
-  //  jts2geojson,
-  geoToolsOGRBridj,
-  bridj,
   breeze,
   breezeNatives,
   breezeViz,
   sparkDaria,
+  jts,
+  "org.datasyslab" % "geotools-wrapper" % "geotools-24.1",
+  "org.wololo" % "jts2geojson" % "0.14.3"
 )
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
