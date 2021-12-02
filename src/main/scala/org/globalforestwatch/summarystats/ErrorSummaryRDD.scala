@@ -8,10 +8,10 @@ import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResult, Summary=>GTSummary}
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector._
-import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
+import org.globalforestwatch.util.RepartitionSkewedRDD
 import scala.reflect.ClassTag
 import cats.kernel.Semigroup
 import cats.data.Validated
@@ -61,12 +61,10 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
      */
 
     val partitionedFeatureRDD = if (partition) {
-      val inputPartitionMultiplier = 8
-      val rangePartitioner =
-        new RangePartitioner(featureRDD.getNumPartitions * inputPartitionMultiplier, keyedFeatureRDD)
-      keyedFeatureRDD.partitionBy(rangePartitioner)
+      // if a single tile has more than 4096 features, split it up over partitions
+      RepartitionSkewedRDD.bySparseId(keyedFeatureRDD, 4096)
     } else {
-      keyedFeatureRDD
+      keyedFeatureRDD.values
     }
 
     // countRecordsPerPartition(partitionedFeatureRDD, SummarySparkSession("tmp"))
@@ -80,39 +78,27 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
      */
     val featuresWithSummaries: RDD[(FEATUREID, ValidatedSummary[SUMMARY])] =
       partitionedFeatureRDD.mapPartitions {
-        featurePartition: Iterator[
-          (Long, (SpatialKey, Feature[Geometry, FEATUREID]))
-        ] =>
+        featurePartition: Iterator[(SpatialKey, Feature[Geometry, FEATUREID])] =>
           // Code inside .mapPartitions works in an Iterator of records
           // Doing things this way allows us to reuse resources and perform other optimizations
           // Grouping by spatial key allows us to minimize read thrashing from record to record
 
-          val windowFeature = featurePartition.map {
-            case (_, (windowKey, feature)) =>
-              (windowKey, feature)
-          }
-
-          val groupedByKey
-            : Map[SpatialKey,
-                  Array[(SpatialKey, Feature[Geometry, FEATUREID])]] =
-            windowFeature.toArray.groupBy {
+          val groupedByKey : Map[SpatialKey, Array[Feature[Geometry, FEATUREID]]] =
+            featurePartition.toArray.groupBy {
               case (windowKey, _) => windowKey
-            }
+            }.mapValues(_.map{ case (_, feature) => feature })
 
           groupedByKey.toIterator.flatMap {
-            case (windowKey, keysAndFeatures) =>
+            case (windowKey, features) =>
               val maybeRasterSource: Either[JobError, SOURCES] =
                 getSources(windowKey, windowLayout, kwargs)
                   .left.map(ex => RasterReadError(ex.getMessage))
-
-              val features = keysAndFeatures map { case (_, feature) => feature }
 
               val maybeRaster: Either[JobError, Raster[TILE]] =
                 maybeRasterSource.flatMap { rs: SOURCES =>
                   readWindow(rs, windowKey, windowLayout)
                     .left.map(ex => RasterReadError(s"Reading raster for $windowKey"))
                 }
-
 
               val partialSummaries: Array[(FEATUREID, ValidatedSummary[SUMMARY])] =
                 features.map { feature: Feature[Geometry, FEATUREID] =>
