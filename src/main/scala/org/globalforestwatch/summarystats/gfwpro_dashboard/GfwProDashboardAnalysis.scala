@@ -46,7 +46,6 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
       val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl, contextualFeatureType, FeatureFilter.empty, "geom", spark)
       val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
       val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(rdd)
-      val fireStatsRDD = fireStats(rdd, fireAlertRDD, spark)
 
       /* Enrich the feature RDD by intersecting it with contextual features
        * The resulting FeatuerId carries combined identity of source fature and contextual geometry
@@ -59,7 +58,6 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
             refineContextualIntersection(feature, context, contextualFeatureType)
           }
 
-      // fold in fireStatsRDD after polygonal summary and accumulate the errors
       ValidatedWorkflow(enrichedRDD)
         .mapValidToValidated { rdd =>
           rdd.map { case row@Location(fid, geom) =>
@@ -69,23 +67,26 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
               Validated.valid[Location[JobError], Location[Geometry]](row)
           }
         }
-        .mapValidToValidated { enrichedRDD =>
+        .flatMap { enrichedRDD =>
+          val fireStatsRDD = fireStats(enrichedRDD, fireAlertRDD, spark)
           val tmp = enrichedRDD.map { case Location(id, geom) => Feature(geom, id) }
-          GfwProDashboardRDD(tmp, GfwProDashboardGrid.blockTileGrid, kwargs)
-        }
-        .mapValid { summaryStatsRDD =>
-          summaryStatsRDD
-            .mapValues(_.toGfwProDashboardData())
-            .leftOuterJoin(fireStatsRDD)
-            .mapValues { case (data, fire) =>
-              data.copy(viirs_alerts_daily = fire.getOrElse(GfwProDashboardDataDateCount.empty))
-            }
+          val validatedSummaryStatsRdd = GfwProDashboardRDD(tmp, GfwProDashboardGrid.blockTileGrid, kwargs)
+          ValidatedWorkflow(validatedSummaryStatsRdd).mapValid { summaryStatsRDD =>
+            // fold in fireStatsRDD after polygonal summary and accumulate the errors
+            summaryStatsRDD
+              .mapValues(_.toGfwProDashboardData())
+              .leftOuterJoin(fireStatsRDD)
+              .mapValues { case (data, fire) =>
+                data.copy(viirs_alerts_daily = fire.getOrElse(GfwProDashboardDataDateCount.empty))
+              }
+          }
         }
     }
 
     val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(summaryRDD.unify, spark)
     val runOutputUrl: String = getOutputUrl(kwargs)
     GfwProDashboardExport.export(featureType, summaryDF, runOutputUrl, kwargs)
+
   }
 
   /** These geometries touch, apply application specific logic of how to treat that.
