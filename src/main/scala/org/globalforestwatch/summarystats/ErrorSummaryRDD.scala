@@ -59,15 +59,12 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
      * but still preserving locality which will both reduce the S3 reads per executor and make it more likely
      * for features to be close together already during export.
      */
-
     val partitionedFeatureRDD = if (partition) {
       // if a single tile has more than 4096 features, split it up over partitions
       RepartitionSkewedRDD.bySparseId(keyedFeatureRDD, 4096)
     } else {
       keyedFeatureRDD.values
     }
-
-    // countRecordsPerPartition(partitionedFeatureRDD, SummarySparkSession("tmp"))
 
     /*
      * Here we're going to work with the features one partition at a time.
