@@ -4,14 +4,14 @@ import java.time.LocalDate
 
 import org.globalforestwatch.util.Mercantile
 
-case class IntegratedAlertsDataGroup(gladLAlertDate: Option[String],
+case class IntegratedAlertsDataGroup(//gladLAlertDate: Option[String],
                                      gladS2AlertDate: Option[String],
                                      raddAlertDate: Option[String],
-                                     gladLConfidence: String,
-                                     gladS2Confidence: String,
-                                     raddConfidence: String,
+                                     //gladLConfidence: String,
+                                     gladS2Confidence: Option[String],
+                                     raddConfidence: Option[String],
                                      integratedAlertDate: Option[String],
-                                     integratedConfidence: String,
+                                     integratedConfidence: Option[String],
                                      climateMask: Boolean,
                                      primaryForest: Boolean,
                                      protectedAreas: String,

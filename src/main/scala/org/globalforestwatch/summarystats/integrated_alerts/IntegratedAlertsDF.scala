@@ -7,11 +7,11 @@ import org.apache.spark.sql.{Column, DataFrame}
 object IntegratedAlertsDF {
 
   val contextualLayers: List[String] = List(
-    "umd_glad_landsat_alerts__date",
+    //"umd_glad_landsat_alerts__date",
     "umd_glad_sentinel2_alerts__date",
     "wur_radd_alerts__date",
     "gfw_integrated_alerts__date",
-    "umd_glad_landsat_alerts__confidence",
+    //"umd_glad_landsat_alerts__confidence",
     "umd_glad_sentinel2_alerts__confidence",
     "wur_radd_alerts__confidence",
     "gfw_integrated_alerts__confidence",
@@ -45,11 +45,11 @@ object IntegratedAlertsDF {
 
     def defaultCols =
       List(
-        $"data_group.gladLAlertDate" as "umd_glad_landsat_alerts__date",
+        //$"data_group.gladLAlertDate" as "umd_glad_landsat_alerts__date",
         $"data_group.gladS2AlertDate" as "umd_glad_sentinel2_alerts__date",
         $"data_group.raddAlertDate" as "wur_radd_alerts__date",
         $"data_group.integratedAlertDate" as "gfw_integrated_alerts__date",
-        $"data_group.gladLConfidence" as "umd_glad_landsat_alerts__confidence",
+        //$"data_group.gladLConfidence" as "umd_glad_landsat_alerts__confidence",
         $"data_group.gladS2Confidence" as "umd_glad_sentinel2_alerts__confidence",
         $"data_group.raddConfidence" as "wur_radd_alerts__confidence",
         $"data_group.integratedConfidence" as "gfw_integrated_alerts__confidence",
@@ -97,7 +97,7 @@ object IntegratedAlertsDF {
       else
         groupByCols ::: contextualLayers
 
-    df.filter($"gfw_integrated_alerts__confidence".notEqual("not_detected"))
+    df//.filter($"gfw_integrated_alerts__confidence".notEqual("not_detected"))
       .groupBy(cols.head, cols.tail: _*)
       .agg(
         sum("alert__count") as "alert__count",

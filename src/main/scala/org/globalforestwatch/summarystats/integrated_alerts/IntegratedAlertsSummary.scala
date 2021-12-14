@@ -87,10 +87,10 @@ object IntegratedAlertsSummary {
             }
           }
 
-          val gladLConfidence: String = {
+          val gladLConfidence: Option[String] = {
             gladL match {
-              case Some((_, conf)) => conf
-              case _ => "not_detected"
+              case Some((_, conf)) => Some(conf)
+              case _ => None
             }
           }
 
@@ -101,10 +101,10 @@ object IntegratedAlertsSummary {
             }
           }
 
-          val gladS2Confidence: String = {
+          val gladS2Confidence: Option[String] = {
             gladS2 match {
-              case Some((_, conf)) => conf
-              case _ => "not_detected"
+              case Some((_, conf)) => Some(conf)
+              case _ => None
             }
           }
 
@@ -115,10 +115,10 @@ object IntegratedAlertsSummary {
             }
           }
 
-          val raddConfidence: String = {
+          val raddConfidence: Option[String] = {
             radd match {
-              case Some((_, conf)) => conf
-              case _ => "not_detected"
+              case Some((_, conf)) => Some(conf)
+              case _ => None
             }
           }
 
@@ -131,28 +131,32 @@ object IntegratedAlertsSummary {
             else Some(alertDates.min)
 
           val confidences = List(gladLConfidence, gladS2Confidence, raddConfidence)
-          val integratedConfidence = {
+          val integratedConfidence = Some({
             // highest if more than one system detected alert
-            if (confidences.filter(_ != "not_detected").size > 1) {
+            if (confidences.flatten.size > 1) {
               "highest"
-            } else if (confidences.contains("high")) {
+            } else if (confidences.contains(Some("high"))) {
               "high"
-            } else if (confidences.contains("nominal")) {
-              "nominal"
             } else {
-              "not_detected"
+              "nominal"
             }
-          }
+          })
 
           def updateSummary(
-             stats: Map[IntegratedAlertsDataGroup, IntegratedAlertsData]
+             stats: Map[IntegratedAlertsDataGroup, IntegratedAlertsData],
+             integratedAlertDate: Option[String] = None,
+             integratedConfidence: Option[String] = None,
+             raddAlertDate: Option[String] = None,
+             raddConfidence: Option[String] = None,
+             gladS2AlertDate: Option[String]  = None,
+             gladS2Confidence: Option[String] = None,
            ): Map[IntegratedAlertsDataGroup, IntegratedAlertsData] = {
               val pKey =
                 IntegratedAlertsDataGroup(
-                  gladLAlertDate,
+                  //gladLAlertDate,
                   gladS2AlertDate,
                   raddAlertDate,
-                  gladLConfidence,
+                  //gladLConfidence,
                   gladS2Confidence,
                   raddConfidence,
                   integratedAlertDate,
@@ -196,10 +200,20 @@ object IntegratedAlertsSummary {
               stats.updated(pKey, summary)
             }
 
-          val updatedSummary: Map[IntegratedAlertsDataGroup, IntegratedAlertsData] =
-            updateSummary(acc.stats)
+          val updatedSummaryInt =
+            updateSummary(acc.stats, integratedAlertDate = integratedAlertDate, integratedConfidence = integratedConfidence)
 
-          acc = IntegratedAlertsSummary(updatedSummary)
+          val updatedSummaryRadd = raddAlertDate match {
+            case Some(_) => updateSummary(updatedSummaryInt, raddAlertDate = raddAlertDate, raddConfidence = raddConfidence)
+            case None => updatedSummaryInt
+          }
+
+          val updatedSummaryS2 = gladS2AlertDate match {
+            case Some(_) => updateSummary(updatedSummaryRadd, gladS2AlertDate = gladS2AlertDate, gladS2Confidence = gladS2Confidence)
+            case None => updatedSummaryRadd
+          }
+
+          acc = IntegratedAlertsSummary(updatedSummaryS2)
         }
       }
     }
