@@ -68,6 +68,7 @@ libraryDependencies ++= Seq(
   scalactic % Test,
   geotrellisSpark,
   geotrellisSparkTestKit % Test,
+  sparkFastTests % Test,
   geotrellisS3,
   geotrellisGdal,
   sedonaCore,
@@ -130,7 +131,7 @@ Compile / runMain := Defaults.runMainTask(Compile / fullClasspath , Compile / ru
 Test / fork := true
 Test / parallelExecution := false
 Test / testOptions += Tests.Argument("-oD")
-Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m")
+Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m", "-Djts.overlay=ng")
 Test / envVars := Map("AWS_REQUEST_PAYER" -> "requester")
 
 // Settings for sbt-assembly plugin which builds fat jars for use by spark jobs

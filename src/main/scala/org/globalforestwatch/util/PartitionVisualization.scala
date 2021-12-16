@@ -1,8 +1,6 @@
 package org.globalforestwatch.util
 
-import org.apache.spark.rdd._
 import org.apache.spark.sql._
-import org.locationtech.jts.geom.Geometry
 import geotrellis.vector._
 import geotrellis.vector.io.json.JsonFeatureCollection
 import _root_.io.circe.generic.auto._
