@@ -27,9 +27,8 @@ object ValidatedFeatureRDD {
     input: NonEmptyList[String],
     featureType: String,
     filters: FeatureFilter,
-    splitFeatures: Boolean,
-    spark: SparkSession
-  ): RDD[ValidatedLocation[Geometry]] = {
+    splitFeatures: Boolean
+  )(implicit spark: SparkSession): RDD[ValidatedLocation[Geometry]] = {
 
     if (splitFeatures) {
       val featureObj: Feature = Feature(featureType)

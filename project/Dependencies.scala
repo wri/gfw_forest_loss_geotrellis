@@ -87,4 +87,5 @@ object Dependencies {
   val breezeNatives = "org.scalanlp" %% "breeze-natives" % Version.breeze
   val breezeViz = "org.scalanlp" %% "breeze-viz" % Version.breeze
   val sparkDaria = "com.github.mrpowers" % "spark-daria_2.12" % "0.38.2"
+  val sparkFastTests = "com.github.mrpowers" %% "spark-fast-tests" % "1.0.0"
 }

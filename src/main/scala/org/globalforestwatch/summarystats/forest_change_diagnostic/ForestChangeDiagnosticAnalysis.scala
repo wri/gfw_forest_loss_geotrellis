@@ -1,6 +1,5 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-import cats.data.NonEmptyList
 import cats.data.Validated.{Invalid, Valid}
 import cats.implicits._
 import scala.collection.JavaConverters._
@@ -35,18 +34,29 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     * locations from output (id=-2).
     */
   def apply(
-    featureType: String,
     features: RDD[ValidatedLocation[Geometry]],
-    intermediateListSource: Option[NonEmptyList[String]],
+    intermediateResultsRDD: Option[RDD[ValidatedLocation[ForestChangeDiagnosticData]]],
     fireAlerts: SpatialRDD[Geometry],
-    runOutputUrl: String,
+    saveIntermidateResults: RDD[ValidatedLocation[ForestChangeDiagnosticData]] => Unit,
     kwargs: Map[String, Any]
-  )(implicit spark: SparkSession): Unit = {
+  )(implicit spark: SparkSession): RDD[ValidatedLocation[ForestChangeDiagnosticData]] = {
     features.persist(StorageLevel.MEMORY_AND_DISK)
 
     val diffGridIds: List[GridId] =
-      if (intermediateListSource.nonEmpty) collectDiffGridIds(features)
+      if (intermediateResultsRDD.nonEmpty) collectDiffGridIds(features)
       else List.empty
+
+    // These records are not covered by diff geometry, they're still valid and can be re-used
+    val cachedIntermidateResultsRDD = intermediateResultsRDD.map { rdd =>
+      rdd.filter {
+        case Valid(Location(CombinedFeatureId(fid1, fid2), _)) =>
+          !diffGridIds.contains(fid2)
+        case Invalid(Location(CombinedFeatureId(fid1, fid2), _)) =>
+          !diffGridIds.contains(fid2)
+        case _ =>
+          false
+      }
+    }
 
     val partialResult: RDD[ValidatedLocation[ForestChangeDiagnosticData]] =
       ValidatedWorkflow(features)
@@ -76,31 +86,14 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
         .unify
         .persist(StorageLevel.MEMORY_AND_DISK)
 
-    val finalResult = intermediateListSource match {
-      case Some(source) =>
-        val intermidateResults = readIntermidateRDD(source, gridFilter = diffGridIds)
-        val mergedResults = partialResult.union(intermidateResults)
-        ForestChangeDiagnosticExport.export(
-          "intermediate",
-          ForestChangeDiagnosticDF.getGridFeatureDataFrame(mergedResults, spark),
-          runOutputUrl,
-          kwargs
-        )
+    cachedIntermidateResultsRDD match {
+      case Some(cachedResults) =>
+        val mergedResults = partialResult.union(cachedResults)
+        saveIntermidateResults(mergedResults)
         combineGridResults(mergedResults)
-
       case None =>
         combineGridResults(partialResult)
     }
-
-    ForestChangeDiagnosticExport.export(
-      featureType,
-      ForestChangeDiagnosticDF.getFeatureDataFrame(finalResult, spark),
-      runOutputUrl,
-      kwargs
-    )
-
-   features.unpersist()
-   partialResult.unpersist()
   }
 
   /** Filter only to those rows covered by gridFilter, these are areas where location geometries have changed If gridFilter is empty list,
@@ -132,24 +125,6 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       .toList
   }
 
-  /** Read intermidate results (per grid cell). Exclude cells present in gridFilter, those values are now outdated.
-    */
-  def readIntermidateRDD(
-    sources: NonEmptyList[String],
-    gridFilter: List[GridId]
-  )(implicit spark: SparkSession): RDD[ValidatedLocation[ForestChangeDiagnosticData]] = {
-    ForestChangeDiagnosticDF
-      .readIntermidateRDD(sources, spark)
-      .filter {
-        case Valid(Location(CombinedFeatureId(fid1, fid2), _)) =>
-          !gridFilter.contains(fid2)
-        case Invalid(Location(CombinedFeatureId(fid1, fid2), _)) =>
-          !gridFilter.contains(fid2)
-        case _ =>
-          false
-      }
-  }
-
   /** Combine per grid results named by CombinedFeatureId to per location results named by FeatureId Some of the per-grid results fo may
     * be Invalid errors. Combining per-grid results will aggregate errors up to Location level.
     */
@@ -161,6 +136,10 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
         case Valid(Location(CombinedFeatureId(fid, _), data)) =>
           (fid, Valid(data))
         case Invalid(Location(CombinedFeatureId(fid, _), err)) =>
+          (fid, Invalid(err))
+        case Valid(Location(fid, data)) =>
+          (fid, Valid(data))
+        case Invalid(Location(fid, err)) =>
           (fid, Invalid(err))
       }
       .reduceByKey(_ combine _)

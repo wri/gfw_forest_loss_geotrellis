@@ -39,8 +39,8 @@ object GfwProDashboardCommand extends SummaryCommand {
       // TODO: move building the feature object into options
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
-      runAnalysis { spark =>
-        val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures, spark)
+      runAnalysis { implicit spark =>
+        val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures)
 
         val fireAlertRDD = FireAlertRDD(spark, fireAlert.alertType, fireAlert.alertSource, FeatureFilter.empty)
 
