@@ -40,12 +40,12 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
     // try to make geometry valid. This is a basic trick, we might need to make this more sophisticated
     // There are some code samples here for JTS
     // https://stackoverflow.com/a/31474580/1410317
-    val reducedGeom = reduce(gpr)(geom)
+    val reducedGeom = geom//reduce(gpr)(geom)
 
     val validGeom = {
       if (!reducedGeom.isValid) {
 
-        val fixedGeom = GeometryFixer(reducedGeom).fix()
+        val fixedGeom = GfwGeometryFixer.fix(geom)
 
         // Geometry fixer may alter the geometry type or even return an empty geometry
         // We want to try to preserve the geometry type if possible
@@ -57,7 +57,6 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
 
     validGeom.normalize()
     validGeom
-
   }
 
   def makeValidGeom(wkb: String): Geometry = {

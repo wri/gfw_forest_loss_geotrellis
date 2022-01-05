@@ -36,7 +36,7 @@ object Dependencies {
   private val dependencyScope = "provided"
 
   val sparkJts = "org.locationtech.geomesa" %% "geomesa-spark-jts" % "2.3.1"
-  val jts = "org.locationtech.jts" % "jts" % Version.jts
+  val jts = "org.locationtech.jts" % "jts-core" % Version.jts
   val geotrellisSpark = "org.locationtech.geotrellis" %% "geotrellis-spark" % Version.geotrellis
   val geotrellisS3 = "org.locationtech.geotrellis" %% "geotrellis-s3" % Version.geotrellis
   val geotrellisRaster = "org.locationtech.geotrellis" %% "geotrellis-raster" % Version.geotrellis

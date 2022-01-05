@@ -9,11 +9,11 @@ class GeometryFixerSuite extends AnyFunSuite {
   test("A 'bowtie' polygon") {
     val poly: Polygon = Polygon((0.0, 0.0), (0.0, 10.0), (10.0, 0.0), (10.0, 10.0), (0.0, 0.0))
     val validGeom = makeValidGeom(poly)
+    info(poly.toText())
+    info(validGeom.toText())
 
     assert(!poly.isValid)
     assert(validGeom.isValid)
-    assert(validGeom.getGeometryType === poly.getGeometryType)
-
   }
 
   test("Inner ring with one edge sharing part of an edge of the outer ring") {
