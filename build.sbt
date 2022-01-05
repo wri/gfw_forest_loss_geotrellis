@@ -77,9 +77,9 @@ libraryDependencies ++= Seq(
   breezeNatives,
   breezeViz,
   sparkDaria,
-  jts,
   "org.datasyslab" % "geotools-wrapper" % "geotools-24.1",
-  "org.wololo" % "jts2geojson" % "0.14.3"
+  "org.wololo" % "jts2geojson" % "0.14.3",
+  jts
 )
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
