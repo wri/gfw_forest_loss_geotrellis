@@ -136,7 +136,6 @@ Test / envVars := Map("AWS_REQUEST_PAYER" -> "requester")
 
 // Settings for sbt-assembly plugin which builds fat jars for use by spark jobs
 assembly / test := {}
-assembly / assemblyOption := (assembly / assemblyOption).value.withAppendContentHash(true)
 assembly / assemblyMergeStrategy  := {
   case "reference.conf" => MergeStrategy.concat
   case "application.conf" => MergeStrategy.concat
