@@ -8,10 +8,16 @@ import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
-import geotrellis.raster.{CellType, IntCells, NoDataHandling, Tile, isNoData}
 import org.globalforestwatch.config.DataEnvironment
 import org.globalforestwatch.util.Config
 import org.globalforestwatch.util.Util.{getAnyMapValue, jsonStrToMap}
+import geotrellis.raster.{
+  CellType,
+  IntCells,
+  NoDataHandling,
+  Tile,
+  isNoData
+}
 import software.amazon.awssdk.services.s3.S3Client
 import scalaj.http._
 

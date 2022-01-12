@@ -1,7 +1,6 @@
 package org.globalforestwatch.summarystats
 
-import frameless.{TypedEncoder, TypedExpressionEncoder}
-import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
+import frameless.TypedEncoder
 
 package object forest_change_diagnostic {
   implicit def dataDoubleTypedEncoder: TypedEncoder[ForestChangeDiagnosticDataDouble] =

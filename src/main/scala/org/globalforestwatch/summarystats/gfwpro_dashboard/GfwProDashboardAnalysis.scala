@@ -1,199 +1,165 @@
 package org.globalforestwatch.summarystats.gfwpro_dashboard
 
-import cats.data.NonEmptyList
-import geotrellis.vector.{Feature, Geometry, MultiPolygon}
-import com.vividsolutions.jts.geom.{Geometry => GeoSparkGeometry, MultiPolygon => GeoSparkMultiPolygon}
+import cats.data.{NonEmptyList, Validated}
+import geotrellis.vector.{Feature, Geometry}
 import geotrellis.store.index.zcurve.Z2
 import org.apache.spark.HashPartitioner
 import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats._
-import org.globalforestwatch.util.GeoSparkGeometryConstructor.createPoint
-import org.globalforestwatch.util.IntersectGeometry.intersectGeometries
+import org.globalforestwatch.util.GeometryConstructor.createPoint
 import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
-import org.globalforestwatch.util.ImplicitGeometryConverter._
-import org.globalforestwatch.util.RDDAdapter.toSpatialRDD
+import org.globalforestwatch.util.RDDAdapter
+import org.globalforestwatch.ValidatedWorkflow
 
-import java.util
-//import org.apache.sedona.core.enums.{FileDataSplitter, GridType, IndexType}
-//import org.apache.sedona.core.spatialOperator.JoinQuery
-//import org.apache.sedona.core.spatialRDD.PointRDD
-//import org.apache.sedona.sql.utils.{Adapter, SedonaSQLRegistrator}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.storage.StorageLevel
 import org.globalforestwatch.features.FeatureId
-import org.globalforestwatch.util.Util.getAnyMapValue
-import org.datasyslab.geosparksql.utils.Adapter
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
+import org.apache.sedona.sql.utils.Adapter
+import org.apache.sedona.core.spatialRDD.SpatialRDD
 
 import scala.collection.JavaConverters._
 import java.time.LocalDate
+import org.globalforestwatch.util.IntersectGeometry
+import scala.reflect.ClassTag
 
 object GfwProDashboardAnalysis extends SummaryAnalysis {
 
   val name = "gfwpro_dashboard"
 
-  def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
-            featureType: String,
-            contextualFeatureType: String,
-            contextualFeatureUrl: NonEmptyList[String],
-            fireAlertRDD: SpatialRDD[GeoSparkGeometry],
-            spark: SparkSession,
-            kwargs: Map[String, Any]): Unit = {
-
-    val enrichedRDD = intersectWithContextualLayer(featureRDD, contextualFeatureType, contextualFeatureUrl, kwargs, spark)
-    enrichedRDD.cache()
-
-    val summaryRDD: RDD[(FeatureId, ValidatedRow[GfwProDashboardSummary])] =
-      GfwProDashboardRDD(enrichedRDD, GfwProDashboardGrid.blockTileGrid, kwargs)
-
-    val fireCountRDD: RDD[(FeatureId, GfwProDashboardDataDateCount)] =
-      GfwProDashboardAnalysis.fireStats(enrichedRDD, fireAlertRDD, spark)
-
-    val dataRDD: RDD[(FeatureId, ValidatedRow[GfwProDashboardData])] =
-      summaryRDD
-        .mapValues{ validated => validated.map(_.toGfwProDashboardData()) }
-        .leftOuterJoin(fireCountRDD)
-        .mapValues {
-          case (validated, fire) =>
-             // Fire results are discarded if joined to error summary
-            validated.map { data =>
-              data.copy(
-                viirs_alerts_daily =
-                  fire.getOrElse(GfwProDashboardDataDateCount.empty)
-              )
-            }
-        }
-
-    val summaryDF = GfwProDashboardDF.getFeatureDataFrame(dataRDD, spark)
-
-    val runOutputUrl: String = getOutputUrl(kwargs)
-
-    GfwProDashboardExport.export(featureType, summaryDF, runOutputUrl, kwargs)
-  }
-
-  def fireStats(
-    featureRDD: RDD[Feature[Geometry, FeatureId]],
-    fireAlertRDD: SpatialRDD[GeoSparkGeometry],
-    spark: SparkSession
-  ): RDD[(FeatureId, GfwProDashboardDataDateCount)] = {
-    val featureSpatialRDD = toSpatialRDD(featureRDD)
-    val joinedRDD = SpatialJoinRDD.spatialjoin(featureSpatialRDD, fireAlertRDD)
-
-    joinedRDD.rdd .map { case (poly, points) =>
-      toGfwProDashboardFireData(poly, points)
-    }.reduceByKey(_ merge _)
-  }
-
-  private def intersectWithContextualLayer(
-    featureRDD: RDD[Feature[Geometry, FeatureId]],
+  def apply(
+    featureRDD: RDD[ValidatedLocation[Geometry]],
+    featureType: String,
     contextualFeatureType: String,
     contextualFeatureUrl: NonEmptyList[String],
-    kwargs: Map[String, Any],
-    spark: SparkSession
-  ): RDD[Feature[Geometry, FeatureId]] = {
+    fireAlertRDD: SpatialRDD[Geometry],
+    spark: SparkSession,
+    kwargs: Map[String, Any]
+  ): Unit = {
+    featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
-    // Reading the contextual Layer directly as SpatialDF to avoid having to go via a FeatureRDD and back.
-    val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl, contextualFeatureType, FeatureFilter.empty, "geom", spark)
+    val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
+      val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl, contextualFeatureType, FeatureFilter.empty, "geom", spark)
+      val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
+      val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(rdd)
 
-    val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
+      /* Enrich the feature RDD by intersecting it with contextual features
+       * The resulting FeatuerId carries combined identity of source fature and contextual geometry
+       */
+      val enrichedRDD =
+        SpatialJoinRDD
+          .flatSpatialJoin(spatialContextualRDD, spatialFeatureRDD, considerBoundaryIntersection = true, usingIndex = true)
+          .rdd
+          .flatMap { case (feature, context) =>
+            refineContextualIntersection(feature, context, contextualFeatureType)
+          }
 
-    val spatialFeatureRDD = toSpatialRDD(featureRDD)
-
-    val joinedRDD = SpatialJoinRDD.flatSpatialJoin(
-      spatialContextualRDD,
-      spatialFeatureRDD,
-      considerBoundaryIntersection = true,
-      usingIndex = false
-    )
-
-    val combinedFeatureRDD = joinedRDD.rdd.flatMap {
-      pair: (GeoSparkGeometry, GeoSparkGeometry) =>
-        val featureGeom = pair._1
-        val featureId = featureGeom.getUserData.asInstanceOf[FeatureId]
-        val contextualGeom = pair._2
-        val contextualId = FeatureId.fromUserData(contextualFeatureType, contextualGeom.getUserData.asInstanceOf[String], delimiter = ",")
-
-        featureId match {
-          case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>
-
-            val featureCentroid = createPoint(gfwproId.x, gfwproId.y)
-            if (contextualGeom.contains(featureCentroid)) {
-              Seq(
-                Feature[Geometry, CombinedFeatureId](
-                  featureGeom,
-                  CombinedFeatureId(gfwproId, contextualId)
-                )
-              )
-            } else Seq()
-          case gfwproId: GfwProFeatureId if gfwproId.locationId < 0 =>
-            val geometries = intersectGeometries(featureGeom, contextualGeom)
-            geometries.flatMap { intersection: GeoSparkMultiPolygon =>
-              // implicitly convert to Geotrellis geometry
-              val geom: MultiPolygon = intersection
-              if (geom.isEmpty) Seq()
-              else
-                Seq(
-                  Feature[Geometry, CombinedFeatureId](
-                    geom,
-                    CombinedFeatureId(gfwproId, contextualId)
-                  )
-                )
-            }
+      ValidatedWorkflow(enrichedRDD)
+        .mapValidToValidated { rdd =>
+          rdd.map { case row@Location(fid, geom) =>
+            if (geom.isEmpty())
+              Validated.invalid[Location[JobError], Location[Geometry]](Location(fid, GeometryError(s"Empty Geometry")))
+            else
+              Validated.valid[Location[JobError], Location[Geometry]](row)
+          }
+        }
+        .flatMap { enrichedRDD =>
+          val fireStatsRDD = fireStats(enrichedRDD, fireAlertRDD, spark)
+          val tmp = enrichedRDD.map { case Location(id, geom) => Feature(geom, id) }
+          val validatedSummaryStatsRdd = GfwProDashboardRDD(tmp, GfwProDashboardGrid.blockTileGrid, kwargs)
+          ValidatedWorkflow(validatedSummaryStatsRdd).mapValid { summaryStatsRDD =>
+            // fold in fireStatsRDD after polygonal summary and accumulate the errors
+            summaryStatsRDD
+              .mapValues(_.toGfwProDashboardData())
+              .leftOuterJoin(fireStatsRDD)
+              .mapValues { case (data, fire) =>
+                data.copy(viirs_alerts_daily = fire.getOrElse(GfwProDashboardDataDateCount.empty))
+              }
+          }
         }
     }
 
-    // Reshuffle for later use in SummaryRDD with Range Partitioner
-    val hashPartitioner = new HashPartitioner(
-      combinedFeatureRDD.getNumPartitions
-    )
-    combinedFeatureRDD
-      .keyBy({ feature: Feature[Geometry, FeatureId] =>
-        Z2(
-          (feature.geom.getCentroid.getX * 100).toInt,
-          (feature.geom.getCentroid.getY * 100).toInt
-        ).z
-      })
-      .partitionBy(hashPartitioner)
-      .mapPartitions({ iter: Iterator[(Long, Feature[Geometry, FeatureId])] =>
-        for {
-          i <- iter
-        } yield {
-          i._2
-        }
-      }, preservesPartitioning = true)
+    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(summaryRDD.unify, spark)
+    val runOutputUrl: String = getOutputUrl(kwargs)
+    GfwProDashboardExport.export(featureType, summaryDF, runOutputUrl, kwargs)
 
   }
 
-  private def toGfwProDashboardFireData(
-                                         poly: GeoSparkGeometry,
-                                         points: util.HashSet[GeoSparkGeometry]
-                                       ): (FeatureId, GfwProDashboardDataDateCount) = {
-    ( {
-      poly.getUserData.asInstanceOf[FeatureId]
-    }, {
+  /** These geometries touch, apply application specific logic of how to treat that.
+    *   - For intersection of location geometries only keep those where centroid of location is in the contextual geom (this ensures that
+    *     any location is only assigned to a single contextual area even if it intersects more)
+    *   - For dissolved geometry of list report all contextual areas it intersects
+    */
+  private def refineContextualIntersection(
+    featureGeom: Geometry,
+    contextualGeom: Geometry,
+    contextualFeatureType: String
+  ): List[ValidatedLocation[Geometry]] = {
+    val featureId = featureGeom.getUserData.asInstanceOf[FeatureId]
+    val contextualId = FeatureId.fromUserData(contextualFeatureType, contextualGeom.getUserData.asInstanceOf[String], delimiter = ",")
 
-      points.asScala.toList.foldLeft(GfwProDashboardDataDateCount.empty) {
-        (z, point) => {
+    featureId match {
+      case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>
+        val featureCentroid = createPoint(gfwproId.x, gfwproId.y)
+        if (contextualGeom.contains(featureCentroid)) {
+          val fid = CombinedFeatureId(gfwproId, contextualId)
+          // val gtGeom: Geometry = toGeotrellisGeometry(featureGeom)
+          List(Validated.Valid(Location(fid, featureGeom)))
+        } else Nil
+
+      case gfwproId: GfwProFeatureId if gfwproId.locationId < 0 =>
+        IntersectGeometry
+          .validatedIntersection(featureGeom, contextualGeom)
+          .leftMap { err => Location(featureId, err) }
+          .map { geometries =>
+            geometries.map { geom =>
+              // val gtGeom: Geometry = toGeotrellisGeometry(geom)
+              Location(CombinedFeatureId(gfwproId, contextualId), geom)
+            }
+          }
+          .traverse(identity) // turn validated list of geometries into list of validated geometries
+    }
+  }
+
+  private def partitionByZIndex[A: ClassTag](rdd: RDD[A])(getGeom: A => Geometry): RDD[A] = {
+    val hashPartitioner = new HashPartitioner(rdd.getNumPartitions)
+
+    rdd
+      .keyBy({ row =>
+        val geom = getGeom(row)
+        Z2(
+          (geom.getCentroid.getX * 100).toInt,
+          (geom.getCentroid.getY * 100).toInt
+        ).z
+      })
+      .partitionBy(hashPartitioner)
+      .mapPartitions(
+        { iter: Iterator[(Long, A)] =>
+          for (i <- iter) yield i._2
+        },
+        preservesPartitioning = true
+      )
+  }
+
+  private def fireStats(
+    featureRDD: RDD[Location[Geometry]],
+    fireAlertRDD: SpatialRDD[Geometry],
+    spark: SparkSession
+  ): RDD[Location[GfwProDashboardDataDateCount]] = {
+    val featureSpatialRDD = RDDAdapter.toSpatialRDDfromLocationRdd(featureRDD)
+    val joinedRDD = SpatialJoinRDD.spatialjoin(featureSpatialRDD, fireAlertRDD)
+
+    joinedRDD.rdd
+      .map { case (poly, points) =>
+        val fid = poly.getUserData.asInstanceOf[FeatureId]
+        val data = points.asScala.foldLeft(GfwProDashboardDataDateCount.empty) { (z, point) =>
           // extract year from acq_date column is YYYY-MM-DD
           val acqDate = point.getUserData.asInstanceOf[String].split("\t")(2)
           val alertDate = LocalDate.parse(acqDate)
           z.merge(GfwProDashboardDataDateCount.fillDaily(Some(alertDate), 1))
         }
+        (fid, data)
       }
-
-    })
-  }
-
-  private def formatGfwProDashboardData(summaryRDD: RDD[(FeatureId, GfwProDashboardSummary)]): RDD[(FeatureId, GfwProDashboardData)] = {
-
-    summaryRDD
-      .flatMap {
-        case (featureId, summary) =>
-          // We need to convert the Map to a List in order to correctly flatmap the data
-          summary.stats.toList.map {
-            case (dataGroup, data) =>
-              (featureId, dataGroup.toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea))
-          }
-      }
+      .reduceByKey(_ merge _)
   }
 }

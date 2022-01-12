@@ -17,7 +17,6 @@ import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
 import scala.reflect.runtime.universe._
-import java.util.NoSuchElementException
 
 
 object Util {

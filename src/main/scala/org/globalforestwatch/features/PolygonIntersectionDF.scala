@@ -1,12 +1,7 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.Geometry
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.util.Util.getAnyMapValue
-import org.apache.spark.sql.functions.{col, expr}
 
 object PolygonIntersectionDF {
   /*

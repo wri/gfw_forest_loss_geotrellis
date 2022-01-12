@@ -5,7 +5,7 @@ import cats.data.Validated.{Invalid, Valid}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features._
-import org.globalforestwatch.summarystats.{JobError, ValidatedRow}
+import org.globalforestwatch.summarystats.{JobError, ValidatedLocation, Location}
 import org.globalforestwatch.util.Util.{colsFor, fieldsFromCol}
 import org.globalforestwatch.summarystats.SummaryDF
 import org.globalforestwatch.summarystats.SummaryDF.{RowError, RowId}
@@ -13,53 +13,50 @@ import org.globalforestwatch.summarystats.SummaryDF.{RowError, RowId}
 object ForestChangeDiagnosticDF extends SummaryDF {
 
   def getFeatureDataFrame(
-    dataRDD: RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticData])],
+    dataRDD: RDD[ValidatedLocation[ForestChangeDiagnosticData]],
     spark: SparkSession
   ): DataFrame = {
     import spark.implicits._
 
-    dataRDD.mapValues {
-      case Valid(data) =>
-        (RowError.empty, data)
-      case Invalid(err) =>
-        (RowError.fromJobError(err), ForestChangeDiagnosticData.empty)
-    }.map {
-      case (id, (error, data)) =>
-        val rowId = id match {
-          case gfwproId: GfwProFeatureId =>
-            RowId(gfwproId.listId, gfwproId.locationId.toString)
+    val rowId: FeatureId => RowId = {
+      case gfwproId: GfwProFeatureId =>
+        RowId(gfwproId.listId, gfwproId.locationId.toString)
+      case gadmId: GadmFeatureId =>
+        RowId("GADM 3.6", gadmId.toString)
+      case wdpaId: WdpaFeatureId =>
+        RowId("WDPA", wdpaId.toString)
+      case id =>
+        throw new IllegalArgumentException(s"Can't produce DataFrame for $id")
+    }
 
-          case gadmId: GadmFeatureId =>
-            RowId("GADM 3.6", gadmId.toString)
-
-          case wdpaId: WdpaFeatureId =>
-            RowId("WDPA", wdpaId.toString)
-
-          case id =>
-            throw new IllegalArgumentException(s"Can't produce DataFrame for $id")
-        }
-        (rowId, error, data)
+    dataRDD.map {
+      case Valid(Location(fid, data)) =>
+        (rowId(fid), RowError.empty, data)
+      case Invalid(Location(fid, err)) =>
+        (rowId(fid), RowError.fromJobError(err), ForestChangeDiagnosticData.empty)
     }
       .toDF("id", "error", "data")
       .select($"id.*" :: $"error.*" :: fieldsFromCol($"data", featureFields): _*)
   }
 
   def getGridFeatureDataFrame(
-    dataRDD: RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticData])],
+    dataRDD: RDD[ValidatedLocation[ForestChangeDiagnosticData]],
     spark: SparkSession
   ): DataFrame = {
     import spark.implicits._
 
-    dataRDD.mapValues {
-      case Valid(data) =>
-        (RowError.empty, data)
-      case Invalid(err) =>
-        (RowError.fromJobError(err), ForestChangeDiagnosticData.empty)
-    }.map {
-      case (CombinedFeatureId(gfwproId: GfwProFeatureId, gridId: GridId), (error, data)) =>
-        (RowGridId(gfwproId, gridId), error, data)
+    val rowId: FeatureId => RowGridId = {
+      case CombinedFeatureId(gfwproId: GfwProFeatureId, gridId: GridId) =>
+        RowGridId(gfwproId, gridId)
       case _ =>
         throw new IllegalArgumentException("Not a CombinedFeatureId")
+    }
+
+    dataRDD.map {
+      case Valid(Location(fid, data)) =>
+        (rowId(fid), RowError.empty, data)
+      case Invalid(Location(fid, err)) =>
+        (rowId(fid), RowError.fromJobError(err), ForestChangeDiagnosticData.empty)
     }
       .toDF("id", "error", "data")
       .select($"id.*" :: $"error.*" :: fieldsFromCol($"data", featureFields) ::: fieldsFromCol($"data", gridFields): _*)
@@ -68,7 +65,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
   def readIntermidateRDD(
     sources: NonEmptyList[String],
     spark: SparkSession,
-  ): RDD[(FeatureId, ValidatedRow[ForestChangeDiagnosticData])] = {
+  ): RDD[ValidatedLocation[ForestChangeDiagnosticData]] = {
     val df = FeatureDF(sources, GfwProFeature, FeatureFilter.empty, spark)
     val ds = df.select(
       colsFor[RowGridId].as[RowGridId],
@@ -76,14 +73,15 @@ object ForestChangeDiagnosticDF extends SummaryDF {
       colsFor[ForestChangeDiagnosticData].as[ForestChangeDiagnosticData])
 
     ds.rdd.map { case (id, error, data) =>
-      if (error.status_code == 2) (id.toFeatureID, Valid(data))
-      else (id.toFeatureID, Invalid(JobError.fromErrorColumn(error.location_error).get))
+      if (error.status_code == 2) Valid(Location(id.toFeatureID, data))
+      else Invalid(Location(id.toFeatureID, JobError.fromErrorColumn(error.location_error).get))
     }
   }
 
   case class RowGridId(list_id: String, location_id: Int, x: Double, y: Double, grid: String) {
     def toFeatureID = CombinedFeatureId(GfwProFeatureId(list_id, location_id , x, y), GridId(grid))
   }
+
   object RowGridId {
     def apply(gfwProId: GfwProFeatureId, gridId: GridId): RowGridId = RowGridId (
       list_id = gfwProId.listId,

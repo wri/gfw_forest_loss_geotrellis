@@ -1,11 +1,11 @@
 package org.globalforestwatch.util
 
-import com.vividsolutions.jts.geom.Envelope
+import org.locationtech.jts.geom.Envelope
 import geotrellis.vector.Point
-import org.apache.spark.sql.functions.{col, expr, lit, udf}
+import org.apache.spark.sql.functions.{col, lit, udf}
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.datasyslab.geospark.spatialRDD.PolygonRDD
-import org.datasyslab.geosparksql.utils.Adapter
+import org.apache.sedona.core.spatialRDD.PolygonRDD
+import org.apache.sedona.sql.utils.Adapter
 import org.globalforestwatch.grids.GridId.pointGridId
 
 object GridDF {

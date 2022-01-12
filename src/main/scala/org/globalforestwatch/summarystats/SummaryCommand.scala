@@ -5,13 +5,9 @@ import com.monovore.decline.{Argument, Opts}
 import cats.data.NonEmptyList
 import cats.implicits._
 import com.monovore.decline.Opts
-import geotrellis.vector.{Feature, Geometry}
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Column, DataFrame, SparkSession}
-import org.apache.spark.sql.functions.{col, substring}
-import org.globalforestwatch.features._
 import org.globalforestwatch.util.Config
-import org.globalforestwatch.util.Util._
+import org.apache.spark.sql.{SparkSession, Column}
+import org.apache.spark.sql.functions.{substring, col}
 
 trait SummaryCommand {
   import SummaryCommand._
@@ -41,6 +37,13 @@ trait SummaryCommand {
 
   val outputOpt: Opts[String] =
     Opts.option[String]("output", "URI of output dir for CSV files")
+
+  val overwriteOutputOpt: Opts[Boolean] = Opts
+    .flag(
+      "overwrite",
+      help = "Overwrite output location if already existing"
+    )
+    .orFalse
 
   val featureTypeOpt: Opts[String] = Opts
     .option[String](
@@ -129,7 +132,7 @@ trait SummaryCommand {
   val noOutputPathSuffixOpt: Opts[Boolean] = Opts.flag("no_output_path_suffix", help = "Do not autogenerate output path suffix at runtime").orFalse
 
   val defaultOptions: Opts[BaseOptions] =
-    (featureTypeOpt, featuresOpt, outputOpt, splitFeatures, noOutputPathSuffixOpt, dataEnvironmentOpt).mapN(BaseOptions)
+    (featureTypeOpt, featuresOpt, outputOpt, overwriteOutputOpt, splitFeatures, noOutputPathSuffixOpt, dataEnvironmentOpt).mapN(BaseOptions)
 
   val fireAlertOptions: Opts[FireAlert] =
     (fireAlertTypeOpt, fireAlertSourceOpt).mapN(FireAlert)
@@ -173,6 +176,7 @@ object SummaryCommand {
     featureType: String,
     featureUris: NonEmptyList[String],
     outputUrl: String,
+    overwriteOutput: Boolean,
     splitFeatures: Boolean,
     noOutputPathSuffix: Boolean,
     dataEnvironment: String)

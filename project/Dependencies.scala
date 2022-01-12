@@ -20,14 +20,15 @@ object Version {
   val breeze = "0.13.2"
   val decline = "1.3.0"
   val scala = "2.12.12"
-  val geotrellis = "3.5.2"
+  val geotrellis = "3.7.0-SNAPSHOT"
   val hadoop = "3.2.1"
   val jackson = "2.10.0"
   val spark = "3.1.1"
   val sparkCompatible = "3.0"
-  val geotools = "23.1"
-  val sedona = "1.0.0-incubating"
+  val geotools = "24.1"
+  val sedona = "1.1.1-incubating"
   val frameless = "0.9.0"
+  val jts = "1.18.2"
 }
 
 object Dependencies {
@@ -35,7 +36,7 @@ object Dependencies {
   private val dependencyScope = "provided"
 
   val sparkJts = "org.locationtech.geomesa" %% "geomesa-spark-jts" % "2.3.1"
-
+  val jts = "org.locationtech.jts" % "jts-core" % Version.jts
   val geotrellisSpark = "org.locationtech.geotrellis" %% "geotrellis-spark" % Version.geotrellis
   val geotrellisS3 = "org.locationtech.geotrellis" %% "geotrellis-s3" % Version.geotrellis
   val geotrellisRaster = "org.locationtech.geotrellis" %% "geotrellis-raster" % Version.geotrellis
@@ -61,6 +62,7 @@ object Dependencies {
   val sparkCore = "org.apache.spark" %% "spark-core" % Version.spark % dependencyScope exclude("org.apache.hadoop", "*")
   val sparkSQL = "org.apache.spark" %% "spark-sql" % Version.spark % dependencyScope exclude("org.apache.hadoop", "*")
   val sparkHive = "org.apache.spark" %% "spark-hive" % Version.spark % dependencyScope exclude("org.apache.hadoop", "*")
+  val frameless = "org.typelevel" %% "frameless-dataset" % Version.frameless
 
   val hadoopClient = "org.apache.hadoop" % "hadoop-client" % Version.hadoop % dependencyScope
   val hadoopMapReduceClientCore = "org.apache.hadoop" % "hadoop-mapreduce-client-core" % Version.hadoop % dependencyScope
@@ -73,8 +75,10 @@ object Dependencies {
   //  val sedonaSQL = "org.apache.sedona" %% "sedona-sql-".concat(
   //    Version.sparkCompatible
   //  ) % Version.sedona
-  val sedonaCore = "org.datasyslab" % "geospark" % "1.3.2-SNAPSHOT"
-  val sedonaSQL = "org.datasyslab" % "geospark-sql_3.0" % "1.3.2-SNAPSHOT"
+
+  val sedonaCore = "org.apache.sedona" %% "sedona-core-3.0" % Version.sedona
+  val sedonaSQL = "org.apache.sedona" %% "sedona-sql-3.0" % Version.sedona
+
   //  val jts2geojson = "org.wololo" % "jts2geojson" % "0.14.3" % "compile"
   //  val jtsCore = "org.locationtech.jts" % "jts-core" % "1.16.1" % "compile"  // 1.18.0 ?
   val geoToolsOGRBridj = "org.geotools" % "gt-ogr-bridj" % Version.geotools exclude("com.nativelibs4java", "bridj")
@@ -83,4 +87,5 @@ object Dependencies {
   val breezeNatives = "org.scalanlp" %% "breeze-natives" % Version.breeze
   val breezeViz = "org.scalanlp" %% "breeze-viz" % Version.breeze
   val sparkDaria = "com.github.mrpowers" % "spark-daria_2.12" % "0.38.2"
+  val sparkFastTests = "com.github.mrpowers" %% "spark-fast-tests" % "1.0.0"
 }

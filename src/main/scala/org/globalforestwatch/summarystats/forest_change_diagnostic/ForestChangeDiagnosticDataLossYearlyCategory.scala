@@ -4,7 +4,6 @@ import frameless.Injection
 import io.circe.syntax._
 import io.circe.parser.decode
 
-import scala.reflect.internal.pickling.ByteCodecs
 
 case class ForestChangeDiagnosticDataLossYearlyCategory(
                                                          value: Map[String, ForestChangeDiagnosticDataLossYearly]

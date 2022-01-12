@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.gladalerts
 
 import geotrellis.vector.Extent
-import org.globalforestwatch.grids.{GridId, GridTile, TenByTen30mGrid}
+import org.globalforestwatch.grids.{GridTile, TenByTen30mGrid}
 
 object GladAlertsGrid extends TenByTen30mGrid[GladAlertsGridSources] {
 

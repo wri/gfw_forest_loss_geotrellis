@@ -1,10 +1,9 @@
 package org.globalforestwatch.features
 
 import geotrellis.vector.Geometry
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Row}
 import org.globalforestwatch.util.GeotrellisGeometryValidator
 import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
-import geotrellis.raster.summary.polygonal.Summary
 
 /** This trait defiens how to read a Feature from DataFrame, from what columns to parse its FeatureId and how to read its geometry */
 trait Feature extends java.io.Serializable {

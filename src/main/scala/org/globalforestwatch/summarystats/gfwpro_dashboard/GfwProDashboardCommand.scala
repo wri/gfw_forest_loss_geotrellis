@@ -4,7 +4,6 @@ import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
-import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features._
 
 object GfwProDashboardCommand extends SummaryCommand {
@@ -35,19 +34,25 @@ object GfwProDashboardCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
+        "overwriteOutput" -> default.overwriteOutput,
       )
       // TODO: move building the feature object into options
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
-      runAnalysis { spark =>
-        val featureRDD = FeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures, spark)
+      runAnalysis { implicit spark =>
+        val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures)
+
         val fireAlertRDD = FireAlertRDD(spark, fireAlert.alertType, fireAlert.alertSource, FeatureFilter.empty)
 
-        GfwProDashboardAnalysis(featureRDD, default.featureType,
+        GfwProDashboardAnalysis(
+          featureRDD,
+          default.featureType,
           contextualFeatureType = contextualFeatureType,
           contextualFeatureUrl = contextualFeatureUrl,
           fireAlertRDD,
-          spark, kwargs)
+          spark,
+          kwargs
+        )
       }
     }
   }

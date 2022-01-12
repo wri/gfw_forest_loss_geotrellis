@@ -1,6 +1,5 @@
 package org.globalforestwatch.summarystats
 
-import com.monovore.decline.CommandApp
 import org.globalforestwatch.summarystats.annualupdate_minimal.AnnualUpdateMinimalCommand.annualupdateMinimalCommand
 import org.globalforestwatch.summarystats.carbon_sensitivity.CarbonSensitivityCommand.carbonSensitivityCommand
 import org.globalforestwatch.summarystats.carbonflux.CarbonFluxCommand.carbonFluxCommand
@@ -10,20 +9,30 @@ import org.globalforestwatch.summarystats.gfwpro_dashboard.GfwProDashboardComman
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsCommand.gladAlertsCommand
 import org.globalforestwatch.summarystats.treecoverloss.TreeCoverLossCommand.treeCoverLossCommand
 import org.globalforestwatch.summarystats.integrated_alerts.IntegratedAlertsCommand.integratedAlertsCommand
+import com.monovore.decline._
 
-object SummaryMain
-  extends CommandApp(
-    name = "geotrellis-summary-stats",
-    header = "Compute summary statistics for GFW data",
-    main = {
-      annualupdateMinimalCommand orElse
-        carbonSensitivityCommand orElse
-        carbonFluxCommand orElse
-        fireAlertsCommand orElse
-        forestChangeDiagnosticCommand orElse
-        gfwProDashboardCommand orElse
-        gladAlertsCommand orElse
-        treeCoverLossCommand orElse
-        integratedAlertsCommand
+object SummaryMain {
+  val name = "geotrellis-summary-stats"
+  val header = "Compute summary statistics for GFW data"
+  val main = {
+    annualupdateMinimalCommand orElse
+      carbonSensitivityCommand orElse
+      carbonFluxCommand orElse
+      fireAlertsCommand orElse
+      forestChangeDiagnosticCommand orElse
+      gfwProDashboardCommand orElse
+      gladAlertsCommand orElse
+      treeCoverLossCommand orElse
+      integratedAlertsCommand
+  }
+  val command = Command(name, header, true)(main)
+
+  final def main(args: Array[String]): Unit = {
+    command.parse(args, sys.env) match {
+      case Left(help) =>
+        System.err.println(help)
+        System.exit(2)
+      case Right(_) => ()
     }
-  )
+  }
+}

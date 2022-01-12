@@ -125,8 +125,6 @@ object FireAlertsDF {
                                aggCol: String,
                                wdpa: Boolean = false): DataFrame = {
     val spark = df.sparkSession
-    import spark.implicits._
-
     val confCols = if (!aggCol.equals("burned_area__ha")) List("confidence__cat")  else List()
     val fireCols2 = List("alert__year", "alert__week") ::: confCols
     val aggCols = List(col(aggCol))

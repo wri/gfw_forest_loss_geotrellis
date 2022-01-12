@@ -1,8 +1,5 @@
 package org.globalforestwatch.features
 
-import org.apache.spark.sql.functions.substring
-import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.util.Util._
 import org.apache.spark.sql.Column
 import org.globalforestwatch.summarystats.SummaryCommand
 

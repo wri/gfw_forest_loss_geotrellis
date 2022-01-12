@@ -1,6 +1,5 @@
 package org.globalforestwatch.util
 
-import org.globalforestwatch.util.Geodesy.pixelArea
 import org.scalatest.funsuite.AnyFunSuite
 
 class SpatialJoinRDDSuite extends AnyFunSuite {

@@ -2,7 +2,7 @@ package org.globalforestwatch.util
 
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3Client, AmazonS3ClientBuilder}
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import org.apache.hadoop.fs.s3a.DefaultS3ClientFactory
 import org.apache.log4j.Logger
 

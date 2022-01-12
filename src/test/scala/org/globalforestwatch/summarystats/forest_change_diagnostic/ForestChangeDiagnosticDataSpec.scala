@@ -29,6 +29,5 @@ class ForestChangeDiagnosticDataSpec extends TestEnvironment with SummaryDF {
     import spark.implicits._
     val data = List(ForestChangeDiagnosticData.empty)
     val df = data.toDF
-    df.show()
   }
 }

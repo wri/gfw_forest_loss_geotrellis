@@ -2,6 +2,7 @@ package org.globalforestwatch.util
 import org.apache.log4j.Logger
 import geotrellis.vector.{
   Geometry,
+  GeomFactory,
   LineString,
   MultiPoint,
   Point,
@@ -11,6 +12,7 @@ import geotrellis.vector.{
 }
 import geotrellis.vector.io.wkb.WKB
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
+import scala.util.Try
 
 object GeotrellisGeometryValidator extends java.io.Serializable {
   val logger = Logger.getLogger("Geotrellis Geometry Validator")
@@ -35,33 +37,26 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
   }
 
   def makeValidGeom(geom: Geometry): Geometry = {
-    // try to make geometry valid. This is a basic trick, we might need to make this more sophisticated
-    // There are some code samples here for JTS
-    // https://stackoverflow.com/a/31474580/1410317
-    val reducedGeom = reduce(gpr)(geom)
-    reducedGeom
+    val validGeom = {
+      if (!geom.isValid) {
 
-//    val validGeom = {
-//      if (!reducedGeom.isValid) {
-//
-//        val fixedGeom = GeometryFixer(reducedGeom).fix()
-//
-//        // Geometry fixer may alter the geometry type or even return an empty geometry
-//        // We want to try to preserve the geometry type if possible
-//
-//        preserveGeometryType(fixedGeom, geom.getGeometryType)
-//
-//      } else preserveGeometryType(reducedGeom, geom.getGeometryType)
-//    }
-//
-//    validGeom.normalize()
-//    validGeom
+        val fixedGeom = GfwGeometryFixer.fix(geom)
 
+        // Geometry fixer may alter the geometry type or even return an empty geometry
+        // We want to try to preserve the geometry type if possible
+
+        preserveGeometryType(fixedGeom, geom.getGeometryType)
+
+      } else preserveGeometryType(geom, geom.getGeometryType)
+    }
+
+    validGeom.normalize()
+    validGeom
   }
 
   def makeValidGeom(wkb: String): Geometry = {
-    val geom: Geometry = WKB.read(wkb)
-    makeValidGeom(geom)
+    val geom: Option[Geometry] = Try(WKB.read(wkb)).toOption
+    geom.map(makeValidGeom(_)).getOrElse(GeomFactory.factory.createPoint())
   }
 
   def makeMultiGeom(geom: Geometry): Geometry = {

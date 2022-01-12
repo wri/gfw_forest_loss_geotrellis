@@ -1,13 +1,16 @@
 package org.globalforestwatch.util
 
-import com.vividsolutions.jts.geom.{
+import cats.data.Validated.{Valid, Invalid}
+import org.locationtech.jts.geom.{
   Geometry,
   GeometryCollection,
   MultiPolygon,
-  Polygon,
+  Polygon
 }
+import scala.util.{Try, Success, Failure}
 
-import org.globalforestwatch.util.GeoSparkGeometryConstructor.createMultiPolygon
+import org.globalforestwatch.util.GeometryConstructor.createMultiPolygon
+import org.globalforestwatch.summarystats.{GeometryError, ValidatedRow}
 
 object IntersectGeometry {
 
@@ -30,16 +33,51 @@ object IntersectGeometry {
         multi.setUserData(userData)
         List(multi)
       case collection: GeometryCollection =>
-        val maybe_multi = extractPolygons(collection)
-        maybe_multi match {
-          case Some(multi) =>
-            multi.setUserData(userData)
-            List(multi)
-          case _ => List()
-        }
+          extractPolygons(collection)
+            .filterNot(_.isEmpty)
+            .map{ geom =>
+              geom.setUserData(userData)
+              geom
+            }.toList
       case _ => List()
     }
+  }
 
+  def validatedIntersection(
+    thisGeom: Geometry,
+    thatGeom: Geometry
+  ): ValidatedRow[List[MultiPolygon]] = {
+    /**
+      * Intersection can return GeometryCollections
+      * Here we filter resulting geometries and only return those of the same type as thisGeom
+      * */
+    val userData = thisGeom.getUserData
+
+    val attempt = Try {
+      val intersection: Geometry = thisGeom intersection thatGeom
+      intersection match {
+        case poly: Polygon =>
+          val multi = createMultiPolygon(Array(poly))
+          multi.setUserData(userData)
+          List(multi).filterNot(_.isEmpty)
+        case multi: MultiPolygon =>
+          multi.setUserData(userData)
+          List(multi).filterNot(_.isEmpty)
+        case collection: GeometryCollection =>
+          extractPolygons(collection)
+            .filterNot(_.isEmpty)
+            .map{ geom =>
+              geom.setUserData(userData)
+              geom
+            }.toList
+        case _ => List()
+      }
+    }
+
+    attempt match {
+      case Success(v) => Valid(v)
+      case Failure(e) => Invalid(GeometryError(s"Failed intersection with ${thatGeom}"))
+    }
   }
 
   def extractPolygons(multiGeometry: Geometry): Option[MultiPolygon] = {

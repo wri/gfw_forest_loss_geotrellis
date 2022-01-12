@@ -19,10 +19,12 @@ scalacOptions ++= Seq(
   "-language:postfixOps",
   "-language:existentials",
   "-language:experimental.macros",
-  "-Ypartial-unification" // Required by Cats
+  "-Ypartial-unification", // Required by Cats
+  "-Ywarn-unused-import",
+  "-Yrangepos"
 )
 publishMavenStyle := true
-publishArtifact in Test := false
+Test / publishArtifact := false
 pomIncludeRepository := { _ =>
   false
 }
@@ -55,7 +57,7 @@ libraryDependencies ++= Seq(
   sparkCore,
   sparkSQL,
   sparkHive,
-  "org.typelevel" %% "frameless-dataset" % Version.frameless,
+  frameless,
   hadoopAws,
   hadoopCommon,
   hadoopMapReduceClientCore,
@@ -66,23 +68,18 @@ libraryDependencies ++= Seq(
   scalactic % Test,
   geotrellisSpark,
   geotrellisSparkTestKit % Test,
+  sparkFastTests % Test,
   geotrellisS3,
-  geotrellisShapefile,
-  geotrellisGeotools,
-  geotrellisVectorTile,
   geotrellisGdal,
-  logging,
-  decline,
   sedonaCore,
   sedonaSQL,
-  //  jtsCore,
-  //  jts2geojson,
-  geoToolsOGRBridj,
-  bridj,
   breeze,
   breezeNatives,
   breezeViz,
   sparkDaria,
+  "org.datasyslab" % "geotools-wrapper" % "geotools-24.1",
+  "org.wololo" % "jts2geojson" % "0.14.3",
+  jts
 )
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
@@ -97,7 +94,7 @@ assembly / assemblyShadeRules := {
 
 // auto imports for local SBT console
 // can be used with `test:console` command
-initialCommands in console :=
+console / initialCommands :=
   """
 import java.net._
 //import geotrellis.raster._
@@ -128,11 +125,13 @@ import org.globalforestwatch.util._
 """
 
 // settings for local testing
-Compile / console / fork := true
+Compile / run := Defaults.runTask(Compile / fullClasspath, Compile / run / mainClass, Compile / run / runner).evaluated
+Compile / runMain := Defaults.runMainTask(Compile / fullClasspath , Compile / runMain / runner)
+
 Test / fork := true
 Test / parallelExecution := false
 Test / testOptions += Tests.Argument("-oD")
-Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m")
+Test / javaOptions ++= Seq("-Xms1024m", "-Xmx8144m", "-Djts.overlay=ng")
 Test / envVars := Map("AWS_REQUEST_PAYER" -> "requester")
 
 // Settings for sbt-assembly plugin which builds fat jars for use by spark jobs

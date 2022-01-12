@@ -3,7 +3,6 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 import cats.implicits._
 import geotrellis.raster._
 import geotrellis.raster.summary.GridVisitor
-import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 

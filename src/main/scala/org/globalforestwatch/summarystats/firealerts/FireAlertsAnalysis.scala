@@ -1,7 +1,9 @@
 package org.globalforestwatch.summarystats.firealerts
 
-import com.vividsolutions.jts.geom.Geometry
-import org.datasyslab.geospark.spatialOperator.JoinQuery
+import org.locationtech.jts.geom.Geometry
+import org.apache.sedona.core.spatialOperator.JoinQuery
+import org.apache.sedona.core.enums.{GridType, IndexType}
+import org.apache.sedona.sql.utils.Adapter
 import geotrellis.vector.Feature
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
@@ -11,8 +13,6 @@ import cats.data.NonEmptyList
 import geotrellis.vector
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.sql.types.{BooleanType, DoubleType, IntegerType, StringType, StructField, StructType}
-import org.datasyslab.geospark.enums.{GridType, IndexType}
-import org.datasyslab.geosparksql.utils.Adapter
 import org.globalforestwatch.summarystats.{SummaryAnalysis}
 import org.apache.spark.sql.catalyst.ScalaReflection
 

@@ -4,8 +4,7 @@ import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
 import org.globalforestwatch.features._
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.datasyslab.geospark.enums.GridType
+import org.apache.sedona.core.enums.GridType
 
 object FireAlertsCommand extends SummaryCommand {
   val changeOnlyOpt: Opts[Boolean] =
