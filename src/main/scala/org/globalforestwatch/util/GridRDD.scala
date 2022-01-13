@@ -1,5 +1,7 @@
 package org.globalforestwatch.util
 
+import geotrellis.layer._
+import geotrellis.proj4.LatLng
 import org.locationtech.jts.geom.{Envelope, MultiPolygon, Polygon}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
@@ -12,7 +14,7 @@ object GridRDD {
 
     val gridCells = getGridCells(envelope)
 
-    val tcl_geom: MultiPolygon = TreeCoverLossExtent.geometry
+    val world_geom: Polygon = LatLng.worldExtent.toPolygon()
 
     val gridRDD: RDD[Polygon] = {
       spark.sparkContext
@@ -22,7 +24,7 @@ object GridRDD {
           val gridId = pointGridId(p._1, p._2 + 1, 1)
           poly.setUserData(gridId)
           if (clip)
-            if (poly coveredBy tcl_geom) List(poly)
+            if (poly coveredBy world_geom) List(poly)
             else List()
           else List(poly)
         }

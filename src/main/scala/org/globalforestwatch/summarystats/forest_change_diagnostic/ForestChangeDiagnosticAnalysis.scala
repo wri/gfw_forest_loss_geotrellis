@@ -156,6 +156,10 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     fireAlertRDD: SpatialRDD[Geometry],
     spark: SparkSession
   ): RDD[Location[ForestChangeDiagnosticDataLossYearly]] = {
+    if (featureRDD.isEmpty) {
+      return spark.sparkContext.emptyRDD[Location[ForestChangeDiagnosticDataLossYearly]]
+    }
+
     // Convert FeatureRDD to SpatialRDD
     val polyRDD = featureRDD.map { case Location(fid, geom) =>
       geom.setUserData(fid)

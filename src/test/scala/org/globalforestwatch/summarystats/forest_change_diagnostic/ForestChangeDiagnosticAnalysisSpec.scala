@@ -15,6 +15,7 @@ import org.globalforestwatch.TestEnvironment
 
 class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameComparer {
   def palm32InputTsvPath = getClass.getResource("/palm-oil-32.tsv").toString()
+  def invalidGeomInputTsvPath = getClass.getResource("/invalid-geometries.tsv").toString()
   def palm32ExpectedOutputPath = getClass.getResource("/palm-32-fcd-output").toString()
 
   def FCD(features: RDD[ValidatedLocation[Geometry]]) = {
@@ -76,6 +77,20 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
       Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1, 0, 0), selfIntersectingPolygon))
     ))
     val fcd = FCD(featureRDD)
+    val res = fcd.collect()
+    res.head.isInvalid shouldBe true
+  }
+
+  it("reports geometries outside TCL extent") {
+    // match it to tile of location 31 so we fetch less tiles
+    val invalidLocRDD = ValidatedFeatureRDD(
+      NonEmptyList.one(invalidGeomInputTsvPath),
+      "gfwpro",
+      FeatureFilter.empty,
+      splitFeatures = true
+    )
+
+    val fcd = FCD(invalidLocRDD)
     val res = fcd.collect()
     res.head.isInvalid shouldBe true
   }
