@@ -39,6 +39,7 @@ object GladAlertsDF {
     def defaultCols =
       List(
         $"data_group.alertDate" as "alert__date",
+        $"data_group.alertDate" as "umd_glad_landsat_alerts__date",
         $"data_group.isConfirmed" as "is__confirmed_alert",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
@@ -85,7 +86,7 @@ object GladAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val gladCols = List("alert__date", "is__confirmed_alert", "umd_glad_landsat_alerts__confidence")
+    val gladCols = List("alert__date", "umd_glad_landsat_alerts__date", "is__confirmed_alert", "umd_glad_landsat_alerts__confidence")
 
     val cols =
       if (!wdpa)
@@ -112,7 +113,7 @@ object GladAlertsDF {
         groupByCols ::: contextualLayers
 
     df.groupBy(cols.head, cols.tail: _*)
-      .agg(sum("alert_area__ha") as "alert_area__ha")
+      .agg(sum("area__ha") as "area__ha")
   }
 
   def whitelist(groupByCols: List[String],
