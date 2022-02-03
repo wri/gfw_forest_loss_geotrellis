@@ -15,17 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Cache sbt
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.sbt
-            ~/.ivy2/cache
-            ~/.coursier/cache/v1
-            ~/.cache/coursier/v1
-            ~/AppData/Local/Coursier/Cache/v1
-            ~/Library/Caches/Coursier/v1
-          key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+      - uses: coursier/cache-action@v6
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -34,7 +24,7 @@ jobs:
           role-to-assume: arn:aws:iam::617001639586:role/gfw-data-lake-read
 
       - name: run tests
-        run: ./sbt ++$SCALA_VERSION test
+        run: ./sbt ++$SCALA_VERSION coverage test coverageReport
 
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@master
@@ -52,6 +42,30 @@ jobs:
           fail_ci_if_error: false
           verbose: false
 
-#      - name: Build with ASSEMBLY
-#        run: |
-#          ./scripts/build
+  publish:
+    name: Publish Artifacts
+    needs: [build]
+    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: coursier/cache-action@v6
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::617001639586:role/gfw-geotrellis-jars-write
+
+      - name: Build Assembly
+        run: sbt assembly
+
+      - name: Publish Assembly
+        run: aws s3 cp target/scala-2.12/*.jar s3://gfwpro-geotrellis-jars/release/
