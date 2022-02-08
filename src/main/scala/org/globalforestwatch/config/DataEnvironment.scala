@@ -29,6 +29,7 @@ case class RasterTableRow(value: Integer, meaning: Either[Int, String])
 object DataEnvironment {
   def getDataEnvironment(configPath: String): DataEnvironment = {
     val rawJson = scala.io.Source.fromFile(configPath).mkString
+    print("here")
     decode[DataEnvironment](rawJson) match {
       case Left(exc) =>
         println(s"Invalid data environment json: ${rawJson}")

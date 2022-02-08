@@ -3,6 +3,7 @@ package org.globalforestwatch.summarystats.gladalerts
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
+import org.globalforestwatch.config.DataEnvironment
 import org.globalforestwatch.features._
 
 object GladAlertsCommand extends SummaryCommand {
@@ -23,7 +24,7 @@ object GladAlertsCommand extends SummaryCommand {
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "changeOnly" -> changeOnly,
-        "dataEnvironment" -> default.dataEnvironment,
+        "dataEnvironment" -> DataEnvironment.getDataEnvironment(default.dataEnvironment),
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

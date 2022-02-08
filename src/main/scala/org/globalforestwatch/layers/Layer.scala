@@ -43,12 +43,8 @@ trait Layer {
   val kwargs: Map[String, Any]
   val datasetName: String
 
-  lazy val dataEnvironment: DataEnvironment = {
-    val dataEnvironmentConfig: String =
-      getAnyMapValue[String](kwargs, "dataEnvironment")
-
-    DataEnvironment.getDataEnvironment(dataEnvironmentConfig)
-  }
+  val dataEnvironment: DataEnvironment =
+      getAnyMapValue[DataEnvironment](kwargs, "dataEnvironment")
 
   val uri: String
 
