@@ -3,6 +3,7 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 import com.monovore.decline.Opts
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
+import org.globalforestwatch.config.DataEnvironment
 import org.globalforestwatch.features._
 
 object AnnualUpdateMinimalCommand extends SummaryCommand {
@@ -17,7 +18,8 @@ object AnnualUpdateMinimalCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
-        "changeOnly" -> changeOnly
+        "changeOnly" -> changeOnly,
+        "dataEnvironment" -> DataEnvironment.getDataEnvironment(default.dataEnvironment),
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

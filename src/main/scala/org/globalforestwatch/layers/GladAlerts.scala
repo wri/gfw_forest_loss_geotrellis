@@ -11,9 +11,5 @@ case class GladAlerts(gridTile: GridTile, kwargs: Map[String, Any]) extends Date
   val gladGrid: String = toGladGridId(gridTile.tileId)
 
   val uri: String =
-    if (gridTile.gridSize == 10 && gridTile.rowCount == 40000) {
-      s"s3://gfw2-data/forest_change/umd_landsat_alerts/prod/analysis/$gladGrid.tif"
-    } else {
-      uriForGrid(gridTile)
-    }
+    uriForGrid(gridTile)
 }
