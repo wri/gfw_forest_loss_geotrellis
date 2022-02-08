@@ -9,7 +9,7 @@ import org.globalforestwatch.config
 import org.globalforestwatch.util.Util.jsonStrToMap
 import scalaj.http.{Http, HttpOptions, HttpResponse}
 
-case class DataEnvironment(layers: List[LayerConfig]) {
+case class RasterCatalog(layers: List[LayerConfig]) {
   def getSourceUri(dataset: String, grid: GridTile): String = {
     layers
       .find(lyr =>
@@ -24,18 +24,18 @@ case class DataEnvironment(layers: List[LayerConfig]) {
 
 case class LayerConfig(name: String, source_uri: String, grid: String)
 
-object DataEnvironment {
-  def getDataEnvironment(configPath: String): DataEnvironment = {
+object RasterCatalog {
+  def getRasterCatalog(configPath: String): RasterCatalog = {
     val rawJson = scala.io.Source.fromFile(configPath).mkString
 
-    val parsed = decode[DataEnvironment](rawJson) match {
+    val parsed = decode[RasterCatalog](rawJson) match {
       case Left(exc) =>
         println(s"Invalid data environment json: ${rawJson}")
         throw exc
       case Right(value) => value
     }
 
-    DataEnvironment(
+    RasterCatalog(
       parsed.layers.map((config: LayerConfig) =>
         LayerConfig(
           config.name,

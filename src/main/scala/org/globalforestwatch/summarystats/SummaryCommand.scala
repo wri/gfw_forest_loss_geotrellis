@@ -29,8 +29,8 @@ trait SummaryCommand {
     def defaultMetavar = "key:value"
   }
 
-  val dataEnvironmentOpt: Opts[String] =
-      Opts.option[String]("dataEnvironment", "Path to data environment config.")
+  val rasterCatalogOpt: Opts[String] =
+      Opts.option[String]("rasterCatalog", "Path to data environment config.")
 
   val featuresOpt: Opts[NonEmptyList[String]] =
     Opts.options[String]("features", "URI of features in TSV format")
@@ -132,7 +132,7 @@ trait SummaryCommand {
   val noOutputPathSuffixOpt: Opts[Boolean] = Opts.flag("no_output_path_suffix", help = "Do not autogenerate output path suffix at runtime").orFalse
 
   val defaultOptions: Opts[BaseOptions] =
-    (featureTypeOpt, featuresOpt, outputOpt, overwriteOutputOpt, splitFeatures, noOutputPathSuffixOpt, dataEnvironmentOpt).mapN(BaseOptions)
+    (featureTypeOpt, featuresOpt, outputOpt, overwriteOutputOpt, splitFeatures, noOutputPathSuffixOpt, rasterCatalogOpt).mapN(BaseOptions)
 
   val fireAlertOptions: Opts[FireAlert] =
     (fireAlertTypeOpt, fireAlertSourceOpt).mapN(FireAlert)
@@ -179,7 +179,7 @@ object SummaryCommand {
     overwriteOutput: Boolean,
     splitFeatures: Boolean,
     noOutputPathSuffix: Boolean,
-    dataEnvironment: String)
+    rasterCatalog: String)
 
   case class BaseFilter(tcl: Boolean, glad: Boolean) extends FilterOptions {
     def filters(): List[Column] = {

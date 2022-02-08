@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
-import org.globalforestwatch.config.DataEnvironment
+import org.globalforestwatch.config.RasterCatalog
 import org.globalforestwatch.util.Config
 import org.globalforestwatch.util.Util.{getAnyMapValue, jsonStrToMap}
 import geotrellis.raster.{
@@ -43,8 +43,8 @@ trait Layer {
   val kwargs: Map[String, Any]
   val datasetName: String
 
-  val dataEnvironment: DataEnvironment =
-      getAnyMapValue[DataEnvironment](kwargs, "dataEnvironment")
+  val rasterCatalog: RasterCatalog =
+      getAnyMapValue[RasterCatalog](kwargs, "rasterCatalog")
 
   val uri: String
 
@@ -92,7 +92,7 @@ trait Layer {
   }
 
   protected def uriForGrid(grid: GridTile): String = {
-    val baseUri = dataEnvironment.getSourceUri(datasetName, grid)
+    val baseUri = rasterCatalog.getSourceUri(datasetName, grid)
     baseUri.replace("{tile_id}", grid.tileId)
   }
 
