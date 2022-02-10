@@ -295,6 +295,14 @@
     {
       "name":"inpe_prodes",
       "source_uri": "s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"wwf_eco_regions",
+      "source_uri": "s3://gfw-data-lake/wwf_eco_regions/v2012/raster/epsg-4326/{grid_size}/{row_count}/name/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"mapbox_river_basins",
+      "source_uri": "s3://gfw-data-lake/mapbox_river_basins/v2018/raster/epsg-4326/{grid_size}/{row_count}/id/geotiff/{tile_id}.tif"
     }
   ]
 }
