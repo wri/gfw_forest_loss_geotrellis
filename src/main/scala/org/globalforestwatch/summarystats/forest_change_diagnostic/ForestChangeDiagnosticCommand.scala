@@ -4,43 +4,62 @@ import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
+import org.globalforestwatch.features._
+import com.typesafe.scalalogging.LazyLogging
+import org.globalforestwatch.summarystats.ValidatedLocation
+import org.apache.spark.rdd.RDD
 
-object ForestChangeDiagnosticCommand extends SummaryCommand {
-
+object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
 
   val intermediateListSourceOpt: Opts[Option[NonEmptyList[String]]] = Opts
     .options[String](
       "intermediate_list_source",
       help = "URI of intermediate list results in TSV format"
-    ).orNone
+    )
+    .orNone
 
   val forestChangeDiagnosticCommand: Opts[Unit] = Opts.subcommand(
-    name = "forest_change_diagnostic",
+    name = ForestChangeDiagnosticAnalysis.name,
     help = "Compute summary statistics for GFW Pro Forest Change Diagnostic."
   ) {
     (
       defaultOptions,
       intermediateListSourceOpt,
       fireAlertOptions,
-      defaultFilterOptions,
-      featureFilterOptions,
-      ).mapN { (default, intermediateListSource, fireAlert, defaultFilter, featureFilter) =>
+      featureFilterOptions
+    ).mapN { (default, intermediateListSource, fireAlert, filterOptions) =>
       val kwargs = Map(
-        "featureUris" -> default._2,
-        "outputUrl" -> default._3,
-        "splitFeatures" -> true, // force to split features
-        "intermediateListSource" -> intermediateListSource,
-        "fireAlertType" -> fireAlert._1,
-        "fireAlertSource" -> fireAlert._2,
-        "idStart" -> featureFilter._1,
-        "idEnd" -> featureFilter._2,
-        "limit" -> defaultFilter._1,
-        "tcl" -> defaultFilter._2,
-        "glad" -> defaultFilter._3
+        "outputUrl" -> default.outputUrl,
+        "noOutputPathSuffix" -> default.noOutputPathSuffix,
+        "overwriteOutput" -> default.overwriteOutput
       )
 
-      runAnalysis("forest_change_diagnostic", default._1, default._2, kwargs)
+      if (!default.splitFeatures) logger.warn("Forcing splitFeatures = true")
+      val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
+      runAnalysis { implicit spark =>
+        val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, splitFeatures = true)
+        val fireAlertRDD = FireAlertRDD(spark, fireAlert.alertType, fireAlert.alertSource, FeatureFilter.empty)
+
+        val intermediateResultsRDD = intermediateListSource.map { sources =>
+          ForestChangeDiagnosticDF.readIntermidateRDD(sources, spark)
+        }
+        val saveIntermidateResults: RDD[ValidatedLocation[ForestChangeDiagnosticData]] => Unit = { rdd =>
+          val df = ForestChangeDiagnosticDF.getGridFeatureDataFrame(rdd, spark)
+          ForestChangeDiagnosticExport.export("intermediate", df, default.outputUrl, kwargs)
+        }
+
+        val fcdRDD = ForestChangeDiagnosticAnalysis(
+          featureRDD,
+          intermediateResultsRDD,
+          fireAlertRDD,
+          saveIntermidateResults,
+          kwargs
+        )
+
+        val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcdRDD, spark)
+        ForestChangeDiagnosticExport.export(default.featureType, fcdDF, default.outputUrl, kwargs)
+      }
     }
   }
 }

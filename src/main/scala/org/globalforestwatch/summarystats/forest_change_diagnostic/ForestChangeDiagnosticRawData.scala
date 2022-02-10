@@ -7,17 +7,9 @@ import cats.Semigroup
   *
   * Note: This case class contains mutable values
   */
-case class ForestChangeDiagnosticRawData(
-                                          var totalArea: Double,
-
-                                        ) {
+case class ForestChangeDiagnosticRawData(var totalArea: Double) {
   def merge(other: ForestChangeDiagnosticRawData): ForestChangeDiagnosticRawData = {
-
-    ForestChangeDiagnosticRawData(
-
-      totalArea + other.totalArea,
-
-    )
+    ForestChangeDiagnosticRawData(totalArea + other.totalArea)
   }
 }
 

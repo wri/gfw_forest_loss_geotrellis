@@ -8,7 +8,6 @@ import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
 import geotrellis.raster.{
   CellType,
-  IntCellType,
   IntCells,
   NoDataHandling,
   Tile,
@@ -20,6 +19,8 @@ import software.amazon.awssdk.services.s3.model.{
   NoSuchKeyException,
   RequestPayer
 }
+import org.globalforestwatch.grids.GridTile
+import java.time.LocalDate
 
 trait Layer {
 
@@ -34,6 +35,13 @@ trait Layer {
   val internalNoDataValue: A
   val externalNoDataValue: B
   val basePath: String = s"s3://gfw-data-lake"
+
+
+  protected def uriForGrid(template: String, grid: GridTile): String =
+    template
+      .replace("<gridSize>", grid.gridSize.toString)
+      .replace("<rowCount>", grid.rowCount.toString)
+      .replace("<tileId>", grid.tileId)
 
   def lookup(a: A): B
 }
@@ -382,11 +390,7 @@ trait IntegerLayer extends ILayer {
 
 trait DateConfLayer extends ILayer {
 
-  /**
-    * Layers which return an Integer type
-    * (use java.lang.Integer to be able to use null)
-    */
-  type B = Option[(String, Boolean)]
+  type B = Option[(LocalDate, Boolean)]
 
   val internalNoDataValue: Int = 0
   val externalNoDataValue: B = None
@@ -483,7 +487,7 @@ trait StringLayer extends ILayer {
 
 }
 
-trait MapLayer extends ILayer {
+trait MapILayer extends ILayer {
 
   /**
     * Layers which return a String type
@@ -491,6 +495,18 @@ trait MapLayer extends ILayer {
   type B = Map[String, Boolean]
 
   val internalNoDataValue: Int = 0
+  val externalNoDataValue: Map[String, Boolean] = Map()
+
+}
+
+trait MapFLayer extends FLayer {
+
+  /**
+    * Layers which return a String type
+    */
+  type B = Map[String, Boolean]
+
+  val internalNoDataValue: Float = 0
   val externalNoDataValue: Map[String, Boolean] = Map()
 
 }

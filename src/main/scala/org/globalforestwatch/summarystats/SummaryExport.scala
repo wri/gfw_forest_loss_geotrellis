@@ -17,16 +17,18 @@ trait SummaryExport {
   def export(featureType: String,
              summaryDF: DataFrame,
              outputUrl: String,
-             kwargs: Map[String, Any]): Unit = {
+             kwargs: Map[String, Any]
+             ): Unit = {
 
     featureType match {
       case "gadm" => exportGadm(summaryDF, outputUrl, kwargs)
       case "feature" => exportFeature(summaryDF, outputUrl, kwargs)
       case "wdpa" => exportWdpa(summaryDF, outputUrl, kwargs)
       case "geostore" => exportGeostore(summaryDF, outputUrl, kwargs)
+      case "gfwpro" => exportGfwPro(summaryDF, outputUrl, kwargs)
       case _ =>
         throw new IllegalArgumentException(
-          "Feature type must be one of 'gadm', 'wdpa', 'geostore' or 'feature'"
+          "Feature type must be one of 'gadm', 'wdpa', 'geostore' 'gfwpro' or 'feature'"
         )
     }
   }
@@ -46,4 +48,8 @@ trait SummaryExport {
   protected def exportGeostore(summaryDF: DataFrame,
                                outputUrl: String,
                                kwargs: Map[String, Any]): Unit = throw new NotImplementedError("Geostore feature analysis not implemented")
+
+  protected def exportGfwPro(summaryDF: DataFrame,
+                             outputUrl: String,
+                             kwargs: Map[String, Any]): Unit = throw new NotImplementedError("GfwPro feature analysis not implemented")
 }

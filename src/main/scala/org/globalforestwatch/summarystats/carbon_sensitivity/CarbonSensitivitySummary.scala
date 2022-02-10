@@ -5,7 +5,6 @@ import geotrellis.raster._
 import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
-import org.globalforestwatch.util.Implicits._
 import org.globalforestwatch.util.Util.getAnyMapValue
 
 import scala.annotation.tailrec
@@ -20,6 +19,7 @@ case class CarbonSensitivitySummary(
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     CarbonSensitivitySummary(stats.combine(other.stats))
   }
+  def isEmpty = stats.isEmpty
 }
 
 object CarbonSensitivitySummary {

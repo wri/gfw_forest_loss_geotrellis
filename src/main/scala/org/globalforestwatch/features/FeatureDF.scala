@@ -7,7 +7,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object FeatureDF {
   def apply(input: NonEmptyList[String],
             featureObj: Feature,
-            filters: Map[String, Any],
+            filters: FeatureFilter,
             spark: SparkSession,
             delimiter: String = "\t"): DataFrame =
     spark.read

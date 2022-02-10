@@ -1,11 +1,11 @@
 package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
+import org.globalforestwatch.config.GfwConfig
 
 case class BrazilBiomes(gridTile: GridTile) extends StringLayer with OptionalILayer {
 
-  val uri: String =
-    s"$basePath/bra_biomes/v20150601/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(GfwConfig.get.rasterLayers(getClass.getSimpleName()), gridTile)
 
   override val externalNoDataValue = "Not applicable"
 

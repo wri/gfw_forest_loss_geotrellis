@@ -1,14 +1,17 @@
 package org.globalforestwatch.summarystats
 
 import cats.data.NonEmptyList
-import com.monovore.decline.Opts
 import cats.implicits._
-import geotrellis.vector.{Feature, Geometry}
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
-import org.globalforestwatch.features.{FeatureId, FeatureRDDFactory}
+import com.monovore.decline.Opts
+import org.apache.spark.sql.{SparkSession, Column}
+import org.apache.spark.sql.functions.{substring, col}
 
 trait SummaryCommand {
+  import SummaryCommand._
+
+  val gfwPro: Opts[Boolean] = Opts
+    .flag("gfwpro", "Feature flag for PRO, changes landcover labels")
+    .orFalse
 
   val featuresOpt: Opts[NonEmptyList[String]] =
     Opts.options[String]("features", "URI of features in TSV format")
@@ -16,10 +19,17 @@ trait SummaryCommand {
   val outputOpt: Opts[String] =
     Opts.option[String]("output", "URI of output dir for CSV files")
 
+  val overwriteOutputOpt: Opts[Boolean] = Opts
+    .flag(
+      "overwrite",
+      help = "Overwrite output location if already existing"
+    )
+    .orFalse
+
   val featureTypeOpt: Opts[String] = Opts
     .option[String](
       "feature_type",
-      help = "Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature'"
+      help = "Feature type: one of 'gadm', 'wdpa', 'geostore', 'gfwpro' or 'feature'"
     )
     .withDefault("feature")
 
@@ -100,42 +110,111 @@ trait SummaryCommand {
       help = "URI of fire alerts in TSV format"
     )
 
-  val defaultOptions: Opts[(String, NonEmptyList[String], String, Boolean)] =
-    (featureTypeOpt, featuresOpt, outputOpt, splitFeatures).tupled
-  val fireAlertOptions: Opts[(String, NonEmptyList[String])] =
-    (fireAlertTypeOpt, fireAlertSourceOpt).tupled
+  val noOutputPathSuffixOpt: Opts[Boolean] = Opts.flag("no_output_path_suffix", help = "Do not autogenerate output path suffix at runtime").orFalse
 
-  val defaultFilterOptions: Opts[(Option[Int], Boolean, Boolean)] =
-    (limitOpt, tclOpt, gladOpt).tupled
-  val gdamFilterOptions: Opts[
-    (Option[String],
-      Option[String],
-      Option[String],
-      Option[String],
-      Option[String],
-      Option[String])
-  ] = (isoOpt, isoFirstOpt, isoStartOpt, isoEndOpt, admin1Opt, admin2Opt).tupled
-  val wdpaFilterOptions
-  : Opts[(Option[NonEmptyList[String]], Option[NonEmptyList[String]])] =
-    (wdpaStatusOpts, iucnCatOpts).tupled
-  val featureFilterOptions: Opts[(Option[Int], Option[Int])] =
-    (idStartOpt, idEndOpt).tupled
+  val defaultOptions: Opts[BaseOptions] =
+    (featureTypeOpt, featuresOpt, outputOpt, overwriteOutputOpt, splitFeatures, noOutputPathSuffixOpt).mapN(BaseOptions)
 
-  def runAnalysis(analysis: String,
-                  fType: String,
-                  featureUris: NonEmptyList[String],
-                  kwargs: Map[String, Any]): Unit = {
+  val fireAlertOptions: Opts[FireAlert] =
+    (fireAlertTypeOpt, fireAlertSourceOpt).mapN(FireAlert)
 
-    val spark: SparkSession =
-      SummarySparkSession(s"${analysis} Session")
+  val defaultFilterOptions: Opts[BaseFilter] =
+    (tclOpt, gladOpt).mapN(BaseFilter)
 
-    /* Transition from DataFrame to RDD in order to work with GeoTrellis features */
-    val featureRDD: RDD[Feature[Geometry, FeatureId]] =
-      FeatureRDDFactory(analysis, fType, featureUris, kwargs, spark)
+  val gdamFilterOptions: Opts[GadmFilter] =
+    (isoOpt, isoFirstOpt, isoStartOpt, isoEndOpt, admin1Opt, admin2Opt).mapN(GadmFilter)
 
-    SummaryAnalysisFactory(analysis, featureRDD, fType, spark, kwargs).runAnalysis
+  val wdpaFilterOptions : Opts[WdpaFilter] =
+    (wdpaStatusOpts, iucnCatOpts).mapN(WdpaFilter)
 
-    spark.stop
+  val featureIdFilterOptions: Opts[FeatureIdFilter] =
+    (idStartOpt, idEndOpt).mapN(FeatureIdFilter)
+
+  val featureFilterOptions: Opts[AllFilterOptions] = (
+    defaultFilterOptions.orNone,
+    featureIdFilterOptions.orNone,
+    gdamFilterOptions.orNone,
+    wdpaFilterOptions.orNone
+  ).mapN(AllFilterOptions)
+
+  def runAnalysis[A](analysis: SparkSession => A): A = {
+    val name = getClass().getSimpleName()
+    val spark = SummarySparkSession(name)
+    try {
+      analysis(spark)
+    } finally {
+      spark.stop()
+    }
+  }
+}
+
+object SummaryCommand {
+  trait FilterOptions
+
+  case class BaseOptions(
+    featureType: String,
+    featureUris: NonEmptyList[String],
+    outputUrl: String,
+    overwriteOutput: Boolean,
+    splitFeatures: Boolean,
+    noOutputPathSuffix: Boolean)
+
+  case class BaseFilter(tcl: Boolean, glad: Boolean) extends FilterOptions {
+    def filters(): List[Column] = {
+      val trueValues: List[String] = List("t", "T", "true", "True", "TRUE", "1", "Yes", "yes", "YES")
+      List(
+        if (glad) Some(col("glad").isin(trueValues: _*)) else None,
+        if (tcl) Some(col("tcl").isin(trueValues: _*)) else None
+      ).flatten
+    }
   }
 
+  case class GadmFilter(
+    iso: Option[String],
+    isoFirst: Option[String],
+    isoStart: Option[String],
+    isoEnd: Option[String],
+    admin1: Option[String],
+    admin2: Option[String]
+  ) extends FilterOptions {
+    def filters(isoColumn: Column, admin1Column: Column, admin2Column: Column): List[Column] = {
+      List(
+        iso.map { code => isoColumn === code },
+        isoStart.map { s => isoColumn >= s },
+        isoEnd.map { s => isoColumn < s },
+        isoFirst.map { s => substring(isoColumn, 0, 1) === s(0) },
+        admin1.map { s => admin1Column === s },
+        admin2.map { s => admin2Column === s }
+      ).flatten
+    }
+  }
+
+  case class WdpaFilter(
+    wdpaStatus: Option[NonEmptyList[String]],
+    iucnCat: Option[NonEmptyList[String]]
+  ) extends FilterOptions {
+    def filters(): List[Column] = {
+      List(
+        wdpaStatus.map { s => col("status") === s },
+        iucnCat.map { s => col("iucn_cat") === s }
+      ).flatten
+    }
+  }
+
+  case class FeatureIdFilter(idStart: Option[Int], idEnd: Option[Int]) extends FilterOptions {
+    def filters(idColumn: Column): List[Column] = {
+      List(
+        idStart.map { id => idColumn >= id },
+        idEnd.map { id => idColumn <= id }
+      ).flatten
+    }
+  }
+
+  case class AllFilterOptions(
+    base: Option[BaseFilter],
+    featureId: Option[FeatureIdFilter],
+    gadm: Option[GadmFilter],
+    wdpa: Option[WdpaFilter])
+
+  case class FireAlert(alertType: String, alertSource: NonEmptyList[String])
 }

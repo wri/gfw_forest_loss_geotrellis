@@ -1,22 +1,21 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
+import frameless.Injection
+
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
 import io.circe.parser.decode
+import cats.kernel.Semigroup
 
 case class ForestChangeDiagnosticDataValueYearly(value: SortedMap[Int, Double])
-  extends ForestChangeDiagnosticDataParser[
-    ForestChangeDiagnosticDataValueYearly
-  ] {
-  def merge(
-             other: ForestChangeDiagnosticDataValueYearly
-           ): ForestChangeDiagnosticDataValueYearly = {
+  extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataValueYearly] {
 
-    ForestChangeDiagnosticDataValueYearly(value ++ other.value.map {
-      case (key, otherValue) =>
-        key ->
-          (value.getOrElse(key, 0.0) + otherValue)
-    })
+  def merge(other: ForestChangeDiagnosticDataValueYearly): ForestChangeDiagnosticDataValueYearly = {
+    ForestChangeDiagnosticDataValueYearly(Semigroup[SortedMap[Int, Double]].combine(value, other.value))
+  }
+
+  def limitToMaxYear(maxYear: Int): ForestChangeDiagnosticDataValueYearly= {
+    ForestChangeDiagnosticDataValueYearly(value.filterKeys{ year => year <= maxYear })
   }
 
   def toJson: String = {
@@ -75,7 +74,8 @@ object ForestChangeDiagnosticDataValueYearly {
         2016 -> 0,
         2017 -> 0,
         2018 -> 0,
-        2019 -> 0
+        2019 -> 0,
+        2020 -> 0
       )
     )
 
@@ -83,4 +83,6 @@ object ForestChangeDiagnosticDataValueYearly {
     val sortedMap = decode[SortedMap[Int, Double]](value)
     ForestChangeDiagnosticDataValueYearly(sortedMap.getOrElse(SortedMap()))
   }
+
+  implicit def injection: Injection[ForestChangeDiagnosticDataValueYearly, String] = Injection(_.toJson, fromString)
 }

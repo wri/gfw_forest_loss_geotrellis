@@ -1,7 +1,8 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.globalforestwatch.summarystats.SummaryExport
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 object ForestChangeDiagnosticExport extends SummaryExport {
 
@@ -14,25 +15,40 @@ object ForestChangeDiagnosticExport extends SummaryExport {
     "nullValue" -> null,
     "emptyValue" -> null
   )
-  override protected def exportFeature(summaryDF: DataFrame,
-                                       outputUrl: String,
-                                       kwargs: Map[String, Any]): Unit = {
 
-    summaryDF
-      .coalesce(1)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/final")
+  override def export(
+    featureType: String,
+    summaryDF: DataFrame,
+    outputUrl: String,
+    kwargs: Map[String, Any]
+  ): Unit = {
+    val saveMode: SaveMode =
+      if (getAnyMapValue[Boolean](kwargs, "overwriteOutput"))
+        SaveMode.Overwrite
+      else
+        SaveMode.ErrorIfExists
 
-  }
+    featureType match {
+      case "gfwpro" | "wdpa" | "gadm" =>
+        summaryDF
+          .repartition(1)
+          .write
+          .mode(saveMode)
+          .options(csvOptions)
+          .csv(path = outputUrl + "/final")
 
-  def exportIntermediateList(intermediateListDF: DataFrame,
-                             outputUrl: String): Unit = {
+      case "intermediate" =>
+        summaryDF
+          .repartition(1)
+          .write
+          .mode(saveMode)
+          .options(csvOptions)
+          .csv(path = outputUrl + "/intermediate")
 
-    intermediateListDF
-      .coalesce(1)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/intermediate")
+      case _ =>
+        throw new IllegalArgumentException(
+          "Feature type must be one of 'gfwpro', 'intermediate', 'wdpa', or 'gadm'"
+        )
+    }
   }
 }

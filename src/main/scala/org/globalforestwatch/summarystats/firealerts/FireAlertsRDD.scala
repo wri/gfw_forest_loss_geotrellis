@@ -3,7 +3,6 @@ package org.globalforestwatch.summarystats.firealerts
 import cats.implicits._
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.summary.polygonal._
-import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.vector._
@@ -22,8 +21,8 @@ object FireAlertsRDD extends SummaryRDD {
 
     Either.catchNonFatal {
       fireAlertType match {
-        case "viirs" => ViirsGrid.getRasterSource(windowKey, windowLayout, kwargs)
-        case "modis" | "burned_areas" => ModisGrid.getRasterSource(windowKey, windowLayout, kwargs)
+        case "viirs" | "burned_areas" => ViirsGrid.getRasterSource(windowKey, windowLayout, kwargs)
+        case "modis" => ModisGrid.getRasterSource(windowKey, windowLayout, kwargs)
       }
     }
   }

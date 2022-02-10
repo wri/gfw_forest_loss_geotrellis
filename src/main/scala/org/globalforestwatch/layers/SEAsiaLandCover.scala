@@ -1,13 +1,13 @@
 package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
+import org.globalforestwatch.config.GfwConfig
 
 case class SEAsiaLandCover(gridTile: GridTile)
     extends StringLayer
     with OptionalILayer {
 
-  val uri: String =
-    s"$basePath/rspo_southeast_asia_land_cover_2010/v2013/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/land_cover_class/gdal-geotiff/${gridTile.tileId}.tif"
+  val uri: String = uriForGrid(GfwConfig.get.rasterLayers(getClass.getSimpleName()), gridTile)
 
   override val externalNoDataValue = "Unknown"
 
@@ -18,7 +18,7 @@ case class SEAsiaLandCover(gridTile: GridTile)
     case 8 => "Oil palm plantation"
     case 9 => "Timber plantation"
     case 10 => "Mixed tree crops"
-    case 11 | 15 => "Grassland/ shrub"
+    case 11 | 15 => "Grassland/shrub"
     case 12 | 16 => "Swamp"
     case 13 | 17 => "Agriculture"
     case 14 => "Settlements"

@@ -8,6 +8,8 @@ import org.globalforestwatch.util.Util.getAnyMapValue
 import org.globalforestwatch.util.{Geodesy, Mercantile}
 
 import scala.annotation.tailrec
+import java.time.format.DateTimeFormatter
+import java.time.LocalDate
 
 /** LossData Summary by year */
 case class GladAlertsSummary(stats: Map[GladAlertsDataGroup, GladAlertsData] = Map.empty)
@@ -18,6 +20,7 @@ case class GladAlertsSummary(stats: Map[GladAlertsDataGroup, GladAlertsData] = M
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     GladAlertsSummary(stats.combine(other.stats))
   }
+  def isEmpty = stats.isEmpty
 }
 
 object GladAlertsSummary {
@@ -39,7 +42,7 @@ object GladAlertsSummary {
         val maxZoom = 12
 
         // This is a pixel by pixel operation
-        val glad: Option[(String, Boolean)] =
+        val glad: Option[(LocalDate, Boolean)] =
           raster.tile.glad.getData(col, row)
 
         if (!(changeOnly && glad.isEmpty)) {
@@ -100,7 +103,7 @@ object GladAlertsSummary {
             else {
               val alertDate: String = {
                 glad match {
-                  case Some((date, _)) => date
+                  case Some((date, _)) => date.format(DateTimeFormatter.ISO_DATE)
                   case _ => null
                 }
               }

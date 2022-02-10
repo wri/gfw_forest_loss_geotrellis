@@ -2,7 +2,7 @@ package org.globalforestwatch.grids
 
 import geotrellis.raster.TileLayout
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
-import geotrellis.vector.{Extent, Point}
+import geotrellis.vector.Extent
 import org.globalforestwatch.layers.{OptionalLayer, RequiredLayer}
 
 trait Grid[T <: GridSources] {
@@ -16,8 +16,8 @@ trait Grid[T <: GridSources] {
   /** this represents the tile layout of 10x10 degrees */
   lazy val rasterFileGrid: LayoutDefinition = {
     val tileLayout = TileLayout(
-      layoutCols = (gridExtent.xmin until gridExtent.xmax by gridSize).length,
-      layoutRows = (gridExtent.ymin until gridExtent.ymax by gridSize).length,
+      layoutCols = (gridExtent.xmin.toInt until gridExtent.xmax.toInt by gridSize).length,
+      layoutRows = (gridExtent.ymin.toInt until gridExtent.ymax.toInt by gridSize).length,
       tileCols = math.round(gridSize / pixelSize).toInt,
       tileRows = math.round(gridSize / pixelSize).toInt
     )
@@ -29,8 +29,8 @@ trait Grid[T <: GridSources] {
     */
   lazy val stripedTileGrid: LayoutDefinition = {
     val tileLayout = TileLayout(
-      layoutCols = (gridExtent.xmin until gridExtent.xmax by gridSize).length,
-      layoutRows = (gridExtent.ymin until gridExtent.ymax by gridSize).length * (math
+      layoutCols = (gridExtent.xmin.toInt until gridExtent.xmax.toInt by gridSize).length,
+      layoutRows = (gridExtent.ymin.toInt until gridExtent.ymax.toInt by gridSize).length * (math
         .round(gridSize / pixelSize)
         .toInt / rowCount),
       tileCols = math.round(gridSize / pixelSize).toInt,
@@ -44,10 +44,10 @@ trait Grid[T <: GridSources] {
     */
   lazy val blockTileGrid: LayoutDefinition = {
     val tileLayout = TileLayout(
-      layoutCols = (gridExtent.xmin until gridExtent.xmax by gridSize).length * (math
+      layoutCols = (gridExtent.xmin.toInt until gridExtent.xmax.toInt by gridSize).length * (math
         .round(gridSize / pixelSize)
         .toInt / blockSize),
-      layoutRows = (gridExtent.ymin until gridExtent.ymax by gridSize).length * (math
+      layoutRows = (gridExtent.ymin.toInt until gridExtent.ymax.toInt by gridSize).length * (math
         .round(gridSize / pixelSize)
         .toInt / blockSize),
       tileCols = blockSize,
@@ -61,7 +61,7 @@ trait Grid[T <: GridSources] {
   def checkSources(gridTile: GridTile, windowExtent: Extent, windowKey: SpatialKey, windowLayout: LayoutDefinition, kwargs:  Map[String, Any]): T = {
 
     def ccToMap(cc: AnyRef): Map[String, Any] =
-      (Map[String, Any]() /: cc.getClass.getDeclaredFields) { (a, f) =>
+      cc.getClass.getDeclaredFields.foldLeft(Map.empty[String, Any]) { (a, f) =>
         f.setAccessible(true)
         a + (f.getName -> f.get(cc))
       }

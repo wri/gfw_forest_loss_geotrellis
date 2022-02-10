@@ -1,7 +1,8 @@
 package org.globalforestwatch.summarystats.gfwpro_dashboard
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.globalforestwatch.summarystats.SummaryExport
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 object GfwProDashboardExport extends SummaryExport {
 
@@ -15,16 +16,21 @@ object GfwProDashboardExport extends SummaryExport {
     "emptyValue" -> null
   )
 
-  override protected def exportFeature(summaryDF: DataFrame,
-                                       outputUrl: String,
-                                       kwargs: Map[String, Any]): Unit = {
+  override protected def exportGfwPro(summaryDF: DataFrame,
+                                      outputUrl: String,
+                                      kwargs: Map[String, Any]): Unit = {
+    val saveMode =
+      if (getAnyMapValue[Boolean](kwargs, "overwriteOutput"))
+        SaveMode.Overwrite
+      else
+        SaveMode.ErrorIfExists
 
     summaryDF
-      .coalesce(1)
+      .repartition(1)
       .write
+      .mode(saveMode)
       .options(csvOptions)
-      .csv(path = outputUrl)
-
+      .csv(path = outputUrl + "/final")
   }
 
 }

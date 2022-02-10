@@ -7,6 +7,7 @@ object GridId {
   /** Translate from a point on a map to file grid ID of 10x10 grid
     * Top-Left corner, exclusive on south, east, inclusive on north and west
     */
+
   def pointGridId(point: Point, gridSize: Int): String = {
     val col = math.floor(point.getX / gridSize).toInt * gridSize
     val long: String = if (col >= 0) f"$col%03dE" else f"${-col}%03dW"
@@ -15,6 +16,10 @@ object GridId {
     val lat: String = if (row >= 0) f"$row%02dN" else f"${-row}%02dS"
 
     s"${lat}_$long"
+  }
+
+  def pointGridId(x: Double, y: Double, gridSize: Int): String = {
+    pointGridId(Point(x, y), gridSize)
   }
 
   def toGladGridId(grid: String): String = {

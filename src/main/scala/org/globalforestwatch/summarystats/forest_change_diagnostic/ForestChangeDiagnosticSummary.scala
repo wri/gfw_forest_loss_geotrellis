@@ -8,8 +8,9 @@ import org.globalforestwatch.util.Geodesy
 
 /** LossData Summary by year */
 case class ForestChangeDiagnosticSummary(
-                                          stats: Map[ForestChangeDiagnosticRawDataGroup, ForestChangeDiagnosticRawData] = Map.empty
-) extends Summary[ForestChangeDiagnosticSummary] {
+                                          stats: Map[ForestChangeDiagnosticRawDataGroup,
+                                            ForestChangeDiagnosticRawData] = Map.empty
+                                        ) extends Summary[ForestChangeDiagnosticSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(
@@ -18,6 +19,14 @@ case class ForestChangeDiagnosticSummary(
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     ForestChangeDiagnosticSummary(stats.combine(other.stats))
   }
+
+  /** Pivot raw data to ForestChangeDiagnosticData and aggregate across years */
+  def toForestChangeDiagnosticData(): ForestChangeDiagnosticData = {
+    stats
+      .map { case (group, data) => group.toForestChangeDiagnosticData(data.totalArea) }
+      .foldLeft(ForestChangeDiagnosticData.empty)( _ merge _)
+  }
+  def isEmpty = stats.isEmpty
 }
 
 object ForestChangeDiagnosticSummary {
@@ -80,7 +89,8 @@ object ForestChangeDiagnosticSummary {
           raster.tile.isIDNForestMoratorium.getData(col, row)
         val braBiomes: String = raster.tile.braBiomes.getData(col, row)
         val isPlantation: Boolean = raster.tile.isPlantation.getData(col, row)
-        val gfwProCoverage: Map[String, Boolean] = raster.tile.gfwProCoverage.getData(col, row)
+        val gfwProCoverage: Map[String, Boolean] =
+          raster.tile.gfwProCoverage.getData(col, row)
 
         // compute Booleans
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
@@ -89,10 +99,13 @@ object ForestChangeDiagnosticSummary {
         val isProtectedArea: Boolean = wdpa != ""
         val isProdesLoss: Boolean = prodesLossYear > 0
 
-        val southAmericaPresence = gfwProCoverage.getOrElse("South America", false)
-        val legalAmazonPresence = gfwProCoverage.getOrElse("Legal Amazon", false)
+        val southAmericaPresence =
+          gfwProCoverage.getOrElse("South America", false)
+        val legalAmazonPresence =
+          gfwProCoverage.getOrElse("Legal Amazon", false)
         val braBiomesPresence = gfwProCoverage.getOrElse("Brazil Biomes", false)
-        val cerradoBiomesPresence = gfwProCoverage.getOrElse("Cerrado Biomes", false)
+        val cerradoBiomesPresence =
+          gfwProCoverage.getOrElse("Cerrado Biomes", false)
         val seAsiaPresence = gfwProCoverage.getOrElse("South East Asia", false)
         val idnPresence = gfwProCoverage.getOrElse("Indonesia", false)
 
@@ -119,8 +132,8 @@ object ForestChangeDiagnosticSummary {
           braBiomesPresence,
           cerradoBiomesPresence,
           seAsiaPresence,
-          idnPresence)
-
+          idnPresence
+        )
 
         val summaryData: ForestChangeDiagnosticRawData =
           acc.stats.getOrElse(

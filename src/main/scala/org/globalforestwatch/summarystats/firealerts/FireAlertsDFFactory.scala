@@ -5,7 +5,6 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features._
 import org.globalforestwatch.util.Util.getAnyMapValue
 
-import scala.collection.immutable
 
 case class FireAlertsDFFactory(
                                 featureType: String,
@@ -59,7 +58,7 @@ case class FireAlertsDFFactory(
                     id match {
                       case combinedId: CombinedFeatureId =>
                         combinedId match {
-                          case CombinedFeatureId(gadmId: GadmFeatureId, burnedAreaId: BurnedAreasFeatureId) =>
+                          case CombinedFeatureId(burnedAreaId: BurnedAreasFeatureId, gadmId: GadmFeatureId) =>
                             BurnedAreasRowGadm(burnedAreaId, gadmId, dataGroup, data)
                           case _ =>
                             throw new IllegalArgumentException("Not a valid GADM-Burned Areas ID")
@@ -79,7 +78,7 @@ case class FireAlertsDFFactory(
                     id match {
                       case combinedId: CombinedFeatureId =>
                         combinedId match {
-                          case CombinedFeatureId(wdpaId: WdpaFeatureId, burnedAreaId: BurnedAreasFeatureId) =>
+                          case CombinedFeatureId(burnedAreaId: BurnedAreasFeatureId, wdpaId: WdpaFeatureId) =>
                             BurnedAreasRowWdpa(burnedAreaId, wdpaId, dataGroup, data)
                           case _ =>
                             throw new IllegalArgumentException("Not a valid WDPA-Burned Areas ID")
@@ -99,7 +98,7 @@ case class FireAlertsDFFactory(
                     id match {
                       case combinedId: CombinedFeatureId =>
                         combinedId match {
-                          case CombinedFeatureId(geostoreId: GeostoreFeatureId, burnedAreaId: BurnedAreasFeatureId) =>
+                          case CombinedFeatureId(burnedAreaId: BurnedAreasFeatureId, geostoreId: GeostoreFeatureId) =>
                             BurnedAreasRowGeostore(burnedAreaId, geostoreId, dataGroup, data)
                           case _ =>
                             throw new IllegalArgumentException("Not a valid Geostore-Burned Areas ID")

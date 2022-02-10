@@ -1,28 +1,24 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
-import com.vividsolutions.jts.geom.Geometry
+import org.locationtech.jts.geom.Geometry
 import org.apache.spark.sql.SparkSession
-import org.datasyslab.geospark.spatialRDD.SpatialRDD
-import org.datasyslab.geosparksql.utils.Adapter
-import org.globalforestwatch.util.Util.getAnyMapValue
+import org.apache.sedona.core.spatialRDD.SpatialRDD
+import org.apache.sedona.sql.utils.Adapter
+
 
 object FireAlertRDD {
-
-  def apply(spark: SparkSession,
-            kwargs: Map[String, Any]): SpatialRDD[Geometry] = {
-    val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
-    val fireAlertUris
-    : NonEmptyList[String] = getAnyMapValue[NonEmptyList[String]](
-      kwargs,
-      "fireAlertSource"
-    )
-    val fireAlertObj =
-      FeatureFactory("firealerts", Some(fireAlertType)).featureObj
+  def apply(
+    spark: SparkSession,
+    fireAlertType: String,
+    fireAlertSource: NonEmptyList[String],
+    filters: FeatureFilter
+  ): SpatialRDD[Geometry] = {
+    val fireAlertObj = Feature(fireAlertType)
     val fireAlertPointDF = SpatialFeatureDF(
-      fireAlertUris,
+      fireAlertSource,
       fireAlertObj,
-      kwargs,
+      filters,
       spark,
       "longitude",
       "latitude"

@@ -1,10 +1,8 @@
 package org.globalforestwatch.features
 
-import geotrellis.vector.Geometry
-import geotrellis.vector.io.wkb.WKB
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.globalforestwatch.util.GeometryReducer
-import org.globalforestwatch.util.Util._
+import org.apache.spark.sql.functions.col
+import org.globalforestwatch.summarystats.SummaryCommand
+import org.apache.spark.sql.Column
 
 object SimpleFeature extends Feature {
 
@@ -14,34 +12,19 @@ object SimpleFeature extends Feature {
 
   val featureIdExpr = "cast(fid as int) as featureId"
 
-  def get(i: Row): geotrellis.vector.Feature[Geometry, FeatureId] = {
-    val featureId = getFeatureId(i)
-    val geom: Geometry =
-      GeometryReducer.reduce(GeometryReducer.gpr)(
-        WKB.read(i.getString(geomPos))
-      )
-    geotrellis.vector.Feature(geom, featureId)
-  }
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
     val feature_id: Int = i(idPos).toInt
     SimpleFeatureId(feature_id)
   }
 
-  override def custom_filter(
-                              filters: Map[String, Any]
-                            )(df: DataFrame): DataFrame = {
-
-    val spark: SparkSession = df.sparkSession
-    import spark.implicits._
-
-    val idStart: Option[Int] = getAnyMapValue[Option[Int]](filters, "idStart")
-    //    val idEnd: Option[Int] = getAnyMapValue[Option[Int]](filters, "idEnd")
-
-    //    val idStartDF: DataFrame =
-    idStart.foldLeft(df)((acc, i) => acc.filter($"fid" >= i))
-
-    //    idEnd.foldLeft(idStartDF)((acc, i) => acc.filter($"fid" < i))
-
+  case class Filter(
+    base: Option[SummaryCommand.BaseFilter],
+    id: Option[SummaryCommand.FeatureIdFilter]
+  ) extends FeatureFilter {
+    def filterConditions: List[Column]= {
+      base.toList.flatMap(_.filters()) ++
+        id.toList.flatMap(_.filters(idColumn=col("fid")))
+    }
   }
 }

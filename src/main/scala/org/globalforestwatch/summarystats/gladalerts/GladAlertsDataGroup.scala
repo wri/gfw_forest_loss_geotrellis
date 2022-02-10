@@ -1,7 +1,5 @@
 package org.globalforestwatch.summarystats.gladalerts
 
-import java.time.LocalDate
-
 import org.globalforestwatch.util.Mercantile
 
 case class GladAlertsDataGroup(alertDate: String,

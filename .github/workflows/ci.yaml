@@ -1,0 +1,71 @@
+name: Run tests and apply terraform changes for current branch
+
+on: [ push ]
+
+permissions:
+  id-token: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    container:
+        image: quay.io/azavea/openjdk-gdal:3.1-jdk8-slim
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: coursier/cache-action@v6
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::617001639586:role/gfw-data-lake-read
+
+      - name: run tests
+        run: ./sbt ++$SCALA_VERSION coverage test coverageReport
+
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@master
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: target/scala-2.12/coverage-report/cobertura.xml
+
+      - name: Run CodeCOV action
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: target/scala-2.12/coverage-report/cobertura.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          verbose: false
+
+  publish:
+    name: Publish Artifacts
+    needs: [build]
+    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: coursier/cache-action@v6
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::617001639586:role/gfw-geotrellis-jars-write
+
+      - name: Build Assembly
+        run: sbt assembly
+
+      - name: Publish Assembly
+        run: aws s3 cp target/scala-2.12/*.jar s3://gfwpro-geotrellis-jars/release/
