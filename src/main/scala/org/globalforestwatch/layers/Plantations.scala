@@ -32,9 +32,7 @@ case class Plantations(gridTile: GridTile, kwargs: Map[String, Any]) extends Str
 }
 
 case class PlantationsBool(gridTile: GridTile, kwargs: Map[String, Any]) extends BooleanLayer with OptionalILayer {
-
-  val datasetName = "Na"
-  override lazy val version = "Na"
+  val datasetName = "gfw_plantations"
 
   val uri: String = uriForGrid(gridTile)
 }
