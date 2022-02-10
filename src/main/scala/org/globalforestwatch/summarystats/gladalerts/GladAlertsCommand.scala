@@ -23,8 +23,7 @@ object GladAlertsCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
-        "changeOnly" -> changeOnly,
-        "rasterCatalog" -> RasterCatalog.getRasterCatalog(default.rasterCatalog),
+        "changeOnly" -> changeOnly
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

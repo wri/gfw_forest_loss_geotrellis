@@ -11,10 +11,8 @@ import scalaj.http.{Http, HttpOptions, HttpResponse}
 
 case class RasterCatalog(layers: List[LayerConfig]) {
   def getSourceUri(dataset: String, grid: GridTile): String = {
-    layers
-      .find(lyr =>
-        lyr.name == dataset &&
-          lyr.grid == s"${grid.gridSize}/${grid.rowCount}") match {
+    //  lyr.grid == s"${grid.gridSize}/${grid.rowCount}"
+    layers.find(lyr => lyr.name == dataset) match {
       case Some(lyr: LayerConfig) => lyr.source_uri
       case None =>
         throw new IllegalArgumentException(s"No configuration found for dataset ${dataset} on a ${grid} grid")
@@ -22,11 +20,11 @@ case class RasterCatalog(layers: List[LayerConfig]) {
   }
 }
 
-case class LayerConfig(name: String, source_uri: String, grid: String)
+case class LayerConfig(name: String, source_uri: String)
 
 object RasterCatalog {
-  def getRasterCatalog(configPath: String): RasterCatalog = {
-    val rawJson = scala.io.Source.fromFile(configPath).mkString
+  def getRasterCatalog(catalogFile: String): RasterCatalog = {
+    val rawJson = scala.io.Source.fromResource(catalogFile).getLines.mkString
 
     val parsed = decode[RasterCatalog](rawJson) match {
       case Left(exc) =>
@@ -39,8 +37,7 @@ object RasterCatalog {
       parsed.layers.map((config: LayerConfig) =>
         LayerConfig(
           config.name,
-          getSourceUri(config.name, config.source_uri),
-          config.grid
+          getSourceUri(config.name, config.source_uri)
         )
       )
     )

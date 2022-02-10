@@ -8,19 +8,12 @@ import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
-import org.globalforestwatch.config.RasterCatalog
+import org.globalforestwatch.config.{GfwConfig, RasterCatalog}
 import org.globalforestwatch.util.Config
 import org.globalforestwatch.util.Util.{getAnyMapValue, jsonStrToMap}
-import geotrellis.raster.{
-  CellType,
-  IntCells,
-  NoDataHandling,
-  Tile,
-  isNoData
-}
+import geotrellis.raster.{CellType, IntCells, NoDataHandling, Tile, isNoData}
 import software.amazon.awssdk.services.s3.S3Client
 import scalaj.http._
-
 import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
 import org.globalforestwatch.grids.GridTile
 
@@ -42,9 +35,6 @@ trait Layer {
 
   val kwargs: Map[String, Any]
   val datasetName: String
-
-  val rasterCatalog: RasterCatalog =
-      getAnyMapValue[RasterCatalog](kwargs, "rasterCatalog")
 
   val uri: String
 
@@ -92,8 +82,10 @@ trait Layer {
   }
 
   protected def uriForGrid(grid: GridTile): String = {
-    val baseUri = rasterCatalog.getSourceUri(datasetName, grid)
-    baseUri.replace("{tile_id}", grid.tileId)
+    val baseUri = GfwConfig.get.rasterCatalog.getSourceUri(datasetName, grid)
+    baseUri.replace("{grid_size}", grid.gridSize.toString)
+      .replace("{row_count}", grid.rowCount.toString)
+      .replace("{tile_id}", grid.tileId)
   }
 
   def lookup(a: A): B
