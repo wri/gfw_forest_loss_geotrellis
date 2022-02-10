@@ -64,6 +64,16 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     // saveExpectedFcdResult(fcdDF)
     val expectedDF = readExpectedFcdResult
 
+    fcdDF.write.options(Map(
+      "header" -> "true",
+      "delimiter" -> "\t",
+      "quote" -> "\u0000",
+      "escape" -> "\u0000",
+      "quoteMode" -> "NONE",
+      "nullValue" -> null,
+      "emptyValue" -> null
+    )).csv(path="output/fcdTest")
+
     assertSmallDataFrameEquality(fcdDF, expectedDF)
   }
 
