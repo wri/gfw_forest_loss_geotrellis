@@ -283,6 +283,10 @@
     {
       "name":"gfw_wood_fiber",
       "source_uri":"s3://gfw-data-lake/gfw_wood_fiber/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"idn_land_cover_2017",
+      "source_uri": "s3://gfw-data-lake/idn_land_cover_2017/v201807/raster/epsg-4326/{grid_size}/{row_count}/class/geotiff/{tile_id}.tif\""
     }
   ]
 }
