@@ -6,7 +6,7 @@ case class PlantationsTypeFluxModel(gridTile: GridTile, kwargs: Map[String, Any]
     with OptionalILayer {
 
   val datasetName = "Na"
-  override lazy val version = "Na"
+
 
   val uri: String =
   //    s"$basePath/gfw_plantations_flux_model/v2.1/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/geotiff/${gridTile.tileId}.tif"

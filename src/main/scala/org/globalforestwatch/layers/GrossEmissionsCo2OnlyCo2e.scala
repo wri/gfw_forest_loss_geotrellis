@@ -8,7 +8,7 @@ case class GrossEmissionsCo2OnlyCo2e(gridTile: GridTile,
     with OptionalFLayer {
 
   val datasetName = "Na"
-  override lazy val version = "Na"
+
 
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =

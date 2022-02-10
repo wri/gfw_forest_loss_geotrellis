@@ -7,7 +7,7 @@ case class ForestAgeCategory(gridTile: GridTile, model: String = "standard", kwa
     with OptionalILayer {
 
   val datasetName = "Na"
-  override lazy val version = "Na"
+
 
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =

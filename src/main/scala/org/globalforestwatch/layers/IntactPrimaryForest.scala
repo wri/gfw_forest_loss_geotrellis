@@ -7,7 +7,7 @@ case class IntactPrimaryForest(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
 
   val datasetName = "Na"
-  override lazy val version = "Na"
+
 
   val uri: String =
   //    s"$basePath/gfw_intact_or_primary_forest_2000/v20180628/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/gdal-geotiff/${gridTile.tileId}.tif"

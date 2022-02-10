@@ -6,7 +6,7 @@ case class JplTropicsAbovegroundBiomassExtent2000(gridTile: GridTile, kwargs: Ma
     with OptionalILayer {
 
   val datasetName = "Na"
-  override lazy val version = "Na"
+
 
   val uri: String =
   //    s"$basePath/jpl_tropics_abovegroundbiomass_2000/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/extent/geotiff/${gridTile.tileId}.tif"

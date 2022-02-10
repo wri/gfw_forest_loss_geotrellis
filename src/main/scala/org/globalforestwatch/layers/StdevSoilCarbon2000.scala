@@ -7,7 +7,7 @@ case class StdevSoilCarbon2000(gridTile: GridTile, model: String = "standard", k
     with OptionalFLayer {
 
   val datasetName = "Na"
-  override lazy val version = "Na"
+
 
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =

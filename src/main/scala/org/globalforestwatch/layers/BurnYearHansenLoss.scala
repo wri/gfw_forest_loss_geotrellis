@@ -7,7 +7,7 @@ case class BurnYearHansenLoss(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
 
   val datasetName = "Na"
-  override lazy val version = "Na"
+
 
   val uri: String =
   //    s"$basePath/gfw_burn_year_Hansen_loss/v20190816/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/year/geotiff/${gridTile.tileId}.tif"

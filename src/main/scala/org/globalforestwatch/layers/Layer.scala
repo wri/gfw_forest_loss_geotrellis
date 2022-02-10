@@ -52,35 +52,6 @@ trait Layer {
     }
   }
 
-  lazy val version: String = {
-    pinnedVersions.getOrElse(datasetName, None) match {
-      case value: String => value
-      case _ =>
-        val response: HttpResponse[String] = Http(
-          s"https://data-api.globalforestwatch.org/dataset/${datasetName}/latest"
-        ).option(HttpOptions
-          .followRedirects(true)).option(HttpOptions.connTimeout(10000)).option(HttpOptions.readTimeout(50000)).asString
-        if (response.code != 200)
-          throw new IllegalArgumentException(
-            s"Dataset ${datasetName} has no latest version or does not exit. Data API responsen code: ${response.code}"
-          )
-
-        val json: Map[String, Any] = jsonStrToMap(response.body)
-
-        val data = json.get("data").asInstanceOf[Option[Map[String, Any]]]
-        data match {
-          case Some(map) =>
-            val version = map.get("version").asInstanceOf[Option[String]]
-            version match {
-              case Some(value) => value
-              case _ => throw new RuntimeException("Cannot understand Data API response.")
-            }
-          case _ => throw new RuntimeException("Cannot understand Data API response.")
-        }
-
-    }
-  }
-
   protected def uriForGrid(grid: GridTile): String = {
     val baseUri = GfwConfig.get.rasterCatalog.getSourceUri(datasetName, grid)
     baseUri.replace("{grid_size}", grid.gridSize.toString)

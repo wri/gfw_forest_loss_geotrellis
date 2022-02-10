@@ -6,7 +6,7 @@ case class FluxModelExtent(gridTile: GridTile, model: String = "standard", kwarg
   extends BooleanLayer
     with OptionalILayer {
   val datasetName = "Na"
-  override lazy val version = "Na"
+
 
   //      val model_suffix = if (model == "standard") "" else s"__$model"
   val model_suffix: String = if (model == "standard") "standard" else s"$model"

@@ -11,7 +11,6 @@ case class Plantations(gridTile: GridTile, kwargs: Map[String, Any]) extends Str
   //  We will first need to update data-api to make this possible
 
   val datasetName = "gfw_plantations"
-  override lazy val version = "Na"
 
   val uri: String = uriForGrid(gridTile)
 

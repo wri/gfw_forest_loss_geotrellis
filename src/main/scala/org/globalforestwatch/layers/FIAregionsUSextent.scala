@@ -7,7 +7,7 @@ case class FiaRegionsUsExtent(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
 
   val datasetName = "Na"
-  override lazy val version = "Na"
+
 
   val uri: String =
   //    s"$basePath/usfs_fia_regions/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"

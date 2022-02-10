@@ -7,7 +7,7 @@ case class AgcEmisYear(gridTile: GridTile, model: String = "standard", kwargs: M
     with OptionalFLayer {
 
   val datasetName = "Na"
-  override lazy val version = "Na"
+
 
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
