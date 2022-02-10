@@ -287,6 +287,14 @@
     {
       "name":"idn_land_cover_2017",
       "source_uri": "s3://gfw-data-lake/idn_land_cover_2017/v201807/raster/epsg-4326/{grid_size}/{row_count}/class/geotiff/{tile_id}.tif\""
+    },
+    {
+      "name":"umd_soy_planted_area",
+      "source_uri": "s3://gfw-data-lake/umd_soy_planted_area/v1/raster/epsg-4326/{grid_size}/{row_count}/year__bit_encoded/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"inpe_prodes",
+      "source_uri": "s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     }
   ]
 }
