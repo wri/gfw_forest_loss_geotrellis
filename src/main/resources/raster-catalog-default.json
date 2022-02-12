@@ -101,10 +101,6 @@
       "source_uri":"s3://gfw-data-lake/idn_forest_area/v201709/raster/epsg-4326/{grid_size}/{row_count}/class_compressed/geotiff/{tile_id}.tif"
     },
     {
-      "name":"umd_tree_cover_loss",
-      "source_uri":"s3://gfw-data-lake/umd_tree_cover_loss/v1.8/raster/epsg-4326/{grid_size}/{row_count}/threshold/geotiff/{tile_id}.tif"
-    },
-    {
       "name":"umd_drivers",
       "source_uri":"s3://gfw-data-lake/umd_drivers/v2020/raster/epsg-4326/{grid_size}/{row_count}/drivers/geotiff/{tile_id}.tif"
     },
@@ -118,7 +114,7 @@
     },
     {
       "name":"umd_tree_cover_density_2010",
-      "source_uri":"s3://gfw-data-lake/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/{grid_size}/{row_count}/threshold/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/{grid_size}/{row_count}/percent/geotiff/{tile_id}.tif"
     },
     {
       "name":"ibge_bra_biomes",
@@ -282,7 +278,7 @@
     },
     {
       "name":"idn_land_cover_2017",
-      "source_uri": "s3://gfw-data-lake/idn_land_cover_2017/v201807/raster/epsg-4326/{grid_size}/{row_count}/class/geotiff/{tile_id}.tif\""
+      "source_uri": "s3://gfw-data-lake/idn_land_cover_2017/v20180720/raster/epsg-4326/{grid_size}/{row_count}/class/geotiff/{tile_id}.tif\""
     },
     {
       "name":"umd_soy_planted_area",

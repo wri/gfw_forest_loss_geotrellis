@@ -101,10 +101,6 @@
       "source_uri":"s3://gfw-data-lake/idn_forest_area/v201709/raster/epsg-4326/{grid_size}/{row_count}/class_compressed/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"umd_tree_cover_loss",
-      "source_uri":"s3://gfw-data-lake/umd_tree_cover_loss/v1.8/raster/epsg-4326/{grid_size}/{row_count}/threshold/gdal-geotiff/{tile_id}.tif"
-    },
-    {
       "name":"umd_drivers",
       "source_uri":"s3://gfw-data-lake/umd_drivers/v2020/raster/epsg-4326/{grid_size}/{row_count}/drivers/gdal-geotiff/{tile_id}.tif"
     },
@@ -118,7 +114,7 @@
     },
     {
       "name":"umd_tree_cover_density_2010",
-      "source_uri":"s3://gfw-data-lake/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/{grid_size}/{row_count}/threshold/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/umd_tree_cover_density_2010/v1.6/raster/epsg-4326/{grid_size}/{row_count}/percent/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"ibge_bra_biomes",
@@ -175,10 +171,6 @@
     {
       "name":"gfw_belowground_carbon",
       "source_uri":"s3://gfw-data-lake/gfw_belowground_carbon/v20200824/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"umd_tree_cover_density_2000",
-      "source_uri":"s3://gfw-data-lake/umd_tree_cover_density_2000/v1.8/raster/epsg-4326/{grid_size}/{row_count}/threshold/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_palm",
