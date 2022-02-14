@@ -65,8 +65,6 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
       keyedFeatureRDD
     }
 
-    // countRecordsPerPartition(partitionedFeatureRDD, SummarySparkSession("tmp"))
-
     /*
      * Here we're going to work with the features one partition at a time.
      * We're going to use the tile key from windowLayout to read pixels from appropriate raster.

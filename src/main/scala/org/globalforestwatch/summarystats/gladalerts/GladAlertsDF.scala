@@ -69,8 +69,14 @@ object GladAlertsDF {
         unpackCols ::: ($"data_group.protectedAreas" as "wdpa_protected_areas__iucn_cat") :: defaultCols
       else unpackCols ::: defaultCols
 
-    df.filter($"data_group.tile.z" === minZoom)
+    val unpackedDf = df.filter($"data_group.tile.z" === minZoom)
       .select(cols: _*)
+
+    unpackedDf.withColumn(
+      "umd_glad_landsat_alerts__confidence",
+      when(col("is__confirmed_alert") === true, "high")
+        .otherwise("nominal")
+    )
   }
 
   def aggChangeDaily(groupByCols: List[String],
@@ -79,7 +85,7 @@ object GladAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val gladCols = List("alert__date", "is__confirmed_alert")
+    val gladCols = List("alert__date", "is__confirmed_alert", "umd_glad_landsat_alerts__confidence")
 
     val cols =
       if (!wdpa)
@@ -89,62 +95,6 @@ object GladAlertsDF {
 
     df.filter($"alert__date".isNotNull)
       .groupBy(cols.head, cols.tail: _*)
-      .agg(
-        sum("alert__count") as "alert__count",
-        sum("alert_area__ha") as "alert_area__ha",
-        sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions__Mg"
-      )
-  }
-
-  def aggChangeWeekly(cols: List[String],
-                      wdpa: Boolean = false)(df: DataFrame): DataFrame = {
-
-    val spark = df.sparkSession
-    import spark.implicits._
-
-    val gladCols = List(
-      year($"alert__date") as "alert__year",
-      weekofyear($"alert__date") as "alert__week",
-      $"is__confirmed_alert"
-    )
-    _aggChangeWeekly(df.filter($"alert__date".isNotNull), cols, gladCols, wdpa)
-  }
-
-  def aggChangeWeekly2(cols: List[String],
-                       wdpa: Boolean = false)(df: DataFrame): DataFrame = {
-
-    val spark = df.sparkSession
-    import spark.implicits._
-
-    val gladCols = List($"alert__year", $"alert__week", $"is__confirmed_alert")
-    _aggChangeWeekly(df, cols, gladCols, wdpa)
-  }
-
-  private def _aggChangeWeekly(df: DataFrame,
-                               cols: List[String],
-                               gladCols: List[Column],
-                               wdpa: Boolean = false): DataFrame = {
-    val spark = df.sparkSession
-    import spark.implicits._
-
-    val gladCols2 = List("alert__year", "alert__week", "is__confirmed_alert")
-
-    val aggCols =
-      List($"alert__count", $"alert_area__ha", $"whrc_aboveground_co2_emissions__Mg")
-
-    val contextLayers: List[String] =
-      if (!wdpa) "wdpa_protected_areas__iucn_cat" :: contextualLayers
-      else contextualLayers
-
-    val selectCols: List[Column] = cols.foldRight(Nil: List[Column])(
-      col(_) :: _
-    ) ::: gladCols ::: contextLayers
-      .foldRight(Nil: List[Column])(col(_) :: _) ::: aggCols
-
-    val groupByCols = cols ::: gladCols2 ::: contextLayers
-
-    df.select(selectCols: _*)
-      .groupBy(groupByCols.head, groupByCols.tail: _*)
       .agg(
         sum("alert__count") as "alert__count",
         sum("alert_area__ha") as "alert_area__ha",

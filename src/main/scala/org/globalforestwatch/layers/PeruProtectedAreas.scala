@@ -2,8 +2,10 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class PeruProtectedAreas(gridTile: GridTile)
-    extends BooleanLayer
+case class PeruProtectedAreas(gridTile: GridTile, kwargs: Map[String, Any])
+  extends BooleanLayer
     with OptionalILayer {
-  val uri: String = s"$basePath/per_protected_areas/v20160901/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
+  val datasetName = "per_protected_areas"
+  val uri: String =
+    uriForGrid(gridTile)
 }

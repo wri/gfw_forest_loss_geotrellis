@@ -3,6 +3,7 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 import com.monovore.decline.Opts
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
+import org.globalforestwatch.config.RasterCatalog
 import org.globalforestwatch.features._
 
 object AnnualUpdateMinimalCommand extends SummaryCommand {

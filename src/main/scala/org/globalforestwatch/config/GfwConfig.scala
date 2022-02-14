@@ -1,12 +1,9 @@
 package org.globalforestwatch.config
 
-import pureconfig.generic.auto._
-import pureconfig.ConfigSource
+import scala.io.Source
 import com.typesafe.scalalogging.LazyLogging
 
-case class GfwConfig(
-  rasterLayers: Map[String, String]
-)
+case class GfwConfig(rasterCatalog: RasterCatalog)
 
 object GfwConfig extends LazyLogging {
   private val featureFlag: Option[String] = {
@@ -17,11 +14,12 @@ object GfwConfig extends LazyLogging {
 
   def isGfwPro: Boolean = featureFlag == Some("pro")
 
-  lazy val get: GfwConfig = read(featureFlag.getOrElse("pro"))
+  lazy val get: GfwConfig = read(featureFlag.getOrElse("flagship"))
 
   def read(flag: String): GfwConfig = {
-    val confFile = s"feature-flag-$flag.conf"
-    logger.info(s"Reading $confFile")
-    ConfigSource.resources(confFile).loadOrThrow[GfwConfig]
+    val rasterCatalogFile = s"raster-catalog-$flag.json"
+    logger.info(s"Reading $rasterCatalogFile")
+    val rasterCatalog = RasterCatalog.getRasterCatalog(rasterCatalogFile)
+    GfwConfig(rasterCatalog)
   }
 }

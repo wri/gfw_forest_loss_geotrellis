@@ -108,17 +108,18 @@ object GladAlertsSummary {
                 }
               }
 
-              val confidence: Option[Boolean] = {
+              val confidence: String = {
                 glad match {
-                  case Some((_, conf)) => Some(conf)
-                  case _ => null
+                  case Some((_, conf)) =>
+                    if (conf) "high" else "low"
+                  case _ => "not_detected"
                 }
               }
 
               val pKey =
                 GladAlertsDataGroup(
                   alertDate,
-                  confidence,
+                  (confidence == "high"),
                   tile,
                   climateMask,
                   primaryForest,

@@ -121,43 +121,34 @@ object GladAlertsExport extends SummaryExport {
 
   private def exportChange(df: DataFrame, outputUrl: String): Unit = {
 
-    val adm2DailyDF = df
+    val adm2DF = df
       .transform(GladAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2")))
 
-    adm2DailyDF
-      .coalesce(10)
+    adm2DF
+      .coalesce(20)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/daily_alerts")
 
-    val adm2DF = adm2DailyDF
-      .transform(GladAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2")))
-
-    adm2DF
-      .coalesce(10)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/adm2/weekly_alerts")
-
     val adm1DF = adm2DF
-      .transform(GladAlertsDF.aggChangeWeekly2(List("iso", "adm1")))
+      .transform(GladAlertsDF.aggChangeDaily(List("iso", "adm1")))
 
     adm1DF
-      .coalesce(10)
+      .coalesce(15)
       .write
       .options(csvOptions)
-      .csv(path = outputUrl + "/adm1/weekly_alerts")
+      .csv(path = outputUrl + "/adm1/daily_alerts")
 
 
     val isoDF = adm1DF
-      .transform(GladAlertsDF.aggChangeWeekly2(List("iso")))
+      .transform(GladAlertsDF.aggChangeDaily(List("iso")))
 
 
     isoDF
       .coalesce(10)
       .write
       .options(csvOptions)
-      .csv(path = outputUrl + "/iso/weekly_alerts")
+      .csv(path = outputUrl + "/iso/daily_alerts")
   }
 
   override protected def exportWdpa(summaryDF: DataFrame,
@@ -256,12 +247,6 @@ object GladAlertsExport extends SummaryExport {
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
-
-    df.transform(GladAlertsDF.aggChangeWeekly(cols, wdpa = wdpa))
-      .coalesce(numExportParts)
-      .write
-      .options(csvOptions)
-      .csv(path = outputUrl + "/weekly_alerts")
 
     df.unpersist()
     ()

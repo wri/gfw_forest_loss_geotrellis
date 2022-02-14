@@ -1,25 +1,22 @@
 package org.globalforestwatch.layers
 
+import cats.data.NonEmptyList
+
 import java.io.FileNotFoundException
 import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
-import geotrellis.raster.{
-  CellType,
-  IntCells,
-  NoDataHandling,
-  Tile,
-  isNoData
-}
+import org.globalforestwatch.config.{GfwConfig, RasterCatalog}
+import org.globalforestwatch.util.Config
+import org.globalforestwatch.util.Util.{getAnyMapValue, jsonStrToMap}
+import geotrellis.raster.{CellType, IntCells, NoDataHandling, Tile, isNoData}
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{
-  HeadObjectRequest,
-  NoSuchKeyException,
-  RequestPayer
-}
+import scalaj.http._
+import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
 import org.globalforestwatch.grids.GridTile
+
 import java.time.LocalDate
 
 trait Layer {
@@ -31,17 +28,36 @@ trait Layer {
   type B
 
   val s3Client: S3Client = geotrellis.store.s3.S3ClientProducer.get()
-  val uri: String
+
   val internalNoDataValue: A
   val externalNoDataValue: B
   val basePath: String = s"s3://gfw-data-lake"
 
+  val kwargs: Map[String, Any]
+  val datasetName: String
 
-  protected def uriForGrid(template: String, grid: GridTile): String =
-    template
-      .replace("<gridSize>", grid.gridSize.toString)
-      .replace("<rowCount>", grid.rowCount.toString)
-      .replace("<tileId>", grid.tileId)
+  val uri: String
+
+  val pinnedVersions: Map[String, String] = {
+    val pinnedVersionList: Option[NonEmptyList[Config]] =
+      getAnyMapValue[Option[NonEmptyList[Config]]](kwargs, "pinnedVersions")
+
+    pinnedVersionList match {
+      case Some(versions) =>
+        versions.foldLeft(Map(): Map[String, String])(
+          (acc, pinnedVersion) =>
+            acc + (pinnedVersion.key -> pinnedVersion.value)
+        )
+      case _ => Map()
+    }
+  }
+
+  protected def uriForGrid(grid: GridTile): String = {
+    val baseUri = GfwConfig.get.rasterCatalog.getSourceUri(datasetName, grid)
+    baseUri.replace("{grid_size}", grid.gridSize.toString)
+      .replace("{row_count}", grid.rowCount.toString)
+      .replace("{tile_id}", grid.tileId)
+  }
 
   def lookup(a: A): B
 }
@@ -389,12 +405,23 @@ trait IntegerLayer extends ILayer {
 }
 
 trait DateConfLayer extends ILayer {
-
   type B = Option[(LocalDate, Boolean)]
 
   val internalNoDataValue: Int = 0
   val externalNoDataValue: B = None
 
+  val baseDate = LocalDate.of(2014,12,31)
+
+  override def lookup(value: Int): Option[(LocalDate, Boolean)] = {
+    val confidence = value >= 30000
+    val days: Int = if (confidence) value - 30000 else value - 20000
+    if (days < 0) {
+      None
+    } else {
+      val date = baseDate.plusDays(days)
+      Some((date, confidence))
+    }
+  }
 }
 
 trait DIntegerLayer extends DLayer {
