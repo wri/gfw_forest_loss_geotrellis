@@ -2,11 +2,15 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class SoilCarbon2000(gridTile: GridTile, model: String="standard")
+case class SoilCarbon2000(gridTile: GridTile, model: String = "standard", kwargs: Map[String, Any])
   extends FloatLayer
     with OptionalFLayer {
-   val model_suffix: String = if (model == "standard") "standard" else s"$model"
-    val uri: String =
+
+  val datasetName = "Na"
+
+
+  val model_suffix: String = if (model == "standard") "standard" else s"$model"
+  val uri: String =
   //  s"$basePath/gfw_soil_carbon_stock_2000$model_suffix/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/Mg/gdal-geotiff/${gridTile.tileId}.tif"
-      s"s3://gfw-files/flux_1_2_0/soil_carbon_2000/standard/${gridTile.tileId}.tif"
+    s"s3://gfw-files/flux_1_2_0/soil_carbon_2000/standard/${gridTile.tileId}.tif"
 }

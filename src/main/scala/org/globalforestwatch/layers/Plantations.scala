@@ -3,17 +3,24 @@ package org.globalforestwatch.layers
 import org.globalforestwatch.grids.GridTile
 import org.globalforestwatch.config.GfwConfig
 
-case class Plantations(gridTile: GridTile) extends StringLayer with OptionalILayer {
+case class Plantations(gridTile: GridTile, kwargs: Map[String, Any]) extends StringLayer with OptionalILayer {
 
-  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("Plantations"), gridTile)
+  //TODO: switch over to gfw_planted_forests dataset which is the same, but registered with the API
+  //  An issue here is that the resampled raster assets for viirs and modis currently would depend on the vector asset
+  //  However, for this dataset we would want to resample the data based on the raster asset using mode resampling method.
+  //  We will first need to update data-api to make this possible
+
+  val datasetName = "gfw_plantations"
+
+  val uri: String = uriForGrid(gridTile)
 
   def lookup(value: Int): String = value match {
-    case 1  => "Fruit"
-    case 2  => "Fruit Mix"
-    case 3  => "Oil Palm "
-    case 4  => "Oil Palm Mix"
-    case 5  => "Other"
-    case 6  => "Rubber"
+    case 1 => "Fruit"
+    case 2 => "Fruit Mix"
+    case 3 => "Oil Palm "
+    case 4 => "Oil Palm Mix"
+    case 5 => "Other"
+    case 6 => "Rubber"
     case 7  => "Rubber Mix"
     case 8  => "Unknown"
     case 9  => "Unknown Mix"
@@ -23,8 +30,8 @@ case class Plantations(gridTile: GridTile) extends StringLayer with OptionalILay
   }
 }
 
-case class PlantationsBool(gridTile: GridTile) extends BooleanLayer with OptionalILayer {
+case class PlantationsBool(gridTile: GridTile, kwargs: Map[String, Any]) extends BooleanLayer with OptionalILayer {
+  val datasetName = "gfw_plantations"
 
-  val uri: String = uriForGrid(GfwConfig.get.rasterLayers("Plantations"), gridTile)
-
+  val uri: String = uriForGrid(gridTile)
 }

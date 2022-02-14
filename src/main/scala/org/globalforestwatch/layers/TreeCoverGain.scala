@@ -2,8 +2,12 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class TreeCoverGain(gridTile: GridTile) extends BooleanLayer with RequiredILayer {
-  val uri: String = s"$basePath/umd_tree_cover_gain/v1.6/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/is/geotiff/${gridTile.tileId}.tif"
+case class TreeCoverGain(gridTile: GridTile, kwargs: Map[String, Any])
+  extends BooleanLayer
+    with RequiredILayer {
+  val datasetName = "umd_tree_cover_gain"
+  val uri: String =
+    uriForGrid(gridTile)
 
   override val internalNoDataValue: Int = 0
   override val externalNoDataValue: Boolean = false

@@ -1,14 +1,18 @@
 package org.globalforestwatch.layers
 import org.globalforestwatch.grids.GridTile
 
-case class GrossEmissionsNodeCodes(gridTile: GridTile, model: String = "standard")
+case class GrossEmissionsNodeCodes(gridTile: GridTile,
+                                   model: String = "standard", kwargs: Map[String, Any])
   extends StringLayer
     with OptionalILayer {
-  val model_suffix: String = if (model == "standard") "standard" else s"$model"
 
+  val datasetName = "Na"
+
+
+  val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
-//    s"$basePath/gfw_emissions_node_codes$model_suffix/v20200824/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"
-//    s"s3://gfw-files/flux_1_2_1/gross_emissions_node_codes/$model_suffix/${gridTile.tileId}.tif"
+  //    s"$basePath/gfw_emissions_node_codes$model_suffix/v20200824/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"
+  //    s"s3://gfw-files/flux_1_2_1/gross_emissions_node_codes/$model_suffix/${gridTile.tileId}.tif"
     s"s3://gfw-files/flux_1_2_0/gross_emissions_node_codes/$model_suffix/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Not applicable"
@@ -39,7 +43,8 @@ case class GrossEmissionsNodeCodes(gridTile: GridTile, model: String = "standard
     case 24 => "Shifting ag, not peat, burned, tropical, IFL, plantation"
     case 241 => "Shifting ag, not peat, burned, tropical, IFL, not plantation"
     case 25 => "Shifting ag, not peat, burned, tropical, not IFL, plantation"
-    case 251 => "Shifting ag, not peat, burned, tropical, not IFL, not plantation"
+    case 251 =>
+      "Shifting ag, not peat, burned, tropical, not IFL, not plantation"
     case 26 => "Shifting ag, not peat, burned, boreal"
     case 27 => "Shifting ag, not peat, burned, temperate, plantation"
     case 271 => "Shifting ag, not peat, burned, temperate, not plantation"
@@ -70,7 +75,8 @@ case class GrossEmissionsNodeCodes(gridTile: GridTile, model: String = "standard
     case 53 => "Urbanization, not peat, burned, tropical, IFL, plantation"
     case 531 => "Urbanization, not peat, burned, tropical, IFL, not plantation"
     case 54 => "Urbanization, not peat, burned, tropical, not IFL, plantation"
-    case 541 => "Urbanization, not peat, burned, tropical, not IFL, not plantation"
+    case 541 =>
+      "Urbanization, not peat, burned, tropical, not IFL, not plantation"
     case 55 => "Urbanization, not peat, burned, boreal"
     case 56 => "Urbanization, not peat, burned, temperate, plantation"
     case 561 => "Urbanization, not peat, burned, temperate, not plantation"

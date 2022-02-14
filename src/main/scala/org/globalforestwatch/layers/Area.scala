@@ -2,6 +2,9 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class Area(gridTile: GridTile) extends DoubleLayer with RequiredDLayer {
-  val uri: String = s"$basePath/gfw_pixel_area/20150327/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/m2/gdal-geotiff/${gridTile.tileId}.tif"
+case class Area(gridTile: GridTile, kwargs: Map[String, Any]) extends DoubleLayer with RequiredDLayer {
+
+  val datasetName = "gfw_pixel_area"
+
+  val uri: String = uriForGrid(gridTile)
 }

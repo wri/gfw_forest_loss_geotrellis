@@ -6,8 +6,8 @@ case class FireAlertViirsFeatureId(
                                     alertDate: String,
                                     alertTime: Int,
                                     confidence: String,
-                                    brightTi4: Float,
-                                    brightTi5: Float,
-                                    frp: Float) extends FeatureId {
+                                    brightTi4: Double,
+                                    brightTi5: Double,
+                                    frp: Double) extends FeatureId {
   override def toString: String = alertDate + " " + alertTime.toString + " " + lon.toString + " " + lat.toString
 }

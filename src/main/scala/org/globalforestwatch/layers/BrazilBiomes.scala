@@ -3,9 +3,12 @@ package org.globalforestwatch.layers
 import org.globalforestwatch.grids.GridTile
 import org.globalforestwatch.config.GfwConfig
 
-case class BrazilBiomes(gridTile: GridTile) extends StringLayer with OptionalILayer {
+case class BrazilBiomes(gridTile: GridTile, kwargs: Map[String, Any]) extends StringLayer with OptionalILayer {
 
-  val uri: String = uriForGrid(GfwConfig.get.rasterLayers(getClass.getSimpleName()), gridTile)
+  val datasetName = "ibge_bra_biomes"
+
+  val uri: String =
+    uriForGrid(gridTile)
 
   override val externalNoDataValue = "Not applicable"
 

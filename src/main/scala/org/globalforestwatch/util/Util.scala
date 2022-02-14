@@ -12,6 +12,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Column, SparkSession}
 import org.apache.spark.sql.functions.{col, struct}
 import org.globalforestwatch.features.FeatureId
+import org.json4s.jackson.JsonMethods.parse
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
@@ -76,18 +77,22 @@ object Util {
   def countRecordsPerPartition[T](rdd: RDD[T], spark: SparkSession): Unit = {
     import spark.implicits._
 
-    rdd
-      .mapPartitionsWithIndex { case (i, rows) => Iterator((i, rows.size)) }
-      .toDF("partition_number", "number_of_records")
-      .orderBy("number_of_records")
-      .show(100, false)
-
+//    rdd
+//      .mapPartitionsWithIndex { case (i, rows) => Iterator((i, rows.size)) }
+//      .toDF("partition_number", "number_of_records")
+//      .orderBy("number_of_records")
+//      .show(100, false)
 
     rdd
       .mapPartitionsWithIndex { case (i, rows) => Iterator((i, rows.size)) }
       .toDF("partition_number", "number_of_records")
       .orderBy(col("number_of_records").desc)
       .show(100, false)
+  }
+
+  def jsonStrToMap(jsonStr: String): Map[String, Any] = {
+    implicit val formats = org.json4s.DefaultFormats
+    parse(jsonStr).extract[Map[String, Any]]
   }
 
   /** Select columns with same names as case class fields and group them into a struct */
@@ -101,5 +106,4 @@ object Util {
   /** Select given fields from a struct column */
   def fieldsFromCol(col: Column, fields: List[String]): List[Column] =
     fields.map(name => col.getField(name).as(name))
-
 }

@@ -1,8 +1,11 @@
 package org.globalforestwatch.summarystats
 
+import cats.data.{NonEmptyList, Validated}
+import com.monovore.decline.{Argument, Opts}
 import cats.data.NonEmptyList
 import cats.implicits._
 import com.monovore.decline.Opts
+import org.globalforestwatch.util.Config
 import org.apache.spark.sql.{SparkSession, Column}
 import org.apache.spark.sql.functions.{substring, col}
 
@@ -12,6 +15,19 @@ trait SummaryCommand {
   val gfwPro: Opts[Boolean] = Opts
     .flag("gfwpro", "Feature flag for PRO, changes landcover labels")
     .orFalse
+
+
+  implicit val configArgument: Argument[Config] = new Argument[Config] {
+
+    def read(string: String) = {
+      string.split(":", 2) match {
+        case Array(key, value) => Validated.valid(Config(key, value))
+        case _ => Validated.invalidNel(s"Invalid key:value pair: $string")
+      }
+    }
+
+    def defaultMetavar = "key:value"
+  }
 
   val featuresOpt: Opts[NonEmptyList[String]] =
     Opts.options[String]("features", "URI of features in TSV format")
@@ -129,6 +145,8 @@ trait SummaryCommand {
 
   val featureIdFilterOptions: Opts[FeatureIdFilter] =
     (idStartOpt, idEndOpt).mapN(FeatureIdFilter)
+
+  val pinnedVersionsOpts: Opts[Option[NonEmptyList[Config]]] = Opts.options[Config]("pin_version", "Pin version of contextual layer. Use syntax `--pin_version dataset:version`.").orNone
 
   val featureFilterOptions: Opts[AllFilterOptions] = (
     defaultFilterOptions.orNone,

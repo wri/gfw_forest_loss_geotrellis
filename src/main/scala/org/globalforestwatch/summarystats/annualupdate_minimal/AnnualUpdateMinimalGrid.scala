@@ -7,7 +7,7 @@ object AnnualUpdateMinimalGrid extends TenByTen30mGrid[AnnualUpdateMinimalGridSo
 
   val gridExtent: Extent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
 
-  def getSources(gridTile: GridTile, kwargs: Map[String, Any]) = AnnualUpdateMinimalGridSources.getCachedSources(gridTile)
+  def getSources(gridTile: GridTile, kwargs: Map[String, Any]) = AnnualUpdateMinimalGridSources.getCachedSources(gridTile, kwargs: Map[String, Any])
 
 
 }

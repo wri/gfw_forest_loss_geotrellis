@@ -25,6 +25,8 @@ jobs:
 
       - name: run tests
         run: ./sbt ++$SCALA_VERSION coverage test coverageReport
+        env:
+          GFW_FEATURE_FLAG: pro
 
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@master

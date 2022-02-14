@@ -2,9 +2,12 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class FiaRegionsUsExtent(gridTile: GridTile)
+case class FiaRegionsUsExtent(gridTile: GridTile, kwargs: Map[String, Any])
   extends StringLayer
     with OptionalILayer {
+
+  val datasetName = "Na"
+
 
   val uri: String =
   //    s"$basePath/usfs_fia_regions/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/name/geotiff/${gridTile.tileId}.tif"
@@ -13,8 +16,8 @@ case class FiaRegionsUsExtent(gridTile: GridTile)
   override val externalNoDataValue = "Not applicable"
 
   def lookup(value: Int): String = value match {
-    case 1  => "PNWE"
-    case 2  => "PNWW"
+    case 1 => "PNWE"
+    case 2 => "PNWW"
     case 3  => "PSW"
     case 4  => "RMS"
     case 5  => "NE"

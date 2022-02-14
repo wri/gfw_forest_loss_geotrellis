@@ -3,12 +3,14 @@ package org.globalforestwatch.layers
 import org.globalforestwatch.grids.GridTile
 import org.globalforestwatch.config.GfwConfig
 
-case class IndonesiaForestArea(gridTile: GridTile)
+case class IndonesiaForestArea(gridTile: GridTile, kwargs: Map[String, Any])
   extends StringLayer
     with OptionalILayer {
 
   val datasetName = "idn_forest_area"
-  val uri: String = uriForGrid(GfwConfig.get.rasterLayers(getClass.getSimpleName()), gridTile)
+
+  val uri: String =
+    uriForGrid(gridTile)
 
   override val externalNoDataValue: String = ""
 
