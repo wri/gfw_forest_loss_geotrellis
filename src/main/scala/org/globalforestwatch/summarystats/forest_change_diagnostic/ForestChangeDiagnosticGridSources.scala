@@ -25,7 +25,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
   val isIDNForestMoratorium: IndonesiaForestMoratorium = IndonesiaForestMoratorium(gridTile, kwargs)
   val prodesLossYear: ProdesLossYear = ProdesLossYear(gridTile, kwargs)
   val braBiomes: BrazilBiomes = BrazilBiomes(gridTile, kwargs)
-  val isPlantation: PlantationsBool = PlantationsBool(gridTile, kwargs)
+  val isPlantation: PlantedForestsBool = PlantedForestsBool(gridTile, kwargs)
   val gfwProCoverage: GFWProCoverage = GFWProCoverage(gridTile, kwargs)
 
 
