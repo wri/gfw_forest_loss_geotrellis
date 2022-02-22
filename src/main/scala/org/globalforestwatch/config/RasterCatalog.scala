@@ -9,6 +9,8 @@ import org.globalforestwatch.config
 import org.globalforestwatch.util.Util.jsonStrToMap
 import scalaj.http.{Http, HttpOptions, HttpResponse}
 
+import java.io.FileNotFoundException
+
 case class RasterCatalog(layers: List[LayerConfig]) {
   def getSourceUri(dataset: String, grid: GridTile): String = {
     //  lyr.grid == s"${grid.gridSize}/${grid.rowCount}"
@@ -24,7 +26,12 @@ case class LayerConfig(name: String, source_uri: String)
 
 object RasterCatalog {
   def getRasterCatalog(catalogFile: String): RasterCatalog = {
-    val rawJson = scala.io.Source.fromResource(catalogFile).getLines.mkString
+    val rawJson = try {
+      scala.io.Source.fromResource(catalogFile).getLines.mkString
+    } catch {
+      case e =>
+        throw new FileNotFoundException(s"Cannot open raster catalog ${catalogFile}: ${e.getMessage}")
+    }
 
     val parsed = decode[RasterCatalog](rawJson) match {
       case Left(exc) =>
