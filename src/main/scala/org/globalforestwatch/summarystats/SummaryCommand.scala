@@ -117,8 +117,8 @@ trait SummaryCommand {
   val gladOpt: Opts[Boolean] = Opts.flag("glad", "GLAD tile extent").orFalse
 
   val fireAlertTypeOpt: Opts[String] = Opts
-    .option[String]("fire_alert_type", help = "MODIS or VIIRS")
-    .withDefault("VIIRS")
+    .option[String]("fire_alert_type", help = "modis or viirs")
+    .withDefault("viirs")
 
   val fireAlertSourceOpt: Opts[NonEmptyList[String]] = Opts
     .options[String](
