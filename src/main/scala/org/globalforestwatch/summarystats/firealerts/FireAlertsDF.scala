@@ -7,7 +7,7 @@ import org.apache.spark.sql.{Column, DataFrame}
 object FireAlertsDF {
 
   val contextualLayers: List[String] = List(
-    "umd_tree_cover_density__threshold",
+    "umd_tree_cover_density_2000__threshold",
     "is__umd_regional_primary_forest_2001",
     "is__birdlife_alliance_for_zero_extinction_sites",
     "is__birdlife_key_biodiversity_areas",
@@ -38,7 +38,7 @@ object FireAlertsDF {
 
     def defaultCols =
       List(
-        $"data_group.threshold" as "umd_tree_cover_density__threshold",
+        $"data_group.threshold" as "umd_tree_cover_density_2000__threshold",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_areas",

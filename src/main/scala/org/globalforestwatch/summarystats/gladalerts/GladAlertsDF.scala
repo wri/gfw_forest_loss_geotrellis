@@ -11,7 +11,7 @@ object GladAlertsDF {
     "is__birdlife_alliance_for_zero_extinction_sites",
     "is__birdlife_key_biodiversity_areas",
     "is__landmark_indigenous_and_community_lands",
-    "gfw_plantations__type",
+    "gfw_plantations__type",  // planted forests?
     "is__gfw_mining_concessions",
     "is__gfw_managed_forests",
     "rspo_oil_palm__certification_status",
@@ -23,8 +23,8 @@ object GladAlertsDF {
     "per_forest_concessions__type",
     "is__gfw_oil_gas",
     "is__gmw_global_mangrove_extent_2016",
-    "is__ifl_intact_forest_landscapes_2016",
-    "ibge_bra_biomes__name"
+    "is__ifl_intact_forest_landscapes_2016", // how to deal with this?
+    "ibge_bra_biomes__name" // necessary?
   )
 
   def unpackValues(unpackCols: List[Column],
