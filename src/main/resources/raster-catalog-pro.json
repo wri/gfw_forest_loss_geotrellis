@@ -74,7 +74,7 @@
     },
     {
       "name":"gfwpro_forest_change_regions",
-      "source_uri":"s3://gfw-data-lake/gfwpro_forest_change_regions/v20210129/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfwpro_forest_change_regions/v20220228/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"landmark_indigenous_and_community_lands",
