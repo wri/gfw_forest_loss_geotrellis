@@ -16,7 +16,7 @@ object AnnualUpdateMinimalDownloadDF {
     val yearRange = treecoverLossMinYear to treecoverLossMaxYear
 
     val annualDF = df
-      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density__threshold")
+      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold")
       .pivot("umd_tree_cover_loss__year", yearRange)
       .agg(
         sum("umd_tree_cover_loss__ha") as "umd_tree_cover_loss__ha",
@@ -26,7 +26,7 @@ object AnnualUpdateMinimalDownloadDF {
       .na.fill(0, Seq("adm1", "adm2"))
 
     val totalDF = df
-      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density__threshold")
+      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold")
       .agg(
         sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
         sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
@@ -46,7 +46,7 @@ object AnnualUpdateMinimalDownloadDF {
     totalDF
       .join(
         annualDF,
-        Seq("iso", "adm1", "adm2", "umd_tree_cover_density__threshold"),
+        Seq("iso", "adm1", "adm2", "umd_tree_cover_density_2000__threshold"),
         "inner"
       )
       .transform(setNullZero)
@@ -123,7 +123,7 @@ object AnnualUpdateMinimalDownloadDF {
 
     df.groupBy(
       groupByCols.head,
-      groupByCols.tail ::: List("umd_tree_cover_density__threshold"): _*
+      groupByCols.tail ::: List("umd_tree_cover_density_2000__threshold"): _*
     )
       .agg(aggCols.head, aggCols.tail: _*)
       .na.fill(0, Seq("avg_whrc_aboveground_biomass_2000_Mg_ha-1"))
@@ -185,7 +185,7 @@ object AnnualUpdateMinimalDownloadDF {
     import spark.implicits._
 
     val cols = List(
-      $"umd_tree_cover_density__threshold",
+      $"umd_tree_cover_density_2000__threshold",
       round($"umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
       round($"umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
       round($"area__ha") as "area__ha",
@@ -229,7 +229,7 @@ object AnnualUpdateMinimalDownloadDF {
    */
   private def removeCarbonThresholds(df: DataFrame): DataFrame = {
     def setNull(column: Column): Column =
-      when(df("umd_tree_cover_density__threshold") < 30, null).otherwise(column)
+      when(df("umd_tree_cover_density_2000__threshold") < 30, null).otherwise(column)
 
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
