@@ -12,7 +12,7 @@ object FireAlertsDF {
     "is__birdlife_alliance_for_zero_extinction_sites",
     "is__birdlife_key_biodiversity_areas",
     "is__landmark_indigenous_and_community_lands",
-    "gfw_plantations__type",
+    "gfw_planted_forests__type",
     "is__gfw_mining_concessions",
     "is__gfw_managed_forests",
     "rspo_oil_palm__certification_status",
@@ -43,7 +43,7 @@ object FireAlertsDF {
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_areas",
         $"data_group.landmark" as "is__landmark_indigenous_and_community_lands",
-        $"data_group.plantations" as "gfw_plantations__type",
+        $"data_group.plantations" as "gfw_planted_forests__type",
         $"data_group.mining" as "is__gfw_mining_concessions",
         $"data_group.logging" as "is__gfw_managed_forests",
         $"data_group.rspo" as "rspo_oil_palm__certification_status",
@@ -158,8 +158,8 @@ object FireAlertsDF {
       max("is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
       max("is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
       max("is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
-      max(length($"gfw_plantations__type"))
-        .cast("boolean") as "gfw_plantations__type",
+      max(length($"gfw_planted_forests__type"))
+        .cast("boolean") as "gfw_planted_forests__type",
       max("is__gfw_mining_concessions") as "is__gfw_mining_concessions",
       max("is__gfw_managed_forests") as "is__gfw_managed_forests",
       max(length($"rspo_oil_palm__certification_status"))
@@ -196,7 +196,7 @@ object FireAlertsDF {
       max("is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
       max("is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas",
       max("is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
-      max("gfw_plantations__type") as "gfw_plantations__type",
+      max("gfw_planted_forests__type") as "gfw_planted_forests__type",
       max("is__gfw_mining_concessions") as "is__gfw_mining_concessions",
       max("is__gfw_managed_forests") as "is__gfw_managed_forests",
       max("rspo_oil_palm__certification_status") as "rspo_oil_palm__certification_status",

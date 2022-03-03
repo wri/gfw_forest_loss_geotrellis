@@ -8,10 +8,10 @@ object AnnualUpdateMinimalDF {
 
   val contextualLayers = List(
     "umd_tree_cover_density_2000__threshold",
-    "tsc_tree_cover_loss_drivers__driver", // driver?
+    "tsc_tree_cover_loss_drivers__driver",
     "esa_land_cover_2015__class",
     "is__birdlife_alliance_for_zero_extinction_sites",
-    "gfw_plantations__type", // change to planted forests?
+    "gfw_planted_forests__type",
     "is__gmw_global_mangrove_extent_1996",
     "is__gmw_global_mangrove_extent_2016",
     "ifl_intact_forest_landscapes__year",
@@ -44,7 +44,7 @@ object AnnualUpdateMinimalDF {
         $"data_group.globalLandCover" as "esa_land_cover_2015__class",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
-        $"data_group.plantations" as "gfw_plantations__type",
+        $"data_group.plantations" as "gfw_planted_forests__type",
         $"data_group.mangroves1996" as "is__gmw_global_mangrove_extent_1996",
         $"data_group.mangroves2016" as "is__gmw_global_mangrove_extent_2016",
         $"data_group.intactForestLandscapes" as "ifl_intact_forest_landscapes__year",
@@ -184,8 +184,8 @@ object AnnualUpdateMinimalDF {
         .cast("boolean") as "esa_land_cover_2015__class",
       max($"is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max($"is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
-      max(length($"gfw_plantations__type"))
-        .cast("boolean") as "gfw_plantations__type",
+      max(length($"gfw_planted_forests__type"))
+        .cast("boolean") as "gfw_planted_forests__type",
       max($"is__gmw_global_mangrove_extent_1996") as "is__gmw_global_mangrove_extent_1996",
       max($"is__gmw_global_mangrove_extent_2016") as "is__gmw_global_mangrove_extent_2016",
       max(length($"ifl_intact_forest_landscapes__year"))
@@ -228,7 +228,7 @@ object AnnualUpdateMinimalDF {
       max($"esa_land_cover_2015__class") as "esa_land_cover_2015__class",
       max($"is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max($"is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
-      max($"gfw_plantations__type") as "gfw_plantations__type",
+      max($"gfw_planted_forests__type") as "gfw_planted_forests__type",
       max($"is__gmw_global_mangrove_extent_1996") as "is__gmw_global_mangrove_extent_1996",
       max($"is__gmw_global_mangrove_extent_2016") as "is__gmw_global_mangrove_extent_2016",
       max($"ifl_intact_forest_landscapes__year") as "ifl_intact_forest_landscapes__year",
