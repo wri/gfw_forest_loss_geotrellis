@@ -44,7 +44,7 @@ object AnnualUpdateMinimalDF {
         $"data_group.globalLandCover" as "esa_land_cover_2015__class",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
-        $"data_group.plantations" as "gfw_planted_forests__type",
+        $"data_group.plantedForests" as "gfw_planted_forests__type",
         $"data_group.mangroves1996" as "is__gmw_global_mangrove_extent_1996",
         $"data_group.mangroves2016" as "is__gmw_global_mangrove_extent_2016",
         $"data_group.intactForestLandscapes" as "ifl_intact_forest_landscapes__year",

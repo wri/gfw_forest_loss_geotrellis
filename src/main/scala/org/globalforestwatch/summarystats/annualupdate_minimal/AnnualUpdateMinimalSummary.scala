@@ -58,7 +58,7 @@ object AnnualUpdateMinimalSummary {
         //          raster.tile.biodiversityIntactness.getData(col, row)
         val wdpa: String = raster.tile.wdpa.getData(col, row)
         val aze: Boolean = raster.tile.aze.getData(col, row)
-        val plantations: String = raster.tile.plantations.getData(col, row)
+        val plantedForests: String = raster.tile.plantedForests.getData(col, row)
         //        val riverBasins: String = raster.tile.riverBasins.getData(col, row)
         //        val ecozones: String = raster.tile.ecozones.getData(col, row)
         //        val urbanWatersheds: Boolean =
@@ -151,7 +151,7 @@ object AnnualUpdateMinimalSummary {
               primaryForest,
               wdpa,
               aze,
-              plantations,
+              plantedForests,
               mangroves1996,
               mangroves2016,
               intactForestLandscapes,

@@ -24,7 +24,7 @@ case class AnnualUpdateMinimalTile(
                                     //                         biodiversityIntactness: BiodiversityIntactness#OptionalDTile,
                                     wdpa: ProtectedAreas#OptionalITile,
                                     aze: Aze#OptionalITile,
-                                    plantations: Plantations#OptionalITile,
+                                    plantedForests: PlantedForests#OptionalITile,
                                     //                         riverBasins: RiverBasins#OptionalITile,
                                     //                         ecozones: Ecozones#OptionalITile,
                                     //                         urbanWatersheds: UrbanWatersheds#OptionalITile,

@@ -19,7 +19,7 @@ case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) e
   val aze: Aze = Aze(gridTile, kwargs)
   val keyBiodiversityAreas: KeyBiodiversityAreas = KeyBiodiversityAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
-  val plantations: Plantations = Plantations(gridTile, kwargs)
+  val plantedForests: PlantedForests = PlantedForests(gridTile, kwargs)
   val mining: Mining = Mining(gridTile, kwargs)
   val logging: Logging = Logging(gridTile, kwargs)
   val rspo: RSPO = RSPO(gridTile, kwargs)
@@ -52,7 +52,7 @@ case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) e
       val azeTile = aze.fetchWindow(windowKey, windowLayout)
       val keyBiodiversityAreasTile = keyBiodiversityAreas.fetchWindow(windowKey, windowLayout)
       val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
-      val plantationsTile = plantations.fetchWindow(windowKey, windowLayout)
+      val plantedForestsTile = plantedForests.fetchWindow(windowKey, windowLayout)
       val miningTile = mining.fetchWindow(windowKey, windowLayout)
       val loggingTile = logging.fetchWindow(windowKey, windowLayout)
       val rspoTile = rspo.fetchWindow(windowKey, windowLayout)
@@ -79,7 +79,7 @@ case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) e
         azeTile,
         keyBiodiversityAreasTile,
         landmarkTile,
-        plantationsTile,
+        plantedForestsTile,
         miningTile,
         loggingTile,
         rspoTile,
