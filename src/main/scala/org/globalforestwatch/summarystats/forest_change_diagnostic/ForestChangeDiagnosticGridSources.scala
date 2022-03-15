@@ -15,7 +15,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
   val treeCoverDensity2000: TreeCoverDensityPercent2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
   val isPrimaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
-  val isPeatlands: GFWProPeatlands = GFWProPeatlands(gridTile, kwargs)
+  val isPeatlands: Peatlands = Peatlands(gridTile, kwargs)
   val isIntactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val seAsiaLandCover: SEAsiaLandCover = SEAsiaLandCover(gridTile, kwargs)
