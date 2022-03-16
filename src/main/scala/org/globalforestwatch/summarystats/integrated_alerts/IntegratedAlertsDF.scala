@@ -70,7 +70,7 @@ object IntegratedAlertsDF {
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_areas",
         $"data_group.landmark" as "is__landmark_indigenous_and_community_lands",
-        $"data_group.plantations" as "gfw_planted_forests__type",
+        $"data_group.plantedForests" as "gfw_planted_forests__type",
         $"data_group.mining" as "is__gfw_mining",
         $"data_group.logging" as "is__gfw_managed_forests",
         $"data_group.rspo" as "rspo_oil_palm__certification_status",

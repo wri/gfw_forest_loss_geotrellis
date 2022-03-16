@@ -9,9 +9,6 @@ object IntegratedAlertsExport extends SummaryExport {
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
 
-    val changeOnly: Boolean =
-      getAnyMapValue[Boolean](kwargs, "changeOnly")
-
     summaryDF.cache()
 
     val spark = summaryDF.sparkSession

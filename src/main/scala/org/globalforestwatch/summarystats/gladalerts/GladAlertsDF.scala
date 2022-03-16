@@ -51,13 +51,13 @@ object GladAlertsDF {
 
     def defaultCols =
       List(
-        $"data_group.alertDate" as "alert__date",
         $"data_group.isConfirmed" as "is__confirmed_alert",
+        $"data_group.alertDate" as "umd_glad_landsat_alerts__date",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_areas",
         $"data_group.landmark" as "is__landmark_indigenous_and_community_lands",
-        $"data_group.plantations" as "gfw_planted_forests__type",
+        $"data_group.plantedForests" as "gfw_planted_forests__type",
         $"data_group.mining" as "is__gfw_mining_concessions",
         $"data_group.logging" as "is__gfw_managed_forests",
         $"data_group.rspo" as "rspo_oil_palm__certification_status",
@@ -111,7 +111,7 @@ object GladAlertsDF {
     val spark = df.sparkSession
     import spark.implicits._
 
-    val gladCols = List("alert__date", "is__confirmed_alert", "umd_glad_landsat_alerts__confidence")
+    val gladCols = List("umd_glad_landsat_alerts__date", "is__confirmed_alert", "umd_glad_landsat_alerts__confidence")
 
     val cols =
       if (!wdpa)
@@ -119,7 +119,7 @@ object GladAlertsDF {
       else
         groupByCols ::: gladCols ::: contextualLayers
 
-    df.filter($"alert__date".isNotNull)
+    df.filter($"umd_glad_landsat_alerts__date".isNotNull)
       .groupBy(cols.head, cols.tail: _*)
       .agg(
         sum("alert__count") as "alert__count",

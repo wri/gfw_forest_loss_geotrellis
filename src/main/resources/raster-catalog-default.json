@@ -246,7 +246,7 @@
     },
     {
       "name":"gfw_planted_forests",
-      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20201209/raster/epsg-4326/{grid_size}/{row_count}/species_simp/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20201209/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
     },
     {
       "name":"per_forest_concessions",
@@ -267,6 +267,14 @@
     {
       "name":"umd_glad_landsat_alerts",
       "source_uri":"s3://gfw-data-lake/umd_glad_landsat_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"umd_glad_sentinel2_alerts",
+      "source_uri":"s3://gfw-data-lake/umd_glad_sentinel2_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"wur_radd_alerts",
+      "source_uri":"s3://gfw-data-lake/wur_radd_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_plantations",
