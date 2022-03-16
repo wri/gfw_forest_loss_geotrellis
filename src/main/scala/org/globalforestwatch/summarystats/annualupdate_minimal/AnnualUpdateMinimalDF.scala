@@ -27,7 +27,24 @@ object AnnualUpdateMinimalDF {
     "is__gfw_wood_fiber",
     "is__gfw_resource_rights",
     "is__gfw_managed_forests",
-    "is__umd_tree_cover_gain"
+    "is__umd_tree_cover_gain",
+
+    "umd_tree_cover_density__threshold",
+    "tsc_tree_cover_loss_drivers__type",
+    "is__birdlife_alliance_for_zero_extinction_site",
+    "gfw_plantation__type",
+    "is__gmw_mangroves_1996",
+    "is__gmw_mangroves_2016",
+    "ifl_intact_forest_landscape__year",
+    "is__gfw_tiger_landscape",
+    "is__landmark_land_right",
+    "is__gfw_land_right",
+    "is__birdlife_key_biodiversity_area",
+    "is__gfw_mining",
+    "is__peatland",
+    "is__gfw_resource_right",
+    "is__gfw_managed_forest",
+    "is__umd_tree_cover_gain_2000-2012"
   )
 
   def unpackValues(cols: List[Column],
@@ -75,13 +92,39 @@ object AnnualUpdateMinimalDF {
         $"data.totalNetFluxCo2" as "gfw_forest_carbon_net_flux__Mg_CO2e",
         $"data.totalGrossEmissionsCo2eCo2Only" as "gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e",
         $"data.totalGrossEmissionsCo2eNonCo2" as "gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e",
-        $"data.totalGrossEmissionsCo2e" as "gfw_forest_carbon_gross_emissions__Mg_CO2e"
+        $"data.totalGrossEmissionsCo2e" as "gfw_forest_carbon_gross_emissions__Mg_CO2e",
+
+        $"data_group.threshold" as "umd_tree_cover_density__threshold",
+        $"data_group.drivers" as "tsc_tree_cover_loss_drivers__type",
+        $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
+        $"data_group.plantations" as "gfw_plantation__type",
+        $"data_group.mangroves1996" as "is__gmw_mangroves_1996",
+        $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
+        $"data_group.intactForestLandscapes" as "ifl_intact_forest_landscape__year",
+        $"data_group.tigerLandscapes" as "is__gfw_tiger_landscape",
+        $"data_group.landmark" as "is__landmark_land_right",
+        $"data_group.landRights" as "is__gfw_land_right",
+        $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_area",
+        $"data_group.mining" as "is__gfw_mining",
+        $"data_group.peatlands" as "is__peatland",
+        $"data_group.resourceRights" as "is__gfw_resource_right",
+        $"data_group.logging" as "is__gfw_managed_forest",
+        $"data_group.isGain" as "is__umd_tree_cover_gain_2000-2012",
+        $"data.totalGainArea" as "umd_tree_cover_gain_2000-2012__ha",
+        $"data.totalGrossCumulAbovegroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_co2_removals__Mg",
+        $"data.totalGrossCumulBelowgroundRemovalsCo2" as "gfw_gross_cumulative_belowground_co2_removals__Mg",
+        $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
+        $"data.totalNetFluxCo2" as "gfw_net_flux_co2e__Mg",
+        $"data.totalGrossEmissionsCo2eCo2Only" as "gfw_gross_emissions_co2e_co2_only__Mg",
+        $"data.totalGrossEmissionsCo2eNonCo2" as "gfw_gross_emissions_co2e_non_co2__Mg",
+        $"data.totalGrossEmissionsCo2e" as "gfw_gross_emissions_co2e_all_gases__Mg"
       )
 
     val unpackCols = {
       if (!wdpa) {
         defaultUnpackCols ::: List(
-          $"data_group.wdpa" as "wdpa_protected_areas__iucn_cat"
+          $"data_group.wdpa" as "wdpa_protected_areas__iucn_cat",
+          $"data_group.wdpa" as "wdpa_protected_area__iucn_cat"
         )
       } else defaultUnpackCols
     }
@@ -97,7 +140,8 @@ object AnnualUpdateMinimalDF {
     val cols =
       if (!wdpa)
         groupByCols ::: contextualLayers ::: List(
-          "wdpa_protected_areas__iucn_cat"
+          "wdpa_protected_areas__iucn_cat",
+          "wdpa_protected_area__iucn_cat"
         )
       else groupByCols ::: contextualLayers
 
@@ -118,6 +162,15 @@ object AnnualUpdateMinimalDF {
         sum("gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e") as "gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e",
         sum("gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e") as "gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e",
         sum("gfw_forest_carbon_gross_emissions__Mg_CO2e") as "gfw_forest_carbon_gross_emissions__Mg_CO2e",
+
+        sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
+        sum("gfw_gross_cumulative_aboveground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_co2_removals__Mg",
+        sum("gfw_gross_cumulative_belowground_co2_removals__Mg") as "gfw_gross_cumulative_belowground_co2_removals__Mg",
+        sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
+        sum("gfw_net_flux_co2e__Mg") as "gfw_net_flux_co2e__Mg",
+        sum("gfw_gross_emissions_co2e_co2_only__Mg") as "gfw_gross_emissions_co2e_co2_only__Mg",
+        sum("gfw_gross_emissions_co2e_non_co2__Mg") as "gfw_gross_emissions_co2e_non_co2__Mg",
+        sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg",
       )
   }
 
@@ -127,7 +180,8 @@ object AnnualUpdateMinimalDF {
     val cols =
       if (!wdpa)
         groupByCols ::: contextualLayers ::: List(
-          "wdpa_protected_areas__iucn_cat"
+          "wdpa_protected_areas__iucn_cat",
+          "wdpa_protected_area__iucn_cat"
         )
       else groupByCols ::: contextualLayers
 
@@ -148,6 +202,15 @@ object AnnualUpdateMinimalDF {
         sum("gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e") as "gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e",
         sum("gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e") as "gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e",
         sum("gfw_forest_carbon_gross_emissions__Mg_CO2e") as "gfw_forest_carbon_gross_emissions__Mg_CO2e",
+
+        sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
+        sum("gfw_gross_cumulative_aboveground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_co2_removals__Mg",
+        sum("gfw_gross_cumulative_belowground_co2_removals__Mg") as "gfw_gross_cumulative_belowground_co2_removals__Mg",
+        sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
+        sum("gfw_net_flux_co2e__Mg") as "gfw_net_flux_co2e__Mg",
+        sum("gfw_gross_emissions_co2e_co2_only__Mg") as "gfw_gross_emissions_co2e_co2_only__Mg",
+        sum("gfw_gross_emissions_co2e_non_co2__Mg") as "gfw_gross_emissions_co2e_non_co2__Mg",
+        sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg",
       )
   }
 
@@ -157,7 +220,8 @@ object AnnualUpdateMinimalDF {
     val cols =
       if (!wdpa)
         groupByCols ::: List("umd_tree_cover_loss__year") ::: contextualLayers ::: List(
-          "wdpa_protected_areas__iucn_cat"
+          "wdpa_protected_areas__iucn_cat",
+          "wdpa_protected_area__iucn_cat"
         )
       else groupByCols ::: List("umd_tree_cover_loss__year") ::: contextualLayers
 
@@ -169,6 +233,9 @@ object AnnualUpdateMinimalDF {
         sum("gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e") as "gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e",
         sum("gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e") as "gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e",
         sum("gfw_forest_carbon_gross_emissions__Mg_CO2e") as "gfw_forest_carbon_gross_emissions__Mg_CO2e",
+        sum("gfw_gross_emissions_co2e_co2_only__Mg") as "gfw_gross_emissions_co2e_co2_only__Mg",
+        sum("gfw_gross_emissions_co2e_non_co2__Mg") as "gfw_gross_emissions_co2e_non_co2__Mg",
+        sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg"
       )
   }
 
@@ -201,14 +268,34 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
       max($"is__gfw_resource_rights") as "is__gfw_resource_rights",
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
-      max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain"
+      max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
+
+      max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
+      max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
+      max(length($"gfw_plantation__type"))
+        .cast("boolean") as "gfw_plantation__type",
+      max($"is__gmw_mangroves_1996") as "is__gmw_mangroves_1996",
+      max($"is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
+      max(length($"ifl_intact_forest_landscape__year"))
+        .cast("boolean") as "ifl_intact_forest_landscape__year",
+      max($"is__gfw_tiger_landscape") as "is__gfw_tiger_landscape",
+      max($"is__landmark_land_right") as "is__landmark_land_right",
+      max($"is__gfw_land_right") as "is__gfw_land_right",
+      max($"is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
+      max($"is__gfw_mining") as "is__gfw_mining",
+      max($"is__peatland") as "is__peatland",
+      max($"is__gfw_resource_right") as "is__gfw_resource_right",
+      max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
+      max($"is__umd_tree_cover_gain_2000-2012") as "is__umd_tree_cover_gain_2000-2012"
     )
 
     val aggCols =
       if (!wdpa)
         defaultAggCols ::: List(
           max(length($"wdpa_protected_areas__iucn_cat"))
-            .cast("boolean") as "wdpa_protected_areas__iucn_cat"
+            .cast("boolean") as "wdpa_protected_areas__iucn_cat",
+          max(length($"wdpa_protected_area__iucn_cat"))
+            .cast("boolean") as "wdpa_protected_area__iucn_cat",
         )
       else defaultAggCols
 
@@ -243,12 +330,29 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
       max($"is__gfw_resource_rights") as "is__gfw_resource_rights",
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
-      max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain"
+      max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
+
+      max($"tsc_tree_cover_loss_drivers__type") as "tsc_tree_cover_loss_drivers__type",
+      max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
+      max($"gfw_plantation__type") as "gfw_plantation__type",
+      max($"is__gmw_mangroves_1996") as "is__gmw_mangroves_1996",
+      max($"is__gmw_mangroves_2016") as "is__gmw_mangroves_2016",
+      max($"ifl_intact_forest_landscape__year") as "ifl_intact_forest_landscape__year",
+      max($"is__gfw_tiger_landscape") as "is__gfw_tiger_landscape",
+      max($"is__landmark_land_right") as "is__landmark_land_right",
+      max($"is__gfw_land_right") as "is__gfw_land_right",
+      max($"is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
+      max($"is__gfw_mining") as "is__gfw_mining",
+      max($"is__peatland") as "is__peatland",
+      max($"is__gfw_resource_right") as "is__gfw_resource_right",
+      max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
+      max($"is__umd_tree_cover_gain_2000-2012") as "is__umd_tree_cover_gain_2000-2012"
     )
 
     val aggCols = if (!wdpa)
       defaultAggCols ::: List(
-        max($"wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat"
+        max($"wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat",
+        max($"wdpa_protected_area__iucn_cat") as "wdpa_protected_area__iucn_cat"
       )
     else defaultAggCols
 
