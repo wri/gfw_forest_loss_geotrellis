@@ -8,7 +8,6 @@ object IntegratedAlertsExport extends SummaryExport {
   override protected def exportGadm(summaryDF: DataFrame,
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
-
     summaryDF.cache()
 
     val spark = summaryDF.sparkSession

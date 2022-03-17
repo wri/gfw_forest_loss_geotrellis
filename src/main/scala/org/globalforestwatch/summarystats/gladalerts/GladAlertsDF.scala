@@ -79,7 +79,7 @@ object GladAlertsDF {
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_area",
         $"data_group.landmark" as "is__landmark_land_right",
-        $"data_group.plantations" as "gfw_plantation__type",
+        $"data_group.plantedForests" as "gfw_plantation__type",
         $"data_group.mining" as "is__gfw_mining",
         $"data_group.logging" as "is__gfw_managed_forest",
         $"data_group.peatlands" as "is__peatland",
