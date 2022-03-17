@@ -124,6 +124,7 @@ object AnnualUpdateMinimalSummary {
         val grossCumulBelowgroundRemovalsCo2: Float =
           raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
+        val soilCarbonPerHa: Float = raster.tile.soilCarbon.getData(col, row)
 
         val netFluxCo2Pixel = netFluxCo2 * areaHa
         val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
@@ -133,6 +134,7 @@ object AnnualUpdateMinimalSummary {
         val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
         val grossEmissionsCo2e = grossEmissionsCo2eNonCo2 + grossEmissionsCo2eCo2Only
         val grossEmissionsCo2ePixel = grossEmissionsCo2e * areaHa
+        val totalCarbonSoil = soilCarbonPerHa * areaHa
 
         val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
 
@@ -172,7 +174,7 @@ object AnnualUpdateMinimalSummary {
             val summary: AnnualUpdateMinimalData =
               stats.getOrElse(
                 key = pKey,
-                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -195,6 +197,7 @@ object AnnualUpdateMinimalSummary {
               summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
               summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
               summary.totalNetFluxCo2 += netFluxCo2Pixel
+              summary.totalSoilCarbon += totalCarbonSoil
             } else if (gain) {
               // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
               // the correct flux model outputs (TCD>=threshold OR Hansen gain=TRUE)

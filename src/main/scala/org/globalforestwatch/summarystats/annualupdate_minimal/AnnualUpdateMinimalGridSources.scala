@@ -41,6 +41,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val netFluxCo2: NetFluxCo2e = NetFluxCo2e(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e = GrossEmissionsNonCo2Co2e(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e = GrossEmissionsCo2OnlyCo2e(gridTile, kwargs = kwargs)
+  val soilCarbon: SoilCarbon = SoilCarbon(gridTile, kwargs = kwargs)
 
   def readWindow(
                   windowKey: SpatialKey, windowLayout: LayoutDefinition
@@ -86,6 +87,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       val netFluxCo2Tile = netFluxCo2.fetchWindow(windowKey, windowLayout)
       val grossEmissionsCo2eNonCo2Tile = grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
       val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
+      val soilCarbonTile = soilCarbon.fetchWindow(windowKey, windowLayout)
 
       val tile = AnnualUpdateMinimalTile(
         lossTile,
@@ -117,7 +119,8 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         grossEmissionsCo2eCo2OnlyTile,
         grossCumulAbovegroundRemovalsCo2Tile,
         grossCumulBelowgroundRemovalsCo2Tile,
-        netFluxCo2Tile
+        netFluxCo2Tile,
+        soilCarbonTile,
       )
 
       Raster(tile, windowKey.extent(windowLayout))

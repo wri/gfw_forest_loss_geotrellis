@@ -58,7 +58,8 @@ case class AnnualUpdateMinimalTile(
                                     grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e#OptionalFTile,
                                     grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2#OptionalFTile,
                                     grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2#OptionalFTile,
-                                    netFluxCo2: NetFluxCo2e#OptionalFTile
+                                    netFluxCo2: NetFluxCo2e#OptionalFTile,
+                                    soilCarbon: SoilCarbon#OptionalFTile,
 ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
   def cols: Int = loss.cols

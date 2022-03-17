@@ -93,11 +93,12 @@ object AnnualUpdateMinimalDF {
         $"data.totalGrossEmissionsCo2eCo2Only" as "gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e",
         $"data.totalGrossEmissionsCo2eNonCo2" as "gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e",
         $"data.totalGrossEmissionsCo2e" as "gfw_forest_carbon_gross_emissions__Mg_CO2e",
+        $"data.totalSoilCarbon" as "gfw_soil_carbon_stocks__Mg_CO2e",
 
         $"data_group.threshold" as "umd_tree_cover_density__threshold",
         $"data_group.drivers" as "tsc_tree_cover_loss_drivers__type",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
-        $"data_group.plantations" as "gfw_plantation__type",
+        $"data_group.plantedForests" as "gfw_plantation__type",
         $"data_group.mangroves1996" as "is__gmw_mangroves_1996",
         $"data_group.mangroves2016" as "is__gmw_mangroves_2016",
         $"data_group.intactForestLandscapes" as "ifl_intact_forest_landscape__year",
@@ -117,7 +118,7 @@ object AnnualUpdateMinimalDF {
         $"data.totalNetFluxCo2" as "gfw_net_flux_co2e__Mg",
         $"data.totalGrossEmissionsCo2eCo2Only" as "gfw_gross_emissions_co2e_co2_only__Mg",
         $"data.totalGrossEmissionsCo2eNonCo2" as "gfw_gross_emissions_co2e_non_co2__Mg",
-        $"data.totalGrossEmissionsCo2e" as "gfw_gross_emissions_co2e_all_gases__Mg"
+        $"data.totalGrossEmissionsCo2e" as "gfw_gross_emissions_co2e_all_gases__Mg",
       )
 
     val unpackCols = {
@@ -162,6 +163,7 @@ object AnnualUpdateMinimalDF {
         sum("gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e") as "gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e",
         sum("gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e") as "gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e",
         sum("gfw_forest_carbon_gross_emissions__Mg_CO2e") as "gfw_forest_carbon_gross_emissions__Mg_CO2e",
+        sum("gfw_soil_carbon_stocks__Mg_CO2e") as "gfw_soil_carbon_stocks__Mg_CO2e",
 
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_co2_removals__Mg",
@@ -202,6 +204,7 @@ object AnnualUpdateMinimalDF {
         sum("gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e") as "gfw_forest_carbon_gross_emissions_co2_only__Mg_CO2e",
         sum("gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e") as "gfw_forest_carbon_gross_emissions_non_co2__Mg_CO2e",
         sum("gfw_forest_carbon_gross_emissions__Mg_CO2e") as "gfw_forest_carbon_gross_emissions__Mg_CO2e",
+        sum("gfw_soil_carbon_stocks__Mg_CO2e") as "gfw_soil_carbon_stocks__Mg_CO2e",
 
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_co2_removals__Mg",

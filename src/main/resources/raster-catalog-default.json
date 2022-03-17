@@ -303,6 +303,10 @@
     {
       "name":"mapbox_river_basins",
       "source_uri": "s3://gfw-data-lake/mapbox_river_basins/v2018/raster/epsg-4326/{grid_size}/{row_count}/id/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_soil_carbon_stocks",
+      "source_uri": "s3://gfw-data-lake/gfw_soil_carbon_stocks/v20200724/raster/epsg-4326/10/40000/Mg_CO2e_ha/geotiff/{tile_id}.tif"
     }
   ]
 }
