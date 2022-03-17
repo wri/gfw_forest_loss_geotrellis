@@ -39,7 +39,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
       .write
       .mode(SaveMode.Overwrite)
       .options(ForestChangeDiagnosticExport.csvOptions)
-      .csv(path = palm32ExpectedOutputPath)
+      .csv(path = "/Users/Shared/dev/gfw_forest_loss_geotrellis/output/fcd_palm")
   }
 
   def readExpectedFcdResult = {
