@@ -78,6 +78,7 @@ object FireAlertsAnalysis extends SummaryAnalysis {
 
     val featureDF = SpatialFeatureDF(featureUris, featureType, featureFilter, "geom", spark)
 
+    // Using RDD instead of DF spatial join for performance options
 //    firePointDF
 //      .join(featureDF)
 //      .where("ST_Intersects(pointshape, polyshape)")
@@ -101,6 +102,8 @@ object FireAlertsAnalysis extends SummaryAnalysis {
     fireRDD.buildIndex(IndexType.QUADTREE, buildOnSpatialPartitionedRDD)
 
     val resultPairRDD = JoinQuery.SpatialJoinQueryFlat(fireRDD, featureRDD, usingIndex, considerBoundaryIntersection)
+    //  resultPairRDD.take(10).foreach(println)
+
     pairRddToDf(resultPairRDD, featureType, fireAlertType, spark)
   }
 
@@ -111,15 +114,15 @@ object FireAlertsAnalysis extends SummaryAnalysis {
     val dataType = ScalaReflection.schemaFor[FireAlertsData].dataType.asInstanceOf[StructType]
 
     val rowRdd = pairRdd.rdd.map[Row](f => {
-      val seq1 = f._1.toString.split("\t").toSeq
-      val seq2 = f._2.toString.split("\t").toSeq
+      val seq1 = f._1.getUserData.toString.split("\t").toSeq
+      val seq2 = f._2.getUserData.toString.split("\t").toSeq
 
-      val featureId = Row.fromSeq(convert(seq1(1).substring(1, seq1(1).length - 1).split(',').toList, featureIdType.toList))
-      val fireId = Row.fromSeq(convert(seq2(1).substring(1, seq2(1).length - 1).split(',').toList, fireIdType.toList))
-      val dataGroup = Row.fromSeq(convert(seq2(2).substring(1, seq2(2).length - 1).split(',').toList, dataGroupType.toList))
-      val data = Row.fromSeq(convert(seq2(3).substring(1, seq2(3).length - 1).split(',').toList, dataType.toList))
+      val featureId = Row.fromSeq(convert(seq1(0).substring(1, seq1(0).length - 1).split(',').toList, featureIdType.toList))
+      val fireId = Row.fromSeq(convert(seq2(0).substring(1, seq2(0).length - 1).split(',').toList, fireIdType.toList))
+      val dataGroup = Row.fromSeq(convert(seq2(1).substring(1, seq2(1).length - 1).split(',').toList, dataGroupType.toList))
+      val data = Row.fromSeq(convert(seq2(2).substring(1, seq2(2).length - 1).split(',').toList, dataType.toList))
 
-      val result = Seq(seq1(0), featureId, seq2(0), fireId, dataGroup, data)
+      val result = Seq(f._1.toString, featureId, f._2.toString, fireId, dataGroup, data)
       Row.fromSeq(result)
     })
 
