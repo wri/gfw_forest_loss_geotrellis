@@ -87,7 +87,8 @@ object FeatureRDD {
              feature2Type: String,
              feature2Uris: NonEmptyList[String],
              feature2Delimiter: String,
-             filters: FeatureFilter,
+             feature1Filters: FeatureFilter,
+             feature2Filters: FeatureFilter,
              spark: SparkSession
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
@@ -97,7 +98,8 @@ object FeatureRDD {
       feature2Uris,
       feature2Type,
       spark,
-      filters,
+      feature1Filters,
+      feature2Filters,
       feature1Delimiter,
       feature2Delimiter,
     )
