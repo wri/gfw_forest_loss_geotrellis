@@ -12,8 +12,8 @@ import org.globalforestwatch.util.Util._
 import cats.data.NonEmptyList
 import geotrellis.vector
 import org.apache.spark.api.java.JavaPairRDD
-import org.apache.spark.sql.types.{BooleanType, DoubleType, IntegerType, StringType, StructField, StructType}
-import org.globalforestwatch.summarystats.{SummaryAnalysis}
+import org.apache.spark.sql.types.{BooleanType, DoubleType, FloatType, IntegerType, StringType, StructField, StructType}
+import org.globalforestwatch.summarystats.SummaryAnalysis
 import org.apache.spark.sql.catalyst.ScalaReflection
 
 import scala.util.{Failure, Success, Try}
@@ -173,6 +173,7 @@ object FireAlertsAnalysis extends SummaryAnalysis {
           case DoubleType => checkNullable(field, value, Try(value.toDouble))
           case IntegerType => checkNullable(field, value, Try(value.toInt))
           case BooleanType => checkNullable(field, value, Try(value.toBoolean))
+          case FloatType => checkNullable(field, value, Try(value.toFloat))
           case _ => throw new IllegalArgumentException(s"Unexpected data type ${field.dataType.toString} for field ${field.name} with value ${value}")
         }
     }

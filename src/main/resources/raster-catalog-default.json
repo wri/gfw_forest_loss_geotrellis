@@ -173,10 +173,6 @@
       "source_uri":"s3://gfw-data-lake/gfw_belowground_carbon/v20200824/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"umd_tree_cover_density_2000",
-      "source_uri":"s3://gfw-data-lake/umd_tree_cover_density_2000/v1.8/raster/epsg-4326/{grid_size}/{row_count}/threshold/geotiff/{tile_id}.tif"
-    },
-    {
       "name":"gfw_oil_palm",
       "source_uri":"s3://gfw-data-lake/gfw_oil_palm/v20191031/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
