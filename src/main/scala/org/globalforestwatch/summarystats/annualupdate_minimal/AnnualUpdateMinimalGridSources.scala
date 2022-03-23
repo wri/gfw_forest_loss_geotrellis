@@ -39,8 +39,8 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile, kwargs = kwargs)
   val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile, kwargs = kwargs)
   val netFluxCo2: NetFluxCo2e = NetFluxCo2e(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e = GrossEmissionsNonCo2Co2e(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e = GrossEmissionsCo2OnlyCo2e(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil = GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2eBiomassSoil = GrossEmissionsCo2OnlyCo2eBiomassSoil(gridTile, kwargs = kwargs)
 
   def readWindow(
                   windowKey: SpatialKey, windowLayout: LayoutDefinition

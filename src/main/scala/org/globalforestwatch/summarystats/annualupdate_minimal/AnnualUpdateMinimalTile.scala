@@ -54,8 +54,8 @@ case class AnnualUpdateMinimalTile(
                                     resourceRights: ResourceRights#OptionalITile,
                                     logging: Logging#OptionalITile,
                                     //                         oilGas: OilGas#OptionalITile
-                                    grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e#OptionalFTile,
-                                    grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e#OptionalFTile,
+                                    grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil#OptionalFTile,
+                                    grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2eBiomassSoil#OptionalFTile,
                                     grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2#OptionalFTile,
                                     grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2#OptionalFTile,
                                     netFluxCo2: NetFluxCo2e#OptionalFTile

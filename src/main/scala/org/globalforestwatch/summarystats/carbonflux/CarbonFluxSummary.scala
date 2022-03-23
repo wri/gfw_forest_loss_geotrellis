@@ -53,8 +53,8 @@ object CarbonFluxSummary {
         val deadwoodCarbon2000: Float = raster.tile.deadwoodCarbon2000.getData(col, row)
         val litterCarbon2000: Float = raster.tile.litterCarbon2000.getData(col, row)
         val soilCarbon2000: Float = raster.tile.soilCarbon2000.getData(col, row)
-        val grossEmissionsCo2eNonCo2: Float = raster.tile.grossEmissionsCo2eNonCo2.getData(col, row)
-        val grossEmissionsCo2eCo2Only: Float =  raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
+        val grossEmissionsCo2eNonCo2BiomassSoil: Float = raster.tile.grossEmissionsCo2eNonCo2BiomassSoil.getData(col, row)
+        val grossEmissionsCo2eCo2OnlyBiomassSoil: Float =  raster.tile.grossEmissionsCo2eCo2OnlyBiomassSoil.getData(col, row)
         val jplTropicsAbovegroundBiomassDensity2000: Float = raster.tile.jplTropicsAbovegroundBiomassDensity2000.getData(col, row)
         val stdevAnnualAbovegroundRemovalsCarbon: Float = raster.tile.stdevAnnualAbovegroundRemovalsCarbon.getData(col, row)
         val stdevSoilCarbon2000: Float = raster.tile.stdevSoilCarbon2000.getData(col, row)
@@ -128,10 +128,10 @@ object CarbonFluxSummary {
         val totalCarbon2000 = agc2000 + bgc2000 + deadwoodCarbon2000 + litterCarbon2000 + soilCarbon2000
         val totalCarbon2000Pixel = totalCarbon2000 * areaHa
 
-        val grossEmissionsCo2eNonCo2Pixel = grossEmissionsCo2eNonCo2 * areaHa
-        val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
-        val grossEmissionsCo2e = grossEmissionsCo2eNonCo2 + grossEmissionsCo2eCo2Only
-        val grossEmissionsCo2ePixel = grossEmissionsCo2e * areaHa
+        val grossEmissionsCo2eNonCo2BiomassSoilPixel = grossEmissionsCo2eNonCo2BiomassSoil * areaHa
+        val grossEmissionsCo2eCo2OnlyBiomassSoilPixel = grossEmissionsCo2eCo2OnlyBiomassSoil * areaHa
+        val grossEmissionsCo2eBiomassSoil = grossEmissionsCo2eNonCo2BiomassSoil + grossEmissionsCo2eCo2OnlyBiomassSoil
+        val grossEmissionsCo2eBiomassSoilPixel = grossEmissionsCo2eBiomassSoil * areaHa
 
         val jplTropicsAbovegroundBiomassDensity2000Pixel = jplTropicsAbovegroundBiomassDensity2000 * areaHa
 
@@ -206,9 +206,9 @@ object CarbonFluxSummary {
               if (lossYear != null) {
                 summary.totalTreecoverLoss += areaHa
                 summary.totalBiomassLoss += biomassPixel
-                summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-                summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
-                summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
+                summary.totalGrossEmissionsCo2eCo2OnlyBiomassSoil += grossEmissionsCo2eCo2OnlyBiomassSoilPixel
+                summary.totalGrossEmissionsCo2eNonCo2BiomassSoil += grossEmissionsCo2eNonCo2BiomassSoilPixel
+                summary.totalGrossEmissionsCo2eBiomassSoil += grossEmissionsCo2eBiomassSoilPixel
                 summary.totalAgcEmisYear += agcEmisYearPixel
                 summary.totalBgcEmisYear += bgcEmisYearPixel
                 summary.totalDeadwoodCarbonEmisYear += deadwoodCarbonEmisYearPixel

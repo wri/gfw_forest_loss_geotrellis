@@ -18,8 +18,8 @@ case class CarbonSensitivityTile(
                                   netFluxCo2: NetFluxCo2e#OptionalFTile,
                                   agcEmisYear: AgcEmisYear#OptionalFTile,
                                   soilCarbonEmisYear: SoilCarbonEmisYear#OptionalFTile,
-                                  grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e#OptionalFTile,
-                                  grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e#OptionalFTile,
+                                  grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil#OptionalFTile,
+                                  grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2eBiomassSoil#OptionalFTile,
                                   jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000#OptionalFTile,
 
                                   fluxModelExtent: FluxModelExtent#OptionalITile,
