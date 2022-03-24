@@ -43,33 +43,17 @@ object AnnualUpdateMinimalSummary {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
-        //        val mangroveBiomass: Double =
-        //          raster.tile.mangroveBiomass.getData(col, row)
         val drivers: String = raster.tile.drivers.getData(col, row)
         val globalLandCover: String =
           raster.tile.globalLandCover.getData(col, row)
         val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
-        //        val idnPrimaryForest: Boolean =
-        //          raster.tile.idnPrimaryForest.getData(col, row)
-        //        val erosion: String = raster.tile.erosion.getData(col, row)
-        //        val biodiversitySignificance: Boolean =
-        //          raster.tile.biodiversitySignificance.getData(col, row)
-        //        val biodiversityIntactness: Boolean =
-        //          raster.tile.biodiversityIntactness.getData(col, row)
         val wdpa: String = raster.tile.wdpa.getData(col, row)
         val aze: Boolean = raster.tile.aze.getData(col, row)
         val plantedForests: String = raster.tile.plantedForests.getData(col, row)
-        //        val riverBasins: String = raster.tile.riverBasins.getData(col, row)
-        //        val ecozones: String = raster.tile.ecozones.getData(col, row)
-        //        val urbanWatersheds: Boolean =
-        //          raster.tile.urbanWatersheds.getData(col, row)
         val mangroves1996: Boolean = raster.tile.mangroves1996.getData(col, row)
         val mangroves2016: Boolean = raster.tile.mangroves2016.getData(col, row)
-        //        val waterStress: String = raster.tile.waterStress.getData(col, row)
         val intactForestLandscapes: String =
           raster.tile.intactForestLandscapes.getData(col, row)
-        //        val endemicBirdAreas: Boolean =
-        //          raster.tile.endemicBirdAreas.getData(col, row)
         val tigerLandscapes: Boolean =
         raster.tile.tigerLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
@@ -77,35 +61,15 @@ object AnnualUpdateMinimalSummary {
         val keyBiodiversityAreas: Boolean =
           raster.tile.keyBiodiversityAreas.getData(col, row)
         val mining: Boolean = raster.tile.mining.getData(col, row)
-        //        val rspo: String = raster.tile.rspo.getData(col, row)
         val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
         val oilPalm: Boolean = raster.tile.oilPalm.getData(col, row)
         val idnForestMoratorium: Boolean =
           raster.tile.idnForestMoratorium.getData(col, row)
-        //        val idnLandCover: String = raster.tile.idnLandCover.getData(col, row)
-        //        val mexProtectedAreas: Boolean =
-        //          raster.tile.mexProtectedAreas.getData(col, row)
-        //        val mexPaymentForEcosystemServices: Boolean =
-        //          raster.tile.mexPaymentForEcosystemServices.getData(col, row)
-        //        val mexForestZoning: String =
-        //          raster.tile.mexForestZoning.getData(col, row)
-        //        val perProductionForest: Boolean =
-        //          raster.tile.perProductionForest.getData(col, row)
-        //        val perProtectedAreas: Boolean =
-        //          raster.tile.perProtectedAreas.getData(col, row)
-        //        val perForestConcessions: String =
-        //          raster.tile.perForestConcessions.getData(col, row)
-        //        val braBiomes: String = raster.tile.braBiomes.getData(col, row)
         val woodFiber: Boolean = raster.tile.woodFiber.getData(col, row)
         val resourceRights: Boolean =
           raster.tile.resourceRights.getData(col, row)
         val logging: Boolean = raster.tile.logging.getData(col, row)
-        //        val oilGas: Boolean = raster.tile.oilGas.getData(col, row)
-
-        //        val cols: Int = raster.rasterExtent.cols
-        //        val rows: Int = raster.rasterExtent.rows
-        //        val ext = raster.rasterExtent.extent
-        //        val cellSize = raster.cellSize
+        val forestAge: String = raster.tile.forestAge.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -168,7 +132,8 @@ object AnnualUpdateMinimalSummary {
               woodFiber,
               resourceRights,
               logging,
-              gain
+              gain,
+              forestAge
             )
 
             val summary: AnnualUpdateMinimalData =

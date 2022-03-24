@@ -5,13 +5,8 @@ import org.globalforestwatch.grids.GridTile
 case class NetFluxCo2e(gridTile: GridTile, model: String = "standard", kwargs: Map[String, Any])
   extends FloatLayer
     with OptionalFLayer {
+  val datasetName = "gfw_full_extent_net_flux"
 
-  val datasetName = "Na"
-
-
-  val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
-  //    s"$basePath/gfw_net_flux_co2e$model_suffix/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/Mg/gdal-geotiff/${gridTile.tileId}.tif"
-    s"s3://gfw-files/flux_1_2_1/net_flux_all_forest_types_all_drivers/$model_suffix/${gridTile.tileId}.tif"
-  //    s"s3://gfw-files/flux_1_2_0/net_flux_all_forest_types_all_drivers/$model_suffix/${gridTile.tileId}.tif"
+    uriForGrid(gridTile)
 }
