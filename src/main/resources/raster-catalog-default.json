@@ -210,7 +210,7 @@
     },
     {
       "name":"gfw_mining_concessions",
-      "source_uri":"s3://gfw-data-lake/gfw_mining_concessions/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_mining_concessions/v202203/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_peatlands",
@@ -330,7 +330,7 @@
     },
     {
       "name":"fao_ecozones",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_non_co2_gross_emissions/v20220316/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/fao_ecozones/v2010/raster/epsg-4326/{grid_size}/{row_count}/class/geotiff/{tile_id}.tif"
     },
     {
       "name":"ifl_intact_forest_landscapes_2000",

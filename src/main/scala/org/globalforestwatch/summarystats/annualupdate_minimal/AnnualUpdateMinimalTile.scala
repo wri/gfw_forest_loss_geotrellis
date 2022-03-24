@@ -22,7 +22,6 @@ case class AnnualUpdateMinimalTile(
                                     plantedForests: PlantedForests#OptionalITile,
                                     mangroves1996: Mangroves1996#OptionalITile,
                                     mangroves2016: Mangroves2016#OptionalITile,
-                                    intactForestLandscapes: IntactForestLandscapes#OptionalITile,
                                     tigerLandscapes: TigerLandscapes#OptionalITile,
                                     landmark: Landmark#OptionalITile,
                                     landRights: LandRights#OptionalITile,
@@ -41,6 +40,11 @@ case class AnnualUpdateMinimalTile(
                                     netFluxCo2: NetFluxCo2e#OptionalFTile,
                                     soilCarbon: SoilCarbon#OptionalFTile,
                                     forestAge: ForestAgeCategory#OptionalITile,
+                                    faoEcozones: FaoEcozones#OptionalITile,
+                                    intactForestLandscapes2000: IntactForestLandscapes2000#OptionalITile,
+                                    intactForestLandscapes2013: IntactForestLandscapes2013#OptionalITile,
+                                    intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
+                                    intactForestLandscapes2020: IntactForestLandscapes2020#OptionalITile,
 ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
   def cols: Int = loss.cols

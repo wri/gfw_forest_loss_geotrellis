@@ -52,8 +52,6 @@ object AnnualUpdateMinimalSummary {
         val plantedForests: String = raster.tile.plantedForests.getData(col, row)
         val mangroves1996: Boolean = raster.tile.mangroves1996.getData(col, row)
         val mangroves2016: Boolean = raster.tile.mangroves2016.getData(col, row)
-        val intactForestLandscapes: String =
-          raster.tile.intactForestLandscapes.getData(col, row)
         val tigerLandscapes: Boolean =
         raster.tile.tigerLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
@@ -70,6 +68,17 @@ object AnnualUpdateMinimalSummary {
           raster.tile.resourceRights.getData(col, row)
         val logging: Boolean = raster.tile.logging.getData(col, row)
         val forestAge: String = raster.tile.forestAge.getData(col, row)
+        val faoEcozones: String = raster.tile.faoEcozones.getData(col, row)
+        val intactForestLandscapes2000: Boolean =
+          raster.tile.intactForestLandscapes2000.getData(col, row)
+        val intactForestLandscapes2013: Boolean =
+          raster.tile.intactForestLandscapes2013.getData(col, row)
+        val intactForestLandscapes2016: Boolean =
+          raster.tile.intactForestLandscapes2016.getData(col, row)
+        val intactForestLandscapes2020: Boolean =
+          raster.tile.intactForestLandscapes2020.getData(col, row)
+
+
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -120,7 +129,6 @@ object AnnualUpdateMinimalSummary {
               plantedForests,
               mangroves1996,
               mangroves2016,
-              intactForestLandscapes,
               tigerLandscapes,
               landmark,
               landRights,
@@ -133,7 +141,12 @@ object AnnualUpdateMinimalSummary {
               resourceRights,
               logging,
               gain,
-              forestAge
+              forestAge,
+              faoEcozones,
+              intactForestLandscapes2000,
+              intactForestLandscapes2013,
+              intactForestLandscapes2016,
+              intactForestLandscapes2020,
             )
 
             val summary: AnnualUpdateMinimalData =

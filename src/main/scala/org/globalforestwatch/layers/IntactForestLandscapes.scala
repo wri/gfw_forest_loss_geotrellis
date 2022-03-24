@@ -19,28 +19,32 @@ case class IntactForestLandscapes(gridTile: GridTile, kwargs: Map[String, Any])
 }
 
 case class IntactForestLandscapes2000(gridTile: GridTile, kwargs: Map[String, Any])
-  extends BooleanLayer {
+  extends BooleanLayer
+    with OptionalILayer{
   val datasetName = "ifl_intact_forest_landscapes_2000"
   val uri: String =
     uriForGrid(gridTile)
 }
 
 case class IntactForestLandscapes2013(gridTile: GridTile, kwargs: Map[String, Any])
-  extends BooleanLayer {
+  extends BooleanLayer
+    with OptionalILayer{
   val datasetName = "ifl_intact_forest_landscapes_2013"
   val uri: String =
     uriForGrid(gridTile)
 }
 
 case class IntactForestLandscapes2016(gridTile: GridTile, kwargs: Map[String, Any])
-  extends BooleanLayer {
+  extends BooleanLayer
+    with OptionalILayer{
   val datasetName = "ifl_intact_forest_landscapes_2016"
   val uri: String =
     uriForGrid(gridTile)
 }
 
 case class IntactForestLandscapes2020(gridTile: GridTile, kwargs: Map[String, Any])
-  extends BooleanLayer {
+  extends BooleanLayer
+    with OptionalILayer{
   val datasetName = "ifl_intact_forest_landscapes_2020"
   val uri: String =
     uriForGrid(gridTile)
