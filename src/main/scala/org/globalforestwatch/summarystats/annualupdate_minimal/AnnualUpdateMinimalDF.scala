@@ -266,8 +266,10 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_resource_rights") as "is__gfw_resource_rights",
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
       max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
-      max($"forest_age__category") as "forest_age__category",
-      max($"fao_ecozones__class") as "fao_ecozones__class",
+      max(length($"forest_age__category"))
+        .cast("boolean") as "forest_age__category",
+      max(length($"fao_ecozones__class"))
+        .cast("boolean") as "fao_ecozones__class",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
       max($"is__ifl_intact_forest_landscapes_2013") as "is__ifl_intact_forest_landscapes_2013",
       max($"is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
@@ -331,8 +333,10 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_resource_rights") as "is__gfw_resource_rights",
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
       max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
-      max($"forest_age__category") as "forest_age__category",
-      max($"fao_ecozones__class") as "fao_ecozones__class",
+      max(length($"forest_age__category"))
+        .cast("boolean") as "forest_age__category",
+      max(length($"fao_ecozones__class"))
+        .cast("boolean") as "fao_ecozones__class",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
       max($"is__ifl_intact_forest_landscapes_2013") as "is__ifl_intact_forest_landscapes_2013",
       max($"is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
