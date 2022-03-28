@@ -306,7 +306,7 @@
     },
     {
       "name":"gfw_forest_age",
-      "source_uri": "s3://gfw-data-lake/gfw_forest_age/v20210621/raster/epsg-4326/{grid_size}/{row_count}/category/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_forest_age/v20220309/raster/epsg-4326/{grid_size}/{row_count}/category/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_full_extent_net_flux",
