@@ -103,7 +103,7 @@ object AnnualUpdateMinimalDF {
         $"data.totalGrossEmissionsCo2eCo2Only" as "gfw_full_extent_gross_emissions_CO2_only__Mg_CO2",
         $"data.totalGrossEmissionsCo2eNonCo2" as "gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e",
         $"data.totalGrossEmissionsCo2e" as "gfw_full_extent_gross_emissions__Mg_CO2e",
-        $"data.totalSoilCarbon" as "gfw_soil_carbon_stocks__Mg_CO2",
+        $"data.totalSoilCarbon" as "gfw_soil_carbon_stocks_2000__Mg_C",
         $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_full_extent_gross_removals__Mg_CO2",
 
         $"data_group.threshold" as "umd_tree_cover_density__threshold",
@@ -169,7 +169,7 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions_CO2_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only__Mg_CO2",
         sum("gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
-        sum("gfw_soil_carbon_stocks__Mg_CO2") as "gfw_soil_carbon_stocks__Mg_CO2",
+        sum("gfw_soil_carbon_stocks_2000__Mg_C") as "gfw_soil_carbon_stocks_2000__Mg_C",
 
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
@@ -206,7 +206,7 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions_CO2_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only__Mg_CO2",
         sum("gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
-        sum("gfw_soil_carbon_stocks__Mg_CO2") as "gfw_soil_carbon_stocks__Mg_CO2",
+        sum("gfw_soil_carbon_stocks_2000__Mg_C") as "gfw_soil_carbon_stocks_2000__Mg_C",
 
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
