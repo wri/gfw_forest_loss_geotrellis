@@ -36,7 +36,6 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
       // Failure for any of these reads will result in function returning Left[Throwable]
       // These are effectively required fields without which we can't make sense of the analysis
       lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(windowKey, windowLayout)).right
-      gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(windowKey, windowLayout)).right
       tcd2000Tile <- Either
         .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
         .right
@@ -46,6 +45,7 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
+      val gainTile = treeCoverGain.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val plantationsBoolTile = plantationsBool.fetchWindow(windowKey, windowLayout)
 

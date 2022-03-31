@@ -56,7 +56,6 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       // Failure for any of these reads will result in function returning Left[Throwable]
       // These are effectively required fields without which we can't make sense of the analysis
       lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(windowKey, windowLayout)).right
-      gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(windowKey, windowLayout)).right
       tcd2000Tile <- Either
         .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
         .right
@@ -66,6 +65,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
+      val gainTile = treeCoverGain.fetchWindow(windowKey, windowLayout)
       val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
       val driversTile = treeCoverLossDrivers.fetchWindow(windowKey, windowLayout)
       val globalLandCoverTile = globalLandCover.fetchWindow(windowKey, windowLayout)
