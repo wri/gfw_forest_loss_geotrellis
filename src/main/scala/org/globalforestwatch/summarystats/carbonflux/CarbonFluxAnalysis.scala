@@ -17,7 +17,11 @@ object CarbonFluxAnalysis extends SummaryAnalysis {
     import spark.implicits._
 
     val summaryRDD: RDD[(FeatureId, CarbonFluxSummary)] =
-      CarbonFluxRDD(featureRDD, CarbonFluxGrid.blockTileGrid, kwargs)
+      CarbonFluxRDD(
+        featureRDD,
+        CarbonFluxGrid.blockTileGrid,
+        kwargs
+      )
 
     val summaryDF =
       CarbonFluxDFFactory(featureType, summaryRDD, spark).getDataFrame
@@ -26,10 +30,15 @@ object CarbonFluxAnalysis extends SummaryAnalysis {
     //    val outputPartitionCount =
     //      maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
 
-    summaryDF.repartition($"id", $"dataGroup")
+    summaryDF.repartition($"id", $"data_group")
 
     val runOutputUrl: String = getOutputUrl(kwargs)
 
-    CarbonFluxExport.export(featureType, summaryDF, runOutputUrl, kwargs)
+    CarbonFluxExport.export(
+      featureType,
+      summaryDF,
+      runOutputUrl,
+      kwargs
+    )
   }
 }

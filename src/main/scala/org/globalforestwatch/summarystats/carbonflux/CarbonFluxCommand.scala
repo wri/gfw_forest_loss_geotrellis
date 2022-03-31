@@ -1,20 +1,20 @@
 package org.globalforestwatch.summarystats.carbonflux
 
+import com.monovore.decline.Opts
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
-import com.monovore.decline.Opts
+import org.globalforestwatch.config.RasterCatalog
 import org.globalforestwatch.features._
 
 object CarbonFluxCommand extends SummaryCommand {
 
+
+
   val carbonFluxCommand: Opts[Unit] = Opts.subcommand(
     name = CarbonFluxAnalysis.name,
-    help = "Compute summary statistics for GFW dashboards."
+    help = "Compute forest carbon flux model statistics with contextual layers of particular interest to the model."
   ) {
-    (
-      defaultOptions,
-      featureFilterOptions
-      ).mapN { (default, filterOptions) =>
+    (defaultOptions, featureFilterOptions).mapN { (default, filterOptions) =>
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix
