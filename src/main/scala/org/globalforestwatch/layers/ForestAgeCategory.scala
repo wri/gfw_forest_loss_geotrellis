@@ -6,12 +6,8 @@ case class ForestAgeCategory(gridTile: GridTile, model: String = "standard", kwa
   extends StringLayer
     with OptionalILayer {
 
-  val datasetName = "Na"
-
-
-  val model_suffix: String = if (model == "standard") "standard" else s"$model"
-  val uri: String =
-      s"s3://gfw-files/flux_1_2_2/forest_age_category/$model_suffix/${gridTile.tileId}.tif"
+  val datasetName = "gfw_forest_age"
+  val uri: String = uriForGrid(gridTile)
 
   override val externalNoDataValue = "Not applicable"
 

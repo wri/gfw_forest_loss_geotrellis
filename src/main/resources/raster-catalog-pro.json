@@ -242,7 +242,7 @@
     },
     {
       "name":"gfw_planted_forests",
-      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20201209/raster/epsg-4326/{grid_size}/{row_count}/species_simp/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20201209/raster/epsg-4326/{grid_size}/{row_count}/type/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"per_forest_concessions",
@@ -295,6 +295,10 @@
     {
       "name":"gfwpro_forest_change_regions",
       "source_uri": "s3://gfw-data-lake/gfwpro_forest_change_regions/v20210129/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"ifl_intact_forest_landscapes_2000",
+      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2000/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     }
   ]
 }

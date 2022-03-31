@@ -30,6 +30,7 @@ object FireAlertsCommand extends SummaryCommand {
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
+      val firesFeatureFilter = FeatureFilter.fromOptions(fireAlert.alertType, filterOptions)
 
       runAnalysis { spark =>
         val featureRDD = fireAlert.alertType match {
@@ -40,6 +41,7 @@ object FireAlertsCommand extends SummaryCommand {
             FeatureRDD.pointInPolygonJoinAsFeature(fireAlert.alertType, fireRDD)
           case "burned_areas" =>
             val burnedAreasUris = fireAlert.alertSource
+
             FeatureRDD(
               fireAlert.alertType,
               burnedAreasUris,
@@ -47,6 +49,7 @@ object FireAlertsCommand extends SummaryCommand {
               default.featureType,
               default.featureUris,
               "\t",
+              firesFeatureFilter,
               featureFilter,
               spark
             )
@@ -55,7 +58,7 @@ object FireAlertsCommand extends SummaryCommand {
         FireAlertsAnalysis(
           featureRDD,
           default.featureType,
-          FeatureFilter.empty,
+          featureFilter,
           spark,
           kwargs
         )

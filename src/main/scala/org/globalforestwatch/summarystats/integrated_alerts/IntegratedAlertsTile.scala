@@ -19,7 +19,7 @@ case class IntegratedAlertsTile(
                            aze: Aze#OptionalITile,
                            keyBiodiversityAreas: KeyBiodiversityAreas#OptionalITile,
                            landmark: Landmark#OptionalITile,
-                           plantations: Plantations#OptionalITile,
+                           plantedForests: PlantedForests#OptionalITile,
                            mining: Mining#OptionalITile,
                            logging: Logging#OptionalITile,
                            rspo: RSPO#OptionalITile,

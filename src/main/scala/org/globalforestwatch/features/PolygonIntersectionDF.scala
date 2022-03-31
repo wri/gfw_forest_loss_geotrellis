@@ -16,15 +16,16 @@ object PolygonIntersectionDF {
             feature2Uris: NonEmptyList[String],
             feature2Type: String,
             spark: SparkSession,
-            filters: FeatureFilter,
+            feature1Filters: FeatureFilter,
+            feature2Filters: FeatureFilter,
             feature1Delimiter: String = "\t",
             feature2Delimiter: String = "\t"): DataFrame = {
 
     val feature1DF: DataFrame =
-      SpatialFeatureDF(feature1Uris, feature1Type, filters, "geom", spark, feature1Delimiter)
+      SpatialFeatureDF(feature1Uris, feature1Type, feature1Filters, "geom", spark, feature1Delimiter)
 
     val feature2DF: DataFrame =
-      SpatialFeatureDF(feature2Uris, feature2Type, filters, "geom", spark, feature2Delimiter)
+      SpatialFeatureDF(feature2Uris, feature2Type, feature2Filters, "geom", spark, feature2Delimiter)
 
     PolygonIntersectionDF(feature1DF, feature2DF, spark)
   }
