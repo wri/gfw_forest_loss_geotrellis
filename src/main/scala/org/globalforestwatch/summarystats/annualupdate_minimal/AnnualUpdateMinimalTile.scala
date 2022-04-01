@@ -10,7 +10,7 @@ import org.globalforestwatch.layers._
   */
 case class AnnualUpdateMinimalTile(
                                     loss: TreeCoverLoss#ITile,
-                                    gain: TreeCoverGain#ITile,
+                                    gain: TreeCoverGain#OptionalITile,
                                     tcd2000: TreeCoverDensityThreshold#ITile,
                                     tcd2010: TreeCoverDensityThreshold#ITile,
                                     biomass: BiomassPerHectar#OptionalDTile,

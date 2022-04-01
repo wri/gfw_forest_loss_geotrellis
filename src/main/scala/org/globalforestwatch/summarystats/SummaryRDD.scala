@@ -9,10 +9,11 @@ import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResu
 import geotrellis.raster.summary.polygonal
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector._
-import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
+import org.globalforestwatch.util.RepartitionSkewedRDD
+
 import scala.reflect.ClassTag
 
 
@@ -57,13 +58,12 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      */
 
     val partitionedFeatureRDD = if (partition) {
-      val inputPartitionMultiplier = 64
-      val rangePartitioner =
-        new RangePartitioner(featureRDD.getNumPartitions * inputPartitionMultiplier, keyedFeatureRDD)
-      keyedFeatureRDD.partitionBy(rangePartitioner)
+      RepartitionSkewedRDD.bySparseId(keyedFeatureRDD, 4096)
     } else {
-      keyedFeatureRDD
+      keyedFeatureRDD.values
     }
+
+    println(s"Number of partitions: ${partitionedFeatureRDD.getNumPartitions}")
 
     /*
      * Here we're going to work with the features one partition at a time.
@@ -74,15 +74,13 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      */
     val featuresWithSummaries: RDD[(FEATUREID, SUMMARY)] =
       partitionedFeatureRDD.mapPartitions {
-        featurePartition: Iterator[
-          (Long, (SpatialKey, Feature[Geometry, FEATUREID]))
-        ] =>
-          // Code inside .mapPartitions works in an Iterator of records
+        featurePartition: Iterator[(SpatialKey, Feature[Geometry, FEATUREID])] =>
+        // Code inside .mapPartitions works in an Iterator of records
           // Doing things this way allows us to reuse resources and perform other optimizations
           // Grouping by spatial key allows us to minimize read thrashing from record to record
 
           val windowFeature = featurePartition.map {
-            case (z, (windowKey, feature)) =>
+            case (windowKey, feature) =>
               (windowKey, feature)
           }
 

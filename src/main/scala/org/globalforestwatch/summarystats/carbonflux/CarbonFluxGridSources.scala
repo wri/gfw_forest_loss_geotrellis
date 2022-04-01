@@ -82,9 +82,6 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
       lossTile <- Either
         .catchNonFatal(treeCoverLoss.fetchWindow(windowKey, windowLayout))
         .right
-      gainTile <- Either
-        .catchNonFatal(treeCoverGain.fetchWindow(windowKey, windowLayout))
-        .right
       tcd2000Tile <- Either
         .catchNonFatal(
           treeCoverDensity2000.fetchWindow(windowKey, windowLayout)
@@ -93,6 +90,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
+      val gainTile = treeCoverGain.fetchWindow(windowKey, windowLayout)
       val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
       val grossAnnualAbovegroundRemovalsCarbonTile =
         grossAnnualAbovegroundRemovalsCarbon.fetchWindow(

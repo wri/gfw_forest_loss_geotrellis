@@ -10,7 +10,7 @@ import org.globalforestwatch.layers._
   */
 case class CarbonFluxTile(
                            loss: TreeCoverLoss#ITile,
-                           gain: TreeCoverGain#ITile,
+                           gain: TreeCoverGain#OptionalITile,
                            tcd2000: TreeCoverDensityThreshold#ITile,
                            biomass: BiomassPerHectar#OptionalDTile,
                            grossAnnualAbovegroundRemovalsCarbon: GrossAnnualAbovegroundRemovalsCarbon#OptionalFTile,
