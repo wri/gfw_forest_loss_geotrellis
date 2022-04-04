@@ -334,19 +334,19 @@
     },
     {
       "name":"ifl_intact_forest_landscapes_2000",
-      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2000/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2000/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"ifl_intact_forest_landscapes_2013",
-      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2013/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2013/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"ifl_intact_forest_landscapes_2016",
-      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2016/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2016/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"ifl_intact_forest_landscapes_2020",
-      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2020/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2020/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }
