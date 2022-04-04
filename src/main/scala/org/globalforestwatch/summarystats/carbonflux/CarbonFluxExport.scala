@@ -10,10 +10,11 @@ object CarbonFluxExport extends SummaryExport {
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
 
-
-
     val changeOnly: Boolean =
       getAnyMapValue[Boolean](kwargs, "changeOnly")
+
+//    val spark: SparkSession = CarbonFluxDF.sparkSession
+//    import spark.implicits._
 
     val exportDF = df
       .transform(CarbonFluxDF.unpackValues)

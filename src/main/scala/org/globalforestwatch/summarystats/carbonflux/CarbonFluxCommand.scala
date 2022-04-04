@@ -7,17 +7,19 @@ import org.globalforestwatch.config.RasterCatalog
 import org.globalforestwatch.features._
 
 object CarbonFluxCommand extends SummaryCommand {
-
-
+  val
+  changeOnlyOpt: Opts[Boolean] =
+    Opts.flag("change_only", "Process change only").orFalse
 
   val carbonFluxCommand: Opts[Unit] = Opts.subcommand(
     name = CarbonFluxAnalysis.name,
     help = "Compute forest carbon flux model statistics with contextual layers of particular interest to the model."
   ) {
-    (defaultOptions, featureFilterOptions).mapN { (default, filterOptions) =>
+    (defaultOptions, featureFilterOptions, changeOnlyOpt).mapN { (default, filterOptions, changeOnly) =>
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
-        "noOutputPathSuffix" -> default.noOutputPathSuffix
+        "noOutputPathSuffix" -> default.noOutputPathSuffix,
+        "changeOnly" -> changeOnly
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

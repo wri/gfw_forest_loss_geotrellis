@@ -66,7 +66,7 @@ object CarbonFluxSummary {
         val drivers: String = raster.tile.drivers.getData(col, row)
         val wdpa: String = raster.tile.wdpa.getData(col, row)
         val plantationsTypeFluxModel: String = raster.tile.plantationsTypeFluxModel.getData(col, row)
-        val ecozones: String = raster.tile.ecozones.getData(col, row)
+        val faoEcozones: String = raster.tile.faoEcozones.getData(col, row)
         val intactForestLandscapes: String = raster.tile.intactForestLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
         val intactPrimaryForest: Boolean = raster.tile.intactPrimaryForest.getData(col, row)
@@ -166,7 +166,7 @@ object CarbonFluxSummary {
               isLoss,
               mangroveBiomassExtent,
               drivers,
-              ecozones,
+              faoEcozones,
               landmark,
               wdpa,
               intactForestLandscapes,

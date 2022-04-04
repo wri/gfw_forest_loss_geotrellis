@@ -9,7 +9,7 @@ case class CarbonFluxDataGroup(
                                isLoss: Boolean,
                                mangroveBiomassExtent: Boolean,
                                drivers: String,
-                               ecozones: String,
+                               faoEcozones: String,
                                landmark: Boolean,
                                wdpa: String,
                                intactForestLandscapes: String,

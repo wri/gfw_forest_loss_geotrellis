@@ -26,10 +26,6 @@ object CarbonFluxAnalysis extends SummaryAnalysis {
     val summaryDF =
       CarbonFluxDFFactory(featureType, summaryRDD, spark).getDataFrame
 
-    //    val maybeOutputPartitions:Option[Int] = getAnyMapValue(kwargs,"maybeOutputPartitions")
-    //    val outputPartitionCount =
-    //      maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
-
     summaryDF.repartition($"id", $"data_group")
 
     val runOutputUrl: String = getOutputUrl(kwargs)
