@@ -30,6 +30,8 @@ case class CarbonFluxTile(
                            soilCarbon2000: SoilCarbon2000#OptionalFTile,
                            grossEmissionsCo2eNonCo2BiomassSoil: GrossEmissionsNonCo2Co2eBiomassSoil#OptionalFTile,
                            grossEmissionsCo2eCo2OnlyBiomassSoil: GrossEmissionsCo2OnlyCo2eBiomassSoil#OptionalFTile,
+                           grossEmissionsCo2eNonCo2SoilOnly: GrossEmissionsNonCo2Co2eSoilOnly#OptionalFTile,
+                           grossEmissionsCo2eCo2OnlySoilOnly: GrossEmissionsCo2OnlyCo2eSoilOnly#OptionalFTile,
                            jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000#OptionalFTile,
                            stdevAnnualAbovegroundRemovalsCarbon: StdevAnnualAbovegroundRemovalsCarbon#OptionalFTile,
                            stdevSoilCarbon2000: StdevSoilCarbon2000#OptionalFTile,
