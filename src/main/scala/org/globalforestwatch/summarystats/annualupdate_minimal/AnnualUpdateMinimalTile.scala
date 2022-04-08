@@ -40,7 +40,7 @@ case class AnnualUpdateMinimalTile(
                                     netFluxCo2: NetFluxCo2e#OptionalFTile,
                                     soilCarbon: SoilCarbon#OptionalFTile,
                                     forestAge: ForestAgeCategory#OptionalITile,
-                                    faoEcozones: FaoEcozones#OptionalITile,
+                                    faoEcozones: FaoEcozones2010#OptionalITile,
                                     intactForestLandscapes2000: IntactForestLandscapes2000#OptionalITile,
                                     intactForestLandscapes2013: IntactForestLandscapes2013#OptionalITile,
                                     intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,

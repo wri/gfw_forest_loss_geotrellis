@@ -42,7 +42,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e = GrossEmissionsCo2OnlyCo2e(gridTile, kwargs = kwargs)
   val soilCarbon: SoilCarbon = SoilCarbon(gridTile, kwargs = kwargs)
   val forestAge: ForestAgeCategory = ForestAgeCategory(gridTile, kwargs = kwargs)
-  val faoEcozones: FaoEcozones = FaoEcozones(gridTile, kwargs = kwargs)
+  val faoEcozones: FaoEcozones2010 = FaoEcozones2010(gridTile, kwargs = kwargs)
   val intactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
   val intactForestLandscapes2013: IntactForestLandscapes2013 = IntactForestLandscapes2013(gridTile, kwargs)
   val intactForestLandscapes2016: IntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile, kwargs)

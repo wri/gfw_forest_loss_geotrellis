@@ -14,7 +14,7 @@ object CarbonFluxDF {
     "is__umd_tree_cover_gain",
     "is__gmw_mangroves_extent",
     "tsc_tree_cover_loss_drivers__driver",
-    "fao_ecozones__class",
+    "fao_ecozones_2000__class",
     "is__landmark_indigenous_and_community_lands",
     "wdpa_protected_areas__iucn_cat",
     "ifl_intact_forest_landscapes__year",
@@ -53,7 +53,7 @@ object CarbonFluxDF {
       $"data_group.isGain" as "is__umd_tree_cover_gain",
       $"data_group.mangroveBiomassExtent" as "is__gmw_mangroves_extent",
       $"data_group.drivers" as "tsc_tree_cover_loss_drivers__driver",
-      $"data_group.faoEcozones" as "fao_ecozones__class",
+      $"data_group.faoEcozones2000" as "fao_ecozones_2000__class",
       $"data_group.landmark" as "is__landmark_indigenous_and_community_lands",
       $"data_group.wdpa" as "wdpa_protected_areas__iucn_cat",
       $"data_group.intactForestLandscapes" as "ifl_intact_forest_landscapes__year",
@@ -210,7 +210,8 @@ object CarbonFluxDF {
         sum("gfw_deadwood_carbon_stock_in_emissions_year__Mg") as "gfw_deadwood_carbon_stock_in_emissions_year__Mg",
         sum("gfw_litter_carbon_stock_in_emissions_year__Mg") as "gfw_litter_carbon_stock_in_emissions_year__Mg",
         sum("gfw_soil_carbon_stock_in_emissions_year__Mg") as "gfw_soil_carbon_stock_in_emissions_year__Mg",
-        sum("gfw_total_carbon_stock_in_emissions_year__Mg") as "gfw_total_carbon_stock_in_emissions_year__Mg"
+        sum("gfw_total_carbon_stock_in_emissions_year__Mg") as "gfw_total_carbon_stock_in_emissions_year__Mg",
+        sum("gfw_forest_carbon_gross_removals__Mg_CO2") as "gfw_forest_carbon_gross_removals__Mg_CO2"
       )
   }
 
@@ -227,7 +228,7 @@ object CarbonFluxDF {
         max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
         max($"is__gmw_mangroves_extent") as "is__gmw_mangroves_extent",
         max(length($"tsc_tree_cover_loss_drivers__driver")).cast("boolean") as "tsc_tree_cover_loss_drivers__driver",
-        max(length($"fao_ecozones__class")).cast("boolean") as "fao_ecozones__class",
+        max(length($"fao_ecozones_2000__class")).cast("boolean") as "fao_ecozones_2000__class",
         max($"is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
         max(length($"wdpa_protected_areas__iucn_cat")).cast("boolean") as "wdpa_protected_areas__iucn_cat",
         max(length($"ifl_intact_forest_landscapes__year")).cast("boolean") as "ifl_intact_forest_landscapes__year",
@@ -261,7 +262,7 @@ object CarbonFluxDF {
         max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
         max($"is__gmw_mangroves_extent") as "is__gmw_mangroves_extent",
         max($"tsc_tree_cover_loss_drivers__driver") as "tsc_tree_cover_loss_drivers__driver",
-        max($"fao_ecozones__class") as "fao_ecozones__class",
+        max($"fao_ecozones_2000__class") as "fao_ecozones_2000__class",
         max($"is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
         max($"wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat",
         max($"ifl_intact_forest_landscapes__year") as "ifl_intact_forest_landscapes__year",

@@ -53,7 +53,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
   val mangroveBiomassExtent: MangroveBiomassExtent = MangroveBiomassExtent(gridTile, kwargs)
   val treeCoverLossDrivers: TreeCoverLossDrivers = TreeCoverLossDrivers(gridTile, kwargs)
-  val faoEcozones: FaoEcozones = FaoEcozones(gridTile, kwargs = kwargs)
+  val faoEcozones2000: FaoEcozones2000 = FaoEcozones2000(gridTile, kwargs = kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
   val intactForestLandscapes: IntactForestLandscapes = IntactForestLandscapes(gridTile, kwargs)
@@ -156,7 +156,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)
       val driversTile =
         treeCoverLossDrivers.fetchWindow(windowKey, windowLayout)
-      val faoEcozonesTile = faoEcozones.fetchWindow(windowKey, windowLayout)
+      val faoEcozones2000Tile = faoEcozones2000.fetchWindow(windowKey, windowLayout)
       val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapesTile =
@@ -221,7 +221,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         removalForestTypeTile,
         mangroveBiomassExtentTile,
         driversTile,
-        faoEcozonesTile,
+        faoEcozones2000Tile,
         landmarkTile,
         wdpaTile,
         intactForestLandscapesTile,

@@ -11,7 +11,7 @@ object CarbonFluxCommand extends SummaryCommand {
   changeOnlyOpt: Opts[Boolean] =
     Opts.flag("change_only", "Process change only").orFalse
 
-  val carbonFluxCommand: Opts[Unit] = Opts.subcommand(
+    val carbonFluxCommand: Opts[Unit] = Opts.subcommand(
     name = CarbonFluxAnalysis.name,
     help = "Compute forest carbon flux model statistics with contextual layers of particular interest to the model."
   ) {

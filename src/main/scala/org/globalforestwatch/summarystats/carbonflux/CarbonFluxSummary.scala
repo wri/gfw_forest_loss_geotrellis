@@ -68,7 +68,7 @@ object CarbonFluxSummary {
         val drivers: String = raster.tile.drivers.getData(col, row)
         val wdpa: String = raster.tile.wdpa.getData(col, row)
         val plantationsTypeFluxModel: String = raster.tile.plantationsTypeFluxModel.getData(col, row)
-        val faoEcozones: String = raster.tile.faoEcozones.getData(col, row)
+        val faoEcozones2000: String = raster.tile.faoEcozones2000.getData(col, row)
         val intactForestLandscapes: String = raster.tile.intactForestLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
         val intactPrimaryForest: Boolean = raster.tile.intactPrimaryForest.getData(col, row)
@@ -173,7 +173,7 @@ object CarbonFluxSummary {
               isLoss,
               mangroveBiomassExtent,
               drivers,
-              faoEcozones,
+              faoEcozones2000,
               landmark,
               wdpa,
               intactForestLandscapes,
@@ -226,6 +226,8 @@ object CarbonFluxSummary {
                   summary.totalLitterCarbonEmisYear += litterCarbonEmisYearPixel
                   summary.totalSoilCarbonEmisYear += soilCarbonEmisYearPixel
                   summary.totalCarbonEmisYear += totalCarbonEmisYearPixel
+                  // Reports gross removals within tree cover loss pixels by loss year
+                  summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
                 }
                 if (isLossLegalAmazon) summary.totalTreecoverLossLegalAmazon += areaHa
 
@@ -237,7 +239,12 @@ object CarbonFluxSummary {
                 summary.totalGrossAnnualAboveBelowgroundRemovalsCarbon += grossAnnualAboveBelowgroundRemovalsCarbonPixel
                 summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
                 summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
-                summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+
+                // Reports gross removals outside tree cover loss pixels.
+                // These two lines of gross removals (inside and outside TCL) are the total gross removals
+                if (lossYear == null) {
+                  summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+                }
 
                 summary.totalNetFluxCo2 += netFluxCo2Pixel
                 summary.totalAgc2000 += agc2000Pixel
