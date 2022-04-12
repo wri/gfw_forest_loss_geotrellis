@@ -2,7 +2,7 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import geotrellis.vector.{Feature, Geometry}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.summarystats.SummaryAnalysis
 
@@ -12,7 +12,7 @@ object AnnualUpdateMinimalAnalysis extends SummaryAnalysis {
   def apply(featureRDD: RDD[Feature[Geometry, FeatureId]],
             featureType: String,
             spark: SparkSession,
-            kwargs: Map[String, Any]): Unit = {
+            kwargs: Map[String, Any]): DataFrame = {
 
     import spark.implicits._
 
@@ -23,22 +23,7 @@ object AnnualUpdateMinimalAnalysis extends SummaryAnalysis {
         kwargs
       )
 
-    val summaryDF =
-      AnnualUpdateMinimalDFFactory(featureType, summaryRDD, spark).getDataFrame
-
-    //    val maybeOutputPartitions:Option[Int] = getAnyMapValue(kwargs,"maybeOutputPartitions")
-    //    val outputPartitionCount =
-    //      maybeOutputPartitions.getOrElse(featureRDD.getNumPartitions)
-
+    val summaryDF = AnnualUpdateMinimalDFFactory(featureType, summaryRDD, spark).getDataFrame
     summaryDF.repartition($"id", $"data_group")
-
-    val runOutputUrl: String = getOutputUrl(kwargs)
-
-    AnnualUpdateMinimalExport.export(
-      featureType,
-      summaryDF,
-      runOutputUrl,
-      kwargs
-    )
   }
 }
