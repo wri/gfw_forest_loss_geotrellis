@@ -110,7 +110,7 @@
     },
     {
       "name":"tsc_tree_cover_loss_drivers",
-      "source_uri":"s3://gfw-data-lake/tsc_tree_cover_loss_drivers/v2021/raster/epsg-4326/{grid_size}/{row_count}/driver/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/tsc_tree_cover_loss_drivers/v2021.1/raster/epsg-4326/{grid_size}/{row_count}/driver/geotiff/{tile_id}.tif"
     },
     {
       "name":"umd_tree_cover_density_2010",
