@@ -26,7 +26,6 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val mangroves2016: Mangroves2016 = Mangroves2016(gridTile, kwargs)
   val tigerLandscapes: TigerLandscapes = TigerLandscapes(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
-  val landRights: LandRights = LandRights(gridTile, kwargs)
   val keyBiodiversityAreas: KeyBiodiversityAreas = KeyBiodiversityAreas(gridTile, kwargs)
   val mining: Mining = Mining(gridTile, kwargs)
   val peatlands: Peatlands = Peatlands(gridTile, kwargs)
@@ -77,7 +76,6 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       val mangroves2016Tile = mangroves2016.fetchWindow(windowKey, windowLayout)
       val tigerLandscapesTile = tigerLandscapes.fetchWindow(windowKey, windowLayout)
       val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
-      val landRightsTile = landRights.fetchWindow(windowKey, windowLayout)
       val keyBiodiversityAreasTile = keyBiodiversityAreas.fetchWindow(windowKey, windowLayout)
       val miningTile = mining.fetchWindow(windowKey, windowLayout)
       val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
@@ -115,7 +113,6 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         mangroves2016Tile,
         tigerLandscapesTile,
         landmarkTile,
-        landRightsTile,
         keyBiodiversityAreasTile,
         miningTile,
         peatlandsTile,

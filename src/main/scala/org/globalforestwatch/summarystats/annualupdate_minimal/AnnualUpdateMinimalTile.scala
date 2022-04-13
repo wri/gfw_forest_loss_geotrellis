@@ -24,7 +24,6 @@ case class AnnualUpdateMinimalTile(
                                     mangroves2016: Mangroves2016#OptionalITile,
                                     tigerLandscapes: TigerLandscapes#OptionalITile,
                                     landmark: Landmark#OptionalITile,
-                                    landRights: LandRights#OptionalITile,
                                     keyBiodiversityAreas: KeyBiodiversityAreas#OptionalITile,
                                     mining: Mining#OptionalITile,
                                     peatlands: Peatlands#OptionalITile,

@@ -133,7 +133,8 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                           println(
                             s"There is an issue with geometry for ${feature.data}"
                           )
-                          throw ise
+                          // TODO some very invalid geoms are somehow getting here, skip for now
+                          None
                         }
                         case te: org.locationtech.jts.geom.TopologyException => {
                           println(

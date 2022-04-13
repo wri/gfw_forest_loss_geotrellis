@@ -100,7 +100,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
       .filter($"umd_tree_cover_loss__year".isNotNull &&
         ($"umd_tree_cover_loss__ha" > 0 || $"gfw_full_extent_gross_emissions__Mg_CO2e" > 0))
       .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1", "adm2")))
-      .coalesce(133) // this should result in an avg file size of 100MB
+      .coalesce(65) // this should result in an avg file size of 100MB
 
     adm2ApiDF.write
       .options(csvOptions)
@@ -108,7 +108,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
     val adm1ApiDF = adm2ApiDF
       .transform(AnnualUpdateMinimalDF.aggChange(List("iso", "adm1")))
-      .coalesce(45) // this should result in an avg file size of 100MB
+      .coalesce(35) // this should result in an avg file size of 100MB
 
     adm1ApiDF.write
       .options(csvOptions)
@@ -274,7 +274,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
 
       exportDF
         .transform(AnnualUpdateMinimalDF.aggSummary(idCols))
-        .coalesce(4) // this should result in an avg file size of 100MB
+        .coalesce(10) // this should result in an avg file size of 100MB
         .write
         .options(csvOptions)
         .csv(path = outputUrl + "/geostore/summary")
@@ -282,7 +282,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     exportDF
       .filter($"umd_tree_cover_loss__year".isNotNull && $"umd_tree_cover_loss__ha" > 0)
       .transform(AnnualUpdateMinimalDF.aggChange(idCols))
-      .coalesce(10) // this should result in an avg file size of 100MB
+      .coalesce(30) // this should result in an avg file size of 100MB
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/geostore/change")

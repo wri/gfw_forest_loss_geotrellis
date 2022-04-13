@@ -55,7 +55,6 @@ object AnnualUpdateMinimalSummary {
         val tigerLandscapes: Boolean =
         raster.tile.tigerLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
-        val landRights: Boolean = raster.tile.landRights.getData(col, row)
         val keyBiodiversityAreas: Boolean =
           raster.tile.keyBiodiversityAreas.getData(col, row)
         val mining: Boolean = raster.tile.mining.getData(col, row)
@@ -131,7 +130,6 @@ object AnnualUpdateMinimalSummary {
               mangroves2016,
               tigerLandscapes,
               landmark,
-              landRights,
               keyBiodiversityAreas,
               mining,
               peatlands,
