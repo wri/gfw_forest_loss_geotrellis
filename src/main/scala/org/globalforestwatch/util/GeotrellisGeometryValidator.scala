@@ -24,6 +24,9 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
       case _: java.lang.AssertionError =>
         println("There was an empty geometry")
         None
+      case _: java.lang.IllegalArgumentException =>
+        println("There was an empty geometry")
+        None
     }
 
     maybeGeom match {

@@ -138,17 +138,22 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                         }
                         case te: org.locationtech.jts.geom.TopologyException => {
                           println(
-                            s"There is an issue with geometry Topology for ${feature.data}"
+                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
                           )
-                          throw te
+                          None
                         }
                         case be: java.lang.ArrayIndexOutOfBoundsException => {
                           println(
-                            s"There is an issue with geometry ${feature.geom}"
+                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
                           )
-                          throw be
+                          None
                         }
-                        case e: Throwable => throw e
+                        case ise: java.lang.IllegalArgumentException => {
+                          println(
+                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
+                          )
+                          None
+                        }
 
                       }
 
