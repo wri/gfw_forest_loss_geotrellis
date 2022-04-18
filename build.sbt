@@ -195,7 +195,7 @@ sparkClusterName := s"geotrellis-treecoverloss"
 sparkEmrServiceRole := "EMR_DefaultRole"
 sparkInstanceRole := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
-  "tmaschler_gfw"
+  "dgibbs_wri"
 )
 sparkEmrBootstrap := List(
   BootstrapAction(
@@ -267,7 +267,7 @@ sparkEmrConfigs := List(
 
     // set this environment variable for GDAL to use request payer method for S3 files
     "spark.yarn.appMasterEnv.AWS_REQUEST_PAYER" -> "requester",
-    "spark.yarn.executorEnv.AWS_REQUEST_PAYER" -> "requester",
+    "spark.executorEnv.AWS_REQUEST_PAYER" -> "requester",
 
   ),
   //  EmrConfig("spark-env").withProperties(
