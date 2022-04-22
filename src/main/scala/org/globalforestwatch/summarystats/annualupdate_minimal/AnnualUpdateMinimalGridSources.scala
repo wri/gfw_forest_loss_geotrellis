@@ -21,13 +21,11 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val aze: Aze = Aze(gridTile, kwargs)
-  val plantations: Plantations = Plantations(gridTile, kwargs)
+  val plantedForests: PlantedForests = PlantedForests(gridTile, kwargs)
   val mangroves1996: Mangroves1996 = Mangroves1996(gridTile, kwargs)
   val mangroves2016: Mangroves2016 = Mangroves2016(gridTile, kwargs)
-  val intactForestLandscapes: IntactForestLandscapes = IntactForestLandscapes(gridTile, kwargs)
   val tigerLandscapes: TigerLandscapes = TigerLandscapes(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
-  val landRights: LandRights = LandRights(gridTile, kwargs)
   val keyBiodiversityAreas: KeyBiodiversityAreas = KeyBiodiversityAreas(gridTile, kwargs)
   val mining: Mining = Mining(gridTile, kwargs)
   val peatlands: Peatlands = Peatlands(gridTile, kwargs)
@@ -41,6 +39,13 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val netFluxCo2: NetFluxCo2e = NetFluxCo2e(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e = GrossEmissionsNonCo2Co2e(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e = GrossEmissionsCo2OnlyCo2e(gridTile, kwargs = kwargs)
+  val soilCarbon: SoilCarbon = SoilCarbon(gridTile, kwargs = kwargs)
+  val forestAge: ForestAgeCategory = ForestAgeCategory(gridTile, kwargs = kwargs)
+  val faoEcozones: FaoEcozones = FaoEcozones(gridTile, kwargs = kwargs)
+  val intactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
+  val intactForestLandscapes2013: IntactForestLandscapes2013 = IntactForestLandscapes2013(gridTile, kwargs)
+  val intactForestLandscapes2016: IntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile, kwargs)
+  val intactForestLandscapes2020: IntactForestLandscapes2020 = IntactForestLandscapes2020(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey, windowLayout: LayoutDefinition
@@ -50,7 +55,6 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       // Failure for any of these reads will result in function returning Left[Throwable]
       // These are effectively required fields without which we can't make sense of the analysis
       lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(windowKey, windowLayout)).right
-      gainTile <- Either.catchNonFatal(treeCoverGain.fetchWindow(windowKey, windowLayout)).right
       tcd2000Tile <- Either
         .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
         .right
@@ -60,19 +64,18 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
 
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
+      val gainTile = treeCoverGain.fetchWindow(windowKey, windowLayout)
       val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
       val driversTile = treeCoverLossDrivers.fetchWindow(windowKey, windowLayout)
       val globalLandCoverTile = globalLandCover.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val azeTile = aze.fetchWindow(windowKey, windowLayout)
-      val plantationsTile = plantations.fetchWindow(windowKey, windowLayout)
+      val plantedForestsTile = plantedForests.fetchWindow(windowKey, windowLayout)
       val mangroves1996Tile = mangroves1996.fetchWindow(windowKey, windowLayout)
       val mangroves2016Tile = mangroves2016.fetchWindow(windowKey, windowLayout)
-      val intactForestLandscapesTile = intactForestLandscapes.fetchWindow(windowKey, windowLayout)
       val tigerLandscapesTile = tigerLandscapes.fetchWindow(windowKey, windowLayout)
       val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
-      val landRightsTile = landRights.fetchWindow(windowKey, windowLayout)
       val keyBiodiversityAreasTile = keyBiodiversityAreas.fetchWindow(windowKey, windowLayout)
       val miningTile = mining.fetchWindow(windowKey, windowLayout)
       val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
@@ -86,6 +89,13 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       val netFluxCo2Tile = netFluxCo2.fetchWindow(windowKey, windowLayout)
       val grossEmissionsCo2eNonCo2Tile = grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
       val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
+      val soilCarbonTile = soilCarbon.fetchWindow(windowKey, windowLayout)
+      val forestAgeTile = forestAge.fetchWindow(windowKey, windowLayout)
+      val faoEcozonesTile = faoEcozones.fetchWindow(windowKey, windowLayout)
+      val intactForestLandscapes2000Tile = intactForestLandscapes2000.fetchWindow(windowKey, windowLayout)
+      val intactForestLandscapes2013Tile = intactForestLandscapes2013.fetchWindow(windowKey, windowLayout)
+      val intactForestLandscapes2016Tile = intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
+      val intactForestLandscapes2020Tile = intactForestLandscapes2020.fetchWindow(windowKey, windowLayout)
 
       val tile = AnnualUpdateMinimalTile(
         lossTile,
@@ -98,13 +108,11 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         primaryForestTile,
         wdpaTile,
         azeTile,
-        plantationsTile,
+        plantedForestsTile,
         mangroves1996Tile,
         mangroves2016Tile,
-        intactForestLandscapesTile,
         tigerLandscapesTile,
         landmarkTile,
-        landRightsTile,
         keyBiodiversityAreasTile,
         miningTile,
         peatlandsTile,
@@ -117,7 +125,14 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         grossEmissionsCo2eCo2OnlyTile,
         grossCumulAbovegroundRemovalsCo2Tile,
         grossCumulBelowgroundRemovalsCo2Tile,
-        netFluxCo2Tile
+        netFluxCo2Tile,
+        soilCarbonTile,
+        forestAgeTile,
+        faoEcozonesTile,
+        intactForestLandscapes2000Tile,
+        intactForestLandscapes2013Tile,
+        intactForestLandscapes2016Tile,
+        intactForestLandscapes2020Tile,
       )
 
       Raster(tile, windowKey.extent(windowLayout))

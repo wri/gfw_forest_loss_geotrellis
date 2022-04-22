@@ -5,7 +5,7 @@ import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 object AnnualUpdateMinimalDownloadDF {
   val treecoverLossMinYear = 2001
-  val treecoverLossMaxYear = 2020
+  val treecoverLossMaxYear = 2021
   val fluxModelTotalYears = (treecoverLossMaxYear - treecoverLossMinYear) + 1
 
   def sumDownload(df: DataFrame): DataFrame = {
@@ -20,7 +20,7 @@ object AnnualUpdateMinimalDownloadDF {
       .pivot("umd_tree_cover_loss__year", yearRange)
       .agg(
         sum("umd_tree_cover_loss__ha") as "umd_tree_cover_loss__ha",
-        sum("gfw_forest_carbon_gross_emissions__Mg_CO2e") as "gfw_forest_carbon_gross_emissions__Mg_CO2e"
+        sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_forest_carbon_gross_emissions__Mg_CO2e"
       )
       .as("annual")
       .na.fill(0, Seq("adm1", "adm2"))
@@ -36,9 +36,9 @@ object AnnualUpdateMinimalDownloadDF {
         sum("whrc_aboveground_biomass_stock_2000__Mg") / sum(
           "umd_tree_cover_extent_2000__ha"
         ) as "avg_whrc_aboveground_biomass_2000_Mg_ha-1",
-        sum($"gfw_forest_carbon_gross_emissions__Mg_CO2e") / fluxModelTotalYears as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
-        sum($"gfw_forest_carbon_gross_removals__Mg_CO2e") / fluxModelTotalYears as "gfw_forest_carbon_gross_removals__Mg_CO2e_yr-1",
-        sum($"gfw_forest_carbon_net_flux__Mg_CO2e") / fluxModelTotalYears as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
+        sum($"gfw_full_extent_gross_emissions__Mg_CO2e") / fluxModelTotalYears as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
+        sum($"gfw_full_extent_gross_removals__Mg_CO2") / fluxModelTotalYears as "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1",
+        sum($"gfw_full_extent_net_flux__Mg_CO2e") / fluxModelTotalYears as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
       )
       .as("total")
       .na.fill(0, Seq("adm1", "adm2"))
@@ -117,7 +117,7 @@ object AnnualUpdateMinimalDownloadDF {
         $"umd_tree_cover_extent_2000__ha"
       ) as "avg_whrc_aboveground_biomass_2000_Mg_ha-1",
       sum($"gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1") as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
-      sum($"gfw_forest_carbon_gross_removals__Mg_CO2e_yr-1") as "gfw_forest_carbon_gross_removals__Mg_CO2e_yr-1",
+      sum($"gfw_forest_carbon_gross_removals__Mg_CO2_yr-1") as "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1",
       sum($"gfw_forest_carbon_net_flux__Mg_CO2e_yr-1") as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
     ) ::: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
 
@@ -193,7 +193,7 @@ object AnnualUpdateMinimalDownloadDF {
       round($"whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
       round($"avg_whrc_aboveground_biomass_2000_Mg_ha-1") as "avg_whrc_aboveground_biomass_2000_Mg_ha-1",
       round($"gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1") as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
-      round($"gfw_forest_carbon_gross_removals__Mg_CO2e_yr-1") as "gfw_forest_carbon_gross_removals__Mg_CO2e_yr-1",
+      round($"gfw_forest_carbon_gross_removals__Mg_CO2_yr-1") as "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1",
       round($"gfw_forest_carbon_net_flux__Mg_CO2e_yr-1") as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
     )
 
@@ -216,7 +216,7 @@ object AnnualUpdateMinimalDownloadDF {
         s"${i}_gfw_forest_carbon_gross_emissions__Mg_CO2e"
       }).toList
 
-    val cols = "avg_whrc_aboveground_biomass_2000_Mg_ha-1" :: "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1" :: "gfw_forest_carbon_gross_removals__Mg_CO2e_yr-1" :: "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1" :: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
+    val cols = "avg_whrc_aboveground_biomass_2000_Mg_ha-1" :: "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1" :: "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1" :: "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1" :: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
     val nullColumns = df
       .select(cols.head, cols.tail: _*)
       .columns
@@ -236,7 +236,7 @@ object AnnualUpdateMinimalDownloadDF {
         s"${i}_gfw_forest_carbon_gross_emissions__Mg_CO2e"
       }).toList
 
-    val cols = "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1" :: "gfw_forest_carbon_gross_removals__Mg_CO2e_yr-1" :: "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1" :: totalGrossEmissionsCo2eAllGasesCols
+    val cols = "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1" :: "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1" :: "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1" :: totalGrossEmissionsCo2eAllGasesCols
 
     val carbonColumns = df
       .select(cols.head, cols.tail: _*)
