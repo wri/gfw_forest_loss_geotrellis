@@ -1,17 +1,10 @@
 package org.globalforestwatch.util
 import org.apache.log4j.Logger
-import geotrellis.vector.{
-  Geometry,
-  GeomFactory,
-  LineString,
-  MultiPoint,
-  Point,
-  Polygon,
-  MultiLineString,
-  MultiPolygon
-}
+import geotrellis.vector.{GeomFactory, Geometry, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon}
 import geotrellis.vector.io.wkb.WKB
+import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
+
 import scala.util.Try
 
 object GeotrellisGeometryValidator extends java.io.Serializable {
@@ -58,8 +51,14 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
   }
 
   def makeValidGeom(wkb: String): Geometry = {
-    val geom: Option[Geometry] = Try(WKB.read(wkb)).toOption
-    geom.map(makeValidGeom(_)).getOrElse(GeomFactory.factory.createPoint())
+    if (GfwConfig.isGfwPro) {
+      // Pro is getting direct geometries from users, geometries may be invalid
+      val geom: Option[Geometry] = Try(WKB.read(wkb)).toOption
+      geom.map(makeValidGeom(_)).getOrElse(GeomFactory.factory.createPoint())
+    } else {
+      // Flagship has already preprocessed geometries to make them valid
+      WKB.read(wkb)
+    }
   }
 
   def makeMultiGeom(geom: Geometry): Geometry = {
