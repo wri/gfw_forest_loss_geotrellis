@@ -8,7 +8,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object TreeLossDF {
 
   val treecoverLossMinYear = 2001
-  val treecoverLossMaxYear = 2020
+  val treecoverLossMaxYear = 2021
 
   def unpackValues(carbonPools: Boolean)(df: DataFrame): DataFrame = {
     val spark: SparkSession = df.sparkSession
@@ -46,24 +46,24 @@ object TreeLossDF {
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
-      $"data.totalGainArea" as "umd_tree_cover_gain_2000-2012__ha",
+      $"data.totalGainArea" as "umd_tree_cover_gain__ha",
       $"data.totalBiomass" as "whrc_aboveground_biomass_stock_2000__Mg",
       $"data.avgBiomass" as "avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1",
-      $"data.totalGrossCumulAbovegroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
-      $"data.totalGrossCumulBelowgroundRemovalsCo2" as "gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg",
-      $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_belowground_co2_removals_2001-2020__Mg",
-      $"data.totalGrossEmissionsCo2eCo2Only" as "gfw_gross_emissions_co2e_co2_only_2001-2020__Mg",
-      $"data.totalGrossEmissionsCo2eNonCo2" as "gfw_gross_emissions_co2e_non_co2_2001-2020__Mg",
-      $"data.totalGrossEmissionsCo2eAllGases" as "gfw_gross_emissions_co2e_all_gases_2001-2020__Mg",
-      $"data.totalNetFluxCo2" as "gfw_net_flux_co2e_2001-2020__Mg",
+      $"data.totalGrossCumulAbovegroundRemovalsCo2" as s"gfw_forest_carbon_gross_removals_aboveground_2001_${treecoverLossMaxYear}__Mg_CO2",
+      $"data.totalGrossCumulBelowgroundRemovalsCo2" as s"gfw_forest_carbon_gross_removals_belowground_2001_${treecoverLossMaxYear}__Mg_CO2",
+      $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as s"gfw_forest_carbon_gross_removals_2001_${treecoverLossMaxYear}__Mg_CO2",
+      $"data.totalGrossEmissionsCo2eCo2Only" as s"gfw_forest_carbon_gross_emissions_co2_only_2001_${treecoverLossMaxYear}__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eNonCo2" as s"gfw_forest_carbon_gross_emissions_non_co2_2001_${treecoverLossMaxYear}__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eAllGases" as s"gfw_forest_carbon_gross_emissions_2001_${treecoverLossMaxYear}__Mg_CO2e",
+      $"data.totalNetFluxCo2" as s"gfw_forest_carbon_net_flux_2001_${treecoverLossMaxYear}__Mg_CO2e",
       $"data.totalFluxModelExtentArea" as "gfw_flux_model_extent__ha"
     )
 
     val carbonPoolCols = if (carbonPools) {
       List(
-        $"data.totalAgc2000" as "gfw_aboveground_carbon_stock_2000__Mg",
-        $"data.totalBgc2000" as "gfw_belowground_carbon_stock_2000__Mg",
-        $"data.totalSoilCarbon2000" as "gfw_soil_carbon_stock_2000__Mg"
+        $"data.totalAgc2000" as "gfw_aboveground_carbon_stock_2000__Mg_C",
+        $"data.totalBgc2000" as "gfw_belowground_carbon_stock_2000__Mg_C",
+        $"data.totalSoilCarbon2000" as "gfw_soil_carbon_stock_2000__Mg_C"
       )
     } else {
       List()
@@ -103,32 +103,33 @@ object TreeLossDF {
       sum("area__ha") as "area__ha",
       sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
       sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
-      sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
+      sum("umd_tree_cover_gain__ha") as "umd_tree_cover_gain__ha",
       sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
       sum($"avg_whrc_aboveground_biomass_stock_2000__Mg_ha-1" * $"umd_tree_cover_extent_2000__ha") /
         sum($"umd_tree_cover_extent_2000__ha") as "avg_whrc_aboveground_biomass_density_2000__Mg_ha-1",
 
-      sum("gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg")
-        as "gfw_gross_cumulative_aboveground_co2_removals_2001-2020__Mg",
-      sum("gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg")
-        as "gfw_gross_cumulative_belowground_co2_removals_2001-2020__Mg",
-      sum("gfw_gross_cumulative_aboveground_belowground_co2_removals_2001-2020__Mg")
-        as "gfw_gross_cumulative_aboveground_belowground_co2_removals_2001-2020__Mg",
-      sum("gfw_gross_emissions_co2e_co2_only_2001-2020__Mg")
-        as "gfw_gross_emissions_co2e_co2_only_2001-2020__Mg",
-      sum("gfw_gross_emissions_co2e_non_co2_2001-2020__Mg")
-        as "gfw_gross_emissions_co2e_non_co2_2001-2020__Mg",
-      sum("gfw_gross_emissions_co2e_all_gases_2001-2020__Mg")
-        as "gfw_gross_emissions_co2e_all_gases_2001-2020__Mg",
-      sum("gfw_net_flux_co2e_2001-2020__Mg") as "gfw_net_flux_co2e_2001-2020__Mg",
+      sum(s"gfw_forest_carbon_gross_removals_aboveground_2001_${treecoverLossMaxYear}__Mg_CO2")
+        as s"gfw_forest_carbon_gross_removals_aboveground_2001_${treecoverLossMaxYear}__Mg_CO2",
+      sum(s"gfw_forest_carbon_gross_removals_belowground_2001_${treecoverLossMaxYear}__Mg_CO2")
+        as s"gfw_forest_carbon_gross_removals_belowground_2001_${treecoverLossMaxYear}__Mg_CO2",
+      sum(s"gfw_forest_carbon_gross_removals_2001_${treecoverLossMaxYear}__Mg_CO2")
+        as s"gfw_forest_carbon_gross_removals_2001_${treecoverLossMaxYear}__Mg_CO2",
+      sum(s"gfw_forest_carbon_gross_emissions_co2_only_2001_${treecoverLossMaxYear}__Mg_CO2e")
+        as s"gfw_forest_carbon_gross_emissions_co2_only_2001_${treecoverLossMaxYear}__Mg_CO2e",
+      sum(s"gfw_forest_carbon_gross_emissions_non_co2_2001_${treecoverLossMaxYear}__Mg_CO2e")
+        as s"gfw_forest_carbon_gross_emissions_non_co2_2001_${treecoverLossMaxYear}__Mg_CO2e",
+      sum(s"gfw_forest_carbon_gross_emissions_2001_${treecoverLossMaxYear}__Mg_CO2e")
+        as s"gfw_forest_carbon_gross_emissions_2001_${treecoverLossMaxYear}__Mg_CO2e",
+      sum(s"gfw_forest_carbon_net_flux_2001_${treecoverLossMaxYear}__Mg_CO2e")
+        as s"gfw_forest_carbon_net_flux_2001_${treecoverLossMaxYear}__Mg_CO2e",
       sum("gfw_flux_model_extent__ha") as "gfw_flux_model_extent__ha"
     )
 
     val carbonPoolCols = if (carbonPools) {
       List(
-        sum("gfw_aboveground_carbon_stock_2000__Mg") as "gfw_aboveground_carbon_stock_2000__Mg",
-        sum("gfw_belowground_carbon_stock_2000__Mg") as "gfw_belowground_carbon_stock_2000__Mg",
-        sum("gfw_soil_carbon_stock_2000__Mg") as "gfw_soil_carbon_stock_2000__Mg"
+        sum("gfw_aboveground_carbon_stock_2000__Mg_C") as "gfw_aboveground_carbon_stock_2000__Mg_C",
+        sum("gfw_belowground_carbon_stock_2000__Mg_C") as "gfw_belowground_carbon_stock_2000__Mg_C",
+        sum("gfw_soil_carbon_stock_2000__Mg_C") as "gfw_soil_carbon_stock_2000__Mg_C"
       )
     } else {
       List()
