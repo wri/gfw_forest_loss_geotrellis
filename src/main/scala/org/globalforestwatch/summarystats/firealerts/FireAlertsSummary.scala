@@ -42,7 +42,7 @@ object FireAlertsSummary {
           val keyBiodiversityAreas: Boolean =
             raster.tile.keyBiodiversityAreas.getData(col, row)
           val landmark: Boolean = raster.tile.landmark.getData(col, row)
-          val plantations: String = raster.tile.plantations.getData(col, row)
+          val plantedForests: String = raster.tile.plantedForests.getData(col, row)
           val mining: Boolean = raster.tile.mining.getData(col, row)
           val logging: Boolean = raster.tile.logging.getData(col, row)
           val rspo: String = raster.tile.rspo.getData(col, row)
@@ -80,7 +80,7 @@ object FireAlertsSummary {
                   aze,
                   keyBiodiversityAreas,
                   landmark,
-                  plantations,
+                  plantedForests,
                   mining,
                   logging,
                   rspo,

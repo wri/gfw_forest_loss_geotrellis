@@ -8,10 +8,6 @@ object IntegratedAlertsExport extends SummaryExport {
   override protected def exportGadm(summaryDF: DataFrame,
                                     outputUrl: String,
                                     kwargs: Map[String, Any]): Unit = {
-
-    val changeOnly: Boolean =
-      getAnyMapValue[Boolean](kwargs, "changeOnly")
-
     summaryDF.cache()
 
     val spark = summaryDF.sparkSession

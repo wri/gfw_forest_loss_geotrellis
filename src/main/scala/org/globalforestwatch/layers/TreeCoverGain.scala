@@ -4,7 +4,7 @@ import org.globalforestwatch.grids.GridTile
 
 case class TreeCoverGain(gridTile: GridTile, kwargs: Map[String, Any])
   extends BooleanLayer
-    with RequiredILayer {
+    with OptionalILayer {
   val datasetName = "umd_tree_cover_gain"
   val uri: String =
     uriForGrid(gridTile)
