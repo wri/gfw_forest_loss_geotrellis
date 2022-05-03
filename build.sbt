@@ -169,7 +169,7 @@ assembly / assemblyMergeStrategy  := {
 import sbtlighter._
 import com.amazonaws.services.elasticmapreduce.model.Tag
 
-//  Always check Spot prices for instance type and select subnet based on bested price
+//  Always check Spot prices for instance type and select subnet based on best price
 //  GFW subnet zone us-east-1a: subnet-00335589f5f424283
 //  GFW subnet zone us-east-1b: subnet-8c2b5ea1
 //  GFW subnet zone us-east-1c: subnet-08458452c1d05713b
@@ -180,22 +180,22 @@ import com.amazonaws.services.elasticmapreduce.model.Tag
 sparkEmrRelease := "emr-6.1.0"
 sparkAwsRegion := "us-east-1"
 sparkEmrApplications := Seq("Spark", "Zeppelin", "Ganglia")
-sparkS3JarFolder := "s3://gfw-pipelines-dev/geotrellis/jars"
-sparkS3LogUri := Some("s3://gfw-pipelines-dev/geotrellis/logs")
-sparkSubnetId := Some("subnet-067b91868bc3a8ff1")
-sparkSecurityGroupIds := Seq("sg-07c11c0c9189c0a7a", "sg-068c422162d468700")
-sparkInstanceCount := 21 // 201 for carbonflux and carbon_sensitivity
+sparkS3JarFolder := "s3://wri-users/dgibbs/geotrellis/jars"
+sparkS3LogUri := Some("s3://wri-users/dgibbs/geotrellis/logs")
+sparkSubnetId := Some("subnet-8c2b5ea1")
+sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
+sparkInstanceCount := 201 // 201 for carbonflux and carbon_sensitivity
 sparkMasterType := "r4.2xlarge"
 sparkCoreType := "r4.2xlarge"
 sparkMasterEbsSize := Some(10)
 sparkCoreEbsSize := Some(10)
 //sparkMasterPrice := Some(3.0320)
 sparkCorePrice := Some(0.532)
-sparkClusterName := s"geotrellis-forest-change-diagnostic"
+sparkClusterName := s"geotrellis-treecoverloss"
 sparkEmrServiceRole := "EMR_DefaultRole"
 sparkInstanceRole := "EMR_EC2_DefaultRole"
 sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
-  "tmaschler_gfw"
+  "dgibbs_wri"
 )
 sparkEmrBootstrap := List(
   BootstrapAction(
@@ -206,12 +206,12 @@ sparkEmrBootstrap := List(
 )
 sparkRunJobFlowRequest := sparkRunJobFlowRequest.value
   .withTags(new Tag("Project", "Global Forest Watch"))
-  .withTags(new Tag("Job", "Tree Cover Loss Analysis Geotrellis"))
-  .withTags(new Tag("Project Lead", "Thomas Maschler"))
+  .withTags(new Tag("Job", "Carbon Flux Analysis Geotrellis"))
+  .withTags(new Tag("Project Lead", "David Gibbs"))
   .withTags(new Tag("Name", "geotrellis-treecoverloss"))
 sparkEmrConfigs := List(
   // reference to example by geotrellis: https://github.com/geotrellis/geotrellis-spark-job.g8/blob/master/src/main/g8/build.sbt#L70-L91
-  EmrConfig("spark").withProperties("maximizeResourceAllocation" -> "true"),
+//  EmrConfig("spark").withProperties("maximizeResourceAllocation" -> "true"),
   EmrConfig("emrfs-site").withProperties("fs.s3.useRequesterPaysHeader" -> "true"),
   EmrConfig("spark-defaults").withProperties(
     // https://aws.amazon.com/blogs/big-data/best-practices-for-successfully-managing-memory-for-apache-spark-applications-on-amazon-emr/
@@ -235,15 +235,15 @@ sparkEmrConfigs := List(
     // spark.default.parallelism = spark.executor.instances * spark.executors.cores * 2
     // spark.sql.shuffle.partitions = spark.default.parallelism
 
-//    "spark.dynamicAllocation.enabled" -> "false",
-//    "spark.executor.cores" -> "1", //5",
-//    "spark.executor.memory" -> "5652m", //37G
-//    "spark.executor.memoryOverhead" -> "2g", //5G
-//    "spark.driver.cores" -> "1",
-//    "spark.driver.memory" -> "6652m",
-//    "spark.executor.instances" -> "159", // 1599 for carbonflux and carbon_sensitivity
-//    "spark.default.parallelism" -> "1590", // 15990 for carbonflux and carbon_sensitivity
-//    "spark.sql.shuffle.partitions" -> "1590", // 15990 for carbonflux and carbon_sensitivity
+    "spark.dynamicAllocation.enabled" -> "false",
+    "spark.executor.cores" -> "1", //5",
+    "spark.executor.memory" -> "5652m", //37G
+    "spark.executor.memoryOverhead" -> "2g", //5G
+    "spark.driver.cores" -> "1",
+    "spark.driver.memory" -> "6652m",
+    "spark.executor.instances" -> "1599", // 1599 for carbonflux and carbon_sensitivity
+    "spark.default.parallelism" -> "15990", // 15990 for carbonflux and carbon_sensitivity
+    "spark.sql.shuffle.partitions" -> "15990", // 15990 for carbonflux and carbon_sensitivity
 
     "spark.shuffle.spill.compress" -> "true",
     "spark.driver.maxResultSize" -> "3G",
@@ -254,20 +254,20 @@ sparkEmrConfigs := List(
     "spark.executorEnv.LD_LIBRARY_PATH" -> "/usr/local/miniconda/lib/:/usr/local/lib",
     "spark.dynamicAllocation.enabled" -> "true",
 
-   // Use these GC strategy as default
-   "spark.driver.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
-   "spark.executor.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
+//   // Use these GC strategy as default
+//   "spark.driver.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
+//   "spark.executor.defaultJavaOptions" -> "-XX:+UseParallelGC -XX:+UseParallelOldGC -XX:OnOutOfMemoryError='kill -9 %p'",
 
     //    "spark.kryoserializer.buffer.max" -> "2047m",
 
     //     Best practice 4: Always set up a garbage collector when handling large volume of data through Spark.
     // Use these GC strategy to avoid java.lang.OutOfMemoryError: GC overhead limit exceeded
-    // "spark.executor.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
-    // "spark.driver.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
+     "spark.executor.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
+     "spark.driver.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
 
     // set this environment variable for GDAL to use request payer method for S3 files
     "spark.yarn.appMasterEnv.AWS_REQUEST_PAYER" -> "requester",
-    "spark.yarn.executorEnv.AWS_REQUEST_PAYER" -> "requester",
+    "spark.executorEnv.AWS_REQUEST_PAYER" -> "requester",
 
   ),
   //  EmrConfig("spark-env").withProperties(
