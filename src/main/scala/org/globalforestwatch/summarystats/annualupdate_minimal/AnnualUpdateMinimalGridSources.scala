@@ -17,7 +17,6 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val treeCoverDensity2010: TreeCoverDensityThreshold2010 = TreeCoverDensityThreshold2010(gridTile, kwargs)
   val biomassPerHectar: BiomassPerHectar = BiomassPerHectar(gridTile, kwargs)
   val treeCoverLossDrivers = TreeCoverLossDrivers(gridTile, kwargs)
-  val globalLandCover: GlobalLandcover = GlobalLandcover(gridTile, kwargs)
   val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val aze: Aze = Aze(gridTile, kwargs)
@@ -41,11 +40,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e = GrossEmissionsCo2OnlyCo2e(gridTile, kwargs = kwargs)
   val soilCarbon: SoilCarbon = SoilCarbon(gridTile, kwargs = kwargs)
   val forestAge: ForestAgeCategory = ForestAgeCategory(gridTile, kwargs = kwargs)
-  val faoEcozones: FaoEcozones2010 = FaoEcozones2010(gridTile, kwargs = kwargs)
   val intactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
-  val intactForestLandscapes2013: IntactForestLandscapes2013 = IntactForestLandscapes2013(gridTile, kwargs)
-  val intactForestLandscapes2016: IntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile, kwargs)
-  val intactForestLandscapes2020: IntactForestLandscapes2020 = IntactForestLandscapes2020(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey, windowLayout: LayoutDefinition
@@ -67,7 +62,6 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       val gainTile = treeCoverGain.fetchWindow(windowKey, windowLayout)
       val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
       val driversTile = treeCoverLossDrivers.fetchWindow(windowKey, windowLayout)
-      val globalLandCoverTile = globalLandCover.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val azeTile = aze.fetchWindow(windowKey, windowLayout)
@@ -91,11 +85,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
       val soilCarbonTile = soilCarbon.fetchWindow(windowKey, windowLayout)
       val forestAgeTile = forestAge.fetchWindow(windowKey, windowLayout)
-      val faoEcozonesTile = faoEcozones.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2000Tile = intactForestLandscapes2000.fetchWindow(windowKey, windowLayout)
-      val intactForestLandscapes2013Tile = intactForestLandscapes2013.fetchWindow(windowKey, windowLayout)
-      val intactForestLandscapes2016Tile = intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
-      val intactForestLandscapes2020Tile = intactForestLandscapes2020.fetchWindow(windowKey, windowLayout)
 
       val tile = AnnualUpdateMinimalTile(
         lossTile,
@@ -104,7 +94,6 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         tcd2010Tile,
         biomassTile,
         driversTile,
-        globalLandCoverTile,
         primaryForestTile,
         wdpaTile,
         azeTile,
@@ -128,11 +117,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         netFluxCo2Tile,
         soilCarbonTile,
         forestAgeTile,
-        faoEcozonesTile,
         intactForestLandscapes2000Tile,
-        intactForestLandscapes2013Tile,
-        intactForestLandscapes2016Tile,
-        intactForestLandscapes2020Tile,
       )
 
       Raster(tile, windowKey.extent(windowLayout))

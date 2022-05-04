@@ -9,7 +9,6 @@ object AnnualUpdateMinimalDF {
   val contextualLayers = List(
     "umd_tree_cover_density_2000__threshold",
     "tsc_tree_cover_loss_drivers__driver",
-    "esa_land_cover_2015__class",
     "is__birdlife_alliance_for_zero_extinction_sites",
     "gfw_planted_forests__type",
     "is__gmw_global_mangrove_extent_1996",
@@ -27,11 +26,7 @@ object AnnualUpdateMinimalDF {
     "is__gfw_managed_forests",
     "is__umd_tree_cover_gain",
     "forest_age__category",
-    "fao_ecozones__class",
     "is__ifl_intact_forest_landscapes_2000",
-    "is__ifl_intact_forest_landscapes_2013",
-    "is__ifl_intact_forest_landscapes_2016",
-    "is__ifl_intact_forest_landscapes_2020",
 
     // TODO delete next data update
     "umd_tree_cover_density__threshold",
@@ -62,7 +57,6 @@ object AnnualUpdateMinimalDF {
         $"data_group.lossYear" as "umd_tree_cover_loss__year",
         $"data_group.threshold" as "umd_tree_cover_density_2000__threshold",
         $"data_group.drivers" as "tsc_tree_cover_loss_drivers__driver",
-        $"data_group.globalLandCover" as "esa_land_cover_2015__class",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.plantedForests" as "gfw_planted_forests__type",
@@ -80,11 +74,7 @@ object AnnualUpdateMinimalDF {
         $"data_group.logging" as "is__gfw_managed_forests",
         $"data_group.isGain" as "is__umd_tree_cover_gain",
         $"data_group.forestAge" as "forest_age__category",
-        $"data_group.faoEcozones" as "fao_ecozones__class",
         $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
-        $"data_group.intactForestLandscapes2013" as "is__ifl_intact_forest_landscapes_2013",
-        $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscapes_2016",
-        $"data_group.intactForestLandscapes2020" as "is__ifl_intact_forest_landscapes_2020",
 
         $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
         $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
@@ -244,8 +234,6 @@ object AnnualUpdateMinimalDF {
 
     val defaultAggCols = List(
       max(length($"tsc_tree_cover_loss_drivers__driver")).cast("boolean") as "tsc_tree_cover_loss_drivers__driver",
-      max(length($"esa_land_cover_2015__class"))
-        .cast("boolean") as "esa_land_cover_2015__class",
       max($"is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max($"is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
       max(length($"gfw_planted_forests__type"))
@@ -265,12 +253,7 @@ object AnnualUpdateMinimalDF {
       max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
       max(length($"forest_age__category"))
         .cast("boolean") as "forest_age__category",
-      max(length($"fao_ecozones__class"))
-        .cast("boolean") as "fao_ecozones__class",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
-      max($"is__ifl_intact_forest_landscapes_2013") as "is__ifl_intact_forest_landscapes_2013",
-      max($"is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
-      max($"is__ifl_intact_forest_landscapes_2020") as "is__ifl_intact_forest_landscapes_2020",
 
       max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
@@ -312,7 +295,6 @@ object AnnualUpdateMinimalDF {
 
     val defaultAggCols: List[Column] = List(
       max($"tsc_tree_cover_loss_drivers__driver") as "tsc_tree_cover_loss_drivers__driver",
-      max($"esa_land_cover_2015__class") as "esa_land_cover_2015__class",
       max($"is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max($"is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
       max($"gfw_planted_forests__type") as "gfw_planted_forests__type",
@@ -331,12 +313,7 @@ object AnnualUpdateMinimalDF {
       max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
       max(length($"forest_age__category"))
         .cast("boolean") as "forest_age__category",
-      max(length($"fao_ecozones__class"))
-        .cast("boolean") as "fao_ecozones__class",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
-      max($"is__ifl_intact_forest_landscapes_2013") as "is__ifl_intact_forest_landscapes_2013",
-      max($"is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
-      max($"is__ifl_intact_forest_landscapes_2020") as "is__ifl_intact_forest_landscapes_2020",
 
       max($"tsc_tree_cover_loss_drivers__type") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",

@@ -15,7 +15,6 @@ case class AnnualUpdateMinimalTile(
                                     tcd2010: TreeCoverDensityThreshold#ITile,
                                     biomass: BiomassPerHectar#OptionalDTile,
                                     drivers: TreeCoverLossDrivers#OptionalITile,
-                                    globalLandCover: GlobalLandcover#OptionalITile,
                                     primaryForest: PrimaryForest#OptionalITile,
                                     wdpa: ProtectedAreas#OptionalITile,
                                     aze: Aze#OptionalITile,
@@ -39,11 +38,7 @@ case class AnnualUpdateMinimalTile(
                                     netFluxCo2: NetFluxCo2e#OptionalFTile,
                                     soilCarbon: SoilCarbon#OptionalFTile,
                                     forestAge: ForestAgeCategory#OptionalITile,
-                                    faoEcozones: FaoEcozones2010#OptionalITile,
                                     intactForestLandscapes2000: IntactForestLandscapes2000#OptionalITile,
-                                    intactForestLandscapes2013: IntactForestLandscapes2013#OptionalITile,
-                                    intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
-                                    intactForestLandscapes2020: IntactForestLandscapes2020#OptionalITile,
 ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
   def cols: Int = loss.cols
