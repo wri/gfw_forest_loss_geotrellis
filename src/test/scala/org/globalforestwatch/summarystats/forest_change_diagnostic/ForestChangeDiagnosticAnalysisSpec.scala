@@ -39,7 +39,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
       .write
       .mode(SaveMode.Overwrite)
       .options(ForestChangeDiagnosticExport.csvOptions)
-      .csv(path = palm32ExpectedOutputPath)
+      .csv(path = "./output/fcd3")
   }
 
   def readExpectedFcdResult = {
@@ -61,7 +61,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     }
     val fcd = FCD(featureLoc31RDD)
     val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
-    // saveExpectedFcdResult(fcdDF)
+    saveExpectedFcdResult(fcdDF)
 
     val expectedDF = readExpectedFcdResult
 
