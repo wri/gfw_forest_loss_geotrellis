@@ -278,7 +278,7 @@
     },
     {
       "name":"umd_soy_planted_area",
-      "source_uri": "s3://gfw-data-lake/umd_soy_planted_area/v1/raster/epsg-4326/{grid_size}/{row_count}/is__year_2020/gdal-geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/umd_soy_planted_area/v2/raster/epsg-4326/{grid_size}/{row_count}/is__year_2021/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"inpe_prodes",
