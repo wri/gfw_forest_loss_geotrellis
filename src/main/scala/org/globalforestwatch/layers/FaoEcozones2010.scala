@@ -2,11 +2,11 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class FaoEcozones(gridTile: GridTile, model: String = "standard", kwargs: Map[String, Any])
+case class FaoEcozones2010(gridTile: GridTile, model: String = "standard", kwargs: Map[String, Any])
   extends StringLayer
     with OptionalILayer {
 
-  val datasetName = "fao_ecozones"
+  val datasetName = "fao_ecozones_2010"
   val uri: String = uriForGrid(gridTile)
 
   def lookup(value: Int): String = value match {

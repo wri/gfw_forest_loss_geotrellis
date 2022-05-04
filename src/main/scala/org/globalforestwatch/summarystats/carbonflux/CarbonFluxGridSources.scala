@@ -34,10 +34,14 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val deadwoodCarbon2000: DeadwoodCarbon2000 = DeadwoodCarbon2000(gridTile, kwargs = kwargs)
   val litterCarbon2000: LitterCarbon2000 = LitterCarbon2000(gridTile, kwargs = kwargs)
   val soilCarbon2000: SoilCarbon2000 = SoilCarbon2000(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e =
-    GrossEmissionsNonCo2Co2e(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e =
-    GrossEmissionsCo2OnlyCo2e(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eNonCo2BiomassSoil: GrossEmissionsNonCo2Co2eBiomassSoil =
+    GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2OnlyBiomassSoil: GrossEmissionsCo2OnlyCo2eBiomassSoil =
+    GrossEmissionsCo2OnlyCo2eBiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eNonCo2SoilOnly: GrossEmissionsNonCo2Co2eSoilOnly =
+    GrossEmissionsNonCo2Co2eSoilOnly(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2OnlySoilOnly: GrossEmissionsCo2OnlyCo2eSoilOnly =
+    GrossEmissionsCo2OnlyCo2eSoilOnly(gridTile, kwargs = kwargs)
   val jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000 =
     JplTropicsAbovegroundBiomassDensity2000(gridTile, kwargs)
   val stdevAnnualAbovegroundRemovalsCarbon: StdevAnnualAbovegroundRemovalsCarbon =
@@ -49,7 +53,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
   val mangroveBiomassExtent: MangroveBiomassExtent = MangroveBiomassExtent(gridTile, kwargs)
   val treeCoverLossDrivers: TreeCoverLossDrivers = TreeCoverLossDrivers(gridTile, kwargs)
-  val ecozones: Ecozones = Ecozones(gridTile, kwargs)
+  val faoEcozones2000: FaoEcozones2000 = FaoEcozones2000(gridTile, kwargs = kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
   val intactForestLandscapes: IntactForestLandscapes = IntactForestLandscapes(gridTile, kwargs)
@@ -123,10 +127,14 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         litterCarbon2000.fetchWindow(windowKey, windowLayout)
       val soilCarbon2000Tile =
         soilCarbon2000.fetchWindow(windowKey, windowLayout)
-      val grossEmissionsCo2eNonCo2Tile =
-        grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
-      val grossEmissionsCo2eCo2OnlyTile =
-        grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eNonCo2BiomassSoilTile =
+        grossEmissionsCo2eNonCo2BiomassSoil.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eCo2OnlyBiomassSoilTile =
+        grossEmissionsCo2eCo2OnlyBiomassSoil.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eNonCo2SoilOnlyTile =
+        grossEmissionsCo2eNonCo2SoilOnly.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eCo2OnlySoilOnlyTile =
+        grossEmissionsCo2eCo2OnlySoilOnly.fetchWindow(windowKey, windowLayout)
       val jplTropicsAbovegroundBiomassDensity2000Tile =
         jplTropicsAbovegroundBiomassDensity2000.fetchWindow(
           windowKey,
@@ -148,7 +156,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)
       val driversTile =
         treeCoverLossDrivers.fetchWindow(windowKey, windowLayout)
-      val ecozonesTile = ecozones.fetchWindow(windowKey, windowLayout)
+      val faoEcozones2000Tile = faoEcozones2000.fetchWindow(windowKey, windowLayout)
       val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapesTile =
@@ -202,8 +210,10 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         deadwoodCarbon2000Tile,
         litterCarbon2000Tile,
         soilCarbon2000Tile,
-        grossEmissionsCo2eNonCo2Tile,
-        grossEmissionsCo2eCo2OnlyTile,
+        grossEmissionsCo2eNonCo2BiomassSoilTile,
+        grossEmissionsCo2eCo2OnlyBiomassSoilTile,
+        grossEmissionsCo2eNonCo2SoilOnlyTile,
+        grossEmissionsCo2eCo2OnlySoilOnlyTile,
         jplTropicsAbovegroundBiomassDensity2000Tile,
         stdevAnnualAbovegroundRemovalsCarbonTile,
         stdevSoilCarbon2000Tile,
@@ -211,7 +221,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         removalForestTypeTile,
         mangroveBiomassExtentTile,
         driversTile,
-        ecozonesTile,
+        faoEcozones2000Tile,
         landmarkTile,
         wdpaTile,
         intactForestLandscapesTile,

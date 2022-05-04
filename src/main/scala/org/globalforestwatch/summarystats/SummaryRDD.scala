@@ -9,6 +9,7 @@ import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResu
 import geotrellis.raster.summary.polygonal
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector._
+import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
@@ -57,6 +58,14 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      * for features to be close together already during export.
      */
 
+//    val partitionedFeatureRDD = if (partition) {
+//      val rangePartitioner =
+//        new RangePartitioner(featureRDD.sparkContext.defaultParallelism, keyedFeatureRDD)
+//      keyedFeatureRDD.partitionBy(rangePartitioner).values
+//    } else {
+//      keyedFeatureRDD.values
+//    }
+
     val partitionedFeatureRDD = if (partition) {
       RepartitionSkewedRDD.bySparseId(keyedFeatureRDD, 4096)
     } else {
@@ -104,63 +113,75 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                 }
 
               // flatMap here flattens out and ignores the errors
-              features.flatMap { feature: Feature[Geometry, FEATUREID] =>
-                val id: FEATUREID = feature.data
-                val rasterizeOptions = Rasterizer.Options(
-                  includePartial = false,
-                  sampleType = PixelIsPoint
-                )
+              val groupedByWindowGeom: Map[Geometry, Array[Feature[Geometry, FEATUREID]]] = features.groupBy {
+                case feature: Feature[Geometry, FEATUREID] =>
+                  val windowGeom: Extent = windowLayout.mapTransform.keyToExtent(windowKey)
+                  feature.geom.intersection(windowGeom)
+              }
 
-                maybeRaster match {
-                  case Left(exception) =>
-                    logger.error(s"Feature $id: $exception")
-                    List.empty
+              groupedByWindowGeom.flatMap {
+                case (windowGeom: Geometry, features: Array[Feature[Geometry, FEATUREID]]) =>
+                  // val id: FEATUREID = feature.data
+                  val rasterizeOptions = Rasterizer.Options(
+                    includePartial = false,
+                    sampleType = PixelIsPoint
+                  )
 
-                  case Right(raster) =>
-                    val summary: Option[SUMMARY] =
-                      try {
-                        runPolygonalSummary(
-                          raster,
-                          feature.geom,
-                          rasterizeOptions,
-                          kwargs
-                        ) match {
-                          case polygonal.Summary(result: SUMMARY) => Some(result)
-                          case NoIntersection => None
-                        }
-                      } catch {
-                        case ise: java.lang.IllegalStateException => {
-                          println(
-                            s"There is an issue with geometry for ${feature.data}"
-                          )
-                          // TODO some very invalid geoms are somehow getting here, skip for now
-                          None
-                        }
-                        case te: org.locationtech.jts.geom.TopologyException => {
-                          println(
-                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
-                          )
-                          None
-                        }
-                        case be: java.lang.ArrayIndexOutOfBoundsException => {
-                          println(
-                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
-                          )
-                          None
-                        }
-                        case ise: java.lang.IllegalArgumentException => {
-                          println(
-                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
-                          )
-                          None
+                  println(s"Size of features for spatial key $windowKey: ${features.size}")
+
+                  maybeRaster match {
+                    case Left(exception) =>
+                      logger.error(s"Raster could not bread at spatial key:\n$windowKey\n$exception")
+                      List.empty
+
+                    case Right(raster) =>
+                      val summary: Option[SUMMARY] =
+                        try {
+                          runPolygonalSummary(
+                            raster,
+                            windowGeom,
+                            rasterizeOptions,
+                            kwargs
+                          ) match {
+                            case polygonal.Summary(result: SUMMARY) => Some(result)
+                            case NoIntersection => None
+                          }
+                        } catch {
+                          case ise: java.lang.IllegalStateException => {
+                            println(
+                              s"There is an issue with running polygonal summary on geometry:\n ${windowGeom}"
+                            )
+                            // TODO some very invalid geoms are somehow getting here, skip for now
+                            None
+                          }
+                          case te: org.locationtech.jts.geom.TopologyException => {
+                            println(
+                              s"There is an issue with running polygonal summary on geometry:\n ${windowGeom}"
+                            )
+                            None
+                          }
+                          case be: java.lang.ArrayIndexOutOfBoundsException => {
+                            println(
+                              s"There is an issue with running polygonal summary on geometry:\n ${windowGeom}"
+                            )
+                            None
+                          }
+                          case ise: java.lang.IllegalArgumentException => {
+                            println(
+                              s"There is an issue with running polygonal summary on geometry:\n ${windowGeom}"
+                            )
+                            None
+                          }
+
                         }
 
+                      summary match {
+                        case Some(result) =>
+                          features.map {
+                            case feature: Feature[Geometry, FEATUREID] => (feature.data, result)
+                          }.toList
+                        case None => List.empty
                       }
-
-                    summary match {
-                      case Some(result) => List((id, result))
-                      case None => List.empty
-                    }
                 }
               }
           }

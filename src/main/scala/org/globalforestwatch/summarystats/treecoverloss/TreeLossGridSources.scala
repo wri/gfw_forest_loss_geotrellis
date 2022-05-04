@@ -20,12 +20,12 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
   val soilCarbon2000 = SoilCarbon2000(gridTile, kwargs = kwargs)
 
   val primaryForest = PrimaryForest(gridTile, kwargs)
-  val plantationsBool = PlantationsBool(gridTile, kwargs)
+  val plantedForestsBool = PlantedForestsBool(gridTile, kwargs)
 
   val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile, kwargs = kwargs)
   val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e = GrossEmissionsNonCo2Co2e(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e = GrossEmissionsCo2OnlyCo2e(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil = GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2eBiomassSoil = GrossEmissionsCo2OnlyCo2eBiomassSoil(gridTile, kwargs = kwargs)
   val netFluxCo2: NetFluxCo2e = NetFluxCo2e(gridTile, kwargs = kwargs)
   val fluxModelExtent: FluxModelExtent = FluxModelExtent(gridTile, kwargs = kwargs)
 
@@ -47,7 +47,7 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
       // Failure for these will be converted to optional result and propagated with TreeLossTile
       val gainTile = treeCoverGain.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
-      val plantationsBoolTile = plantationsBool.fetchWindow(windowKey, windowLayout)
+      val plantedForestsBoolTile = plantedForestsBool.fetchWindow(windowKey, windowLayout)
 
       val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
       val agc2000Tile = agc2000.fetchWindow(windowKey, windowLayout)
@@ -71,7 +71,7 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
         bgc2000Tile,
         soilCarbon2000Tile,
         primaryForestTile,
-        plantationsBoolTile,
+        plantedForestsBoolTile,
         grossCumulAbovegroundRemovalsCo2Tile,
         grossCumulBelowgroundRemovalsCo2Tile,
         netFluxCo2Tile,

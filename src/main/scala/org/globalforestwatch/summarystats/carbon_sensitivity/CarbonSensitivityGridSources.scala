@@ -26,10 +26,10 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
   val netFluxCo2: NetFluxCo2e = NetFluxCo2e(gridTile, model, kwargs)
   val agcEmisYear: AgcEmisYear = AgcEmisYear(gridTile, model, kwargs)
   val soilCarbonEmisYear: SoilCarbonEmisYear = SoilCarbonEmisYear(gridTile, model, kwargs)
-  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e =
-    GrossEmissionsNonCo2Co2e(gridTile, model, kwargs)
-  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e =
-    GrossEmissionsCo2OnlyCo2e(gridTile, model, kwargs)
+  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil =
+    GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, model, kwargs)
+  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2eBiomassSoil =
+    GrossEmissionsCo2OnlyCo2eBiomassSoil(gridTile, model, kwargs)
   val jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000 =
     JplTropicsAbovegroundBiomassDensity2000(gridTile, kwargs)
   val fluxModelExtent: FluxModelExtent = FluxModelExtent(gridTile, model, kwargs)
