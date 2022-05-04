@@ -73,7 +73,7 @@ object TreeLossSummary {
 
         val isPlantations: Boolean = {
           if (contextualLayers contains "is__gfw_plantations")
-            raster.tile.plantationsBool.getData(col, row)
+            raster.tile.plantedForestsBool.getData(col, row)
           else false
         }
 

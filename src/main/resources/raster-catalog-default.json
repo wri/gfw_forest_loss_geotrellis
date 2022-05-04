@@ -272,10 +272,7 @@
       "name":"wur_radd_alerts",
       "source_uri":"s3://gfw-data-lake/wur_radd_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
     },
-    {
-      "name":"gfw_plantations",
-      "source_uri":"s3://gfw-data-lake/gfw_plantations/v2014/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
-    },
+
     {
       "name":"gfw_wood_fiber",
       "source_uri":"s3://gfw-data-lake/gfw_wood_fiber/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
