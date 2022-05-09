@@ -116,18 +116,23 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
               val groupedByWindowGeom: Map[Geometry, Array[Feature[Geometry, FEATUREID]]] = features.groupBy {
                 case feature: Feature[Geometry, FEATUREID] =>
                   val windowGeom: Extent = windowLayout.mapTransform.keyToExtent(windowKey)
-                  feature.geom.intersection(windowGeom)
+
+                  try {
+                    feature.geom.intersection(windowGeom)
+                  } catch {
+                    case e: org.locationtech.jts.geom.TopologyException =>
+                      // fallback if JTS can't do the intersection because of a wonky geometry,
+                      // just use the original geometry as a key
+                      feature.geom
+                  }
               }
 
               groupedByWindowGeom.flatMap {
                 case (windowGeom: Geometry, features: Array[Feature[Geometry, FEATUREID]]) =>
-                  // val id: FEATUREID = feature.data
                   val rasterizeOptions = Rasterizer.Options(
                     includePartial = false,
                     sampleType = PixelIsPoint
                   )
-
-                  println(s"Size of features for spatial key $windowKey: ${features.size}")
 
                   maybeRaster match {
                     case Left(exception) =>
