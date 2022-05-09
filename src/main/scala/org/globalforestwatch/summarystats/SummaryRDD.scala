@@ -112,17 +112,25 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                   readWindow(rs, windowKey, windowLayout)
                 }
 
-              // flatMap here flattens out and ignores the errors
+              // Intersect with window extent and group by resulting geom, so we only do polygonal summary
+              // once per each geometry tile. This will speed up overlapping geometries a lot, where often we're
+              // analyzing the full window extent across many features.
               val groupedByWindowGeom: Map[Geometry, Array[Feature[Geometry, FEATUREID]]] = features.groupBy {
                 case feature: Feature[Geometry, FEATUREID] =>
                   val windowGeom: Extent = windowLayout.mapTransform.keyToExtent(windowKey)
 
                   try {
-                    feature.geom.intersection(windowGeom)
+                    if (feature.geom.isValid) {
+                      // if valid geometry, attempt to intersect
+                      feature.geom.intersection(windowGeom)
+                    } else {
+                      // otherwise, just use original geometry, since sometimes
+                      // making complex geometries valid can be very slow
+                      feature.geom
+                    }
                   } catch {
                     case e: org.locationtech.jts.geom.TopologyException =>
-                      // fallback if JTS can't do the intersection because of a wonky geometry,
-                      // just use the original geometry as a key
+                      // fallback to original geometry if there are any intersection issues
                       feature.geom
                   }
               }
