@@ -81,7 +81,7 @@ object SpatialJoinRDD {
 
     try {
       queryWindowRDD.spatialPartitioning(
-        GridType.QUADTREE,
+        GridType.KDBTREE,
         Seq(queryWindowPartitions, (queryWindowCount / 2).toInt).min
       )
       valueRDD.spatialPartitioning(queryWindowRDD.getPartitioner)

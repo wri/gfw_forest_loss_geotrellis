@@ -131,18 +131,18 @@ object FireAlertsExport extends SummaryExport {
     import spark.implicits._
 
     val groupByCols = List(
-      "wdpa_protected_areas__id",
-      "wdpa_protected_areas__name",
-      "wdpa_protected_areas__iucn_cat",
-      "wdpa_protected_areas__iso",
-      "wdpa_protected_areas__status",
+      "wdpa_protected_area__id",
+      "wdpa_protected_area__name",
+      "wdpa_protected_area__iucn_cat",
+      "wdpa_protected_area__iso",
+      "wdpa_protected_area__status",
     )
     val unpackCols = List(
-      $"featureId.wdpaId" as "wdpa_protected_areas__id",
-      $"featureId.name" as "wdpa_protected_areas__name",
-      $"featureId.iucnCat" as "wdpa_protected_areas__iucn_cat",
-      $"featureId.iso" as "wdpa_protected_areas__iso",
-      $"featureId.status" as "wdpa_protected_areas__status"
+      $"featureId.wdpaId" as "wdpa_protected_area__id",
+      $"featureId.name" as "wdpa_protected_area__name",
+      $"featureId.iucnCat" as "wdpa_protected_area__iucn_cat",
+      $"featureId.iso" as "wdpa_protected_area__iso",
+      $"featureId.status" as "wdpa_protected_area__status"
     )
 
     _export(summaryDF, outputUrl + "/wdpa", kwargs, groupByCols, unpackCols, wdpa = true)
