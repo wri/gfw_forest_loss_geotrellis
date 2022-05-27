@@ -8,6 +8,7 @@ import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResult}
 import geotrellis.raster.summary.polygonal
 import geotrellis.store.index.zcurve.Z2
+import geotrellis.vector.Extent.toPolygon
 import geotrellis.vector._
 import org.apache.spark.RangePartitioner
 import org.apache.spark.rdd.RDD
@@ -94,8 +95,8 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
           }
 
           val groupedByKey
-            : Map[SpatialKey,
-                  Array[(SpatialKey, Feature[Geometry, FEATUREID])]] =
+          : Map[SpatialKey,
+            Array[(SpatialKey, Feature[Geometry, FEATUREID])]] =
             windowFeature.toArray.groupBy {
               case (windowKey, feature) => windowKey
             }
@@ -112,89 +113,64 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                   readWindow(rs, windowKey, windowLayout)
                 }
 
-              // Intersect with window extent and group by resulting geom, so we only do polygonal summary
-              // once per each geometry tile. This will speed up overlapping geometries a lot, where often we're
-              // analyzing the full window extent across many features.
-              val groupedByWindowGeom: Map[Geometry, Array[Feature[Geometry, FEATUREID]]] = features.groupBy {
-                case feature: Feature[Geometry, FEATUREID] =>
-                  val windowGeom: Extent = windowLayout.mapTransform.keyToExtent(windowKey)
+              // flatMap here flattens out and ignores the errors
+              features.flatMap { feature: Feature[Geometry, FEATUREID] =>
+                val id: FEATUREID = feature.data
+                val rasterizeOptions = Rasterizer.Options(
+                  includePartial = false,
+                  sampleType = PixelIsPoint
+                )
 
-                  try {
-                    if (feature.geom.isValid) {
-                      // if valid geometry, attempt to intersect
-                      feature.geom.intersection(windowGeom)
-                    } else {
-                      // otherwise, just use original geometry, since sometimes
-                      // making complex geometries valid can be very slow
-                      feature.geom
-                    }
-                  } catch {
-                    case e: org.locationtech.jts.geom.TopologyException =>
-                      // fallback to original geometry if there are any intersection issues
-                      feature.geom
-                  }
-              }
+                maybeRaster match {
+                  case Left(exception) =>
+                    logger.error(s"Feature $id: $exception")
+                    List.empty
 
-              groupedByWindowGeom.flatMap {
-                case (windowGeom: Geometry, features: Array[Feature[Geometry, FEATUREID]]) =>
-                  val rasterizeOptions = Rasterizer.Options(
-                    includePartial = false,
-                    sampleType = PixelIsPoint
-                  )
-
-                  maybeRaster match {
-                    case Left(exception) =>
-                      logger.error(s"Raster could not bread at spatial key:\n$windowKey\n$exception")
-                      List.empty
-
-                    case Right(raster) =>
-                      val summary: Option[SUMMARY] =
-                        try {
-                          runPolygonalSummary(
-                            raster,
-                            windowGeom,
-                            rasterizeOptions,
-                            kwargs
-                          ) match {
-                            case polygonal.Summary(result: SUMMARY) => Some(result)
-                            case NoIntersection => None
-                          }
-                        } catch {
-                          case ise: java.lang.IllegalStateException => {
-                            println(
-                              s"There is an issue with running polygonal summary on geometry:\n ${windowGeom}"
-                            )
-                            // TODO some very invalid geoms are somehow getting here, skip for now
-                            None
-                          }
-                          case te: org.locationtech.jts.geom.TopologyException => {
-                            println(
-                              s"There is an issue with running polygonal summary on geometry:\n ${windowGeom}"
-                            )
-                            None
-                          }
-                          case be: java.lang.ArrayIndexOutOfBoundsException => {
-                            println(
-                              s"There is an issue with running polygonal summary on geometry:\n ${windowGeom}"
-                            )
-                            None
-                          }
-                          case ise: java.lang.IllegalArgumentException => {
-                            println(
-                              s"There is an issue with running polygonal summary on geometry:\n ${windowGeom}"
-                            )
-                            None
-                          }
-
+                  case Right(raster) =>
+                    val summary: Option[SUMMARY] =
+                      try {
+                        runPolygonalSummary(
+                          raster,
+                          feature.geom,
+                          rasterizeOptions,
+                          kwargs
+                        ) match {
+                          case polygonal.Summary(result: SUMMARY) => Some(result)
+                          case NoIntersection => None
+                        }
+                      } catch {
+                        case ise: java.lang.IllegalStateException => {
+                          println(
+                            s"There is an issue with geometry for ${feature.data}"
+                          )
+                          // TODO some very invalid geoms are somehow getting here, skip for now
+                          None
+                        }
+                        case te: org.locationtech.jts.geom.TopologyException => {
+                          println(
+                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
+                          )
+                          None
+                        }
+                        case be: java.lang.ArrayIndexOutOfBoundsException => {
+                          println(
+                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
+                          )
+                          None
+                        }
+                        case ise: java.lang.IllegalArgumentException => {
+                          println(
+                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
+                          )
+                          None
                         }
 
-                      summary match {
-                        case Some(result) =>
-                          features.map {
-                            case feature: Feature[Geometry, FEATUREID] => (feature.data, result)
-                          }.toList
-                        case None => List.empty
                       }
+
+                    summary match {
+                      case Some(result) => List((id, result))
+                      case None => List.empty
+                    }
                 }
               }
           }
