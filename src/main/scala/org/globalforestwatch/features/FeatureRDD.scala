@@ -145,12 +145,11 @@ object FeatureRDD {
       Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialRDD.analyze()
 
-
     spatialRDD.rawSpatialRDD = spatialRDD.rawSpatialRDD.rdd.map { geom: Geometry =>
       val featureId = FeatureId.fromUserData(featureType, geom.getUserData.asInstanceOf[String], delimiter = ",")
       geom.setUserData(featureId)
       geom
-    }
+    }.repartition(numPartitions = spatialRDD.rawSpatialRDD.getNumPartitions * 10)
 
     splitGeometries(spatialRDD, spark)
   }
