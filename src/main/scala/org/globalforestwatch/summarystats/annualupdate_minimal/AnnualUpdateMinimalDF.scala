@@ -27,6 +27,7 @@ object AnnualUpdateMinimalDF {
     "is__umd_tree_cover_gain",
     "forest_age__category",
     "is__ifl_intact_forest_landscapes_2000",
+    "is__umd_tree_cover_loss_from_fires",
 
     // TODO delete next data update
     "umd_tree_cover_density__threshold",
@@ -75,6 +76,7 @@ object AnnualUpdateMinimalDF {
         $"data_group.isGain" as "is__umd_tree_cover_gain",
         $"data_group.forestAge" as "forest_age__category",
         $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
+        $"data_group.treeCoverLossFromFires" as "is__umd_tree_cover_loss_from_fires",
 
         $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
         $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
@@ -254,6 +256,7 @@ object AnnualUpdateMinimalDF {
       max(length($"forest_age__category"))
         .cast("boolean") as "forest_age__category",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
+      max($"is__umd_tree_cover_loss_from_fires") as "is__umd_tree_cover_loss_from_fires",
 
       max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
@@ -314,6 +317,7 @@ object AnnualUpdateMinimalDF {
       max(length($"forest_age__category"))
         .cast("boolean") as "forest_age__category",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
+      max($"is__umd_tree_cover_loss_from_fires") as "is__umd_tree_cover_loss_from_fires",
 
       max($"tsc_tree_cover_loss_drivers__type") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
@@ -340,6 +344,5 @@ object AnnualUpdateMinimalDF {
 
     df.groupBy(groupByCols.head, groupByCols.tail: _*)
       .agg(aggCols.head, aggCols.tail: _*)
-
   }
 }

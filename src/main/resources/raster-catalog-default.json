@@ -348,6 +348,10 @@
     {
       "name":"ifl_intact_forest_landscapes_2020",
       "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2020/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"umd_tree_cover_loss_from_fires",
+      "source_uri": "s3://gfw-data-lake/umd_tree_cover_loss_from_fires/v20220309/raster/epsg-4326/10/40000/year/geotiff/{tile_id}.tif"
     }
   ]
 }

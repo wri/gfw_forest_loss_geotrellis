@@ -39,6 +39,7 @@ case class AnnualUpdateMinimalTile(
                                     soilCarbon: SoilCarbon#OptionalFTile,
                                     forestAge: ForestAgeCategory#OptionalITile,
                                     intactForestLandscapes2000: IntactForestLandscapes2000#OptionalITile,
+                                    treeCoverLossFromFires: TreeCoverLossFromFires#OptionalITile,
 ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
   def cols: Int = loss.cols

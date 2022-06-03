@@ -41,6 +41,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val soilCarbon: SoilCarbon = SoilCarbon(gridTile, kwargs = kwargs)
   val forestAge: ForestAgeCategory = ForestAgeCategory(gridTile, kwargs = kwargs)
   val intactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
+  val treeCoverLossFromFires: TreeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey, windowLayout: LayoutDefinition
@@ -86,6 +87,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       val soilCarbonTile = soilCarbon.fetchWindow(windowKey, windowLayout)
       val forestAgeTile = forestAge.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2000Tile = intactForestLandscapes2000.fetchWindow(windowKey, windowLayout)
+      val treeCoverLossFromFiresTile = treeCoverLossFromFires.fetchWindow(windowKey, windowLayout)
 
       val tile = AnnualUpdateMinimalTile(
         lossTile,
@@ -118,6 +120,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         soilCarbonTile,
         forestAgeTile,
         intactForestLandscapes2000Tile,
+        treeCoverLossFromFiresTile,
       )
 
       Raster(tile, windowKey.extent(windowLayout))
