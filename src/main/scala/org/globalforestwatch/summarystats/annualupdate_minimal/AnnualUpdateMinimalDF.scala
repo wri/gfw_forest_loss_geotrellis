@@ -27,7 +27,6 @@ object AnnualUpdateMinimalDF {
     "is__umd_tree_cover_gain",
     "forest_age__category",
     "is__ifl_intact_forest_landscapes_2000",
-    "is__umd_tree_cover_loss_from_fires",
 
     // TODO delete next data update
     "umd_tree_cover_density__threshold",
@@ -76,7 +75,6 @@ object AnnualUpdateMinimalDF {
         $"data_group.isGain" as "is__umd_tree_cover_gain",
         $"data_group.forestAge" as "forest_age__category",
         $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
-        $"data_group.treeCoverLossFromFires" as "is__umd_tree_cover_loss_from_fires",
 
         $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
         $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
@@ -95,6 +93,7 @@ object AnnualUpdateMinimalDF {
         $"data.totalGrossEmissionsCo2e" as "gfw_full_extent_gross_emissions__Mg_CO2e",
         $"data.totalSoilCarbon" as "gfw_soil_carbon_stocks_2000__Mg_C",
         $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_full_extent_gross_removals__Mg_CO2",
+        $"data.treeCoverLossFromFires" as "umd_tree_cover_loss_from_fires__ha",
 
         $"data_group.threshold" as "umd_tree_cover_density__threshold",
         $"data_group.drivers" as "tsc_tree_cover_loss_drivers__type",
@@ -160,6 +159,7 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
         sum("gfw_soil_carbon_stocks_2000__Mg_C") as "gfw_soil_carbon_stocks_2000__Mg_C",
+        sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
 
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
@@ -197,6 +197,7 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
         sum("gfw_soil_carbon_stocks_2000__Mg_C") as "gfw_soil_carbon_stocks_2000__Mg_C",
+        sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
 
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
@@ -224,7 +225,8 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions_CO2_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only__Mg_CO2",
         sum("gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
-        sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg"
+        sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg",
+        sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
       )
   }
 
@@ -256,7 +258,6 @@ object AnnualUpdateMinimalDF {
       max(length($"forest_age__category"))
         .cast("boolean") as "forest_age__category",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
-      max($"is__umd_tree_cover_loss_from_fires") as "is__umd_tree_cover_loss_from_fires",
 
       max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
@@ -317,7 +318,6 @@ object AnnualUpdateMinimalDF {
       max(length($"forest_age__category"))
         .cast("boolean") as "forest_age__category",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
-      max($"is__umd_tree_cover_loss_from_fires") as "is__umd_tree_cover_loss_from_fires",
 
       max($"tsc_tree_cover_loss_drivers__type") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",

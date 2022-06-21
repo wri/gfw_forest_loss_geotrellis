@@ -131,13 +131,12 @@ object AnnualUpdateMinimalSummary {
               gain,
               forestAge,
               intactForestLandscapes2000,
-              treeCoverLossFromFires,
             )
 
             val summary: AnnualUpdateMinimalData =
               stats.getOrElse(
                 key = pKey,
-                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -151,6 +150,10 @@ object AnnualUpdateMinimalSummary {
                 summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
                 summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
                 summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
+
+                if (treeCoverLossFromFires) {
+                  summary.treeCoverLossFromFires += areaHa
+                }
               }
 
               summary.treecoverExtent2000 += areaHa
