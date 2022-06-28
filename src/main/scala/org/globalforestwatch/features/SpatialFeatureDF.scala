@@ -2,8 +2,12 @@ package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
 import org.locationtech.jts
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.functions.{col, isnull, udf}
+import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
+import org.locationtech.jts.geom.util.GeometryFixer
+import org.locationtech.jts.geom.{Geometry, MultiPolygon, Polygon}
+
 import scala.util.Try
 
 object SpatialFeatureDF {
@@ -51,14 +55,27 @@ object SpatialFeatureDF {
       FeatureDF(input, featureObj, filters, spark, delimiter)
     val emptyPolygonWKB = "0106000020E610000000000000"
 
-    // ST_PrecisionReduce may create invalid geometry if it contains a "sliver" that is below the precision threshold
-    // ST_Buffer(0) fixes these invalid geometries
+    val readOptionWkbUDF = udf {
+      s: String =>
+        val geom: Option[Geometry] = readOption(s)
+
+        geom match {
+          case Some(g) => Some(GeometryFixer.fix(g))
+          case None => None
+        }
+    }
+
     featureDF
-     .selectExpr(
-       s"ST_Buffer(ST_PrecisionReduce(ST_GeomFromWKB(${wkbField}), 11), 0) AS polyshape",
-       s"struct(${featureObj.featureIdExpr}) as featureId"
-     )
-     .where(s"${wkbField} != '${emptyPolygonWKB}'")
+      .where(s"${wkbField} != '${emptyPolygonWKB}'")
+      .selectExpr(
+        s"${wkbField} AS wkb",
+        s"struct(${featureObj.featureIdExpr}) as featureId"
+      )
+      .select(
+        readOptionWkbUDF (col("wkb")).as("polyshape"),
+        col("featureId")
+      )
+      .where(!isnull(col("polyshape")))
   }
 
   /*

@@ -26,9 +26,9 @@ object Version {
   val spark = "3.1.1"
   val sparkCompatible = "3.0"
   val geotools = "24.1"
-  val sedona = "1.1.1-incubating"
+  val sedona = "1.2.0-incubating"
   val frameless = "0.9.0"
-  val jts = "1.18.2"
+  val jts = "1.19.0"
 }
 
 object Dependencies {

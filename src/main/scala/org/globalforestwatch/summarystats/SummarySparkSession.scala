@@ -18,7 +18,7 @@ object SummarySparkSession {
       .set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
       .set("spark.kryo.registrator", classOf[SedonaKryoRegistrator].getName)
       .set("spark.debug.maxToStringFields", "255")
-      .set("sedona.join.gridtype", "kdbtree")
+      .set("sedona.join.gridtype", "quadtree")
     //    .set("spark.sql.crossJoin.enabled", "true")
 
     val localConf: SparkConf = conf

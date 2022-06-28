@@ -36,8 +36,8 @@ case class GfwGeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
       // so we need to do this early on to avoid winding code. This block is not part of the original Java implementation.
       val preFixedGeometry =
       geom match {
-        case poly: Polygon => ironPolgons(poly)
-        case multi: MultiPolygon => ironPolgons(multi)
+        case poly: Polygon => ironPolygons(poly)
+        case multi: MultiPolygon => ironPolygons(multi)
         case _ => geom
       }
 
@@ -47,7 +47,7 @@ case class GfwGeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
 
   /** Ironing out potential sliver artifacts such as holes that resemble lines. Should only be used with Polygons or MultiPolygons.
     */
-  private def ironPolgons(geom: Geometry): Geometry = {
+  private def ironPolygons(geom: Geometry): Geometry = {
     val bufferedGeom: Geometry = geom.buffer(0.0001).buffer(-0.0001)
     val polygons: Geometry = extractPolygons(bufferedGeom)
     reduce(gpr)(polygons)

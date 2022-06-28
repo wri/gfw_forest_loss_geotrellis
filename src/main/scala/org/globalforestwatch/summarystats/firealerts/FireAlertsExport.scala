@@ -41,7 +41,7 @@ object FireAlertsExport extends SummaryExport {
     // only export all points for viirs gadm
     if (fireAlertType == "viirs") {
       gadmDF
-        .coalesce (ceil (numPartitions / 40.0).toInt)
+        .coalesce (Integer.min(200, ceil (numPartitions / 40.0).toInt))
         .write
         .options (csvOptions)
         .csv (path = outputUrl + "/all")
@@ -88,7 +88,7 @@ object FireAlertsExport extends SummaryExport {
       .transform(FireAlertsDF.aggChangeDaily(List("iso", "adm1", "adm2"), aggCol))
 
     adm2DailyDF
-      .coalesce(ceil(numPartitions / 80.0).toInt)
+      .coalesce(Integer.min(200, ceil(numPartitions / 80.0).toInt))
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/daily_alerts")
@@ -97,7 +97,7 @@ object FireAlertsExport extends SummaryExport {
       .transform(FireAlertsDF.aggChangeWeekly(List("iso", "adm1", "adm2"), aggCol))
 
     adm2DF
-      .coalesce(ceil(numPartitions / 100.0).toInt)
+      .coalesce(Integer.min(200, ceil(numPartitions / 100.0).toInt))
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/weekly_alerts")
@@ -106,7 +106,7 @@ object FireAlertsExport extends SummaryExport {
       .transform(FireAlertsDF.aggChangeWeekly2(List("iso", "adm1"), aggCol))
 
     adm1DF
-      .coalesce(ceil(numPartitions / 150.0).toInt)
+      .coalesce(Integer.min(200, ceil(numPartitions / 150.0).toInt))
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/weekly_alerts")
@@ -117,7 +117,7 @@ object FireAlertsExport extends SummaryExport {
 
 
     isoDF
-      .coalesce(ceil(numPartitions / 200.0).toInt)
+      .coalesce(Integer.min(200, ceil(numPartitions / 200.0).toInt))
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/weekly_alerts")
@@ -219,13 +219,13 @@ object FireAlertsExport extends SummaryExport {
     }
 
     df.transform(FireAlertsDF.aggChangeDaily(cols, aggCol, wdpa = wdpa))
-      .coalesce(ceil(numPartitions / 100.0).toInt)
+      .coalesce(Integer.min(200, ceil(numPartitions / 100.0).toInt))
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
 
     df.transform(FireAlertsDF.aggChangeWeekly(cols, aggCol, wdpa = wdpa))
-      .coalesce(ceil(numPartitions / 150.0).toInt)
+      .coalesce(Integer.min(200, ceil(numPartitions / 150.0).toInt))
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/weekly_alerts")

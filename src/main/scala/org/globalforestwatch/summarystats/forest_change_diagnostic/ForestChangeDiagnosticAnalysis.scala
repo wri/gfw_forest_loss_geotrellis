@@ -42,57 +42,65 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
   )(implicit spark: SparkSession): RDD[ValidatedLocation[ForestChangeDiagnosticData]] = {
     features.persist(StorageLevel.MEMORY_AND_DISK)
 
-    val diffGridIds: List[GridId] =
-      if (intermediateResultsRDD.nonEmpty) collectDiffGridIds(features)
-      else List.empty
+    try {
+      val diffGridIds: List[GridId] =
+        if (intermediateResultsRDD.nonEmpty) collectDiffGridIds(features)
+        else List.empty
 
-    // These records are not covered by diff geometry, they're still valid and can be re-used
-    val cachedIntermidateResultsRDD = intermediateResultsRDD.map { rdd =>
-      rdd.filter {
-        case Valid(Location(CombinedFeatureId(fid1, fid2), _)) =>
-          !diffGridIds.contains(fid2)
-        case Invalid(Location(CombinedFeatureId(fid1, fid2), _)) =>
-          !diffGridIds.contains(fid2)
-        case _ =>
-          false
-      }
-    }
-
-    val partialResult: RDD[ValidatedLocation[ForestChangeDiagnosticData]] =
-      ValidatedWorkflow(features)
-        .flatMap { locationGeometries =>
-          val diffLocations = filterDiffGridCells(locationGeometries, diffGridIds)
-
-          val fireCount: RDD[Location[ForestChangeDiagnosticDataLossYearly]] =
-            fireStats(diffLocations, fireAlerts, spark)
-
-          val locationSummaries: RDD[ValidatedLocation[ForestChangeDiagnosticSummary]] = {
-            val tmp = diffLocations.map { case Location(id, geom) => Feature(geom, id) }
-            ForestChangeDiagnosticRDD(tmp, ForestChangeDiagnosticGrid.blockTileGrid, kwargs)
-          }
-
-          ValidatedWorkflow(locationSummaries).mapValid { summaries =>
-            summaries
-              .mapValues { _.toForestChangeDiagnosticData().withUpdatedCommodityRisk() }
-              .leftOuterJoin(fireCount)
-              .mapValues { case (data, fire) =>
-                data.copy(
-                  commodity_threat_fires = fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty),
-                  tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2020)
-                )
-              }
-          }
+      // These records are not covered by diff geometry, they're still valid and can be re-used
+      val cachedIntermidateResultsRDD = intermediateResultsRDD.map { rdd =>
+        rdd.filter {
+          case Valid(Location(CombinedFeatureId(fid1, fid2), _)) =>
+            !diffGridIds.contains(fid2)
+          case Invalid(Location(CombinedFeatureId(fid1, fid2), _)) =>
+            !diffGridIds.contains(fid2)
+          case _ =>
+            false
         }
-        .unify
-        .persist(StorageLevel.MEMORY_AND_DISK)
+      }
 
-    cachedIntermidateResultsRDD match {
-      case Some(cachedResults) =>
-        val mergedResults = partialResult.union(cachedResults)
-        saveIntermidateResults(mergedResults)
-        combineGridResults(mergedResults)
-      case None =>
-        combineGridResults(partialResult)
+      val partialResult: RDD[ValidatedLocation[ForestChangeDiagnosticData]] =
+        ValidatedWorkflow(features)
+          .flatMap { locationGeometries =>
+            val diffLocations = filterDiffGridCells(locationGeometries, diffGridIds)
+
+            val fireCount: RDD[Location[ForestChangeDiagnosticDataLossYearly]] =
+              fireStats(diffLocations, fireAlerts, spark)
+
+            val locationSummaries: RDD[ValidatedLocation[ForestChangeDiagnosticSummary]] = {
+              val tmp = diffLocations.map { case Location(id, geom) => Feature(geom, id) }
+              ForestChangeDiagnosticRDD(tmp, ForestChangeDiagnosticGrid.blockTileGrid, kwargs)
+            }
+
+            ValidatedWorkflow(locationSummaries).mapValid { summaries =>
+              summaries
+                .mapValues {
+                  _.toForestChangeDiagnosticData().withUpdatedCommodityRisk()
+                }
+                .leftOuterJoin(fireCount)
+                .mapValues { case (data, fire) =>
+                  data.copy(
+                    commodity_threat_fires = fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty),
+                    tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2020)
+                  )
+                }
+            }
+          }
+          .unify
+          .persist(StorageLevel.MEMORY_AND_DISK)
+
+      cachedIntermidateResultsRDD match {
+        case Some(cachedResults) =>
+          val mergedResults = partialResult.union(cachedResults)
+          saveIntermidateResults(mergedResults)
+          combineGridResults(mergedResults)
+        case None =>
+          combineGridResults(partialResult)
+      }
+    } catch {
+      case e: StackOverflowError =>
+        e.printStackTrace()
+        throw e
     }
   }
 
