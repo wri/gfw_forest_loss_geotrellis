@@ -67,58 +67,44 @@ object FireAlertsSummary {
           val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
           val areaHa = area / 10000.0
 
-          val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
+          val pKey =
+            FireAlertsDataGroup(
+              tcd2000,
+              primaryForest,
+              protectedAreas,
+              aze,
+              keyBiodiversityAreas,
+              landmark,
+              plantedForests,
+              mining,
+              logging,
+              rspo,
+              woodFiber,
+              peatlands,
+              indonesiaForestMoratorium,
+              oilPalm,
+              indonesiaForestArea,
+              peruForestConcessions,
+              oilGas,
+              mangroves2016,
+              intactForestLandscapes2016,
+              braBiomes,
+            )
 
-          def updateSummary(thresholds: List[Int], stats: Map[FireAlertsDataGroup, FireAlertsData]): Map[FireAlertsDataGroup, FireAlertsData] = {
-            if (thresholds == Nil) stats
-            else {
-              val pKey =
-                FireAlertsDataGroup(
-                  thresholds.head,
-                  primaryForest,
-                  protectedAreas,
-                  aze,
-                  keyBiodiversityAreas,
-                  landmark,
-                  plantedForests,
-                  mining,
-                  logging,
-                  rspo,
-                  woodFiber,
-                  peatlands,
-                  indonesiaForestMoratorium,
-                  oilPalm,
-                  indonesiaForestArea,
-                  peruForestConcessions,
-                  oilGas,
-                  mangroves2016,
-                  intactForestLandscapes2016,
-                  braBiomes,
-                )
+          val summary: FireAlertsData =
+            acc.stats.getOrElse(
+              key = pKey,
+              default = FireAlertsData(0)
+            )
 
-              val summary: FireAlertsData =
-                stats.getOrElse(
-                  key = pKey,
-                  default = FireAlertsData(0)
-                )
-
-              if (tcd2000 >= thresholds.head) {
-                fireAlertType match {
-                  case "modis" | "viirs" =>
-                    summary.total += 1
-                  case "burned_areas" =>
-                    summary.total += areaHa
-                }
-              }
-
-              updateSummary(thresholds.tail, stats.updated(pKey, summary))
-            }
+          fireAlertType match {
+            case "modis" | "viirs" =>
+              summary.total += 1
+            case "burned_areas" =>
+              summary.total += areaHa
           }
 
-          val updatedSummary: Map[FireAlertsDataGroup, FireAlertsData] =
-            updateSummary(thresholds, acc.stats)
-
-          acc = FireAlertsSummary(updatedSummary)
+          acc = FireAlertsSummary(acc.stats.updated(pKey, summary))
         }
       }
     }
