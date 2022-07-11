@@ -74,7 +74,7 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
     }
   }
 
-  private def preserveGeometryType(geom: Geometry,
+  def preserveGeometryType(geom: Geometry,
                                    desiredGeometryType: String): Geometry = {
     if (desiredGeometryType != geom.getGeometryType && desiredGeometryType
       .contains(geom.getGeometryType)) {

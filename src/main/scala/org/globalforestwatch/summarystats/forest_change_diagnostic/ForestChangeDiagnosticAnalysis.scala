@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 import cats.data.Validated.{Invalid, Valid}
 import cats.implicits._
+
 import scala.collection.JavaConverters._
 import scala.collection.immutable.SortedMap
 import geotrellis.vector.{Feature, Geometry}
@@ -9,9 +10,9 @@ import org.locationtech.jts.geom.Geometry
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.sedona.core.spatialRDD.SpatialRDD
-import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GfwProFeatureId, GridId }
+import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GfwProFeatureId, GridId}
 import org.globalforestwatch.grids.GridId.pointGridId
-import org.globalforestwatch.summarystats.{SummaryAnalysis, ValidatedLocation, Location}
+import org.globalforestwatch.summarystats.{Location, NoIntersectionError, SummaryAnalysis, ValidatedLocation}
 import org.globalforestwatch.util.SpatialJoinRDD
 import org.apache.spark.storage.StorageLevel
 import org.globalforestwatch.ValidatedWorkflow
@@ -75,14 +76,24 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
             ValidatedWorkflow(locationSummaries).mapValid { summaries =>
               summaries
                 .mapValues {
-                  _.toForestChangeDiagnosticData().withUpdatedCommodityRisk()
+                  case summary: ForestChangeDiagnosticSummary =>
+                    val data = summary.toForestChangeDiagnosticData()
+                    if (data.equals(ForestChangeDiagnosticData.empty)) {
+                      ForestChangeDiagnosticData.empty
+                    } else {
+                      data.withUpdatedCommodityRisk()
+                    }
                 }
                 .leftOuterJoin(fireCount)
                 .mapValues { case (data, fire) =>
-                  data.copy(
-                    commodity_threat_fires = fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty),
-                    tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2020)
-                  )
+                  if (data.equals(ForestChangeDiagnosticData.empty)) {
+                    ForestChangeDiagnosticData.empty
+                  } else {
+                    data.copy(
+                      commodity_threat_fires = fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty),
+                      tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2020)
+                    )
+                  }
                 }
             }
           }
@@ -152,6 +163,8 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       }
       .reduceByKey(_ combine _)
       .map {
+        case (fid, Valid(data)) if data.equals(ForestChangeDiagnosticData.empty) =>
+          Invalid(Location(fid, NoIntersectionError))
         case (fid, Valid(data)) =>
           Valid(Location(fid, data.withUpdatedCommodityRisk()))
         case (fid, Invalid(err)) =>

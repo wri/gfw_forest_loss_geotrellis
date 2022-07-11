@@ -22,10 +22,15 @@ case class ForestChangeDiagnosticSummary(
 
   /** Pivot raw data to ForestChangeDiagnosticData and aggregate across years */
   def toForestChangeDiagnosticData(): ForestChangeDiagnosticData = {
-    stats
-      .map { case (group, data) => group.toForestChangeDiagnosticData(data.totalArea) }
-      .foldLeft(ForestChangeDiagnosticData.empty)( _ merge _)
+    if (stats.isEmpty) {
+      ForestChangeDiagnosticData.empty
+    } else {
+      stats
+        .map { case (group, data) => group.toForestChangeDiagnosticData(data.totalArea) }
+        .foldLeft(ForestChangeDiagnosticData.empty)(_ merge _)
+    }
   }
+
   def isEmpty = stats.isEmpty
 }
 

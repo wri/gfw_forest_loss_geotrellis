@@ -38,8 +38,8 @@ object FireAlertsAnalysis extends SummaryAnalysis {
     }
 
     val partition = fireAlertType match {
-      case "modis" | "viirs" | "burned_areas" => false
-      case _ => true
+      case "modis" | "viirs" => false
+      case "burned_areas" => true
     }
 
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
@@ -91,8 +91,16 @@ object FireAlertsAnalysis extends SummaryAnalysis {
 
     // # of partitions must be less than half the total number of records for the spatial partitioner,
     // so only increase partitions if there are enough records
-    val partitionMultiplier = if (fireRDD.approximateTotalCount > 128) 64 else 1
-    fireRDD.spatialPartitioning(GridType.KDBTREE, fireRDD.rawSpatialRDD.getNumPartitions * partitionMultiplier)
+    val parallelism = spark.sparkContext.defaultParallelism
+
+    val partitions =
+      if (parallelism > fireRDD.approximateTotalCount / 2) {
+        Math.max((fireRDD.approximateTotalCount / 4).toInt, 1)
+      } else {
+        parallelism
+      }
+
+    fireRDD.spatialPartitioning(GridType.KDBTREE, partitions)
     featureRDD.spatialPartitioning(fireRDD.getPartitioner)
 
     val buildOnSpatialPartitionedRDD = true

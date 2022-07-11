@@ -5,16 +5,18 @@ import com.typesafe.scalalogging.LazyLogging
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
-import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResult, Summary=>GTSummary}
+import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResult, Summary => GTSummary}
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector._
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
 import org.globalforestwatch.util.RepartitionSkewedRDD
+import org.globalforestwatch.summarystats.EmptySummary
+
 import scala.reflect.ClassTag
 import cats.kernel.Semigroup
-import cats.data.Validated.{Valid, Invalid}
+import cats.data.Validated.{Invalid, Valid}
 
 
 trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
@@ -136,10 +138,8 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
         .map { case (fid, summary) =>
           summary match {
             // If there was no intersection for any partial results, we consider this an invalid geometry
-            case Valid(NoIntersection) =>
-              Invalid(Location(fid, NoIntersectionError))
             case Valid(GTSummary(result)) if result.isEmpty =>
-              Invalid(Location(fid, NoIntersectionError))
+              Valid(Location(fid, result))
             case Invalid(error) =>
               Invalid(Location(fid, error))
             case Valid(GTSummary(result)) =>

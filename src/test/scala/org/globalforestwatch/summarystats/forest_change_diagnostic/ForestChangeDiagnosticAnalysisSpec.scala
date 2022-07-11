@@ -68,13 +68,41 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     assertSmallDataFrameEquality(fcdDF, expectedDF)
   }
 
-  it("reports inValid geometries") {
+  it("reports invalid geoms") {
     // match it to tile of location 31 so we fetch less tiles
     val x = 114
     val y = -1
     val selfIntersectingPolygon = Polygon(LineString(Point(x+0,y+0), Point(x+1,y+0), Point(x+0,y+1), Point(x+1,y+1), Point(x+0,y+0)))
     val featureRDD = spark.sparkContext.parallelize(List(
       Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1, 0, 0), selfIntersectingPolygon))
+    ))
+    val fcd = FCD(featureRDD)
+    val res = fcd.collect()
+    res.head.isInvalid shouldBe true
+  }
+
+  it("gives results for geometries with tiles that don't intersect") {
+    val featureLoc32RDD = ValidatedFeatureRDD(
+      NonEmptyList.one(palm32InputTsvPath),
+      "gfwpro",
+      FeatureFilter.empty,
+      splitFeatures = true
+    ).filter {
+      case Validated.Valid(Location(GfwProFeatureId(_, 32, _, _), _)) => true
+      case _ => false
+    }
+    val fcd = FCD(featureLoc32RDD)
+    val res = fcd.collect()
+    res.head.isValid shouldBe true
+  }
+
+  it("reports no intersection geometries as invalid") {
+    // match it to tile of location 31 so we fetch less tiles
+    val x = 60
+    val y = 20
+    val smallGeom = Polygon(LineString(Point(x+0,y+0), Point(x+0.00001,y+0), Point(x+0.00001,y+0.00001), Point(x+0,y+0.00001), Point(x+0,y+0)))
+    val featureRDD = spark.sparkContext.parallelize(List(
+      Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1, 0, 0), smallGeom))
     ))
     val fcd = FCD(featureRDD)
     val res = fcd.collect()

@@ -5,6 +5,7 @@ import org.locationtech.jts
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.functions.{col, isnull, udf}
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
+import org.globalforestwatch.util.GeotrellisGeometryValidator.preserveGeometryType
 import org.locationtech.jts.geom.util.GeometryFixer
 import org.locationtech.jts.geom.{Geometry, MultiPolygon, Polygon}
 
@@ -60,7 +61,8 @@ object SpatialFeatureDF {
         val geom: Option[Geometry] = readOption(s)
 
         geom match {
-          case Some(g) => Some(GeometryFixer.fix(g))
+          case Some(g) =>
+            Some(preserveGeometryType(GeometryFixer.fix(g), g.getGeometryType))
           case None => None
         }
     }
@@ -94,7 +96,16 @@ object SpatialFeatureDF {
 
     val featureDF: DataFrame = FeatureDF(input, featureObj, filters, spark, delimiter)
     val emptyPolygonWKB = "0106000020E610000000000000"
-    val readOptionWkbUDF = udf{ s: String => readOption(s) }
+    val readOptionWkbUDF = udf {
+      s: String =>
+        val geom: Option[Geometry] = readOption(s)
+
+        geom match {
+          case Some(g) => Some(GeometryFixer.fix(g))
+          case None => None
+        }
+    }
+
     featureDF
       .where(s"${wkbField} != '${emptyPolygonWKB}'")
       .selectExpr(
