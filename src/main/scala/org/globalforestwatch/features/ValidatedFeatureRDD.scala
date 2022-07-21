@@ -71,6 +71,7 @@ object ValidatedFeatureRDD {
 
     val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
     val spatialGridRDD = GridRDD(envelope, spark, clip = true)
+
     val flatJoin: JavaPairRDD[Polygon, Geometry] =
       SpatialJoinRDD.flatSpatialJoin(
         spatialFeatureRDD,

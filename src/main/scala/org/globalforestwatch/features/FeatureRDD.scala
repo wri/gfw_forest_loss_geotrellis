@@ -6,6 +6,8 @@ import org.apache.log4j.Logger
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector
 import geotrellis.vector.{Geometry, MultiPolygon}
+import org.apache.sedona.core.enums.{GridType, IndexType}
+import org.apache.sedona.core.spatialOperator.JoinQuery
 import org.apache.spark.HashPartitioner
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
@@ -13,10 +15,7 @@ import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.apache.sedona.sql.utils.Adapter
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
-import org.globalforestwatch.util.IntersectGeometry.{
-  extractPolygons,
-  intersectGeometries
-}
+import org.globalforestwatch.util.IntersectGeometry.{extractPolygons, intersectGeometries}
 
 object FeatureRDD {
   val logger = Logger.getLogger("FeatureRDD")
@@ -92,22 +91,33 @@ object FeatureRDD {
              spark: SparkSession
            ): RDD[geotrellis.vector.Feature[Geometry, FeatureId]] = {
 
-    val spatialDF: DataFrame = PolygonIntersectionDF(
-      feature1Uris,
-      feature1Type,
-      feature2Uris,
-      feature2Type,
-      spark,
-      feature1Filters,
-      feature2Filters,
-      feature1Delimiter,
-      feature2Delimiter,
-    )
+    val feature1DF: DataFrame =
+      SpatialFeatureDF(feature1Uris, feature1Type, feature1Filters, "geom", spark, feature1Delimiter)
 
-    val pairedRDD = spatialDF.rdd.map { row: Row =>
-      val featureId1: FeatureId = FeatureId.fromUserData(feature1Type, row.getAs[Row](0).toString, ",")
-      val featureId2: FeatureId = FeatureId.fromUserData(feature2Type, row.getAs[Row](1).toString, ",")
-      val geom = row.getAs[Geometry](2)
+    val feature2DF: DataFrame =
+      SpatialFeatureDF(feature2Uris, feature2Type, feature2Filters, "geom", spark, feature2Delimiter)
+
+    val feature1RDD = Adapter.toSpatialRdd(feature1DF, "polyshape")
+    val feature2RDD = Adapter.toSpatialRdd(feature2DF, "polyshape")
+
+    feature1RDD.analyze()
+    feature2RDD.analyze()
+
+    feature1RDD.spatialPartitioning(GridType.QUADTREE)
+    feature2RDD.spatialPartitioning(feature1RDD.getPartitioner)
+
+    val buildOnSpatialPartitionedRDD = true
+    val usingIndex = true
+    val considerBoundaryIntersection = true
+
+    feature1RDD.buildIndex(IndexType.QUADTREE, buildOnSpatialPartitionedRDD)
+
+    val resultPairRDD = JoinQuery.SpatialJoinQueryFlat(feature1RDD, feature2RDD, usingIndex, considerBoundaryIntersection)
+
+    val pairedRDD = resultPairRDD.rdd.map { row =>
+      val featureId1: FeatureId = FeatureId.fromUserData(feature1Type, row._2.getUserData.toString, ",")
+      val featureId2: FeatureId = FeatureId.fromUserData(feature2Type, row._1.getUserData.toString, ",")
+      val geom = row._1.intersection(row._2)
 
       (CombinedFeatureId(featureId1, featureId2), geom)
     }

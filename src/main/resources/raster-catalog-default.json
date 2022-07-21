@@ -351,7 +351,7 @@
     },
     {
       "name":"umd_tree_cover_loss_from_fires",
-      "source_uri": "s3://gfw-data-lake/umd_tree_cover_loss_from_fires/v20220309/raster/epsg-4326/10/40000/year/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/umd_tree_cover_loss_from_fires/v20220324/raster/epsg-4326/10/40000/year/geotiff/{tile_id}.tif"
     }
   ]
 }

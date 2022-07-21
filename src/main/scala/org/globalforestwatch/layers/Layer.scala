@@ -215,8 +215,11 @@ trait RequiredLayer extends Layer {
         }
 
       if (!keyExists) {
+        println(s"Cannot open: $uri")
         throw new FileNotFoundException(uri)
       }
+
+      println(s"Opening: $uri")
     } catch {
       case e: AmazonS3Exception => throw new FileNotFoundException(uri)
     }

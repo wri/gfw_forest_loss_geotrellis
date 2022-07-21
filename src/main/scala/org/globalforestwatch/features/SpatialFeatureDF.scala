@@ -101,7 +101,8 @@ object SpatialFeatureDF {
         val geom: Option[Geometry] = readOption(s)
 
         geom match {
-          case Some(g) => Some(GeometryFixer.fix(g))
+          case Some(g) =>
+            Some(preserveGeometryType(GeometryFixer.fix(g), g.getGeometryType))
           case None => None
         }
     }

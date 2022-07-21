@@ -1,7 +1,11 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
+import org.apache.sedona.core.enums.{GridType, IndexType}
+import org.apache.sedona.core.spatialOperator.JoinQuery
+import org.apache.sedona.sql.utils.Adapter
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.globalforestwatch.summarystats.firealerts.FireAlertsAnalysis.pairRddToDf
 
 object PolygonIntersectionDF {
   /*

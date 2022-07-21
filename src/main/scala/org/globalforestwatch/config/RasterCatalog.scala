@@ -58,16 +58,24 @@ object RasterCatalog {
     }
   }
 
-  def getLatestVersion(dataset: String): String = {
+  def getLatestVersion(dataset: String, retries: Int = 0): String = {
     val response: HttpResponse[String] = Http(
       s"https://data-api.globalforestwatch.org/dataset/${dataset}/latest"
     ).option(HttpOptions
-      .followRedirects(true)).option(HttpOptions.connTimeout(10000)).option(HttpOptions.readTimeout(50000)).asString
+      .followRedirects(true))
+      .option(HttpOptions.connTimeout(10000))
+      .option(HttpOptions.readTimeout(50000)).asString
 
-    if (response.code != 200)
-      throw new IllegalArgumentException(
-        s"Dataset ${dataset} has no latest version or does not exit. Data API response code: ${response.code}"
-      )
+    if (response.code != 200) {
+      if (retries <= 2) {
+        Thread.sleep(10000)
+        getLatestVersion(dataset, retries + 1)
+      } else {
+        throw new IllegalArgumentException(
+          s"Dataset ${dataset} has no latest version or does not exist. Data API response code: ${response.code}"
+        )
+      }
+    }
 
     val json: Map[String, Any] = jsonStrToMap(response.body)
 

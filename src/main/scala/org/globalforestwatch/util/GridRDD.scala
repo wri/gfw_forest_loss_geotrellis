@@ -1,6 +1,6 @@
 package org.globalforestwatch.util
 
-import org.locationtech.jts.geom.{Envelope, MultiPolygon, Polygon}
+import org.locationtech.jts.geom.{Envelope, Geometry, GeometryFactory, MultiPolygon, Polygon}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.sedona.core.spatialRDD.PolygonRDD
@@ -12,7 +12,7 @@ object GridRDD {
 
     val gridCells = getGridCells(envelope)
 
-    val tcl_geom: MultiPolygon = TreeCoverLossExtent.geometry
+    val tcl_geom: Geometry = new GeometryFactory().toGeometry(new Envelope(-180, 180, -90, 90))
 
     val gridRDD: RDD[Polygon] = {
       spark.sparkContext

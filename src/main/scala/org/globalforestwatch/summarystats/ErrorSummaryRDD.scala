@@ -12,7 +12,6 @@ import org.apache.spark.rdd.RDD
 import org.globalforestwatch.features.FeatureId
 import org.globalforestwatch.grids.GridSources
 import org.globalforestwatch.util.RepartitionSkewedRDD
-import org.globalforestwatch.summarystats.EmptySummary
 
 import scala.reflect.ClassTag
 import cats.kernel.Semigroup
@@ -89,12 +88,16 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
             case (windowKey, features) =>
               val maybeRasterSource: Either[JobError, SOURCES] =
                 getSources(windowKey, windowLayout, kwargs)
-                  .left.map(ex => RasterReadError(ex.getMessage))
+                  .left.map(ex =>
+                    RasterReadError(ex.getMessage)
+                )
 
               val maybeRaster: Either[JobError, Raster[TILE]] =
                 maybeRasterSource.flatMap { rs: SOURCES =>
                   readWindow(rs, windowKey, windowLayout)
-                    .left.map(ex => RasterReadError(s"Reading raster for $windowKey"))
+                    .left.map(ex =>
+                    RasterReadError(s"Reading raster for $windowKey: ${ex.getMessage}")
+                  )
                 }
 
               val partialSummaries: Array[(FEATUREID, ValidatedSummary[SUMMARY])] =

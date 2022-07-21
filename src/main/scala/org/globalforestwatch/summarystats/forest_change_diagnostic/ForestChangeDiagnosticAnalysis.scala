@@ -60,7 +60,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
         }
       }
 
-      val partialResult: RDD[ValidatedLocation[ForestChangeDiagnosticData]] =
+      val partialResult: RDD[ValidatedLocation[ForestChangeDiagnosticData]] = {
         ValidatedWorkflow(features)
           .flatMap { locationGeometries =>
             val diffLocations = filterDiffGridCells(locationGeometries, diffGridIds)
@@ -99,6 +99,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
           }
           .unify
           .persist(StorageLevel.MEMORY_AND_DISK)
+      }
 
       cachedIntermidateResultsRDD match {
         case Some(cachedResults) =>
@@ -135,6 +136,8 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
   /** Collect lists of GridIds for which diff geometry is present (id=-2) */
   def collectDiffGridIds(rdd: RDD[ValidatedLocation[Geometry]]): List[GridId] = {
+    // new logic: get ID with new old geom, get grid IDs, join on same grid ID, collect
+    // IDs where grid geometry is not the same
     rdd
       .collect {
         case Valid(Location(GfwProFeatureId(_, locationId, _, _), geom)) if locationId == -2 =>

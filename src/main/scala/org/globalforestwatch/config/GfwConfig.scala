@@ -14,7 +14,7 @@ object GfwConfig extends LazyLogging {
 
   def isGfwPro: Boolean = featureFlag == Some("pro")
 
-  lazy val get: GfwConfig = read(featureFlag.getOrElse("default"))
+  val get: GfwConfig = read(featureFlag.getOrElse("default"))
 
   def read(flag: String): GfwConfig = {
     val rasterCatalogFile = s"raster-catalog-$flag.json"
