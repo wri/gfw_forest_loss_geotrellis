@@ -9,12 +9,12 @@ object RepartitionSkewedRDD {
   def bySparseId[A: ClassTag](rdd: RDD[(Long, A)], maxPartitionSize: Int): RDD[A] = {
     val counts = rdd.map{ case (id, _) => (id, 1l) }.reduceByKey(_ + _).collect().sortBy(_._2)
     val splits = PartitionSplit.fromCounts(counts, maxPartitionSize)
-    val paritionIndex: (Long, A) => Int = (id, v) => splits(id).partitionForRow(v)
+    val partitionIndex: (Long, A) => Int = (id, v) => splits(id).partitionForRow(v)
     val parallelism = rdd.sparkContext.defaultParallelism
     val numPartitions: Int = math.max(parallelism, splits.size / 16).toInt
 
     rdd
-      .map { case (id, v) => (paritionIndex(id, v), v) }
+      .map { case (id, v) => (partitionIndex(id, v), v) }
       .partitionBy(new HashPartitioner(numPartitions))
       .values
   }

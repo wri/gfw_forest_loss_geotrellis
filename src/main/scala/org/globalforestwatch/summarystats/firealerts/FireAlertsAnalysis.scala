@@ -43,7 +43,7 @@ object FireAlertsAnalysis extends SummaryAnalysis {
 //    }
 
     val summaryRDD: RDD[(FeatureId, FireAlertsSummary)] =
-      FireAlertsRDD(featureRDD, layoutDefinition, kwargs, partition = true)
+      FireAlertsRDD(featureRDD, layoutDefinition, kwargs)
 
     val summaryDF = fireAlertType match {
       case "modis" | "viirs" =>
@@ -97,10 +97,10 @@ object FireAlertsAnalysis extends SummaryAnalysis {
       if (parallelism > fireRDD.approximateTotalCount / 2) {
         Math.max((fireRDD.approximateTotalCount / 4).toInt, 1)
       } else {
-        parallelism
+        parallelism * 8
       }
 
-    fireRDD.spatialPartitioning(GridType.KDBTREE, partitions)
+    fireRDD.spatialPartitioning(GridType.QUADTREE, partitions)
     featureRDD.spatialPartitioning(fireRDD.getPartitioner)
 
     val buildOnSpatialPartitionedRDD = true
@@ -110,7 +110,6 @@ object FireAlertsAnalysis extends SummaryAnalysis {
     fireRDD.buildIndex(IndexType.QUADTREE, buildOnSpatialPartitionedRDD)
 
     val resultPairRDD = JoinQuery.SpatialJoinQueryFlat(fireRDD, featureRDD, usingIndex, considerBoundaryIntersection)
-    //  resultPairRDD.take(10).foreach(println)
 
     pairRddToDf(resultPairRDD, featureType, fireAlertType, spark)
   }

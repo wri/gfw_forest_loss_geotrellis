@@ -41,7 +41,7 @@ object FireAlertsExport extends SummaryExport {
     // only export all points for viirs gadm
     if (fireAlertType == "viirs") {
       gadmDF
-        .coalesce (Integer.min(200, ceil (numPartitions / 40.0).toInt))
+        .coalesce(Integer.min(300, ceil (numPartitions / 20.0).toInt))
         .write
         .options (csvOptions)
         .csv (path = outputUrl + "/all")

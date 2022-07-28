@@ -29,13 +29,13 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
     *
     * @param featureRDD areas of interest
     * @param windowLayout window layout used for distribution of IO, subdivision of 10x10 degree grid
-    * @param partition flag of whether to partition RDD while processing
+    * @param partitionType flag of whether to partition RDD while processing
     */
   def apply[FEATUREID <: FeatureId](
                                      featureRDD: RDD[Feature[Geometry, FEATUREID]],
                                      windowLayout: LayoutDefinition,
                                      kwargs: Map[String, Any],
-                                     partition: Boolean = true)(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
+                                     partitionType: String = "SKEWED")(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID], ord: Ordering[SUMMARY] = null): RDD[(FEATUREID, SUMMARY)] = {
 
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
      * Each features will intersect one or more windows, possibly creating a duplicate record.
@@ -59,19 +59,16 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
      * for features to be close together already during export.
      */
 
-//    val partitionedFeatureRDD = if (partition) {
-//      val rangePartitioner =
-//        new RangePartitioner(featureRDD.sparkContext.defaultParallelism, keyedFeatureRDD)
-//      keyedFeatureRDD.partitionBy(rangePartitioner).values
-//    } else {
-//      keyedFeatureRDD.values
-//    }
-
-    val partitionedFeatureRDD = if (partition) {
-      RepartitionSkewedRDD.bySparseId(keyedFeatureRDD, 4096)
-    } else {
-      keyedFeatureRDD.values
-    }
+    val partitionedFeatureRDD =
+      if (partitionType.equals("SKEWED")) {
+        RepartitionSkewedRDD.bySparseId(keyedFeatureRDD, 4096)
+      } else if (partitionType.equals("RANGE")) {
+        val rangePartitioner =
+          new RangePartitioner(featureRDD.sparkContext.defaultParallelism, keyedFeatureRDD)
+        keyedFeatureRDD.partitionBy(rangePartitioner).values
+      } else {
+        keyedFeatureRDD.values
+      }
 
     println(s"Number of partitions: ${partitionedFeatureRDD.getNumPartitions}")
 
