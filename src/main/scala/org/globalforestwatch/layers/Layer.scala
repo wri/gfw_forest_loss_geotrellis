@@ -16,6 +16,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import scalaj.http._
 import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
 import org.globalforestwatch.grids.GridTile
+import geotrellis.raster.geotiff.GeoTiffRasterSource
 
 import java.time.LocalDate
 
