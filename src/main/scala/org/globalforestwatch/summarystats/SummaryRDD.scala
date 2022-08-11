@@ -110,9 +110,16 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                   readWindow(rs, windowKey, windowLayout)
                 }
 
-              // flatMap here flattens out and ignores the errors
-              features.flatMap { feature: Feature[Geometry, FEATUREID] =>
-                val id: FEATUREID = feature.data
+
+              // Split features into those that completely contain the current window
+              // and those that only partially contain it
+              val windowGeom: Extent = windowLayout.mapTransform.keyToExtent(windowKey)
+              val (fullWindowFeatures, partialWindowFeatures) = features.partition {
+                feature =>
+                  feature.geom.contains(windowGeom)
+              }
+
+              def getSummaryForGeom(featureIds: List[FEATUREID], geom: Geometry) = {
                 val rasterizeOptions = Rasterizer.Options(
                   includePartial = false,
                   sampleType = PixelIsPoint
@@ -120,7 +127,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
                 maybeRaster match {
                   case Left(exception) =>
-                    logger.error(s"Feature $id: $exception")
+                    logger.error(s"Feature(s) $featureIds: $exception")
                     List.empty
 
                   case Right(raster) =>
@@ -128,7 +135,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                       try {
                         runPolygonalSummary(
                           raster,
-                          feature.geom,
+                          geom,
                           rasterizeOptions,
                           kwargs
                         ) match {
@@ -138,38 +145,59 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                       } catch {
                         case ise: java.lang.IllegalStateException => {
                           println(
-                            s"There is an issue with geometry for ${feature.data}"
+                            s"There is an issue with geometry for feature(s) $featureIds"
                           )
                           // TODO some very invalid geoms are somehow getting here, skip for now
                           None
                         }
                         case te: org.locationtech.jts.geom.TopologyException => {
                           println(
-                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
+                            s"There is an issue with geometry for feature(s) $featureIds: ${geom}"
                           )
                           None
                         }
                         case be: java.lang.ArrayIndexOutOfBoundsException => {
                           println(
-                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
+                            s"There is an issue with geometry for feature(s) $featureIds: ${geom}"
                           )
                           None
                         }
                         case ise: java.lang.IllegalArgumentException => {
                           println(
-                            s"There is an issue with geometry for ${feature.data}: ${feature.geom}"
+                            s"There is an issue with geometry for feature(s) $featureIds: ${geom}"
                           )
                           None
                         }
-
                       }
 
                     summary match {
-                      case Some(result) => List((id, result))
+                      case Some(result) => featureIds.map { case featureId => (featureId, result) }
                       case None => List.empty
                     }
                 }
               }
+
+              // for partial windows, we need to calculate summary for each geometry,
+              // since they all may have unique intersections with the window
+              val partialWindowResults = partialWindowFeatures.flatMap {
+                case feature =>
+                  println(s"Running partial window summary for feature ID ${feature.data}")
+                  getSummaryForGeom(List(feature.data), feature.geom)
+              }
+
+              // if there are any full window intersections, we only need to calculate
+              // the summary for the window, and then tie it to each feature ID
+              val fullWindowIds = fullWindowFeatures.map { case feature => feature.data}.toList
+              val fullWindowResults =
+                if (fullWindowFeatures.nonEmpty) {
+                  println(s"Running full window summary for feature IDs ${fullWindowIds} on window ${windowGeom}")
+                  getSummaryForGeom(fullWindowIds, windowGeom)
+                } else {
+                  List.empty
+                }
+
+              // combine results
+              partialWindowResults ++ fullWindowResults
           }
       }
 
