@@ -17,7 +17,7 @@ object FireAlertsCommand extends SummaryCommand {
     (
       defaultOptions,
       changeOnlyOpt,
-      fireAlertOptions,
+      requiredFireAlertOptions,
       featureFilterOptions
     ).mapN { (default, changeOnly, fireAlert, filterOptions) =>
       val kwargs = Map(
@@ -38,7 +38,6 @@ object FireAlertsCommand extends SummaryCommand {
             FeatureRDD(fireAlert.alertSource, fireAlert.alertType, firesFeatureFilter, false, spark)
           case "burned_areas" =>
             val burnedAreasUris = fireAlert.alertSource
-
             FeatureRDD(
               fireAlert.alertType,
               burnedAreasUris,
