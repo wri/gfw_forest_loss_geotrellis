@@ -25,7 +25,7 @@ object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
     (
       defaultOptions,
       intermediateListSourceOpt,
-      fireAlertOptions,
+      requiredFireAlertOptions,
       featureFilterOptions
     ).mapN { (default, intermediateListSource, fireAlert, filterOptions) =>
       val kwargs = Map(

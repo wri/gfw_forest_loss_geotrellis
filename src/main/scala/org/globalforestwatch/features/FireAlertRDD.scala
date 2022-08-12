@@ -1,6 +1,7 @@
 package org.globalforestwatch.features
 
 import cats.data.NonEmptyList
+import geotrellis.vector.Geometry
 import org.locationtech.jts.geom.Geometry
 import org.apache.spark.sql.SparkSession
 import org.apache.sedona.core.spatialRDD.SpatialRDD
@@ -14,20 +15,20 @@ object FireAlertRDD {
     fireAlertSource: NonEmptyList[String],
     filters: FeatureFilter
   ): SpatialRDD[Geometry] = {
-    val fireAlertObj = Feature(fireAlertType)
-    val fireAlertPointDF = SpatialFeatureDF(
-      fireAlertSource,
-      fireAlertObj,
-      filters,
-      spark,
-      "longitude",
-      "latitude"
-    )
+      val fireAlertObj = Feature(fireAlertType)
+      val fireAlertPointDF = SpatialFeatureDF(
+        fireAlertSource,
+        fireAlertObj,
+        filters,
+        spark,
+        "longitude",
+        "latitude"
+      )
 
-    val fireAlertSpatialRDD =
-      Adapter.toSpatialRdd(fireAlertPointDF, "pointshape")
+      val fireAlertSpatialRDD =
+        Adapter.toSpatialRdd(fireAlertPointDF, "pointshape")
 
-    fireAlertSpatialRDD.analyze()
-    fireAlertSpatialRDD
+      fireAlertSpatialRDD.analyze()
+      fireAlertSpatialRDD
   }
 }
