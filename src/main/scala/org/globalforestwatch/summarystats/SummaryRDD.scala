@@ -191,7 +191,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
               val fullWindowResults =
                 if (fullWindowFeatures.nonEmpty) {
                   println(s"Running full window summary for feature IDs ${fullWindowIds} on window ${windowGeom}")
-                  getSummaryForGeom(fullWindowIds, windowGeom)
+                  getSummaryForGeom(fullWindowIds, fullWindowFeatures.head.geom)
                 } else {
                   List.empty
                 }
