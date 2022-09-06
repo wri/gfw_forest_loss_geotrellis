@@ -10,10 +10,12 @@ import org.globalforestwatch.summarystats.gladalerts.GladAlertsCommand.gladAlert
 import org.globalforestwatch.summarystats.treecoverloss.TreeCoverLossCommand.treeCoverLossCommand
 import org.globalforestwatch.summarystats.integrated_alerts.IntegratedAlertsCommand.integratedAlertsCommand
 import com.monovore.decline._
+import org.globalforestwatch.config.GfwConfig
 
 object SummaryMain {
   val name = "geotrellis-summary-stats"
   val header = "Compute summary statistics for GFW data"
+  val config = GfwConfig.get
   val main = {
     annualupdateMinimalCommand orElse
       carbonSensitivityCommand orElse

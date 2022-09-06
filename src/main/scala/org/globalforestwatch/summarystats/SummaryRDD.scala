@@ -116,7 +116,14 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
               val windowGeom: Extent = windowLayout.mapTransform.keyToExtent(windowKey)
               val (fullWindowFeatures, partialWindowFeatures) = features.partition {
                 feature =>
-                  feature.geom.contains(windowGeom)
+                  try {
+                    feature.geom.contains(windowGeom)
+                  } catch {
+                    case e: org.locationtech.jts.geom.TopologyException =>
+                      // fallback if JTS can't do the intersection because of a wonky geometry,
+                      // just skip the optimization
+                      false
+                  }
               }
 
               def getSummaryForGeom(featureIds: List[FEATUREID], geom: Geometry) = {
@@ -181,7 +188,6 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
               // since they all may have unique intersections with the window
               val partialWindowResults = partialWindowFeatures.flatMap {
                 case feature =>
-                  println(s"Running partial window summary for feature ID ${feature.data}")
                   getSummaryForGeom(List(feature.data), feature.geom)
               }
 
@@ -190,8 +196,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
               val fullWindowIds = fullWindowFeatures.map { case feature => feature.data}.toList
               val fullWindowResults =
                 if (fullWindowFeatures.nonEmpty) {
-                  println(s"Running full window summary for feature IDs ${fullWindowIds} on window ${windowGeom}")
-                  getSummaryForGeom(fullWindowIds, fullWindowFeatures.head.geom)
+                  getSummaryForGeom(fullWindowIds, windowGeom)
                 } else {
                   List.empty
                 }

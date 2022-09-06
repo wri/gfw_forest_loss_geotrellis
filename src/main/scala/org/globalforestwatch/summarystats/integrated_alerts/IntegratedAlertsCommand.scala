@@ -3,6 +3,7 @@ package org.globalforestwatch.summarystats.integrated_alerts
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
+import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features.{FeatureFilter, FeatureRDD}
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsAnalysis
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsCommand.runAnalysis
@@ -35,5 +36,4 @@ object IntegratedAlertsCommand extends SummaryCommand {
         }
     }
   }
-
 }
