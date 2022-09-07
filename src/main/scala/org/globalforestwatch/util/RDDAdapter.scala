@@ -6,7 +6,7 @@ import org.globalforestwatch.features.FeatureId
 import org.locationtech.jts.geom.Geometry
 import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.globalforestwatch.summarystats.Location
-import org.globalforestwatch.util.GeotrellisGeometryValidator.preserveGeometryType
+import org.globalforestwatch.util.GeotrellisGeometryValidator.{makeValidGeom, preserveGeometryType}
 import org.locationtech.jts.geom.util.GeometryFixer
 
 object RDDAdapter {
@@ -26,7 +26,7 @@ object RDDAdapter {
     val spatialRDD = new SpatialRDD[Geometry]()
     spatialRDD.rawSpatialRDD = rdd.map { case Location(id, geom) =>
       geom.setUserData(id)
-      preserveGeometryType(GeometryFixer.fix(geom), geom.getGeometryType)
+      geom
     }.toJavaRDD()
     spatialRDD.analyze()
     spatialRDD
