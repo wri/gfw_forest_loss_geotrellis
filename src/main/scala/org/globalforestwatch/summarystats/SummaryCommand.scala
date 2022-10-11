@@ -119,19 +119,29 @@ trait SummaryCommand {
     .option[String]("fire_alert_type", help = "modis or viirs")
     .withDefault("viirs")
 
-  val fireAlertSourceOpt: Opts[NonEmptyList[String]] = Opts
+  val requiredFireAlertSourceOpt: Opts[NonEmptyList[String]] = Opts
     .options[String](
       "fire_alert_source",
       help = "URI of fire alerts in TSV format"
     )
+
+  val optionalFireAlertSourceOpt: Opts[Option[NonEmptyList[String]]] = Opts
+    .options[String](
+      "fire_alert_source",
+      help = "URI of fire alerts in TSV format"
+    ).orNone
+
 
   val noOutputPathSuffixOpt: Opts[Boolean] = Opts.flag("no_output_path_suffix", help = "Do not autogenerate output path suffix at runtime").orFalse
 
   val defaultOptions: Opts[BaseOptions] =
     (featureTypeOpt, featuresOpt, outputOpt, overwriteOutputOpt, splitFeatures, noOutputPathSuffixOpt).mapN(BaseOptions)
 
-  val fireAlertOptions: Opts[FireAlert] =
-    (fireAlertTypeOpt, fireAlertSourceOpt).mapN(FireAlert)
+  val requiredFireAlertOptions: Opts[RequiredFireAlert] =
+    (fireAlertTypeOpt, requiredFireAlertSourceOpt).mapN(RequiredFireAlert)
+
+  val optionalFireAlertOptions: Opts[OptionalFireAlert] =
+    (fireAlertTypeOpt, optionalFireAlertSourceOpt).mapN(OptionalFireAlert)
 
   val defaultFilterOptions: Opts[BaseFilter] =
     (tclOpt, gladOpt).mapN(BaseFilter)
@@ -233,5 +243,7 @@ object SummaryCommand {
     gadm: Option[GadmFilter],
     wdpa: Option[WdpaFilter])
 
-  case class FireAlert(alertType: String, alertSource: NonEmptyList[String])
+  case class RequiredFireAlert(alertType: String, alertSource: NonEmptyList[String])
+
+  case class OptionalFireAlert(alertType: String, alertSource: Option[NonEmptyList[String]])
 }
