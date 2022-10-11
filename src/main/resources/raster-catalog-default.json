@@ -10,7 +10,7 @@
     },
     {
       "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202204/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202208/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
@@ -106,7 +106,7 @@
     },
     {
       "name":"umd_tree_cover_gain",
-      "source_uri":"s3://gfw-data-lake/umd_tree_cover_gain/v1.2/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/umd_tree_cover_gain_from_height/v202206/raster/epsg-4326/{grid_size}/{row_count}/gain/geotiff/{tile_id}.tif"
     },
     {
       "name":"tsc_tree_cover_loss_drivers",
