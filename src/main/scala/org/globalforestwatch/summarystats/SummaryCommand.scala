@@ -18,7 +18,6 @@ trait SummaryCommand {
 
 
   implicit val configArgument: Argument[Config] = new Argument[Config] {
-
     def read(string: String) = {
       string.split(":", 2) match {
         case Array(key, value) => Validated.valid(Config(key, value))

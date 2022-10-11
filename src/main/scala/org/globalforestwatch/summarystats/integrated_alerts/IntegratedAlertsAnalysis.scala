@@ -20,7 +20,7 @@ object IntegratedAlertsAnalysis extends SummaryAnalysis {
     import spark.implicits._
 
     val summaryRDD: RDD[(FeatureId, IntegratedAlertsSummary)] =
-      IntegratedAlertsRDD(featureRDD, IntegratedAlertsGrid.blockTileGrid, kwargs, partitionType = "RANGE")
+      IntegratedAlertsRDD(featureRDD, IntegratedAlertsGrid.blockTileGrid, kwargs)
 
     val summaryDF =
       IntegratedAlertsDFFactory(featureType, summaryRDD, spark).getDataFrame

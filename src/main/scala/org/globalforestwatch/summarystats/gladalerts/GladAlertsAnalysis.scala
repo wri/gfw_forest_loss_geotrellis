@@ -17,7 +17,7 @@ object GladAlertsAnalysis extends SummaryAnalysis {
     import spark.implicits._
 
     val summaryRDD: RDD[(FeatureId, GladAlertsSummary)] =
-      GladAlertsRDD(featureRDD, GladAlertsGrid.blockTileGrid, kwargs, partitionType = "RANGE")
+      GladAlertsRDD(featureRDD, GladAlertsGrid.blockTileGrid, kwargs)
 
     val summaryDF =
       GladAlertsDFFactory(featureType, summaryRDD, spark).getDataFrame
