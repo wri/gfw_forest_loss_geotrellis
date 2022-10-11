@@ -10,17 +10,18 @@ import org.globalforestwatch.util.GeometryConstructor.createPoint
 import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
 import org.globalforestwatch.util.RDDAdapter
 import org.globalforestwatch.ValidatedWorkflow
-
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
 import org.globalforestwatch.features.FeatureId
 import org.apache.sedona.sql.utils.Adapter
 import org.apache.sedona.core.spatialRDD.SpatialRDD
+import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 
 import scala.collection.JavaConverters._
 import java.time.LocalDate
 import org.globalforestwatch.util.IntersectGeometry
+
 import scala.reflect.ClassTag
 
 object GfwProDashboardAnalysis extends SummaryAnalysis {
@@ -57,9 +58,11 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
       ValidatedWorkflow(enrichedRDD)
         .mapValidToValidated { rdd =>
           rdd.map { case row@Location(fid, geom) =>
-            if (geom.isEmpty())
+            if (geom.isEmpty()) {
               Validated.invalid[Location[JobError], Location[Geometry]](Location(fid, GeometryError(s"Empty Geometry")))
-            else
+            } else if (!geom.isValid) {
+              Validated.invalid[Location[JobError], Location[Geometry]](Location(fid, GeometryError(s"Invalid Geometry")))
+            } else
               Validated.valid[Location[JobError], Location[Geometry]](row)
           }
         }
@@ -104,7 +107,8 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
         if (contextualGeom.contains(featureCentroid)) {
           val fid = CombinedFeatureId(gfwproId, contextualId)
           // val gtGeom: Geometry = toGeotrellisGeometry(featureGeom)
-          List(Validated.Valid(Location(fid, featureGeom)))
+          val fixedGeom = makeValidGeom(featureGeom)
+          List(Validated.Valid(Location(fid, fixedGeom)))
         } else Nil
 
       case gfwproId: GfwProFeatureId if gfwproId.locationId < 0 =>
@@ -114,7 +118,8 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           .map { geometries =>
             geometries.map { geom =>
               // val gtGeom: Geometry = toGeotrellisGeometry(geom)
-              Location(CombinedFeatureId(gfwproId, contextualId), geom)
+              val fixedGeom = makeValidGeom(geom)
+              Location(CombinedFeatureId(gfwproId, contextualId), fixedGeom)
             }
           }
           .traverse(identity) // turn validated list of geometries into list of validated geometries

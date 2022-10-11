@@ -31,7 +31,7 @@ object IntegratedAlertsExport extends SummaryExport {
       .transform(IntegratedAlertsDF.aggSummary(List("iso", "adm1", "adm2")))
 
     adm2DF
-      .coalesce(10)
+      .coalesce(50)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm2/summary")
@@ -40,7 +40,7 @@ object IntegratedAlertsExport extends SummaryExport {
       .transform(IntegratedAlertsDF.aggSummary(List("iso", "adm1")))
 
     adm1DF
-      .coalesce(10)
+      .coalesce(30)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/summary")
@@ -49,7 +49,7 @@ object IntegratedAlertsExport extends SummaryExport {
       .transform(IntegratedAlertsDF.aggSummary(List("iso")))
 
     isoDF
-      .coalesce(10)
+      .coalesce(20)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/summary")
@@ -165,8 +165,7 @@ object IntegratedAlertsExport extends SummaryExport {
     val groupByCols = List("geostore__id")
     val unpackCols = List($"id.geostoreId" as "geostore__id")
 
-    _export(summaryDF, outputUrl + "/geostore", kwargs, groupByCols, unpackCols, numExportParts = 100)
-
+    _export(summaryDF, outputUrl + "/geostore", kwargs, groupByCols, unpackCols, numExportParts = 200)
   }
 
   private def _export(summaryDF: DataFrame,

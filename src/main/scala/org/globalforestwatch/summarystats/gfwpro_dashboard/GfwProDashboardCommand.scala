@@ -4,7 +4,10 @@ import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
+import geotrellis.vector.Geometry
+import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.globalforestwatch.features._
+import org.locationtech.jts.geom.Geometry
 
 object GfwProDashboardCommand extends SummaryCommand {
 
@@ -26,7 +29,7 @@ object GfwProDashboardCommand extends SummaryCommand {
   ) {
     (
       defaultOptions,
-      fireAlertOptions,
+      optionalFireAlertOptions,
       featureFilterOptions,
       contextualFeatureUrlOpt,
       contextualFeatureTypeOpt
@@ -42,7 +45,15 @@ object GfwProDashboardCommand extends SummaryCommand {
       runAnalysis { implicit spark =>
         val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures)
 
-        val fireAlertRDD = FireAlertRDD(spark, fireAlert.alertType, fireAlert.alertSource, FeatureFilter.empty)
+        val fireAlertRDD = fireAlert.alertSource match {
+          case Some(alertSource) =>
+            FireAlertRDD(spark, fireAlert.alertType, alertSource, FeatureFilter.empty)
+          case None =>
+            // If no sources provided, just create an empty RDD
+            val spatialRDD = new SpatialRDD[Geometry]
+            spatialRDD.rawSpatialRDD = spark.sparkContext.emptyRDD[Geometry].toJavaRDD()
+            spatialRDD
+        }
 
         GfwProDashboardAnalysis(
           featureRDD,

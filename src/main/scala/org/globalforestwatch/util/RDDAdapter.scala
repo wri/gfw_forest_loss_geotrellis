@@ -6,6 +6,8 @@ import org.globalforestwatch.features.FeatureId
 import org.locationtech.jts.geom.Geometry
 import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.globalforestwatch.summarystats.Location
+import org.globalforestwatch.util.GeotrellisGeometryValidator.{makeValidGeom, preserveGeometryType}
+import org.locationtech.jts.geom.util.GeometryFixer
 
 object RDDAdapter {
 

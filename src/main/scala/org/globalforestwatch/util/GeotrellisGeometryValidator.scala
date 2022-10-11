@@ -5,6 +5,7 @@ import geotrellis.vector.io.wkb.WKB
 import org.locationtech.jts.geom
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
+import org.locationtech.jts.geom.util.GeometryFixer
 
 import scala.util.Try
 
@@ -37,7 +38,7 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
     val validGeom = {
       if (!geom.isValid) {
 
-        val fixedGeom = GfwGeometryFixer.fix(geom)
+        val fixedGeom = GeometryFixer.fix(geom)
 
         // Geometry fixer may alter the geometry type or even return an empty geometry
         // We want to try to preserve the geometry type if possible
@@ -52,14 +53,8 @@ object GeotrellisGeometryValidator extends java.io.Serializable {
   }
 
   def makeValidGeom(wkb: String): Geometry = {
-    if (GfwConfig.isGfwPro) {
-      // Pro is getting direct geometries from users, geometries may be invalid
-      val geom: Option[Geometry] = Try(WKB.read(wkb)).toOption
-      geom.map(makeValidGeom(_)).getOrElse(GeomFactory.factory.createPoint())
-    } else {
-      // Flagship has already preprocessed geometries to make them valid
-      WKB.read(wkb)
-    }
+    val geom: Option[Geometry] = Try(WKB.read(wkb)).toOption
+    geom.map(makeValidGeom(_)).getOrElse(GeomFactory.factory.createPoint())
   }
 
   def makeMultiGeom(geom: Geometry): Geometry = {
