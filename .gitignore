@@ -20,6 +20,11 @@ target
 *.jar
 *.crc
 _SUCCESS
+*.bloop/
+*.bsp/
+*.metals/
+/project
+
 
 *.pyc
 .project
