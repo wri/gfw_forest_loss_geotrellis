@@ -14,7 +14,7 @@
     },
     {
       "name":"gfw_oil_gas",
-      "source_uri":"s3://gfw-data-lake/gfw_oil_gas/v20190321/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_oil_gas/v20221024/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"idn_forest_area",
