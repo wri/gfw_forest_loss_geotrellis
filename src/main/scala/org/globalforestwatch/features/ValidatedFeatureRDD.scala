@@ -14,6 +14,8 @@ import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.validatedIntersection
 import org.locationtech.jts.geom._
+import org.locationtech.jts.operation.union.UnaryUnionOp
+import java.util.Collection
 
 object ValidatedFeatureRDD {
   val logger = Logger.getLogger("FeatureRDD")
@@ -87,13 +89,37 @@ object ValidatedFeatureRDD {
      */
     val hashPartitioner = new HashPartitioner(flatJoin.getNumPartitions)
 
-     flatJoin.rdd
+    val spatiallyKeyed = flatJoin.rdd
       .keyBy({ pair: (Polygon, Geometry) =>
         Z2(
           (pair._1.getCentroid.getX * 100).toInt,
           (pair._1.getCentroid.getY * 100).toInt
         ).z
       })
+
+    import org.locationtech.jts.geom.GeometryFactory
+    import org.locationtech.jts.geom.GeometryCollection
+
+    val dissolved: RDD[(Long, (Polygon, Geometry))] = spatiallyKeyed.groupByKey().mapValues({
+      geoms: Iterable[(Polygon, Geometry)] =>
+        val mappedGeoms = geoms.toMap
+        val gridCell = mappedGeoms.keys.toList(0)
+        val firstGeom = mappedGeoms.values.toList(0)
+        val featureId: GfwProFeatureId = firstGeom.getUserData.asInstanceOf[GfwProFeatureId]
+
+        val geomCollection: GeometryCollection =
+          new GeometryFactory().createGeometryCollection(
+            mappedGeoms.values.toArray
+          )
+        val unioned = UnaryUnionOp.union(geomCollection)
+
+        unioned.setUserData(GfwProFeatureId(featureId.listId, -1, 0, 0))
+        (gridCell, unioned)
+    })
+
+    val combined = spatiallyKeyed ++ dissolved
+
+    combined
       .partitionBy(hashPartitioner)
       .flatMap { case (_, (gridCell, geom)) =>
         val fid = geom.getUserData.asInstanceOf[FeatureId]
