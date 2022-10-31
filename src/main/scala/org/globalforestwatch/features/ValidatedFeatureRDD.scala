@@ -100,24 +100,44 @@ object ValidatedFeatureRDD {
     import org.locationtech.jts.geom.GeometryFactory
     import org.locationtech.jts.geom.GeometryCollection
 
-    val dissolved: RDD[(Long, (Polygon, Geometry))] = spatiallyKeyed.groupByKey().mapValues({
-      geoms: Iterable[(Polygon, Geometry)] =>
-        val mappedGeoms = geoms.toMap
-        val gridCell = mappedGeoms.keys.toList(0)
-        val firstGeom = mappedGeoms.values.toList(0)
-        val featureId: GfwProFeatureId = firstGeom.getUserData.asInstanceOf[GfwProFeatureId]
+//    def dissolve(pair1: (Polygon, Geometry), pair2: (Polygon, Geometry)): (Polygon, Geometry) = {
+//      val unioned = pair1._2.union(pair2._2)
+//      val featureId = pair1._2.getUserData.asInstanceOf[GfwProFeatureId]
+//      unioned.setUserData(pair1._2.setUserData(GfwProFeatureId(featureId.listId, -1, 0, 0)))
+//      (pair1._1, unioned)
+//    }
 
+    val dissolved: RDD[(Long, (Polygon, Geometry))] = spatiallyKeyed.groupByKey().flatMapValues({
+      geoms: Iterable[(Polygon, Geometry)] =>
+        val locations: List[(GfwProFeatureId, Geometry)] = geoms.toMap.values.toList.map({
+          geom => (geom.getUserData.asInstanceOf[GfwProFeatureId], geom)
+        })
+
+        // if all values are unchanged, skip this tile
+        if (locations.forall({ pair: (GfwProFeatureId, Geometry) => pair._1.locationId == -1})) {
+          None
+        }
+
+        // remove any deleted locations (ID == -2)
+        val deletedRemoved = locations.filter(pair => pair._1.locationId != -2)
+
+        val gridCell = geoms.toMap.keys.toList(0)
+        val featureId: GfwProFeatureId = deletedRemoved(0)._1
+
+        // union all remaining geoms to get diff geom
         val geomCollection: GeometryCollection =
           new GeometryFactory().createGeometryCollection(
-            mappedGeoms.values.toArray
+            deletedRemoved.map(g => g._2).toArray
           )
-        val unioned = UnaryUnionOp.union(geomCollection)
 
+        val unioned = UnaryUnionOp.union(geomCollection)
         unioned.setUserData(GfwProFeatureId(featureId.listId, -1, 0, 0))
-        (gridCell, unioned)
+        Some(gridCell, unioned)
     })
 
-    val combined = spatiallyKeyed ++ dissolved
+    val combined = spatiallyKeyed.filter(
+      pair => pair._2._2.getUserData.asInstanceOf[GfwProFeatureId].locationId >= 0
+    ) ++ dissolved
 
     combined
       .partitionBy(hashPartitioner)
