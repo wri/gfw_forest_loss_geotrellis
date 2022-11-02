@@ -87,18 +87,23 @@ object ValidatedFeatureRDD {
 
       val preGriddedGeoms: RDD[Geometry] =
         if (prevDissolvedGeom.size() > 0) {
-          val diffGeom = currDissolvedGeom.get(0).difference(prevDissolvedGeom.get(0))
-          diffGeom.setUserData(prevDissolvedGeom.get(0).getUserData)
+          val diffGeom = currDissolvedGeom.get(0).symDifference(prevDissolvedGeom.get(0))
 
-          val griddedDiffGeom = spatialGridRDD.rawSpatialRDD.map(
-            geom => {
-              val diff = geom.intersection(diffGeom)
-              diff.setUserData(diffGeom.getUserData)
-              diff
-            }
-          )
+          if (!diffGeom.isEmpty) {
+            diffGeom.setUserData(prevDissolvedGeom.get(0).getUserData)
 
-          griddedCurrDissolvedGeom ++ griddedDiffGeom
+            val griddedDiffGeom = spatialGridRDD.rawSpatialRDD.map(
+              geom => {
+                val diff = geom.intersection(diffGeom)
+                diff.setUserData(diffGeom.getUserData)
+                diff
+              }
+            )
+
+            griddedCurrDissolvedGeom ++ griddedDiffGeom
+          } else {
+            griddedCurrDissolvedGeom
+          }
         } else {
           griddedCurrDissolvedGeom
         }
@@ -106,6 +111,7 @@ object ValidatedFeatureRDD {
       spatialFeatureRDD.rawSpatialRDD = spatialFeatureRDD.rawSpatialRDD.filter(
         g => g.getUserData.asInstanceOf[GfwProFeatureId].locationId >= 0
       ) ++ preGriddedGeoms
+      spatialFeatureRDD.analyze()
     }
 
     val flatJoin: JavaPairRDD[Polygon, Geometry] =
