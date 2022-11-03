@@ -59,6 +59,7 @@ object ValidatedFeatureRDD {
     featureDF: DataFrame,
     spark: SparkSession
   ): RDD[ValidatedLocation[Geometry]] = {
+    featureDF.show()
     val spatialFeatureRDD: SpatialRDD[Geometry] = Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialFeatureRDD.analyze()
 
@@ -70,49 +71,6 @@ object ValidatedFeatureRDD {
 
     val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
     val spatialGridRDD = GridRDD(envelope, spark, clip = true)
-
-    // hacky workaround since Apache Sedona can't handle spatially partitioning
-    // the overlapping dissolved geom
-    val currDissolvedGeom = spatialFeatureRDD.rawSpatialRDD.filter(g => g.getUserData.asInstanceOf[GfwProFeatureId].locationId == -1).collect()
-    val prevDissolvedGeom = spatialFeatureRDD.rawSpatialRDD.filter(g => g.getUserData.asInstanceOf[GfwProFeatureId].locationId == -2).collect()
-
-    if (currDissolvedGeom.size() > 0) {
-      val griddedCurrDissolvedGeom = spatialGridRDD.rawSpatialRDD.map(
-        geom => {
-          val dissolved = geom.intersection(currDissolvedGeom.get(0))
-          dissolved.setUserData(currDissolvedGeom.get(0).getUserData)
-          dissolved
-        }
-      )
-
-      val preGriddedGeoms: RDD[Geometry] =
-        if (prevDissolvedGeom.size() > 0) {
-          val diffGeom = currDissolvedGeom.get(0).symDifference(prevDissolvedGeom.get(0))
-
-          if (!diffGeom.isEmpty) {
-            diffGeom.setUserData(prevDissolvedGeom.get(0).getUserData)
-
-            val griddedDiffGeom = spatialGridRDD.rawSpatialRDD.map(
-              geom => {
-                val diff = geom.intersection(diffGeom)
-                diff.setUserData(diffGeom.getUserData)
-                diff
-              }
-            )
-
-            griddedCurrDissolvedGeom ++ griddedDiffGeom
-          } else {
-            griddedCurrDissolvedGeom
-          }
-        } else {
-          griddedCurrDissolvedGeom
-        }
-
-      spatialFeatureRDD.rawSpatialRDD = spatialFeatureRDD.rawSpatialRDD.filter(
-        g => g.getUserData.asInstanceOf[GfwProFeatureId].locationId >= 0
-      ) ++ preGriddedGeoms
-      spatialFeatureRDD.analyze()
-    }
 
     val flatJoin: JavaPairRDD[Polygon, Geometry] =
       SpatialJoinRDD.flatSpatialJoin(

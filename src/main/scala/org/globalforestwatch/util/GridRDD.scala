@@ -9,7 +9,6 @@ import org.globalforestwatch.util.GeometryConstructor.createPolygon1x1
 
 object GridRDD {
   def apply(envelope: Envelope, spark: SparkSession, clip: Boolean = false): PolygonRDD = {
-
     val gridCells = getGridCells(envelope)
 
     val tcl_geom: Geometry = TreeCoverLossExtent.geometry // new GeometryFactory().toGeometry(new Envelope(-180, 180, -90, 90))
@@ -33,7 +32,7 @@ object GridRDD {
     spatialGridRDD
   }
 
-  private def getGridCells(envelope: Envelope): IndexedSeq[(Int, Int)] = {
+  def getGridCells(envelope: Envelope): IndexedSeq[(Int, Int)] = {
     {
       for (x <- envelope.getMinX.floor.toInt until envelope.getMaxX.ceil.toInt;
            y <- envelope.getMinY.floor.toInt until envelope.getMaxY.ceil.toInt)

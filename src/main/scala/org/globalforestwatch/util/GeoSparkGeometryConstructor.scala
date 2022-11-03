@@ -18,7 +18,6 @@ object GeometryConstructor {
   }
 
   def createPolygon1x1(minX: Double, minY: Double, srid: Int = 0): Polygon = {
-
     val polygon = geomFactory.createPolygon(
       coordSeqFactory.create(
         Array(

@@ -3,9 +3,12 @@ package org.globalforestwatch.features
 import cats.data.NonEmptyList
 import org.locationtech.jts
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.spark.sql.functions.{col, isnull, udf}
+import org.apache.spark.sql.functions.{col, explode, isnull, udf}
+import org.globalforestwatch.util.GeometryConstructor.createPolygon1x1
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
 import org.globalforestwatch.util.GeotrellisGeometryValidator.preserveGeometryType
+import org.globalforestwatch.util.GridRDD
+import org.globalforestwatch.util.GridRDD.getGridCells
 import org.locationtech.jts.geom.util.GeometryFixer
 import org.locationtech.jts.geom.{Geometry, MultiPolygon, Polygon}
 
@@ -95,6 +98,7 @@ object SpatialFeatureDF {
     import spark.implicits._
 
     val featureDF: DataFrame = FeatureDF(input, featureObj, filters, spark, delimiter)
+
     val emptyPolygonWKB = "0106000020E610000000000000"
     val readOptionWkbUDF = udf {
       s: String =>
@@ -102,7 +106,14 @@ object SpatialFeatureDF {
 
         geom match {
           case Some(g) =>
-            Some(preserveGeometryType(GeometryFixer.fix(g), g.getGeometryType))
+            val fixedGeom = preserveGeometryType(GeometryFixer.fix(g), g.getGeometryType)
+            if (fixedGeom.getArea > 10) {
+              val gridCells = getGridCells(fixedGeom.getEnvelopeInternal)
+              val polygons: List[Polygon] = gridCells.map(p => createPolygon1x1(minX = p._1, minY = p._2)).toList
+              Some(polygons.map(p => fixedGeom.intersection(p)).filterNot(p => p.isEmpty))
+            } else {
+              Some(List(fixedGeom))
+            }
           case None => None
         }
     }
@@ -114,7 +125,7 @@ object SpatialFeatureDF {
         s"struct(${featureObj.featureIdExpr}) as featureId"
       )
       .select(
-        readOptionWkbUDF (col("wkb")).as("polyshape"),
+        explode(readOptionWkbUDF(col("wkb"))).as("polyshape"),
         col("featureId")
       )
       .where(!isnull('polyshape))
