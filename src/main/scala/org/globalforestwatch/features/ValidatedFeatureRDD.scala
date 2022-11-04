@@ -113,21 +113,13 @@ object ValidatedFeatureRDD {
           geom => (geom.getUserData.asInstanceOf[GfwProFeatureId], geom)
         })
 
-        // if all values are unchanged, skip this tile
-        if (locations.forall({ pair: (GfwProFeatureId, Geometry) => pair._1.locationId == -1})) {
-          None
-        }
-
-        // remove any deleted locations (ID == -2)
-        val deletedRemoved = locations.filter(pair => pair._1.locationId != -2)
-
         val gridCell = geoms.toMap.keys.toList(0)
-        val featureId: GfwProFeatureId = deletedRemoved(0)._1
+        val featureId: GfwProFeatureId = locations(0)._1
 
         // union all remaining geoms to get diff geom
         val geomCollection: GeometryCollection =
           new GeometryFactory().createGeometryCollection(
-            deletedRemoved.map(g => g._2).toArray
+            locations.map(g => g._2).toArray
           )
 
         val unioned = UnaryUnionOp.union(geomCollection)

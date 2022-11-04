@@ -108,7 +108,7 @@ object SpatialFeatureDF {
     }
 
     featureDF
-      .where(s"${wkbField} != '${emptyPolygonWKB}'")
+      .where(s"${wkbField} != '${emptyPolygonWKB}' and location_id >= 0")
       .selectExpr(
         s"${wkbField} AS wkb",
         s"struct(${featureObj.featureIdExpr}) as featureId"
