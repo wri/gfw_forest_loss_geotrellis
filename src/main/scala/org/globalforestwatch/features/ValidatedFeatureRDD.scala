@@ -4,6 +4,7 @@ import cats.data.{NonEmptyList, Validated}
 import org.apache.log4j.Logger
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector.{Geometry, Feature => GTFeature}
+import org.apache.sedona.core.formatMapper.WktReader
 import org.apache.spark.HashPartitioner
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
@@ -14,7 +15,9 @@ import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.validatedIntersection
 import org.locationtech.jts.geom._
+import org.locationtech.jts.io.WKTReader
 import org.locationtech.jts.operation.union.UnaryUnionOp
+
 import java.util.Collection
 
 object ValidatedFeatureRDD {
@@ -71,6 +74,9 @@ object ValidatedFeatureRDD {
       geom
     }
 
+    import org.locationtech.jts.geom.GeometryFactory
+    import org.locationtech.jts.geom.GeometryCollection
+
     val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
     val spatialGridRDD = GridRDD(envelope, spark, clip = true)
 
@@ -97,21 +103,21 @@ object ValidatedFeatureRDD {
         ).z
       })
 
-    import org.locationtech.jts.geom.GeometryFactory
-    import org.locationtech.jts.geom.GeometryCollection
-
-//    def dissolve(pair1: (Polygon, Geometry), pair2: (Polygon, Geometry)): (Polygon, Geometry) = {
-//      val unioned = pair1._2.union(pair2._2)
-//      val featureId = pair1._2.getUserData.asInstanceOf[GfwProFeatureId]
-//      unioned.setUserData(pair1._2.setUserData(GfwProFeatureId(featureId.listId, -1, 0, 0)))
-//      (pair1._1, unioned)
-//    }
+//    val geoms = spatiallyKeyed.groupByKey().flatMap({
+//      geoms: (Long, Iterable[(Polygon, Geometry)]) =>
+//        geoms._2.map(g => g._2)
+//    }).collect()
+//
+//    val geomCollection = UnaryUnionOp.union( new GeometryFactory().createGeometryCollection(
+//      geoms.toArray
+//    ))
+//    println("Dissolved: " + geomCollection.toText)
 
     val dissolved: RDD[(Long, (Polygon, Geometry))] = spatiallyKeyed.groupByKey().flatMapValues({
       geoms: Iterable[(Polygon, Geometry)] =>
-        val locations: List[(GfwProFeatureId, Geometry)] = geoms.toMap.values.toList.map({
+        val locations: List[(GfwProFeatureId, Geometry)] = geoms.map(g => g._2).map({
           geom => (geom.getUserData.asInstanceOf[GfwProFeatureId], geom)
-        })
+        }).toList
 
         val gridCell = geoms.toMap.keys.toList(0)
         val featureId: GfwProFeatureId = locations(0)._1
@@ -127,9 +133,7 @@ object ValidatedFeatureRDD {
         Some(gridCell, unioned)
     })
 
-    val combined = spatiallyKeyed.filter(
-      pair => pair._2._2.getUserData.asInstanceOf[GfwProFeatureId].locationId >= 0
-    ) ++ dissolved
+    val combined = spatiallyKeyed ++ dissolved
 
     combined
       .partitionBy(hashPartitioner)

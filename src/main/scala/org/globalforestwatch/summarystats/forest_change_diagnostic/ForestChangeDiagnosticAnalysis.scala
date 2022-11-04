@@ -91,7 +91,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
                   } else {
                     data.copy(
                       commodity_threat_fires = fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty),
-                      tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2020)
+                      tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2021)
                     )
                   }
                 }
@@ -214,7 +214,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       }
       .reduceByKey(_ merge _)
       .mapValues { fires =>
-        aggregateFireData(fires.merge(ForestChangeDiagnosticDataLossYearly.prefilled)).limitToMaxYear(2020)
+        aggregateFireData(fires.merge(ForestChangeDiagnosticDataLossYearly.prefilled)).limitToMaxYear(2021)
       }
   }
 
