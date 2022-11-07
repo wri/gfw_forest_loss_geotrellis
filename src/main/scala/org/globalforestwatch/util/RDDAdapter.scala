@@ -31,18 +31,6 @@ object RDDAdapter {
       geom
     }.toJavaRDD()
 
-    val spatialDF = Adapter.toDf(spatialRDD, spark)
-    spatialDF.createOrReplaceTempView("fixGeometries")
-    val spatialDFFixed = spark.sql(
-      s"""
-         |SELECT ST_CollectionExtract(ST_MakeValid(geometry), 3) as fixedGeometry, *
-         |FROM fixGeometries
-      """.stripMargin)
-    val spatialDFDropped = spatialDFFixed.drop("geometry")
-    val spatialRDDFixed = Adapter.toSpatialRdd(spatialDFDropped, "fixedGeometry")
-
-    spatialRDDFixed.analyze()
-
     spatialRDD.analyze()
     spatialRDD
   }

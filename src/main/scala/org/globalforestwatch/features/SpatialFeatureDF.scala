@@ -8,6 +8,8 @@ import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
 import org.globalforestwatch.util.GeotrellisGeometryValidator.preserveGeometryType
 import org.locationtech.jts.geom.util.GeometryFixer
 import org.locationtech.jts.geom.{Geometry, MultiPolygon, Polygon}
+import org.apache.sedona.core.joinJudgement.JudgementHelper
+import org.globalforestwatch.util.GfwGeometryFixer
 
 import scala.util.Try
 
@@ -95,6 +97,17 @@ object SpatialFeatureDF {
     import spark.implicits._
 
     val featureDF: DataFrame = FeatureDF(input, featureObj, filters, spark, delimiter)
+
+    val dissolved = featureDF.where("location_id == -1").select(wkbField).collect()
+    val diff = featureDF.where("location_id == -2").select(wkbField).collect()
+
+    val skipCond =
+      if (dissolved.size > 0 && diff.size > 0 && dissolved(0)(0).equals(diff(0)(0))) {
+        "location_id >= 0"
+      } else {
+        "location_id != -1"
+      }
+
     val emptyPolygonWKB = "0106000020E610000000000000"
     val readOptionWkbUDF = udf {
       s: String =>
@@ -102,13 +115,14 @@ object SpatialFeatureDF {
 
         geom match {
           case Some(g) =>
-            Some(preserveGeometryType(GeometryFixer.fix(g), g.getGeometryType))
+            Some(GfwGeometryFixer.fix(g))
+            //Some(preserveGeometryType(GeometryFixer.fix(g), g.getGeometryType))
           case None => None
         }
     }
 
     featureDF
-      .where(s"${wkbField} != '${emptyPolygonWKB}' and location_id >= 0")
+      .where(s"${wkbField} != '${emptyPolygonWKB}' and $skipCond")
       .selectExpr(
         s"${wkbField} AS wkb",
         s"struct(${featureObj.featureIdExpr}) as featureId"
