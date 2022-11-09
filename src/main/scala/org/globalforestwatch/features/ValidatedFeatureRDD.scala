@@ -120,17 +120,23 @@ object ValidatedFeatureRDD {
         }).toList
 
         val gridCell = geoms.toMap.keys.toList(0)
-        val featureId: GfwProFeatureId = locations(0)._1
+        val byListId: Map[String, List[Geometry]] =
+          locations
+            .groupBy(p => p._1.listId)
+            .mapValues(p => p.map(g => g._2))
 
-        // union all remaining geoms to get diff geom
-        val geomCollection: GeometryCollection =
-          new GeometryFactory().createGeometryCollection(
-            locations.map(g => g._2).toArray
-          )
+        byListId.map({
+          case (listId: String, geoms: List[Geometry]) =>
+            // union all remaining geoms to get diff geom
+            val geomCollection: GeometryCollection =
+              new GeometryFactory().createGeometryCollection(
+                geoms.toArray
+              )
 
-        val unioned = UnaryUnionOp.union(geomCollection)
-        unioned.setUserData(GfwProFeatureId(featureId.listId, -1, 0, 0))
-        Some(gridCell, unioned)
+            val unioned = UnaryUnionOp.union(geomCollection)
+            unioned.setUserData(GfwProFeatureId(listId, -1, 0, 0))
+            (gridCell, unioned)
+        })
     })
 
     val combined = spatiallyKeyed ++ dissolved
