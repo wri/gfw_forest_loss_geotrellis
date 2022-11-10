@@ -6,6 +6,7 @@ import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.functions.{col, isnull, udf}
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
 import org.globalforestwatch.util.GeotrellisGeometryValidator.preserveGeometryType
+import org.globalforestwatch.util.GfwGeometryFixer
 import org.locationtech.jts.geom.util.GeometryFixer
 import org.locationtech.jts.geom.{Geometry, MultiPolygon, Polygon}
 
@@ -102,7 +103,7 @@ object SpatialFeatureDF {
 
         geom match {
           case Some(g) =>
-            Some(preserveGeometryType(GeometryFixer.fix(g), g.getGeometryType))
+            Some(GfwGeometryFixer.fix(g))
           case None => None
         }
     }

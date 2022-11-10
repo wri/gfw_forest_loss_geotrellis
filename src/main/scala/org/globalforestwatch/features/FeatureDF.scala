@@ -14,5 +14,5 @@ object FeatureDF {
       .options(Map("header" -> "true", "delimiter" -> delimiter, "escape" -> "\""))
       .csv(input.toList: _*)
       .transform(featureObj.filter(filters))
-
+      .repartition(spark.sparkContext.defaultParallelism)
 }
