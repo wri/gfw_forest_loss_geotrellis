@@ -12,9 +12,11 @@ package org.globalforestwatch.util
 
 import org.apache.log4j.Logger
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
-import org.locationtech.jts.geom.{Geometry, Polygon, MultiPolygon, GeometryFactory, TopologyException}
+import org.locationtech.jts.geom.{Geometry, GeometryFactory, MultiPolygon, Polygon, TopologyException}
 import org.locationtech.jts.geom.util.GeometryFixer
 import org.locationtech.jts.operation.overlay.snap.GeometrySnapper
+import org.locationtech.jts.operation.overlayng.OverlayNGRobust
+import scala.collection.JavaConverters._
 
 import scala.annotation.tailrec
 
@@ -72,8 +74,8 @@ case class GfwGeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
       nested_polygons.flatten
     }
 
-    val polygons: Array[Option[Polygon]] = loop(multiGeometry).toArray
-    union(polygons)
+    val polygons: Array[Geometry] = loop(multiGeometry).toArray.flatten
+    OverlayNGRobust.union(polygons.toList.asJava)
   }
 
   /** Poor man's implementation of JTS Overlay NG Robust difference (not part of current JTS version)
