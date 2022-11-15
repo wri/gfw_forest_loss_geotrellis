@@ -80,7 +80,7 @@ object IntersectGeometry {
     }
   }
 
-  def extractPolygons(multiGeometry: Geometry): Option[MultiPolygon] = {
+  def extractPolygonsToList(multiGeometry: Geometry): List[Polygon] = {
     def loop(multiGeometry: Geometry): List[Polygon] = {
 
       val geomRange: List[Int] =
@@ -99,11 +99,13 @@ object IntersectGeometry {
       nested_polygons.flatten
     }
 
-    val polygons: List[Polygon] = loop(multiGeometry)
+    loop(multiGeometry)
+  }
 
+  def extractPolygons(multiGeometry: Geometry): Option[MultiPolygon] = {
+    val polygons = extractPolygonsToList(multiGeometry)
     if (polygons.isEmpty) None
     else Some(createMultiPolygon(polygons.toArray))
-
   }
 
 }

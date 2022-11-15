@@ -191,26 +191,33 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     spatialFeatureRDD.analyze()
 
     val joinedRDD =
-      SpatialJoinRDD.spatialjoin(
-        spatialFeatureRDD,
+      SpatialJoinRDD.flatSpatialJoin(
         fireAlertRDD,
+        spatialFeatureRDD,
         usingIndex = true
       )
 
     joinedRDD.rdd
-      .map { case (poly, points) =>
-        val fid = poly.getUserData.asInstanceOf[FeatureId]
-        val fireCount = points.asScala.foldLeft(SortedMap.empty[Int, Double]) { (acc, point) =>
-          // extract year from acq_date column
-          val year = point.getUserData
-            .asInstanceOf[String]
-            .split("\t")(2)
-            .substring(0, 4)
-            .toInt
-          val count = acc.getOrElse(year, 0.0) + 1.0
-          acc.updated(year, count)
-        }
-        (fid, ForestChangeDiagnosticDataLossYearly(fireCount))
+      .groupBy({
+        case p: (Geometry, Geometry) => p._2
+      })
+      .mapValues({
+        case geoms: Iterable[(Geometry, Geometry)] => geoms.map(g => g._1)
+      })
+      .map {
+        case (poly, points) =>
+          val fid = poly.getUserData.asInstanceOf[FeatureId]
+          val fireCount = points.foldLeft(SortedMap.empty[Int, Double]) { (acc, point) =>
+            // extract year from acq_date column
+            val year = point.getUserData
+              .asInstanceOf[String]
+              .split("\t")(2)
+              .substring(0, 4)
+              .toInt
+            val count = acc.getOrElse(year, 0.0) + 1.0
+            acc.updated(year, count)
+          }
+          (fid, ForestChangeDiagnosticDataLossYearly(fireCount))
       }
       .reduceByKey(_ merge _)
       .mapValues { fires =>

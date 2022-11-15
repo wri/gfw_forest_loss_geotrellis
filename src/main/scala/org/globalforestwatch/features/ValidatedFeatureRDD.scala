@@ -13,7 +13,7 @@ import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.apache.sedona.sql.utils.Adapter
 import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
-import org.globalforestwatch.util.IntersectGeometry.validatedIntersection
+import org.globalforestwatch.util.IntersectGeometry.{extractPolygonsToList, validatedIntersection}
 import org.locationtech.jts.geom._
 import org.locationtech.jts.io.WKTReader
 import org.locationtech.jts.operation.union.UnaryUnionOp
@@ -125,7 +125,7 @@ object ValidatedFeatureRDD {
             .groupBy(p => p._1.listId)
             .mapValues(p => p.map(g => g._2))
 
-        byListId.map({
+        val result: Iterable[(Polygon, Geometry)] = byListId.map({
           case (listId: String, geoms: List[Geometry]) =>
             // union all remaining geoms to get diff geom
             val geomCollection: GeometryCollection =
@@ -134,9 +134,12 @@ object ValidatedFeatureRDD {
               )
 
             val unioned = UnaryUnionOp.union(geomCollection)
-            unioned.setUserData(GfwProFeatureId(listId, -1, 0, 0))
-            (gridCell, unioned)
-        })
+            val polygons: List[Polygon] = extractPolygonsToList(unioned)
+            polygons.foreach(p => p.setUserData(GfwProFeatureId(listId, -1, 0, 0)))
+            (listId, polygons.map(p => (gridCell, p)))
+        }).values.flatten
+
+        result
     })
 
     val combined = spatiallyKeyed ++ dissolved
