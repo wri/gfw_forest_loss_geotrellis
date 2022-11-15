@@ -352,6 +352,14 @@
     {
       "name":"umd_tree_cover_loss_from_fires",
       "source_uri": "s3://gfw-data-lake/umd_tree_cover_loss_from_fires/v20220324/raster/epsg-4326/10/40000/year/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"wri_trees_in_mosaic_landscapes",
+      "source_uri": "s3://gfw-data-lake/wri_trees_in_mosaic_landscapes/v20220922.1/raster/epsg-4326/{grid_size}/{row_count}/decile/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"umd_land_cover",
+      "source_uri": "s3://gfw-data-lake/umd_land_cover/v2020/raster/epsg-4326/{grid_size}/{row_count}/class/geotiff/{tile_id}.tif"
     }
   ]
 }

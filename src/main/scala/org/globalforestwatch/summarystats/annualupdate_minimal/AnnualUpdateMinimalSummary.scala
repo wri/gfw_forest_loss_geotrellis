@@ -69,6 +69,10 @@ object AnnualUpdateMinimalSummary {
           raster.tile.intactForestLandscapes2000.getData(col, row)
         val treeCoverLossFromFires: Boolean =
           raster.tile.treeCoverLossFromFires.getData(col, row)
+        val treesInMosaicLandscapes: Int =
+          raster.tile.treesInMosaicLandscapes.getData(col, row)
+        val umdGlobalLandCover: Int =
+          raster.tile.umdGlobalLandCover.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -131,6 +135,8 @@ object AnnualUpdateMinimalSummary {
               gain,
               forestAge,
               intactForestLandscapes2000,
+              treesInMosaicLandscapes,
+              umdGlobalLandCover,
             )
 
             val summary: AnnualUpdateMinimalData =
