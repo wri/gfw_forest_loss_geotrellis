@@ -355,7 +355,7 @@
     },
     {
       "name":"wri_trees_in_mosaic_landscapes",
-      "source_uri": "s3://gfw-data-lake/wri_trees_in_mosaic_landscapes/v20220922.1/raster/epsg-4326/{grid_size}/{row_count}/decile/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/wri_trees_in_mosaic_landscapes/v20220922.4/raster/epsg-4326/{grid_size}/{row_count}/decile/geotiff/{tile_id}.tif"
     },
     {
       "name":"umd_land_cover",

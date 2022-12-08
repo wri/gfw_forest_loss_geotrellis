@@ -130,8 +130,8 @@ object AnnualUpdateMinimalSummary {
               gain,
               forestAge,
               intactForestLandscapes2000,
-              treesInMosaicLandscapes,
               umdGlobalLandCover,
+              treesInMosaicLandscapes,
             )
 
             val summary: AnnualUpdateMinimalData =

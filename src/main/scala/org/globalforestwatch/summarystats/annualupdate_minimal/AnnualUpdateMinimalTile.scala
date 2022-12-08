@@ -1,6 +1,6 @@
 package org.globalforestwatch.summarystats.annualupdate_minimal
 
-import geotrellis.raster.{CellGrid, CellType}
+import geotrellis.raster.{CellGrid, CellType, UShortConstantNoDataCellType}
 import org.globalforestwatch.layers._
 
 /**
@@ -11,8 +11,8 @@ import org.globalforestwatch.layers._
 case class AnnualUpdateMinimalTile(
                                     loss: TreeCoverLoss#ITile,
                                     gain: TreeCoverGain#OptionalITile,
-                                    tcd2000: TreeCoverDensityThreshold#ITile,
-                                    tcd2010: TreeCoverDensityThreshold#ITile,
+                                    tcd2000: TreeCoverDensityThreshold2010#OptionalITile,
+                                    tcd2010: TreeCoverDensityThreshold2010#OptionalITile,
                                     biomass: BiomassPerHectar#OptionalDTile,
                                     drivers: TreeCoverLossDrivers#OptionalITile,
                                     primaryForest: PrimaryForest#OptionalITile,
