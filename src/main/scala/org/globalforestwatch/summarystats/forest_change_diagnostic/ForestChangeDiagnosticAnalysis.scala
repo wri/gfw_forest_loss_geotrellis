@@ -140,7 +140,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     // IDs where grid geometry is not the same
     rdd
       .collect {
-        case Valid(Location(GfwProFeatureId(_, locationId, _, _), geom)) if locationId == -2 =>
+        case Valid(Location(GfwProFeatureId(_, locationId, _, _), geom)) if locationId == -1 =>
           GridId(pointGridId(geom.getCentroid, 1))
       }
       .collect

@@ -39,6 +39,10 @@ _SUCCESS
 *.swp
 *.swo
 *.sublime-*
+.metals/
+project/
+.bloop/
+.bsp/
 
 lib
 index.html
