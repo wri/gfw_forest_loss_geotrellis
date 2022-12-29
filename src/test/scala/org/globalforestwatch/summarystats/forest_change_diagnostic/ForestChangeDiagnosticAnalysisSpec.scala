@@ -56,7 +56,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
       FeatureFilter.empty,
       splitFeatures = true
     ).filter {
-      case Validated.Valid(Location(GfwProFeatureId(_, 31, _, _), _)) => true
+      case Validated.Valid(Location(GfwProFeatureId(_, 31), _)) => true
       case _ => false
     }
     val fcd = FCD(featureLoc31RDD)
@@ -74,7 +74,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     val y = -1
     val selfIntersectingPolygon = Polygon(LineString(Point(x+0,y+0), Point(x+1,y+0), Point(x+0,y+1), Point(x+1,y+1), Point(x+0,y+0)))
     val featureRDD = spark.sparkContext.parallelize(List(
-      Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1, 0, 0), selfIntersectingPolygon))
+      Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1), selfIntersectingPolygon))
     ))
     val fcd = FCD(featureRDD)
     val res = fcd.collect()
@@ -88,7 +88,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
       FeatureFilter.empty,
       splitFeatures = true
     ).filter {
-      case Validated.Valid(Location(GfwProFeatureId(_, 32, _, _), _)) => true
+      case Validated.Valid(Location(GfwProFeatureId(_, 32), _)) => true
       case _ => false
     }
     val fcd = FCD(featureLoc32RDD)
@@ -102,7 +102,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     val y = 20
     val smallGeom = Polygon(LineString(Point(x+0,y+0), Point(x+0.00001,y+0), Point(x+0.00001,y+0.00001), Point(x+0,y+0.00001), Point(x+0,y+0)))
     val featureRDD = spark.sparkContext.parallelize(List(
-      Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1, 0, 0), smallGeom))
+      Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1), smallGeom))
     ))
     val fcd = FCD(featureRDD)
     val res = fcd.collect()

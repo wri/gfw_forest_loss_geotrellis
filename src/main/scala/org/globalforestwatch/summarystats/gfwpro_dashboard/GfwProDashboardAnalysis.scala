@@ -103,7 +103,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
     featureId match {
       case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>
-        val featureCentroid = createPoint(gfwproId.x, gfwproId.y)
+        val featureCentroid = createPoint(featureGeom.getCentroid.getX, featureGeom.getCentroid.getY)
         if (contextualGeom.contains(featureCentroid)) {
           val fid = CombinedFeatureId(gfwproId, contextualId)
           // val gtGeom: Geometry = toGeotrellisGeometry(featureGeom)
