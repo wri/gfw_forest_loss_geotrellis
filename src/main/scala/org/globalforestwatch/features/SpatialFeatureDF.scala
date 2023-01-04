@@ -4,11 +4,10 @@ import cats.data.NonEmptyList
 import org.locationtech.jts
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.functions.{col, isnull, udf}
-import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
 import org.globalforestwatch.util.GeotrellisGeometryValidator.preserveGeometryType
-import org.globalforestwatch.util.GfwGeometryFixer
 import org.locationtech.jts.geom.util.GeometryFixer
-import org.locationtech.jts.geom.{Geometry, MultiPolygon, Polygon}
+import org.locationtech.jts.geom.{Envelope, Geometry, MultiPolygon, Polygon}
+import org.globalforestwatch.util.GfwGeometryFixer
 
 import scala.util.Try
 
@@ -96,6 +95,7 @@ object SpatialFeatureDF {
     import spark.implicits._
 
     val featureDF: DataFrame = FeatureDF(input, featureObj, filters, spark, delimiter)
+
     val emptyPolygonWKB = "0106000020E610000000000000"
     val readOptionWkbUDF = udf {
       s: String =>
@@ -115,10 +115,12 @@ object SpatialFeatureDF {
         s"struct(${featureObj.featureIdExpr}) as featureId"
       )
       .select(
-        readOptionWkbUDF (col("wkb")).as("polyshape"),
+        readOptionWkbUDF(col("wkb")).as("polyshape"),
         col("featureId")
-      )
-      .where(!isnull('polyshape))
+      ).where(!isnull('polyshape))
+//      .selectExpr(
+//        "ST_SubDivideExplode(polyshape, 10000) as polyshape", "featureId"
+//      )
   }
 
   private val threadLocalWkbReader = new ThreadLocal[jts.io.WKBReader]

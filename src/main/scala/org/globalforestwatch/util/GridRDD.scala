@@ -9,10 +9,9 @@ import org.globalforestwatch.util.GeometryConstructor.createPolygon1x1
 
 object GridRDD {
   def apply(envelope: Envelope, spark: SparkSession, clip: Boolean = false): PolygonRDD = {
-
     val gridCells = getGridCells(envelope)
 
-    val tcl_geom: Geometry = new GeometryFactory().toGeometry(new Envelope(-180, 180, -90, 90))
+    val tcl_geom: Geometry = TreeCoverLossExtent.geometry //new GeometryFactory().toGeometry(new Envelope(-180, 180, -90, 90))
 
     val gridRDD: RDD[Polygon] = {
       spark.sparkContext
