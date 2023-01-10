@@ -75,7 +75,7 @@ object ForestChangeDiagnosticSummary {
         val isIntactForestLandscapes2000: Boolean =
           raster.tile.isIntactForestLandscapes2000.getData(col, row)
         val wdpa: String = raster.tile.wdpaProtectedAreas.getData(col, row)
-        val prodeAmazonLossYear: Int = {
+        val prodesAmazonLossYear: Int = {
           val loss = raster.tile.prodesAmazonLossYear.getData(col, row)
           if (loss != null) {
             loss.toInt
@@ -83,7 +83,7 @@ object ForestChangeDiagnosticSummary {
             0
           }
         }
-        val prodeCerradoLossYear: Int = {
+        val prodesCerradoLossYear: Int = {
           val loss = raster.tile.prodesCerradoLossYear.getData(col, row)
           if (loss != null) {
             loss.toInt
