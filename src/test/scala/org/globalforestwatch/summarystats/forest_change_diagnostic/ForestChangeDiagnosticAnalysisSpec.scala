@@ -1,17 +1,18 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-import cats.data.{ NonEmptyList, Validated }
+import cats.data.{NonEmptyList, Validated}
 import com.github.mrpowers.spark.fast.tests.DataFrameComparer
 import geotrellis.vector._
 import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{ DataFrame, SaveMode }
+import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
-import org.globalforestwatch.features.{ ValidatedFeatureRDD, FeatureFilter }
+import org.globalforestwatch.features.{FeatureFilter, ValidatedFeatureRDD}
 import org.globalforestwatch.features.GfwProFeatureId
-import org.globalforestwatch.summarystats.{ JobError, ValidatedLocation, Location }
+import org.globalforestwatch.summarystats.{JobError, Location, ValidatedLocation}
 import org.globalforestwatch.TestEnvironment
+import org.globalforestwatch.config.GfwConfig
 
 class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameComparer {
   def palm32InputTsvPath = getClass.getResource("/palm-oil-32.tsv").toString()
@@ -30,7 +31,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
       intermediateResultsRDD = None,
       fireAlerts = fireAlertsRdd,
       saveIntermidateResults = identity,
-      kwargs = Map.empty)
+      kwargs = Map("config" -> GfwConfig.get))
   }
 
   /** Function to update expected results when this test becomes invalid */
