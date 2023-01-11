@@ -3,7 +3,7 @@ package org.globalforestwatch.summarystats.carbonflux
 import com.monovore.decline.Opts
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
-import org.globalforestwatch.config.RasterCatalog
+import org.globalforestwatch.config.{GfwConfig, RasterCatalog}
 import org.globalforestwatch.features._
 
 object CarbonFluxCommand extends SummaryCommand {
@@ -19,7 +19,8 @@ object CarbonFluxCommand extends SummaryCommand {
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
-        "changeOnly" -> changeOnly
+        "changeOnly" -> changeOnly,
+        "config" -> GfwConfig.get
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

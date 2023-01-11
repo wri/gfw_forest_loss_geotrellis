@@ -4,7 +4,7 @@ import org.globalforestwatch.grids.GridTile
 
 case class BiodiversitySignificance(gridTile: GridTile, kwargs: Map[String, Any]) extends DBooleanLayer with OptionalDLayer {
   val datasetName = "birdlife_biodiversity_significance"
-  val uri: String = uriForGrid(gridTile)
+  val uri: String = uriForGrid(gridTile, kwargs)
 
   def lookup(value: Double): Boolean =
     if (value > 6.3) true

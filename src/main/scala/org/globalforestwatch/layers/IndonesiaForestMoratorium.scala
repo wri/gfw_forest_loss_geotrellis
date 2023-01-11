@@ -8,5 +8,5 @@ case class IndonesiaForestMoratorium(gridTile: GridTile, kwargs: Map[String, Any
 
   val datasetName = "idn_forest_moratorium"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

@@ -8,5 +8,5 @@ case class SoyPlantedAreas(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "umd_soy_planted_area"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

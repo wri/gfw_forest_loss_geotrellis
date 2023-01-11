@@ -7,5 +7,5 @@ case class Landmark(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "landmark_indigenous_and_community_lands"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }
