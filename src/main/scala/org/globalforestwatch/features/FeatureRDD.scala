@@ -103,14 +103,14 @@ object FeatureRDD {
     feature1RDD.analyze()
     feature2RDD.analyze()
 
-    feature1RDD.spatialPartitioning(GridType.QUADTREE)
+    feature1RDD.spatialPartitioning(GridType.KDBTREE)
     feature2RDD.spatialPartitioning(feature1RDD.getPartitioner)
 
     val buildOnSpatialPartitionedRDD = true
     val usingIndex = true
     val considerBoundaryIntersection = true
 
-    feature1RDD.buildIndex(IndexType.QUADTREE, buildOnSpatialPartitionedRDD)
+    feature1RDD.buildIndex(IndexType.RTREE, buildOnSpatialPartitionedRDD)
 
     val resultPairRDD = JoinQuery.SpatialJoinQueryFlat(feature1RDD, feature2RDD, usingIndex, considerBoundaryIntersection)
 
