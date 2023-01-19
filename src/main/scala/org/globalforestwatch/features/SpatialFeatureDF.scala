@@ -103,7 +103,7 @@ object SpatialFeatureDF {
 
         geom match {
           case Some(g) =>
-            Some(GeometryFixer.fix(g))
+            Some(GfwGeometryFixer.fix(g))
           case None => None
         }
     }
