@@ -60,6 +60,7 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isProtectedArea && isUMDLoss
       ),
+    tree_cover_loss_arg_otbn_yearly = ForestChangeDiagnosticDataLossYearlyCategory.empty,
     tree_cover_loss_sea_landcover_yearly =
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
         seAsiaLandCover,
