@@ -55,4 +55,3 @@ derby.log
 metastore_db/
 *.log
 *.tsv
-*.csv
