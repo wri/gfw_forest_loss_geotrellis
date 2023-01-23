@@ -11,10 +11,13 @@ case class UmdGlobalLandcover(gridTile: GridTile, kwargs: Map[String, Any])
 
   override def lookup(value: Int): Integer = {
     value match {
-      case v if v <= 50 => 1
-      case v if v <= 100 => 2
-      case v if v <= 150 => 3
-      case _ => 4
+      case v if v > 0 && v <= 24 => 1
+      case v if v > 24 && v <= 41 => 2
+      case v if v > 41 && v <= 48 => 3
+      case v if v >= 100 && v <= 124 => 4
+      case v if v > 124 && v <= 148 => 5
+      case v if v >= 202 && v <= 207 => 6
+      case _ => 0
     }
   }
 }
