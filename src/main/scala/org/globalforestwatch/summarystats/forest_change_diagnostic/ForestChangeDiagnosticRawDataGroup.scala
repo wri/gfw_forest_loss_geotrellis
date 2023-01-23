@@ -22,7 +22,8 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
                                               braBiomesPresence: Boolean,
                                               cerradoBiomesPresence: Boolean,
                                               seAsiaPresence: Boolean,
-                                              idnPresence: Boolean) {
+                                              idnPresence: Boolean,
+                                              argOTBN: String) {
 
   /** Produce a partial ForestChangeDiagnosticData only for the loss year in this data group */
   def toForestChangeDiagnosticData(totalArea: Double): ForestChangeDiagnosticData = ForestChangeDiagnosticData(

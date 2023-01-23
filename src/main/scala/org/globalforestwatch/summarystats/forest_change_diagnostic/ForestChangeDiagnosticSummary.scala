@@ -96,6 +96,7 @@ object ForestChangeDiagnosticSummary {
         val isPlantation: Boolean = raster.tile.isPlantation.getData(col, row)
         val gfwProCoverage: Map[String, Boolean] =
           raster.tile.gfwProCoverage.getData(col, row)
+        val argOTBN: String = raster.tile.argOTBN.getData(col, row)
 
         // compute Booleans
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
@@ -137,7 +138,8 @@ object ForestChangeDiagnosticSummary {
           braBiomesPresence,
           cerradoBiomesPresence,
           seAsiaPresence,
-          idnPresence
+          idnPresence,
+          argOTBN
         )
 
         val summaryData: ForestChangeDiagnosticRawData =

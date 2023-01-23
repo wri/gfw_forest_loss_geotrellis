@@ -295,6 +295,10 @@
     {
       "name":"ifl_intact_forest_landscapes_2000",
       "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2000/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "arg_native_forest_land_plan",
+      "source_uri": "s3://gfw-data-lake/arg_native_forest_land_plan/v202212/raster/epsg-4326/{grid_size}/{row_count}/category/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }

@@ -17,6 +17,8 @@ case class ForestChangeDiagnosticData(
   tree_cover_loss_peat_yearly: ForestChangeDiagnosticDataLossYearly,
   tree_cover_loss_intact_forest_yearly: ForestChangeDiagnosticDataLossYearly,
   tree_cover_loss_protected_areas_yearly: ForestChangeDiagnosticDataLossYearly,
+  /** Tree cover loss in Argentina Native Forest Land Plan (OTBN) categories */
+  tree_cover_loss_arg_otbn_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   /** Tree cover loss in south east asia */
   tree_cover_loss_sea_landcover_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   tree_cover_loss_idn_landcover_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
@@ -75,7 +77,7 @@ case class ForestChangeDiagnosticData(
   commodity_threat_peat: ForestChangeDiagnosticDataLossYearly,
   /** Sum of moving to year window over filtered_tree_cover_loss_protected_areas_yearly + plantation_in_protected_areas_area */
   commodity_threat_protected_areas: ForestChangeDiagnosticDataLossYearly,
-  commodity_threat_fires: ForestChangeDiagnosticDataLossYearly
+  commodity_threat_fires: ForestChangeDiagnosticDataLossYearly  
 ) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
@@ -92,6 +94,9 @@ case class ForestChangeDiagnosticData(
       ),
       tree_cover_loss_protected_areas_yearly.merge(
         other.tree_cover_loss_protected_areas_yearly
+      ),
+      tree_cover_loss_arg_otbn_yearly.merge(
+        other.tree_cover_loss_arg_otbn_yearly
       ),
       tree_cover_loss_sea_landcover_yearly.merge(
         other.tree_cover_loss_sea_landcover_yearly
@@ -275,6 +280,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
