@@ -85,7 +85,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
     val isoApiDF =
       adm1ApiDF.transform(AnnualUpdateMinimalDF.aggSummary2(List("iso")))
     isoApiDF
-      .coalesce(1) // this should result in an avg file size of 100MB
+      .coalesce(3) // this should result in an avg file size of 100MB
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/summary")

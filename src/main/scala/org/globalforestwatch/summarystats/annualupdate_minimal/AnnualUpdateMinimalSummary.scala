@@ -71,7 +71,7 @@ object AnnualUpdateMinimalSummary {
           raster.tile.treeCoverLossFromFires.getData(col, row)
         val treesInMosaicLandscapes: Int =
           raster.tile.treesInMosaicLandscapes.getData(col, row)
-        val umdGlobalLandCover: Int =
+        val umdGlobalLandCover: String =
           raster.tile.umdGlobalLandCover.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
@@ -104,7 +104,7 @@ object AnnualUpdateMinimalSummary {
         val totalCarbonSoil = soilCarbonPerHa * areaHa
 
         def updateSummary(
-                          loss: Integer, tcd2000: Integer, treesInMosaicLandscapes: Integer, umdGlobalLandCover: Integer,
+                          loss: Integer, tcd2000: Integer, treesInMosaicLandscapes: Integer, umdGlobalLandCover: String,
                            stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData]
                          ): Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = {
             val pKey = AnnualUpdateMinimalDataGroup(
@@ -186,7 +186,7 @@ object AnnualUpdateMinimalSummary {
 
         val lossSummary
         : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
-          updateSummary(loss, tcd2000, -1, -1, acc.stats)
+          updateSummary(loss, tcd2000, -1, "", acc.stats)
 
         val tmlSummary =
           updateSummary(-1, -1, treesInMosaicLandscapes, umdGlobalLandCover, lossSummary)
