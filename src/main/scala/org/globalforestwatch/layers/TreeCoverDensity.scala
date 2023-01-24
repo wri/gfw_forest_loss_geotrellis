@@ -25,7 +25,7 @@ case class TreeCoverDensityThreshold2000(gridTile: GridTile, kwargs: Map[String,
   extends TreeCoverDensityThreshold {
   val datasetName = "umd_tree_cover_density_2000"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }
 
 case class TreeCoverDensityThreshold2010(gridTile: GridTile, kwargs: Map[String, Any])
@@ -34,7 +34,7 @@ case class TreeCoverDensityThreshold2010(gridTile: GridTile, kwargs: Map[String,
   override val externalNoDataValue: Integer = 0
 
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 
   override def lookup(value: Int): Integer = {
     value match {
@@ -55,7 +55,7 @@ case class TreeCoverDensity2010_60(gridTile: GridTile, kwargs: Map[String, Any])
     with RequiredILayer {
   val datasetName = "umd_tree_cover_density_2010"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 
   override def lookup(value: Int): Boolean = value > 60
 }
@@ -67,7 +67,7 @@ case class TreeCoverDensityPercent2000(gridTile: GridTile, kwargs: Map[String, A
   override val externalNoDataValue: Integer = 0
 
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }
 
 case class TreeCoverDensityPercent2010(gridTile: GridTile, kwargs: Map[String, Any])

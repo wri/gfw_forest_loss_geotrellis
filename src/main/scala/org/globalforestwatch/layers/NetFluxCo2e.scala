@@ -8,5 +8,5 @@ case class NetFluxCo2e(gridTile: GridTile, model: String = "standard", kwargs: M
   val datasetName = "gfw_full_extent_net_flux"
 
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

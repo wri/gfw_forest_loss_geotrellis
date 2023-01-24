@@ -66,7 +66,7 @@ object RasterCatalog {
       .option(HttpOptions.connTimeout(10000))
       .option(HttpOptions.readTimeout(50000)).asString
 
-    if (response.code != 200) {
+    if (!response.isSuccess) {
       if (retries <= 2) {
         Thread.sleep(10000)
         getLatestVersion(dataset, retries + 1)

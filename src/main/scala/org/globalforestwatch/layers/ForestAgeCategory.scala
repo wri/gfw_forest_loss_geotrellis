@@ -7,7 +7,7 @@ case class ForestAgeCategory(gridTile: GridTile, model: String = "standard", kwa
     with OptionalILayer {
 
   val datasetName = "gfw_forest_age"
-  val uri: String = uriForGrid(gridTile)
+  val uri: String = uriForGrid(gridTile, kwargs)
 
   override val externalNoDataValue = "Not applicable"
 

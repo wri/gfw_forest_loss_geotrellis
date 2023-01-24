@@ -100,14 +100,14 @@ object FireAlertsAnalysis extends SummaryAnalysis {
         parallelism * 8
       }
 
-    fireRDD.spatialPartitioning(GridType.QUADTREE, partitions)
+    fireRDD.spatialPartitioning(GridType.KDBTREE, partitions)
     featureRDD.spatialPartitioning(fireRDD.getPartitioner)
 
     val buildOnSpatialPartitionedRDD = true
     val usingIndex = true
     val considerBoundaryIntersection = true
 
-    fireRDD.buildIndex(IndexType.QUADTREE, buildOnSpatialPartitionedRDD)
+    fireRDD.buildIndex(IndexType.RTREE, buildOnSpatialPartitionedRDD)
 
     val resultPairRDD = JoinQuery.SpatialJoinQueryFlat(fireRDD, featureRDD, usingIndex, considerBoundaryIntersection)
 

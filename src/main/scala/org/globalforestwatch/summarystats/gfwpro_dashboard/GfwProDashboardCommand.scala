@@ -6,6 +6,7 @@ import cats.implicits._
 import com.monovore.decline.Opts
 import geotrellis.vector.Geometry
 import org.apache.sedona.core.spatialRDD.SpatialRDD
+import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features._
 import org.locationtech.jts.geom.Geometry
 
@@ -38,6 +39,7 @@ object GfwProDashboardCommand extends SummaryCommand {
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "overwriteOutput" -> default.overwriteOutput,
+        "config" -> GfwConfig.get
       )
       // TODO: move building the feature object into options
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

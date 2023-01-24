@@ -7,5 +7,5 @@ case class PrimaryForest(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "umd_regional_primary_forest_2001"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

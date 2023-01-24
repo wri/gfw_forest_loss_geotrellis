@@ -7,7 +7,7 @@ case class UmdGlobalLandcover(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "umd_land_cover"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 
   override def lookup(value: Int): String = {
     value match {

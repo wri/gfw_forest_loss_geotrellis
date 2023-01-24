@@ -12,10 +12,12 @@ package org.globalforestwatch.util
 
 import org.apache.log4j.Logger
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
-import org.locationtech.jts.geom.{Geometry, Polygon, MultiPolygon, GeometryFactory, TopologyException}
+import org.locationtech.jts.geom.{Geometry, GeometryFactory, MultiPolygon, Polygon, TopologyException}
 import org.locationtech.jts.geom.util.GeometryFixer
 import org.locationtech.jts.operation.overlay.snap.GeometrySnapper
+import org.locationtech.jts.operation.overlayng.OverlayNGRobust
 
+import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 
 case class GfwGeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
@@ -28,27 +30,33 @@ case class GfwGeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
 
   private val maxSnapTolerance: Double = snapTolerance * 1000
   def fix(): Geometry = {
-    if (geom.getNumGeometries == 0) {
-      geom.copy()
-    } else {
+    try {
+      if (geom.getNumGeometries == 0) {
+        geom.copy()
+      } else {
 
-      // doing a cheap trick here to eliminate sliver holes and other artifacts. However this might change geometry type.
-      // so we need to do this early on to avoid winding code. This block is not part of the original Java implementation.
-      val preFixedGeometry =
-      geom match {
-        case poly: Polygon => ironPolygons(poly)
-        case multi: MultiPolygon => ironPolygons(multi)
-        case _ => geom
+        // doing a cheap trick here to eliminate sliver holes and other artifacts. However this might change geometry type.
+        // so we need to do this early on to avoid winding code. This block is not part of the original Java implementation.
+        val preFixedGeometry =
+        geom match {
+          case poly: Polygon => ironPolygons(poly)
+          case multi: MultiPolygon => ironPolygons(multi)
+          case _ => geom
+        }
+
+        GeometryFixer.fix(preFixedGeometry)
       }
-
-      GeometryFixer.fix(preFixedGeometry)
+    } catch {
+      case e: Throwable => // TODO: narrow down exception
+        println(s"Error fixing geometry: ${geom.toText}")
+        throw e
     }
   }
 
   /** Ironing out potential sliver artifacts such as holes that resemble lines. Should only be used with Polygons or MultiPolygons.
     */
   private def ironPolygons(geom: Geometry): Geometry = {
-    val bufferedGeom: Geometry = geom.buffer(0.0001).buffer(-0.0001)
+    val bufferedGeom: Geometry = geom.buffer(0.0001).buffer(-0.0001).buffer(0)
     val polygons: Geometry = extractPolygons(bufferedGeom)
     reduce(gpr)(polygons)
   }
@@ -65,6 +73,17 @@ case class GfwGeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
       } yield {
         multiGeometry.getGeometryN(i) match {
           case geom: Polygon           => List(Some(geom))
+//            if (!geom.isValid) {
+//              val fixedGeom = geom.buffer(0)
+//
+//              if (!fixedGeom.isValid) {
+//                throw new Exception(f"Geometry could not be fixed: ${geom}")
+//              }
+//
+//              loop(fixedGeom)
+//            } else {
+//              List(Some(geom))
+//            }
           case multiGeom: MultiPolygon => loop(multiGeom)
           case _                       => List()
         }
@@ -72,8 +91,8 @@ case class GfwGeometryFixer(geom: Geometry, keepCollapsed: Boolean = false) {
       nested_polygons.flatten
     }
 
-    val polygons: Array[Option[Polygon]] = loop(multiGeometry).toArray
-    union(polygons)
+    val polygons: Array[Geometry] = loop(multiGeometry).toArray.flatten
+    OverlayNGRobust.union(polygons.toList.asJava)
   }
 
   /** Poor man's implementation of JTS Overlay NG Robust difference (not part of current JTS version)

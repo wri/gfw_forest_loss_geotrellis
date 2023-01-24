@@ -8,5 +8,5 @@ case class PeruProductionForest(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "osinfor_peru_permanent_production_forests"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

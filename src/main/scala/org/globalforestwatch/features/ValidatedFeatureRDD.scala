@@ -4,6 +4,7 @@ import cats.data.{NonEmptyList, Validated}
 import org.apache.log4j.Logger
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector.{Geometry, Feature => GTFeature}
+import org.apache.sedona.core.formatMapper.WktReader
 import org.apache.spark.HashPartitioner
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
@@ -14,6 +15,10 @@ import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.validatedIntersection
 import org.locationtech.jts.geom._
+import org.locationtech.jts.io.WKTReader
+import org.locationtech.jts.operation.union.UnaryUnionOp
+
+import java.util.Collection
 
 object ValidatedFeatureRDD {
   val logger = Logger.getLogger("FeatureRDD")
@@ -59,7 +64,6 @@ object ValidatedFeatureRDD {
     featureDF: DataFrame,
     spark: SparkSession
   ): RDD[ValidatedLocation[Geometry]] = {
-
     val spatialFeatureRDD: SpatialRDD[Geometry] = Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialFeatureRDD.analyze()
 
@@ -87,7 +91,7 @@ object ValidatedFeatureRDD {
      */
     val hashPartitioner = new HashPartitioner(flatJoin.getNumPartitions)
 
-     flatJoin.rdd
+    flatJoin.rdd
       .keyBy({ pair: (Polygon, Geometry) =>
         Z2(
           (pair._1.getCentroid.getX * 100).toInt,

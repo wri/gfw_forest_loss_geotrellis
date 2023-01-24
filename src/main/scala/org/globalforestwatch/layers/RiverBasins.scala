@@ -8,7 +8,7 @@ case class RiverBasins(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "mapbox_river_basins"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 
   override val externalNoDataValue = "Unknown"
 

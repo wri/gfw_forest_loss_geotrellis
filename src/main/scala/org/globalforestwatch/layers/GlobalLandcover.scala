@@ -8,7 +8,7 @@ case class GlobalLandcover(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "esa_land_cover_2015"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
   override val externalNoDataValue = "Unknown"
 
   def lookup(value: Int): String = value match {

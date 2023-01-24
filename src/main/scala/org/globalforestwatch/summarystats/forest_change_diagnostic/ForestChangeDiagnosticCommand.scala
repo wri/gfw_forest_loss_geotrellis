@@ -8,6 +8,7 @@ import org.globalforestwatch.features._
 import com.typesafe.scalalogging.LazyLogging
 import org.globalforestwatch.summarystats.ValidatedLocation
 import org.apache.spark.rdd.RDD
+import org.globalforestwatch.config.GfwConfig
 
 object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
 
@@ -31,7 +32,8 @@ object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
-        "overwriteOutput" -> default.overwriteOutput
+        "overwriteOutput" -> default.overwriteOutput,
+        "config" -> GfwConfig.get
       )
 
       if (!default.splitFeatures) logger.warn("Forcing splitFeatures = true")

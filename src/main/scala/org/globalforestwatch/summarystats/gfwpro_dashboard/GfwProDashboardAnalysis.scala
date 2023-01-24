@@ -42,7 +42,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
       val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl, contextualFeatureType, FeatureFilter.empty, "geom", spark)
       val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
-      val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(rdd)
+      val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(rdd, spark)
 
       /* Enrich the feature RDD by intersecting it with contextual features
        * The resulting FeatuerId carries combined identity of source fature and contextual geometry
@@ -103,7 +103,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
     featureId match {
       case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>
-        val featureCentroid = createPoint(gfwproId.x, gfwproId.y)
+        val featureCentroid = createPoint(featureGeom.getCentroid.getX, featureGeom.getCentroid.getY)
         if (contextualGeom.contains(featureCentroid)) {
           val fid = CombinedFeatureId(gfwproId, contextualId)
           // val gtGeom: Geometry = toGeotrellisGeometry(featureGeom)
@@ -151,7 +151,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     fireAlertRDD: SpatialRDD[Geometry],
     spark: SparkSession
   ): RDD[Location[GfwProDashboardDataDateCount]] = {
-    val featureSpatialRDD = RDDAdapter.toSpatialRDDfromLocationRdd(featureRDD)
+    val featureSpatialRDD = RDDAdapter.toSpatialRDDfromLocationRdd(featureRDD, spark)
     val joinedRDD = SpatialJoinRDD.spatialjoin(featureSpatialRDD, fireAlertRDD)
 
     joinedRDD.rdd

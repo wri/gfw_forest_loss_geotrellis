@@ -8,5 +8,5 @@ case class GFWProPeatlands(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "gfwpro_peatlands"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }
