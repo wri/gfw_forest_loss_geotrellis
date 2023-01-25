@@ -139,7 +139,7 @@ object AnnualUpdateMinimalSummary {
             val summary: AnnualUpdateMinimalData =
               stats.getOrElse(
                 key = pKey,
-                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -182,6 +182,10 @@ object AnnualUpdateMinimalSummary {
             }
 
             summary.treecoverExtent2010 += areaHa
+
+            if (treesInMosaicLandscapes > 0) {
+              summary.tropicalTreeCoverExtent += areaHa
+            }
 
             stats.updated(pKey, summary)
           }

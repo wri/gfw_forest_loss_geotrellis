@@ -98,6 +98,7 @@ object AnnualUpdateMinimalDF {
         $"data.totalSoilCarbon" as "gfw_soil_carbon_stocks_2000__Mg_C",
         $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_full_extent_gross_removals__Mg_CO2",
         $"data.treeCoverLossFromFires" as "umd_tree_cover_loss_from_fires__ha",
+        $"data.tropicalTreeCoverExtent" as "wri_tropical_tree_cover_extent__ha",
 
         $"data_group.threshold" as "umd_tree_cover_density__threshold",
         $"data_group.drivers" as "tsc_tree_cover_loss_drivers__type",
@@ -164,7 +165,7 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
         sum("gfw_soil_carbon_stocks_2000__Mg_C") as "gfw_soil_carbon_stocks_2000__Mg_C",
         sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
-
+        sum("wri_tropical_tree_cover_extent__ha") as "wri_tropical_tree_cover_extent__ha",
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
         sum("gfw_net_flux_co2e__Mg") as "gfw_net_flux_co2e__Mg",
@@ -202,6 +203,7 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
         sum("gfw_soil_carbon_stocks_2000__Mg_C") as "gfw_soil_carbon_stocks_2000__Mg_C",
         sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
+        sum("wri_tropical_tree_cover_extent__ha") as "wri_tropical_tree_cover_extent__ha",
 
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
@@ -231,6 +233,7 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
         sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg",
         sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
+        sum("wri_tropical_tree_cover_extent__ha") as "wri_tropical_tree_cover_extent__ha",
       )
   }
 
