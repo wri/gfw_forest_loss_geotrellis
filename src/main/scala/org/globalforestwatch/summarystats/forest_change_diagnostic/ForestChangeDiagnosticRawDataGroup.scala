@@ -17,13 +17,14 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
                                               isIdnForestMoratorium: Boolean,
                                               braBiomes: String,
                                               isPlantation: Boolean,
+                                              argOTBN: String,
                                               southAmericaPresence: Boolean,
                                               legalAmazonPresence: Boolean,
                                               braBiomesPresence: Boolean,
                                               cerradoBiomesPresence: Boolean,
                                               seAsiaPresence: Boolean,
                                               idnPresence: Boolean,
-                                              argOTBN: String) {
+                                              argPresence: Boolean) {
 
   /** Produce a partial ForestChangeDiagnosticData only for the loss year in this data group */
   def toForestChangeDiagnosticData(totalArea: Double): ForestChangeDiagnosticData = ForestChangeDiagnosticData(
@@ -60,7 +61,13 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isProtectedArea && isUMDLoss
       ),
-    tree_cover_loss_arg_otbn_yearly = ForestChangeDiagnosticDataLossYearlyCategory.empty,
+    tree_cover_loss_arg_otbn_yearly = 
+      ForestChangeDiagnosticDataLossYearlyCategory.fill(
+      argOTBN, 
+      umdTreeCoverLossYear,
+      totalArea,
+      include = isUMDLoss
+    ),
     tree_cover_loss_sea_landcover_yearly =
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
         seAsiaLandCover,
@@ -167,6 +174,8 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
       ForestChangeDiagnosticDataBoolean.fill(seAsiaPresence),
     indonesia_presence =
       ForestChangeDiagnosticDataBoolean.fill(idnPresence),
+    argentina_presence =
+      ForestChangeDiagnosticDataBoolean.fill(argPresence),
     filtered_tree_cover_extent = ForestChangeDiagnosticDataDouble
       .fill(
         totalArea,

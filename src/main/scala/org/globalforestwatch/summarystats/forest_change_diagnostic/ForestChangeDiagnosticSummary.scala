@@ -114,6 +114,7 @@ object ForestChangeDiagnosticSummary {
           gfwProCoverage.getOrElse("Cerrado Biomes", false)
         val seAsiaPresence = gfwProCoverage.getOrElse("South East Asia", false)
         val idnPresence = gfwProCoverage.getOrElse("Indonesia", false)
+        val argPresence = gfwProCoverage.getOrElse("Argentina", false)
 
         val groupKey = ForestChangeDiagnosticRawDataGroup(
           umdTreeCoverLossYear,
@@ -133,13 +134,14 @@ object ForestChangeDiagnosticSummary {
           isIdnForestMoratorium,
           braBiomes,
           isPlantation,
+          argOTBN,
           southAmericaPresence,
           legalAmazonPresence,
           braBiomesPresence,
           cerradoBiomesPresence,
           seAsiaPresence,
           idnPresence,
-          argOTBN
+          argPresence
         )
 
         val summaryData: ForestChangeDiagnosticRawData =

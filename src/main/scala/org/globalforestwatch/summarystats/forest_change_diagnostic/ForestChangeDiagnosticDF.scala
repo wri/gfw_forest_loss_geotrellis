@@ -97,6 +97,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "tree_cover_loss_peat_yearly", //treeCoverLossPeatLandYearly
     "tree_cover_loss_intact_forest_yearly", // treeCoverLossIntactForestYearly
     "tree_cover_loss_protected_areas_yearly", // treeCoverLossProtectedAreasYearly
+    "tree_cover_loss_arg_otbn_yearly", // treeCoverLossARGOTBNYearly
     "tree_cover_loss_sea_landcover_yearly", // treeCoverLossSEAsiaLandCoverYearly
     "tree_cover_loss_idn_landcover_yearly", // treeCoverLossIDNLandCoverYearly
     "tree_cover_loss_soy_yearly", // treeCoverLossSoyPlanedAreasYearly
