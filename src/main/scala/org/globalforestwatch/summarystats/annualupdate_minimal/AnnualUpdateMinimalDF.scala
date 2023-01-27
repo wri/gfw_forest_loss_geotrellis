@@ -28,7 +28,7 @@ object AnnualUpdateMinimalDF {
     "forest_age__category",
     "is__ifl_intact_forest_landscapes_2000",
     "wri_tropical_tree_cover__decile",
-    "umd_global_land_cover__class",
+    "umd_global_land_cover__ipcc_class",
 
     // TODO delete next data update
     "umd_tree_cover_density__threshold",

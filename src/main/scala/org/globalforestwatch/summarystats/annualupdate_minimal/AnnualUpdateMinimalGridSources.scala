@@ -13,7 +13,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
 
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
   val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
-  val treeCoverDensity2000: TreeCoverDensityThreshold2010 = TreeCoverDensityThreshold2010(gridTile, kwargs)
+  val treeCoverDensity2000: TreeCoverDensityThreshold2000 = TreeCoverDensityThreshold2000(gridTile, kwargs)
   val treeCoverDensity2010: TreeCoverDensityThreshold2010 = TreeCoverDensityThreshold2010(gridTile, kwargs)
   val biomassPerHectar: BiomassPerHectar = BiomassPerHectar(gridTile, kwargs)
   val treeCoverLossDrivers = TreeCoverLossDrivers(gridTile, kwargs)
@@ -53,11 +53,15 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       // Failure for any of these reads will result in function returning Left[Throwable]
       // These are effectively required fields without which we can't make sense of the analysis
       lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(windowKey, windowLayout)).right
+      tcd2000Tile <- Either
+        .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
+        .right
+      tcd2010Tile <- Either
+        .catchNonFatal(treeCoverDensity2010.fetchWindow(windowKey, windowLayout))
+        .right
+
     } yield {
-      val lossTile = treeCoverLoss.fetchWindow(windowKey, windowLayout)
       // Failure for these will be converted to optional result and propagated with TreeLossTile
-      val tcd2000Tile = treeCoverDensity2000.fetchWindow(windowKey, windowLayout)
-      val tcd2010Tile = treeCoverDensity2010.fetchWindow(windowKey, windowLayout)
       val gainTile = treeCoverGain.fetchWindow(windowKey, windowLayout)
       val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
       val driversTile = treeCoverLossDrivers.fetchWindow(windowKey, windowLayout)
