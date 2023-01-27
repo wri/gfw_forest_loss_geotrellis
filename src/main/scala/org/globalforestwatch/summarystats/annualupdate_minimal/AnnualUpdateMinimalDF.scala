@@ -78,7 +78,7 @@ object AnnualUpdateMinimalDF {
         $"data_group.forestAge" as "forest_age__category",
         $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
         $"data_group.tmlDensity" as "wri_tropical_tree_cover__decile",
-        $"data_group.landCover" as "umd_global_land_cover__class",
+        $"data_group.landCover" as "umd_global_land_cover__ipcc_class",
 
         $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
         $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",

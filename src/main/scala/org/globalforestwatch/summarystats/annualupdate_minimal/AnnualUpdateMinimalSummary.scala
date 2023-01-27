@@ -106,45 +106,46 @@ object AnnualUpdateMinimalSummary {
         val totalCarbonSoil = soilCarbonPerHa * areaHa
 
         def updateSummary(
-                          loss: Integer, tcd2000: Integer, treesInMosaicLandscapes: Integer, umdGlobalLandCover: String,
+                          loss: Integer, tcd2000: Integer, tcdThreshold: Integer, treesInMosaicLandscapes: Integer, umdGlobalLandCover: String,
                            stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData]
                          ): Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = {
-            val pKey = AnnualUpdateMinimalDataGroup(
-              loss,
-              tcd2000,
-              drivers,
-              primaryForest,
-              wdpa,
-              aze,
-              plantedForests,
-              mangroves1996,
-              mangroves2016,
-              tigerLandscapes,
-              landmark,
-              keyBiodiversityAreas,
-              mining,
-              peatlands,
-              oilPalm,
-              idnForestMoratorium,
-              woodFiber,
-              resourceRights,
-              logging,
-              gain,
-              forestAge,
-              intactForestLandscapes2000,
-              umdGlobalLandCover,
-              treesInMosaicLandscapes,
+          val pKey = AnnualUpdateMinimalDataGroup(
+            loss,
+            tcdThreshold,
+            drivers,
+            primaryForest,
+            wdpa,
+            aze,
+            plantedForests,
+            mangroves1996,
+            mangroves2016,
+            tigerLandscapes,
+            landmark,
+            keyBiodiversityAreas,
+            mining,
+            peatlands,
+            oilPalm,
+            idnForestMoratorium,
+            woodFiber,
+            resourceRights,
+            logging,
+            gain,
+            forestAge,
+            intactForestLandscapes2000,
+            umdGlobalLandCover,
+            treesInMosaicLandscapes,
+          )
+
+          val summary: AnnualUpdateMinimalData =
+            stats.getOrElse(
+              key = pKey,
+              default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             )
 
-            val summary: AnnualUpdateMinimalData =
-              stats.getOrElse(
-                key = pKey,
-                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-              )
+          summary.totalArea += areaHa
+          summary.totalGainArea += gainArea
 
-            summary.totalArea += areaHa
-            summary.totalGainArea += gainArea
-
+          if (tcd2000 >= tcdThreshold) {
             if (loss != null) {
               summary.treecoverLoss += areaHa
               summary.biomassLoss += biomassPixel
@@ -166,7 +167,8 @@ object AnnualUpdateMinimalSummary {
             summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
             summary.totalNetFluxCo2 += netFluxCo2Pixel
             summary.totalSoilCarbon += totalCarbonSoil
-
+          }
+          else if (gain) {
             // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
             // the correct flux model outputs (TCD>=threshold OR Hansen gain=TRUE)
             summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
@@ -180,24 +182,31 @@ object AnnualUpdateMinimalSummary {
               summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
               summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
             }
-
-            summary.treecoverExtent2010 += areaHa
-
-            if (treesInMosaicLandscapes > 0) {
-              summary.tropicalTreeCoverExtent += areaHa
-            }
-
-            stats.updated(pKey, summary)
           }
+
+          if (tcd2010 >= tcdThreshold) {
+            summary.treecoverExtent2010 += areaHa
+          }
+
+          if (treesInMosaicLandscapes >= 0) {
+            summary.tropicalTreeCoverExtent += areaHa
+          }
+
+          stats.updated(pKey, summary)
+        }
+
+        val umdTcdThresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
 
         val lossSummary
         : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
-          updateSummary(loss, tcd2000, -1, "", acc.stats)
+          umdTcdThresholds.foldLeft(acc.stats) { (stats, threshold) =>
+            updateSummary(loss, tcd2000, threshold, -1, "", stats)
+          }
 
-        val tmlSummary =
-          updateSummary(-1, -1, treesInMosaicLandscapes, umdGlobalLandCover, lossSummary)
+        val ttcSummary =
+          updateSummary(null, -2, -1, treesInMosaicLandscapes, umdGlobalLandCover, lossSummary)
 
-        acc = AnnualUpdateMinimalSummary(tmlSummary)
+        acc = AnnualUpdateMinimalSummary(ttcSummary)
       }
     }
 }
