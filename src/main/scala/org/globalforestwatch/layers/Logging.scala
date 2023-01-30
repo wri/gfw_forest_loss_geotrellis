@@ -7,5 +7,5 @@ case class Logging(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "gfw_managed_forests"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

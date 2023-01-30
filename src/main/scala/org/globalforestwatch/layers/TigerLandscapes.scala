@@ -7,5 +7,5 @@ case class TigerLandscapes(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "wwf_tiger_conservation_landscapes"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

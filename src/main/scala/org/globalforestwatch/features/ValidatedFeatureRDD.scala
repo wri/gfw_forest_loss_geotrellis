@@ -60,11 +60,10 @@ object ValidatedFeatureRDD {
   }
 
   private def splitGeometries(
-    featureType: String,
-    featureDF: DataFrame,
-    spark: SparkSession
-  ): RDD[ValidatedLocation[Geometry]] = {
-
+                               featureType: String,
+                               featureDF: DataFrame,
+                               spark: SparkSession
+                             ): RDD[ValidatedLocation[Geometry]] = {
     val spatialFeatureRDD: SpatialRDD[Geometry] = Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialFeatureRDD.analyze()
 
@@ -73,9 +72,6 @@ object ValidatedFeatureRDD {
       geom.setUserData(featureId)
       geom
     }
-
-    import org.locationtech.jts.geom.GeometryFactory
-    import org.locationtech.jts.geom.GeometryCollection
 
     val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
     val spatialGridRDD = GridRDD(envelope, spark, clip = true)
@@ -95,53 +91,13 @@ object ValidatedFeatureRDD {
      */
     val hashPartitioner = new HashPartitioner(flatJoin.getNumPartitions)
 
-    val spatiallyKeyed = flatJoin.rdd
+    flatJoin.rdd
       .keyBy({ pair: (Polygon, Geometry) =>
         Z2(
           (pair._1.getCentroid.getX * 100).toInt,
           (pair._1.getCentroid.getY * 100).toInt
         ).z
       })
-
-//    val geoms = spatiallyKeyed.groupByKey().flatMap({
-//      geoms: (Long, Iterable[(Polygon, Geometry)]) =>
-//        geoms._2.map(g => g._2)
-//    }).collect()
-//
-//    val geomCollection = UnaryUnionOp.union( new GeometryFactory().createGeometryCollection(
-//      geoms.toArray
-//    ))
-//    println("Dissolved: " + geomCollection.toText)
-
-    val dissolved: RDD[(Long, (Polygon, Geometry))] = spatiallyKeyed.groupByKey().flatMapValues({
-      geoms: Iterable[(Polygon, Geometry)] =>
-        val locations: List[(GfwProFeatureId, Geometry)] = geoms.map(g => g._2).map({
-          geom => (geom.getUserData.asInstanceOf[GfwProFeatureId], geom)
-        }).toList
-
-        val gridCell = geoms.toMap.keys.toList(0)
-        val byListId: Map[String, List[Geometry]] =
-          locations
-            .groupBy(p => p._1.listId)
-            .mapValues(p => p.map(g => g._2))
-
-        byListId.map({
-          case (listId: String, geoms: List[Geometry]) =>
-            // union all remaining geoms to get diff geom
-            val geomCollection: GeometryCollection =
-              new GeometryFactory().createGeometryCollection(
-                geoms.toArray
-              )
-
-            val unioned = UnaryUnionOp.union(geomCollection)
-            unioned.setUserData(GfwProFeatureId(listId, -1, 0, 0))
-            (gridCell, unioned)
-        })
-    })
-
-    val combined = spatiallyKeyed ++ dissolved
-
-    combined
       .partitionBy(hashPartitioner)
       .flatMap { case (_, (gridCell, geom)) =>
         val fid = geom.getUserData.asInstanceOf[FeatureId]

@@ -27,8 +27,9 @@ object RDDAdapter {
   def toSpatialRDDfromLocationRdd(rdd: RDD[Location[Geometry]], spark: SparkSession): SpatialRDD[Geometry] = {
     val spatialRDD = new SpatialRDD[Geometry]()
     spatialRDD.rawSpatialRDD = rdd.map { case Location(id, geom) =>
-      geom.setUserData(id)
-      geom
+      val fixedGeom = GfwGeometryFixer.fix(geom)
+      fixedGeom.setUserData(id)
+      fixedGeom
     }.toJavaRDD()
 
     spatialRDD.analyze()

@@ -7,7 +7,7 @@ case class FaoEcozones2000(gridTile: GridTile, model: String = "standard", kwarg
     with OptionalILayer {
 
   val datasetName = "fao_ecozones_2000"
-  val uri: String = uriForGrid(gridTile)
+  val uri: String = uriForGrid(gridTile, kwargs)
 
   def lookup(value: Int): String = value match {
     case 1 => "Boreal coniferous forest"

@@ -10,7 +10,7 @@ case class IndonesiaForestArea(gridTile: GridTile, kwargs: Map[String, Any])
   val datasetName = "idn_forest_area"
 
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 
   override val externalNoDataValue: String = ""
 

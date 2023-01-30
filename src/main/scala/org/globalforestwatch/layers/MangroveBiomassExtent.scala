@@ -8,6 +8,6 @@ case class MangroveBiomassExtent(gridTile: GridTile, kwargs: Map[String, Any])
   val datasetName = "jpl_mangrove_aboveground_biomass_stock_2000"
 
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 
 }

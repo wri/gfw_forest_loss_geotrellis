@@ -7,5 +7,5 @@ case class PeruProtectedAreas(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "per_protected_areas"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }
