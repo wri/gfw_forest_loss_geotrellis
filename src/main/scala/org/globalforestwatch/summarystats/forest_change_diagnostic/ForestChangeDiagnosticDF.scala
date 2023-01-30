@@ -81,13 +81,15 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     }
   }
 
-  case class RowGridId(list_id: String, location_id: Int, x: Double, y: Double, grid: String) {
-    def toFeatureID = CombinedFeatureId(GfwProFeatureId(list_id, location_id, x, y), GridId(grid))
+  case class RowGridId(list_id: String, location_id: Int, grid: String) {
+    def toFeatureID = CombinedFeatureId(GfwProFeatureId(list_id, location_id), GridId(grid))
   }
 
   object RowGridId {
-    def apply(gfwProId: GfwProFeatureId, gridId: GridId): RowGridId =
-      RowGridId(list_id = gfwProId.listId, location_id = gfwProId.locationId, x = gfwProId.x, y = gfwProId.y, grid = gridId.gridId)
+    def apply(gfwProId: GfwProFeatureId, gridId: GridId): RowGridId = RowGridId (
+      list_id = gfwProId.listId,
+      location_id = gfwProId.locationId,
+      grid = gridId.gridId)
   }
 
   val featureFields = List(

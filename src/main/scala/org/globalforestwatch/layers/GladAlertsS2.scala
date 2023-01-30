@@ -12,5 +12,5 @@ case class GladAlertsS2(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "umd_glad_sentinel2_alerts"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

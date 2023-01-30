@@ -4,6 +4,7 @@ import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
+import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features._
 
 object TreeCoverLossCommand extends SummaryCommand {
@@ -49,7 +50,8 @@ object TreeCoverLossCommand extends SummaryCommand {
         "contextualLayers" -> treeCoverLoss._1,
         "tcdYear" -> treeCoverLoss._2,
         "thresholdFilter" -> treeCoverLoss._3,
-        "carbonPools" -> treeCoverLoss._4
+        "carbonPools" -> treeCoverLoss._4,
+        "config" -> GfwConfig.get
       )
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 

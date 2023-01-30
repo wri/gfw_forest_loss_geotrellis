@@ -9,7 +9,7 @@ case class SEAsiaLandCover(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "rspo_southeast_asia_land_cover_2010"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 
   override val externalNoDataValue = "Unknown"
 

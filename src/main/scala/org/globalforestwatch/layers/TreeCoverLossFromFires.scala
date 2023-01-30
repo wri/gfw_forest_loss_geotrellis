@@ -7,5 +7,5 @@ case class TreeCoverLossFromFires(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "umd_tree_cover_loss_from_fires"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

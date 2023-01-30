@@ -8,7 +8,7 @@ case class TreeCoverLossDrivers(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "tsc_tree_cover_loss_drivers"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 
   override val internalNoDataValue = 0
   override val externalNoDataValue = "Unknown"

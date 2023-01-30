@@ -2,10 +2,10 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class TreeCoverLoss(gridTile: GridTile, kwargs: Map[String, Any])
+case class ProdesLossYear(gridTile: GridTile, kwargs: Map[String, Any])
   extends IntegerLayer
-    with RequiredILayer {
-  val datasetName = "umd_tree_cover_loss"
+    with OptionalILayer {
+  val datasetName = "inpe_prodes"
   val uri: String =
     uriForGrid(gridTile, kwargs)
 

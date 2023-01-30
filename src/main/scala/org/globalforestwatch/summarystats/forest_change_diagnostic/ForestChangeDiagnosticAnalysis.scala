@@ -91,7 +91,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
                   } else {
                     data.copy(
                       commodity_threat_fires = fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty),
-                      tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2020)
+                      tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2021)
                     )
                   }
                 }
@@ -127,7 +127,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       (locationId >= -1) && (gridFilter.isEmpty || gridFilter.contains(GridId(pointGridId(geom.getCentroid, 1))))
 
     rdd.collect {
-      case Location(gfwFid @ GfwProFeatureId(_, lid, _, _), geom) if keepLocationCell(lid, geom) =>
+      case Location(gfwFid @ GfwProFeatureId(_, lid), geom) if keepLocationCell(lid, geom) =>
         val grid = pointGridId(geom.getCentroid, 1)
         val fid = CombinedFeatureId(gfwFid, GridId(grid))
         Location(fid, geom)
@@ -140,7 +140,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     // IDs where grid geometry is not the same
     rdd
       .collect {
-        case Valid(Location(GfwProFeatureId(_, locationId, _, _), geom)) if locationId == -2 =>
+        case Valid(Location(GfwProFeatureId(_, locationId), geom)) if locationId == -1 =>
           GridId(pointGridId(geom.getCentroid, 1))
       }
       .collect
@@ -214,7 +214,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       }
       .reduceByKey(_ merge _)
       .mapValues { fires =>
-        aggregateFireData(fires.merge(ForestChangeDiagnosticDataLossYearly.prefilled)).limitToMaxYear(2020)
+        aggregateFireData(fires.merge(ForestChangeDiagnosticDataLossYearly.prefilled)).limitToMaxYear(2021)
       }
   }
 

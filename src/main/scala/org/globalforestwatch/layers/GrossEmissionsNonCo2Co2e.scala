@@ -9,5 +9,5 @@ case class GrossEmissionsNonCo2Co2e(gridTile: GridTile, model: String = "standar
   val datasetName = "gfw_full_extent_non_co2_gross_emissions"
 
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }
