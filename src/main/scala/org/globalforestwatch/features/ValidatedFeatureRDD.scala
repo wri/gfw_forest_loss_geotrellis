@@ -60,10 +60,10 @@ object ValidatedFeatureRDD {
   }
 
   private def splitGeometries(
-    featureType: String,
-    featureDF: DataFrame,
-    spark: SparkSession
-  ): RDD[ValidatedLocation[Geometry]] = {
+                               featureType: String,
+                               featureDF: DataFrame,
+                               spark: SparkSession
+                             ): RDD[ValidatedLocation[Geometry]] = {
     val spatialFeatureRDD: SpatialRDD[Geometry] = Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialFeatureRDD.analyze()
 

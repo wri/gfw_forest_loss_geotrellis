@@ -10,11 +10,11 @@
     },
     {
       "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202106/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202208/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
-      "source_uri":"s3://gfw-data-lake/gfw_oil_gas/v20190321/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_oil_gas/v20221024/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"idn_forest_area",
@@ -51,10 +51,6 @@
     {
       "name":"gfw_forest_carbon_net_flux",
       "source_uri":"s3://gfw-data-lake/gfw_forest_carbon_net_flux/v20210331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_pixel_area",

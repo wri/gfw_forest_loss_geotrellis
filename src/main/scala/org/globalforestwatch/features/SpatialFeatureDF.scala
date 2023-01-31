@@ -5,6 +5,7 @@ import org.locationtech.jts
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.functions.{col, isnull, udf}
 import org.globalforestwatch.util.GeotrellisGeometryValidator.preserveGeometryType
+import org.globalforestwatch.util.GfwGeometryFixer
 import org.locationtech.jts.geom.util.GeometryFixer
 import org.locationtech.jts.geom.{Envelope, Geometry, MultiPolygon, Polygon}
 import org.globalforestwatch.util.GfwGeometryFixer
