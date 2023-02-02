@@ -117,6 +117,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "total_area", // totalArea
     "protected_areas_area", // protectedAreasArea
     "peat_area", // peatlandsArea
+    "arg_otbn_area", // argOTBNArea
     "brazil_biomes", // braBiomesArea
     "idn_legal_area", // idnForestAreaArea
     "sea_landcover_area", // seAsiaLandCoverArea
