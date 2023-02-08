@@ -153,7 +153,7 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
     peat_area = ForestChangeDiagnosticDataDouble
       .fill(totalArea, isPeatlands),
     arg_otbn_area = ForestChangeDiagnosticDataDoubleCategory
-      .fill(braBiomes, totalArea),
+      .fill(argOTBN, totalArea),
     brazil_biomes = ForestChangeDiagnosticDataDoubleCategory
       .fill(braBiomes, totalArea),
     idn_legal_area = ForestChangeDiagnosticDataDoubleCategory

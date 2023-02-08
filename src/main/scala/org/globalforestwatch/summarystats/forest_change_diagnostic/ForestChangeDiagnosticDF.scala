@@ -129,6 +129,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "cerrado_biome_presence", // cerradoBiomesPresence,
     "southeast_asia_presence", // seAsiaPresence,
     "indonesia_presence", // idnPresence
+    "argentina_presence", // argPresence
     "commodity_value_forest_extent", //  forestValueIndicator
     "commodity_value_peat", // peatValueIndicator
     "commodity_value_protected_areas", // protectedAreaValueIndicator
