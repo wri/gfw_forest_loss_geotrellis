@@ -8,7 +8,7 @@ case class ArgOTBN(gridTile: GridTile, kwargs: Map[String, Any])
 
     val datasetName = "arg_native_forest_land_plan"
     val uri: String = 
-        uriForGrid(gridTile)
+        uriForGrid(gridTile, kwargs)
 
     override val externalNoDataValue = "Unknown"
 
