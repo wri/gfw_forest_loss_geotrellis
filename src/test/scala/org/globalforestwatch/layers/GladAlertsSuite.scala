@@ -1,17 +1,17 @@
 package org.globalforestwatch.layers
 
+import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.grids.GridTile
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
 import org.scalatest.funsuite.AnyFunSuite
 
 class GladAlertsSuits extends AnyFunSuite {
 
   private val fullDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-  val glad = new GladAlerts(GridTile(10, 40000, 400, "10N_010E"), Map())
+  val glad = new GladAlerts(GridTile(10, 40000, 400, "10N_010E"), Map("config" -> GfwConfig.get))
 
   test("Unconfirmed date 1") {
     assert(

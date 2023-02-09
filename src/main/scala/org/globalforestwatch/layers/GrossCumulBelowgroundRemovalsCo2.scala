@@ -9,5 +9,5 @@ case class GrossCumulBelowgroundRemovalsCo2(gridTile: GridTile, model: String = 
   val datasetName = "gfw_full_extent_belowground_gross_removals"
 
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

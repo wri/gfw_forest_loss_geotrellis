@@ -8,5 +8,5 @@ case class OilPalm(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "gfw_oil_palm"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

@@ -5,6 +5,7 @@ import cats.implicits._
 import com.monovore.decline.Opts
 import org.globalforestwatch.features._
 import org.apache.sedona.core.enums.GridType
+import org.globalforestwatch.config.GfwConfig
 
 object FireAlertsCommand extends SummaryCommand {
   val changeOnlyOpt: Opts[Boolean] =
@@ -26,7 +27,8 @@ object FireAlertsCommand extends SummaryCommand {
         "splitFeatures" -> default.splitFeatures,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "changeOnly" -> changeOnly,
-        "fireAlertType" -> fireAlert.alertType
+        "fireAlertType" -> fireAlert.alertType,
+        "config" -> GfwConfig.get
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

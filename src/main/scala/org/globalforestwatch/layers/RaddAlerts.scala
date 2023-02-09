@@ -11,5 +11,5 @@ case class RaddAlerts(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "wur_radd_alerts"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

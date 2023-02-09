@@ -7,5 +7,5 @@ case class KeyBiodiversityAreas(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "birdlife_key_biodiversity_areas"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

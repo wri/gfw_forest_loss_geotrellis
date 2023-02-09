@@ -10,17 +10,14 @@ object GfwProFeature extends Feature {
   val locationIdPos = 1
   val geomPos = 2
 
-  val featureIdExpr = "list_id as listId, cast(location_id as int) as locationId, ST_X(ST_Centroid(ST_GeomFromWKB(geom))) as x, ST_Y(ST_Centroid(ST_GeomFromWKB(geom))) as y"
-
+  val featureIdExpr = "list_id as listId, cast(location_id as int) as locationId"
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
 
     val listId: String = i(0)
     val locationId: Int = i(1).toInt
-    val x: Double = i(2).toDouble
-    val y: Double = i(3).toDouble
 
-    GfwProFeatureId(listId, locationId, x, y)
+    GfwProFeatureId(listId, locationId)
   }
 
   case class Filter(

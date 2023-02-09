@@ -7,5 +7,5 @@ case class WoodFiber(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "gfw_wood_fiber"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

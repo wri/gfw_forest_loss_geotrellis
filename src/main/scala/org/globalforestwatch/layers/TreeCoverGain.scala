@@ -7,7 +7,7 @@ case class TreeCoverGain(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "umd_tree_cover_gain"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 
   override val internalNoDataValue: Int = 0
   override val externalNoDataValue: Boolean = false

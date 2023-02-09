@@ -8,5 +8,5 @@ case class Mangroves2016(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "gmw_global_mangrove_extent_2016"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

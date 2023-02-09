@@ -5,7 +5,7 @@ import org.globalforestwatch.grids.GridTile
 case class PlantedForests(gridTile: GridTile, kwargs: Map[String, Any]) extends StringLayer with OptionalILayer {
   val datasetName = "gfw_planted_forests"
 
-  val uri: String = uriForGrid(gridTile)
+  val uri: String = uriForGrid(gridTile, kwargs)
 
   def lookup(value: Int): String = value match {
     case 1 => "Fruit"
@@ -26,5 +26,5 @@ case class PlantedForests(gridTile: GridTile, kwargs: Map[String, Any]) extends 
 case class PlantedForestsBool(gridTile: GridTile, kwargs: Map[String, Any]) extends BooleanLayer with OptionalILayer {
   val datasetName = "gfw_planted_forests"
 
-  val uri: String = uriForGrid(gridTile)
+  val uri: String = uriForGrid(gridTile, kwargs)
 }

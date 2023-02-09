@@ -11,5 +11,5 @@ case class GladAlerts(gridTile: GridTile, kwargs: Map[String, Any]) extends Date
   val gladGrid: String = toGladGridId(gridTile.tileId)
 
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }

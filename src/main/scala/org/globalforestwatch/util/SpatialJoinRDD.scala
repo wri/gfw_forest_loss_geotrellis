@@ -21,13 +21,13 @@ object SpatialJoinRDD {
                                                                      ): JavaPairRDD[A, util.List[B]] = {
 
     try {
-      queryWindowRDD.spatialPartitioning(GridType.QUADTREE)
+      queryWindowRDD.spatialPartitioning(GridType.KDBTREE)
 
       valueRDD.spatialPartitioning(queryWindowRDD.getPartitioner)
 
       if (usingIndex)
         queryWindowRDD.buildIndex(
-          IndexType.QUADTREE,
+          IndexType.RTREE,
           buildOnSpatialPartitionedRDD
         )
 
@@ -40,13 +40,13 @@ object SpatialJoinRDD {
     } catch {
       case _: java.lang.IllegalArgumentException =>
         try {
-          valueRDD.spatialPartitioning(GridType.QUADTREE)
+          valueRDD.spatialPartitioning(GridType.KDBTREE)
 
           queryWindowRDD.spatialPartitioning(valueRDD.getPartitioner)
 
           if (usingIndex)
             valueRDD.buildIndex(
-              IndexType.QUADTREE,
+              IndexType.RTREE,
               buildOnSpatialPartitionedRDD
             )
           JoinQuery.SpatialJoinQuery(
@@ -81,13 +81,13 @@ object SpatialJoinRDD {
 
     try {
       queryWindowRDD.spatialPartitioning(
-        GridType.QUADTREE,
+        GridType.KDBTREE,
         Seq(queryWindowPartitions, (queryWindowCount / 2).toInt).min
       )
       valueRDD.spatialPartitioning(queryWindowRDD.getPartitioner)
       if (usingIndex)
         queryWindowRDD.buildIndex(
-          IndexType.QUADTREE,
+          IndexType.RTREE,
           buildOnSpatialPartitionedRDD
         )
 
@@ -104,13 +104,13 @@ object SpatialJoinRDD {
         )
         try {
           valueRDD.spatialPartitioning(
-            GridType.QUADTREE,
+            GridType.KDBTREE,
             Seq(valuePartitions, (valueCount / 2).toInt).min
           )
           queryWindowRDD.spatialPartitioning(valueRDD.getPartitioner)
           if (usingIndex)
             valueRDD.buildIndex(
-              IndexType.QUADTREE,
+              IndexType.RTREE,
               buildOnSpatialPartitionedRDD
             )
 

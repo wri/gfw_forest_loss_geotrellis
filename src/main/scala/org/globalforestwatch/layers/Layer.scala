@@ -53,8 +53,9 @@ trait Layer {
     }
   }
 
-  protected def uriForGrid(grid: GridTile): String = {
-    val baseUri = GfwConfig.get.rasterCatalog.getSourceUri(datasetName, grid)
+  protected def uriForGrid(grid: GridTile, kwargs: Map[String, Any]): String = {
+    val config: GfwConfig = getAnyMapValue[GfwConfig](kwargs, "config")
+    val baseUri = config.rasterCatalog.getSourceUri(datasetName, grid)
     baseUri.replace("{grid_size}", grid.gridSize.toString)
       .replace("{row_count}", grid.rowCount.toString)
       .replace("{tile_id}", grid.tileId)

@@ -9,7 +9,7 @@ case class IndonesiaLandCover(gridTile: GridTile, kwargs: Map[String, Any])
 
   val datasetName = "idn_land_cover_2017"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 
   override val externalNoDataValue: String = ""
   private val fLookup = if (GfwConfig.isGfwPro) IndonesiaLandCover.proLabelTable else IndonesiaLandCover.flagshipLabelTable

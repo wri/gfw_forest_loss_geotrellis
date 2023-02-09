@@ -7,5 +7,5 @@ case class Mangroves1996(gridTile: GridTile, kwargs: Map[String, Any])
     with OptionalILayer {
   val datasetName = "gmw_global_mangrove_extent_1996"
   val uri: String =
-    uriForGrid(gridTile)
+    uriForGrid(gridTile, kwargs)
 }
