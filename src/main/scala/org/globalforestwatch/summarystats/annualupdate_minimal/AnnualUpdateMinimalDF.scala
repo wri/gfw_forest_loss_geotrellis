@@ -25,7 +25,6 @@ object AnnualUpdateMinimalDF {
     "is__gfw_resource_rights",
     "is__gfw_managed_forests",
     "is__umd_tree_cover_gain",
-    "forest_age__category",
     "is__ifl_intact_forest_landscapes_2000",
     "wri_tropical_tree_cover__decile",
     "umd_global_land_cover__ipcc_class",
@@ -75,7 +74,6 @@ object AnnualUpdateMinimalDF {
         $"data_group.resourceRights" as "is__gfw_resource_rights",
         $"data_group.logging" as "is__gfw_managed_forests",
         $"data_group.isGain" as "is__umd_tree_cover_gain",
-        $"data_group.forestAge" as "forest_age__category",
         $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
         $"data_group.tmlDensity" as "wri_tropical_tree_cover__decile",
         $"data_group.landCover" as "umd_global_land_cover__ipcc_class",
@@ -262,8 +260,6 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_resource_rights") as "is__gfw_resource_rights",
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
       max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
-      max(length($"forest_age__category"))
-        .cast("boolean") as "forest_age__category",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
 
       max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
@@ -322,8 +318,6 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_resource_rights") as "is__gfw_resource_rights",
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
       max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
-      max(length($"forest_age__category"))
-        .cast("boolean") as "forest_age__category",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
 
       max($"tsc_tree_cover_loss_drivers__type") as "tsc_tree_cover_loss_drivers__type",

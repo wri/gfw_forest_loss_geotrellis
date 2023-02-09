@@ -66,7 +66,6 @@ object AnnualUpdateMinimalSummary {
         val resourceRights: Boolean =
           raster.tile.resourceRights.getData(col, row)
         val logging: Boolean = raster.tile.logging.getData(col, row)
-        val forestAge: String = raster.tile.forestAge.getData(col, row)
         val intactForestLandscapes2000: Boolean =
           raster.tile.intactForestLandscapes2000.getData(col, row)
         val treeCoverLossFromFires: Boolean =
@@ -130,7 +129,6 @@ object AnnualUpdateMinimalSummary {
             resourceRights,
             logging,
             gain,
-            forestAge,
             intactForestLandscapes2000,
             umdGlobalLandCover,
             treesInMosaicLandscapes,
