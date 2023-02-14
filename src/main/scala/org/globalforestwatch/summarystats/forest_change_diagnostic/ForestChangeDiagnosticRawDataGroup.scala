@@ -17,12 +17,14 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
                                               isIdnForestMoratorium: Boolean,
                                               braBiomes: String,
                                               isPlantation: Boolean,
+                                              argOTBN: String,
                                               southAmericaPresence: Boolean,
                                               legalAmazonPresence: Boolean,
                                               braBiomesPresence: Boolean,
                                               cerradoBiomesPresence: Boolean,
                                               seAsiaPresence: Boolean,
-                                              idnPresence: Boolean) {
+                                              idnPresence: Boolean,
+                                              argPresence: Boolean) {
 
   /** Produce a partial ForestChangeDiagnosticData only for the loss year in this data group */
   def toForestChangeDiagnosticData(totalArea: Double): ForestChangeDiagnosticData = ForestChangeDiagnosticData(
@@ -59,6 +61,13 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isProtectedArea && isUMDLoss
       ),
+    tree_cover_loss_arg_otbn_yearly = 
+      ForestChangeDiagnosticDataLossYearlyCategory.fill(
+      argOTBN, 
+      umdTreeCoverLossYear,
+      totalArea,
+      include = isUMDLoss
+    ),
     tree_cover_loss_sea_landcover_yearly =
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
         seAsiaLandCover,
@@ -143,6 +152,8 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
       .fill(totalArea, isProtectedArea),
     peat_area = ForestChangeDiagnosticDataDouble
       .fill(totalArea, isPeatlands),
+    arg_otbn_area = ForestChangeDiagnosticDataDoubleCategory
+      .fill(argOTBN, totalArea),
     brazil_biomes = ForestChangeDiagnosticDataDoubleCategory
       .fill(braBiomes, totalArea),
     idn_legal_area = ForestChangeDiagnosticDataDoubleCategory
@@ -165,6 +176,8 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
       ForestChangeDiagnosticDataBoolean.fill(seAsiaPresence),
     indonesia_presence =
       ForestChangeDiagnosticDataBoolean.fill(idnPresence),
+    argentina_presence =
+      ForestChangeDiagnosticDataBoolean.fill(argPresence),
     filtered_tree_cover_extent = ForestChangeDiagnosticDataDouble
       .fill(
         totalArea,

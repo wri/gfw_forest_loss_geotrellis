@@ -95,6 +95,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "tree_cover_loss_peat_yearly", //treeCoverLossPeatLandYearly
     "tree_cover_loss_intact_forest_yearly", // treeCoverLossIntactForestYearly
     "tree_cover_loss_protected_areas_yearly", // treeCoverLossProtectedAreasYearly
+    "tree_cover_loss_arg_otbn_yearly", // treeCoverLossARGOTBNYearly
     "tree_cover_loss_sea_landcover_yearly", // treeCoverLossSEAsiaLandCoverYearly
     "tree_cover_loss_idn_landcover_yearly", // treeCoverLossIDNLandCoverYearly
     "tree_cover_loss_soy_yearly", // treeCoverLossSoyPlanedAreasYearly
@@ -114,6 +115,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "total_area", // totalArea
     "protected_areas_area", // protectedAreasArea
     "peat_area", // peatlandsArea
+    "arg_otbn_area", // argOTBNArea
     "brazil_biomes", // braBiomesArea
     "idn_legal_area", // idnForestAreaArea
     "sea_landcover_area", // seAsiaLandCoverArea
@@ -125,6 +127,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "cerrado_biome_presence", // cerradoBiomesPresence,
     "southeast_asia_presence", // seAsiaPresence,
     "indonesia_presence", // idnPresence
+    "argentina_presence", // argPresence
     "commodity_value_forest_extent", //  forestValueIndicator
     "commodity_value_peat", // peatValueIndicator
     "commodity_value_protected_areas", // protectedAreaValueIndicator

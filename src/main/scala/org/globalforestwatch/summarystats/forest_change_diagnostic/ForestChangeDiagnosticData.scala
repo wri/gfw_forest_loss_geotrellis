@@ -17,6 +17,8 @@ case class ForestChangeDiagnosticData(
   tree_cover_loss_peat_yearly: ForestChangeDiagnosticDataLossYearly,
   tree_cover_loss_intact_forest_yearly: ForestChangeDiagnosticDataLossYearly,
   tree_cover_loss_protected_areas_yearly: ForestChangeDiagnosticDataLossYearly,
+  /** Tree cover loss in Argentina Native Forest Land Plan (OTBN) categories */
+  tree_cover_loss_arg_otbn_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   /** Tree cover loss in south east asia */
   tree_cover_loss_sea_landcover_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   tree_cover_loss_idn_landcover_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
@@ -43,6 +45,8 @@ case class ForestChangeDiagnosticData(
   protected_areas_area: ForestChangeDiagnosticDataDouble,
   /** Peatland Area */
   peat_area: ForestChangeDiagnosticDataDouble,
+  /** OTBN category area */
+  arg_otbn_area: ForestChangeDiagnosticDataDoubleCategory,
   brazil_biomes: ForestChangeDiagnosticDataDoubleCategory,
   /** IDN Forest Area */
   idn_legal_area: ForestChangeDiagnosticDataDoubleCategory,
@@ -56,6 +60,7 @@ case class ForestChangeDiagnosticData(
   cerrado_biome_presence: ForestChangeDiagnosticDataBoolean,
   southeast_asia_presence: ForestChangeDiagnosticDataBoolean,
   indonesia_presence: ForestChangeDiagnosticDataBoolean,
+  argentina_presence: ForestChangeDiagnosticDataBoolean,
   filtered_tree_cover_extent: ForestChangeDiagnosticDataDouble,
   filtered_tree_cover_extent_yearly: ForestChangeDiagnosticDataValueYearly,
   filtered_tree_cover_loss_yearly: ForestChangeDiagnosticDataLossYearly,
@@ -75,7 +80,7 @@ case class ForestChangeDiagnosticData(
   commodity_threat_peat: ForestChangeDiagnosticDataLossYearly,
   /** Sum of moving to year window over filtered_tree_cover_loss_protected_areas_yearly + plantation_in_protected_areas_area */
   commodity_threat_protected_areas: ForestChangeDiagnosticDataLossYearly,
-  commodity_threat_fires: ForestChangeDiagnosticDataLossYearly
+  commodity_threat_fires: ForestChangeDiagnosticDataLossYearly  
 ) {
 
   def merge(other: ForestChangeDiagnosticData): ForestChangeDiagnosticData = {
@@ -92,6 +97,9 @@ case class ForestChangeDiagnosticData(
       ),
       tree_cover_loss_protected_areas_yearly.merge(
         other.tree_cover_loss_protected_areas_yearly
+      ),
+      tree_cover_loss_arg_otbn_yearly.merge(
+        other.tree_cover_loss_arg_otbn_yearly
       ),
       tree_cover_loss_sea_landcover_yearly.merge(
         other.tree_cover_loss_sea_landcover_yearly
@@ -126,6 +134,7 @@ case class ForestChangeDiagnosticData(
       total_area.merge(other.total_area),
       protected_areas_area.merge(other.protected_areas_area),
       peat_area.merge(other.peat_area),
+      arg_otbn_area.merge(other.arg_otbn_area),
       brazil_biomes.merge(other.brazil_biomes),
       idn_legal_area.merge(other.idn_legal_area),
       sea_landcover_area.merge(other.sea_landcover_area),
@@ -137,6 +146,7 @@ case class ForestChangeDiagnosticData(
       cerrado_biome_presence.merge(other.cerrado_biome_presence),
       southeast_asia_presence.merge(other.southeast_asia_presence),
       indonesia_presence.merge(other.indonesia_presence),
+      argentina_presence.merge(other.argentina_presence),
       filtered_tree_cover_extent.merge(other.filtered_tree_cover_extent),
       filtered_tree_cover_extent_yearly.merge(other.filtered_tree_cover_extent_yearly),
       filtered_tree_cover_loss_yearly.merge(other.filtered_tree_cover_loss_yearly),
@@ -277,6 +287,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
+      ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
@@ -298,7 +309,9 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataBoolean.empty,
       ForestChangeDiagnosticDataBoolean.empty,
       ForestChangeDiagnosticDataBoolean.empty,
       ForestChangeDiagnosticDataBoolean.empty,
