@@ -12,7 +12,7 @@ case class GFWProCoverage(gridTile: GridTile, kwargs: Map[String, Any])
     uriForGrid(gridTile, kwargs)
 
   def lookup(value: Int): Map[String, Boolean] = {
-    val bits = "00000000" + value.toBinaryString takeRight 8
+    val bits = "000000000" + value.toBinaryString takeRight 9
     Map(
       "Argentina" -> (bits(8) == '1'),
       "Soy Coverage" -> (bits(7) == '1'),
