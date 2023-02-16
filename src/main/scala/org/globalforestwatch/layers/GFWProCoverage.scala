@@ -14,11 +14,12 @@ case class GFWProCoverage(gridTile: GridTile, kwargs: Map[String, Any])
   def lookup(value: Int): Map[String, Boolean] = {
     val bits = "00000000" + value.toBinaryString takeRight 8
     Map(
-      "Argentina" -> (bits(7) == '1'),
+      "Argentina" -> (bits(8) == '1'),
+      "Soy Coverage" -> (bits(7) == '1'),
       "South America" -> (bits(6) == '1'),
       "Legal Amazon" -> (bits(5) == '1'),
       "Brazil Biomes" -> (bits(4) == '1'),
-      "Cerrado Biomes" -> (bits(7) == '1'),
+      "Cerrado Biomes" -> (bits(3) == '1'),
       "South East Asia" -> (bits(2) == '1'),
       "Indonesia" -> (bits(1) == '1')
     )
