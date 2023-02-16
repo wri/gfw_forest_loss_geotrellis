@@ -69,10 +69,6 @@
       "source_uri":"s3://gfw-data-lake/rspo_southeast_asia_land_cover_2010/v2013/raster/epsg-4326/{grid_size}/{row_count}/land_cover_class/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfwpro_forest_change_regions",
-      "source_uri":"s3://gfw-data-lake/gfwpro_forest_change_regions/v20220228/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
-    },
-    {
       "name":"landmark_indigenous_and_community_lands",
       "source_uri":"s3://gfw-data-lake/landmark_indigenous_and_community_lands/v20201215/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
@@ -290,7 +286,7 @@
     },
     {
       "name":"gfwpro_forest_change_regions",
-      "source_uri": "s3://gfw-data-lake/gfwpro_forest_change_regions/v20210129/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfwpro_forest_change_regions/v20230207/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"ifl_intact_forest_landscapes_2000",
