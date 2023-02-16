@@ -201,8 +201,13 @@ object AnnualUpdateMinimalSummary {
             updateSummary(loss, tcd2000, threshold, -1, "", stats)
           }
 
-        val ttcSummary =
-          updateSummary(null, -2, -1, treesInMosaicLandscapes, umdGlobalLandCover, lossSummary)
+        val ttcSummary = {
+          if (treesInMosaicLandscapes == 255) {
+            lossSummary
+          } else {
+            updateSummary(null, -2, -1, treesInMosaicLandscapes, umdGlobalLandCover, lossSummary)
+          }
+        }
 
         acc = AnnualUpdateMinimalSummary(ttcSummary)
       }
