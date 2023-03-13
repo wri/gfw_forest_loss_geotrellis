@@ -8,9 +8,8 @@ import org.globalforestwatch.util.Geodesy
 
 /** LossData Summary by year */
 case class ForestChangeDiagnosticSummary(
-                                          stats: Map[ForestChangeDiagnosticRawDataGroup,
-                                            ForestChangeDiagnosticRawData] = Map.empty
-                                        ) extends Summary[ForestChangeDiagnosticSummary] {
+  stats: Map[ForestChangeDiagnosticRawDataGroup, ForestChangeDiagnosticRawData] = Map.empty
+) extends Summary[ForestChangeDiagnosticSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(
@@ -39,23 +38,23 @@ object ForestChangeDiagnosticSummary {
 
   def getGridVisitor(
     kwargs: Map[String, Any]
-  ): GridVisitor[Raster[ForestChangeDiagnosticTile],
-                 ForestChangeDiagnosticSummary] =
+  ): GridVisitor[Raster[ForestChangeDiagnosticTile], ForestChangeDiagnosticSummary] =
     new GridVisitor[Raster[ForestChangeDiagnosticTile], ForestChangeDiagnosticSummary] {
       private var acc: ForestChangeDiagnosticSummary =
         new ForestChangeDiagnosticSummary()
 
       def result: ForestChangeDiagnosticSummary = acc
 
-      def visit(raster: Raster[ForestChangeDiagnosticTile],
-                col: Int,
-                row: Int): Unit = {
+      def visit(raster: Raster[ForestChangeDiagnosticTile], col: Int, row: Int): Unit = {
 
         // This is a pixel by pixel operation
 
         // pixel Area
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
-        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
+        val area: Double = Geodesy.pixelArea(
+          lat,
+          raster.cellSize
+        ) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
         val areaHa = area / 10000.0
 
         // input layers
@@ -76,8 +75,16 @@ object ForestChangeDiagnosticSummary {
         val isIntactForestLandscapes2000: Boolean =
           raster.tile.isIntactForestLandscapes2000.getData(col, row)
         val wdpa: String = raster.tile.wdpaProtectedAreas.getData(col, row)
-        val prodesLossYear: Int = {
-          val loss = raster.tile.prodesLossYear.getData(col, row)
+        val prodesAmazonLossYear: Int = {
+          val loss = raster.tile.prodesAmazonLossYear.getData(col, row)
+          if (loss != null) {
+            loss.toInt
+          } else {
+            0
+          }
+        }
+        val prodesCerradoLossYear: Int = {
+          val loss = raster.tile.prodesCerradoLossYear.getData(col, row)
           if (loss != null) {
             loss.toInt
           } else {
@@ -103,8 +110,8 @@ object ForestChangeDiagnosticSummary {
         val isTreeCoverExtent90: Boolean = tcd2000 > 90
         val isUMDLoss: Boolean = isTreeCoverExtent30 && umdTreeCoverLossYear > 0
         val isProtectedArea: Boolean = wdpa != ""
-        val isProdesLoss: Boolean = prodesLossYear > 0
-
+        val isProdesAmazonLoss: Boolean = prodesAmazonLossYear > 0
+        val isProdesCerradoLoss: Boolean = prodesCerradoLossYear > 0
         val southAmericaPresence =
           gfwProCoverage.getOrElse("South America", false)
         val legalAmazonPresence =
@@ -119,8 +126,10 @@ object ForestChangeDiagnosticSummary {
         val groupKey = ForestChangeDiagnosticRawDataGroup(
           umdTreeCoverLossYear,
           isUMDLoss,
-          prodesLossYear,
-          isProdesLoss,
+          prodesAmazonLossYear,
+          prodesCerradoLossYear,
+          isProdesAmazonLoss,
+          isProdesCerradoLoss,
           isTreeCoverExtent30,
           isTreeCoverExtent90,
           isPrimaryForest,
