@@ -1,30 +1,34 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
-                                              isUMDLoss: Boolean,
-                                              prodesLossYear: Int,
-                                              isProdesLoss: Boolean,
-                                              isTreeCoverExtent30: Boolean,
-                                              isTreeCoverExtent90: Boolean,
-                                              isPrimaryForest: Boolean,
-                                              isPeatlands: Boolean,
-                                              isIntactForestLandscapes2000: Boolean,
-                                              isProtectedArea: Boolean,
-                                              seAsiaLandCover: String,
-                                              idnLandCover: String,
-                                              isSoyPlantedAreas: Boolean,
-                                              idnForestArea: String,
-                                              isIdnForestMoratorium: Boolean,
-                                              braBiomes: String,
-                                              isPlantation: Boolean,
-                                              argOTBN: String,
-                                              southAmericaPresence: Boolean,
-                                              legalAmazonPresence: Boolean,
-                                              braBiomesPresence: Boolean,
-                                              cerradoBiomesPresence: Boolean,
-                                              seAsiaPresence: Boolean,
-                                              idnPresence: Boolean,
-                                              argPresence: Boolean) {
+case class ForestChangeDiagnosticRawDataGroup(
+  umdTreeCoverLossYear: Int,
+  isUMDLoss: Boolean,
+  prodesAmazonLossYear: Int,
+  prodesCerradoLossYear: Int,
+  isProdesAmazonLoss: Boolean,
+  isProdesCerradoLoss: Boolean,
+  isTreeCoverExtent30: Boolean,
+  isTreeCoverExtent90: Boolean,
+  isPrimaryForest: Boolean,
+  isPeatlands: Boolean,
+  isIntactForestLandscapes2000: Boolean,
+  isProtectedArea: Boolean,
+  seAsiaLandCover: String,
+  idnLandCover: String,
+  isSoyPlantedAreas: Boolean,
+  idnForestArea: String,
+  isIdnForestMoratorium: Boolean,
+  braBiomes: String,
+  isPlantation: Boolean,
+  argOTBN: String,
+  southAmericaPresence: Boolean,
+  legalAmazonPresence: Boolean,
+  braBiomesPresence: Boolean,
+  cerradoBiomesPresence: Boolean,
+  seAsiaPresence: Boolean,
+  idnPresence: Boolean,
+  argPresence: Boolean
+) {
 
   /** Produce a partial ForestChangeDiagnosticData only for the loss year in this data group */
   def toForestChangeDiagnosticData(totalArea: Double): ForestChangeDiagnosticData = ForestChangeDiagnosticData(
@@ -38,93 +42,96 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
       totalArea,
       isUMDLoss && isTreeCoverExtent90
     ),
-    tree_cover_loss_primary_forest_yearly =
-      ForestChangeDiagnosticDataLossYearly.fill(
-        umdTreeCoverLossYear,
-        totalArea,
-        isPrimaryForest && isUMDLoss
-      ),
+    tree_cover_loss_primary_forest_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      umdTreeCoverLossYear,
+      totalArea,
+      isPrimaryForest && isUMDLoss
+    ),
     tree_cover_loss_peat_yearly = ForestChangeDiagnosticDataLossYearly.fill(
       umdTreeCoverLossYear,
       totalArea,
       isPeatlands && isUMDLoss
     ),
-    tree_cover_loss_intact_forest_yearly =
-      ForestChangeDiagnosticDataLossYearly.fill(
-        umdTreeCoverLossYear,
-        totalArea,
-        isIntactForestLandscapes2000 && isUMDLoss
-      ),
-    tree_cover_loss_protected_areas_yearly =
-      ForestChangeDiagnosticDataLossYearly.fill(
-        umdTreeCoverLossYear,
-        totalArea,
-        isProtectedArea && isUMDLoss
-      ),
-    tree_cover_loss_arg_otbn_yearly = 
-      ForestChangeDiagnosticDataLossYearlyCategory.fill(
-      argOTBN, 
+    tree_cover_loss_intact_forest_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      umdTreeCoverLossYear,
+      totalArea,
+      isIntactForestLandscapes2000 && isUMDLoss
+    ),
+    tree_cover_loss_protected_areas_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      umdTreeCoverLossYear,
+      totalArea,
+      isProtectedArea && isUMDLoss
+    ),
+    tree_cover_loss_arg_otbn_yearly = ForestChangeDiagnosticDataLossYearlyCategory.fill(
+      argOTBN,
       umdTreeCoverLossYear,
       totalArea,
       include = isUMDLoss
     ),
-    tree_cover_loss_sea_landcover_yearly =
-      ForestChangeDiagnosticDataLossYearlyCategory.fill(
-        seAsiaLandCover,
-        umdTreeCoverLossYear,
-        totalArea,
-        include = isUMDLoss
-      ),
-    tree_cover_loss_idn_landcover_yearly =
-      ForestChangeDiagnosticDataLossYearlyCategory.fill(
-        idnLandCover,
-        umdTreeCoverLossYear,
-        totalArea,
-        include = isUMDLoss
-      ),
-    tree_cover_loss_soy_yearly =
-      ForestChangeDiagnosticDataLossYearly.fill(
-        umdTreeCoverLossYear,
-        totalArea,
-        isSoyPlantedAreas && isUMDLoss
-      ),
-    tree_cover_loss_idn_legal_yearly =
-      ForestChangeDiagnosticDataLossYearlyCategory.fill(
-        idnForestArea,
-        umdTreeCoverLossYear,
-        totalArea,
-        include = isUMDLoss
-      ),
-    tree_cover_loss_idn_forest_moratorium_yearly =
-      ForestChangeDiagnosticDataLossYearly.fill(
-        umdTreeCoverLossYear,
-        totalArea,
-        isIdnForestMoratorium && isUMDLoss
-      ),
-    tree_cover_loss_prodes_yearly = ForestChangeDiagnosticDataLossYearly.fill(
-      prodesLossYear,
+    tree_cover_loss_sea_landcover_yearly = ForestChangeDiagnosticDataLossYearlyCategory.fill(
+      seAsiaLandCover,
+      umdTreeCoverLossYear,
       totalArea,
-      isProdesLoss
+      include = isUMDLoss
     ),
-    tree_cover_loss_prodes_wdpa_yearly =
-      ForestChangeDiagnosticDataLossYearly.fill(
-        prodesLossYear,
-        totalArea,
-        isProdesLoss && isProtectedArea
-      ),
-    tree_cover_loss_prodes_primary_forest_yearly =
-      ForestChangeDiagnosticDataLossYearly.fill(
-        prodesLossYear,
-        totalArea,
-        isProdesLoss && isPrimaryForest
-      ),
-    tree_cover_loss_brazil_biomes_yearly =
-      ForestChangeDiagnosticDataLossYearlyCategory.fill(
-        braBiomes,
-        umdTreeCoverLossYear,
-        totalArea,
-        include = isUMDLoss
-      ),
+    tree_cover_loss_idn_landcover_yearly = ForestChangeDiagnosticDataLossYearlyCategory.fill(
+      idnLandCover,
+      umdTreeCoverLossYear,
+      totalArea,
+      include = isUMDLoss
+    ),
+    tree_cover_loss_soy_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      umdTreeCoverLossYear,
+      totalArea,
+      isSoyPlantedAreas && isUMDLoss
+    ),
+    tree_cover_loss_idn_legal_yearly = ForestChangeDiagnosticDataLossYearlyCategory.fill(
+      idnForestArea,
+      umdTreeCoverLossYear,
+      totalArea,
+      include = isUMDLoss
+    ),
+    tree_cover_loss_idn_forest_moratorium_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      umdTreeCoverLossYear,
+      totalArea,
+      isIdnForestMoratorium && isUMDLoss
+    ),
+    tree_cover_loss_prodes_amazon_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      prodesAmazonLossYear,
+      totalArea,
+      isProdesAmazonLoss
+    ),
+    tree_cover_loss_prodes_cerrado_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      prodesCerradoLossYear,
+      totalArea,
+      isProdesCerradoLoss
+    ),
+    tree_cover_loss_prodes_amazon_wdpa_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      prodesAmazonLossYear,
+      totalArea,
+      isProdesAmazonLoss && isProtectedArea
+    ),
+    tree_cover_loss_prodes_cerrado_wdpa_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      prodesCerradoLossYear,
+      totalArea,
+      isProdesCerradoLoss && isProtectedArea
+    ),
+    tree_cover_loss_prodes_amazon_primary_forest_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      prodesAmazonLossYear,
+      totalArea,
+      isProdesAmazonLoss && isPrimaryForest
+    ),
+    tree_cover_loss_prodes_cerrado_primary_forest_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      prodesCerradoLossYear,
+      totalArea,
+      isProdesCerradoLoss && isPrimaryForest
+    ),
+    tree_cover_loss_brazil_biomes_yearly = ForestChangeDiagnosticDataLossYearlyCategory.fill(
+      braBiomes,
+      umdTreeCoverLossYear,
+      totalArea,
+      include = isUMDLoss
+    ),
     tree_cover_extent_total = ForestChangeDiagnosticDataDouble
       .fill(totalArea, isTreeCoverExtent30),
     tree_cover_extent_primary_forest = ForestChangeDiagnosticDataDouble.fill(
@@ -172,36 +179,30 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
       .fill(braBiomesPresence),
     cerrado_biome_presence = ForestChangeDiagnosticDataBoolean
       .fill(cerradoBiomesPresence),
-    southeast_asia_presence =
-      ForestChangeDiagnosticDataBoolean.fill(seAsiaPresence),
-    indonesia_presence =
-      ForestChangeDiagnosticDataBoolean.fill(idnPresence),
-    argentina_presence =
-      ForestChangeDiagnosticDataBoolean.fill(argPresence),
+    southeast_asia_presence = ForestChangeDiagnosticDataBoolean.fill(seAsiaPresence),
+    indonesia_presence = ForestChangeDiagnosticDataBoolean.fill(idnPresence),
+    argentina_presence = ForestChangeDiagnosticDataBoolean.fill(argPresence),
     filtered_tree_cover_extent = ForestChangeDiagnosticDataDouble
       .fill(
         totalArea,
         isTreeCoverExtent90 && !isPlantation
       ),
-    filtered_tree_cover_extent_yearly =
-      ForestChangeDiagnosticDataValueYearly.empty,
+    filtered_tree_cover_extent_yearly = ForestChangeDiagnosticDataValueYearly.empty,
     filtered_tree_cover_loss_yearly = ForestChangeDiagnosticDataLossYearly.fill(
       umdTreeCoverLossYear,
       totalArea,
       isUMDLoss && isTreeCoverExtent90 && !isPlantation
     ),
-    filtered_tree_cover_loss_peat_yearly =
-      ForestChangeDiagnosticDataLossYearly.fill(
-        umdTreeCoverLossYear,
-        totalArea,
-        isUMDLoss && isTreeCoverExtent90 && !isPlantation && isPeatlands
-      ),
-    filtered_tree_cover_loss_protected_areas_yearly =
-      ForestChangeDiagnosticDataLossYearly.fill(
-        umdTreeCoverLossYear,
-        totalArea,
-        isUMDLoss && isTreeCoverExtent90 && !isPlantation && isProtectedArea
-      ),
+    filtered_tree_cover_loss_peat_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      umdTreeCoverLossYear,
+      totalArea,
+      isUMDLoss && isTreeCoverExtent90 && !isPlantation && isPeatlands
+    ),
+    filtered_tree_cover_loss_protected_areas_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      umdTreeCoverLossYear,
+      totalArea,
+      isUMDLoss && isTreeCoverExtent90 && !isPlantation && isProtectedArea
+    ),
     plantation_area = ForestChangeDiagnosticDataDouble
       .fill(totalArea, isPlantation),
     plantation_on_peat_area = ForestChangeDiagnosticDataDouble
@@ -222,6 +223,4 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
     commodity_threat_protected_areas = ForestChangeDiagnosticDataLossYearly.empty,
     commodity_threat_fires = ForestChangeDiagnosticDataLossYearly.empty
   )
-  }
-
-
+}

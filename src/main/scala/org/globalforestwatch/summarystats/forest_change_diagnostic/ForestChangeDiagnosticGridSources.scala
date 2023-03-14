@@ -6,11 +6,10 @@ import geotrellis.raster.Raster
 import org.globalforestwatch.grids.{GridSources, GridTile}
 import org.globalforestwatch.layers._
 
-/**
-  * @param gridTile top left corner, padded from east ex: "10N_010E"
+/** @param gridTile
+  *   top left corner, padded from east ex: "10N_010E"
   */
-case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[String, Any])
-  extends GridSources {
+case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
 
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
   val treeCoverDensity2000: TreeCoverDensityPercent2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
@@ -23,17 +22,17 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
   val isSoyPlantedArea: SoyPlantedAreas = SoyPlantedAreas(gridTile, kwargs)
   val idnForestArea: IndonesiaForestArea = IndonesiaForestArea(gridTile, kwargs)
   val isIDNForestMoratorium: IndonesiaForestMoratorium = IndonesiaForestMoratorium(gridTile, kwargs)
-  val prodesLossYear: ProdesLossYear = ProdesLossYear(gridTile, kwargs)
+  val prodesAmazonLossYear: ProdesAmazonLossYear = ProdesAmazonLossYear(gridTile, kwargs)
+  val prodesCerradoLossYear: ProdesCerradoLossYear = ProdesCerradoLossYear(gridTile, kwargs)
   val braBiomes: BrazilBiomes = BrazilBiomes(gridTile, kwargs)
   val isPlantation: PlantedForestsBool = PlantedForestsBool(gridTile, kwargs)
   val gfwProCoverage: GFWProCoverage = GFWProCoverage(gridTile, kwargs)
   val argOTBN: ArgOTBN = ArgOTBN(gridTile, kwargs)
 
-
   def readWindow(
-                  windowKey: SpatialKey,
-                  windowLayout: LayoutDefinition
-                ): Either[Throwable, Raster[ForestChangeDiagnosticTile]] = {
+    windowKey: SpatialKey,
+    windowLayout: LayoutDefinition
+  ): Either[Throwable, Raster[ForestChangeDiagnosticTile]] = {
 
     for {
       // Failure for any of these reads will result in function returning Left[Throwable]
@@ -59,12 +58,12 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
       val isSoyPlantedAreasTile = isSoyPlantedArea.fetchWindow(windowKey, windowLayout)
       val idnForestAreaTile = idnForestArea.fetchWindow(windowKey, windowLayout)
       val isINDForestMoratoriumTile = isIDNForestMoratorium.fetchWindow(windowKey, windowLayout)
-      val prodesLossYearTile = prodesLossYear.fetchWindow(windowKey, windowLayout)
+      val prodesAmazonLossYearTile = prodesAmazonLossYear.fetchWindow(windowKey, windowLayout)
+      val prodesCerradoLossYearTile = prodesCerradoLossYear.fetchWindow(windowKey, windowLayout)
       val braBiomesTile = braBiomes.fetchWindow(windowKey, windowLayout)
       val isPlantationTile = isPlantation.fetchWindow(windowKey, windowLayout)
       val gfwProCoverageTile = gfwProCoverage.fetchWindow(windowKey, windowLayout)
       val argOTBNTile = argOTBN.fetchWindow(windowKey, windowLayout)
-
 
       val tile = ForestChangeDiagnosticTile(
         lossTile,
@@ -78,7 +77,8 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
         isSoyPlantedAreasTile,
         idnForestAreaTile,
         isINDForestMoratoriumTile,
-        prodesLossYearTile,
+        prodesAmazonLossYearTile,
+        prodesCerradoLossYearTile,
         braBiomesTile,
         isPlantationTile,
         gfwProCoverageTile,
@@ -98,9 +98,9 @@ object ForestChangeDiagnosticGridSources {
       .empty[String, ForestChangeDiagnosticGridSources]
 
   def getCachedSources(
-                        gridTile: GridTile,
-                        kwargs: Map[String, Any]
-                      ): ForestChangeDiagnosticGridSources = {
+    gridTile: GridTile,
+    kwargs: Map[String, Any]
+  ): ForestChangeDiagnosticGridSources = {
 
     cache.getOrElseUpdate(
       gridTile.tileId,
