@@ -74,6 +74,8 @@ object AnnualUpdateMinimalSummary {
           raster.tile.treesInMosaicLandscapes.getData(col, row)
         val umdGlobalLandCover: String =
           raster.tile.umdGlobalLandCover.getData(col, row)
+        val plantationsPre2000: Boolean =
+          raster.tile.plantationsPre2000.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -160,13 +162,16 @@ object AnnualUpdateMinimalSummary {
             summary.treecoverExtent2000 += areaHa
             summary.totalBiomass += biomassPixel
             summary.totalCo2 += co2Pixel
-            summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
-            summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
-            summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
-            summary.totalNetFluxCo2 += netFluxCo2Pixel
-            summary.totalSoilCarbon += totalCarbonSoil
+
+            if (!plantationsPre2000) {
+              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
+              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
+              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+              summary.totalNetFluxCo2 += netFluxCo2Pixel
+              summary.totalSoilCarbon += totalCarbonSoil
+            }
           }
-          else if (gain) {
+          else if (gain && !plantationsPre2000) {
             // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
             // the correct flux model outputs (TCD>=threshold OR Hansen gain=TRUE)
             summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
