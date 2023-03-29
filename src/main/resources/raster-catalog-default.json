@@ -359,7 +359,7 @@
     },
     {
       "name":"umd_land_cover",
-      "source_uri": "s3://gfw-data-lake/umd_land_cover/v2020/raster/epsg-4326/{grid_size}/{row_count}/class/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/umd_land_cover/v2020/raster/epsg-4326/{grid_size}/{row_count}/ipcc_class/geotiff/{tile_id}.tif"
     }
   ]
 }
