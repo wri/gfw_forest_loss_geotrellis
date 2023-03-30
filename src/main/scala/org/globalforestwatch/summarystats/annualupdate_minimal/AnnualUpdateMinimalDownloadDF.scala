@@ -16,6 +16,7 @@ object AnnualUpdateMinimalDownloadDF {
     val yearRange = treecoverLossMinYear to treecoverLossMaxYear
 
     val annualDF = df
+      .where($"umd_tree_cover_density_2000__threshold" >= 0)
       .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold")
       .pivot("umd_tree_cover_loss__year", yearRange)
       .agg(
@@ -26,6 +27,7 @@ object AnnualUpdateMinimalDownloadDF {
       .na.fill(0, Seq("adm1", "adm2"))
 
     val totalDF = df
+      .where($"umd_tree_cover_density_2000__threshold" >= 0)
       .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold")
       .agg(
         sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
@@ -121,7 +123,8 @@ object AnnualUpdateMinimalDownloadDF {
       sum($"gfw_forest_carbon_net_flux__Mg_CO2e_yr-1") as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
     ) ::: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
 
-    df.groupBy(
+    df.where($"umd_tree_cover_density_2000__threshold" >= 0)
+      .groupBy(
       groupByCols.head,
       groupByCols.tail ::: List("umd_tree_cover_density_2000__threshold"): _*
     )
