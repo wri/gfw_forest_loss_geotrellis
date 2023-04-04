@@ -95,6 +95,8 @@ object AnnualUpdateMinimalSummary {
           raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
         val soilCarbonPerHa: Float = raster.tile.soilCarbon.getData(col, row)
+        val abovegroundCarbon2000: Float = raster.tile.abovegroundCarbon2000.getData(col, row)
+        val belowgroundCarbon2000: Float = raster.tile.belowgroundCarbon2000.getData(col, row)
 
         val netFluxCo2Pixel = netFluxCo2 * areaHa
         val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
@@ -139,7 +141,7 @@ object AnnualUpdateMinimalSummary {
           val summary: AnnualUpdateMinimalData =
             stats.getOrElse(
               key = pKey,
-              default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+              default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             )
 
           summary.totalArea += areaHa
@@ -163,12 +165,15 @@ object AnnualUpdateMinimalSummary {
             summary.totalBiomass += biomassPixel
             summary.totalCo2 += co2Pixel
 
+            summary.totalSoilCarbon += totalCarbonSoil
+            summary.abovegroundCarbon2000 += abovegroundCarbon2000
+            summary.belowgroundCarbon2000 += belowgroundCarbon2000
+
             if (!plantationsPre2000) {
               summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
               summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
               summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
               summary.totalNetFluxCo2 += netFluxCo2Pixel
-              summary.totalSoilCarbon += totalCarbonSoil
             }
           }
           else if (gain && !plantationsPre2000) {

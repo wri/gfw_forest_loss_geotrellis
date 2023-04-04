@@ -42,7 +42,9 @@ case class AnnualUpdateMinimalTile(
                                     treesInMosaicLandscapes: TreesInMosaicLandscapes#OptionalITile,
                                     umdGlobalLandCover: UmdGlobalLandcover#OptionalITile,
                                     plantationsPre2000: PlantationsPre2000#OptionalITile,
-) extends CellGrid[Int] {
+                                    abovegroundCarbon2000: AbovegroundCarbon2000#OptionalFTile,
+                                    belowgroundCarbon2000: BelowgroundCarbon2000#OptionalFTile,
+                                  ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
   def cols: Int = loss.cols
   def rows: Int = loss.rows

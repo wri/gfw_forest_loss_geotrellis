@@ -307,23 +307,23 @@
     },
     {
       "name":"gfw_full_extent_net_flux",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_net_flux/v20220316/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_full_extent_net_flux/v20230331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_full_extent_aboveground_gross_removals",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_aboveground_gross_removals/v20220309/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_full_extent_aboveground_gross_removals/v20230331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_full_extent_belowground_gross_removals",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_belowground_gross_removals/v20220309/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_full_extent_belowground_gross_removals/v20230331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_full_extent_co2_gross_emissions",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_co2_gross_emissions/v20220316/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_full_extent_co2_gross_emissions/v20230331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_full_extent_non_co2_gross_emissions",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_non_co2_gross_emissions/v20220316/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_full_extent_non_co2_gross_emissions/v20230331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     },
     {
       "name":"fao_ecozones_2000",
@@ -360,6 +360,14 @@
     {
       "name":"umd_land_cover",
       "source_uri": "s3://gfw-data-lake/umd_land_cover/v2020/raster/epsg-4326/{grid_size}/{row_count}/ipcc_class/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_aboveground_carbon",
+      "source_uri": "s3://gfw-data-lake/gfw_aboveground_carbon/v20230322/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_belowground_carbon",
+      "source_uri": "s3://gfw-data-lake/gfw_belowground_carbon/v20230322/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     }
   ]
 }
