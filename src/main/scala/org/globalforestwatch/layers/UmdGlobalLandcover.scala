@@ -6,6 +6,8 @@ case class UmdGlobalLandcover(gridTile: GridTile, kwargs: Map[String, Any])
   extends StringLayer
     with OptionalILayer {
   val datasetName = "umd_land_cover"
+  override val externalNoDataValue = "Other"
+
   val uri: String =
     uriForGrid(gridTile, kwargs)
 

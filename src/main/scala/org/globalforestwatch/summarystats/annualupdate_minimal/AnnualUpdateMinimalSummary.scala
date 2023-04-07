@@ -94,9 +94,9 @@ object AnnualUpdateMinimalSummary {
         val grossCumulBelowgroundRemovalsCo2: Float =
           raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
-        val soilCarbonPerHa: Float = raster.tile.soilCarbon.getData(col, row)
-        val abovegroundCarbon2000: Float = raster.tile.abovegroundCarbon2000.getData(col, row)
-        val belowgroundCarbon2000: Float = raster.tile.belowgroundCarbon2000.getData(col, row)
+        val soilCarbonPerHa: Integer = raster.tile.soilCarbon.getData(col, row)
+        val abovegroundCarbon2000PerHa: Float = raster.tile.abovegroundCarbon2000.getData(col, row)
+        val belowgroundCarbon2000PerHa: Float = raster.tile.belowgroundCarbon2000.getData(col, row)
 
         val netFluxCo2Pixel = netFluxCo2 * areaHa
         val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
@@ -107,6 +107,8 @@ object AnnualUpdateMinimalSummary {
         val grossEmissionsCo2e = grossEmissionsCo2eNonCo2 + grossEmissionsCo2eCo2Only
         val grossEmissionsCo2ePixel = grossEmissionsCo2e * areaHa
         val totalCarbonSoil = soilCarbonPerHa * areaHa
+        val abovegroundCarbon2000 = abovegroundCarbon2000PerHa * areaHa
+        val belowgroundCarbon2000 = belowgroundCarbon2000PerHa * areaHa
 
         def updateSummary(
                           loss: Integer, tcd2000: Integer, tcdThreshold: Integer, treesInMosaicLandscapes: Integer, umdGlobalLandCover: String,

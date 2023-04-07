@@ -208,7 +208,6 @@ object AnnualUpdateMinimalDF {
         sum("wri_tropical_tree_cover_extent__ha") as "wri_tropical_tree_cover_extent__ha",
         sum("gfw_aboveground_carbon_stocks_2000__Mg_C") as "gfw_aboveground_carbon_stocks_2000__Mg_C",
         sum("gfw_belowground_carbon_stocks_2000__Mg_C") as "gfw_belowground_carbon_stocks_2000__Mg_C",
-
         sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
         sum("gfw_net_flux_co2e__Mg") as "gfw_net_flux_co2e__Mg",
