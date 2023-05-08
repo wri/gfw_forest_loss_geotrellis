@@ -97,6 +97,7 @@ object AnnualUpdateMinimalSummary {
         val soilCarbonPerHa: Integer = raster.tile.soilCarbon.getData(col, row)
         val abovegroundCarbon2000PerHa: Float = raster.tile.abovegroundCarbon2000.getData(col, row)
         val belowgroundCarbon2000PerHa: Float = raster.tile.belowgroundCarbon2000.getData(col, row)
+        val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
         val netFluxCo2Pixel = netFluxCo2 * areaHa
         val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
@@ -154,9 +155,12 @@ object AnnualUpdateMinimalSummary {
               summary.treecoverLoss += areaHa
               summary.biomassLoss += biomassPixel
               summary.co2Emissions += co2Pixel
-              summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-              summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
-              summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
+
+              if (!plantationsPre2000) {
+                summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+                summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
+              }
 
               if (treeCoverLossFromFires) {
                 summary.treeCoverLossFromFires += areaHa
@@ -178,7 +182,7 @@ object AnnualUpdateMinimalSummary {
               summary.totalNetFluxCo2 += netFluxCo2Pixel
             }
           }
-          else if (gain && !plantationsPre2000) {
+          else if ((gain || mangroveBiomassExtent) && !plantationsPre2000) {
             // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
             // the correct flux model outputs (TCD>=threshold OR Hansen gain=TRUE)
             summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel

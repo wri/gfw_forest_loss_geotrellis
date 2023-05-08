@@ -22,8 +22,8 @@ case class TreeLossTile(loss: TreeCoverLoss#ITile,
                         grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2#OptionalFTile,
                         grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2#OptionalFTile,
                         netFluxCo2: NetFluxCo2e#OptionalFTile,
-                        grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil#OptionalFTile,
-                        grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2eBiomassSoil#OptionalFTile,
+                        grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e#OptionalFTile,
+                        grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e#OptionalFTile,
                         fluxModelExtent: FluxModelExtent#OptionalITile)
 
   extends CellGrid[Int] {

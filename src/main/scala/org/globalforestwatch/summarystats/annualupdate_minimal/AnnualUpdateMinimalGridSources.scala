@@ -46,6 +46,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val plantationsPre2000: PlantationsPre2000 = PlantationsPre2000(gridTile, kwargs)
   val abovegroundCarbon2000: AbovegroundCarbon2000 = AbovegroundCarbon2000(gridTile, kwargs = kwargs)
   val belowgroundCarbon2000: BelowgroundCarbon2000 = BelowgroundCarbon2000(gridTile, kwargs = kwargs)
+  val mangroveBiomassExtent: MangroveBiomassExtent = MangroveBiomassExtent(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey, windowLayout: LayoutDefinition
@@ -96,6 +97,8 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       val plantationsPre2000Tile = plantationsPre2000.fetchWindow(windowKey, windowLayout)
       val abovegroundCarbon2000Tile = abovegroundCarbon2000.fetchWindow(windowKey, windowLayout)
       val belowgroundCarbon2000Tile = belowgroundCarbon2000.fetchWindow(windowKey, windowLayout)
+      val mangroveBiomassExtentTile =
+        mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)
 
       val tile = AnnualUpdateMinimalTile(
         lossTile,
@@ -133,6 +136,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         plantationsPre2000Tile,
         abovegroundCarbon2000Tile,
         belowgroundCarbon2000Tile,
+        mangroveBiomassExtentTile,
       )
 
       Raster(tile, windowKey.extent(windowLayout))

@@ -139,9 +139,12 @@ object TreeLossSummary {
               if (loss != null) {
                 summary.lossYear(loss).treecoverLoss += areaHa
                 summary.lossYear(loss).biomassLoss += biomassPixel
-                summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-                summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
-                summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
+
+                if (!plantationsPre2000) {
+                  summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+                  summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                  summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
+                }
               }
 
               // TODO: use extent2010 to calculate avg biomass incase year is selected
