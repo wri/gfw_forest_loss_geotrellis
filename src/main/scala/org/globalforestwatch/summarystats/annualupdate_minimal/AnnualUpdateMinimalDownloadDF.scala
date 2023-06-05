@@ -5,7 +5,7 @@ import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 object AnnualUpdateMinimalDownloadDF {
   val treecoverLossMinYear = 2001
-  val treecoverLossMaxYear = 2021
+  val treecoverLossMaxYear = 2022
   val fluxModelTotalYears = (treecoverLossMaxYear - treecoverLossMinYear) + 1
 
   def sumDownload(df: DataFrame): DataFrame = {
@@ -16,6 +16,7 @@ object AnnualUpdateMinimalDownloadDF {
     val yearRange = treecoverLossMinYear to treecoverLossMaxYear
 
     val annualDF = df
+      .where($"umd_tree_cover_density_2000__threshold" >= 0)
       .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold")
       .pivot("umd_tree_cover_loss__year", yearRange)
       .agg(
@@ -26,16 +27,17 @@ object AnnualUpdateMinimalDownloadDF {
       .na.fill(0, Seq("adm1", "adm2"))
 
     val totalDF = df
+      .where($"umd_tree_cover_density_2000__threshold" >= 0)
       .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold")
       .agg(
         sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
         sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
         sum("area__ha") as "area__ha",
         sum("umd_tree_cover_gain__ha") as "umd_tree_cover_gain__ha",
-        sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
-        sum("whrc_aboveground_biomass_stock_2000__Mg") / sum(
+        sum("gfw_aboveground_carbon_stocks_2000__Mg_C") as "gfw_aboveground_carbon_stocks_2000__Mg_C",
+        sum("gfw_aboveground_carbon_stocks_2000__Mg_C") / sum(
           "umd_tree_cover_extent_2000__ha"
-        ) as "avg_whrc_aboveground_biomass_2000_Mg_ha-1",
+        ) as "avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1",
         sum($"gfw_full_extent_gross_emissions__Mg_CO2e") / fluxModelTotalYears as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
         sum($"gfw_full_extent_gross_removals__Mg_CO2") / fluxModelTotalYears as "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1",
         sum($"gfw_full_extent_net_flux__Mg_CO2e") / fluxModelTotalYears as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
@@ -112,21 +114,22 @@ object AnnualUpdateMinimalDownloadDF {
       sum($"umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
       sum($"area__ha") as "area__ha",
       sum($"umd_tree_cover_gain__ha") as "umd_tree_cover_gain__ha",
-      sum($"whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
-      sum($"whrc_aboveground_biomass_stock_2000__Mg") / sum(
+      sum($"gfw_aboveground_carbon_stocks_2000__Mg_C") as "gfw_aboveground_carbon_stocks_2000__Mg_C",
+      sum($"gfw_aboveground_carbon_stocks_2000__Mg_C") / sum(
         $"umd_tree_cover_extent_2000__ha"
-      ) as "avg_whrc_aboveground_biomass_2000_Mg_ha-1",
+      ) as "avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1",
       sum($"gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1") as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
       sum($"gfw_forest_carbon_gross_removals__Mg_CO2_yr-1") as "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1",
       sum($"gfw_forest_carbon_net_flux__Mg_CO2e_yr-1") as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
     ) ::: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
 
-    df.groupBy(
+    df.where($"umd_tree_cover_density_2000__threshold" >= 0)
+      .groupBy(
       groupByCols.head,
       groupByCols.tail ::: List("umd_tree_cover_density_2000__threshold"): _*
     )
       .agg(aggCols.head, aggCols.tail: _*)
-      .na.fill(0, Seq("avg_whrc_aboveground_biomass_2000_Mg_ha-1"))
+      .na.fill(0, Seq("avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1"))
   }
 
   def roundDownload(roundCols: List[Column])(df: DataFrame): DataFrame = {
@@ -190,8 +193,8 @@ object AnnualUpdateMinimalDownloadDF {
       round($"umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
       round($"area__ha") as "area__ha",
       round($"umd_tree_cover_gain__ha") as "umd_tree_cover_gain__ha",
-      round($"whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
-      round($"avg_whrc_aboveground_biomass_2000_Mg_ha-1") as "avg_whrc_aboveground_biomass_2000_Mg_ha-1",
+      round($"gfw_aboveground_carbon_stocks_2000__Mg_C") as "gfw_aboveground_carbon_stocks_2000__Mg_C",
+      round($"avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1") as "avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1",
       round($"gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1") as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
       round($"gfw_forest_carbon_gross_removals__Mg_CO2_yr-1") as "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1",
       round($"gfw_forest_carbon_net_flux__Mg_CO2e_yr-1") as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
@@ -216,7 +219,7 @@ object AnnualUpdateMinimalDownloadDF {
         s"${i}_gfw_forest_carbon_gross_emissions__Mg_CO2e"
       }).toList
 
-    val cols = "avg_whrc_aboveground_biomass_2000_Mg_ha-1" :: "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1" :: "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1" :: "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1" :: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
+    val cols = "avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1" :: "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1" :: "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1" :: "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1" :: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
     val nullColumns = df
       .select(cols.head, cols.tail: _*)
       .columns

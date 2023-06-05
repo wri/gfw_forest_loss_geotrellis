@@ -74,6 +74,8 @@ object AnnualUpdateMinimalSummary {
           raster.tile.treesInMosaicLandscapes.getData(col, row)
         val umdGlobalLandCover: String =
           raster.tile.umdGlobalLandCover.getData(col, row)
+        val plantationsPre2000: Boolean =
+          raster.tile.plantationsPre2000.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -92,7 +94,10 @@ object AnnualUpdateMinimalSummary {
         val grossCumulBelowgroundRemovalsCo2: Float =
           raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
-        val soilCarbonPerHa: Float = raster.tile.soilCarbon.getData(col, row)
+        val soilCarbonPerHa: Integer = raster.tile.soilCarbon.getData(col, row)
+        val abovegroundCarbon2000PerHa: Float = raster.tile.abovegroundCarbon2000.getData(col, row)
+        val belowgroundCarbon2000PerHa: Float = raster.tile.belowgroundCarbon2000.getData(col, row)
+        val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
         val netFluxCo2Pixel = netFluxCo2 * areaHa
         val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
@@ -103,6 +108,8 @@ object AnnualUpdateMinimalSummary {
         val grossEmissionsCo2e = grossEmissionsCo2eNonCo2 + grossEmissionsCo2eCo2Only
         val grossEmissionsCo2ePixel = grossEmissionsCo2e * areaHa
         val totalCarbonSoil = soilCarbonPerHa * areaHa
+        val abovegroundCarbon2000 = abovegroundCarbon2000PerHa * areaHa
+        val belowgroundCarbon2000 = belowgroundCarbon2000PerHa * areaHa
 
         def updateSummary(
                           loss: Integer, tcd2000: Integer, tcdThreshold: Integer, treesInMosaicLandscapes: Integer, umdGlobalLandCover: String,
@@ -137,7 +144,7 @@ object AnnualUpdateMinimalSummary {
           val summary: AnnualUpdateMinimalData =
             stats.getOrElse(
               key = pKey,
-              default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+              default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             )
 
           summary.totalArea += areaHa
@@ -148,9 +155,12 @@ object AnnualUpdateMinimalSummary {
               summary.treecoverLoss += areaHa
               summary.biomassLoss += biomassPixel
               summary.co2Emissions += co2Pixel
-              summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-              summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
-              summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
+
+              if (!plantationsPre2000) {
+                summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+                summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
+              }
 
               if (treeCoverLossFromFires) {
                 summary.treeCoverLossFromFires += areaHa
@@ -160,13 +170,19 @@ object AnnualUpdateMinimalSummary {
             summary.treecoverExtent2000 += areaHa
             summary.totalBiomass += biomassPixel
             summary.totalCo2 += co2Pixel
-            summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
-            summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
-            summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
-            summary.totalNetFluxCo2 += netFluxCo2Pixel
+
             summary.totalSoilCarbon += totalCarbonSoil
+            summary.abovegroundCarbon2000 += abovegroundCarbon2000
+            summary.belowgroundCarbon2000 += belowgroundCarbon2000
+
+            if (!plantationsPre2000) {
+              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
+              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
+              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+              summary.totalNetFluxCo2 += netFluxCo2Pixel
+            }
           }
-          else if (gain) {
+          else if ((gain || mangroveBiomassExtent) && !plantationsPre2000) {
             // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
             // the correct flux model outputs (TCD>=threshold OR Hansen gain=TRUE)
             summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel

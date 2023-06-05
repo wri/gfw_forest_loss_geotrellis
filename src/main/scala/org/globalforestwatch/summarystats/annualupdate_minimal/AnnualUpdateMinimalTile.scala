@@ -36,12 +36,16 @@ case class AnnualUpdateMinimalTile(
                                     grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2#OptionalFTile,
                                     grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2#OptionalFTile,
                                     netFluxCo2: NetFluxCo2e#OptionalFTile,
-                                    soilCarbon: SoilCarbon#OptionalFTile,
+                                    soilCarbon: SoilCarbon#OptionalITile,
                                     intactForestLandscapes2000: IntactForestLandscapes2000#OptionalITile,
                                     treeCoverLossFromFires: TreeCoverLossFromFires#OptionalITile,
                                     treesInMosaicLandscapes: TreesInMosaicLandscapes#OptionalITile,
                                     umdGlobalLandCover: UmdGlobalLandcover#OptionalITile,
-) extends CellGrid[Int] {
+                                    plantationsPre2000: PlantationsPre2000#OptionalITile,
+                                    abovegroundCarbon2000: AbovegroundCarbon2000#OptionalFTile,
+                                    belowgroundCarbon2000: BelowgroundCarbon2000#OptionalFTile,
+                                    mangroveBiomassExtent: MangroveBiomassExtent#OptionalITile,
+                                  ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
   def cols: Int = loss.cols
   def rows: Int = loss.rows
