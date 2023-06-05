@@ -26,6 +26,9 @@ case class AnnualUpdateMinimalData(var treecoverLoss: Double,
                                    var totalCo2: Double,
                                    var totalSoilCarbon: Double,
                                    var treeCoverLossFromFires: Double,
+                                   var tropicalTreeCoverExtent: Double,
+                                   var abovegroundCarbon2000: Double,
+                                   var belowgroundCarbon2000: Double,
                                   ) {
   def merge(other: AnnualUpdateMinimalData): AnnualUpdateMinimalData = {
     AnnualUpdateMinimalData(
@@ -49,6 +52,9 @@ case class AnnualUpdateMinimalData(var treecoverLoss: Double,
       totalCo2 + other.totalCo2,
       totalSoilCarbon + other.totalSoilCarbon,
       treeCoverLossFromFires + other.treeCoverLossFromFires,
+      tropicalTreeCoverExtent + other.tropicalTreeCoverExtent,
+      abovegroundCarbon2000 + other.abovegroundCarbon2000,
+      belowgroundCarbon2000 + other.belowgroundCarbon2000,
     )
   }
 }

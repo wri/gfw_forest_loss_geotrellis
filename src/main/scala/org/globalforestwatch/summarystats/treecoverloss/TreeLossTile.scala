@@ -18,11 +18,13 @@ case class TreeLossTile(loss: TreeCoverLoss#ITile,
                         soilCarbon2000: SoilCarbon2000#OptionalFTile,
                         primaryForest: PrimaryForest#OptionalITile,
                         plantedForestsBool: PlantedForestsBool#OptionalITile,
+                        plantationsPre2000: PlantationsPre2000#OptionalITile,
+                        mangroveBiomassExtent: MangroveBiomassExtent#OptionalITile,
                         grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2#OptionalFTile,
                         grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2#OptionalFTile,
                         netFluxCo2: NetFluxCo2e#OptionalFTile,
-                        grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil#OptionalFTile,
-                        grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2eBiomassSoil#OptionalFTile,
+                        grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e#OptionalFTile,
+                        grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e#OptionalFTile,
                         fluxModelExtent: FluxModelExtent#OptionalITile)
 
   extends CellGrid[Int] {
