@@ -79,6 +79,7 @@ object TreeLossSummary {
 
         val plantationsPre2000: Boolean =
           raster.tile.plantationsPre2000.getData(col, row)
+        val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordinate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -174,7 +175,7 @@ object TreeLossSummary {
 
                 summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
               }
-            } else if (gain && !plantationsPre2000) {
+            } else if ((gain || mangroveBiomassExtent) && !plantationsPre2000) {
             // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
             // the correct flux model outputs (TCD>=threshold OR Hansen gain)
               summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
