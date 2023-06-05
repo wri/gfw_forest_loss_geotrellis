@@ -29,12 +29,13 @@ object ForestChangeDiagnosticDF extends SummaryDF {
         throw new IllegalArgumentException(s"Can't produce DataFrame for $id")
     }
 
-    dataRDD.map {
-      case Valid(Location(fid, data)) =>
-        (rowId(fid), RowError.empty, data)
-      case Invalid(Location(fid, err)) =>
-        (rowId(fid), RowError.fromJobError(err), ForestChangeDiagnosticData.empty)
-    }
+    dataRDD
+      .map {
+        case Valid(Location(fid, data)) =>
+          (rowId(fid), RowError.empty, data)
+        case Invalid(Location(fid, err)) =>
+          (rowId(fid), RowError.fromJobError(err), ForestChangeDiagnosticData.empty)
+      }
       .toDF("id", "error", "data")
       .select($"id.*" :: $"error.*" :: fieldsFromCol($"data", featureFields): _*)
   }
@@ -52,25 +53,27 @@ object ForestChangeDiagnosticDF extends SummaryDF {
         throw new IllegalArgumentException("Not a CombinedFeatureId")
     }
 
-    dataRDD.map {
-      case Valid(Location(fid, data)) =>
-        (rowId(fid), RowError.empty, data)
-      case Invalid(Location(fid, err)) =>
-        (rowId(fid), RowError.fromJobError(err), ForestChangeDiagnosticData.empty)
-    }
+    dataRDD
+      .map {
+        case Valid(Location(fid, data)) =>
+          (rowId(fid), RowError.empty, data)
+        case Invalid(Location(fid, err)) =>
+          (rowId(fid), RowError.fromJobError(err), ForestChangeDiagnosticData.empty)
+      }
       .toDF("id", "error", "data")
       .select($"id.*" :: $"error.*" :: fieldsFromCol($"data", featureFields) ::: fieldsFromCol($"data", gridFields): _*)
   }
 
   def readIntermidateRDD(
     sources: NonEmptyList[String],
-    spark: SparkSession,
+    spark: SparkSession
   ): RDD[ValidatedLocation[ForestChangeDiagnosticData]] = {
     val df = FeatureDF(sources, GfwProFeature, FeatureFilter.empty, spark)
     val ds = df.select(
       colsFor[RowGridId].as[RowGridId],
       colsFor[RowError].as[RowError],
-      colsFor[ForestChangeDiagnosticData].as[ForestChangeDiagnosticData])
+      colsFor[ForestChangeDiagnosticData].as[ForestChangeDiagnosticData]
+    )
 
     ds.rdd.map { case (id, error, data) =>
       if (error.status_code == 2) Valid(Location(id.toFeatureID, data))
@@ -95,14 +98,18 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "tree_cover_loss_peat_yearly", //treeCoverLossPeatLandYearly
     "tree_cover_loss_intact_forest_yearly", // treeCoverLossIntactForestYearly
     "tree_cover_loss_protected_areas_yearly", // treeCoverLossProtectedAreasYearly
+    "tree_cover_loss_arg_otbn_yearly", // treeCoverLossARGOTBNYearly
     "tree_cover_loss_sea_landcover_yearly", // treeCoverLossSEAsiaLandCoverYearly
     "tree_cover_loss_idn_landcover_yearly", // treeCoverLossIDNLandCoverYearly
     "tree_cover_loss_soy_yearly", // treeCoverLossSoyPlanedAreasYearly
     "tree_cover_loss_idn_legal_yearly", // treeCoverLossIDNForestAreaYearly
     "tree_cover_loss_idn_forest_moratorium_yearly", // treeCoverLossIDNForestMoratoriumYearly
-    "tree_cover_loss_prodes_yearly", // prodesLossYearly
-    "tree_cover_loss_prodes_wdpa_yearly", // prodesLossProtectedAreasYearly
-    "tree_cover_loss_prodes_primary_forest_yearly", // prodesLossProdesPrimaryForestYearly
+    "tree_cover_loss_prodes_amazon_yearly", // prodesLossAmazonYearly
+    "tree_cover_loss_prodes_cerrado_yearly", // prodesLossCerradoYearly
+    "tree_cover_loss_prodes_amazon_wdpa_yearly", // prodesLossAmazonProtectedAreasYearly
+    "tree_cover_loss_prodes_cerrado_wdpa_yearly", // prodesLossCerradoProtectedAreasYearly
+    "tree_cover_loss_prodes_amazon_primary_forest_yearly", // prodesLossProdesAmazonPrimaryForestYearly
+    "tree_cover_loss_prodes_cerrado_primary_forest_yearly", // prodesLossProdesCerradoPrimaryForestYearly
     "tree_cover_loss_brazil_biomes_yearly", // treeCoverLossBRABiomesYearly
     "tree_cover_extent_total", // treeCoverExtent
     "tree_cover_extent_primary_forest", // treeCoverExtentPrimaryForest
@@ -114,6 +121,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "total_area", // totalArea
     "protected_areas_area", // protectedAreasArea
     "peat_area", // peatlandsArea
+    "arg_otbn_area", // argOTBNArea
     "brazil_biomes", // braBiomesArea
     "idn_legal_area", // idnForestAreaArea
     "sea_landcover_area", // seAsiaLandCoverArea
@@ -125,6 +133,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "cerrado_biome_presence", // cerradoBiomesPresence,
     "southeast_asia_presence", // seAsiaPresence,
     "indonesia_presence", // idnPresence
+    "argentina_presence", // argPresence
     "commodity_value_forest_extent", //  forestValueIndicator
     "commodity_value_peat", // peatValueIndicator
     "commodity_value_protected_areas", // protectedAreaValueIndicator

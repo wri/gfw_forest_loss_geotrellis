@@ -10,11 +10,11 @@
     },
     {
       "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202106/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202208/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
-      "source_uri":"s3://gfw-data-lake/gfw_oil_gas/v20190321/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_oil_gas/v20221024/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"idn_forest_area",
@@ -53,10 +53,6 @@
       "source_uri":"s3://gfw-data-lake/gfw_forest_carbon_net_flux/v20210331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
-    },
-    {
       "name":"gfw_pixel_area",
       "source_uri":"s3://gfw-data-lake/gfw_pixel_area/v20150327/raster/epsg-4326/{grid_size}/{row_count}/m2/gdal-geotiff/{tile_id}.tif"
     },
@@ -71,10 +67,6 @@
     {
       "name":"rspo_southeast_asia_land_cover_2010",
       "source_uri":"s3://gfw-data-lake/rspo_southeast_asia_land_cover_2010/v2013/raster/epsg-4326/{grid_size}/{row_count}/land_cover_class/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"gfwpro_forest_change_regions",
-      "source_uri":"s3://gfw-data-lake/gfwpro_forest_change_regions/v20220228/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"landmark_indigenous_and_community_lands",
@@ -205,8 +197,12 @@
       "source_uri":"s3://gfw-data-lake/gfw_managed_forests/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"inpe_prodes",
-      "source_uri":"s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
+      "name":"inpe_amazon_prodes",
+      "source_uri":"s3://gfw-data-lake/inpe_amazon_prodes/v2021/raster/epsg-4326/{grid_size}/{row_count}/year/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"inpe_cerrado_prodes",
+      "source_uri":"s3://gfw-data-lake/inpe_cerrado_prodes/v2021/raster/epsg-4326/{grid_size}/{row_count}/year/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_mining_concessions",
@@ -281,10 +277,6 @@
       "source_uri": "s3://gfw-data-lake/umd_soy_planted_area/v2/raster/epsg-4326/{grid_size}/{row_count}/is__year_2021/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"inpe_prodes",
-      "source_uri": "s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
-    },
-    {
       "name":"wwf_eco_regions",
       "source_uri": "s3://gfw-data-lake/wwf_eco_regions/v2012/raster/epsg-4326/{grid_size}/{row_count}/name/gdal-geotiff/{tile_id}.tif"
     },
@@ -294,11 +286,15 @@
     },
     {
       "name":"gfwpro_forest_change_regions",
-      "source_uri": "s3://gfw-data-lake/gfwpro_forest_change_regions/v20210129/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfwpro_forest_change_regions/v20230207/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"ifl_intact_forest_landscapes_2000",
-      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2000/v2021/raster/epsg-4326/{grid_size}/{row_count}/ipcc_class/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2000/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "arg_native_forest_land_plan",
+      "source_uri": "s3://gfw-data-lake/arg_native_forest_land_plan/v202212/raster/epsg-4326/{grid_size}/{row_count}/category/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }

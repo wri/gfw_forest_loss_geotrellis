@@ -20,6 +20,11 @@ target
 *.jar
 *.crc
 _SUCCESS
+*.bloop/
+*.bsp/
+*.metals/
+/project
+
 
 *.pyc
 .project
@@ -50,4 +55,3 @@ derby.log
 metastore_db/
 *.log
 *.tsv
-*.csv
