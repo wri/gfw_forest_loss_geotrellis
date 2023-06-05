@@ -20,6 +20,7 @@ case class AnnualUpdateMinimalDataGroup(lossYear: Integer,
                                         resourceRights: Boolean,
                                         logging: Boolean,
                                         isGain: Boolean,
-                                        forestAge: String,
                                         intactForestLandscapes2000: Boolean,
+                                        landCover: String,
+                                        tmlDensity: Int
                                        )

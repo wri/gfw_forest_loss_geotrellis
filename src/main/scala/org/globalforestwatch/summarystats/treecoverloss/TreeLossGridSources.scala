@@ -21,11 +21,13 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
 
   val primaryForest = PrimaryForest(gridTile, kwargs)
   val plantedForestsBool = PlantedForestsBool(gridTile, kwargs)
+  val plantationsPre2000: PlantationsPre2000 = PlantationsPre2000(gridTile, kwargs)
+  val mangroveBiomassExtent: MangroveBiomassExtent = MangroveBiomassExtent(gridTile, kwargs)
 
   val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile, kwargs = kwargs)
   val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil = GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2eBiomassSoil = GrossEmissionsCo2OnlyCo2eBiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e = GrossEmissionsNonCo2Co2e(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e = GrossEmissionsCo2OnlyCo2e(gridTile, kwargs = kwargs)
   val netFluxCo2: NetFluxCo2e = NetFluxCo2e(gridTile, kwargs = kwargs)
   val fluxModelExtent: FluxModelExtent = FluxModelExtent(gridTile, kwargs = kwargs)
 
@@ -48,6 +50,7 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
       val gainTile = treeCoverGain.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val plantedForestsBoolTile = plantedForestsBool.fetchWindow(windowKey, windowLayout)
+      val plantationsPre2000Tile = plantationsPre2000.fetchWindow(windowKey, windowLayout)
 
       val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
       val agc2000Tile = agc2000.fetchWindow(windowKey, windowLayout)
@@ -60,6 +63,8 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
       val grossEmissionsCo2eCo2OnlyTile = grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
       val netFluxCo2Tile = netFluxCo2.fetchWindow(windowKey, windowLayout)
       val fluxModelExtentTile = fluxModelExtent.fetchWindow(windowKey, windowLayout)
+      val mangroveBiomassExtentTile =
+        mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)
 
       val tile = TreeLossTile(
         lossTile,
@@ -72,12 +77,14 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
         soilCarbon2000Tile,
         primaryForestTile,
         plantedForestsBoolTile,
+        plantationsPre2000Tile,
+        mangroveBiomassExtentTile,
         grossCumulAbovegroundRemovalsCo2Tile,
         grossCumulBelowgroundRemovalsCo2Tile,
         netFluxCo2Tile,
         grossEmissionsCo2eNonCo2Tile,
         grossEmissionsCo2eCo2OnlyTile,
-        fluxModelExtentTile
+        fluxModelExtentTile,
       )
 
       Raster(tile, windowKey.extent(windowLayout))

@@ -10,5 +10,5 @@ case class GrossEmissionsCo2OnlyCo2e(gridTile: GridTile,
   val datasetName = "gfw_full_extent_co2_gross_emissions"
 
   val uri: String =
-    s"s3://gfw-files/flux_1_2_2/gross_emissions_co2_only_co2e/standard/${gridTile.tileId}.tif"
+    uriForGrid(gridTile, kwargs)
 }

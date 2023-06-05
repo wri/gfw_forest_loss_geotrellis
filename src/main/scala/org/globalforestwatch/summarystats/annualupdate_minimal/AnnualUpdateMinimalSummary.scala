@@ -66,11 +66,16 @@ object AnnualUpdateMinimalSummary {
         val resourceRights: Boolean =
           raster.tile.resourceRights.getData(col, row)
         val logging: Boolean = raster.tile.logging.getData(col, row)
-        val forestAge: String = raster.tile.forestAge.getData(col, row)
         val intactForestLandscapes2000: Boolean =
           raster.tile.intactForestLandscapes2000.getData(col, row)
         val treeCoverLossFromFires: Boolean =
           raster.tile.treeCoverLossFromFires.getData(col, row)
+        val tropicalTreeCover: Int =
+          raster.tile.tropicalTreeCover.getData(col, row)
+        val umdGlobalLandCover: String =
+          raster.tile.umdGlobalLandCover.getData(col, row)
+        val plantationsPre2000: Boolean =
+          raster.tile.plantationsPre2000.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -89,7 +94,10 @@ object AnnualUpdateMinimalSummary {
         val grossCumulBelowgroundRemovalsCo2: Float =
           raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
-        val soilCarbonPerHa: Float = raster.tile.soilCarbon.getData(col, row)
+        val soilCarbonPerHa: Integer = raster.tile.soilCarbon.getData(col, row)
+        val abovegroundCarbon2000PerHa: Float = raster.tile.abovegroundCarbon2000.getData(col, row)
+        val belowgroundCarbon2000PerHa: Float = raster.tile.belowgroundCarbon2000.getData(col, row)
+        val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
         val netFluxCo2Pixel = netFluxCo2 * areaHa
         val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
@@ -100,101 +108,124 @@ object AnnualUpdateMinimalSummary {
         val grossEmissionsCo2e = grossEmissionsCo2eNonCo2 + grossEmissionsCo2eCo2Only
         val grossEmissionsCo2ePixel = grossEmissionsCo2e * areaHa
         val totalCarbonSoil = soilCarbonPerHa * areaHa
+        val abovegroundCarbon2000 = abovegroundCarbon2000PerHa * areaHa
+        val belowgroundCarbon2000 = belowgroundCarbon2000PerHa * areaHa
 
-        val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
-
-        @tailrec
         def updateSummary(
-                           thresholds: List[Int],
+                          loss: Integer, tcd2000: Integer, tcdThreshold: Integer, tropicalTreeCover: Integer, umdGlobalLandCover: String,
                            stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData]
                          ): Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = {
-          if (thresholds == Nil) stats
-          else {
-            val pKey = AnnualUpdateMinimalDataGroup(
-              loss,
-              thresholds.head,
-              drivers,
-              primaryForest,
-              wdpa,
-              aze,
-              plantedForests,
-              mangroves1996,
-              mangroves2016,
-              tigerLandscapes,
-              landmark,
-              keyBiodiversityAreas,
-              mining,
-              peatlands,
-              oilPalm,
-              idnForestMoratorium,
-              woodFiber,
-              resourceRights,
-              logging,
-              gain,
-              forestAge,
-              intactForestLandscapes2000,
+          val pKey = AnnualUpdateMinimalDataGroup(
+            loss,
+            tcdThreshold,
+            drivers,
+            primaryForest,
+            wdpa,
+            aze,
+            plantedForests,
+            mangroves1996,
+            mangroves2016,
+            tigerLandscapes,
+            landmark,
+            keyBiodiversityAreas,
+            mining,
+            peatlands,
+            oilPalm,
+            idnForestMoratorium,
+            woodFiber,
+            resourceRights,
+            logging,
+            gain,
+            intactForestLandscapes2000,
+            umdGlobalLandCover,
+            tropicalTreeCover,
+          )
+
+          val summary: AnnualUpdateMinimalData =
+            stats.getOrElse(
+              key = pKey,
+              default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             )
 
-            val summary: AnnualUpdateMinimalData =
-              stats.getOrElse(
-                key = pKey,
-                default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-              )
+          summary.totalArea += areaHa
+          summary.totalGainArea += gainArea
 
-            summary.totalArea += areaHa
-            summary.totalGainArea += gainArea
+          if (tcd2000 >= tcdThreshold) {
+            if (loss != null) {
+              summary.treecoverLoss += areaHa
+              summary.biomassLoss += biomassPixel
+              summary.co2Emissions += co2Pixel
 
-            if (tcd2000 >= thresholds.head) {
-              if (loss != null) {
-                summary.treecoverLoss += areaHa
-                summary.biomassLoss += biomassPixel
-                summary.co2Emissions += co2Pixel
-                summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-                summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
-                summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
-
-                if (treeCoverLossFromFires) {
-                  summary.treeCoverLossFromFires += areaHa
-                }
-              }
-
-              summary.treecoverExtent2000 += areaHa
-              summary.totalBiomass += biomassPixel
-              summary.totalCo2 += co2Pixel
-              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
-              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
-              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
-              summary.totalNetFluxCo2 += netFluxCo2Pixel
-              summary.totalSoilCarbon += totalCarbonSoil
-            } else if (gain) {
-              // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
-              // the correct flux model outputs (TCD>=threshold OR Hansen gain=TRUE)
-              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
-              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
-              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
-
-              summary.totalNetFluxCo2 += netFluxCo2Pixel
-
-              if (loss != null) {
+              if (!plantationsPre2000) {
                 summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
                 summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
                 summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
               }
+
+              if (treeCoverLossFromFires) {
+                summary.treeCoverLossFromFires += areaHa
+              }
             }
 
-            if (tcd2010 >= thresholds.head) {
-              summary.treecoverExtent2010 += areaHa
-            }
+            summary.treecoverExtent2000 += areaHa
+            summary.totalBiomass += biomassPixel
+            summary.totalCo2 += co2Pixel
 
-            updateSummary(thresholds.tail, stats.updated(pKey, summary))
+            summary.totalSoilCarbon += totalCarbonSoil
+            summary.abovegroundCarbon2000 += abovegroundCarbon2000
+            summary.belowgroundCarbon2000 += belowgroundCarbon2000
+
+            if (!plantationsPre2000) {
+              summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
+              summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
+              summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+              summary.totalNetFluxCo2 += netFluxCo2Pixel
+            }
+          }
+          else if ((gain || mangroveBiomassExtent) && !plantationsPre2000) {
+            // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
+            // the correct flux model outputs (TCD>=threshold OR Hansen gain=TRUE)
+            summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
+            summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
+            summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
+
+            summary.totalNetFluxCo2 += netFluxCo2Pixel
+
+            if (loss != null) {
+              summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
+              summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+              summary.totalGrossEmissionsCo2e += grossEmissionsCo2ePixel
+            }
+          }
+
+          if (tcd2010 >= tcdThreshold) {
+            summary.treecoverExtent2010 += areaHa
+          }
+
+          if (tropicalTreeCover >= 0) {
+            summary.tropicalTreeCoverExtent += areaHa
+          }
+
+          stats.updated(pKey, summary)
+        }
+
+        val umdTcdThresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
+
+        val lossSummary
+        : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
+          umdTcdThresholds.foldLeft(acc.stats) { (stats, threshold) =>
+            updateSummary(loss, tcd2000, threshold, -1, "", stats)
+          }
+
+        val ttcSummary = {
+          if (tropicalTreeCover == 255) {
+            lossSummary
+          } else {
+            updateSummary(null, -2, -1, tropicalTreeCover, umdGlobalLandCover, lossSummary)
           }
         }
 
-        val updatedSummary
-        : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
-          updateSummary(thresholds, acc.stats)
-
-        acc = AnnualUpdateMinimalSummary(updatedSummary)
+        acc = AnnualUpdateMinimalSummary(ttcSummary)
       }
     }
 }
