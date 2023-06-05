@@ -70,8 +70,8 @@ object AnnualUpdateMinimalSummary {
           raster.tile.intactForestLandscapes2000.getData(col, row)
         val treeCoverLossFromFires: Boolean =
           raster.tile.treeCoverLossFromFires.getData(col, row)
-        val treesInMosaicLandscapes: Int =
-          raster.tile.treesInMosaicLandscapes.getData(col, row)
+        val tropicalTreeCover: Int =
+          raster.tile.tropicalTreeCover.getData(col, row)
         val umdGlobalLandCover: String =
           raster.tile.umdGlobalLandCover.getData(col, row)
         val plantationsPre2000: Boolean =
@@ -112,7 +112,7 @@ object AnnualUpdateMinimalSummary {
         val belowgroundCarbon2000 = belowgroundCarbon2000PerHa * areaHa
 
         def updateSummary(
-                          loss: Integer, tcd2000: Integer, tcdThreshold: Integer, treesInMosaicLandscapes: Integer, umdGlobalLandCover: String,
+                          loss: Integer, tcd2000: Integer, tcdThreshold: Integer, tropicalTreeCover: Integer, umdGlobalLandCover: String,
                            stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData]
                          ): Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = {
           val pKey = AnnualUpdateMinimalDataGroup(
@@ -138,7 +138,7 @@ object AnnualUpdateMinimalSummary {
             gain,
             intactForestLandscapes2000,
             umdGlobalLandCover,
-            treesInMosaicLandscapes,
+            tropicalTreeCover,
           )
 
           val summary: AnnualUpdateMinimalData =
@@ -202,7 +202,7 @@ object AnnualUpdateMinimalSummary {
             summary.treecoverExtent2010 += areaHa
           }
 
-          if (treesInMosaicLandscapes >= 0) {
+          if (tropicalTreeCover >= 0) {
             summary.tropicalTreeCoverExtent += areaHa
           }
 
@@ -218,10 +218,10 @@ object AnnualUpdateMinimalSummary {
           }
 
         val ttcSummary = {
-          if (treesInMosaicLandscapes == 255) {
+          if (tropicalTreeCover == 255) {
             lossSummary
           } else {
-            updateSummary(null, -2, -1, treesInMosaicLandscapes, umdGlobalLandCover, lossSummary)
+            updateSummary(null, -2, -1, tropicalTreeCover, umdGlobalLandCover, lossSummary)
           }
         }
 

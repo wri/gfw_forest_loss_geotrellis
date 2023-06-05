@@ -2,10 +2,10 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class TreesInMosaicLandscapes(gridTile: GridTile, kwargs: Map[String, Any])
+case class TropicalTreeCover(gridTile: GridTile, kwargs: Map[String, Any])
   extends IntegerLayer
     with OptionalILayer {
-  val datasetName = "wri_trees_in_mosaic_landscapes"
+  val datasetName = "wri_tropical_tree_cover"
   override val internalNoDataValue: Int = 255
   override val externalNoDataValue: Integer = 255
 

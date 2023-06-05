@@ -41,7 +41,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val soilCarbon: SoilCarbon = SoilCarbon(gridTile, kwargs = kwargs)
   val intactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
   val treeCoverLossFromFires: TreeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
-  val treesInMosaicLandscapes: TreesInMosaicLandscapes = TreesInMosaicLandscapes(gridTile, kwargs)
+  val tropicalTreeCover: TropicalTreeCover = TropicalTreeCover(gridTile, kwargs)
   val umdGlobalLandCover: UmdGlobalLandcover = UmdGlobalLandcover(gridTile, kwargs)
   val plantationsPre2000: PlantationsPre2000 = PlantationsPre2000(gridTile, kwargs)
   val abovegroundCarbon2000: AbovegroundCarbon2000 = AbovegroundCarbon2000(gridTile, kwargs = kwargs)
@@ -92,7 +92,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       val soilCarbonTile = soilCarbon.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2000Tile = intactForestLandscapes2000.fetchWindow(windowKey, windowLayout)
       val treeCoverLossFromFiresTile = treeCoverLossFromFires.fetchWindow(windowKey, windowLayout)
-      val treesInMosaicLandscapesTile = treesInMosaicLandscapes.fetchWindow(windowKey, windowLayout)
+      val tropicalTreeCoverTile = tropicalTreeCover.fetchWindow(windowKey, windowLayout)
       val umdGlobalLandCoverTile = umdGlobalLandCover.fetchWindow(windowKey, windowLayout)
       val plantationsPre2000Tile = plantationsPre2000.fetchWindow(windowKey, windowLayout)
       val abovegroundCarbon2000Tile = abovegroundCarbon2000.fetchWindow(windowKey, windowLayout)
@@ -131,7 +131,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         soilCarbonTile,
         intactForestLandscapes2000Tile,
         treeCoverLossFromFiresTile,
-        treesInMosaicLandscapesTile,
+        tropicalTreeCoverTile,
         umdGlobalLandCoverTile,
         plantationsPre2000Tile,
         abovegroundCarbon2000Tile,

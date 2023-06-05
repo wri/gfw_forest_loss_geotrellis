@@ -334,7 +334,7 @@
       "source_uri": "s3://gfw-data-lake/umd_tree_cover_loss_from_fires/v20230424/raster/epsg-4326/10/40000/year/geotiff/{tile_id}.tif"
     },
     {
-      "name":"wri_trees_in_mosaic_landscapes",
+      "name":"wri_tropical_tree_cover",
       "source_uri": "s3://gfw-data-lake/wri_tropical_tree_cover/v2020/raster/epsg-4326/{grid_size}/{row_count}/percent/geotiff/{tile_id}.tif"
     },
     {

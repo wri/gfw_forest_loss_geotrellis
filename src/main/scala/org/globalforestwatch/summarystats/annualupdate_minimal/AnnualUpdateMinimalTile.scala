@@ -39,7 +39,7 @@ case class AnnualUpdateMinimalTile(
                                     soilCarbon: SoilCarbon#OptionalITile,
                                     intactForestLandscapes2000: IntactForestLandscapes2000#OptionalITile,
                                     treeCoverLossFromFires: TreeCoverLossFromFires#OptionalITile,
-                                    treesInMosaicLandscapes: TreesInMosaicLandscapes#OptionalITile,
+                                    tropicalTreeCover: TropicalTreeCover#OptionalITile,
                                     umdGlobalLandCover: UmdGlobalLandcover#OptionalITile,
                                     plantationsPre2000: PlantationsPre2000#OptionalITile,
                                     abovegroundCarbon2000: AbovegroundCarbon2000#OptionalFTile,
