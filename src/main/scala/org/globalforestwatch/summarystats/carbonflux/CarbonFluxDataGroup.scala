@@ -2,20 +2,16 @@ package org.globalforestwatch.summarystats.carbonflux
 
 case class CarbonFluxDataGroup(
                                fluxModelExtent: Boolean,
-                               removalForestType: String,
-                               lossYear: Integer,
-                               threshold: Integer,
-                               isGain: Boolean,
-                               isLoss: Boolean,
                                mangroveBiomassExtent: Boolean,
+                               removalForestType: String,
                                drivers: String,
                                faoEcozones2000: String,
-                               landmark: Boolean,
                                wdpa: String,
-                               intactForestLandscapes: String,
+                               landmark: Boolean,
+                               intactForestLandscapes2000: Boolean,
                                plantationsTypeFluxModel: String,
                                intactPrimaryForest: Boolean,
-                               peatlandsExtentFluxModel: Boolean,
+                               peatlands: Boolean,
                                forestAgeCategory: String,
                                jplTropicsAbovegroundBiomassExtent2000: Boolean,
                                fiaRegionsUsExtent: String,
@@ -25,6 +21,10 @@ case class CarbonFluxDataGroup(
                                isLossLegalAmazon: Boolean,
                                prodesLegalAmazonExtent2000: Boolean,
                                tropicLatitudeExtent: Boolean,
-                               isBurnLoss: Boolean,
-                               grossEmissionsNodeCodes: String
+                               treeCoverLossFromFires: Boolean,
+                               grossEmissionsNodeCodes: String,
+                               lossYear: Integer,
+                               threshold: Integer,
+                               isGain: Boolean,
+                               isLoss: Boolean
                               )

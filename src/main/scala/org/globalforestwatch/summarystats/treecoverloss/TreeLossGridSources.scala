@@ -15,8 +15,8 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
   val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
   val treeCoverDensity2010 = TreeCoverDensityPercent2010(gridTile, kwargs)
   val biomassPerHectar = BiomassPerHectar(gridTile, kwargs)
-  val agc2000 = Agc2000(gridTile, kwargs = kwargs)
-  val bgc2000 = Bgc2000(gridTile, kwargs = kwargs)
+  val agc2000 = AbovegroundCarbon2000(gridTile, kwargs = kwargs)
+  val bgc2000 = BelowgroundCarbon2000(gridTile, kwargs = kwargs)
   val soilCarbon2000 = SoilCarbon2000(gridTile, kwargs = kwargs)
 
   val primaryForest = PrimaryForest(gridTile, kwargs)

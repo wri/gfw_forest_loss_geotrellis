@@ -18,6 +18,7 @@ case class CarbonFluxSummary(
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     CarbonFluxSummary(stats.combine(other.stats))
   }
+
   def isEmpty = stats.isEmpty
 }
 
@@ -32,7 +33,8 @@ object CarbonFluxSummary {
 
         def visit(raster: Raster[CarbonFluxTile],
                     col: Int,
-                    row: Int): Unit = {
+                    row: Int):
+                  Unit = {
         // This is a pixel by pixel operation
         val lossYear: Integer = raster.tile.loss.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
@@ -48,8 +50,8 @@ object CarbonFluxSummary {
         val deadwoodCarbonEmisYear: Float = raster.tile.deadwoodCarbonEmisYear.getData(col, row)
         val litterCarbonEmisYear: Float = raster.tile.litterCarbonEmisYear.getData(col, row)
         val soilCarbonEmisYear: Float = raster.tile.soilCarbonEmisYear.getData(col, row)
-        val agc2000: Float = raster.tile.agc2000.getData(col, row)
-        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
+        val abovegroundCarbon2000: Float = raster.tile.abovegroundCarbon2000.getData(col, row)
+        val belowgroundCarbon2000: Float = raster.tile.belowgroundCarbon2000.getData(col, row)
         val deadwoodCarbon2000: Float = raster.tile.deadwoodCarbon2000.getData(col, row)
         val litterCarbon2000: Float = raster.tile.litterCarbon2000.getData(col, row)
         val soilCarbon2000: Float = raster.tile.soilCarbon2000.getData(col, row)
@@ -69,10 +71,10 @@ object CarbonFluxSummary {
         val wdpa: String = raster.tile.wdpa.getData(col, row)
         val plantationsTypeFluxModel: String = raster.tile.plantationsTypeFluxModel.getData(col, row)
         val faoEcozones2000: String = raster.tile.faoEcozones2000.getData(col, row)
-        val intactForestLandscapes: String = raster.tile.intactForestLandscapes.getData(col, row)
+        val intactForestLandscapes2000: Boolean = raster.tile.intactForestLandscapes2000.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
         val intactPrimaryForest: Boolean = raster.tile.intactPrimaryForest.getData(col, row)
-        val peatlandsExtentFluxModel: Boolean = raster.tile.peatlandsExtentFluxModel.getData(col, row)
+        val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
         val forestAgeCategory: String = raster.tile.forestAgeCategory.getData(col, row)
         val jplTropicsAbovegroundBiomassExtent2000: Boolean = raster.tile.jplTropicsAbovegroundBiomassExtent2000.getData(col, row)
         val fiaRegionsUsExtent: String = raster.tile.fiaRegionsUsExtent.getData(col, row)
@@ -82,11 +84,13 @@ object CarbonFluxSummary {
         val lossYearLegalAmazon: Integer = raster.tile.lossLegalAmazon.getData(col, row)
         val prodesLegalAmazonExtent2000: Boolean = raster.tile.prodesLegalAmazonExtent2000.getData(col, row)
         val tropicLatitudeExtent: Boolean = raster.tile.tropicLatitudeExtent.getData(col, row)
-        val burnYearHansenLoss: Integer = raster.tile.burnYearHansenLoss.getData(col, row)
+        val treeCoverLossFromFires: Boolean =  raster.tile.treeCoverLossFromFires.getData(col, row)
         val grossEmissionsNodeCodes: String = raster.tile.grossEmissionsNodeCodes.getData(col, row)
 
+
+
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
-        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
+        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordinate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
         val areaHa = area / 10000.0
 
@@ -96,9 +100,6 @@ object CarbonFluxSummary {
 //        val carbonfluxLossYearLegalAmazon: Integer = if (lossYearLegalAmazon != null
 //          && lossYearLegalAmazon >= 2001 && lossYearLegalAmazon <= 2015) lossYearLegalAmazon else null
         val isLossLegalAmazon: Boolean = lossYearLegalAmazon != null
-
-        // Creates variable of whether the Hansen loss coincided with burning
-        val isBurnLoss: Boolean = burnYearHansenLoss != null
 
         // Calculates model extent area. Need to convert from boolean to integer, unlike in
         // annualupdate_minimal package where gain bollean can be multiplied by areaHa directly. Not sure why different
@@ -122,23 +123,20 @@ object CarbonFluxSummary {
         val soilCarbonEmisYearPixel = soilCarbonEmisYear * areaHa
         val totalCarbonEmisYear = agcEmisYear + bgcEmisYear + deadwoodCarbonEmisYear + litterCarbonEmisYear + soilCarbonEmisYear
         val totalCarbonEmisYearPixel = totalCarbonEmisYear * areaHa
-        val agc2000Pixel = agc2000 * areaHa
-        val bgc2000Pixel = bgc2000 * areaHa
+        val abovegroundCarbon2000Pixel = abovegroundCarbon2000 * areaHa
+        val belowgroundCarbon2000Pixel = belowgroundCarbon2000 * areaHa
         val deadwoodCarbon2000Pixel = deadwoodCarbon2000 * areaHa
         val litterCarbon2000Pixel = litterCarbon2000 * areaHa
         val soilCarbon2000Pixel = soilCarbon2000 * areaHa
-        val totalCarbon2000 = agc2000 + bgc2000 + deadwoodCarbon2000 + litterCarbon2000 + soilCarbon2000
-        val totalCarbon2000Pixel = totalCarbon2000 * areaHa
+        val totalCarbon2000Pixel = abovegroundCarbon2000Pixel + belowgroundCarbon2000Pixel + deadwoodCarbon2000Pixel + litterCarbon2000Pixel + soilCarbon2000Pixel
 
         val grossEmissionsCo2eNonCo2BiomassSoilPixel = grossEmissionsCo2eNonCo2BiomassSoil * areaHa
         val grossEmissionsCo2eCo2OnlyBiomassSoilPixel = grossEmissionsCo2eCo2OnlyBiomassSoil * areaHa
-        val grossEmissionsCo2eBiomassSoil = grossEmissionsCo2eNonCo2BiomassSoil + grossEmissionsCo2eCo2OnlyBiomassSoil
-        val grossEmissionsCo2eBiomassSoilPixel = grossEmissionsCo2eBiomassSoil * areaHa
+        val grossEmissionsCo2eBiomassSoilPixel = grossEmissionsCo2eNonCo2BiomassSoilPixel + grossEmissionsCo2eCo2OnlyBiomassSoilPixel
 
         val grossEmissionsCo2eNonCo2SoilOnlyPixel = grossEmissionsCo2eNonCo2SoilOnly * areaHa
         val grossEmissionsCo2eCo2OnlySoilOnlyPixel = grossEmissionsCo2eCo2OnlySoilOnly * areaHa
-        val grossEmissionsCo2eSoilOnly = grossEmissionsCo2eNonCo2SoilOnly + grossEmissionsCo2eCo2OnlySoilOnly
-        val grossEmissionsCo2eSoilOnlyPixel = grossEmissionsCo2eSoilOnly * areaHa
+        val grossEmissionsCo2eSoilOnlyPixel = grossEmissionsCo2eNonCo2SoilOnlyPixel + grossEmissionsCo2eCo2OnlySoilOnlyPixel
 
         val jplTropicsAbovegroundBiomassDensity2000Pixel = jplTropicsAbovegroundBiomassDensity2000 * areaHa
 
@@ -166,20 +164,16 @@ object CarbonFluxSummary {
           else {
             val pKey = CarbonFluxDataGroup(
               fluxModelExtent,
-              removalForestType,
-              lossYear,
-              thresholds.head,
-              isGain,
-              isLoss,
               mangroveBiomassExtent,
+              removalForestType,
               drivers,
               faoEcozones2000,
-              landmark,
               wdpa,
-              intactForestLandscapes,
+              landmark,
+              intactForestLandscapes2000,
               plantationsTypeFluxModel,
               intactPrimaryForest,
-              peatlandsExtentFluxModel,
+              peatlands,
               forestAgeCategory,
               jplTropicsAbovegroundBiomassExtent2000,
               fiaRegionsUsExtent,
@@ -189,8 +183,12 @@ object CarbonFluxSummary {
               isLossLegalAmazon,
               prodesLegalAmazonExtent2000,
               tropicLatitudeExtent,
-              isBurnLoss,
-              grossEmissionsNodeCodes
+              treeCoverLossFromFires,
+              grossEmissionsNodeCodes,
+              lossYear,
+              thresholds.head,
+              isGain,
+              isLoss
             )
 
             // Number of 0s must match number of summary. items below (including summary.totalArea)
@@ -241,14 +239,15 @@ object CarbonFluxSummary {
                 summary.totalGrossCumulBelowgroundRemovalsCo2 += grossCumulBelowgroundRemovalsCo2Pixel
 
                 // Reports gross removals outside tree cover loss pixels.
-                // These two lines of gross removals (inside and outside TCL) are the total gross removals
+                // These two lines of gross removals (inside and outside TCL) sum to the total gross removals
                 if (lossYear == null) {
                   summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
                 }
 
                 summary.totalNetFluxCo2 += netFluxCo2Pixel
-                summary.totalAgc2000 += agc2000Pixel
-                summary.totalBgc2000 += bgc2000Pixel
+
+                summary.totalAgc2000 += abovegroundCarbon2000Pixel
+                summary.totalBgc2000 += belowgroundCarbon2000Pixel
                 summary.totalDeadwoodCarbon2000 += deadwoodCarbon2000Pixel
                 summary.totalLitterCarbon2000 += litterCarbon2000Pixel
                 summary.totalSoilCarbon2000 += soilCarbon2000Pixel

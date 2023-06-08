@@ -6,11 +6,16 @@ case class LitterCarbon2000(gridTile: GridTile, model: String = "standard", kwar
   extends FloatLayer
     with OptionalFLayer {
 
-  val datasetName = "Na"
+//  val datasetName = "gfw_litter_carbon"
+//
+//  val uri: String =
+//    uriForGrid(gridTile, kwargs)
 
+
+  // For carbonflux package run only
+  val datasetName = "Na"
 
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
-  //  "$basePath/gfw_litter_carbon_stock_2000$model_suffix/v20191106/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/Mg/gdal-geotiff/${gridTile.tileId}.tif"
-    s"s3://gfw-files/flux_1_2_0/litter_carbon_2000/standard/${gridTile.tileId}.tif"
+    s"s3://gfw-files/flux_1_2_3/litter_carbon_2000/$model_suffix/${gridTile.tileId}.tif"
 }

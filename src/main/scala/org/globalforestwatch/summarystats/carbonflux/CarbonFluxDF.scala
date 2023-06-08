@@ -20,7 +20,7 @@ object CarbonFluxDF {
     "ifl_intact_forest_landscapes__year",
     "gfw_plantation_flux_model__type",
     "is__intact_primary_forest",
-    "is__peatlands_extent_flux_model",
+    "is__gfw_peatlands",
     "gfw_forest_age_category__cat",
     "is__jpl_aboveground_biomass_extent",
     "usfs_fia_region__name",
@@ -30,7 +30,7 @@ object CarbonFluxDF {
     "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019",
     "is__prodes_legal_Amazon_extent_2000",
     "is__tropical_latitude_extent",
-    "is__gfw_burn_loss_2001-2021",
+    "is__tree_cover_loss_from_fires",
     "gfw_gross_emissions_code__type"
   )
 
@@ -59,7 +59,7 @@ object CarbonFluxDF {
       $"data_group.intactForestLandscapes" as "ifl_intact_forest_landscapes__year",
       $"data_group.plantationsTypeFluxModel" as "gfw_plantation_flux_model__type",
       $"data_group.intactPrimaryForest" as "is__intact_primary_forest",
-      $"data_group.peatlandsExtentFluxModel" as "is__peatlands_extent_flux_model",
+      $"data_group.peatlands" as "is__gfw_peatlands",
       $"data_group.forestAgeCategory" as "gfw_forest_age_category__cat",
       $"data_group.jplTropicsAbovegroundBiomassExtent2000" as "is__jpl_aboveground_biomass_extent",
       $"data_group.fiaRegionsUsExtent" as "usfs_fia_region__name",
@@ -69,7 +69,7 @@ object CarbonFluxDF {
       $"data_group.isLossLegalAmazon" as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019",
       $"data_group.prodesLegalAmazonExtent2000" as "is__prodes_legal_Amazon_extent_2000",
       $"data_group.tropicLatitudeExtent" as "is__tropical_latitude_extent",
-      $"data_group.isBurnLoss" as "is__gfw_burn_loss_2001-2021",
+      $"data_group.isTreeCoverLossFromFires" as "is__tree_cover_loss_from_fires",
       $"data_group.grossEmissionsNodeCodes" as "gfw_gross_emissions_code__type",
 
       $"data.totalTreecoverLoss" as "umd_tree_cover_loss__ha",
@@ -234,7 +234,7 @@ object CarbonFluxDF {
         max(length($"ifl_intact_forest_landscapes__year")).cast("boolean") as "ifl_intact_forest_landscapes__year",
         max(length($"gfw_plantation_flux_model__type")).cast("boolean") as "gfw_plantation_flux_model__type",
         max($"is__intact_primary_forest") as "is__intact_primary_forest",
-        max($"is__peatlands_extent_flux_model") as "is__peatlands_extent_flux_model",
+        max($"is__gfw_peatlands") as "is__gfw_peatlands",
         max(length($"gfw_forest_age_category__cat")).cast("boolean") as "gfw_forest_age_category__cat",
         max($"is__jpl_aboveground_biomass_extent") as "is__jpl_aboveground_biomass_extent",
         max(length($"usfs_fia_region__name")).cast("boolean") as "usfs_fia_region__name",
@@ -244,7 +244,7 @@ object CarbonFluxDF {
         max($"is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019") as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019",
         max($"is__prodes_legal_Amazon_extent_2000") as "is__prodes_legal_Amazon_extent_2000",
         max($"is__tropical_latitude_extent") as "is__tropical_latitude_extent",
-        max($"is__gfw_burn_loss_2001-2021") as "is__gfw_burn_loss_2001-2021",
+        max($"is__tree_cover_loss_from_fires") as "is__tree_cover_loss_from_fires",
         max(length($"gfw_gross_emissions_code__type")).cast("boolean") as "gfw_gross_emissions_code__type"
       )
   }
@@ -268,7 +268,7 @@ object CarbonFluxDF {
         max($"ifl_intact_forest_landscapes__year") as "ifl_intact_forest_landscapes__year",
         max($"gfw_plantation_flux_model__type") as "gfw_plantation_flux_model__type",
         max($"is__intact_primary_forest") as "is__intact_primary_forest",
-        max($"is__peatlands_extent_flux_model") as "is__peatlands_extent_flux_model",
+        max($"is__gfw_peatlands") as "is__gfw_peatlands",
         max($"gfw_forest_age_category__cat") as "gfw_forest_age_category__cat",
         max($"is__jpl_aboveground_biomass_extent") as "is__jpl_aboveground_biomass_extent",
         max($"usfs_fia_region__name") as "usfs_fia_region__name",
@@ -278,7 +278,7 @@ object CarbonFluxDF {
         max($"is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019") as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019",
         max($"is__prodes_legal_Amazon_extent_2000") as "is__prodes_legal_Amazon_extent_2000",
         max($"is__tropical_latitude_extent") as "is__tropical_latitude_extent",
-        max($"is__gfw_burn_loss_2001-2021") as "is__gfw_burn_loss_2001-2021",
+        max($"is__tree_cover_loss_from_fires") as "is__tree_cover_loss_from_fires",
         max($"gfw_gross_emissions_code__type") as "gfw_gross_emissions_code__type"
       )
   }

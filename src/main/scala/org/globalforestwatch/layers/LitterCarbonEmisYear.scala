@@ -8,8 +8,7 @@ case class LitterCarbonEmisYear(gridTile: GridTile, model: String = "standard", 
 
   val datasetName = "Na"
 
-
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
-      s"s3://gfw-files/flux_1_2_2/litter_emis_year/$model_suffix/${gridTile.tileId}.tif"
+      s"s3://gfw-files/flux_1_2_3/litter_emis_year/$model_suffix/${gridTile.tileId}.tif"
 }

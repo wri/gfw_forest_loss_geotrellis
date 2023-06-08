@@ -8,8 +8,7 @@ case class BgcEmisYear(gridTile: GridTile, model: String = "standard", kwargs: M
 
   val datasetName = "Na"
 
-
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
-      s"s3://gfw-files/flux_1_2_2/bgc_emis_year/$model_suffix/${gridTile.tileId}.tif"
+      s"s3://gfw-files/flux_1_2_3/bgc_emis_year/$model_suffix/${gridTile.tileId}.tif"
 }
