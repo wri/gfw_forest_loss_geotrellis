@@ -61,6 +61,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val tropicLatitudeExtent: TropicLatitudeExtent = TropicLatitudeExtent(gridTile, kwargs)
   val treeCoverLossFromFires: TreeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
   val grossEmissionsNodeCodes: GrossEmissionsNodeCodes = GrossEmissionsNodeCodes(gridTile, kwargs = kwargs)
+  val plantationsPre2000: PlantationsPre2000 = PlantationsPre2000(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,
@@ -120,7 +121,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
       val forestAgeCategoryTile = forestAgeCategory.fetchWindow(windowKey, windowLayout)
       val jplTropicsAbovegroundBiomassExtent2000Tile = jplTropicsAbovegroundBiomassExtent2000.fetchWindow(windowKey, windowLayout)
       val fiaRegionsUsExtentTile = fiaRegionsUsExtent.fetchWindow(windowKey, windowLayout)
-      val braBiomesTile = brazilBiomes.fetchWindow(windowKey, windowLayout)
+      val brazilBiomesTile = brazilBiomes.fetchWindow(windowKey, windowLayout)
       val riverBasinsTile = riverBasins.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val treeCoverLossLegalAmazonTile = treeCoverLossLegalAmazon.fetchWindow(windowKey, windowLayout)
@@ -128,6 +129,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
       val tropicLatitudeExtentTile = tropicLatitudeExtent.fetchWindow(windowKey, windowLayout)
       val treeCoverLossFromFiresTile = treeCoverLossFromFires.fetchWindow(windowKey, windowLayout)
       val grossEmissionsNodeCodesTile = grossEmissionsNodeCodes.fetchWindow(windowKey, windowLayout)
+      val plantationsPre2000Tile = plantationsPre2000.fetchWindow(windowKey, windowLayout)
 
       val tile = CarbonFluxTile(
         lossTile,
@@ -171,14 +173,15 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         forestAgeCategoryTile,
         jplTropicsAbovegroundBiomassExtent2000Tile,
         fiaRegionsUsExtentTile,
-        braBiomesTile,
+        brazilBiomesTile,
         riverBasinsTile,
         primaryForestTile,
         treeCoverLossLegalAmazonTile,
         prodesLegalAmazonExtent2000Tile,
         tropicLatitudeExtentTile,
         treeCoverLossFromFiresTile,
-        grossEmissionsNodeCodesTile
+        grossEmissionsNodeCodesTile,
+        plantationsPre2000Tile,
       )
 
       Raster(tile, windowKey.extent(windowLayout))

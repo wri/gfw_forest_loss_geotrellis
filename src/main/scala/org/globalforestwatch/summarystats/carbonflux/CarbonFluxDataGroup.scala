@@ -15,7 +15,7 @@ case class CarbonFluxDataGroup(
                                forestAgeCategory: String,
                                jplTropicsAbovegroundBiomassExtent2000: Boolean,
                                fiaRegionsUsExtent: String,
-                               braBiomes: String,
+                               brazilBiomes: String,
                                riverBasins: String,
                                primaryForest: Boolean,
                                isLossLegalAmazon: Boolean,
@@ -25,6 +25,6 @@ case class CarbonFluxDataGroup(
                                grossEmissionsNodeCodes: String,
                                lossYear: Integer,
                                threshold: Integer,
-                               isGain: Boolean,
-                               isLoss: Boolean
+                               gain: Boolean,
+                               plantationsPre2000: Boolean
                               )

@@ -50,14 +50,15 @@ case class CarbonFluxTile(
                            forestAgeCategory: ForestAgeCategory#OptionalITile,
                            jplTropicsAbovegroundBiomassExtent2000: JplTropicsAbovegroundBiomassExtent2000#OptionalITile,
                            fiaRegionsUsExtent: FiaRegionsUsExtent#OptionalITile,
-                           braBiomes: BrazilBiomes#OptionalITile,
+                           brazilBiomes: BrazilBiomes#OptionalITile,
                            riverBasins: RiverBasins#OptionalITile,
                            primaryForest: PrimaryForest#OptionalITile,
                            lossLegalAmazon: TreeCoverLossLegalAmazon#OptionalITile,
                            prodesLegalAmazonExtent2000: ProdesLegalAmazonExtent2000#OptionalITile,
                            tropicLatitudeExtent: TropicLatitudeExtent#OptionalITile,
                            treeCoverLossFromFires: TreeCoverLossFromFires#OptionalITile,
-                           grossEmissionsNodeCodes: GrossEmissionsNodeCodes#OptionalITile
+                           grossEmissionsNodeCodes: GrossEmissionsNodeCodes#OptionalITile,
+                           plantationsPre2000: PlantationsPre2000#OptionalITile
                          ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
 
