@@ -70,7 +70,7 @@ object CarbonFluxDF {
       $"data_group.isLossLegalAmazon" as "is__prodes_legal_amazon_umd_tree_cover_loss_2001-2019",
       $"data_group.prodesLegalAmazonExtent2000" as "is__prodes_legal_Amazon_extent_2000",
       $"data_group.tropicLatitudeExtent" as "is__tropical_latitude_extent",
-      $"data_group.isTreeCoverLossFromFires" as "is__tree_cover_loss_from_fires",
+      $"data_group.treeCoverLossFromFires" as "is__tree_cover_loss_from_fires",
       $"data_group.grossEmissionsNodeCodes" as "gfw_full_extent_gross_emissions_code__type",
       $"data_group.plantationsPre2000" as "is__gfw_pre_2000_plantations",
 

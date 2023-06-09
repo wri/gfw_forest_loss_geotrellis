@@ -63,7 +63,7 @@ object CarbonFluxSummary {
         val stdevAnnualAbovegroundRemovalsCarbon: Float = raster.tile.stdevAnnualAbovegroundRemovalsCarbon.getData(col, row)
         val stdevSoilCarbon2000: Float = raster.tile.stdevSoilCarbon2000.getData(col, row)
 
-        val gain: Boolean = raster.tile.gain.getData(col, row)
+        val isGain: Boolean = raster.tile.gain.getData(col, row)
         val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
         val removalForestType: String = raster.tile.removalForestType.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
@@ -94,6 +94,8 @@ object CarbonFluxSummary {
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordinate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
         val areaHa = area / 10000.0
+
+        val isLoss: Boolean = lossYear != null
 
         val isLossLegalAmazon: Boolean = lossYearLegalAmazon != null
 
@@ -184,7 +186,8 @@ object CarbonFluxSummary {
               grossEmissionsNodeCodes,
               lossYear,
               thresholds.head,
-              gain,
+              isGain,
+              isLoss,
               plantationsPre2000
             )
 
@@ -283,7 +286,7 @@ object CarbonFluxSummary {
               // to the flux model outputs:
               // ((TCD>=threshold OR Hansen gain=TRUE OR mangrove=TRUE) AND pre-2000plant=FALSE).
               // Only flux model statistics use these rules.
-              else if ((gain || mangroveBiomassExtent) && !plantationsPre2000) {
+              else if ((isGain || mangroveBiomassExtent) && !plantationsPre2000) {
 
                 // Flux model statistics by loss year without using TCD threshold
                 if (lossYear != null) {
