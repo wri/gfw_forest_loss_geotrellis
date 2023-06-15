@@ -37,13 +37,13 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
   val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
   val mangroveBiomassExtent: MangroveBiomassExtent = MangroveBiomassExtent(gridTile, kwargs)
   val treeCoverLossDrivers: TreeCoverLossDrivers = TreeCoverLossDrivers(gridTile, kwargs)
-  val ecozones: Ecozones = Ecozones(gridTile, kwargs)
+  val ecozones: FaoEcozones2000 = FaoEcozones2000(gridTile, kwargs = kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
   val intactForestLandscapes: IntactForestLandscapes = IntactForestLandscapes(gridTile, kwargs)
   val plantationsTypeFluxModel: PlantationsTypeFluxModel = PlantationsTypeFluxModel(gridTile, kwargs)
   val intactPrimaryForest: IntactPrimaryForest = IntactPrimaryForest(gridTile, kwargs)
-  val peatlandsExtentFluxModel: PeatlandsExtentFluxModel = PeatlandsExtentFluxModel(gridTile, kwargs)
+  val peatlandsExtentFluxModel: Peatlands = Peatlands(gridTile, kwargs)
   val forestAgeCategory: ForestAgeCategory = ForestAgeCategory(gridTile, model, kwargs)
   val jplTropicsAbovegroundBiomassExtent2000: JplTropicsAbovegroundBiomassExtent2000 =
     JplTropicsAbovegroundBiomassExtent2000(gridTile, kwargs)
@@ -55,7 +55,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
   val prodesLegalAmazonExtent2000: ProdesLegalAmazonExtent2000 =
     ProdesLegalAmazonExtent2000(gridTile, kwargs)
   val tropicLatitudeExtent: TropicLatitudeExtent = TropicLatitudeExtent(gridTile, kwargs)
-  val burnYearHansenLoss: BurnYearHansenLoss = BurnYearHansenLoss(gridTile, kwargs)
+  val burnYearHansenLoss: TreeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
   val grossEmissionsNodeCodes: GrossEmissionsNodeCodes = GrossEmissionsNodeCodes(gridTile, model, kwargs)
 
   def readWindow(

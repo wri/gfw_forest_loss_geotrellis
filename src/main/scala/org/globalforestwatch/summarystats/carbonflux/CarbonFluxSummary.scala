@@ -36,7 +36,7 @@ object CarbonFluxSummary {
                     row: Int):
                   Unit = {
         // This is a pixel by pixel operation
-        val lossYear: Integer = raster.tile.loss.getData(col, row)
+        val loss: Integer = raster.tile.loss.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
@@ -95,7 +95,7 @@ object CarbonFluxSummary {
 
         val areaHa = area / 10000.0
 
-        val isLoss: Boolean = lossYear != null
+        val isLoss: Boolean = loss != null
 
         val isLossLegalAmazon: Boolean = lossYearLegalAmazon != null
 
@@ -129,8 +129,8 @@ object CarbonFluxSummary {
         val soilCarbon2000Pixel = soilCarbon2000 * areaHa
         val totalCarbon2000Pixel = abovegroundCarbon2000Pixel + belowgroundCarbon2000Pixel + deadwoodCarbon2000Pixel + litterCarbon2000Pixel + soilCarbon2000Pixel
 
+         val grossEmissionsCo2eCo2OnlyBiomassSoilPixel = grossEmissionsCo2eCo2OnlyBiomassSoil * areaHa
         val grossEmissionsCo2eNonCo2BiomassSoilPixel = grossEmissionsCo2eNonCo2BiomassSoil * areaHa
-        val grossEmissionsCo2eCo2OnlyBiomassSoilPixel = grossEmissionsCo2eCo2OnlyBiomassSoil * areaHa
         val grossEmissionsCo2eBiomassSoil = grossEmissionsCo2eNonCo2BiomassSoil + grossEmissionsCo2eCo2OnlyBiomassSoil
         val grossEmissionsCo2eBiomassSoilPixel = grossEmissionsCo2eBiomassSoil * areaHa
 
@@ -147,11 +147,11 @@ object CarbonFluxSummary {
         val varianceAnnualAbovegroundRemovalsCarbonCount = if (stdevAnnualAbovegroundRemovalsCarbon != 0) 1 else 0
 
         // Calculates the variance for each soil carbon pixel (units are Mg^2/ha^2)
-        val stdevSoilCarbonEmisYear: Float = if (lossYear != null) stdevSoilCarbon2000 else 0
+        val stdevSoilCarbonEmisYear: Float = if (loss != null) stdevSoilCarbon2000 else 0
         val varianceSoilCarbonEmisYearPixel: Double = math.pow(stdevSoilCarbonEmisYear, 2)
 
         // Keeps track of the number of pixels with variance in them
-        val varianceSoilCarbonEmisYearCount = if (lossYear != null && stdevSoilCarbon2000 != 0) 1 else 0
+        val varianceSoilCarbonEmisYearCount = if (loss != null && stdevSoilCarbon2000 != 0) 1 else 0
 
         val thresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
 
@@ -185,7 +185,7 @@ object CarbonFluxSummary {
               tropicLatitudeExtent,
               treeCoverLossFromFires,
               grossEmissionsNodeCodes,
-              lossYear,
+              loss,
               thresholds.head,
               isGain,
               isLoss,
@@ -212,7 +212,7 @@ object CarbonFluxSummary {
               if (tcd2000 >= thresholds.head) {
 
                 // Statistics by loss year using TCD threshold
-                if (lossYear != null) {
+                if (loss != null) {
 
                   // Non-flux model statistics by loss year using TCD threshold
                   summary.totalTreecoverLoss += areaHa
@@ -223,6 +223,7 @@ object CarbonFluxSummary {
                     summary.totalGrossEmissionsCo2eCo2OnlyBiomassSoil += grossEmissionsCo2eCo2OnlyBiomassSoilPixel
                     summary.totalGrossEmissionsCo2eNonCo2BiomassSoil += grossEmissionsCo2eNonCo2BiomassSoilPixel
                     summary.totalGrossEmissionsCo2eBiomassSoil += grossEmissionsCo2eBiomassSoilPixel
+
                     summary.totalGrossEmissionsCo2eCo2OnlySoilOnly += grossEmissionsCo2eCo2OnlySoilOnlyPixel
                     summary.totalGrossEmissionsCo2eNonCo2SoilOnly += grossEmissionsCo2eNonCo2SoilOnlyPixel
                     summary.totalGrossEmissionsCo2eSoilOnly += grossEmissionsCo2eSoilOnlyPixel
@@ -275,7 +276,7 @@ object CarbonFluxSummary {
 
                   // Reports gross removals outside tree cover loss pixels.
                   // These two lines of gross removals (inside and outside TCL) sum to the total gross removals
-                  if (lossYear == null) {
+                  if (loss == null) {
                     summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
                   }
                 }
@@ -290,10 +291,11 @@ object CarbonFluxSummary {
               else if ((isGain || mangroveBiomassExtent) && !plantationsPre2000) {
 
                 // Flux model statistics by loss year without using TCD threshold
-                if (lossYear != null) {
+                if (loss != null) {
                   summary.totalGrossEmissionsCo2eCo2OnlyBiomassSoil += grossEmissionsCo2eCo2OnlyBiomassSoilPixel
                   summary.totalGrossEmissionsCo2eNonCo2BiomassSoil += grossEmissionsCo2eNonCo2BiomassSoilPixel
                   summary.totalGrossEmissionsCo2eBiomassSoil += grossEmissionsCo2eBiomassSoilPixel
+
                   summary.totalGrossEmissionsCo2eCo2OnlySoilOnly += grossEmissionsCo2eCo2OnlySoilOnlyPixel
                   summary.totalGrossEmissionsCo2eNonCo2SoilOnly += grossEmissionsCo2eNonCo2SoilOnlyPixel
                   summary.totalGrossEmissionsCo2eSoilOnly += grossEmissionsCo2eSoilOnlyPixel
@@ -321,7 +323,7 @@ object CarbonFluxSummary {
 
                 // Reports gross removals outside tree cover loss pixels.
                 // These two lines of gross removals (inside and outside TCL) sum to the total gross removals
-                if (lossYear == null) {
+                if (loss == null) {
                   summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
                 }
               }

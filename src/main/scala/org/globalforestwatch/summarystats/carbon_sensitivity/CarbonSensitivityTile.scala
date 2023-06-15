@@ -26,13 +26,13 @@ case class CarbonSensitivityTile(
                                   removalForestType: RemovalForestType#OptionalITile,
                                   mangroveBiomassExtent: MangroveBiomassExtent#OptionalITile,
                                   drivers: TreeCoverLossDrivers#OptionalITile,
-                                  ecozones: Ecozones#OptionalITile,
+                                  ecozones: FaoEcozones2000#OptionalITile,
                                   landmark: Landmark#OptionalITile,
                                   wdpa: ProtectedAreas#OptionalITile,
                                   intactForestLandscapes: IntactForestLandscapes#OptionalITile,
                                   plantationsTypeFluxModel: PlantationsTypeFluxModel#OptionalITile,
                                   intactPrimaryForest: IntactPrimaryForest#OptionalITile,
-                                  peatlandsExtentFluxModel: PeatlandsExtentFluxModel#OptionalITile,
+                                  peatlandsExtentFluxModel: Peatlands#OptionalITile,
                                   forestAgeCategory: ForestAgeCategory#OptionalITile,
                                   jplTropicsAbovegroundBiomassExtent2000: JplTropicsAbovegroundBiomassExtent2000#OptionalITile,
                                   fiaRegionsUsExtent: FiaRegionsUsExtent#OptionalITile,
@@ -42,7 +42,7 @@ case class CarbonSensitivityTile(
                                   lossLegalAmazon: TreeCoverLossLegalAmazon#OptionalITile,
                                   prodesLegalAmazonExtent2000: ProdesLegalAmazonExtent2000#OptionalITile,
                                   tropicLatitudeExtent: TropicLatitudeExtent#OptionalITile,
-                                  burnYearHansenLoss: BurnYearHansenLoss#OptionalITile,
+                                  treeCoverLossFromFires: TreeCoverLossFromFires#OptionalITile,
                                   grossEmissionsNodeCodes: GrossEmissionsNodeCodes#OptionalITile
                                 ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
