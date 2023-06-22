@@ -266,10 +266,17 @@ sparkEmrConfigs := List(
      "spark.driver.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
 
     // set this environment variable for GDAL to use request payer method for S3 files
-    "spark.yarn.appMasterEnv.AWS_REQUEST_PAYER" -> "requester",
     "spark.executorEnv.AWS_REQUEST_PAYER" -> "requester",
+    "spark.yarn.appMasterEnv.AWS_REQUEST_PAYER" -> "requester",
+    "spark.executorEnv.GDAL_HTTP_MAX_RETRY" -> "3",
+    "spark.yarn.appMasterEnv.GDAL_HTTP_MAX_RETRY" -> "3",
+    "spark.executorEnv.GDAL_DISABLE_READDIR_ON_OPEN" -> "EMPTY_DIR",
+    "spark.yarn.appMasterEnv.GDAL_DISABLE_READDIR_ON_OPEN" -> "EMPTY_DIR",
+    "spark.executorEnv.GDAL_HTTP_RETRY_DELAY" -> "10",
+    "spark.yarn.appMasterEnv.GDAL_HTTP_RETRY_DELAY" -> "10"
 
-  ),
+
+),
   //  EmrConfig("spark-env").withProperties(
   //    "LD_LIBRARY_PATH" -> "/usr/local/lib"
   //  ),
