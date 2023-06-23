@@ -1,10 +1,10 @@
-package org.globalforestwatch.summarystats.gfwpro_dashboard
+package org.globalforestwatch.summarystats.afi
 
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.globalforestwatch.summarystats.SummaryExport
 import org.globalforestwatch.util.Util.getAnyMapValue
 
-object GfwProDashboardExport extends SummaryExport {
+object AFiExport extends SummaryExport {
 
   override val csvOptions: Map[String, String] = Map(
     "header" -> "true",

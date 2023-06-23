@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.gfwpro_dashboard
+package org.globalforestwatch.summarystats.afi
 
 import cats.Semigroup
 
@@ -6,12 +6,12 @@ import cats.Semigroup
   *
   * Note: This case class contains mutable values
   */
-case class GfwProDashboardRawData(var treeCoverExtentArea: Double, var alertCount: Int) {
-  def merge(other: GfwProDashboardRawData): GfwProDashboardRawData = {
-    GfwProDashboardRawData(treeCoverExtentArea + other.treeCoverExtentArea, alertCount + other.alertCount)
+case class AFiRawData(var lossArea: Double) {
+  def merge(other: AFiRawData): AFiRawData = {
+    AFiRawData(lossArea + other.lossArea)
   }
 }
 
-object GfwProDashboardRawData {
-  implicit val lossDataSemigroup: Semigroup[GfwProDashboardRawData] = Semigroup.instance(_ merge _)
+object AFiRawData {
+  implicit val lossDataSemigroup: Semigroup[AFiRawData] = Semigroup.instance(_ merge _)
 }

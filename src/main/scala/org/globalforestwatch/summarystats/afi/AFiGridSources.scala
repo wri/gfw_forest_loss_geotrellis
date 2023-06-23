@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.gfwpro_dashboard
+package org.globalforestwatch.summarystats.afi
 
 import cats.implicits._
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
@@ -9,38 +9,31 @@ import org.globalforestwatch.layers._
 /**
   * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
-case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
-  val gladAlerts = GladAlerts(gridTile, kwargs)
-  val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
+case class AFiGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
+  val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,
                   windowLayout: LayoutDefinition
-                ): Either[Throwable, Raster[GfwProDashboardTile]] = {
+                ): Either[Throwable, Raster[AFiTile]] = {
 
     for {
-      // Glad alerts are Optional Tiles, but we keep it this way to avoid signature changes
-      gladAlertsTile <- Either
-        .catchNonFatal(gladAlerts.fetchWindow(windowKey, windowLayout))
-        .right
-      tcd2000Tile <- Either
-        .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
-        .right
+      lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(windowKey, windowLayout)).right
     } yield {
-      val tile = GfwProDashboardTile(gladAlertsTile, tcd2000Tile)
+      val tile = AFiTile(lossTile)
       Raster(tile, windowKey.extent(windowLayout))
     }
   }
 }
 
-object GfwProDashboardGridSources {
+object AFiGridSources {
 
   @transient
   private lazy val cache =
     scala.collection.concurrent.TrieMap
-      .empty[String, GfwProDashboardGridSources]
+      .empty[String, AFiGridSources]
 
-  def getCachedSources(gridTile: GridTile, kwargs: Map[String, Any]): GfwProDashboardGridSources = {
-    cache.getOrElseUpdate(gridTile.tileId, GfwProDashboardGridSources(gridTile, kwargs))
+  def getCachedSources(gridTile: GridTile, kwargs: Map[String, Any]): AFiGridSources = {
+    cache.getOrElseUpdate(gridTile.tileId, AFiGridSources(gridTile, kwargs))
   }
 }

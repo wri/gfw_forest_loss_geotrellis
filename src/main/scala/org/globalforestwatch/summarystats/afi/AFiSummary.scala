@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.gfwpro_dashboard
+package org.globalforestwatch.summarystats.afi
 
 import cats.implicits._
 import geotrellis.raster._
@@ -9,53 +9,48 @@ import org.globalforestwatch.util.Geodesy
 import java.time.LocalDate
 
 /** LossData Summary by year */
-case class GfwProDashboardSummary(
-                                   stats: Map[GfwProDashboardRawDataGroup, GfwProDashboardRawData] = Map.empty
-                                 ) extends Summary[GfwProDashboardSummary] {
+case class AFiSummary(
+                                   stats: Map[AFiRawDataGroup, AFiRawData] = Map.empty
+                                 ) extends Summary[AFiSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
-  def merge(other: GfwProDashboardSummary): GfwProDashboardSummary = {
+  def merge(other: AFiSummary): AFiSummary = {
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
-    GfwProDashboardSummary(stats.combine(other.stats))
+    AFiSummary(stats.combine(other.stats))
   }
   def isEmpty = stats.isEmpty
 
-  def toGfwProDashboardData(): GfwProDashboardData = {
+  def toAFiData(): AFiData = {
     stats
-      .map { case (group, data) => group.toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
-      .foldLeft(GfwProDashboardData.empty)( _ merge _)
+      .map { case (group, data) => group.toAFiData(data.alertCount, data.treeCoverExtentArea) }
+      .foldLeft(AFiData.empty)( _ merge _)
   }
 }
 
-object GfwProDashboardSummary {
+object AFiSummary {
 
-  def getGridVisitor(kwargs: Map[String, Any]): GridVisitor[Raster[GfwProDashboardTile], GfwProDashboardSummary] =
-    new GridVisitor[Raster[GfwProDashboardTile], GfwProDashboardSummary] {
-      private var acc: GfwProDashboardSummary =
-        new GfwProDashboardSummary()
+  def getGridVisitor(kwargs: Map[String, Any]): GridVisitor[Raster[AFiTile], AFiSummary] =
+    new GridVisitor[Raster[AFiTile], AFiSummary] {
+      private var acc: AFiSummary =
+        new AFiSummary()
 
-      def result: GfwProDashboardSummary = acc
+      def result: AFiSummary = acc
 
-      def visit(raster: Raster[GfwProDashboardTile], col: Int, row: Int): Unit = {
-        val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
-        val gladAlertDate: Option[LocalDate] = raster.tile.gladAlerts.getData(col, row).map { case (date, _) => date }
-        val gladAlertCoverage = raster.tile.gladAlerts.t.isDefined
-        val isTreeCoverExtent30: Boolean = tcd2000 > 30
+      def visit(raster: Raster[AFiTile], col: Int, row: Int): Unit = {
+        val lossYear: Integer = raster.tile.treeCoverLoss.getData(col, row)
 
-        val groupKey = GfwProDashboardRawDataGroup(gladAlertDate, gladAlertsCoverage = gladAlertCoverage)
-        val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(treeCoverExtentArea = 0.0, alertCount = 0))
+        val iso = ...
+        val adm1 = ...
+        val adm2: Integer = ...
 
-        if (isTreeCoverExtent30) {
-          val areaHa = Geodesy.pixelArea(lat = raster.rasterExtent.gridRowToMap(row), raster.cellSize) / 10000.0
-          summaryData.treeCoverExtentArea += areaHa
-        }
+        val groupKey = AFiRawDataGroup(iso, adm1, adm2, lossYear)
+        val area = ...
 
-        if (gladAlertDate.isDefined) {
-          summaryData.alertCount += 1
-        }
+        val summaryData = acc.stats.getOrElse(groupKey, AFiRawData(lossArea = 0))
+        summaryData.lossArea += area
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
-        acc = GfwProDashboardSummary(new_stats)
+        acc = AFiSummary(new_stats)
       }
     }
 }

@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.gfwpro_dashboard
+package org.globalforestwatch.summarystats.afi
 
 import cats.implicits._
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
@@ -8,17 +8,17 @@ import geotrellis.raster.summary.polygonal._
 import geotrellis.vector._
 import org.globalforestwatch.summarystats.ErrorSummaryRDD
 
-object GfwProDashboardRDD extends ErrorSummaryRDD {
+object AFiRDD extends ErrorSummaryRDD {
 
-  type SOURCES = GfwProDashboardGridSources
-  type SUMMARY = GfwProDashboardSummary
-  type TILE = GfwProDashboardTile
+  type SOURCES = AFiGridSources
+  type SUMMARY = AFiSummary
+  type TILE = AFiTile
 
   def getSources(windowKey: SpatialKey,
                  windowLayout: LayoutDefinition,
                  kwargs: Map[String, Any]): Either[Throwable, SOURCES] = {
     Either.catchNonFatal {
-      GfwProDashboardGrid.getRasterSource(
+      AFiGrid.getRasterSource(
         windowKey,
         windowLayout,
         kwargs
@@ -41,7 +41,7 @@ object GfwProDashboardRDD extends ErrorSummaryRDD {
                          ): PolygonalSummaryResult[SUMMARY] = {
     raster.polygonalSummary(
       geometry,
-      GfwProDashboardSummary.getGridVisitor(kwargs),
+      AFiSummary.getGridVisitor(kwargs),
       options = options
     )
   }

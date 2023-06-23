@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.gfwpro_dashboard
+package org.globalforestwatch.summarystats.afi
 
 import io.circe.syntax._
 
@@ -9,16 +9,16 @@ import java.time.LocalDate
 import java.time.format._
 import java.time.temporal._
 
-case class GfwProDashboardDataDateCount(value: SortedMap[String, Int]) {
+case class AFiDataDateCount(value: SortedMap[String, Int]) {
 
-  def merge(other: GfwProDashboardDataDateCount): GfwProDashboardDataDateCount = {
-    GfwProDashboardDataDateCount(value combine other.value)
+  def merge(other: AFiDataDateCount): AFiDataDateCount = {
+    AFiDataDateCount(value combine other.value)
   }
 
   def toJson: String = this.value.asJson.noSpaces
 }
 
-object GfwProDashboardDataDateCount {
+object AFiDataDateCount {
 
   /** ex: 2016-1-1 => 2015-53 because the 1st of 2016 is Friday of the last week of 2015 */
   val WeekOfYear =
@@ -37,37 +37,37 @@ object GfwProDashboardDataDateCount {
       .appendValue(ChronoField.MONTH_OF_YEAR, 2)
       .toFormatter(java.util.Locale.US);
 
-  implicit def injection: Injection[GfwProDashboardDataDateCount, String] = Injection(_.toJson, fromString)
+  implicit def injection: Injection[AFiDataDateCount, String] = Injection(_.toJson, fromString)
 
-  def empty: GfwProDashboardDataDateCount = GfwProDashboardDataDateCount(SortedMap())
+  def empty: AFiDataDateCount = AFiDataDateCount(SortedMap())
 
-  def fillDaily(alertDate: Option[LocalDate], alertCount: Int): GfwProDashboardDataDateCount =
+  def fillDaily(alertDate: Option[LocalDate], alertCount: Int): AFiDataDateCount =
     fill(alertDate, alertCount, _.format(DateTimeFormatter.ISO_DATE))
 
-  def fillWeekly(alertDate: Option[LocalDate], alertCount: Int): GfwProDashboardDataDateCount =
+  def fillWeekly(alertDate: Option[LocalDate], alertCount: Int): AFiDataDateCount =
     fill(alertDate, alertCount, _.format(WeekOfYear))
 
-  def fillMonthly(alertDate: Option[LocalDate], alertCount: Int): GfwProDashboardDataDateCount =
+  def fillMonthly(alertDate: Option[LocalDate], alertCount: Int): AFiDataDateCount =
     fill(alertDate, alertCount, _.format(MonthOfYear))
 
   def fill(
     alertDate: Option[LocalDate],
     alertCount: Int,
     formatter: LocalDate => String
-  ): GfwProDashboardDataDateCount = {
+  ): AFiDataDateCount = {
 
     alertDate match {
       case Some(date) =>
         val dateKey: String = formatter(date)
-        GfwProDashboardDataDateCount(SortedMap(dateKey -> alertCount))
+        AFiDataDateCount(SortedMap(dateKey -> alertCount))
 
       case _ =>
         this.empty
     }
   }
 
-  def fromString(value: String): GfwProDashboardDataDateCount = {
+  def fromString(value: String): AFiDataDateCount = {
     val sortedMap = io.circe.parser.decode[SortedMap[String, Int]](value)
-    GfwProDashboardDataDateCount(sortedMap.getOrElse(SortedMap()))
+    AFiDataDateCount(sortedMap.getOrElse(SortedMap()))
   }
 }

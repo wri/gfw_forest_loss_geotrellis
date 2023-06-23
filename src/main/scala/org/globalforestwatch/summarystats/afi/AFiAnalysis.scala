@@ -1,4 +1,4 @@
-package org.globalforestwatch.summarystats.gfwpro_dashboard
+package org.globalforestwatch.summarystats.afi
 
 import cats.data.{NonEmptyList, Validated}
 import geotrellis.vector.{Feature, Geometry}
@@ -24,9 +24,9 @@ import org.globalforestwatch.util.IntersectGeometry
 
 import scala.reflect.ClassTag
 
-object GfwProDashboardAnalysis extends SummaryAnalysis {
+object AFiAnalysis extends SummaryAnalysis {
 
-  val name = "gfwpro_dashboard"
+  val name = "aafi"
 
   def apply(
     featureRDD: RDD[ValidatedLocation[Geometry]],
@@ -69,22 +69,22 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
         .flatMap { enrichedRDD =>
           val fireStatsRDD = fireStats(enrichedRDD, fireAlertRDD, spark)
           val tmp = enrichedRDD.map { case Location(id, geom) => Feature(geom, id) }
-          val validatedSummaryStatsRdd = GfwProDashboardRDD(tmp, GfwProDashboardGrid.blockTileGrid, kwargs)
+          val validatedSummaryStatsRdd = AFiRDD(tmp, AFiGrid.blockTileGrid, kwargs)
           ValidatedWorkflow(validatedSummaryStatsRdd).mapValid { summaryStatsRDD =>
             // fold in fireStatsRDD after polygonal summary and accumulate the errors
             summaryStatsRDD
-              .mapValues(_.toGfwProDashboardData())
+              .mapValues(_.toAFiData())
               .leftOuterJoin(fireStatsRDD)
               .mapValues { case (data, fire) =>
-                data.copy(viirs_alerts_daily = fire.getOrElse(GfwProDashboardDataDateCount.empty))
+                data.copy(viirs_alerts_daily = fire.getOrElse(AFiDataDateCount.empty))
               }
           }
         }
     }
 
-    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(summaryRDD.unify, spark)
+    val summaryDF = AFiDF.getFeatureDataFrameFromVerifiedRdd(summaryRDD.unify, spark)
     val runOutputUrl: String = getOutputUrl(kwargs)
-    GfwProDashboardExport.export(featureType, summaryDF, runOutputUrl, kwargs)
+    AFiExport.export(featureType, summaryDF, runOutputUrl, kwargs)
 
   }
 
@@ -150,18 +150,18 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     featureRDD: RDD[Location[Geometry]],
     fireAlertRDD: SpatialRDD[Geometry],
     spark: SparkSession
-  ): RDD[Location[GfwProDashboardDataDateCount]] = {
+  ): RDD[Location[AFiDataDateCount]] = {
     val featureSpatialRDD = RDDAdapter.toSpatialRDDfromLocationRdd(featureRDD, spark)
     val joinedRDD = SpatialJoinRDD.spatialjoin(featureSpatialRDD, fireAlertRDD)
 
     joinedRDD.rdd
       .map { case (poly, points) =>
         val fid = poly.getUserData.asInstanceOf[FeatureId]
-        val data = points.asScala.foldLeft(GfwProDashboardDataDateCount.empty) { (z, point) =>
+        val data = points.asScala.foldLeft(AFiDataDateCount.empty) { (z, point) =>
           // extract year from acq_date column is YYYY-MM-DD
           val acqDate = point.getUserData.asInstanceOf[String].split("\t")(2)
           val alertDate = LocalDate.parse(acqDate)
-          z.merge(GfwProDashboardDataDateCount.fillDaily(Some(alertDate), 1))
+          z.merge(AFiDataDateCount.fillDaily(Some(alertDate), 1))
         }
         (fid, data)
       }
