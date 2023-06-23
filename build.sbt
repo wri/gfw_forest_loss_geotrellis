@@ -260,12 +260,13 @@ sparkEmrConfigs := List(
 
     //    "spark.kryoserializer.buffer.max" -> "2047m",
 
-    //     Best practice 4: Always set up a garbage collector when handling large volume of data through Spark.
+    // Best practice 4: Always set up a garbage collector when handling large volume of data through Spark.
     // Use these GC strategy to avoid java.lang.OutOfMemoryError: GC overhead limit exceeded
      "spark.executor.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
      "spark.driver.defaultJavaOptions" -> "-XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:OnOutOfMemoryError='kill -9 %p'",
 
-    // set this environment variable for GDAL to use request payer method for S3 files
+    // set this environment variable for GDAL to use request payer method for S3 files.
+    // Added some of these to resolve 503 errors using 200 worker instances.
     "spark.executorEnv.AWS_REQUEST_PAYER" -> "requester",
     "spark.yarn.appMasterEnv.AWS_REQUEST_PAYER" -> "requester",
     "spark.executorEnv.GDAL_HTTP_MAX_RETRY" -> "3",
