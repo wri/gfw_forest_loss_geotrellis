@@ -13,10 +13,9 @@ case class AFiGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends 
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
 
   def readWindow(
-                  windowKey: SpatialKey,
-                  windowLayout: LayoutDefinition
-                ): Either[Throwable, Raster[AFiTile]] = {
-
+    windowKey: SpatialKey,
+    windowLayout: LayoutDefinition
+  ): Either[Throwable, Raster[AFiTile]] = {
     for {
       lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(windowKey, windowLayout)).right
     } yield {

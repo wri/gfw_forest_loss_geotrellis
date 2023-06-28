@@ -4,37 +4,14 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GadmFeatureId, GfwProFeatureId}
 import org.globalforestwatch.summarystats._
-import cats.data.Validated.{Valid, Invalid}
+import cats.data.Validated.{Invalid, Valid}
+import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticData
 
 object AFiDF extends SummaryDF {
   case class RowGadmId(list_id: String, location_id: String, gadm_id: String)
 
-  def getFeatureDataFrameFromVerifiedRdd(
-    dataRDD: RDD[ValidatedLocation[AFiData]],
-    spark: SparkSession
-  ): DataFrame = {
-    import spark.implicits._
-
-    val rowId: FeatureId => RowGadmId = {
-      case CombinedFeatureId(proId: GfwProFeatureId, gadmId: GadmFeatureId) =>
-        RowGadmId(proId.listId, proId.locationId.toString, gadmId.toString())
-      case proId: GfwProFeatureId =>
-        RowGadmId(proId.listId, proId.locationId.toString, "none")
-      case _ =>
-        throw new IllegalArgumentException("Not a CombinedFeatureId[GfwProFeatureId, GadmFeatureId]")
-    }
-    dataRDD.map {
-      case Valid(Location(id, data)) =>
-        (rowId(id), SummaryDF.RowError.empty, data)
-      case Invalid(Location(id, err)) =>
-        (rowId(id), SummaryDF.RowError.fromJobError(err), AFiData.empty)
-    }
-    .toDF("id", "error", "data")
-    .select($"id.*", $"error.*", $"data.*")
-  }
-
   def getFeatureDataFrame(
-    dataRDD: RDD[(FeatureId, ValidatedRow[AFiData])],
+    dataRDD: RDD[ValidatedLocation[AFiData]],
     spark: SparkSession
   ): DataFrame = {
     import spark.implicits._
