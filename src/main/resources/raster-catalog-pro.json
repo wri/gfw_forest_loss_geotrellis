@@ -295,6 +295,18 @@
     {
       "name": "arg_native_forest_land_plan",
       "source_uri": "s3://gfw-data-lake/arg_native_forest_land_plan/v202212/raster/epsg-4326/{grid_size}/{row_count}/category/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "gadm_adm0",
+      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm0/geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "gadm_adm1",
+      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "gadm_adm2",
+      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm2/geotiff/{tile_id}.tif"
     }
   ]
 }
