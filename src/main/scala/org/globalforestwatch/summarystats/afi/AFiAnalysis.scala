@@ -18,7 +18,7 @@ import org.apache.spark.storage.StorageLevel
 
 object AFiAnalysis extends SummaryAnalysis {
 
-  val name = "aafi"
+  val name = "afi"
 
   def apply(
     featureRDD: RDD[ValidatedLocation[Geometry]],
@@ -34,10 +34,17 @@ object AFiAnalysis extends SummaryAnalysis {
       case Validated.Invalid(Location(id, geom: Geometry)) => Feature(geom, id)
     }
 
-    val summaryRDD = AFiRDD(validatedRDD, AFiGrid.blockTileGrid, kwargs)
+    val summaryRDD: RDD[ValidatedLocation[AFiSummary]] = AFiRDD(validatedRDD, AFiGrid.blockTileGrid, kwargs)
+    val dataRDD: RDD[ValidatedLocation[AFiData]] = ValidatedWorkflow(summaryRDD).mapValid { summaries =>
+      summaries
+        .mapValues {
+          case summary: AFiSummary => summary.toAFiData()
+        }
+    }.unify
+
 
     // TODO somehow convert AFiSummary to AFiData
-    val summaryDF = AFiDF.getFeatureDataFrame(summaryRDD, spark)
+    val summaryDF = AFiDF.getFeatureDataFrame(dataRDD, spark)
     val runOutputUrl: String = getOutputUrl(kwargs)
     AFiExport.export(featureType, summaryDF, runOutputUrl, kwargs)
   }

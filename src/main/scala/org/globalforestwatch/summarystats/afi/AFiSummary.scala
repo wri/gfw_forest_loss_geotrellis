@@ -22,7 +22,7 @@ case class AFiSummary(
 
   def toAFiData(): AFiData = {
     stats
-      .map { case (group, data) => group.toAFiData(data.alertCount, data.treeCoverExtentArea) }
+      .map { case (group, data) => group.toAFiData(data.treeCoverLossArea) }
       .foldLeft(AFiData.empty)( _ merge _)
   }
 }
@@ -39,15 +39,22 @@ object AFiSummary {
       def visit(raster: Raster[AFiTile], col: Int, row: Int): Unit = {
         val lossYear: Integer = raster.tile.treeCoverLoss.getData(col, row)
 
-        val iso = ...
-        val adm1 = ...
-        val adm2: Integer = ...
+//        val iso = ...
+//        val adm1 = ...
+//        val adm2: Integer = ...
+//
+//        val groupKey = AFiRawDataGroup(iso, adm1, adm2, lossYear)
+        // pixel Area
+        val lat: Double = raster.rasterExtent.gridRowToMap(row)
+        val area: Double = Geodesy.pixelArea(
+          lat,
+          raster.cellSize
+        )
+        val areaHa = area / 10000.0
 
-        val groupKey = AFiRawDataGroup(iso, adm1, adm2, lossYear)
-        val area = ...
-
-        val summaryData = acc.stats.getOrElse(groupKey, AFiRawData(lossArea = 0))
-        summaryData.lossArea += area
+        val groupKey = AFiRawDataGroup(lossYear)
+        val summaryData = acc.stats.getOrElse(groupKey, AFiRawData(treeCoverLossArea = 0))
+        summaryData.treeCoverLossArea += areaHa
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
         acc = AFiSummary(new_stats)

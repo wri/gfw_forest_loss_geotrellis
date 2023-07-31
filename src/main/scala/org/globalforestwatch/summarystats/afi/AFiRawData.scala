@@ -6,9 +6,9 @@ import cats.Semigroup
   *
   * Note: This case class contains mutable values
   */
-case class AFiRawData(var lossArea: Double) {
+case class AFiRawData(var treeCoverLossArea: Double) {
   def merge(other: AFiRawData): AFiRawData = {
-    AFiRawData(lossArea + other.lossArea)
+    AFiRawData(treeCoverLossArea + other.treeCoverLossArea)
   }
 }
 

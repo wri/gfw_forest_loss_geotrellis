@@ -2,10 +2,11 @@ package org.globalforestwatch.summarystats.afi
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GadmFeatureId, GfwProFeatureId}
+import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GadmFeatureId, GfwProFeatureId, WdpaFeatureId}
 import org.globalforestwatch.summarystats._
 import cats.data.Validated.{Invalid, Valid}
-import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticData
+import org.globalforestwatch.summarystats.SummaryDF.{RowError, RowId}
+import org.globalforestwatch.util.Util.fieldsFromCol
 
 object AFiDF extends SummaryDF {
   case class RowGadmId(list_id: String, location_id: String, gadm_id: String)
@@ -16,19 +17,25 @@ object AFiDF extends SummaryDF {
   ): DataFrame = {
     import spark.implicits._
 
-    dataRDD.mapValues {
-      case Valid(data) =>
-        (SummaryDF.RowError.empty, data)
-      case Invalid(err) =>
-        (SummaryDF.RowError.fromJobError(err), AFiData.empty)
-    }.map {
-      case (CombinedFeatureId(proId: GfwProFeatureId, gadmId: GadmFeatureId), (error, data)) =>
-        val rowId = RowGadmId(proId.listId, proId.locationId.toString, gadmId.toString())
-        (rowId, error, data)
-      case _ =>
-        throw new IllegalArgumentException("Not a CombinedFeatureId[GfwProFeatureId, GadmFeatureId]")
+    val rowId: FeatureId => RowId = {
+      case gfwproId: GfwProFeatureId =>
+        RowId(gfwproId.listId, gfwproId.locationId.toString)
+      case gadmId: GadmFeatureId =>
+        RowId("GADM 3.6", gadmId.toString)
+      case wdpaId: WdpaFeatureId =>
+        RowId("WDPA", wdpaId.toString)
+      case id =>
+        throw new IllegalArgumentException(s"Can't produce DataFrame for $id")
     }
-    .toDF("id", "error", "data")
-    .select($"id.*", $"error.*", $"data.*")
+
+    dataRDD
+      .map {
+        case Valid(Location(fid, data)) =>
+          (rowId(fid), RowError.empty, data)
+        case Invalid(Location(fid, err)) =>
+          (rowId(fid), RowError.fromJobError(err), AFiData.empty)
+      }
+      .toDF("id", "error", "data")
+      .select($"id.*", $"error.*", $"data.*")
   }
 }
