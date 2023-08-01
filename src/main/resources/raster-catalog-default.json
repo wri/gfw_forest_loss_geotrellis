@@ -352,6 +352,10 @@
     {
       "name":"gfw_soil_carbon",
       "source_uri": "s3://gfw-data-lake/gfw_soil_carbon/v20230322.2/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_integrated_alerts",
+      "source_uri": "s3://gfw-data-lake/gfw_integrated_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
     }
   ]
 }
