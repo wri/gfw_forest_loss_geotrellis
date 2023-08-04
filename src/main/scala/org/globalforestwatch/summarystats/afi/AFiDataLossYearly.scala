@@ -3,12 +3,9 @@ package org.globalforestwatch.summarystats.afi
 import cats.implicits._
 import cats.kernel.Semigroup
 import frameless.Injection
-import io.circe.syntax._
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
 import io.circe.parser.decode
-import cats.kernel.Semigroup
-import cats.implicits._
 
 import scala.collection.immutable.SortedMap
 

@@ -1,9 +1,10 @@
 package org.globalforestwatch.summarystats.afi
 
-import cats.Semigroup
-import frameless.TypedEncoder.bigDecimalEncoder
+import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticDataLossYearly
+import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticDataLossYearlyCategory
+import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticDataDoubleCategory
 
-import scala.collection.immutable.SortedMap
+import cats.Semigroup
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 
 /** Summary data per class
@@ -11,12 +12,19 @@ import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
   * Note: This case class contains mutable values
   */
 case class AFiData(
-  treeCoverLoss: AFiDataLossYearly
+  /** Annual Tree Cover Loss TCD 30 within location geometry */
+  tree_cover_loss_total_yearly: ForestChangeDiagnosticDataLossYearly,
+  /** Annual Tree Cover Loss on Natural Forest pixels within location geometry */
+  tree_cover_loss_natural_forest_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
+  /** Natural Forest extent within location geometry */
+  natural_forest_extent: ForestChangeDiagnosticDataDoubleCategory
 ) {
 
   def merge(other: AFiData): AFiData = {
     AFiData(
-      treeCoverLoss.merge(other.treeCoverLoss)
+      tree_cover_loss_total_yearly.merge(other.tree_cover_loss_total_yearly),
+      tree_cover_loss_natural_forest_yearly.merge(other.tree_cover_loss_natural_forest_yearly),
+      natural_forest_extent.merge(other.natural_forest_extent)
     )
   }
 }
@@ -24,7 +32,11 @@ case class AFiData(
 object AFiData {
 
   def empty: AFiData =
-    AFiData(AFiDataLossYearly.empty)
+    AFiData(
+      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossYearlyCategory.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty
+    )
 
   implicit val afiDataSemigroup: Semigroup[AFiData] =
     new Semigroup[AFiData] {
@@ -33,6 +45,7 @@ object AFiData {
     }
 
   implicit def dataExpressionEncoder: ExpressionEncoder[AFiData] =
-    frameless.TypedExpressionEncoder[AFiData]
+    frameless
+      .TypedExpressionEncoder[AFiData]
       .asInstanceOf[ExpressionEncoder[AFiData]]
 }

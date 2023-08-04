@@ -11,6 +11,8 @@ import org.globalforestwatch.layers._
   */
 case class AFiGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
+  val sbtnNaturalForest: SBTNNaturalForests = SBTNNaturalForests(gridTile, kwargs)
+  val negligibleRisk: NegligibleRisk = NegligibleRisk(gridTile, kwargs)
 
   def readWindow(
     windowKey: SpatialKey,
@@ -19,7 +21,15 @@ case class AFiGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends 
     for {
       lossTile <- Either.catchNonFatal(treeCoverLoss.fetchWindow(windowKey, windowLayout)).right
     } yield {
-      val tile = AFiTile(lossTile)
+
+      val sbtnNaturalForestTile = sbtnNaturalForest.fetchWindow(windowKey, windowLayout)
+      val negligibleRiskTile = negligibleRisk.fetchWindow(windowKey, windowLayout)
+
+      val tile = AFiTile(
+        lossTile,
+        sbtnNaturalForestTile,
+        negligibleRiskTile
+      )
       Raster(tile, windowKey.extent(windowLayout))
     }
   }
