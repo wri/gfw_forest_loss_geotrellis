@@ -6,6 +6,7 @@ import org.globalforestwatch.summarystats.carbonflux.CarbonFluxCommand.carbonFlu
 import org.globalforestwatch.summarystats.firealerts.FireAlertsCommand.fireAlertsCommand
 import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticCommand.forestChangeDiagnosticCommand
 import org.globalforestwatch.summarystats.gfwpro_dashboard.GfwProDashboardCommand.gfwProDashboardCommand
+import org.globalforestwatch.summarystats.gfwpro_dashboard_integrated.GfwProDashboardCommand.gfwProDashboardIntegratedCommand
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsCommand.gladAlertsCommand
 import org.globalforestwatch.summarystats.treecoverloss.TreeCoverLossCommand.treeCoverLossCommand
 import org.globalforestwatch.summarystats.integrated_alerts.IntegratedAlertsCommand.integratedAlertsCommand
@@ -25,7 +26,8 @@ object SummaryMain {
       gfwProDashboardCommand orElse
       gladAlertsCommand orElse
       treeCoverLossCommand orElse
-      integratedAlertsCommand
+      integratedAlertsCommand orElse
+      gfwProDashboardIntegratedCommand
   }
   val command = Command(name, header, true)(main)
 

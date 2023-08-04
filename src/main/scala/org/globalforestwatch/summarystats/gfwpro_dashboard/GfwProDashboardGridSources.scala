@@ -10,7 +10,7 @@ import org.globalforestwatch.layers._
   * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
 case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
-  val gladAlerts = IntegratedAlerts(gridTile, kwargs)
+  val gladAlerts = GladAlerts(gridTile, kwargs)
   val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
 
   def readWindow(
