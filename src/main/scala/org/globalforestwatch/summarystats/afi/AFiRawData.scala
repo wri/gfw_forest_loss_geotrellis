@@ -6,20 +6,10 @@ import cats.Semigroup
   *
   * Note: This case class contains mutable values
   */
-case class AFiRawData(
-                       var treeCoverLossArea: Double,
-                       var naturalLandExtent: Double,
-                       var isNegligibleRisk: Boolean,
-                       var negligibleRiskArea: Double,
-                       var totalArea: Double
-       ) {
+case class AFiRawData(var totalArea: Double) {
   def merge(other: AFiRawData): AFiRawData = {
     AFiRawData(
-      treeCoverLossArea + other.treeCoverLossArea,
-      naturalLandExtent + other.naturalLandExtent,
-      isNegligibleRisk || other.isNegligibleRisk,
-      negligibleRiskArea + other.negligibleRiskArea,
-      totalArea + other.totalArea,
+      totalArea + other.totalArea
   }
 }
 
