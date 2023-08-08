@@ -12,19 +12,21 @@ import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
   * Note: This case class contains mutable values
   */
 case class AFiData(
-  /** Annual Tree Cover Loss TCD 30 within location geometry */
-  tree_cover_loss_total_yearly: ForestChangeDiagnosticDataLossYearly,
   /** Annual Tree Cover Loss on Natural Forest pixels within location geometry */
-  tree_cover_loss_natural_forest_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
+  tree_cover_loss_natural_forest_yearly: AFiDataLossYearly,
   /** Natural Forest extent within location geometry */
-  natural_forest_extent: ForestChangeDiagnosticDataDoubleCategory
+  natural_forest_extent: AFiDataDouble,
+  is_negligible_risk: AFiDataBoolean,
+  negligible_risk_area: AFiDataDoubleCategory,
+  total_area: AFiDataDoubleCategory,
 ) {
-
   def merge(other: AFiData): AFiData = {
     AFiData(
-      tree_cover_loss_total_yearly.merge(other.tree_cover_loss_total_yearly),
       tree_cover_loss_natural_forest_yearly.merge(other.tree_cover_loss_natural_forest_yearly),
-      natural_forest_extent.merge(other.natural_forest_extent)
+      natural_forest_extent.merge(other.natural_forest_extent),
+      is_negligible_risk.merge(other.is_negligible_risk),
+      negligible_risk_area.merge(other.negligible_risk_area),
+      total_area.merge(other.total_area)
     )
   }
 }
@@ -33,9 +35,9 @@ object AFiData {
 
   def empty: AFiData =
     AFiData(
-      ForestChangeDiagnosticDataLossYearly.empty,
-      ForestChangeDiagnosticDataLossYearlyCategory.empty,
-      ForestChangeDiagnosticDataDoubleCategory.empty
+      AFiDataLossYearly.empty,
+      AFiDataDouble.empty,
+      AFiDataBoolean.empty
     )
 
   implicit val afiDataSemigroup: Semigroup[AFiData] =
