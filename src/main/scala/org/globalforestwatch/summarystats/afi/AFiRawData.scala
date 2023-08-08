@@ -10,6 +10,7 @@ case class AFiRawData(var totalArea: Double) {
   def merge(other: AFiRawData): AFiRawData = {
     AFiRawData(
       totalArea + other.totalArea
+    )
   }
 }
 
