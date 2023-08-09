@@ -4,7 +4,9 @@ import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeD
 import java.time.LocalDate
 
 case class AFiRawDataGroup(
-  treeCoverLossYear: Int
+  treeCoverLossYear: Int,
+  gadmId: String
+
 ) {
     def toAFiData(treeCoverLossArea: Double): AFiData = {
       AFiData(AFiDataLossYearly.fill(treeCoverLossYear, treeCoverLossArea))

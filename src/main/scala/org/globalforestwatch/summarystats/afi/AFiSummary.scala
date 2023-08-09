@@ -39,11 +39,11 @@ object AFiSummary {
       def visit(raster: Raster[AFiTile], col: Int, row: Int): Unit = {
         val lossYear: Integer = raster.tile.treeCoverLoss.getData(col, row)
 
-//        val iso = ...
-//        val adm1 = ...
-//        val adm2: Integer = ...
-//
-//        val groupKey = AFiRawDataGroup(iso, adm1, adm2, lossYear)
+       val gadmAdm0: String = raster.tile.gadmAdm0.getData(col, row)
+       val gadmAdm1: Integer = raster.tile.gadmAdm1.getData(col, row)
+       val gadmAdm2: Integer = raster.tile.gadmAdm2.getData(col, row)
+       val gadmId: String = s"$gadmAdm0.$gadmAdm1.$gadmAdm2"
+
         // pixel Area
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(
@@ -52,7 +52,7 @@ object AFiSummary {
         )
         val areaHa = area / 10000.0
 
-        val groupKey = AFiRawDataGroup(lossYear)
+        val groupKey = AFiRawDataGroup(lossYear, gadmId)
         val summaryData = acc.stats.getOrElse(groupKey, AFiRawData(treeCoverLossArea = 0))
         summaryData.treeCoverLossArea += areaHa
 

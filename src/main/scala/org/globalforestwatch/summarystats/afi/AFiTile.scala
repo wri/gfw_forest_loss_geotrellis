@@ -11,7 +11,10 @@ import org.globalforestwatch.layers._
 case class AFiTile(
   treeCoverLoss: TreeCoverLoss#ITile,
   sbtnNaturalForest: SBTNNaturalForests#OptionalITile,
-  negligibleRisk: NegligibleRisk#OptionalITile
+  negligibleRisk: NegligibleRisk#OptionalITile,
+  gadmAdm0: GADMadm0#OptionalITile,
+  gadmAdm1: GADMadm1#OptionalITile,
+  gadmAdm2: GADMadm2#OptionalITile
 ) extends CellGrid[Int] {
 
   def cellType: CellType = treeCoverLoss.cellType
