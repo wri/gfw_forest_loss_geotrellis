@@ -56,6 +56,7 @@ object ForestChangeDiagnosticDataLossYearly {
         2019 -> 0,
         2020 -> 0,
         2021 -> 0,
+        2022 -> 0,
       )
     )
 
