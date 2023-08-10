@@ -12,7 +12,7 @@ object AFiDF extends SummaryDF {
   case class RowGadmId(list_id: String, location_id: String, gadm_id: String)
 
   def getFeatureDataFrame(
-    dataRDD: RDD[ValidatedLocation[AFiData]],
+    summaryRDD: RDD[ValidatedLocation[AFiSummary]],
     spark: SparkSession
   ): DataFrame = {
     import spark.implicits._
@@ -28,14 +28,17 @@ object AFiDF extends SummaryDF {
         throw new IllegalArgumentException(s"Can't produce DataFrame for $id")
     }
 
-    dataRDD
-      .map {
+    summaryRDD
+      .flatMap {
         case Valid(Location(fid, data)) =>
-          (rowId(fid), RowError.empty, data)
+          data.stats.map {
+            case (dataGroup, data) =>
+              (rowId(fid), RowError.empty, dataGroup, data)
+          }
         case Invalid(Location(fid, err)) =>
-          (rowId(fid), RowError.fromJobError(err), AFiData.empty)
+         List((rowId(fid), RowError.fromJobError(err), AFiDataGroup.empty, AFiData.empty))
       }
-      .toDF("id", "error", "data")
-      .select($"id.*", $"error.*", $"data.*")
+      .toDF("id", "error", "dataGroup", "data")
+      .select($"id.*", $"error.*", $"dataGroup.*", $"data.*")
   }
 }

@@ -35,18 +35,18 @@ object AFiAnalysis extends SummaryAnalysis {
     }
 
     val summaryRDD: RDD[ValidatedLocation[AFiSummary]] = AFiRDD(validatedRDD, AFiGrid.blockTileGrid, kwargs)
-    val dataRDD: RDD[ValidatedLocation[AFiData]] = ValidatedWorkflow(summaryRDD).mapValid { summaries =>
-      summaries
-        .mapValues {
-          case summary: AFiSummary => summary.toAFiData()
-        }
-    }.unify
+//    val dataRDD: RDD[ValidatedLocation[AFiData]] = ValidatedWorkflow(summaryRDD).mapValid { summaries =>
+//      summaries
+//        .mapValues {
+//          case summary: AFiSummary => summary.toAFiData()
+//        }
+//    }.unify
 
 
     // TODO somehow convert AFiSummary to AFiData
     import spark.implicits._
 
-    val summaryDF = AFiDF.getFeatureDataFrame(dataRDD, spark)
+    val summaryDF = AFiDF.getFeatureDataFrame(summaryRDD, spark)
       .withColumn(
         "negligible_risk_percent",
         $"negligible_risk_area" / $"total_area" * 100

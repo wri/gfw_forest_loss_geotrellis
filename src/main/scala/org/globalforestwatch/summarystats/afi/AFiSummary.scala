@@ -4,13 +4,14 @@ import cats.implicits._
 import geotrellis.raster._
 import geotrellis.raster.Raster
 import geotrellis.raster.summary.GridVisitor
-import org.globalforestwatch.summarystats.Summary
+import org.globalforestwatch.summarystats.{Summary, summarySemigroup}
 import org.globalforestwatch.util.Geodesy
+
 import java.time.LocalDate
 
 /** LossData Summary by year */
 case class AFiSummary(
-                                   stats: Map[AFiRawDataGroup, AFiRawData] = Map.empty
+                                   stats: Map[AFiDataGroup, AFiData] = Map.empty
                                  ) extends Summary[AFiSummary] {
 
   /** Combine two Maps and combine their LossData when a year is present in both */
@@ -18,13 +19,8 @@ case class AFiSummary(
     // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
     AFiSummary(stats.combine(other.stats))
   }
-  def isEmpty = stats.isEmpty
 
-  def toAFiData(): AFiData = {
-    stats
-      .map { case (group, data) => group.toAFiData(data.totalArea) }
-      .foldLeft(AFiData.empty)( _ merge _)
-  }
+  def isEmpty = stats.isEmpty
 }
 
 object AFiSummary {
@@ -45,7 +41,7 @@ object AFiSummary {
 //        val adm1 = ...
 //        val adm2: Integer = ...
 //
-//        val groupKey = AFiRawDataGroup(iso, adm1, adm2, lossYear)
+
         // pixel Area
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(
@@ -58,9 +54,21 @@ object AFiSummary {
         // TODO implement
         val gadmId = "IDN.24.9"
 
-        val groupKey = AFiRawDataGroup(lossYear, gadmId, isNaturalLand, negligibleRisk)
-        val summaryData = acc.stats.getOrElse(groupKey, AFiRawData(totalArea = 0))
-        summaryData.totalArea += areaHa
+        val groupKey = AFiDataGroup(gadmId)
+        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0))
+        summaryData.total_area += areaHa
+
+        if (lossYear >= 2021) {
+          summaryData.tree_cover_loss_area += areaHa
+        }
+
+        if (negligibleRisk == "NO") {
+          summaryData.negligible_risk_area += areaHa
+        }
+
+        if (naturalLandsCategory == "Natural Forest") {
+          summaryData.natural_land_extent += areaHa
+        }
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
         acc = AFiSummary(new_stats)

@@ -314,7 +314,7 @@
     },
     {
       "name": "gfwpro_negligible_risk_analysis",
-      "source_uri": "s3://gfw-data-lake/gfwpro_negligible_risk_analysis/v20230726/raster/epsg-4326/{grid_size}/{row_count}/negligible_risk/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfwpro_negligible_risk_analysis/v20230726/raster/epsg-4326/{grid_size}/{row_count}/risk/geotiff/{tile_id}.tif"
     }
   ]
 }
