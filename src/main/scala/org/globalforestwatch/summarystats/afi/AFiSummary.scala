@@ -22,7 +22,7 @@ case class AFiSummary(
 
   def toAFiData(): AFiData = {
     stats
-      .map { case (group, data) => group.toAFiData(data.treeCoverLossArea) }
+      .map { case (group, data) => group.toAFiData(data.totalArea) }
       .foldLeft(AFiData.empty)( _ merge _)
   }
 }
@@ -38,6 +38,8 @@ object AFiSummary {
 
       def visit(raster: Raster[AFiTile], col: Int, row: Int): Unit = {
         val lossYear: Integer = raster.tile.treeCoverLoss.getData(col, row)
+        val naturalLandsCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
+        val negligibleRisk: String = raster.tile.negligibleRisk.getData(col, row)
 
 //        val iso = ...
 //        val adm1 = ...
@@ -51,10 +53,14 @@ object AFiSummary {
           raster.cellSize
         )
         val areaHa = area / 10000.0
+        val isNaturalLand = naturalLandsCategory =="Natural Forest"
 
-        val groupKey = AFiRawDataGroup(lossYear)
-        val summaryData = acc.stats.getOrElse(groupKey, AFiRawData(treeCoverLossArea = 0))
-        summaryData.treeCoverLossArea += areaHa
+        // TODO implement
+        val gadmId = "IDN.24.9"
+
+        val groupKey = AFiRawDataGroup(lossYear, gadmId, isNaturalLand, negligibleRisk)
+        val summaryData = acc.stats.getOrElse(groupKey, AFiRawData(totalArea = 0))
+        summaryData.totalArea += areaHa
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
         acc = AFiSummary(new_stats)

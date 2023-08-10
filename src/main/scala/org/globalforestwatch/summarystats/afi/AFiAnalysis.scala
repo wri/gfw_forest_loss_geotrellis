@@ -44,7 +44,14 @@ object AFiAnalysis extends SummaryAnalysis {
 
 
     // TODO somehow convert AFiSummary to AFiData
+    import spark.implicits._
+
     val summaryDF = AFiDF.getFeatureDataFrame(dataRDD, spark)
+      .withColumn(
+        "negligible_risk_percent",
+        $"negligible_risk_area" / $"total_area" * 100
+      ).drop("negligible_risk_area")
+
     val runOutputUrl: String = getOutputUrl(kwargs)
     AFiExport.export(featureType, summaryDF, runOutputUrl, kwargs)
   }

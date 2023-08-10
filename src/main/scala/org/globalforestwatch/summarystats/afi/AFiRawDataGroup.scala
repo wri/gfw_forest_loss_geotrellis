@@ -14,9 +14,8 @@ case class AFiRawDataGroup(
       AFiData(
         AFiDataLossYearly.fill(treeCoverLossYear, totalArea, isNaturalLand),
         AFiDataDouble.fill(totalArea, isNaturalLand),
-        AFiDataBoolean.fill(negligibleRisk == "YES"),
-        AFiDataDoubleCategory.fill(gadmId, totalArea, include = negligibleRisk != "NA"),
-        AFiDataDoubleCategory.fill(gadmId, totalArea)
+        AFiDataDouble.fill(totalArea, negligibleRisk != "Y"),
+        AFiDataDouble.fill(totalArea)
       )
   }
 }
