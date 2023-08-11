@@ -91,6 +91,10 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
                   } else {
                     data.copy(
                       commodity_threat_fires = fire.getOrElse(ForestChangeDiagnosticDataLossYearly.empty),
+                      // Soy is planted late in year (Sept/Oct) and harvested in
+                      // March. So, the most recent data relates to soy planted late
+                      // in previous year. So, we should only intersect with tree
+                      // cover loss from previous year.
                       tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2021)
                     )
                   }
@@ -197,6 +201,8 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
         usingIndex = true
       )
 
+    // This fire data is an input to the palm risk tool, so limit data to 2021 to sync
+    // with the palm risk tool.
     joinedRDD.rdd
       .map { case (poly, points) =>
         val fid = poly.getUserData.asInstanceOf[FeatureId]
