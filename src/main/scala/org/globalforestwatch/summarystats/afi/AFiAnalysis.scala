@@ -1,5 +1,5 @@
 package org.globalforestwatch.summarystats.afi
-
+import org.apache.spark.sql.functions.{col, lit, when, sum, max}
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.{NonEmptyList, Validated}
 import geotrellis.vector.{Feature, Geometry}
@@ -15,7 +15,6 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
 
-
 object AFiAnalysis extends SummaryAnalysis {
 
   val name = "afi"
@@ -29,8 +28,8 @@ object AFiAnalysis extends SummaryAnalysis {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
     // TODO invalid should map to job error somehow, probably using ValidatedWorkflow
-    val validatedRDD = featureRDD.map{
-      case Validated.Valid(Location(id, geom: Geometry)) => Feature(geom, id)
+    val validatedRDD = featureRDD.map {
+      case Validated.Valid(Location(id, geom: Geometry))   => Feature(geom, id)
       case Validated.Invalid(Location(id, geom: Geometry)) => Feature(geom, id)
     }
 
@@ -42,7 +41,6 @@ object AFiAnalysis extends SummaryAnalysis {
 //        }
 //    }.unify
 
-
     // TODO somehow convert AFiSummary to AFiData
     import spark.implicits._
 
@@ -50,12 +48,29 @@ object AFiAnalysis extends SummaryAnalysis {
       .getFeatureDataFrame(summaryRDD, spark)
       .withColumn("gadm_id", when(col("location_id") =!= -1, lit("")).otherwise(col("gadm_id")))
 
+    val gadmAgg = summaryDF
+      .filter($"location_id" === -1)
+      .groupBy($"list_id")
+      .agg(
+        sum("natural_land_extent").alias("natural_land_extent"),
+        sum("tree_cover_loss_area").alias("tree_cover_loss_area"),
+        sum("negligible_risk_area").alias("negligible_risk_area"),
+        sum("total_area").alias("total_area"),
+        max("status_code").alias("status_code")
+      )
+      .withColumn("gadm_id", lit(""))
+      .withColumn("location_error", lit(""))
+      .withColumn("location_id", lit(-1))
+
+    val combinedDF = summaryDF.unionByName(gadmAgg)
+    val resultsDF = combinedDF
       .withColumn(
         "negligible_risk_percent",
         $"negligible_risk_area" / $"total_area" * 100
-      ).drop("negligible_risk_area")
+      )
+      .drop("negligible_risk_area")
 
     val runOutputUrl: String = getOutputUrl(kwargs)
-    AFiExport.export(featureType, summaryDF, runOutputUrl, kwargs)
+    AFiExport.export(featureType, resultsDF, runOutputUrl, kwargs)
   }
 }
