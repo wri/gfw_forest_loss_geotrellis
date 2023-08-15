@@ -46,7 +46,10 @@ object AFiAnalysis extends SummaryAnalysis {
     // TODO somehow convert AFiSummary to AFiData
     import spark.implicits._
 
-    val summaryDF = AFiDF.getFeatureDataFrame(summaryRDD, spark)
+    val summaryDF = AFiDF
+      .getFeatureDataFrame(summaryRDD, spark)
+      .withColumn("gadm_id", when(col("location_id") =!= -1, lit("")).otherwise(col("gadm_id")))
+
       .withColumn(
         "negligible_risk_percent",
         $"negligible_risk_area" / $"total_area" * 100
