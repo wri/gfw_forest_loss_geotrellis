@@ -9,13 +9,14 @@ This project performs a polygonal summary on tree cover loss and intersecting la
 Currently the following analysis are implemented
 
 *   Tree Cover Loss (for ArcPy client)
-*   Annual Update
 *   Annual Update minimal
 *   Carbon Flux Full Standard Model
 *   Carbon Flux Sensitivity Analysis
 *   Glad Alerts
-*   Viirs Fire Alerts
-*   MODIS Fire Alerts
+*   Viirs/ MODIS Fire Alerts
+*   Forest Change Diagnostic
+*   GFW Pro Dashboard
+*   Integrated Alerts
 
 ### Tree Cover Loss
 
@@ -35,18 +36,9 @@ This type of analysis only supports simple features as input. Best used together
 sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain treecoverloss --feature_type feature --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --tcd 2000 --threshold 0 --threshold 30 --contextual layer is__gfw_plantations --carbon_pools
 ```
 
-### Annual Update
-
-A complex analysis intersecting Tree Cover Loss data with more than 40 layers. This analysis is used for the GFU. Supported input features are GADM features only.
-Output are Summary and Change tables for ISO, ADM1 and ADM2 areas.
-
-```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-```
-
 ### Annual Update minimal
 
-This analysis follows the same methodology as the annual update analysis above, just with fewer intersecting layers. 
+An analysis intersecting Tree Cover Loss data with a number of layers.
 It is used to compute statistics for the GFW country and user dashboards, including carbon flux outputs (emissions, removals, net flux).
 
 Supported input features are
@@ -61,10 +53,10 @@ For GADM there will also be summary tables with one row per ISO, ADM1, ADM2 and 
 To produce final spreadsheets you will need to add another [post processing step](https://github.com/wri/write_country_stats).
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type wdpa --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type geostore --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis annualupdate_minimal --feature_type feature --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type wdpa --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type geostore --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type feature --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
 ```
 
 ### Carbon Flux Full Standard Model
@@ -75,7 +67,7 @@ It also analyzes several contextual layers that are unique to the carbon flux mo
 It currently only works with GADM features.
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis carbonflux --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain carbonflux --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
 ```
 
 ### Carbon Flux Sensitivity Analysis
@@ -87,8 +79,8 @@ To run this model with the standard flux model output for an analysis using fewe
 It currently only works with GADM features. 
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis carbon_sensitivity --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --sensitivity_type sensitivity_analysis_type
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis carbon_sensitivity --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --sensitivity_type standard
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain carbon_sensitivity --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --sensitivity_type sensitivity_analysis_type
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain carbon_sensitivity --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --sensitivity_type standard
 ```
 
 ### Glad Alerts
@@ -107,10 +99,10 @@ Supported input features are
 *   Simple Feature
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis gladalerts --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
 ```
 
 ### Viirs/ MODIS Fire Alerts
@@ -127,11 +119,50 @@ Supported input features are
 *   Simple Feature
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --analysis firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
 ```
+### Forest Change Diagnostic
+
+Forest Change Diagnostic computes forest loss and fire alerts for an input set of
+lists of geometries. It is used to compute statistics for lists of a GFW Pro
+customer. It requires the `firealerts` options and optionally takes any `feature`
+options. The only supported input feature is `gfwpro`. Automatically turns on the
+`--split_features` option.
+
+```sbt
+sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain forest_change_diagnostic --feature_type gfwpro --features s3://bucket/prefix/file.tsv --fire_alert_source s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+```
+### GFW Pro Dashboard
+
+GFW Pro Dashboard computes summary statistics for the GFW Pro Dashboard. It
+optionally takes `firealert` options and `feature` options.
+
+Supported input features are:
+
+*   GADM
+*   Geostore
+*   WDPA
+*   Simple Feature
+*   GFW Pro
+
+
+###  Integrated Alerts
+
+Integrated Alerts computes a combination of deforestation alerts based on GLAD-L,
+GLAD-S2, and RADD systems. It is used to compute these alerts for GFW. It optionally
+takes any `feature`, `gadm`, or `wdpa` options.
+
+Supported input features are
+
+*   GADM
+*   Geostore
+*   WDPA
+*   Simple Feature
+*   GFW Pro
+
 
 ## Inputs
 
@@ -147,6 +178,7 @@ Larger features should be split into smaller features, prior to running the anal
 Also make sure, that features do not overlap with tile boundaries (we use 10x10 degree tiles). 
 For best performance, intersect input features with a 1x1 degree grid.
 If you are not sure how to best approach this, simply use the [ArcPY Client](https://github.com/wri/gfw_forest_loss_geotrellis_arcpy_client)
+Alternatively, use the `--split_features` opton.
 
 ## Options
 
@@ -154,10 +186,9 @@ The following options are supported:
 
 |Option           |Type  |Analysis or Feature Type |Description                                                                                                                      |
 |-----------------|------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-|analysis         |string|                         |Type of analysis to run `annualupdate`, `annualupdate_minimal`, `carbonflux`, `carbon_sensitivity`, `gladalerts`, `treecoverloss`|
 |features         |string|all (required)           |URI of features in TSV format                                                                                                    |
 |output           |string|all (required)           |URI of output dir for CSV files                                                                                                  |
-|feature_type     |string|all (required)           |Feature type: one of 'gadm', 'wdpa', 'geostore' or 'feature                                                                      |
+|feature_type     |string|all (required)           |Feature type: one of 'gadm', 'wdpa', 'geostore', 'feature', or 'gfwpro'                                                          |
 |limit            |int   |all                      |Limit number of records processed                                                                                                |
 |iso_first        |string|`gadm` or `wdpa` features|Filter by first letter of ISO code                                                                                               |
 |iso_start        |string|`gadm` or `wdpa` features|Filter by ISO code larger than or equal to given value                                                                           |
@@ -165,8 +196,10 @@ The following options are supported:
 |iso              |string|`gadm` or `wdpa` features|Filter by country ISO code                                                                                                       |
 |admin1           |string|`gadm` features          |Filter by country Admin1 code                                                                                                    |
 |admin2           |string|`gadm` features          |Filter by country Admin2 code                                                                                                    |
-|id_start         |int   |`feature` analysis       |Filter by IDs larger than or equal to given value                                                                                |
+|id_start         |int   |`feature` analysis       |Filter by IDs greater than or equal to given value                                                                               |
+|id_end           |int   |`feature` analysis       |Filter by IDs less than or equal to given value                                                                                  |
 |wdpa_status      |string|`wdpa` features          |Filter by WDPA Status                                                                                                            |
+|iucn_cat         |string|`wdpa` features          |Filter by IUCS Category                                                                                                          |
 |tcd              |int   |`treecoverloss` analysis |Select tree cover density year                                                                                                   |
 |threshold        |int   |`treecoverloss` analysis |Treecover threshold to apply (multiple)                                                                                          |
 |contextual_layer |string|`treecoverloss` analysis |Include (multiple) selected contextual layers: `is__umd_regional_primary_forest_2001`, `is__gfw_plantations`                     |
@@ -175,8 +208,15 @@ The following options are supported:
 |glad             |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class                                   |
 |change_only      |flag  |all except `treecover`   |Process change only                                                                                                              |
 |sensitivity_type |string|`carbon_sensitivity`     |Select carbon sensitivity model                                                                                                  |
-|fire_alert_type  |string|`firealerts`             |Select Fire alert type                                                                                                           |
-|fire_alert_source|string|`firealerts`             |URI of fire alert TSV file                                                                                                       |
+|fire_alert_type  |string|`firealerts` |Select Fire alert type                                                                                                                       |
+|fire_alert_source|string|`firealerts` |URI of fire alert TSV file                                                                                                                   |
+|overwrite        |flag  |all                      |Overwrite output location if already existing                                                                                    |
+|split_features   |flag  |all                      |Split input features along 1x1 degree grid                                                                                       |
+|no_output_path_suffix|flag |all                   |Do not autogenerate output path suffix at runtime                                                                                |
+|intermediate_list_source|flag |`forest_change_diagnostic` analysis |URI of intermediate list results in TSV format                                                                  |
+|contextual_feature_type|flag |`gfwpro_dashboard` analysis |URI of intermediate list results in TSV format                                                                           |
+|contextual_feature_url|flag |`gfwpro_dashboard` analysis |Type of contextual features                                                                                               |
+
 
 ## Inventory
 
@@ -193,7 +233,7 @@ The following options are supported:
 For local testing input should be limited with `--limit` flag to minimize the time.
 
 ```sbt
-sbt:geotrellis-wri> test:runMain org.globalforestwatch.summarystats.SummaryMain --features file:/Users/input/ten-by-ten-gadm36/wdpa__10N_010E.tsv --output file:/User/out/summary --limit 10
+sbt:geotrellis-wri> test:runMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --features file:/Users/input/ten-by-ten-gadm36/wdpa__10N_010E.tsv --output file:/User/out/summary --limit 10
 ```
     
 ### EMR
@@ -202,6 +242,6 @@ Before running review `sbtlighter` configuration in `build.sbt`, `reload` SBT se
 
 ```sbt
 sbt:geotrellis-wri> sparkCreateCluster
-sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain --features s3://gfw-files/2018_update/tsv/gadm36_1_1.csv --output s3://gfw-files/2018_update/results/summary --feature_type gadm --analysis annualupdate_minimal --tcl
-sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain  --features s3://gfw-files/2018_update/tsv/wdpa__*.tsv --output s3://gfw-files/2018_update/results/summary  --feature_type wdpa --analysis gladalerts --tcl --iso BRA
+sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --features s3://gfw-files/2018_update/tsv/gadm36_1_1.csv --output s3://gfw-files/2018_update/results/summary --feature_type gadm --tcl
+sbt:treecoverloss> sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain gladalerts --features s3://gfw-files/2018_update/tsv/wdpa__*.tsv --output s3://gfw-files/2018_update/results/summary  --feature_type wdpa --tcl --iso BRA
 ```
