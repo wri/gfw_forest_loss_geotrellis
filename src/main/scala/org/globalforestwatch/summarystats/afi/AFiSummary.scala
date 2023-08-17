@@ -34,7 +34,7 @@ object AFiSummary {
 
       def visit(raster: Raster[AFiTile], col: Int, row: Int): Unit = {
         val lossYear: Integer = raster.tile.treeCoverLoss.getData(col, row)
-        val naturalLandsCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
+        val naturalForestCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
         val negligibleRisk: String = raster.tile.negligibleRisk.getData(col, row)
 
 //        val iso = ...
@@ -49,13 +49,13 @@ object AFiSummary {
           raster.cellSize
         )
         val areaHa = area / 10000.0
-        val isNaturalLand = naturalLandsCategory =="Natural Forest"
+        val isNaturalForest = naturalForestCategory == "Natural Forest"
 
         // TODO implement
         val gadmId = "IDN.24.9"
 
         val groupKey = AFiDataGroup(gadmId)
-        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0))
+        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0, 0))
         summaryData.total_area += areaHa
 
         if (lossYear >= 2021) {
@@ -66,8 +66,12 @@ object AFiSummary {
           summaryData.negligible_risk_area += areaHa
         }
 
-        if (naturalLandsCategory == "Natural Forest") {
-          summaryData.natural_land_extent += areaHa
+        if (naturalForestCategory == "Natural Forest") {
+          summaryData.natural_forest_extent += areaHa
+        }
+
+        if (lossYear >= 2021 && naturalForestCategory == "Natural Forest") {
+          summaryData.natural_forest_loss_area += areaHa
         }
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
