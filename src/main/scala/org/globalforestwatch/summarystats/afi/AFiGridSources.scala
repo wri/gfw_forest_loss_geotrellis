@@ -13,9 +13,9 @@ case class AFiGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends 
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
   val sbtnNaturalForest: SBTNNaturalForests = SBTNNaturalForests(gridTile, kwargs)
   val negligibleRisk: NegligibleRisk = NegligibleRisk(gridTile, kwargs)
-  val gadmAdm0: GADMadm0 = GADMadm0(gridTile, kwargs)
-  val gadmAdm1: GADMadm1 = GADMadm1(gridTile, kwargs)
-  val gadmAdm2: GADMadm2 = GADMadm2(gridTile, kwargs)
+  val gadmAdm0: GadmAdm0 = GadmAdm0(gridTile, kwargs)
+  val gadmAdm1: GadmAdm1 = GadmAdm1(gridTile, kwargs)
+  val gadmAdm2: GadmAdm2 = GadmAdm2(gridTile, kwargs)
 
   def readWindow(
     windowKey: SpatialKey,

@@ -2,7 +2,7 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class GADMadm0(gridTile: GridTile, kwargs: Map[String, Any]) 
+case class GadmAdm0(gridTile: GridTile, kwargs: Map[String, Any]) 
   extends StringLayer
     with OptionalILayer {
     
