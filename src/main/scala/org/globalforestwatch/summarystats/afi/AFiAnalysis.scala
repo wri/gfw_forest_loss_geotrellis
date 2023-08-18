@@ -1,5 +1,5 @@
 package org.globalforestwatch.summarystats.afi
-import org.apache.spark.sql.functions.{col, lit, when, sum, max}
+import org.apache.spark.sql.functions.{col, lit, when, sum, max, concat_ws, collect_list}
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.{NonEmptyList, Validated}
 import geotrellis.vector.{Feature, Geometry}
@@ -55,9 +55,9 @@ object AFiAnalysis extends SummaryAnalysis {
         sum("tree_cover_loss_area").alias("tree_cover_loss_area"),
         sum("negligible_risk_area").alias("negligible_risk_area"),
         sum("total_area").alias("total_area"),
-        max("status_code").alias("status_code")
+        max("status_code").alias("status_code"),
+        concat_ws(", ", collect_list(when(col("location_error").isNotNull && col("location_error") =!= "", col("location_error")))).alias("location_error")
       )
-      .withColumn("location_error", lit(""))
 
 
     val gadmAgg = summaryDF
@@ -68,10 +68,10 @@ object AFiAnalysis extends SummaryAnalysis {
         sum("tree_cover_loss_area").alias("tree_cover_loss_area"),
         sum("negligible_risk_area").alias("negligible_risk_area"),
         sum("total_area").alias("total_area"),
-        max("status_code").alias("status_code")
+        max("status_code").alias("status_code"),
+        concat_ws(", ", collect_list(when(col("location_error").isNotNull && col("location_error") =!= "", col("location_error")))).alias("location_error")
       )
       .withColumn("gadm_id", lit(""))
-      .withColumn("location_error", lit(""))
       .withColumn("location_id", lit(-1))
 
     val combinedDF = summaryDF.unionByName(gadmAgg)
