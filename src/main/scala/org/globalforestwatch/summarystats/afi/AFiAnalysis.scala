@@ -46,7 +46,19 @@ object AFiAnalysis extends SummaryAnalysis {
 
     val summaryDF = AFiDF
       .getFeatureDataFrame(summaryRDD, spark)
-      .withColumn("gadm_id", when(col("location_id") =!= -1, lit("")).otherwise(col("gadm_id")))
+      .withColumn(
+        "gadm_id", when(col("location_id") =!= -1|| col("gadm_id").contains("null"), lit("") ).otherwise(col("gadm_id"))
+      )
+      .groupBy($"list_id", $"location_id", $"gadm_id")
+      .agg(
+        sum("natural_land_extent").alias("natural_land_extent"),
+        sum("tree_cover_loss_area").alias("tree_cover_loss_area"),
+        sum("negligible_risk_area").alias("negligible_risk_area"),
+        sum("total_area").alias("total_area"),
+        max("status_code").alias("status_code")
+      )
+      .withColumn("location_error", lit(""))
+
 
     val gadmAgg = summaryDF
       .filter($"location_id" === -1)
