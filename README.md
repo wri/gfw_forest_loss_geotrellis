@@ -214,8 +214,8 @@ The following options are supported:
 |split_features   |flag  |all                      |Split input features along 1x1 degree grid                                                                                       |
 |no_output_path_suffix|flag |all                   |Do not autogenerate output path suffix at runtime                                                                                |
 |intermediate_list_source|flag |`forest_change_diagnostic` analysis |URI of intermediate list results in TSV format                                                                  |
-|contextual_feature_type|flag |`gfwpro_dashboard` analysis |URI of intermediate list results in TSV format                                                                           |
-|contextual_feature_url|flag |`gfwpro_dashboard` analysis |Type of contextual features                                                                                               |
+|contextual_feature_type|flag |`gfwpro_dashboard` analysis |type of contextual feature                                                                                               |
+|contextual_feature_url|flag |`gfwpro_dashboard` analysis |URI of contextual feature in TSV format                                                                                   |
 
 
 ## Inventory
