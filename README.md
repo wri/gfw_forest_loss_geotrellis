@@ -149,7 +149,7 @@ Supported input features are:
 *   GFW Pro
 
 
-###  Integrated Alerts
+### Integrated Alerts
 
 Integrated Alerts computes a combination of deforestation alerts based on GLAD-L,
 GLAD-S2, and RADD systems. It is used to compute these alerts for GFW. It optionally
