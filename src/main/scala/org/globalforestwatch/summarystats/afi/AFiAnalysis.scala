@@ -14,6 +14,7 @@ import org.globalforestwatch.ValidatedWorkflow
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
+import org.apache.spark.sql.RelationalGroupedDataset
 
 object AFiAnalysis extends SummaryAnalysis {
 
@@ -44,33 +45,20 @@ object AFiAnalysis extends SummaryAnalysis {
     // TODO somehow convert AFiSummary to AFiData
     import spark.implicits._
 
-    val summaryDF = AFiDF
-      .getFeatureDataFrame(summaryRDD, spark)
-      .withColumn(
-        "gadm_id", when(col("location_id") =!= -1|| col("gadm_id").contains("null"), lit("") ).otherwise(col("gadm_id"))
-      )
-      .groupBy($"list_id", $"location_id", $"gadm_id")
-      .agg(
-        sum("natural_land_extent").alias("natural_land_extent"),
-        sum("tree_cover_loss_area").alias("tree_cover_loss_area"),
-        sum("negligible_risk_area").alias("negligible_risk_area"),
-        sum("total_area").alias("total_area"),
-        max("status_code").alias("status_code"),
-        concat_ws(", ", collect_list(when(col("location_error").isNotNull && col("location_error") =!= "", col("location_error")))).alias("location_error")
-      )
+    val summaryDF = AFiAnalysis.aggregateResults(
+        AFiDF
+        .getFeatureDataFrame(summaryRDD, spark)
+        .withColumn(
+          "gadm_id", when(col("location_id") =!= -1|| col("gadm_id").contains("null"), lit("") ).otherwise(col("gadm_id"))
+        )
+        .groupBy($"list_id", $"location_id", $"gadm_id")
+    )
 
-
-    val gadmAgg = summaryDF
+    val gadmAgg = AFiAnalysis.aggregateResults(
+      summaryDF
       .filter($"location_id" === -1)
-      .groupBy($"list_id")
-      .agg(
-        sum("natural_land_extent").alias("natural_land_extent"),
-        sum("tree_cover_loss_area").alias("tree_cover_loss_area"),
-        sum("negligible_risk_area").alias("negligible_risk_area"),
-        sum("total_area").alias("total_area"),
-        max("status_code").alias("status_code"),
-        concat_ws(", ", collect_list(when(col("location_error").isNotNull && col("location_error") =!= "", col("location_error")))).alias("location_error")
-      )
+      .groupBy($"list_id"),
+    )
       .withColumn("gadm_id", lit(""))
       .withColumn("location_id", lit(-1))
 
@@ -84,5 +72,16 @@ object AFiAnalysis extends SummaryAnalysis {
 
     val runOutputUrl: String = getOutputUrl(kwargs)
     AFiExport.export(featureType, resultsDF, runOutputUrl, kwargs)
+  }
+
+  private def aggregateResults(group: RelationalGroupedDataset) = {
+    group.agg(
+        sum("natural_land_extent").alias("natural_land_extent"),
+        sum("tree_cover_loss_area").alias("tree_cover_loss_area"),
+        sum("negligible_risk_area").alias("negligible_risk_area"),
+        sum("total_area").alias("total_area"),
+        max("status_code").alias("status_code"),
+        concat_ws(", ", collect_list(when(col("location_error").isNotNull && col("location_error") =!= "", col("location_error")))).alias("location_error")
+      )
   }
 }
