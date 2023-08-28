@@ -53,23 +53,19 @@ object AFiSummary {
 
 
         val groupKey = AFiDataGroup(gadmId)
-        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0, 0))
-        summaryData.total_area += areaHa
-
-        if (lossYear >= 2021) {
-          summaryData.tree_cover_loss_area += areaHa
-        }
+        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0))
+        summaryData.total_area__ha += areaHa
 
         if (negligibleRisk == "NO") {
-          summaryData.negligible_risk_area += areaHa
+          summaryData.negligible_risk_area__ha += areaHa
         }
 
         if (naturalForestCategory == "Natural Forest") {
-          summaryData.natural_forest_extent += areaHa
+          summaryData.natural_forest__extent += areaHa
         }
 
         if (lossYear >= 2021 && naturalForestCategory == "Natural Forest") {
-          summaryData.natural_forest_loss_area += areaHa
+          summaryData.natural_forest_loss__ha += areaHa
         }
 
         val new_stats = acc.stats.updated(groupKey, summaryData)

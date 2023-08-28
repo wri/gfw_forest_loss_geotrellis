@@ -65,10 +65,10 @@ object AFiAnalysis extends SummaryAnalysis {
     val combinedDF = summaryDF.unionByName(gadmAgg)
     val resultsDF = combinedDF
       .withColumn(
-        "negligible_risk_percent",
-        $"negligible_risk_area" / $"total_area" * 100
+        "negligible_risk__percent",
+        $"negligible_risk_area__ha" / $"total_area__ha" * 100
       )
-      .drop("negligible_risk_area")
+      .drop("negligible_risk_area__ha")
 
     val runOutputUrl: String = getOutputUrl(kwargs)
     AFiExport.export(featureType, resultsDF, runOutputUrl, kwargs)
@@ -76,10 +76,10 @@ object AFiAnalysis extends SummaryAnalysis {
 
   private def aggregateResults(group: RelationalGroupedDataset) = {
     group.agg(
-        sum("natural_land_extent").alias("natural_land_extent"),
-        sum("tree_cover_loss_area").alias("tree_cover_loss_area"),
-        sum("negligible_risk_area").alias("negligible_risk_area"),
-        sum("total_area").alias("total_area"),
+        sum("natural_forest__extent").alias("natural_forest__extent"),
+        sum("natural_forest_loss__ha").alias("natural_forest_loss__ha"),
+        sum("negligible_risk_area__ha").alias("negligible_risk_area__ha"),
+        sum("total_area__ha").alias("total_area__ha"),
         max("status_code").alias("status_code"),
         concat_ws(", ", collect_list(when(col("location_error").isNotNull && col("location_error") =!= "", col("location_error")))).alias("location_error")
       )
