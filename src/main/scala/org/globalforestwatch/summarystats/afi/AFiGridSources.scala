@@ -13,6 +13,9 @@ case class AFiGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends 
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
   val sbtnNaturalForest: SBTNNaturalForests = SBTNNaturalForests(gridTile, kwargs)
   val negligibleRisk: NegligibleRisk = NegligibleRisk(gridTile, kwargs)
+  val gadmAdm0: GadmAdm0 = GadmAdm0(gridTile, kwargs)
+  val gadmAdm1: GadmAdm1 = GadmAdm1(gridTile, kwargs)
+  val gadmAdm2: GadmAdm2 = GadmAdm2(gridTile, kwargs)
 
   def readWindow(
     windowKey: SpatialKey,
@@ -24,11 +27,17 @@ case class AFiGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends 
 
       val sbtnNaturalForestTile = sbtnNaturalForest.fetchWindow(windowKey, windowLayout)
       val negligibleRiskTile = negligibleRisk.fetchWindow(windowKey, windowLayout)
+      val adm0Tile = gadmAdm0.fetchWindow(windowKey, windowLayout)
+      val adm1Tile = gadmAdm1.fetchWindow(windowKey, windowLayout)
+      val adm2Tile = gadmAdm2.fetchWindow(windowKey, windowLayout)
 
       val tile = AFiTile(
         lossTile,
         sbtnNaturalForestTile,
-        negligibleRiskTile
+        negligibleRiskTile,
+        adm0Tile,
+        adm1Tile,
+        adm2Tile
       )
       Raster(tile, windowKey.extent(windowLayout))
     }

@@ -2,11 +2,11 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class GADMadm1(gridTile: GridTile, kwargs: Map[String, Any]) 
+case class GadmAdm2(gridTile: GridTile, kwargs: Map[String, Any]) 
     extends IntegerLayer
         with OptionalILayer {
         
-        val datasetName: String = "gadm_adm1"
+        val datasetName: String = "gadm_adm2"
         val uri: String = 
             uriForGrid(gridTile, kwargs)
 
