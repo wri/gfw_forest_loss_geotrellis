@@ -3,6 +3,7 @@ import frameless.Injection
 import org.globalforestwatch.util.Implicits._
 import io.circe.syntax._
 
+
 case class ForestChangeDiagnosticDataDouble(value: Double) extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataDouble] {
   def merge(
              other: ForestChangeDiagnosticDataDouble

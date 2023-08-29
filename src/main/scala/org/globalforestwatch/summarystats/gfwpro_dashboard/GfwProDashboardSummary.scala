@@ -22,7 +22,8 @@ case class GfwProDashboardSummary(
 
   def toGfwProDashboardData(): GfwProDashboardData = {
     stats
-      .map { case (group, data) => group.toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
+      .map { case (group, data) => group.
+        toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
       .foldLeft(GfwProDashboardData.empty)( _ merge _)
   }
 }
