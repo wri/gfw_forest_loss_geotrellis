@@ -237,6 +237,7 @@ trait RequiredILayer extends RequiredLayer with ILayer {
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): ITile = {
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
+    println(s"Fetching required int tile ${source.dataPath.value}, key ${windowKey}")
     val tile = source.synchronized {
       layoutSource.read(windowKey).get.band(0)
     }
@@ -253,6 +254,7 @@ trait RequiredDLayer extends RequiredLayer with DLayer {
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): DTile = {
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
+    println(s"Fetching required double tile ${source.dataPath.value}, key ${windowKey}")
     val tile = source.synchronized {
       layoutSource.read(windowKey).get.band(0)
     }
@@ -269,6 +271,7 @@ trait RequiredFLayer extends RequiredLayer with FLayer {
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): FTile = {
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
+    println(s"Fetching required float tile ${source.dataPath.value}, key ${windowKey}")
     val tile = source.synchronized {
       layoutSource.read(windowKey).get.band(0)
     }
@@ -325,6 +328,7 @@ trait OptionalILayer extends OptionalLayer with ILayer {
     */
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): OptionalITile = {
+    source.foreach(s => println(s"Fetching optional int tile ${s.dataPath.value}, key ${windowKey}"))
     new OptionalITile(for {
       source <- source
       raster <- Either
@@ -346,7 +350,8 @@ trait OptionalDLayer extends OptionalLayer with DLayer {
     * Define how to fetch data for optional double rasters
     */
   def fetchWindow(windowKey: SpatialKey,
-                  windowLayout: LayoutDefinition): OptionalDTile =
+                  windowLayout: LayoutDefinition): OptionalDTile = {
+    source.foreach(s => println(s"Fetching optional double tile ${s.dataPath.value}, key ${windowKey}"))
     new OptionalDTile(for {
       source <- source
       raster <- Either
@@ -359,6 +364,7 @@ trait OptionalDLayer extends OptionalLayer with DLayer {
         })
         .toOption
     } yield raster)
+  }
 }
 
 trait OptionalFLayer extends OptionalLayer with FLayer {
@@ -367,7 +373,8 @@ trait OptionalFLayer extends OptionalLayer with FLayer {
     * Define how to fetch data for optional double rasters
     */
   def fetchWindow(windowKey: SpatialKey,
-                  windowLayout: LayoutDefinition): OptionalFTile =
+                  windowLayout: LayoutDefinition): OptionalFTile = {
+    source.foreach(s => println(s"Fetching optional float tile ${s.dataPath.value}, key ${windowKey}"))
     new OptionalFTile(for {
       source <- source
       raster <- Either
@@ -380,6 +387,7 @@ trait OptionalFLayer extends OptionalLayer with FLayer {
         })
         .toOption
     } yield raster)
+  }
 }
 
 trait BooleanLayer extends ILayer {

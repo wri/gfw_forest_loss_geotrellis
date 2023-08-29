@@ -126,6 +126,8 @@ object ForestChangeDiagnosticSummary {
         // Currently, only do the area intersection with the detailed WDPA categories
         // if location is in Argentina. Similarly, only do area intersection with
         // Landmark (indigenous territories) if in Argentina.
+        // With lazy tile loading, the WDPA and landmark tiles are only loaded if
+        // argPresence is true.
         val detailedWdpa = if (argPresence)
           raster.tile.detailedWdpaProtectedAreas.getData(col, row)
         else
