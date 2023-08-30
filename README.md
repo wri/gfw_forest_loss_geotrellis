@@ -33,7 +33,7 @@ Other outputs from this analysis (loss, gain, biomass, carbon pools, etc.) use t
 This type of analysis only supports simple features as input. Best used together with the [ArcPY Client](https://github.com/wri/gfw_forest_loss_geotrellis_arcpy_client).
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain treecoverloss --feature_type feature --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --tcd 2000 --threshold 0 --threshold 30 --contextual layer is__gfw_plantations --carbon_pools
+test:runMain org.globalforestwatch.summarystats.SummaryMain treecoverloss --feature_type feature --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --tcd 2000 --threshold 0 --threshold 30 --contextual layer is__gfw_plantations --carbon_pools
 ```
 
 ### Annual Update minimal
@@ -53,10 +53,10 @@ For GADM there will also be summary tables with one row per ISO, ADM1, ADM2 and 
 To produce final spreadsheets you will need to add another [post processing step](https://github.com/wri/write_country_stats).
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type wdpa --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type geostore --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type feature --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+test:runMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+test:runMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type wdpa --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+test:runMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type geostore --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+test:runMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --feature_type feature --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
 ```
 
 ### Carbon Flux Full Standard Model
@@ -67,7 +67,7 @@ It also analyzes several contextual layers that are unique to the carbon flux mo
 It currently only works with GADM features.
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain carbonflux --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+test:runMain org.globalforestwatch.summarystats.SummaryMain carbonflux --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix
 ```
 
 ### Carbon Flux Sensitivity Analysis
@@ -79,8 +79,8 @@ To run this model with the standard flux model output for an analysis using fewe
 It currently only works with GADM features. 
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain carbon_sensitivity --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --sensitivity_type sensitivity_analysis_type
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain carbon_sensitivity --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --sensitivity_type standard
+test:runMain org.globalforestwatch.summarystats.SummaryMain carbon_sensitivity --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --sensitivity_type sensitivity_analysis_type
+test:runMain org.globalforestwatch.summarystats.SummaryMain carbon_sensitivity --feature_type gadm --tcl --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --sensitivity_type standard
 ```
 
 ### Glad Alerts
@@ -99,10 +99,10 @@ Supported input features are
 *   Simple Feature
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+test:runMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+test:runMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+test:runMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+test:runMain org.globalforestwatch.summarystats.SummaryMain gladalerts --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
 ```
 
 ### Viirs/ MODIS Fire Alerts
@@ -119,10 +119,10 @@ Supported input features are
 *   Simple Feature
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+test:runMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type gadm --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+test:runMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type wdpa --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+test:runMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type geostore --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
+test:runMain org.globalforestwatch.summarystats.SummaryMain firealerts --fire_alert_type MODIS/VIIRS --fire_alert_source s3://bucket/prefix/file.tsv --feature_type feature --glad --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix [--change_only]
 ```
 ### Forest Change Diagnostic
 
@@ -133,8 +133,16 @@ options. The only supported input feature is `gfwpro`. Automatically turns on th
 `--split_features` option.
 
 ```sbt
-sparkSubmitMain org.globalforestwatch.summarystats.SummaryMain forest_change_diagnostic --feature_type gfwpro --features s3://bucket/prefix/file.tsv --fire_alert_source s3://bucket/prefix/file.tsv --output s3://bucket/prefix
+test:runMain org.globalforestwatch.summarystats.SummaryMain forest_change_diagnostic --feature_type gfwpro --features s3://bucket/prefix/file.tsv --fire_alert_source s3://bucket/prefix/file.tsv --output s3://bucket/prefix
 ```
+
+There are two test input files available in the source tree, so you can run a sample
+forest change diagnostic locally without s3 via a command like:
+
+```sbt
+test:runMain org.globalforestwatch.summarystats.SummaryMain forest_change_diagnostic --split_features --feature_type gfwpro --features src/test/resources/palm-oil-32.tsv --fire_alert_type modis --fire_alert_source src/test/resources/sample-fire-alert.tsv --output testout
+```
+
 ### GFW Pro Dashboard
 
 GFW Pro Dashboard computes summary statistics for the GFW Pro Dashboard. It
@@ -230,10 +238,8 @@ The following options are supported:
 
 ### Local
 
-For local testing input should be limited with `--limit` flag to minimize the time.
-
 ```sbt
-sbt:geotrellis-wri> test:runMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --features file:/Users/input/ten-by-ten-gadm36/wdpa__10N_010E.tsv --output file:/User/out/summary --limit 10
+sbt:geotrellis-wri> test:runMain org.globalforestwatch.summarystats.SummaryMain annualupdate_minimal --features file:/Users/input/ten-by-ten-gadm36/wdpa__10N_010E.tsv --output file:/User/out/summary
 ```
     
 ### EMR
