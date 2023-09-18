@@ -42,6 +42,9 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     kwargs: Map[String, Any]
   )(implicit spark: SparkSession): RDD[ValidatedLocation[ForestChangeDiagnosticData]] = {
     features.persist(StorageLevel.MEMORY_AND_DISK)
+    // For debugging - will be removed before checkin.
+    println(s"Number of rows: ${features.collect().length}")
+    features.collect().foreach(println)
 
     try {
       val diffGridIds: List[GridId] =

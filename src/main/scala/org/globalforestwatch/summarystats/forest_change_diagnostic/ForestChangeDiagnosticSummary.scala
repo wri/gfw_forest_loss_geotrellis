@@ -123,6 +123,18 @@ object ForestChangeDiagnosticSummary {
         val idnPresence = gfwProCoverage.getOrElse("Indonesia", false)
         val argPresence = gfwProCoverage.getOrElse("Argentina", false)
 
+        // Currently, only do the area intersection with the detailed WDPA categories
+        // if location is in Argentina. Similarly, only do area intersection with
+        // Landmark (indigenous territories) if in Argentina.
+        val detailedWdpa = if (argPresence)
+          raster.tile.detailedWdpaProtectedAreas.getData(col, row)
+        else
+          ""
+        val landmark = if (argPresence)
+          raster.tile.landmark.getData(col, row)
+        else
+          false
+
         val groupKey = ForestChangeDiagnosticRawDataGroup(
           umdTreeCoverLossYear,
           isUMDLoss,
@@ -150,7 +162,9 @@ object ForestChangeDiagnosticSummary {
           cerradoBiomesPresence,
           seAsiaPresence,
           idnPresence,
-          argPresence
+          argPresence,
+          detailedWdpa,
+          landmark,
         )
 
         val summaryData: ForestChangeDiagnosticRawData =

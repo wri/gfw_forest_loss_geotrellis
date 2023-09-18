@@ -23,7 +23,9 @@ case class ForestChangeDiagnosticTile(
   braBiomes: BrazilBiomes#OptionalITile,
   isPlantation: PlantedForestsBool#OptionalITile,
   gfwProCoverage: GFWProCoverage#OptionalITile,
-  argOTBN: ArgOTBN#OptionalITile
+  argOTBN: ArgOTBN#OptionalITile,
+  detailedWdpaProtectedAreas: DetailedProtectedAreas#OptionalITile,
+  landmark: Landmark#OptionalITile,
 ) extends CellGrid[Int] {
 
   def cellType: CellType = loss.cellType

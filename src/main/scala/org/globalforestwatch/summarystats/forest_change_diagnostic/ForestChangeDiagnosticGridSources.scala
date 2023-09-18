@@ -28,6 +28,8 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
   val isPlantation: PlantedForestsBool = PlantedForestsBool(gridTile, kwargs)
   val gfwProCoverage: GFWProCoverage = GFWProCoverage(gridTile, kwargs)
   val argOTBN: ArgOTBN = ArgOTBN(gridTile, kwargs)
+  val detailedProtectedAreas: DetailedProtectedAreas = DetailedProtectedAreas(gridTile, kwargs)
+  val landmark: Landmark = Landmark(gridTile, kwargs)
 
   def readWindow(
     windowKey: SpatialKey,
@@ -65,6 +67,8 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
       val gfwProCoverageTile = gfwProCoverage.fetchWindow(windowKey, windowLayout)
       val argOTBNTile = argOTBN.fetchWindow(windowKey, windowLayout)
 
+      val detailedWdpaTile = detailedProtectedAreas.fetchWindow(windowKey, windowLayout)
+      val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
       val tile = ForestChangeDiagnosticTile(
         lossTile,
         tcd2000Tile,
@@ -82,7 +86,9 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
         braBiomesTile,
         isPlantationTile,
         gfwProCoverageTile,
-        argOTBNTile
+        argOTBNTile,
+        detailedWdpaTile,
+        landmarkTile,
       )
 
       Raster(tile, windowKey.extent(windowLayout))
