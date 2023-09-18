@@ -48,6 +48,8 @@ object AFiAnalysis extends SummaryAnalysis {
     val summaryDF = AFiAnalysis.aggregateResults(
         AFiDF
         .getFeatureDataFrame(summaryRDD, spark)
+        .filter($"location_id" =!= -2)
+        .filter(!$"gadm_id".contains("null"))
         .withColumn(
           "gadm_id", when(col("location_id") =!= -1|| col("gadm_id").contains("null"), lit("") ).otherwise(col("gadm_id"))
         )
