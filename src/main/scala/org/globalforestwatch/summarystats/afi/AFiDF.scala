@@ -40,5 +40,7 @@ object AFiDF extends SummaryDF {
       }
       .toDF("id", "error", "dataGroup", "data")
       .select($"id.*", $"error.*", $"dataGroup.*", $"data.*")
+      .filter($"location_id" =!= -2)
+      .filter(!$"gadm_id".contains("null"))
   }
 }
