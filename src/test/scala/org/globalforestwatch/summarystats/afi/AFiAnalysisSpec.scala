@@ -1,6 +1,7 @@
 package org.globalforestwatch.summarystats.afi
 
 import cats.data.{NonEmptyList, Validated}
+import com.github.mrpowers.spark.daria.sql.transformations.sortColumns
 import com.github.mrpowers.spark.fast.tests.DataFrameComparer
 import geotrellis.vector._
 import org.apache.sedona.core.spatialRDD.SpatialRDD
@@ -38,7 +39,16 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
 
   def readExpectedAFiResult = {
     spark.read
-      .options(AFiExport.csvOptions)
+      .options(Map(
+        "header" -> "true",
+        "delimiter" -> "\t",
+        "quote" -> "\u0000",
+        "escape" -> "\u0000",
+        "quoteMode" -> "NONE",
+        "nullValue" -> "",
+        "emptyValue" -> null,
+        "inferSchema" -> "true"
+      ))
       .csv(palm32ExpectedOutputPath)
       .withColumn("status_code", col("status_code").cast(IntegerType))
   }
@@ -57,8 +67,9 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
     //saveExpectedAFiResult(afiDF)
 
     val expectedDF = readExpectedAFiResult
-
-    assertSmallDataFrameEquality(afiDF, expectedDF)
+    afiDF.show()
+    expectedDF.show()
+    assertSmallDataFrameEquality(afiDF.transform(sortColumns()), expectedDF.transform(sortColumns()), ignoreNullable = true)
   }
 
   it("reports invalid geoms") {

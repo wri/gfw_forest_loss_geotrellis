@@ -12,6 +12,7 @@ import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
 import org.globalforestwatch.util.RDDAdapter
 import org.globalforestwatch.ValidatedWorkflow
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, RelationalGroupedDataset, SparkSession}
 import org.apache.spark.storage.StorageLevel
 
@@ -58,8 +59,8 @@ object AFiAnalysis extends SummaryAnalysis {
       .filter($"location_id" === -1)
       .groupBy($"list_id"),
     )
-      .withColumn("gadm_id", lit(""))
-      .withColumn("location_id", lit(-1))
+    .withColumn("gadm_id", lit(""))
+    .withColumn("location_id", lit(-1))
 
     val combinedDF = summaryDF.unionByName(gadmAgg)
     val resultsDF = combinedDF
@@ -70,6 +71,8 @@ object AFiAnalysis extends SummaryAnalysis {
       .drop("negligible_risk_area__ha")
 
     resultsDF
+      .withColumn("list_id", col("list_id").cast(IntegerType))
+      .withColumn("location_id", col("location_id").cast(IntegerType))
   }
 
   private def aggregateResults(group: RelationalGroupedDataset) = {
