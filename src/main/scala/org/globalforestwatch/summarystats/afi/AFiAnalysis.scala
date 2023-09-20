@@ -35,23 +35,17 @@ object AFiAnalysis extends SummaryAnalysis {
     }
 
     val summaryRDD: RDD[ValidatedLocation[AFiSummary]] = AFiRDD(validatedRDD, AFiGrid.blockTileGrid, kwargs)
-//    val dataRDD: RDD[ValidatedLocation[AFiData]] = ValidatedWorkflow(summaryRDD).mapValid { summaries =>
-//      summaries
-//        .mapValues {
-//          case summary: AFiSummary => summary.toAFiData()
-//        }
-//    }.unify
 
     // TODO somehow convert AFiSummary to AFiData
     import spark.implicits._
 
     val summaryDF = AFiAnalysis.aggregateResults(
         AFiDF
-        .getFeatureDataFrame(summaryRDD, spark)
-        .withColumn(
-          "gadm_id", when(col("location_id") =!= -1|| col("gadm_id").contains("null"), lit("") ).otherwise(col("gadm_id"))
-        )
-        .groupBy($"list_id", $"location_id", $"gadm_id")
+          .getFeatureDataFrame(summaryRDD, spark)
+          .withColumn(
+            "gadm_id", when(col("location_id") =!= -1|| col("gadm_id").contains("null"), lit("") ).otherwise(col("gadm_id"))
+          )
+          .groupBy($"list_id", $"location_id", $"gadm_id")
     )
 
     val gadmAgg = AFiAnalysis.aggregateResults(

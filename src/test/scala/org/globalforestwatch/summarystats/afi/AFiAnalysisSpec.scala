@@ -83,7 +83,7 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
     val afi = AFI(featureRDD)
     val res = afi.head(1)
 
-    res.head.get(6) shouldBe 3
+    res.head.get(6) shouldBe 2
   }
 
   it("gives results for geometries with tiles that don't intersect") {
