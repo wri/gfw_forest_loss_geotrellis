@@ -1,5 +1,5 @@
 package org.globalforestwatch.summarystats.afi
-import org.apache.spark.sql.functions.{col, lit, when, sum, max, concat_ws, collect_list}
+import org.apache.spark.sql.functions.{col, collect_list, concat_ws, lit, max, sum, when}
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.{NonEmptyList, Validated}
 import geotrellis.vector.{Feature, Geometry}
@@ -12,9 +12,8 @@ import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
 import org.globalforestwatch.util.RDDAdapter
 import org.globalforestwatch.ValidatedWorkflow
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, RelationalGroupedDataset, SparkSession}
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.sql.RelationalGroupedDataset
 
 object AFiAnalysis extends SummaryAnalysis {
 
@@ -25,7 +24,7 @@ object AFiAnalysis extends SummaryAnalysis {
     featureType: String,
     spark: SparkSession,
     kwargs: Map[String, Any]
-  ): Unit = {
+  ): DataFrame = {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
     // TODO invalid should map to job error somehow, probably using ValidatedWorkflow
@@ -70,8 +69,7 @@ object AFiAnalysis extends SummaryAnalysis {
       )
       .drop("negligible_risk_area__ha")
 
-    val runOutputUrl: String = getOutputUrl(kwargs)
-    AFiExport.export(featureType, resultsDF, runOutputUrl, kwargs)
+    resultsDF
   }
 
   private def aggregateResults(group: RelationalGroupedDataset) = {
