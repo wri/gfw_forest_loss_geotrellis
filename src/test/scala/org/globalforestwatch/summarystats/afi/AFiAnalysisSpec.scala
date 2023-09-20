@@ -69,8 +69,6 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
     //saveExpectedAFiResult(afiDF)
 
     val expectedDF = readExpectedAFiResult
-    afiDF.show()
-    expectedDF.show()
     assertSmallDataFrameEquality(afiDF.transform(sortColumns()), expectedDF.transform(sortColumns()), ignoreNullable = true)
   }
 
@@ -83,8 +81,9 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
       Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1), selfIntersectingPolygon))
     ))
     val afi = AFI(featureRDD)
-    val res = afi.collect()
-    res.head.get(2) shouldBe 3
+    val res = afi.head(1)
+
+    res.head.get(6) shouldBe 3
   }
 
   it("gives results for geometries with tiles that don't intersect") {
@@ -98,10 +97,10 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
       case _ => false
     }
     val afi = AFI(featureLoc32RDD)
-    val res = afi.collect()
+    val res = afi.head(1)
 
     // 3 is error code
-    res.head.get(2) shouldBe 3
+    res.head.get(6) shouldBe 3
   }
 
   it("reports no intersection geometries as invalid") {
@@ -113,9 +112,9 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
       Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1), smallGeom))
     ))
     val afi = AFI(featureRDD)
-    val res = afi.collect()
+    val res = afi.head(1)
 
     // 3 is error code
-    res.head.get(2) shouldBe 3
+    res.head.get(6) shouldBe 3
   }
 }
