@@ -197,12 +197,8 @@
       "source_uri":"s3://gfw-data-lake/gfw_managed_forests/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"inpe_amazon_prodes",
-      "source_uri":"s3://gfw-data-lake/inpe_amazon_prodes/v2021/raster/epsg-4326/{grid_size}/{row_count}/year/geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"inpe_cerrado_prodes",
-      "source_uri":"s3://gfw-data-lake/inpe_cerrado_prodes/v2021/raster/epsg-4326/{grid_size}/{row_count}/year/geotiff/{tile_id}.tif"
+      "name":"inpe_prodes",
+      "source_uri":"s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_mining_concessions",
@@ -275,6 +271,10 @@
     {
       "name":"umd_soy_planted_area",
       "source_uri": "s3://gfw-data-lake/umd_soy_planted_area/v2/raster/epsg-4326/{grid_size}/{row_count}/is__year_2021/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"inpe_prodes",
+      "source_uri": "s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"wwf_eco_regions",
