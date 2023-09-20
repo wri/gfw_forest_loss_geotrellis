@@ -46,11 +46,13 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
         "escape" -> "\u0000",
         "quoteMode" -> "NONE",
         "nullValue" -> "",
-        "emptyValue" -> null,
+        "emptyValue" -> "",
         "inferSchema" -> "true"
       ))
       .csv(palm32ExpectedOutputPath)
       .withColumn("status_code", col("status_code").cast(IntegerType))
+      .withColumn("gadm_id", lit(""))
+      .withColumn("location_error", lit(""))
   }
 
   it("matches recorded output for palm oil mills location 31") {
