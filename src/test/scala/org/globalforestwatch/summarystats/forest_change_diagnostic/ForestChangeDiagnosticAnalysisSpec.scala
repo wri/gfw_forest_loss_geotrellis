@@ -36,8 +36,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
 
   /** Function to update expected results when this test becomes invalid */
   def saveExpectedFcdResult(fcd: DataFrame): Unit = {
-    fcd
-      .repartition(1)
+    fcd.repartition(1)
       .write
       .mode(SaveMode.Overwrite)
       .options(ForestChangeDiagnosticExport.csvOptions)

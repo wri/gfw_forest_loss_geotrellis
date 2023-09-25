@@ -197,12 +197,8 @@
       "source_uri":"s3://gfw-data-lake/gfw_managed_forests/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"inpe_amazon_prodes",
-      "source_uri":"s3://gfw-data-lake/inpe_amazon_prodes/v2021/raster/epsg-4326/{grid_size}/{row_count}/year/geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"inpe_cerrado_prodes",
-      "source_uri":"s3://gfw-data-lake/inpe_cerrado_prodes/v2021/raster/epsg-4326/{grid_size}/{row_count}/year/geotiff/{tile_id}.tif"
+      "name":"inpe_prodes",
+      "source_uri":"s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_mining_concessions",
@@ -277,6 +273,10 @@
       "source_uri": "s3://gfw-data-lake/umd_soy_planted_area/v2/raster/epsg-4326/{grid_size}/{row_count}/is__year_2021/gdal-geotiff/{tile_id}.tif"
     },
     {
+      "name":"inpe_prodes",
+      "source_uri": "s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
+    },
+    {
       "name":"wwf_eco_regions",
       "source_uri": "s3://gfw-data-lake/wwf_eco_regions/v2012/raster/epsg-4326/{grid_size}/{row_count}/name/gdal-geotiff/{tile_id}.tif"
     },
@@ -295,6 +295,26 @@
     {
       "name": "arg_native_forest_land_plan",
       "source_uri": "s3://gfw-data-lake/arg_native_forest_land_plan/v202212/raster/epsg-4326/{grid_size}/{row_count}/category/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "gadm_adm0",
+      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm0/geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "gadm_adm1",
+      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "gadm_adm2",
+      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm2/geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "sbtn_natural_forests_map",
+      "source_uri": "s3://gfw-data-lake/sbtn_natural_forests_map/v202305/raster/epsg-4326/{grid_size}/{row_count}/class/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "gfwpro_negligible_risk_analysis",
+      "source_uri": "s3://gfw-data-lake/gfwpro_negligible_risk_analysis/v20230726/raster/epsg-4326/{grid_size}/{row_count}/risk/geotiff/{tile_id}.tif"
     }
   ]
 }
