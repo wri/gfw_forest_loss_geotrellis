@@ -25,7 +25,7 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
                                               seAsiaPresence: Boolean,
                                               idnPresence: Boolean,
                                               argPresence: Boolean,
-                                              wdpa: String,
+                                              protectedAreaByCategory: String,
                                               landmark: Boolean,
 ) {
 
@@ -158,8 +158,8 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
       .fill(totalArea, isPeatlands),
     arg_otbn_area = ForestChangeDiagnosticDataDoubleCategory
       .fill(argOTBN, totalArea),
-    wdpa_area = ForestChangeDiagnosticDataDoubleCategory
-      .fill(wdpa, totalArea),
+    protected_areas_by_category_area = ForestChangeDiagnosticDataDoubleCategory
+      .fill(protectedAreaByCategory, totalArea),
     landmark_area = ForestChangeDiagnosticDataDouble.fill(totalArea, landmark),
     brazil_biomes = ForestChangeDiagnosticDataDoubleCategory
       .fill(braBiomes, totalArea),

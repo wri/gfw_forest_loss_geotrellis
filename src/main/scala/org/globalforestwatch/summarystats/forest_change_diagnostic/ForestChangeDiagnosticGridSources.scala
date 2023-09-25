@@ -17,7 +17,6 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
   val isPrimaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
   val isPeatlands: Peatlands = Peatlands(gridTile, kwargs)
   val isIntactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
-  val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val seAsiaLandCover: SEAsiaLandCover = SEAsiaLandCover(gridTile, kwargs)
   val idnLandCover: IndonesiaLandCover = IndonesiaLandCover(gridTile, kwargs)
   val isSoyPlantedArea: SoyPlantedAreas = SoyPlantedAreas(gridTile, kwargs)
@@ -28,7 +27,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
   val isPlantation: PlantedForestsBool = PlantedForestsBool(gridTile, kwargs)
   val gfwProCoverage: GFWProCoverage = GFWProCoverage(gridTile, kwargs)
   val argOTBN: ArgOTBN = ArgOTBN(gridTile, kwargs)
-  val detailedProtectedAreas: DetailedProtectedAreas = DetailedProtectedAreas(gridTile, kwargs)
+  val protectedAreasByCategory: DetailedProtectedAreas = DetailedProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
 
 

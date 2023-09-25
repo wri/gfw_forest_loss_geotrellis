@@ -20,7 +20,6 @@ case class ForestChangeDiagnosticTile(
   lazy val isPeatlands = sources.isPeatlands.fetchWindow(windowKey, windowLayout)
   lazy val isIntactForestLandscapes2000 =
         sources.isIntactForestLandscapes2000.fetchWindow(windowKey, windowLayout)
-  lazy val wdpaProtectedAreas = sources.protectedAreas.fetchWindow(windowKey, windowLayout)
   lazy val seAsiaLandCover = sources.seAsiaLandCover.fetchWindow(windowKey, windowLayout)
   lazy val idnLandCover = sources.idnLandCover.fetchWindow(windowKey, windowLayout)
   lazy val isSoyPlantedArea = sources.isSoyPlantedArea.fetchWindow(windowKey, windowLayout)
@@ -32,7 +31,7 @@ case class ForestChangeDiagnosticTile(
   lazy val gfwProCoverage = sources.gfwProCoverage.fetchWindow(windowKey, windowLayout)
   lazy val argOTBN = sources.argOTBN.fetchWindow(windowKey, windowLayout)
 
-  lazy val detailedWdpaProtectedAreas = sources.detailedProtectedAreas.fetchWindow(windowKey, windowLayout)
+  lazy val protectedAreasByCategory = sources.protectedAreasByCategory.fetchWindow(windowKey, windowLayout)
   lazy val landmark = sources.landmark.fetchWindow(windowKey, windowLayout)
 
   def cellType: CellType = loss.cellType

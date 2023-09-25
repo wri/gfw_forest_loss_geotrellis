@@ -20,6 +20,6 @@ case class DetailedProtectedAreas(gridTile: GridTile, kwargs: Map[String, Any]) 
     case 11 => "Not Reported"
     case 12 => "Not Applicable"
     case 13 => "Not Assigned"
-    case _  => "Unknown"
+    case _  => ""
   }
 }

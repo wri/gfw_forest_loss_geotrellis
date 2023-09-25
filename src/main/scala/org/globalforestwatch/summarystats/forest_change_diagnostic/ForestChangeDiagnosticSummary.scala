@@ -75,7 +75,6 @@ object ForestChangeDiagnosticSummary {
         val isPeatlands: Boolean = raster.tile.isPeatlands.getData(col, row)
         val isIntactForestLandscapes2000: Boolean =
           raster.tile.isIntactForestLandscapes2000.getData(col, row)
-        val wdpa: String = raster.tile.wdpaProtectedAreas.getData(col, row)
         val prodesLossYear: Int = {
           val loss = raster.tile.prodesLossYear.getData(col, row)
           if (loss != null) {
@@ -102,7 +101,6 @@ object ForestChangeDiagnosticSummary {
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
         val isTreeCoverExtent90: Boolean = tcd2000 > 90
         val isUMDLoss: Boolean = isTreeCoverExtent30 && umdTreeCoverLossYear > 0
-        val isProtectedArea: Boolean = wdpa != ""
         val isProdesLoss: Boolean = prodesLossYear > 0
 
         val southAmericaPresence =
@@ -116,13 +114,16 @@ object ForestChangeDiagnosticSummary {
         val idnPresence = gfwProCoverage.getOrElse("Indonesia", false)
         val argPresence = gfwProCoverage.getOrElse("Argentina", false)
 
+        val protectedAreaCategory = raster.tile.protectedAreasByCategory.getData(col, row)
+        val isProtectedArea = (protectedAreaCategory != "")
+
         // Currently, only do the area intersection with the detailed WDPA categories
         // if location is in Argentina. Similarly, only do area intersection with
         // Landmark (indigenous territories) if in Argentina.
-        // With lazy tile loading, the WDPA and landmark tiles are only loaded if
+        // With lazy tile loading, the landmark tiles are only loaded if
         // argPresence is true.
         val detailedWdpa = if (argPresence)
-          raster.tile.detailedWdpaProtectedAreas.getData(col, row)
+          protectedAreaCategory
         else
           ""
         val landmark = if (argPresence)
