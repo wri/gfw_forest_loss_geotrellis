@@ -3,8 +3,10 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 import geotrellis.raster.{CellGrid, CellType}
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
 
-/** Tile-like structure to hold tiles from datasets required for our summary. We can not use GeoTrellis MultibandTile because it requires
-  * all bands share a CellType.
+/**
+  *
+  * Tile-like structure to hold tiles from datasets required for our summary.
+  * We can not use GeoTrellis MultibandTile because it requires all bands share a CellType.
   */
 case class ForestChangeDiagnosticTile(
   windowKey: SpatialKey,
@@ -24,8 +26,7 @@ case class ForestChangeDiagnosticTile(
   lazy val isSoyPlantedArea = sources.isSoyPlantedArea.fetchWindow(windowKey, windowLayout)
   lazy val idnForestArea = sources.idnForestArea.fetchWindow(windowKey, windowLayout)
   lazy val isIDNForestMoratorium = sources.isIDNForestMoratorium.fetchWindow(windowKey, windowLayout)
-  lazy val prodesAmazonLossYear = sources.prodesAmazonLossYear.fetchWindow(windowKey, windowLayout)
-  lazy val prodesCerradoLossYear = sources.prodesCerradoLossYear.fetchWindow(windowKey, windowLayout)
+  lazy val prodesLossYear = sources.prodesLossYear.fetchWindow(windowKey, windowLayout)
   lazy val braBiomes = sources.braBiomes.fetchWindow(windowKey, windowLayout)
   lazy val isPlantation = sources.isPlantation.fetchWindow(windowKey, windowLayout)
   lazy val gfwProCoverage = sources.gfwProCoverage.fetchWindow(windowKey, windowLayout)
