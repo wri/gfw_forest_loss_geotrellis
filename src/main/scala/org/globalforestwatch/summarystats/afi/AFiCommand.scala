@@ -9,13 +9,15 @@ import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features._
 import org.locationtech.jts.geom.Geometry
+import cats.data.Validated.Valid
+
 
 object AFiCommand extends SummaryCommand {
 
   val afiCommand: Opts[Unit] = Opts.subcommand(
     name = AFiAnalysis.name,
     help = "Compute summary statistics for GFW Pro Dashboard."
-  ) {
+  ) (
     (
       defaultOptions,
       featureFilterOptions,
@@ -30,14 +32,18 @@ object AFiCommand extends SummaryCommand {
 
       runAnalysis { implicit spark =>
         val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures)
+        val filteredFeatureRDD = featureRDD.filter{
+          case Valid((GfwProFeatureId(_, locationId), _)) => locationId != -2
+          case _ => true
+        }
 
         AFiAnalysis(
-          featureRDD,
+          filteredFeatureRDD,
           default.featureType,
           spark,
           kwargs
         )
       }
     }
-  }
+  )
 }
