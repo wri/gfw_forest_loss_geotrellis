@@ -15,7 +15,7 @@ object IntegratedAlertsCommand extends SummaryCommand {
 
   val integratedAlertsCommand: Opts[Unit] = Opts.subcommand(
     name = IntegratedAlertsAnalysis.name,
-    help = "Compute GLAD summary statistics for GFW dashboards."
+    help = "Compute Integrated Alerts summary statistics for GFW dashboards."
   ) {
     (
       defaultOptions,

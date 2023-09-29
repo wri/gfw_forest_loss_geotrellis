@@ -9,6 +9,7 @@ import org.globalforestwatch.summarystats.gfwpro_dashboard.GfwProDashboardComman
 import org.globalforestwatch.summarystats.gladalerts.GladAlertsCommand.gladAlertsCommand
 import org.globalforestwatch.summarystats.treecoverloss.TreeCoverLossCommand.treeCoverLossCommand
 import org.globalforestwatch.summarystats.integrated_alerts.IntegratedAlertsCommand.integratedAlertsCommand
+import org.globalforestwatch.summarystats.afi.AFiCommand.afiCommand
 import com.monovore.decline._
 import org.globalforestwatch.config.GfwConfig
 
@@ -25,7 +26,8 @@ object SummaryMain {
       gfwProDashboardCommand orElse
       gladAlertsCommand orElse
       treeCoverLossCommand orElse
-      integratedAlertsCommand
+      integratedAlertsCommand orElse
+      afiCommand
   }
   val command = Command(name, header, true)(main)
 
