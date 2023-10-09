@@ -2,7 +2,6 @@ package org.globalforestwatch.summarystats.treecoverloss
 
 import geotrellis.raster.{CellGrid, CellType}
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
-import org.globalforestwatch.layers._
 
 /**
   *
@@ -13,25 +12,6 @@ case class TreeLossTile(
                          windowKey: SpatialKey,
                          windowLayout: LayoutDefinition,
                          sources: TreeLossGridSources,
-
-//                        loss: TreeCoverLoss#ITile,
-//                        gain: TreeCoverGain#OptionalITile,
-//                        tcd2000: TreeCoverDensityPercent2000#ITile,
-//                        tcd2010: TreeCoverDensityPercent2010#ITile,
-//                        biomass: BiomassPerHectar#OptionalDTile,
-//                        agc2000: Agc2000#OptionalFTile,
-//                        bgc2000: Bgc2000#OptionalFTile,
-//                        soilCarbon2000: SoilCarbon2000#OptionalFTile,
-//                        primaryForest: PrimaryForest#OptionalITile,
-//                        plantedForestsBool: PlantedForestsBool#OptionalITile,
-//                        plantationsPre2000: PlantationsPre2000#OptionalITile,
-//                        mangroveBiomassExtent: MangroveBiomassExtent#OptionalITile,
-//                        grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2#OptionalFTile,
-//                        grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2#OptionalFTile,
-//                        netFluxCo2: NetFluxCo2e#OptionalFTile,
-//                        grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2e#OptionalFTile,
-//                        grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2e#OptionalFTile,
-//                        fluxModelExtent: FluxModelExtent#OptionalITile)
                        )
   extends CellGrid[Int] {
 

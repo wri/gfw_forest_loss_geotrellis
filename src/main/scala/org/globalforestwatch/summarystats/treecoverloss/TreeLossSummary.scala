@@ -46,21 +46,29 @@ object TreeLossSummary {
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
-
-        // Optionally calculate stocks in carbon pools in 2000
-        val carbonPools: Boolean =
-          getAnyMapValue[Boolean](kwargs, "carbonPools")
-
-        val agc2000: Float = raster.tile.agc2000.getData(col, row)
-        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
-        val soilCarbon2000: Float = raster.tile.soilCarbon2000.getData(col, row)
-
         val grossCumulAbovegroundRemovalsCo2: Float = raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
         val grossCumulBelowgroundRemovalsCo2: Float = raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
         val grossEmissionsCo2eNonCo2: Float = raster.tile.grossEmissionsCo2eNonCo2.getData(col, row)
         val grossEmissionsCo2eCo2Only: Float =  raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
         val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
+
+
+        // Optionally calculate stocks in carbon pools in 2000
+        val agc2000: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+          raster.tile.agc2000.getData(col, row)
+        else
+          None
+
+        val bgc2000: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+          raster.tile.bgc2000.getData(col, row)
+        else
+          None
+
+        val soilCarbon2000: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+          raster.tile.soilCarbon2000.getData(col, row)
+        else
+          None
 
         val contextualLayers: List[String] =
           getAnyMapValue[NonEmptyList[String]](kwargs, "contextualLayers").toList
@@ -77,8 +85,7 @@ object TreeLossSummary {
           else false
         }
 
-        val plantationsPre2000: Boolean =
-          raster.tile.plantationsPre2000.getData(col, row)
+        val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
@@ -87,10 +94,27 @@ object TreeLossSummary {
         val areaHa = area / 10000.0
 
         val gainArea: Double = gain * areaHa
+
         val biomassPixel = biomass * areaHa
-        val agc2000Pixel = agc2000 * areaHa
-        val bgc2000Pixel = bgc2000 * areaHa
-        val soilCarbon2000Pixel = soilCarbon2000 * areaHa
+
+        val agc2000Pixel: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+          agc2000 * areaHa
+        else
+          None
+
+        val bgc2000Pixel: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+          bgc2000 * areaHa
+        else
+          None
+
+        val soilCarbon2000Pixel: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+          soilCarbon2000 * areaHa
+        else
+          None
+
+//        val agc2000Pixel = agc2000 * areaHa
+//        val bgc2000Pixel = bgc2000 * areaHa
+//        val soilCarbon2000Pixel = soilCarbon2000 * areaHa
 
         val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
         val grossCumulBelowgroundRemovalsCo2Pixel = grossCumulBelowgroundRemovalsCo2 * areaHa
@@ -156,7 +180,7 @@ object TreeLossSummary {
               }
               summary.totalBiomass += biomassPixel
 
-              if (carbonPools) {
+              if (getAnyMapValue[Boolean](kwargs, "carbonPools")) {
                 summary.totalAgc2000 += agc2000Pixel
                 summary.totalBgc2000 += bgc2000Pixel
                 summary.totalSoilCarbon2000 += soilCarbon2000Pixel
