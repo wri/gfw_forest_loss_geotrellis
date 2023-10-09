@@ -5,5 +5,6 @@ case class TreeLossDataGroup(
                               tcdYear: Int,
                               isPrimaryForest: Boolean,
                               isPlantations: Boolean,
+                              isGlobalPeat: Boolean,
                               isGain: Boolean
                         )

@@ -43,7 +43,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
   val intactForestLandscapes: IntactForestLandscapes = IntactForestLandscapes(gridTile, kwargs)
   val plantationsTypeFluxModel: PlantationsTypeFluxModel = PlantationsTypeFluxModel(gridTile, kwargs)
   val intactPrimaryForest: IntactPrimaryForest = IntactPrimaryForest(gridTile, kwargs)
-  val peatlandsExtentFluxModel: PeatlandsExtentFluxModel = PeatlandsExtentFluxModel(gridTile, kwargs)
+  val peatlands: Peatlands = Peatlands(gridTile, kwargs)
   val forestAgeCategory: ForestAgeCategory = ForestAgeCategory(gridTile, model, kwargs)
   val jplTropicsAbovegroundBiomassExtent2000: JplTropicsAbovegroundBiomassExtent2000 =
     JplTropicsAbovegroundBiomassExtent2000(gridTile, kwargs)
@@ -114,8 +114,8 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
         plantationsTypeFluxModel.fetchWindow(windowKey, windowLayout)
       val intactPrimaryForestTile =
         intactPrimaryForest.fetchWindow(windowKey, windowLayout)
-      val peatlandsExtentFluxTile =
-        peatlandsExtentFluxModel.fetchWindow(windowKey, windowLayout)
+      val peatlandsTile =
+        peatlands.fetchWindow(windowKey, windowLayout)
       val forestAgeCategoryTile =
         forestAgeCategory.fetchWindow(windowKey, windowLayout)
       val jplTropicsAbovegroundBiomassExtent2000Tile =
@@ -162,7 +162,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
         intactForestLandscapesTile,
         plantationsTypeFluxTile,
         intactPrimaryForestTile,
-        peatlandsExtentFluxTile,
+        peatlandsTile,
         forestAgeCategoryTile,
         jplTropicsAbovegroundBiomassExtent2000Tile,
         fiaRegionsUsExtentTile,

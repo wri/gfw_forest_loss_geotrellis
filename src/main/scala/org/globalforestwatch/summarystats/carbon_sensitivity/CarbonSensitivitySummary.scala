@@ -68,7 +68,7 @@ object CarbonSensitivitySummary {
         val intactForestLandscapes: String = raster.tile.intactForestLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
         val intactPrimaryForest: Boolean = raster.tile.intactPrimaryForest.getData(col, row)
-        val peatlandsExtentFluxModel: Boolean = raster.tile.peatlandsExtentFluxModel.getData(col, row)
+        val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
         val forestAgeCategory: String = raster.tile.forestAgeCategory.getData(col, row)
         val jplTropicsAbovegroundBiomassExtent2000: Boolean = raster.tile.jplTropicsAbovegroundBiomassExtent2000.getData(col, row)
         val fiaRegionsUsExtent: String = raster.tile.fiaRegionsUsExtent.getData(col, row)
@@ -140,7 +140,7 @@ object CarbonSensitivitySummary {
               intactForestLandscapes,
               plantationsTypeFluxModel,
               intactPrimaryForest,
-              peatlandsExtentFluxModel,
+              peatlands,
               forestAgeCategory,
               jplTropicsAbovegroundBiomassExtent2000,
               fiaRegionsUsExtent,

@@ -192,38 +192,38 @@ Alternatively, use the `--split_features` opton.
 
 The following options are supported:
 
-|Option           |Type  |Analysis or Feature Type |Description                                                                                                                      |
-|-----------------|------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-|features         |string|all (required)           |URI of features in TSV format                                                                                                    |
-|output           |string|all (required)           |URI of output dir for CSV files                                                                                                  |
-|feature_type     |string|all (required)           |Feature type: one of 'gadm', 'wdpa', 'geostore', 'feature', or 'gfwpro'                                                          |
-|limit            |int   |all                      |Limit number of records processed                                                                                                |
-|iso_first        |string|`gadm` or `wdpa` features|Filter by first letter of ISO code                                                                                               |
-|iso_start        |string|`gadm` or `wdpa` features|Filter by ISO code larger than or equal to given value                                                                           |
-|iso_end          |string|`gadm` or `wdpa` features|Filter by ISO code smaller than given value                                                                                      |
-|iso              |string|`gadm` or `wdpa` features|Filter by country ISO code                                                                                                       |
-|admin1           |string|`gadm` features          |Filter by country Admin1 code                                                                                                    |
-|admin2           |string|`gadm` features          |Filter by country Admin2 code                                                                                                    |
-|id_start         |int   |`feature` analysis       |Filter by IDs greater than or equal to given value                                                                               |
-|id_end           |int   |`feature` analysis       |Filter by IDs less than or equal to given value                                                                                  |
-|wdpa_status      |string|`wdpa` features          |Filter by WDPA Status                                                                                                            |
-|iucn_cat         |string|`wdpa` features          |Filter by IUCS Category                                                                                                          |
-|tcd              |int   |`treecoverloss` analysis |Select tree cover density year                                                                                                   |
-|threshold        |int   |`treecoverloss` analysis |Treecover threshold to apply (multiple)                                                                                          |
-|contextual_layer |string|`treecoverloss` analysis |Include (multiple) selected contextual layers: `is__umd_regional_primary_forest_2001`, `is__gfw_plantations`                     |
-|carbon_pools     |flag  |`treecoverloss` analysis |Optionally calculate stock sums for multiple carbon pools in 2000 (aboveground, belowground, soil)                                    |
-|tcl              |flag  |all                      |Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class                                     |
-|glad             |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class                                   |
-|change_only      |flag  |all except `treecover`   |Process change only                                                                                                              |
-|sensitivity_type |string|`carbon_sensitivity`     |Select carbon sensitivity model                                                                                                  |
-|fire_alert_type  |string|`firealerts` |Select Fire alert type                                                                                                                       |
-|fire_alert_source|string|`firealerts` |URI of fire alert TSV file                                                                                                                   |
-|overwrite        |flag  |all                      |Overwrite output location if already existing                                                                                    |
-|split_features   |flag  |all                      |Split input features along 1x1 degree grid                                                                                       |
-|no_output_path_suffix|flag |all                   |Do not autogenerate output path suffix at runtime                                                                                |
-|intermediate_list_source|flag |`forest_change_diagnostic` analysis |URI of intermediate list results in TSV format                                                                  |
-|contextual_feature_type|flag |`gfwpro_dashboard` analysis |type of contextual feature                                                                                               |
-|contextual_feature_url|flag |`gfwpro_dashboard` analysis |URI of contextual feature in TSV format                                                                                   |
+|Option           |Type  |Analysis or Feature Type | Description                                                                                                    |
+|-----------------|------|-------------------------|----------------------------------------------------------------------------------------------------------------|
+|features         |string|all (required)           | URI of features in TSV format                                                                                  |
+|output           |string|all (required)           | URI of output dir for CSV files                                                                                |
+|feature_type     |string|all (required)           | Feature type: one of 'gadm', 'wdpa', 'geostore', 'feature', or 'gfwpro'                                        |
+|limit            |int   |all                      | Limit number of records processed                                                                              |
+|iso_first        |string|`gadm` or `wdpa` features| Filter by first letter of ISO code                                                                             |
+|iso_start        |string|`gadm` or `wdpa` features| Filter by ISO code larger than or equal to given value                                                         |
+|iso_end          |string|`gadm` or `wdpa` features| Filter by ISO code smaller than given value                                                                    |
+|iso              |string|`gadm` or `wdpa` features| Filter by country ISO code                                                                                     |
+|admin1           |string|`gadm` features          | Filter by country Admin1 code                                                                                  |
+|admin2           |string|`gadm` features          | Filter by country Admin2 code                                                                                  |
+|id_start         |int   |`feature` analysis       | Filter by IDs greater than or equal to given value                                                             |
+|id_end           |int   |`feature` analysis       | Filter by IDs less than or equal to given value                                                                |
+|wdpa_status      |string|`wdpa` features          | Filter by WDPA Status                                                                                          |
+|iucn_cat         |string|`wdpa` features          | Filter by IUCS Category                                                                                        |
+|tcd              |int   |`treecoverloss` analysis | Select tree cover density year                                                                                 |
+|threshold        |int   |`treecoverloss` analysis | Treecover threshold to apply (multiple)                                                                        |
+|contextual_layer |string|`treecoverloss` analysis | Include (multiple) selected contextual layers: `is__umd_regional_primary_forest_2001`, `is__gfw_plantations`, `is__global_peat`, `tsc_drivers__class` |
+|carbon_pools     |flag  |`treecoverloss` analysis | Optionally calculate stock sums for multiple carbon pools in 2000 (aboveground, belowground, soil)             |
+|tcl              |flag  |all                      | Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class                   |
+|glad             |flag  |all                      | Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class                 |
+|change_only      |flag  |all except `treecover`   | Process change only                                                                                            |
+|sensitivity_type |string|`carbon_sensitivity`     | Select carbon sensitivity model                                                                                |
+|fire_alert_type  |string|`firealerts` | Select Fire alert type                                                                                         |
+|fire_alert_source|string|`firealerts` | URI of fire alert TSV file                                                                                     |
+|overwrite        |flag  |all                      | Overwrite output location if already existing                                                                  |
+|split_features   |flag  |all                      | Split input features along 1x1 degree grid                                                                     |
+|no_output_path_suffix|flag |all                   | Do not autogenerate output path suffix at runtime                                                              |
+|intermediate_list_source|flag |`forest_change_diagnostic` analysis | URI of intermediate list results in TSV format                                                                 |
+|contextual_feature_type|flag |`gfwpro_dashboard` analysis | type of contextual feature                                                                                     |
+|contextual_feature_url|flag |`gfwpro_dashboard` analysis | URI of contextual feature in TSV format                                                                        |
 
 
 ## Inventory

@@ -32,7 +32,7 @@ case class CarbonSensitivityTile(
                                   intactForestLandscapes: IntactForestLandscapes#OptionalITile,
                                   plantationsTypeFluxModel: PlantationsTypeFluxModel#OptionalITile,
                                   intactPrimaryForest: IntactPrimaryForest#OptionalITile,
-                                  peatlandsExtentFluxModel: PeatlandsExtentFluxModel#OptionalITile,
+                                  peatlands: Peatlands#OptionalITile,
                                   forestAgeCategory: ForestAgeCategory#OptionalITile,
                                   jplTropicsAbovegroundBiomassExtent2000: JplTropicsAbovegroundBiomassExtent2000#OptionalITile,
                                   fiaRegionsUsExtent: FiaRegionsUsExtent#OptionalITile,

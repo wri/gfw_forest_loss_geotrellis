@@ -16,7 +16,7 @@ case class CarbonSensitivityDataGroup(
                                       intactForestLandscapes: String,
                                       plantationsTypeFluxModel: String,
                                       intactPrimaryForest: Boolean,
-                                      peatlandsExtentFluxModel: Boolean,
+                                      peatlands: Boolean,
                                       forestAgeCategory: String,
                                       jplTropicsAbovegroundBiomassExtent2000: Boolean,
                                       fiaRegionsUsExtent: String,

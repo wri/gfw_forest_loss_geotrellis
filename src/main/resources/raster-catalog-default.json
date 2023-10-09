@@ -118,7 +118,7 @@
     },
     {
       "name":"gfw_peatlands",
-      "source_uri":"s3://gfw-data-lake/gfw_peatlands/v20230302/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_peatlands/v20230315/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_deadwood_carbon",
@@ -191,10 +191,6 @@
     {
       "name":"gfw_mining_concessions",
       "source_uri":"s3://gfw-data-lake/gfw_mining_concessions/v202203/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"gfw_peatlands",
-      "source_uri":"s3://gfw-data-lake/gfw_peatlands/v20200807/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
       "name":"gmw_global_mangrove_extent_2016",

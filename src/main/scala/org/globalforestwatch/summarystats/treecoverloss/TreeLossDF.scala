@@ -43,6 +43,7 @@ object TreeLossDF {
       $"data_group.tcdYear" as "umd_tree_cover_extent__year",
       $"data_group.isPrimaryForest" as "is__umd_regional_primary_forest_2001",
       $"data_group.isPlantations" as "is__gfw_plantations",
+      $"data_group.isGlobalPeat" as "is__gfw_global_peat",
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
@@ -79,6 +80,7 @@ object TreeLossDF {
   def contextualLayerFilter(
                              includePrimaryForest: Boolean,
                              includePlantations: Boolean,
+                             includeGlobalPeat: Boolean,
                              carbonPools: Boolean
                            )(df: DataFrame): DataFrame = {
 
@@ -151,8 +153,13 @@ object TreeLossDF {
       else List()
     }
 
+    val ptGroupByCol = {
+      if (includeGlobalPeat) List($"is__gfw_global_peat")
+      else List()
+    }
 
-    df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol: _*)
+
+    df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol ::: ptGroupByCol : _*)
       .agg(
         cols.head,
         cols.tail ::: carbonPoolCols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: totalGrossEmissionsCo2eAllGasesCols: _*

@@ -15,7 +15,7 @@ case class CarbonFluxDataGroup(
                                intactForestLandscapes: String,
                                plantationsTypeFluxModel: String,
                                intactPrimaryForest: Boolean,
-                               peatlandsExtentFluxModel: Boolean,
+                               peatlands: Boolean,
                                forestAgeCategory: String,
                                jplTropicsAbovegroundBiomassExtent2000: Boolean,
                                fiaRegionsUsExtent: String,

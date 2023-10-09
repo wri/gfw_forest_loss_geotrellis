@@ -21,7 +21,7 @@ object TreeCoverLossCommand extends SummaryCommand {
   val contextualLayersOpts: Opts[NonEmptyList[String]] = Opts
     .options[String](
       "contextual_layer",
-      "Contextual Layer to include (currently supported: is__umd_regional_primary_forest_2001, is__gfw_plantations"
+      "Contextual layers to filter by (currently supported: is__umd_regional_primary_forest_2001, is__gfw_plantations, is__global_peat, tcl_drivers__class"
     )
     .withDefault(NonEmptyList.of(""))
 

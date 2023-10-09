@@ -23,16 +23,19 @@ case class TreeLossTile(
     lazy val agc2000 = sources.agc2000.fetchWindow(windowKey, windowLayout)
     lazy val bgc2000 = sources.bgc2000.fetchWindow(windowKey, windowLayout)
     lazy val soilCarbon2000 = sources.soilCarbon2000.fetchWindow(windowKey, windowLayout)
-    lazy val primaryForest = sources.primaryForest.fetchWindow(windowKey, windowLayout)
-    lazy val plantedForestsBool = sources.plantedForestsBool.fetchWindow(windowKey, windowLayout)
-    lazy val plantationsPre2000 = sources.plantationsPre2000.fetchWindow(windowKey, windowLayout)
-    lazy val mangroveBiomassExtent = sources.mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)
     lazy val grossCumulAbovegroundRemovalsCo2 = sources.grossCumulAbovegroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
     lazy val grossCumulBelowgroundRemovalsCo2 = sources.grossCumulBelowgroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
     lazy val netFluxCo2 = sources.netFluxCo2e.fetchWindow(windowKey, windowLayout)
     lazy val grossEmissionsCo2eNonCo2 = sources.grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
     lazy val grossEmissionsCo2eCo2Only = sources.grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
     lazy val fluxModelExtent = sources.fluxModelExtent.fetchWindow(windowKey, windowLayout)
+
+    lazy val primaryForest = sources.primaryForest.fetchWindow(windowKey, windowLayout)
+    lazy val plantedForestsBool = sources.plantedForestsBool.fetchWindow(windowKey, windowLayout)
+    lazy val globalPeat = sources.globalPeat.fetchWindow(windowKey, windowLayout)
+
+    lazy val plantationsPre2000 = sources.plantationsPre2000.fetchWindow(windowKey, windowLayout)
+    lazy val mangroveBiomassExtent = sources.mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)
 
     def cellType: CellType = loss.cellType
 
