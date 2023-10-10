@@ -95,6 +95,12 @@ object TreeLossSummary {
           else false
         }
 
+        val tclDriverClass: String = {
+          if (contextualLayers contains "tcl_driver__class")
+            raster.tile.tclDriverClass.getData(col, row)
+          else ""
+        }
+
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
@@ -156,6 +162,7 @@ object TreeLossSummary {
                 isPrimaryForest,
                 isPlantations,
                 isGlobalPeat,
+                tclDriverClass,
                 gain
               )
 
@@ -163,7 +170,8 @@ object TreeLossSummary {
               stats.getOrElse(
                 key = pKey,
                 default =
-                  TreeLossData(TreeLossYearDataMap.empty, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                  TreeLossData(TreeLossYearDataMap.empty,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
