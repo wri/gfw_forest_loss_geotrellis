@@ -62,17 +62,17 @@ object TreeLossSummary {
         val agc2000: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
           raster.tile.agc2000.getData(col, row)
         else
-          None
+          0.0
 
         val bgc2000: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
           raster.tile.bgc2000.getData(col, row)
         else
-          None
+          0.0
 
         val soilCarbon2000: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
           raster.tile.soilCarbon2000.getData(col, row)
         else
-          None
+          0.0
 
         val contextualLayers: List[String] =
           getAnyMapValue[NonEmptyList[String]](kwargs, "contextualLayers").toList
@@ -120,17 +120,17 @@ object TreeLossSummary {
         val agc2000Pixel: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
           agc2000 * areaHa
         else
-          None
+          0.0
 
         val bgc2000Pixel: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
           bgc2000 * areaHa
         else
-          None
+          0.0
 
         val soilCarbon2000Pixel: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
           soilCarbon2000 * areaHa
         else
-          None
+          0.0
 
         val grossCumulAbovegroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2 * areaHa
         val grossCumulBelowgroundRemovalsCo2Pixel = grossCumulBelowgroundRemovalsCo2 * areaHa

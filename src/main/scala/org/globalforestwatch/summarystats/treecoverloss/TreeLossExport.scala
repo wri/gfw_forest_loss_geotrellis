@@ -29,6 +29,9 @@ object TreeLossExport extends SummaryExport {
     val carbonPools: Boolean =
       getAnyMapValue[Boolean](kwargs, "carbonPools")
 
+    val simpleAGBEmis: Boolean =
+      getAnyMapValue[Boolean](kwargs, "simpleAGBEmis")
+
 
     summaryDF
       .transform(TreeLossDF.unpackValues(carbonPools))
