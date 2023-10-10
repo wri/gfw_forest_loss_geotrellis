@@ -34,7 +34,7 @@ object TreeLossExport extends SummaryExport {
       .transform(TreeLossDF.unpackValues(carbonPools))
       .transform(TreeLossDF.contextualLayerFilter(includePrimaryForest, includePlantations,
         includeGlobalPeat, includeTclDriverClass,
-        carbonPools))
+        carbonPools, simpleAGBEmis))
       .coalesce(1)
       .orderBy($"feature__id", $"umd_tree_cover_density__threshold")
       .write

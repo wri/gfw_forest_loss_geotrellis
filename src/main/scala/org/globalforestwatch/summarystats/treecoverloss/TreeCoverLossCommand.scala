@@ -32,8 +32,15 @@ object TreeCoverLossCommand extends SummaryCommand {
     )
     .orFalse
 
+  val simpleAGBEmisOpts: Opts[Boolean] = Opts
+    .flag(
+      "simple_agb_emissions",
+      "Calculate emissions from tree cover loss in AGB (simple emissions model) following Zarin et al. 2016"
+    )
+    .orFalse
+
   val treeCoverLossOptions: Opts[(NonEmptyList[String], Int, Product with Serializable, Boolean)] =
-    (contextualLayersOpts, tcdOpt, thresholdOpts, carbonPoolOpts).tupled
+    (contextualLayersOpts, tcdOpt, thresholdOpts, carbonPoolOpts, simpleAGBEmisOpts).tupled
 
   val treeCoverLossCommand: Opts[Unit] = Opts.subcommand(
     name = TreeLossAnalysis.name,
@@ -51,6 +58,7 @@ object TreeCoverLossCommand extends SummaryCommand {
         "tcdYear" -> treeCoverLoss._2,
         "thresholdFilter" -> treeCoverLoss._3,
         "carbonPools" -> treeCoverLoss._4,
+        "simpleAGBEmis" -> treeCoverLoss._5,
         "config" -> GfwConfig.get
       )
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

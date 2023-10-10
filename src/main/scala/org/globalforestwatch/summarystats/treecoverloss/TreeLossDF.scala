@@ -83,7 +83,8 @@ object TreeLossDF {
                              includePlantations: Boolean,
                              includeGlobalPeat: Boolean,
                              includeTclDriverClass: Boolean,
-                             carbonPools: Boolean
+                             carbonPools: Boolean,
+                             simpleAGBEmis: Boolean
                            )(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
