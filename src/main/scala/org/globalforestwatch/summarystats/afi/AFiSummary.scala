@@ -56,7 +56,7 @@ object AFiSummary {
         val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0))
         summaryData.total_area__ha += areaHa
 
-        if (negligibleRisk == "NO") {
+        if (negligibleRisk == "YES") {
           summaryData.negligible_risk_area__ha += areaHa
         }
 
