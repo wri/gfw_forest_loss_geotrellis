@@ -64,7 +64,7 @@ object AFiSummary {
           summaryData.natural_forest__extent += areaHa
         }
 
-        if (lossYear >= 2021 && naturalForestCategory == "Natural Forest") {
+        if (lossYear == 2021 && naturalForestCategory == "Natural Forest") {
           summaryData.natural_forest_loss__ha += areaHa
         }
 
