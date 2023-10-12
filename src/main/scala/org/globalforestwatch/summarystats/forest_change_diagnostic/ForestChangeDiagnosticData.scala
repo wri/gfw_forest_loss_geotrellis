@@ -50,7 +50,7 @@ case class ForestChangeDiagnosticData(
   /** Detailed WDPA category area */
   protected_areas_by_category_area: ForestChangeDiagnosticDataDoubleCategory,
   /** Indigenous area (from Landmark dataset) */
-  landmark_area: ForestChangeDiagnosticDataDouble,
+  landmark_by_category_area: ForestChangeDiagnosticDataDoubleCategory,
   brazil_biomes: ForestChangeDiagnosticDataDoubleCategory,
   /** IDN Forest Area */
   idn_legal_area: ForestChangeDiagnosticDataDoubleCategory,
@@ -140,7 +140,7 @@ case class ForestChangeDiagnosticData(
       peat_area.merge(other.peat_area),
       arg_otbn_area.merge(other.arg_otbn_area),
       protected_areas_by_category_area.merge(other.protected_areas_by_category_area),
-      landmark_area.merge(other.landmark_area),
+      landmark_by_category_area.merge(other.landmark_by_category_area),
       brazil_biomes.merge(other.brazil_biomes),
       idn_legal_area.merge(other.idn_legal_area),
       sea_landcover_area.merge(other.sea_landcover_area),
@@ -313,7 +313,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
-      ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,

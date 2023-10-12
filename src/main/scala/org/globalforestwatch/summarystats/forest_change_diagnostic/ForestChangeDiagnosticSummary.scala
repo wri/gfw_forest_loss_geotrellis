@@ -126,10 +126,13 @@ object ForestChangeDiagnosticSummary {
           protectedAreaCategory
         else
           ""
-        val landmark = if (argPresence)
-          raster.tile.landmark.getData(col, row)
+        // We will likely have different Landmark categories for other countries, but
+        // there is no distinction currently for Argentina, so we put all of the
+        // indigenous area into the "Not Reported" category.
+        val landmarkCategory = if (argPresence)
+          (if (raster.tile.landmark.getData(col, row)) "Not Reported" else "")
         else
-          false
+          ""
 
         val groupKey = ForestChangeDiagnosticRawDataGroup(
           umdTreeCoverLossYear,
@@ -158,7 +161,7 @@ object ForestChangeDiagnosticSummary {
           idnPresence,
           argPresence,
           detailedWdpa,
-          landmark,
+          landmarkCategory,
         )
 
         val summaryData: ForestChangeDiagnosticRawData =
