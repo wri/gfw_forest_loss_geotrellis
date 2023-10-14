@@ -53,11 +53,6 @@ object TreeLossSummary {
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
         val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
 
-
-//        val agc2000: Float = raster.tile.agc2000.getData(col, row)
-//        val bgc2000: Float = raster.tile.bgc2000.getData(col, row)
-//        val soilCarbon2000: Float = raster.tile.soilCarbon2000.getData(col, row)
-
         // Optionally calculate stocks in carbon pools in 2000
         val agc2000: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
           raster.tile.agc2000.getData(col, row)
@@ -112,10 +107,6 @@ object TreeLossSummary {
         val gainArea: Double = gain * areaHa
 
         val biomassPixel = biomass * areaHa
-
-//        val agc2000Pixel = agc2000 * areaHa
-//        val bgc2000Pixel = bgc2000 * areaHa
-//        val soilCarbon2000Pixel = soilCarbon2000 * areaHa
 
         val agc2000Pixel: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
           agc2000 * areaHa

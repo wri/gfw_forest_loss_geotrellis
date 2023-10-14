@@ -10,7 +10,7 @@ object TreeLossDF {
   val treecoverLossMinYear = 2001
   val treecoverLossMaxYear = 2022
 
-  def unpackValues(carbonPools: Boolean)(df: DataFrame): DataFrame = {
+  def unpackValues(carbonPools: Boolean, simpleAGBEmis: Boolean)(df: DataFrame): DataFrame = {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
@@ -94,10 +94,13 @@ object TreeLossDF {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         sum(s"umd_tree_cover_loss_${i}__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
-    val abovegroundBiomassLossCols =
+    val abovegroundBiomassLossCols = if (simpleAGBEmis) {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         sum(s"whrc_aboveground_biomass_loss_${i}__Mg") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
+      } else {
+        List()
+      }
 
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {

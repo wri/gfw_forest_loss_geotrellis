@@ -11,5 +11,5 @@ case class FluxModelExtent(gridTile: GridTile, model: String = "standard", kwarg
   //      val model_suffix = if (model == "standard") "" else s"__$model"
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
-      s"s3://gfw-files/flux_1_2_3/model_extent/$model_suffix/${gridTile.tileId}.tif"
+      s"s3://gfw-files/flux_1_2_2/model_extent/$model_suffix/${gridTile.tileId}.tif"
 }

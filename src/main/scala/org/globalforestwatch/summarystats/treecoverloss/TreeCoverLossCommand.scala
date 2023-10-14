@@ -39,7 +39,7 @@ object TreeCoverLossCommand extends SummaryCommand {
     )
     .orFalse
 
-  val treeCoverLossOptions: Opts[(NonEmptyList[String], Int, Product with Serializable, Boolean, Boolean)] = // New types must be updated with the line below
+  val treeCoverLossOptions: Opts[(NonEmptyList[String], Int, Product with Serializable, Boolean, Boolean)] = // If new options are added below, the corresponding types must be added here
     (contextualLayersOpts, tcdOpt, thresholdOpts, carbonPoolOpts, simpleAGBEmisOpts).tupled
 
   val treeCoverLossCommand: Opts[Unit] = Opts.subcommand(
