@@ -32,12 +32,15 @@ object TreeLossExport extends SummaryExport {
     val simpleAGBEmis: Boolean =
       getAnyMapValue[Boolean](kwargs, "simpleAGBEmis")
 
+    val emisGasAnnual: Boolean =
+      getAnyMapValue[Boolean](kwargs, "emisGasAnnual")
+
 
     summaryDF
-      .transform(TreeLossDF.unpackValues(carbonPools, simpleAGBEmis))
+      .transform(TreeLossDF.unpackValues(carbonPools, simpleAGBEmis, emisGasAnnual))
       .transform(TreeLossDF.contextualLayerFilter(
         includePrimaryForest, includePlantations, includeGlobalPeat, includeTclDriverClass,
-        carbonPools, simpleAGBEmis))
+        carbonPools, simpleAGBEmis, emisGasAnnual))
       .coalesce(1)
       .orderBy($"feature__id", $"umd_tree_cover_density__threshold")
       .write
