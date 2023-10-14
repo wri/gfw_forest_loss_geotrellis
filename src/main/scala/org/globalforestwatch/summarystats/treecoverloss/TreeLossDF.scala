@@ -43,7 +43,7 @@ object TreeLossDF {
       $"data_group.tcdYear" as "umd_tree_cover_extent__year",
       $"data_group.isPrimaryForest" as "is__umd_regional_primary_forest_2001",
       $"data_group.isPlantations" as "is__gfw_plantations",
-      $"data_group.isGlobalPeat" as "is__gfw_global_peat",
+      $"data_group.isGlobalPeat" as "is__global_peat",
       $"data_group.tclDriverClass" as "tcl_driver__class",
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
@@ -160,7 +160,7 @@ object TreeLossDF {
     }
 
     val ptGroupByCol = {
-      if (includeGlobalPeat) List($"is__gfw_global_peat")
+      if (includeGlobalPeat) List($"is__global_peat")
       else List()
     }
 

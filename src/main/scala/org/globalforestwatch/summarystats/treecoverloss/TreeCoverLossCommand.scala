@@ -39,8 +39,15 @@ object TreeCoverLossCommand extends SummaryCommand {
     )
     .orFalse
 
-  val treeCoverLossOptions: Opts[(NonEmptyList[String], Int, Product with Serializable, Boolean, Boolean)] = // If new options are added below, the corresponding types must be added here
-    (contextualLayersOpts, tcdOpt, thresholdOpts, carbonPoolOpts, simpleAGBEmisOpts).tupled
+  val emisGasOpts: Opts[Boolean] = Opts
+    .flag(
+      "emissions_by_gas",
+      "Output emissions for CO2 and non-CO2 gases (CH4 and N2O) separately"
+    )
+    .orFalse
+
+  val treeCoverLossOptions: Opts[(NonEmptyList[String], Int, Product with Serializable, Boolean, Boolean, Boolean)] = // If new options are added below, the corresponding types must be added here
+    (contextualLayersOpts, tcdOpt, thresholdOpts, carbonPoolOpts, simpleAGBEmisOpts, emisGasOpts).tupled   // If new options are added here, the corresponding types must be added in the row above
 
   val treeCoverLossCommand: Opts[Unit] = Opts.subcommand(
     name = TreeLossAnalysis.name,
@@ -59,6 +66,7 @@ object TreeCoverLossCommand extends SummaryCommand {
         "thresholdFilter" -> treeCoverLoss._3,
         "carbonPools" -> treeCoverLoss._4,
         "simpleAGBEmis" -> treeCoverLoss._5,
+        "emisGas" -> treeCoverLoss._6,
         "config" -> GfwConfig.get
       )
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

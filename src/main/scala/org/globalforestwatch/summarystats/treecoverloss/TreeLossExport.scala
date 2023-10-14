@@ -21,7 +21,7 @@ object TreeLossExport extends SummaryExport {
       (
         contextualLayers contains "is__umd_regional_primary_forest_2001",
         contextualLayers contains "is__gfw_plantations",
-        contextualLayers contains "is__gfw_global_peat",
+        contextualLayers contains "is__global_peat",
         contextualLayers contains "tcl_driver__class"
       )
     }

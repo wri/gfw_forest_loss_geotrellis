@@ -85,7 +85,7 @@ object TreeLossSummary {
         }
 
         val isGlobalPeat: Boolean = {
-          if (contextualLayers contains "is__gfw_global_peat")
+          if (contextualLayers contains "is__global_peat")
             raster.tile.globalPeat.getData(col, row)
           else false
         }
