@@ -23,18 +23,21 @@ object TreeLossDF {
           .getItem("treecoverLoss") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
 
-    val abovegroundBiomassLossCols =
+    val abovegroundBiomassLossCols = if (simpleAGBEmis) {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
           .getItem("biomassLoss") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
+    } else {
+      List()
+    }
 
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("grossEmissionsCo2eAllGases") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
+          .getItem("grossEmissionsCo2eAllGases") as s"gfw_forest_carbon_gross_emissions_co2e_all_gases_${i}__Mg"
       }).toList
 
     val cols = List(
@@ -129,7 +132,7 @@ object TreeLossDF {
 
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"gfw_gross_emissions_co2e_all_gases_${i}__Mg") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
+        sum(s"gfw_forest_carbon_gross_emissions_co2e_all_gases_${i}__Mg") as s"gfw_forest_carbon_gross_emissions_co2e_all_gases_${i}__Mg"
       }).toList
 
     val totalGrossEmissionsCo2Co2OnlyCols = if (emisGasAnnual) {
