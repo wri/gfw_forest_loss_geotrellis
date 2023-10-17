@@ -1,16 +1,16 @@
 package org.globalforestwatch.summarystats.afi
 
-import cats.data.NonEmptyList
-import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
-import geotrellis.vector.Geometry
-import org.apache.sedona.core.spatialRDD.SpatialRDD
+import org.globalforestwatch.summarystats.SummaryCommand
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features._
+<<<<<<< Updated upstream
 import org.locationtech.jts.geom.Geometry
 import cats.data.Validated.Valid
 
+=======
+>>>>>>> Stashed changes
 
 object AFiCommand extends SummaryCommand {
 
@@ -21,7 +21,7 @@ object AFiCommand extends SummaryCommand {
     (
       defaultOptions,
       featureFilterOptions,
-      ).mapN { (default, filterOptions) =>
+    ).mapN { (default, filterOptions) =>
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
