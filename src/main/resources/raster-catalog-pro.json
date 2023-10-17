@@ -13,6 +13,10 @@
       "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202208/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/gdal-geotiff/{tile_id}.tif"
     },
     {
+      "name":"detailed_wdpa_protected_areas",
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202308/raster/epsg-4326/{grid_size}/{row_count}/detailed_iucn_cat/gdal-geotiff/{tile_id}.tif"
+    },
+    {
       "name":"gfw_oil_gas",
       "source_uri":"s3://gfw-data-lake/gfw_oil_gas/v20221024/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
