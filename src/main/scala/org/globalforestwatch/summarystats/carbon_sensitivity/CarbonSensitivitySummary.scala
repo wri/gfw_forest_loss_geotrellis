@@ -68,7 +68,7 @@ object CarbonSensitivitySummary {
         val intactForestLandscapes: String = raster.tile.intactForestLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
         val intactPrimaryForest: Boolean = raster.tile.intactPrimaryForest.getData(col, row)
-        val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
+        val peatlandsExtentFluxModel: Boolean = raster.tile.peatlandsExtentFluxModel.getData(col, row)
         val forestAgeCategory: String = raster.tile.forestAgeCategory.getData(col, row)
         val jplTropicsAbovegroundBiomassExtent2000: Boolean = raster.tile.jplTropicsAbovegroundBiomassExtent2000.getData(col, row)
         val fiaRegionsUsExtent: String = raster.tile.fiaRegionsUsExtent.getData(col, row)
@@ -78,7 +78,7 @@ object CarbonSensitivitySummary {
         val lossYearLegalAmazon: Integer = raster.tile.lossLegalAmazon.getData(col, row)
         val prodesLegalAmazonExtent2000: Boolean = raster.tile.prodesLegalAmazonExtent2000.getData(col, row)
         val tropicLatitudeExtent: Boolean = raster.tile.tropicLatitudeExtent.getData(col, row)
-        val burnYearHansenLoss: Integer = raster.tile.burnYearHansenLoss.getData(col, row)
+        val burnYearHansenLoss: Boolean = raster.tile.treeCoverLossFromFires.getData(col, row)
         val grossEmissionsNodeCodes: String = raster.tile.grossEmissionsNodeCodes.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
@@ -92,9 +92,6 @@ object CarbonSensitivitySummary {
         val carbonfluxLossYearLegalAmazon: Integer = if (lossYearLegalAmazon != null
           && lossYearLegalAmazon >= 2001) lossYearLegalAmazon else null
         val isLossLegalAmazon: Boolean = carbonfluxLossYearLegalAmazon != null
-
-        // Creates variable of whether the Hansen loss coincided with burning
-        val isBurnLoss: Boolean = burnYearHansenLoss != null
 
         // Calculates model extent area. Need to convert from boolean to integer, unlike in
         // annualupdate_minimal package where gain bollean can be multiplied by areaHa directly. Not sure why different
@@ -140,7 +137,7 @@ object CarbonSensitivitySummary {
               intactForestLandscapes,
               plantationsTypeFluxModel,
               intactPrimaryForest,
-              peatlands,
+              peatlandsExtentFluxModel,
               forestAgeCategory,
               jplTropicsAbovegroundBiomassExtent2000,
               fiaRegionsUsExtent,
@@ -150,7 +147,7 @@ object CarbonSensitivitySummary {
               isLossLegalAmazon,
               prodesLegalAmazonExtent2000,
               tropicLatitudeExtent,
-              isBurnLoss,
+              burnYearHansenLoss,
               grossEmissionsNodeCodes
             )
 

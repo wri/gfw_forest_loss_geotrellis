@@ -59,7 +59,7 @@ object CarbonSensitivityDF {
         $"dataGroup.intactForestLandscapes" as "ifl_intact_forest_landscape__year",
         $"dataGroup.plantationsTypeFluxModel" as "gfw_plantation_flux_model__type",
         $"dataGroup.intactPrimaryForest" as "is__intact_primary_forest",
-        $"dataGroup.peatlands" as "is__peatlands",
+        $"dataGroup.peatlandsExtentFluxModel" as "is__peatlands_extent_flux_model",
         $"dataGroup.forestAgeCategory" as "gfw_forest_age_category__cat",
         $"dataGroup.jplTropicsAbovegroundBiomassExtent2000" as "is__jpl_aboveground_biomass_extent",
         $"dataGroup.fiaRegionsUsExtent" as "usfs_fia_region__name",

@@ -10,5 +10,5 @@ case class SoilCarbonEmisYear(gridTile: GridTile, model: String = "standard", kw
 
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
-      s"s3://gfw-files/flux_1_2_2/soil_emis_year/$model_suffix/${gridTile.tileId}.tif"
+      s"s3://gfw-files/flux_1_2_3/soil_emis_year/$model_suffix/${gridTile.tileId}.tif"
 }
