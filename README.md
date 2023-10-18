@@ -21,19 +21,22 @@ Currently the following analysis are implemented
 ### Tree Cover Loss
 
 A simple analysis which only looks at tree cover loss, tree cover density (2000 or 2010), aboveground biomass,
-gross GHG emissions, gross carbon removals, and net GHG flux. Aboveground carbon, belowground carbon, and soil carbon can be optionally analyzed.
+gross GHG emissions, gross carbon removals, and net GHG flux. Aboveground carbon, belowground carbon, and soil carbon stocks in 2000
+and annual emissions from aboveground biomass loss (old emissions model) can be optionally output.
 Users can select one or many tree cover thresholds. Output will be a flat file, with one row per input feature and tree cover density threshold.
-Optional contextual analysis layers include plantations and humid tropical primary forests. 
+Optional contextual analysis layers include plantations, humid tropical primary forests, global peat, and drivers of tree cover loss.
+Contextual layers are lazily analyzed, meaning that they are not loaded into the analysis if the user does not request them (to save memory).
 The emissions outputs (annual and total) are from the forest carbon flux model (Harris et al. 2021 Nature Climate Change) [forest carbon flux model](https://github.com/wri/carbon-budget).
 Outputs also include carbon removals and carbon net flux (total only) (Harris et al. 2021). 
-Emissions, removals, and net flux are reported for (> tree cover density 2000 threshold OR Hansen gain) because the model results
+Emissions, removals, and net flux are reported for (> tree cover density 2000 threshold OR Hansen gain OR mangrove extent NOT pre-2000 plantations) 
+because the model results
 include not just pixels above a certain tree cover density threshold, but also Hansen gain pixels.
 Other outputs from this analysis (loss, gain, biomass, carbon pools, etc.) use the simple tree cover density threshold. 
 
 This type of analysis only supports simple features as input. Best used together with the [ArcPY Client](https://github.com/wri/gfw_forest_loss_geotrellis_arcpy_client).
 
 ```sbt
-test:runMain org.globalforestwatch.summarystats.SummaryMain treecoverloss --feature_type feature --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --tcd 2000 --threshold 0 --threshold 30 --contextual layer is__gfw_plantations --carbon_pools
+test:runMain org.globalforestwatch.summarystats.SummaryMain treecoverloss --feature_type feature --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --tcd 2000 --threshold 0 --threshold 30 --contextual_layer is__gfw_plantations --contextual_layer tsc_drivers__class --carbon_pools
 ```
 
 ### Annual Update minimal
