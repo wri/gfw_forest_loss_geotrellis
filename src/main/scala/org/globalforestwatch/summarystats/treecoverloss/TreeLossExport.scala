@@ -17,12 +17,13 @@ object TreeLossExport extends SummaryExport {
     val contextualLayers: List[String] =
       getAnyMapValue[NonEmptyList[String]](kwargs, "contextualLayers").toList
 
-    val (includePrimaryForest, includePlantations, includeGlobalPeat, includeTclDriverClass) = {
+    val (includePrimaryForest, includePlantations, includeGlobalPeat, includeTclDriverClass, includeTreeCoverLossFires) = {
       (
         contextualLayers contains "is__umd_regional_primary_forest_2001",
         contextualLayers contains "is__gfw_plantations",
         contextualLayers contains "is__global_peat",
-        contextualLayers contains "tcl_driver__class"
+        contextualLayers contains "tcl_driver__class",
+        contextualLayers contains "is__tree_cover_loss_from_fires"
       )
     }
 
@@ -39,7 +40,7 @@ object TreeLossExport extends SummaryExport {
     summaryDF
       .transform(TreeLossDF.unpackValues(carbonPools, simpleAGBEmis, emisGasAnnual))
       .transform(TreeLossDF.contextualLayerFilter(
-        includePrimaryForest, includePlantations, includeGlobalPeat, includeTclDriverClass,
+        includePrimaryForest, includePlantations, includeGlobalPeat, includeTclDriverClass, includeTreeCoverLossFires,
         carbonPools, simpleAGBEmis, emisGasAnnual))
       .coalesce(1)
       .orderBy($"feature__id", $"umd_tree_cover_density__threshold")

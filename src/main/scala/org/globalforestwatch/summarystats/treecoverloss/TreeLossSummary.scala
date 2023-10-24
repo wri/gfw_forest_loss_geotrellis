@@ -53,18 +53,20 @@ object TreeLossSummary {
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
         val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
 
+        val useCarbonPools: Boolean = getAnyMapValue[Boolean](kwargs, "carbonPools")
+
         // Optionally calculate stocks in carbon pools in 2000
-        val agc2000: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+        val agc2000: Double = if (useCarbonPools)
           raster.tile.agc2000.getData(col, row)
         else
           0.0
 
-        val bgc2000: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+        val bgc2000: Double = if (useCarbonPools)
           raster.tile.bgc2000.getData(col, row)
         else
           0.0
 
-        val soilCarbon2000: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+        val soilCarbon2000: Double = if (useCarbonPools)
           raster.tile.soilCarbon2000.getData(col, row)
         else
           0.0
@@ -96,6 +98,12 @@ object TreeLossSummary {
           else ""
         }
 
+        val isTreeCoverLossFromFires: Boolean = {
+          if (contextualLayers contains "is__tree_cover_loss_from_fires")
+            raster.tile.treeCoverLossFromFires.getData(col, row)
+          else false
+        }
+
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
@@ -108,17 +116,17 @@ object TreeLossSummary {
 
         val biomassPixel = biomass * areaHa
 
-        val agc2000Pixel: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+        val agc2000Pixel: Double = if (useCarbonPools)
           agc2000 * areaHa
         else
           0.0
 
-        val bgc2000Pixel: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+        val bgc2000Pixel: Double = if (useCarbonPools)
           bgc2000 * areaHa
         else
           0.0
 
-        val soilCarbon2000Pixel: Double = if (getAnyMapValue[Boolean](kwargs, "carbonPools"))
+        val soilCarbon2000Pixel: Double = if (useCarbonPools)
           soilCarbon2000 * areaHa
         else
           0.0
@@ -154,6 +162,7 @@ object TreeLossSummary {
                 isPlantations,
                 isGlobalPeat,
                 tclDriverClass,
+                isTreeCoverLossFromFires,
                 gain
               )
 

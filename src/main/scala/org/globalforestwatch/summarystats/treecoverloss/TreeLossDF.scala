@@ -48,6 +48,7 @@ object TreeLossDF {
       $"data_group.isPlantations" as "is__gfw_plantations",
       $"data_group.isGlobalPeat" as "is__global_peat",
       $"data_group.tclDriverClass" as "tcl_driver__class",
+      $"data_group.isTreeCoverLossFire" as "is__tree_cover_loss_from_fires",
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
@@ -107,6 +108,7 @@ object TreeLossDF {
                              includePlantations: Boolean,
                              includeGlobalPeat: Boolean,
                              includeTclDriverClass: Boolean,
+                             includeTreeCoverLossFires: Boolean,
                              carbonPools: Boolean,
                              simpleAGBEmis: Boolean,
                              emisGasAnnual: Boolean
@@ -213,8 +215,13 @@ object TreeLossDF {
       else List()
     }
 
+    val fiGroupByCol = {
+      if (includeTreeCoverLossFires) List($"is__tree_cover_loss_from_fires")
+      else List()
+    }
 
-    df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol ::: ptGroupByCol ::: drGroupByCol : _*)
+
+    df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol ::: ptGroupByCol ::: drGroupByCol ::: fiGroupByCol : _*)
       .agg(
         cols.head,
         cols.tail ::: carbonPoolCols ::: treecoverLossCols ::: abovegroundBiomassLossCols

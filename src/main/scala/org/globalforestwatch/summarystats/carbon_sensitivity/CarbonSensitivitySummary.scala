@@ -78,7 +78,7 @@ object CarbonSensitivitySummary {
         val lossYearLegalAmazon: Integer = raster.tile.lossLegalAmazon.getData(col, row)
         val prodesLegalAmazonExtent2000: Boolean = raster.tile.prodesLegalAmazonExtent2000.getData(col, row)
         val tropicLatitudeExtent: Boolean = raster.tile.tropicLatitudeExtent.getData(col, row)
-        val burnYearHansenLoss: Boolean = raster.tile.treeCoverLossFromFires.getData(col, row)
+        val treeCoverLossFromFires: Boolean = raster.tile.treeCoverLossFromFires.getData(col, row)
         val grossEmissionsNodeCodes: String = raster.tile.grossEmissionsNodeCodes.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
@@ -147,7 +147,7 @@ object CarbonSensitivitySummary {
               isLossLegalAmazon,
               prodesLegalAmazonExtent2000,
               tropicLatitudeExtent,
-              burnYearHansenLoss,
+              treeCoverLossFromFires,
               grossEmissionsNodeCodes
             )
 
