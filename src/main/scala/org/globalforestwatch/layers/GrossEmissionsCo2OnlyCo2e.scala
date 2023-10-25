@@ -6,14 +6,14 @@ case class GrossEmissionsCo2OnlyCo2e(gridTile: GridTile,  model: String = "stand
   extends FloatLayer
     with OptionalFLayer {
 
-//  val datasetName = "gfw_full_extent_co2_gross_emissions"
-//
-//  val uri: String =
-//    uriForGrid(gridTile, kwargs)
+  val datasetName = "gfw_full_extent_co2_gross_emissions"
 
-  val datasetName = "Na"
-
-  val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
-    s"s3://gfw-files/flux_1_2_3/gross_emissions_co2_only_co2e/$model_suffix/${gridTile.tileId}.tif"
+    uriForGrid(gridTile, kwargs)
+
+//  val datasetName = "Na"
+//
+//  val model_suffix: String = if (model == "standard") "standard" else s"$model"
+//  val uri: String =
+//    s"s3://gfw-files/flux_1_2_3/gross_emissions_co2_only_co2e/$model_suffix/${gridTile.tileId}.tif"
 }
