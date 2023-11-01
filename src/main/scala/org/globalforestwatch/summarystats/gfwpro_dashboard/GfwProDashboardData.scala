@@ -9,27 +9,27 @@ import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
   * Note: This case class contains mutable values
   */
 case class GfwProDashboardData(
-  /** Location intersects GLAD Alert tiles, GLAD alerts are possible */
-  glad_alerts_coverage: Boolean,
-  /** How many hacters of location geometry had tree cover extent > 30%  in 2000 */
+  /** Location intersects Integrated Alert tiles, integrated alerts are possible */
+  integrated_alerts_coverage: Boolean,
+  /** How many hectares of location geometry had tree cover extent > 30%  in 2000 */
   tree_cover_extent_total: ForestChangeDiagnosticDataDouble,
-  /** GLAD alert count within location geometry grouped by day */
-  glad_alerts_daily: GfwProDashboardDataDateCount,
-  /** GLAD alert count within location geometry grouped by ISO year-week */
-  glad_alerts_weekly: GfwProDashboardDataDateCount,
-  /** GLAD alert count within location geometry grouped by year-month */
-  glad_alerts_monthly: GfwProDashboardDataDateCount,
+  /** Integrated alert count within location geometry grouped by day */
+  integrated_alerts_daily: GfwProDashboardDataDateCount,
+  /** Integrated alert count within location geometry grouped by ISO year-week */
+  integrated_alerts_weekly: GfwProDashboardDataDateCount,
+  /** Integrated alert count within location geometry grouped by year-month */
+  integrated_alerts_monthly: GfwProDashboardDataDateCount,
   /** VIIRS alerts for location geometry grouped by day */
   viirs_alerts_daily: GfwProDashboardDataDateCount,
 ) {
 
   def merge(other: GfwProDashboardData): GfwProDashboardData = {
     GfwProDashboardData(
-      glad_alerts_coverage || other.glad_alerts_coverage,
+      integrated_alerts_coverage || other.integrated_alerts_coverage,
       tree_cover_extent_total.merge(other.tree_cover_extent_total),
-      glad_alerts_daily.merge(other.glad_alerts_daily),
-      glad_alerts_weekly.merge(other.glad_alerts_weekly),
-      glad_alerts_monthly.merge(other.glad_alerts_monthly),
+      integrated_alerts_daily.merge(other.integrated_alerts_daily),
+      integrated_alerts_weekly.merge(other.integrated_alerts_weekly),
+      integrated_alerts_monthly.merge(other.integrated_alerts_monthly),
       viirs_alerts_daily.merge(other.viirs_alerts_daily)
     )
   }
@@ -39,7 +39,7 @@ object GfwProDashboardData {
 
   def empty: GfwProDashboardData =
     GfwProDashboardData(
-      glad_alerts_coverage = false,
+      integrated_alerts_coverage = false,
       tree_cover_extent_total = ForestChangeDiagnosticDataDouble.empty,
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,
