@@ -15,7 +15,7 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
   val gladAlertsL: GladAlerts = GladAlerts(gridTile, kwargs)
   val gladAlertsS2: GladAlertsS2 = GladAlertsS2(gridTile, kwargs)
   val raddAlerts: RaddAlerts = RaddAlerts(gridTile, kwargs)
-  val biomassPerHectar: BiomassPerHectar = BiomassPerHectar(gridTile, kwargs)
+  val biomassPerHectar: AbovegroundBiomass2000 = AbovegroundBiomass2000(gridTile, kwargs)
   val climateMask: ClimateMask = ClimateMask(gridTile, kwargs)
   val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)

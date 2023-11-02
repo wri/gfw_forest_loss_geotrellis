@@ -2,7 +2,7 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class AgcEmisYear(gridTile: GridTile, model: String = "standard", kwargs: Map[String, Any])
+case class AbovegroundCarbonEmisYear(gridTile: GridTile, model: String = "standard", kwargs: Map[String, Any])
   extends FloatLayer
     with OptionalFLayer {
 

@@ -2,7 +2,7 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-case class GrossAnnualAbovegroundRemovalsCarbon(gridTile: GridTile, model: String = "standard", kwargs: Map[String, Any])
+case class BelowgroundCarbonEmisYear(gridTile: GridTile, model: String = "standard", kwargs: Map[String, Any])
   extends FloatLayer
     with OptionalFLayer {
 
@@ -10,5 +10,5 @@ case class GrossAnnualAbovegroundRemovalsCarbon(gridTile: GridTile, model: Strin
 
   val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
-      s"s3://gfw-files/flux_1_2_3/annual_removal_factor_AGC_all_forest_types/$model_suffix/${gridTile.tileId}.tif"
+      s"s3://gfw-files/flux_1_2_3/bgc_emis_year/$model_suffix/${gridTile.tileId}.tif"
 }

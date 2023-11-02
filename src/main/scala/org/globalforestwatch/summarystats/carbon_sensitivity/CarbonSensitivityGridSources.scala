@@ -18,20 +18,17 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
 
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
   val treeCoverDensity2000: TreeCoverDensityThreshold2000 = TreeCoverDensityThreshold2000(gridTile, kwargs)
-  val biomassPerHectar: BiomassPerHectar = BiomassPerHectar(gridTile, kwargs)
+  val biomassPerHectar: AbovegroundBiomass2000 = AbovegroundBiomass2000(gridTile, kwargs)
   val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 =
     GrossCumulAbovegroundRemovalsCo2(gridTile, model, kwargs)
   val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 =
     GrossCumulBelowgroundRemovalsCo2(gridTile, model, kwargs)
   val netFluxCo2: NetFluxCo2e = NetFluxCo2e(gridTile, model, kwargs)
-  val agcEmisYear: AgcEmisYear = AgcEmisYear(gridTile, model, kwargs)
+  val agcEmisYear: AbovegroundCarbonEmisYear = AbovegroundCarbonEmisYear(gridTile, model, kwargs)
   val soilCarbonEmisYear: SoilCarbonEmisYear = SoilCarbonEmisYear(gridTile, model, kwargs)
-  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil =
-    GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, model, kwargs)
-  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2eBiomassSoil =
-    GrossEmissionsCo2OnlyCo2eBiomassSoil(gridTile, model, kwargs)
-  val jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000 =
-    JplTropicsAbovegroundBiomassDensity2000(gridTile, kwargs)
+  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil = GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, model, kwargs)
+  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2BiomassSoil = GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile, model, kwargs)
+  val jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000 = JplTropicsAbovegroundBiomassDensity2000(gridTile, kwargs)
   val fluxModelExtent: FluxModelExtent = FluxModelExtent(gridTile, model, kwargs)
   val removalForestType: RemovalForestType = RemovalForestType(gridTile, model, kwargs)
   val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
