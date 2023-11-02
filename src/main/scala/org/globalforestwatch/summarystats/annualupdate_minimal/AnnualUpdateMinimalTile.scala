@@ -36,7 +36,7 @@ case class AnnualUpdateMinimalTile(
                                     grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2#OptionalFTile,
                                     grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2#OptionalFTile,
                                     netFluxCo2: NetFluxCo2e#OptionalFTile,
-                                    soilCarbon: SoilCarbon#OptionalITile,
+                                    soilCarbon2000: SoilCarbon2000#OptionalFTile,
                                     intactForestLandscapes2000: IntactForestLandscapes2000#OptionalITile,
                                     treeCoverLossFromFires: TreeCoverLossFromFires#OptionalITile,
                                     tropicalTreeCover: TropicalTreeCover#OptionalITile,

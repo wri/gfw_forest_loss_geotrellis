@@ -21,7 +21,7 @@ object TreeCoverLossCommand extends SummaryCommand {
   val contextualLayersOpts: Opts[NonEmptyList[String]] = Opts
     .options[String](
       "contextual_layer",
-      "Contextual Layer to include (currently supported: is__umd_regional_primary_forest_2001, is__gfw_plantations"
+      "Contextual layers to filter by (currently supported: is__umd_regional_primary_forest_2001, is__gfw_plantations, is__global_peat, tcl_driver__class, is__tree_cover_loss_from_fires"
     )
     .withDefault(NonEmptyList.of(""))
 
@@ -32,8 +32,22 @@ object TreeCoverLossCommand extends SummaryCommand {
     )
     .orFalse
 
-  val treeCoverLossOptions: Opts[(NonEmptyList[String], Int, Product with Serializable, Boolean)] =
-    (contextualLayersOpts, tcdOpt, thresholdOpts, carbonPoolOpts).tupled
+  val simpleAGBEmisOpts: Opts[Boolean] = Opts
+    .flag(
+      "simple_agb_emissions",
+      "Calculate emissions from tree cover loss in AGB (simple emissions model) following Zarin et al. 2016"
+    )
+    .orFalse
+
+  val emisGasAnnualOpts: Opts[Boolean] = Opts
+    .flag(
+      "emissions_by_gas_annually",
+      "Output emissions for CO2 and non-CO2 gases (CH4 and N2O) separately"
+    )
+    .orFalse
+
+  val treeCoverLossOptions: Opts[(NonEmptyList[String], Int, Product with Serializable, Boolean, Boolean, Boolean)] = // If new options are added below, the corresponding types must be added here
+    (contextualLayersOpts, tcdOpt, thresholdOpts, carbonPoolOpts, simpleAGBEmisOpts, emisGasAnnualOpts).tupled   // If new options are added here, the corresponding types must be added in the row above
 
   val treeCoverLossCommand: Opts[Unit] = Opts.subcommand(
     name = TreeLossAnalysis.name,
@@ -51,6 +65,8 @@ object TreeCoverLossCommand extends SummaryCommand {
         "tcdYear" -> treeCoverLoss._2,
         "thresholdFilter" -> treeCoverLoss._3,
         "carbonPools" -> treeCoverLoss._4,
+        "simpleAGBEmis" -> treeCoverLoss._5,
+        "emisGasAnnual" -> treeCoverLoss._6,
         "config" -> GfwConfig.get
       )
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

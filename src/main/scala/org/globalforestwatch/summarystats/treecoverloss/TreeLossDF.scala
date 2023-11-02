@@ -10,7 +10,7 @@ object TreeLossDF {
   val treecoverLossMinYear = 2001
   val treecoverLossMaxYear = 2022
 
-  def unpackValues(carbonPools: Boolean)(df: DataFrame): DataFrame = {
+  def unpackValues(carbonPools: Boolean, simpleAGBEmis: Boolean, emisGasAnnual: Boolean)(df: DataFrame): DataFrame = {
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
@@ -23,18 +23,21 @@ object TreeLossDF {
           .getItem("treecoverLoss") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
 
-    val abovegroundBiomassLossCols =
+    val abovegroundBiomassLossCols = if (simpleAGBEmis) {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
           .getItem("biomassLoss") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
+    } else {
+      List()
+    }
 
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("grossEmissionsCo2eAllGases") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
+          .getItem("grossEmissionsCo2eAllGases") as s"gfw_forest_carbon_gross_emissions_co2e_all_gases_${i}__Mg"
       }).toList
 
     val cols = List(
@@ -43,6 +46,9 @@ object TreeLossDF {
       $"data_group.tcdYear" as "umd_tree_cover_extent__year",
       $"data_group.isPrimaryForest" as "is__umd_regional_primary_forest_2001",
       $"data_group.isPlantations" as "is__gfw_plantations",
+      $"data_group.isGlobalPeat" as "is__global_peat",
+      $"data_group.tclDriverClass" as "tcl_driver__class",
+      $"data_group.isTreeCoverLossFire" as "is__tree_cover_loss_from_fires",
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
@@ -69,9 +75,30 @@ object TreeLossDF {
       List()
     }
 
+    val totalGrossEmissionsCo2Co2OnlyCols = if (emisGasAnnual) {
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        $"data.lossYear"
+          .getItem(i)
+          .getItem("grossEmissionsCo2eCo2Only") as s"gfw_forest_carbon_gross_emissions_co2_only_${i}__Mg"
+      }).toList
+    } else {
+      List()
+    }
+
+    val totalGrossEmissionsCo2eNonCo2Cols = if (emisGasAnnual) {
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        $"data.lossYear"
+          .getItem(i)
+          .getItem("grossEmissionsCo2eNonCo2") as s"gfw_forest_carbon_gross_emissions_non_co2_${i}__Mg"
+      }).toList
+    } else {
+      List()
+    }
+
 
     df.select(
-      cols ::: carbonPoolCols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: totalGrossEmissionsCo2eAllGasesCols : _*
+      cols ::: carbonPoolCols ::: treecoverLossCols ::: abovegroundBiomassLossCols
+        ::: totalGrossEmissionsCo2eAllGasesCols ::: totalGrossEmissionsCo2Co2OnlyCols ::: totalGrossEmissionsCo2eNonCo2Cols : _*
     )
 
   }
@@ -79,25 +106,52 @@ object TreeLossDF {
   def contextualLayerFilter(
                              includePrimaryForest: Boolean,
                              includePlantations: Boolean,
-                             carbonPools: Boolean
+                             includeGlobalPeat: Boolean,
+                             includeTclDriverClass: Boolean,
+                             includeTreeCoverLossFires: Boolean,
+                             carbonPools: Boolean,
+                             simpleAGBEmis: Boolean,
+                             emisGasAnnual: Boolean
                            )(df: DataFrame): DataFrame = {
 
     val spark: SparkSession = df.sparkSession
     import spark.implicits._
 
+
+
     val treecoverLossCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         sum(s"umd_tree_cover_loss_${i}__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
-    val abovegroundBiomassLossCols =
+
+    val abovegroundBiomassLossCols = if (simpleAGBEmis) {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         sum(s"whrc_aboveground_biomass_loss_${i}__Mg") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
+      } else {
+        List()
+      }
 
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"gfw_gross_emissions_co2e_all_gases_${i}__Mg") as s"gfw_gross_emissions_co2e_all_gases_${i}__Mg"
+        sum(s"gfw_forest_carbon_gross_emissions_co2e_all_gases_${i}__Mg") as s"gfw_forest_carbon_gross_emissions_co2e_all_gases_${i}__Mg"
       }).toList
+
+    val totalGrossEmissionsCo2Co2OnlyCols = if (emisGasAnnual) {
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        sum(s"gfw_forest_carbon_gross_emissions_co2_only_${i}__Mg") as s"gfw_forest_carbon_gross_emissions_co2_only_${i}__Mg"
+      }).toList
+    } else {
+      List()
+    }
+
+    val totalGrossEmissionsCo2eNonCo2Cols = if (emisGasAnnual) {
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        sum(s"gfw_forest_carbon_gross_emissions_non_co2_${i}__Mg") as s"gfw_forest_carbon_gross_emissions_non_co2_${i}__Mg"
+      }).toList
+    } else {
+      List()
+    }
 
     val cols = List(
       sum("area__ha") as "area__ha",
@@ -151,11 +205,27 @@ object TreeLossDF {
       else List()
     }
 
+    val ptGroupByCol = {
+      if (includeGlobalPeat) List($"is__global_peat")
+      else List()
+    }
 
-    df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol: _*)
+    val drGroupByCol = {
+      if (includeTclDriverClass) List($"tcl_driver__class")
+      else List()
+    }
+
+    val fiGroupByCol = {
+      if (includeTreeCoverLossFires) List($"is__tree_cover_loss_from_fires")
+      else List()
+    }
+
+
+    df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol ::: ptGroupByCol ::: drGroupByCol ::: fiGroupByCol : _*)
       .agg(
         cols.head,
-        cols.tail ::: carbonPoolCols ::: treecoverLossCols ::: abovegroundBiomassLossCols ::: totalGrossEmissionsCo2eAllGasesCols: _*
+        cols.tail ::: carbonPoolCols ::: treecoverLossCols ::: abovegroundBiomassLossCols
+          ::: totalGrossEmissionsCo2eAllGasesCols ::: totalGrossEmissionsCo2Co2OnlyCols ::: totalGrossEmissionsCo2eNonCo2Cols : _*
       )
 
   }

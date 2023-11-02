@@ -8,8 +8,7 @@ case class GrossEmissionsCo2OnlyCo2eSoilOnly(gridTile: GridTile, kwargs: Map[Str
 
   val datasetName = "Na"
 
-
   val uri: String =
-      s"s3://gfw-files/flux_1_2_2/gross_emissions_co2_only_co2e/soil_only/${gridTile.tileId}.tif"
+      s"s3://gfw-files/flux_1_2_3/gross_emissions_co2_only_co2e/soil_only/${gridTile.tileId}.tif"
 
 }

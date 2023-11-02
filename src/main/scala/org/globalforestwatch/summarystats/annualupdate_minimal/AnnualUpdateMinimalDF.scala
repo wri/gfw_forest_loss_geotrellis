@@ -93,7 +93,7 @@ object AnnualUpdateMinimalDF {
         $"data.totalGrossEmissionsCo2eCo2Only" as "gfw_full_extent_gross_emissions_CO2_only__Mg_CO2",
         $"data.totalGrossEmissionsCo2eNonCo2" as "gfw_full_extent_gross_emissions_non_CO2__Mg_CO2e",
         $"data.totalGrossEmissionsCo2e" as "gfw_full_extent_gross_emissions__Mg_CO2e",
-        $"data.totalSoilCarbon" as "gfw_soil_carbon_stocks_2000__Mg_C",
+        $"data.totalSoilCarbon2000" as "gfw_soil_carbon_stocks_2000__Mg_C",
         $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_full_extent_gross_removals__Mg_CO2",
         $"data.treeCoverLossFromFires" as "umd_tree_cover_loss_from_fires__ha",
         $"data.tropicalTreeCoverExtent" as "wri_tropical_tree_cover_extent__ha",

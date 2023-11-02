@@ -7,9 +7,7 @@ case class PlantationsTypeFluxModel(gridTile: GridTile, kwargs: Map[String, Any]
 
   val datasetName = "Na"
 
-
   val uri: String =
-  //    s"$basePath/gfw_plantations_flux_model/v2.1/raster/epsg-4326/${gridTile.gridSize}/${gridTile.rowCount}/type/geotiff/${gridTile.tileId}.tif"
     s"s3://gfw-files/flux_1_2_0/plantation_type/standard/${gridTile.tileId}.tif"
 
   override val externalNoDataValue = "Not applicable"
