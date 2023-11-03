@@ -6,7 +6,7 @@ case class GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile: GridTile, model: String
   extends FloatLayer
     with OptionalFLayer {
 
-  val datasetName = "gfw_full_extent_co2_gross_emissions"
+  val datasetName = "gfw_full_extent_co2_gross_emissions_biomass_soil"
 
   val uri: String =
     uriForGrid(gridTile, kwargs)

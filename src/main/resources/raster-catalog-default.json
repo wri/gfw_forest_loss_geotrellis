@@ -263,14 +263,6 @@
       "source_uri":"s3://gfw-data-lake/gfw_belowground_carbon/v20230322/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_deadwood_carbon",
-      "source_uri":"s3://gfw-data-lake/gfw_deadwood_carbon/v20200824/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"gfw_litter_carbon",
-      "source_uri":"s3://gfw-data-lake/gfw_litter_carbon/v20200824/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
-    },
-    {
       "name":"gfw_soil_carbon",
       "source_uri": "s3://gfw-data-lake/gfw_soil_carbon/v20230322.2/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
     },
@@ -287,11 +279,11 @@
       "source_uri": "s3://gfw-data-lake/gfw_full_extent_belowground_gross_removals/v20230331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_full_extent_co2_gross_emissions",
+      "name":"gfw_full_extent_co2_gross_emissions_biomass_soil",
       "source_uri": "s3://gfw-data-lake/gfw_full_extent_co2_gross_emissions/v20230407/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_full_extent_non_co2_gross_emissions",
+      "name":"gfw_full_extent_non_co2_gross_emissions_biomass_soil",
       "source_uri": "s3://gfw-data-lake/gfw_full_extent_non_co2_gross_emissions/v20230407/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     }
   ]

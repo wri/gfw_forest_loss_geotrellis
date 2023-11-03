@@ -6,16 +6,16 @@ case class DeadwoodCarbon2000(gridTile: GridTile, model: String = "standard", kw
   extends FloatLayer
     with OptionalFLayer {
 
-  val datasetName = "gfw_deadwood_carbon"
-
-  val uri: String =
-    uriForGrid(gridTile, kwargs)
-
-
-//  // For carbonflux package run only
-//  val datasetName = "Na"
+//  val datasetName = "gfw_deadwood_carbon"
 //
-//  val model_suffix: String = if (model == "standard") "standard" else s"$model"
 //  val uri: String =
-//    s"s3://gfw-files/flux_1_2_3/deadwood_carbon_2000/$model_suffix/${gridTile.tileId}.tif"
+//    uriForGrid(gridTile, kwargs)
+
+
+  // For carbonflux package run only
+  val datasetName = "Na"
+
+  val model_suffix: String = if (model == "standard") "standard" else s"$model"
+  val uri: String =
+    s"s3://gfw-files/flux_1_2_3/deadwood_carbon_2000/$model_suffix/${gridTile.tileId}.tif"
 }
