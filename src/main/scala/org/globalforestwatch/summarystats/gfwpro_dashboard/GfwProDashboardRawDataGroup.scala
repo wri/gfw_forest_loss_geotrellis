@@ -9,10 +9,10 @@ case class GfwProDashboardRawDataGroup(
 ) {
     def toGfwProDashboardData(alertCount: Int, totalArea: Double): GfwProDashboardData = {
       GfwProDashboardData(
-        integrated_alerts_coverage = integratedAlertsCoverage,
-        integrated_alerts_daily = GfwProDashboardDataDateCount.fillDaily(alertDate, alertCount),
-        integrated_alerts_weekly = GfwProDashboardDataDateCount.fillWeekly(alertDate, alertCount),
-        integrated_alerts_monthly = GfwProDashboardDataDateCount.fillMonthly(alertDate, alertCount),
+        glad_alerts_coverage = integratedAlertsCoverage,
+        glad_alerts_daily = GfwProDashboardDataDateCount.fillDaily(alertDate, alertCount),
+        glad_alerts_weekly = GfwProDashboardDataDateCount.fillWeekly(alertDate, alertCount),
+        glad_alerts_monthly = GfwProDashboardDataDateCount.fillMonthly(alertDate, alertCount),
         viirs_alerts_daily = GfwProDashboardDataDateCount.empty,
         tree_cover_extent_total = ForestChangeDiagnosticDataDouble.fill(totalArea))
   }
