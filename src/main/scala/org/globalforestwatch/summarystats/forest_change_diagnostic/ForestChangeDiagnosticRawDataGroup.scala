@@ -24,10 +24,14 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
                                               cerradoBiomesPresence: Boolean,
                                               seAsiaPresence: Boolean,
                                               idnPresence: Boolean,
-                                              argPresence: Boolean) {
+                                              argPresence: Boolean,
+                                              protectedAreaByCategory: String,
+                                              landmarkByCategory: String,
+) {
 
   /** Produce a partial ForestChangeDiagnosticData only for the loss year in this data group */
-  def toForestChangeDiagnosticData(totalArea: Double): ForestChangeDiagnosticData = ForestChangeDiagnosticData(
+  def toForestChangeDiagnosticData(totalArea: Double): ForestChangeDiagnosticData = {
+    ForestChangeDiagnosticData(
     tree_cover_loss_total_yearly = ForestChangeDiagnosticDataLossYearly.fill(
       umdTreeCoverLossYear,
       totalArea,
@@ -154,6 +158,9 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
       .fill(totalArea, isPeatlands),
     arg_otbn_area = ForestChangeDiagnosticDataDoubleCategory
       .fill(argOTBN, totalArea),
+    protected_areas_by_category_area = ForestChangeDiagnosticDataDoubleCategory
+      .fill(protectedAreaByCategory, totalArea),
+    landmark_by_category_area = ForestChangeDiagnosticDataDoubleCategory.fill(landmarkByCategory, totalArea),
     brazil_biomes = ForestChangeDiagnosticDataDoubleCategory
       .fill(braBiomes, totalArea),
     idn_legal_area = ForestChangeDiagnosticDataDoubleCategory
@@ -223,5 +230,4 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
     commodity_threat_fires = ForestChangeDiagnosticDataLossYearly.empty
   )
   }
-
-
+}
