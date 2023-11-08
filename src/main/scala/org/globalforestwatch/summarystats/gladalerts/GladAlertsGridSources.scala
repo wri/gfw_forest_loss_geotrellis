@@ -12,7 +12,7 @@ import org.globalforestwatch.layers._
 case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
 
   val gladAlerts: GladAlerts = GladAlerts(gridTile, kwargs)
-  val biomassPerHectar: BiomassPerHectar = BiomassPerHectar(gridTile, kwargs)
+  val biomassPerHectar: AbovegroundBiomass2000 = AbovegroundBiomass2000(gridTile, kwargs)
   val climateMask: ClimateMask = ClimateMask(gridTile, kwargs)
   val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
