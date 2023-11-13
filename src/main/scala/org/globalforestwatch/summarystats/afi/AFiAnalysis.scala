@@ -48,9 +48,8 @@ object AFiAnalysis extends SummaryAnalysis {
     val summaryDF = AFiAnalysis.aggregateResults(
         AFiDF
         .getFeatureDataFrame(summaryRDD, spark)
-        .filter(!$"gadm_id".substr(1, 3).contains("null"))
         .withColumn(
-          "gadm_id", when(col("location_id") =!= -1, lit("")).otherwise(col("gadm_id"))
+          "gadm_id", when(col("location_id") =!= -1, lit("") ).otherwise(col("gadm_id"))
         )
         .groupBy($"list_id", $"location_id", $"gadm_id")
     )
