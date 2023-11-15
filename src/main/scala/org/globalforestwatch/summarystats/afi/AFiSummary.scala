@@ -37,10 +37,14 @@ object AFiSummary {
         val naturalForestCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
         val negligibleRisk: String = raster.tile.negligibleRisk.getData(col, row)
 
-       val gadmAdm0: String = raster.tile.gadmAdm0.getData(col, row)
-       val gadmAdm1: Integer = raster.tile.gadmAdm1.getData(col, row)
-       val gadmAdm2: Integer = raster.tile.gadmAdm2.getData(col, row)
-       val gadmId: String = s"$gadmAdm0.$gadmAdm1.$gadmAdm2"
+        val gadmAdm0: String = raster.tile.gadmAdm0.getData(col, row)
+        // Skip processing this pixel if gadmAdm0 is empty
+        if (gadmAdm0 == "") {
+          return
+        }
+        val gadmAdm1: Integer = raster.tile.gadmAdm1.getData(col, row)
+        val gadmAdm2: Integer = raster.tile.gadmAdm2.getData(col, row)
+        val gadmId: String = s"$gadmAdm0.$gadmAdm1.$gadmAdm2"
 
         // pixel Area
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
