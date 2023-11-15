@@ -5,11 +5,11 @@ import java.time.LocalDate
 
 case class GfwProDashboardRawDataGroup(
   alertDate: Option[LocalDate],
-  gladAlertsCoverage: Boolean
+  integratedAlertsCoverage: Boolean
 ) {
     def toGfwProDashboardData(alertCount: Int, totalArea: Double): GfwProDashboardData = {
       GfwProDashboardData(
-        glad_alerts_coverage = gladAlertsCoverage,
+        glad_alerts_coverage = integratedAlertsCoverage,
         glad_alerts_daily = GfwProDashboardDataDateCount.fillDaily(alertDate, alertCount),
         glad_alerts_weekly = GfwProDashboardDataDateCount.fillWeekly(alertDate, alertCount),
         glad_alerts_monthly = GfwProDashboardDataDateCount.fillMonthly(alertDate, alertCount),

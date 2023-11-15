@@ -1,10 +1,10 @@
 package org.globalforestwatch.summarystats.gfwpro_dashboard
 
 import geotrellis.vector.Extent
-import org.globalforestwatch.grids.{GridTile, TenByTen30mGrid}
+import org.globalforestwatch.grids.{GridTile, TenByTen10mGrid}
 
 object GfwProDashboardGrid
-  extends TenByTen30mGrid[GfwProDashboardGridSources] {
+  extends TenByTen10mGrid[GfwProDashboardGridSources] {
 
   val gridExtent: Extent = Extent(-180.0000, -90.0000, 180.0000, 90.0000)
 

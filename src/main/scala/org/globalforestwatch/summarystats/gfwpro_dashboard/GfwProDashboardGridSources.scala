@@ -10,7 +10,7 @@ import org.globalforestwatch.layers._
   * @param gridTile top left corner, padded from east ex: "10N_010E"
   */
 case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
-  val gladAlerts = GladAlerts(gridTile, kwargs)
+  val integratedAlerts = IntegratedAlerts(gridTile, kwargs)
   val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
 
   def readWindow(
@@ -19,15 +19,15 @@ case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, An
                 ): Either[Throwable, Raster[GfwProDashboardTile]] = {
 
     for {
-      // Glad alerts are Optional Tiles, but we keep it this way to avoid signature changes
-      gladAlertsTile <- Either
-        .catchNonFatal(gladAlerts.fetchWindow(windowKey, windowLayout))
+      // Integrated alerts are Optional Tiles, but we keep it this way to avoid signature changes
+      integratedAlertsTile <- Either
+        .catchNonFatal(integratedAlerts.fetchWindow(windowKey, windowLayout))
         .right
       tcd2000Tile <- Either
         .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
         .right
     } yield {
-      val tile = GfwProDashboardTile(gladAlertsTile, tcd2000Tile)
+      val tile = GfwProDashboardTile(integratedAlertsTile, tcd2000Tile)
       Raster(tile, windowKey.extent(windowLayout))
     }
   }
