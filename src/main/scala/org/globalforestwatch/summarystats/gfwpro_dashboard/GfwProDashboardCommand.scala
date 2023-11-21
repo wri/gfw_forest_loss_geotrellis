@@ -57,7 +57,7 @@ object GfwProDashboardCommand extends SummaryCommand {
             spatialRDD
         }
 
-        GfwProDashboardAnalysis(
+        val dashRDD = GfwProDashboardAnalysis(
           featureRDD,
           default.featureType,
           contextualFeatureType = contextualFeatureType,
@@ -66,6 +66,8 @@ object GfwProDashboardCommand extends SummaryCommand {
           spark,
           kwargs
         )
+        val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(dashRDD.unify, spark)
+        GfwProDashboardExport.export(default.featureType, summaryDF, default.outputUrl, kwargs)
       }
     }
   }

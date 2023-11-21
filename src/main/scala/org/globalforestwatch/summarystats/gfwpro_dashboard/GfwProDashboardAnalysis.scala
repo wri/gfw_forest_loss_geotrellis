@@ -36,7 +36,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     fireAlertRDD: SpatialRDD[Geometry],
     spark: SparkSession,
     kwargs: Map[String, Any]
-  ): Unit = {
+  ): ValidatedWorkflow[Location[JobError],(FeatureId, GfwProDashboardData)] = {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
     val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
@@ -81,10 +81,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           }
         }
     }
-
-    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(summaryRDD.unify, spark)
-    val runOutputUrl: String = getOutputUrl(kwargs)
-    GfwProDashboardExport.export(featureType, summaryDF, runOutputUrl, kwargs)
+    summaryRDD
 
   }
 
