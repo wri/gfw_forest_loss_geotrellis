@@ -26,7 +26,7 @@ object IntegratedAlertsCommand extends SummaryCommand {
         val kwargs = Map(
           "outputUrl" -> default.outputUrl,
           "noOutputPathSuffix" -> default.noOutputPathSuffix,
-          "config" -> GfwConfig.get,
+          "config" -> GfwConfig.get(None),
         )
 
         val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

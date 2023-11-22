@@ -16,7 +16,7 @@ import org.globalforestwatch.config.GfwConfig
 object SummaryMain {
   val name = "geotrellis-summary-stats"
   val header = "Compute summary statistics for GFW data"
-  val config = GfwConfig.get
+  val config = GfwConfig.get(None)
   val main = {
     annualupdateMinimalCommand orElse
       carbonSensitivityCommand orElse
