@@ -12,6 +12,7 @@ import org.globalforestwatch.features.{FeatureFilter, ValidatedFeatureRDD}
 import org.globalforestwatch.summarystats.ValidatedLocation
 import org.globalforestwatch.TestEnvironment
 import org.globalforestwatch.config.GfwConfig
+import org.globalforestwatch.util.Config
 
 class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer {
   def dashInputTsvPath = getClass.getResource("/dash.tsv").toString()
@@ -34,7 +35,9 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       NonEmptyList.one(idn1_5GadmTsvPath),
       fireAlertsRdd,
       spark,
-      kwargs = Map("config" -> GfwConfig.get))
+      kwargs = Map(
+        "config" -> GfwConfig.get(Some(NonEmptyList.one(Config("gfw_integrated_alerts", "v20231121")))))
+    )
   }
 
   /** Function to update expected results when this test becomes invalid */

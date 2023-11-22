@@ -1,13 +1,12 @@
 package org.globalforestwatch.config
 
-import io.circe.Json
 import org.globalforestwatch.grids.GridTile
 import io.circe.generic.auto._
 import io.circe.parser.decode
-import io.circe.syntax._
-import org.globalforestwatch.config
 import org.globalforestwatch.util.Util.jsonStrToMap
 import scalaj.http.{Http, HttpOptions, HttpResponse}
+import cats.data.NonEmptyList
+import org.globalforestwatch.util.Config
 
 import java.io.FileNotFoundException
 
@@ -25,11 +24,11 @@ case class RasterCatalog(layers: List[LayerConfig]) {
 case class LayerConfig(name: String, source_uri: String)
 
 object RasterCatalog {
-  def getRasterCatalog(catalogFile: String): RasterCatalog = {
+  def getRasterCatalog(catalogFile: String, pinned: Option[NonEmptyList[Config]]): RasterCatalog = {
     val rawJson = try {
       scala.io.Source.fromResource(catalogFile).getLines.mkString
     } catch {
-      case e =>
+      case e: Throwable =>
         throw new FileNotFoundException(s"Cannot open raster catalog ${catalogFile}: ${e.getMessage}")
     }
 
@@ -44,14 +43,28 @@ object RasterCatalog {
       parsed.layers.map((config: LayerConfig) =>
         LayerConfig(
           config.name,
-          getSourceUri(config.name, config.source_uri)
+          getSourceUri(config.name, config.source_uri, pinned)
         )
       )
     )
   }
 
-  def getSourceUri(dataset: String, sourceUri: String): String = {
+  /** Return the sourceUri to be used. If the sourceUri argument has 'latest' as its
+   * version, then either use a pinned version, if there is a matching entry for the
+   * dataset in pinned, or determine the actual latest version and use that.
+   */
+  def getSourceUri(dataset: String, sourceUri: String, pinned: Option[NonEmptyList[Config]]): String = {
     if (sourceUri.contains("latest")) {
+      pinned match {
+        case Some(list) => {
+          list.toList.foreach(c => {
+            if (c.key == dataset) {
+              return sourceUri.replace("latest", c.value)
+            }
+          })
+        }
+        case None =>
+      }
       sourceUri.replace("latest", getLatestVersion(dataset))
     } else {
       sourceUri

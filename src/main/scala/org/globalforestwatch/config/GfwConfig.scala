@@ -1,7 +1,7 @@
 package org.globalforestwatch.config
 
-import scala.io.Source
-import com.typesafe.scalalogging.LazyLogging
+import cats.data.NonEmptyList
+import org.globalforestwatch.util.Config
 
 case class GfwConfig(rasterCatalog: RasterCatalog)
 
@@ -12,14 +12,17 @@ object GfwConfig {
     flag
   }
 
-  val get: GfwConfig = read(featureFlag.getOrElse("default"))
+  /** Read the configuration from the raster catalog. pinned specifies any entries using
+   * 'latest' that should be pinned to a specified version, else use the actual
+   * latest version of the dataset. */
+  def get(pinned: Option[NonEmptyList[Config]]): GfwConfig = read(featureFlag.getOrElse("default"), pinned)
 
   def isGfwPro: Boolean = featureFlag == Some("pro")
 
-  def read(flag: String): GfwConfig = {
+  def read(flag: String, pinned: Option[NonEmptyList[Config]]): GfwConfig = {
     val rasterCatalogFile = s"raster-catalog-$flag.json"
     println(s"Reading $rasterCatalogFile")
-    val rasterCatalog = RasterCatalog.getRasterCatalog(rasterCatalogFile)
+    val rasterCatalog = RasterCatalog.getRasterCatalog(rasterCatalogFile, pinned)
     GfwConfig(rasterCatalog)
   }
 }

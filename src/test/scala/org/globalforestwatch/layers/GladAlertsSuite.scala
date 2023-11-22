@@ -11,7 +11,7 @@ class GladAlertsSuits extends AnyFunSuite {
 
   private val fullDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-  val glad = new GladAlerts(GridTile(10, 40000, 400, "10N_010E"), Map("config" -> GfwConfig.get))
+  val glad = new GladAlerts(GridTile(10, 40000, 400, "10N_010E"), Map("config" -> GfwConfig.get(None)))
 
   test("Unconfirmed date 1") {
     assert(
