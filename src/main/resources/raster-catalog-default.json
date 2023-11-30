@@ -10,7 +10,7 @@
     },
     {
       "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202302/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202310/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
@@ -162,11 +162,11 @@
     },
     {
       "name":"gfw_planted_forests",
-      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20201209/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20230911/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
     },
     {
       "name":"per_forest_concessions",
-      "source_uri":"s3://gfw-data-lake/per_forest_concessions/v201610/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/osinfor_per_forest_concessions/v2023/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
     },
     {
       "name":"osinfor_peru_permanent_production_forests",
