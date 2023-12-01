@@ -19,7 +19,7 @@ object AnnualUpdateMinimalCommand extends SummaryCommand {
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "changeOnly" -> changeOnly,
-        "config" -> GfwConfig.get(None)
+        "config" -> GfwConfig.get()
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

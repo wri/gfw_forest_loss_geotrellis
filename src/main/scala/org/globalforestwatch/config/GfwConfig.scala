@@ -15,7 +15,7 @@ object GfwConfig {
   /** Read the configuration from the raster catalog. pinned specifies any entries using
    * 'latest' that should be pinned to a specified version, else use the actual
    * latest version of the dataset. */
-  def get(pinned: Option[NonEmptyList[Config]]): GfwConfig = read(featureFlag.getOrElse("default"), pinned)
+  def get(pinned: Option[NonEmptyList[Config]] = None): GfwConfig = read(featureFlag.getOrElse("default"), pinned)
 
   def isGfwPro: Boolean = featureFlag == Some("pro")
 

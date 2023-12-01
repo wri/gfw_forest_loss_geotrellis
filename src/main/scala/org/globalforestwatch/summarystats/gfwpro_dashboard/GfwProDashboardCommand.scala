@@ -33,13 +33,14 @@ object GfwProDashboardCommand extends SummaryCommand {
       optionalFireAlertOptions,
       featureFilterOptions,
       contextualFeatureUrlOpt,
-      contextualFeatureTypeOpt
-      ).mapN { (default, fireAlert, filterOptions, contextualFeatureUrl, contextualFeatureType) =>
+      contextualFeatureTypeOpt,
+      pinnedVersionsOpts
+      ).mapN { (default, fireAlert, filterOptions, contextualFeatureUrl, contextualFeatureType, pinned) =>
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "overwriteOutput" -> default.overwriteOutput,
-        "config" -> GfwConfig.get(None)
+        "config" -> GfwConfig.get(pinned)
       )
       // TODO: move building the feature object into options
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
