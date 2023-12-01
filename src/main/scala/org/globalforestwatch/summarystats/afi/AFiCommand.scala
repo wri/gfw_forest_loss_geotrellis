@@ -26,7 +26,7 @@ object AFiCommand extends SummaryCommand {
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "overwriteOutput" -> default.overwriteOutput,
-        "config" -> GfwConfig.get(None)
+        "config" -> GfwConfig.get()
       )
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 

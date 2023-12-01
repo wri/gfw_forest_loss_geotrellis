@@ -28,7 +28,7 @@ object FireAlertsCommand extends SummaryCommand {
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "changeOnly" -> changeOnly,
         "fireAlertType" -> fireAlert.alertType,
-        "config" -> GfwConfig.get(None)
+        "config" -> GfwConfig.get()
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
