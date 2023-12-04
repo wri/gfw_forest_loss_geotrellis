@@ -356,6 +356,10 @@
     {
       "name":"gfw_forest_flux_gross_emissions_node_codes",
       "source_uri": "s3://gfw-data-lake/gfw_forest_flux_gross_emissions_node_codes/v20231114/raster/epsg-4326/{grid_size}/{row_count}/category/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_planted_forest_type",
+      "source_uri": "s3://gfw-data-lake/gfw_planted_forests/v20230911/raster/epsg-4326/{grid_size}/{row_count}/simpleName/geotiff/{tile_id}.tif"
     }
   ]
 }
