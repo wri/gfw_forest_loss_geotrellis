@@ -84,19 +84,47 @@ trait Grid[T <: GridSources] {
 
   // NOTE: This check will cause an eager fetch of raster metadata
   def checkRequired(layer: RequiredLayer, windowExtent: Extent): Unit = {
-    require(
-      layer.source.extent.intersects(windowExtent),
-      s"${layer.uri} does not intersect: $windowExtent"
-    )
+    var retries = 3
+    var doesIntersect = false
+    while (retries > 0) {
+      try {
+        doesIntersect = layer.source.extent.intersects(windowExtent)
+        retries = 0
+      } catch {
+        case scala.util.control.NonFatal(t) => {
+          retries -= 1
+          if (retries == 0) {
+            throw t
+          }
+          println("Retrying checkRequired ${retries}: ${t.getMessage()}")
+          Thread.sleep(5000)
+        }
+      }
+    }
+    require(doesIntersect, s"${layer.uri} does not intersect: $windowExtent")
   }
 
   // Only check these guys if they're defined
   def checkOptional(layer: OptionalLayer, windowExtent: Extent): Unit = {
     layer.source.foreach { source =>
-      require(
-        source.extent.intersects(windowExtent),
-        s"${layer.uri} does not intersect: $windowExtent"
-      )
+      var retries = 3
+      var doesIntersect = false
+      while (retries > 0) {
+        try {
+          doesIntersect = source.extent.intersects(windowExtent)
+          retries = 0
+        } catch {
+          case scala.util.control.NonFatal(t) => {
+            retries -= 1
+            if (retries == 0) {
+              throw t
+            }
+            println("Retrying checkOptional ${retries}: ${t.getMessage()}")
+           Thread.sleep(5000)
+          }
+        }
+      }
+      require(doesIntersect, s"${layer.uri} does not intersect: $windowExtent")
     }
   }
 
