@@ -237,9 +237,25 @@ trait RequiredILayer extends RequiredLayer with ILayer {
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): ITile = {
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
+    var retries = 3
+    var tile: Tile = null
+    while (retries > 0) {
+      try {
 //    println(s"Fetching required int tile ${source.dataPath.value}, key ${windowKey}")
-    val tile = source.synchronized {
-      layoutSource.read(windowKey).get.band(0)
+        tile = source.synchronized {
+          layoutSource.read(windowKey).get.band(0)
+        }
+        retries = 0
+      } catch {
+        case scala.util.control.NonFatal(t) => {
+          retries -= 1
+          if (retries == 0) {
+            throw t
+          }
+          println("Retrying RequiredILayer fetchWindow ${retries}: ${t.getMessage()}")
+          Thread.sleep(5000)
+        }
+      }
     }
     new ITile(tile)
   }
@@ -329,18 +345,28 @@ trait OptionalILayer extends OptionalLayer with ILayer {
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): OptionalITile = {
 //    source.foreach(s => println(s"Fetching optional int tile ${s.dataPath.value}, key ${windowKey}"))
-    new OptionalITile(for {
-      source <- source
-      raster <- Either
-        .catchNonFatal(source.synchronized {
-          LayoutTileSource
-            .spatial(source, windowLayout)
-            .read(windowKey)
-            .get
-            .band(0)
+    if (source.isEmpty) {
+      return OptionalITile(None)
+    }
+    val layoutSource = LayoutTileSource.spatial(source.get, windowLayout)
+    var retries = 3
+    var tile: Option[Tile] = None
+    while (retries > 0) {
+      try {
+//    println(s"Fetching required int tile ${source.dataPath.value}, key ${windowKey}")
+        tile = Some(source.synchronized {
+          layoutSource.read(windowKey).get.band(0)
         })
-        .toOption
-    } yield raster)
+        retries = 0
+      } catch {
+        case scala.util.control.NonFatal(t) => {
+          retries -= 1
+          println("Retrying OptionalILayer fetchWindow ${retries}: ${t.getMessage()}")
+          Thread.sleep(5000)
+        }
+      }
+    }
+    new OptionalITile(tile)
   }
 }
 
