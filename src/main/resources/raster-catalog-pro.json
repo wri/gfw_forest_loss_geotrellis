@@ -10,7 +10,7 @@
     },
     {
       "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202208/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202210/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"detailed_wdpa_protected_areas",
@@ -230,7 +230,7 @@
     },
     {
       "name":"gfw_planted_forests",
-      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20201209/raster/epsg-4326/{grid_size}/{row_count}/type/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20230911/raster/epsg-4326/{grid_size}/{row_count}/type/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"per_forest_concessions",
