@@ -67,7 +67,7 @@ object TreeCoverLossCommand extends SummaryCommand {
         "carbonPools" -> treeCoverLoss._4,
         "simpleAGBEmis" -> treeCoverLoss._5,
         "emisGasAnnual" -> treeCoverLoss._6,
-        "config" -> GfwConfig.get
+        "config" -> GfwConfig.get()
       )
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 

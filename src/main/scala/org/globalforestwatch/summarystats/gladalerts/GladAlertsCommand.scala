@@ -24,7 +24,7 @@ object GladAlertsCommand extends SummaryCommand {
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "changeOnly" -> changeOnly,
-        "config" -> GfwConfig.get
+        "config" -> GfwConfig.get()
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

@@ -33,7 +33,7 @@ object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "overwriteOutput" -> default.overwriteOutput,
-        "config" -> GfwConfig.get
+        "config" -> GfwConfig.get()
       )
 
       if (!default.splitFeatures) logger.warn("Forcing splitFeatures = true")
