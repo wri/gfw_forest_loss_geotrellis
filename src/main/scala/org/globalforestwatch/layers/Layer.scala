@@ -237,7 +237,7 @@ trait RequiredILayer extends RequiredLayer with ILayer {
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): ITile = {
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
-    var retries = 3
+    var retries = 5
     var tile: Tile = null
     while (retries > 0) {
       try {
@@ -252,7 +252,7 @@ trait RequiredILayer extends RequiredLayer with ILayer {
           if (retries == 0) {
             throw t
           }
-          println("Retrying RequiredILayer fetchWindow ${retries}: ${t.getMessage()}")
+          System.err.println(s"Retrying RequiredILayer fetchWindow ${retries}: ${t.getMessage()}")
           Thread.sleep(5000)
         }
       }
@@ -349,7 +349,7 @@ trait OptionalILayer extends OptionalLayer with ILayer {
       return OptionalITile(None)
     }
     val layoutSource = LayoutTileSource.spatial(source.get, windowLayout)
-    var retries = 3
+    var retries = 5
     var tile: Option[Tile] = None
     while (retries > 0) {
       try {
@@ -361,7 +361,7 @@ trait OptionalILayer extends OptionalLayer with ILayer {
       } catch {
         case scala.util.control.NonFatal(t) => {
           retries -= 1
-          println("Retrying OptionalILayer fetchWindow ${retries}: ${t.getMessage()}")
+          System.err.println(s"Retrying OptionalILayer fetchWindow ${retries}: ${t.getMessage()}")
           Thread.sleep(5000)
         }
       }

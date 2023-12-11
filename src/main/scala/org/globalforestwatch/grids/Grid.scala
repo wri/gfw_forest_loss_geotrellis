@@ -84,7 +84,7 @@ trait Grid[T <: GridSources] {
 
   // NOTE: This check will cause an eager fetch of raster metadata
   def checkRequired(layer: RequiredLayer, windowExtent: Extent): Unit = {
-    var retries = 3
+    var retries = 5
     var doesIntersect = false
     while (retries > 0) {
       try {
@@ -96,7 +96,7 @@ trait Grid[T <: GridSources] {
           if (retries == 0) {
             throw t
           }
-          println("Retrying checkRequired ${retries}: ${t.getMessage()}")
+          System.err.println(s"Retrying checkRequired ${retries}: ${t.getMessage()}")
           Thread.sleep(5000)
         }
       }
@@ -107,7 +107,7 @@ trait Grid[T <: GridSources] {
   // Only check these guys if they're defined
   def checkOptional(layer: OptionalLayer, windowExtent: Extent): Unit = {
     layer.source.foreach { source =>
-      var retries = 3
+      var retries = 5
       var doesIntersect = false
       while (retries > 0) {
         try {
@@ -119,7 +119,7 @@ trait Grid[T <: GridSources] {
             if (retries == 0) {
               throw t
             }
-            println("Retrying checkOptional ${retries}: ${t.getMessage()}")
+            System.err.println(s"Retrying checkOptional ${retries}: ${t.getMessage()}")
            Thread.sleep(5000)
           }
         }
