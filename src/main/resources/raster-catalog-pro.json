@@ -118,7 +118,7 @@
     },
     {
       "name":"gfw_peatlands",
-      "source_uri":"s3://gfw-data-lake/gfw_peatlands/v20200807/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_peatlands/v20230315/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_deadwood_carbon",
