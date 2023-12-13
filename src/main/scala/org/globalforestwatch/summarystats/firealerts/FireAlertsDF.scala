@@ -128,7 +128,7 @@ object FireAlertsDF {
     val confCols = if (!aggCol.equals("burned_area__ha")) List($"confidence__cat")  else List()
 
     val fireCols = List(
-      year($"alert__date") as "alert__year",
+      expr("EXTRACT(YEAROFWEEK FROM alert__date)") as "alert__year",
       weekofyear($"alert__date") as "alert__week",
     ) ::: confCols
 
