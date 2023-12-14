@@ -95,7 +95,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
                       // March. So, the most recent data relates to soy planted late
                       // in previous year. So, we should only intersect with tree
                       // cover loss from previous year.
-                      tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2021)
+                      tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2022)
                     )
                   }
                 }
@@ -201,7 +201,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
         usingIndex = true
       )
 
-    // This fire data is an input to the palm risk tool, so limit data to 2021 to sync
+    // This fire data is an input to the palm risk tool, so limit data to 2022 to sync
     // with the palm risk tool.
     joinedRDD.rdd
       .map { case (poly, points) =>
@@ -220,7 +220,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       }
       .reduceByKey(_ merge _)
       .mapValues { fires =>
-        aggregateFireData(fires.merge(ForestChangeDiagnosticDataLossYearly.prefilled)).limitToMaxYear(2021)
+        aggregateFireData(fires.merge(ForestChangeDiagnosticDataLossYearly.prefilled)).limitToMaxYear(2022)
       }
   }
 

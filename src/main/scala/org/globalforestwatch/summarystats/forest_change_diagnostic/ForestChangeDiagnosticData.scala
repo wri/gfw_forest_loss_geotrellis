@@ -182,12 +182,12 @@ case class ForestChangeDiagnosticData(
     */
   def withUpdatedCommodityRisk(): ForestChangeDiagnosticData = {
 
-    /* Exclude the last year, limit data to 2021 to sync with palm risk tool:
+    /* Exclude the last year, limit data to 2022 to sync with palm risk tool:
     commodity_threat_deforestation, commodity_threat_peat, commodity_threat_protected_areas use year n and year n-1.
     Including information from the current year would under-represent these values as it's in progress.
     */
     val minLossYear = ForestChangeDiagnosticDataLossYearly.prefilled.value.keys.min
-    val maxLossYear = 2021
+    val maxLossYear = 2022
     val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
 
     val forestValueIndicator: ForestChangeDiagnosticDataValueYearly =
