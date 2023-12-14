@@ -1,16 +1,15 @@
-package org.globalforestwatch.summarystats.afi
+package org.globalforestwatch.stats.afi
 
 import cats.implicits._
 import com.monovore.decline.Opts
-import org.globalforestwatch.summarystats.SummaryCommand
+import org.globalforestwatch.command.SparkCommand
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features._
-import cats.data.Validated.Valid
+import org.globalforestwatch.summarystats.SummaryCommand
 
-object AFiCommand extends SummaryCommand {
-
-  val afiCommand: Opts[Unit] = Opts.subcommand(
-    name = AFiAnalysis.name,
+object AFiCommand extends SparkCommand with SummaryCommand {
+  val command: Opts[Unit] = Opts.subcommand(
+    name = "afi",
     help = "Compute summary statistics for GFW Pro Dashboard."
   ) (
     (
@@ -25,17 +24,11 @@ object AFiCommand extends SummaryCommand {
       )
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
-      runAnalysis { implicit spark =>
-        val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures)
-        val filteredFeatureRDD = featureRDD.filter{
-          case Valid((GfwProFeatureId(_, locationId), _)) => locationId != -2
-          case _ => true
-        }
-
+      withSpark { implicit spark =>
         AFiAnalysis(
-          filteredFeatureRDD,
+          default.featureUris,
           default.featureType,
-          spark,
+          featureFilter,
           kwargs
         )
       }

@@ -20,6 +20,15 @@ case class RasterCatalog(layers: List[LayerConfig]) {
         throw new IllegalArgumentException(s"No configuration found for dataset ${dataset} on a ${grid} grid")
     }
   }
+
+  def getSourceUri(dataset: String): String = {
+    //  lyr.grid == s"${grid.gridSize}/${grid.rowCount}"
+    layers.find(lyr => lyr.name == dataset) match {
+      case Some(lyr: LayerConfig) => lyr.source_uri
+      case None =>
+        throw new IllegalArgumentException(s"No configuration found for dataset ${dataset}")
+    }
+  }
 }
 
 case class LayerConfig(name: String, source_uri: String)

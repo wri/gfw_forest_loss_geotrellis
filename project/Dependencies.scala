@@ -19,16 +19,17 @@ import sbt._
 object Version {
   val breeze = "0.13.2"
   val decline = "1.3.0"
-  val scala = "2.12.12"
+  val scala = "2.12.15"
   val geotrellis = "3.7.0-SNAPSHOT"
   val hadoop = "3.2.1"
   val jackson = "2.10.0"
-  val spark = "3.1.1"
+  val spark = "3.3.3"
   val sparkCompatible = "3.0"
   val geotools = "24.1"
   val sedona = "1.2.0-incubating"
-  val frameless = "0.9.0"
+  val frameless = "0.13.0"
   val jts = "1.19.0"
+  val rasterframes = "0.11.1"
 }
 
 object Dependencies {
@@ -49,6 +50,8 @@ object Dependencies {
   val geotrellisSparkTestKit = "org.locationtech.geotrellis" %% "geotrellis-spark-testkit" % Version.geotrellis
   val geotrellisRasterTestkit = "org.locationtech.geotrellis" %% "geotrellis-raster-testkit" % Version.geotrellis
   val geotrellisGdal = "org.locationtech.geotrellis" %% "geotrellis-gdal" % Version.geotrellis
+
+  val rasterframes = "org.locationtech.rasterframes" %% "rasterframes-datasource" % Version.rasterframes
 
   val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.9.1"
   val logging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"

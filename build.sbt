@@ -16,13 +16,13 @@ lazy val root = Project("globalforestwatch", file("."))
   )
 
 lazy val core = project
-  .settings(sbtLighterSettings)
+  .settings(commonSettings ++ consoleSettings ++ sbtLighterSettings)
 
 lazy val `spark-sql` = project
-  .settings(sbtLighterSettings)
+  .settings(commonSettings ++ sparkSettings ++ sbtLighterSettings)
+  .dependsOn(core)
 
-lazy val commonSettings = Seq(
-  scalacOptions ++= Seq(
+lazy val scalacOpts = Seq(
     "-deprecation",
     "-unchecked",
     "-feature",
@@ -35,7 +35,11 @@ lazy val commonSettings = Seq(
     "-Ypartial-unification", // Required by Cats
     "-Ywarn-unused-import",
     "-Yrangepos"
-  ),
+)
+
+lazy val commonSettings = Seq(
+  Compile / scalacOptions ++= scalacOpts,
+  Compile / console / scalacOptions -= "-Ywarn-unused-import",
   publishMavenStyle := true,
   Test / publishArtifact := false,
   pomIncludeRepository := { _ =>
@@ -104,41 +108,10 @@ lazy val commonSettings = Seq(
     )
   },
 
-  // auto imports for local SBT console
-  // can be used with `test:console` command
-  console / initialCommands :=
-    """
-  import java.net._
-  //import geotrellis.raster._
-  //import geotrellis.vector._
-  //import geotrellis.vector.io._
-  //import geotrellis.spark._
-  //import geotrellis.spark.tiling._
-  //import geotrellis.contrib.vlm._
-  //import geotrellis.contrib.vlm.gdal._
-  //import geotrellis.contrib.vlm.geotiff._
-  //import geotrellis.vector.io.wkt.WKT
-
-  import org.apache.spark.rdd._
-  import org.apache.spark.sql._
-  import org.apache.spark.{SparkConf, SparkContext}
-
-  import org.globalforestwatch.summarystats.treecoverloss._
-  import org.globalforestwatch.util._
-
-  //
-  //val conf = new SparkConf().
-  //setAppName("Tree Cover Loss Console").
-  //set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-  ////.set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
-  //
-  //implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
-  //implicit val sc: SparkContext = spark.sparkContext
-  """,
-
   // settings for local testing
   Compile / run := Defaults.runTask(Compile / fullClasspath, Compile / run / mainClass, Compile / run / runner).evaluated,
   Compile / runMain := Defaults.runMainTask(Compile / fullClasspath , Compile / runMain / runner),
+  Compile / javaOptions ++= Seq("-Djava.library.path=\"/usr/lib64\""),
 
   Test / fork := true,
   Test / parallelExecution := false,
@@ -176,6 +149,46 @@ lazy val commonSettings = Seq(
       }
     case _ => MergeStrategy.first
   }
+)
+
+lazy val sparkSettings = Seq(
+  libraryDependencies ++= Seq(
+    rasterframes
+  )
+)
+
+lazy val consoleSettings = Seq(
+  // auto imports for local SBT console
+  // can be used with `test:console` command
+  console / initialCommands :=
+    """
+  import java.net._
+  //import geotrellis.raster._
+  //import geotrellis.vector._
+  //import geotrellis.vector.io._
+  //import geotrellis.spark._
+  //import geotrellis.spark.tiling._
+  //import geotrellis.contrib.vlm._
+  //import geotrellis.contrib.vlm.gdal._
+  //import geotrellis.contrib.vlm.geotiff._
+  //import geotrellis.vector.io.wkt.WKT
+
+  import org.apache.spark.rdd._
+  import org.apache.spark.sql._
+  import org.apache.spark.{SparkConf, SparkContext}
+
+  import org.globalforestwatch.summarystats.treecoverloss._
+  import org.globalforestwatch.util._
+
+  //
+  //val conf = new SparkConf().
+  //setAppName("Tree Cover Loss Console").
+  //set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+  ////.set("spark.kryo.registrator", "geotrellis.spark.io.kryo.KryoRegistrator")
+  //
+  //implicit val spark: SparkSession = SparkSession.builder.config(conf).getOrCreate
+  //implicit val sc: SparkContext = spark.sparkContext
+  """
 )
 
 // Settings from sbt-lighter plugin that will automate creating and submitting this job to EMR

@@ -140,4 +140,19 @@ object SpatialFeatureDF {
       wkbReader.read(binWkb)
     }.toOption
   }
+
+  def readEither(wkbHexString: String): Either[Throwable, jts.geom.Geometry] = {
+    if (threadLocalWkbReader.get() == null) {
+      val precisionModel = new jts.geom.PrecisionModel(1e11)
+      val factory = new jts.geom.GeometryFactory(precisionModel)
+      val wkbReader = new jts.io.WKBReader(factory)
+      threadLocalWkbReader.set(wkbReader)
+    }
+    val wkbReader = threadLocalWkbReader.get()
+
+    Try{
+      val binWkb = javax.xml.bind.DatatypeConverter.parseHexBinary(wkbHexString)
+      wkbReader.read(binWkb)
+    }.toEither
+  }
 }
