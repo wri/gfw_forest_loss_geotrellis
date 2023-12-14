@@ -347,7 +347,7 @@
     },
     {
       "name":"gfw_forest_flux_removal_forest_type",
-      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_removal_forest_type/v20231114/v20231114/raster/epsg-4326/{grid_size}/{row_count}/source/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_removal_forest_type/v20231114/raster/epsg-4326/{grid_size}/{row_count}/source/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_forest_flux_forest_age_category",
