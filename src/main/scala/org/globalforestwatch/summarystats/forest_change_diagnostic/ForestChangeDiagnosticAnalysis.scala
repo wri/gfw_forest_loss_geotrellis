@@ -201,7 +201,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
         usingIndex = true
       )
 
-    // This fire data is an input to the palm risk tool, so limit data to 2021 to sync
+    // This fire data is an input to the palm risk tool, so limit data to 2022 to sync
     // with the palm risk tool.
     joinedRDD.rdd
       .map { case (poly, points) =>
