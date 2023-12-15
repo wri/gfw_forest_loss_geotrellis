@@ -29,8 +29,8 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
   val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil = GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, model, kwargs)
   val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2BiomassSoil = GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile, model, kwargs)
   val jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000 = JplTropicsAbovegroundBiomassDensity2000(gridTile, kwargs)
-  val fluxModelExtent: FluxModelExtent = FluxModelExtent(gridTile, model, kwargs)
-  val removalForestType: RemovalForestType = RemovalForestType(gridTile, model, kwargs)
+  val fluxModelExtent: ForestFluxModelExtent = ForestFluxModelExtent(gridTile, model, kwargs)
+  val removalForestType: ForestFluxModelRemovalForestType = ForestFluxModelRemovalForestType(gridTile, model, kwargs)
   val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
   val mangroveBiomassExtent: MangroveBiomassExtent = MangroveBiomassExtent(gridTile, kwargs)
   val treeCoverLossDrivers: TreeCoverLossDrivers = TreeCoverLossDrivers(gridTile, kwargs)
@@ -38,10 +38,10 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
   val intactForestLandscapes: IntactForestLandscapes = IntactForestLandscapes(gridTile, kwargs)
-  val plantationsTypeFluxModel: PlantationsTypeFluxModel = PlantationsTypeFluxModel(gridTile, kwargs)
+  val plantationsTypeFluxModel: ForestFluxModelPlantedForestType = ForestFluxModelPlantedForestType(gridTile, kwargs)
   val intactPrimaryForest: IntactPrimaryForest = IntactPrimaryForest(gridTile, kwargs)
   val peatlandsExtentFluxModel: Peatlands = Peatlands(gridTile, kwargs)
-  val forestAgeCategory: ForestAgeCategory = ForestAgeCategory(gridTile, model, kwargs)
+  val forestAgeCategory: ForestFluxModelAgeCategory = ForestFluxModelAgeCategory(gridTile, model, kwargs)
   val jplTropicsAbovegroundBiomassExtent2000: JplTropicsAbovegroundBiomassExtent2000 =
     JplTropicsAbovegroundBiomassExtent2000(gridTile, kwargs)
   val fiaRegionsUsExtent: FiaRegionsUsExtent = FiaRegionsUsExtent(gridTile, kwargs)
@@ -53,7 +53,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
     ProdesLegalAmazonExtent2000(gridTile, kwargs)
   val tropicLatitudeExtent: TropicLatitudeExtent = TropicLatitudeExtent(gridTile, kwargs)
   val treeCoverLossFromFires: TreeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
-  val grossEmissionsNodeCodes: GrossEmissionsNodeCodes = GrossEmissionsNodeCodes(gridTile, model, kwargs)
+  val grossEmissionsNodeCodes: ForestFluxModelGrossEmissionsNodeCodes = ForestFluxModelGrossEmissionsNodeCodes(gridTile, model, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,

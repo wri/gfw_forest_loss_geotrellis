@@ -6,10 +6,16 @@ case class StdevSoilCarbon2000(gridTile: GridTile, model: String = "standard", k
   extends FloatLayer
     with OptionalFLayer {
 
-  val datasetName = "Na"
+  val datasetName = "gfw_forest_flux_soil_carbon_stock_2000_stdev"
 
-
-  val model_suffix: String = if (model == "standard") "standard" else s"$model"
   val uri: String =
-    s"s3://gfw-files/flux_1_2_0/stdev_soil_carbon_full_extent/$model_suffix/${gridTile.tileId}.tif"
+    uriForGrid(gridTile, kwargs)
+
+
+  //  // For carbon_sensitivity run only (but not currently functional)
+  //  val datasetName = "Na"
+  //
+  //  val model_suffix: String = if (model == "standard") "standard" else s"$model"
+  //  val uri: String =
+  //    s"s3://gfw-data-lake/gfw_forest_flux_soil_carbon_stock_2000_stdev/v20231108/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
 }

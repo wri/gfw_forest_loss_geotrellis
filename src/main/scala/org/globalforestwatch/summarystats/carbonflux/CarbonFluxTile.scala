@@ -36,18 +36,18 @@ case class CarbonFluxTile(
                            stdevAnnualAbovegroundRemovalsCarbon: StdevAnnualAbovegroundRemovalsCarbon#OptionalFTile,
                            stdevSoilCarbon2000: StdevSoilCarbon2000#OptionalFTile,
 
-                           fluxModelExtent: FluxModelExtent#OptionalITile,
+                           fluxModelExtent: ForestFluxModelExtent#OptionalITile,
                            mangroveBiomassExtent: MangroveBiomassExtent#OptionalITile,
-                           removalForestType: RemovalForestType#OptionalITile,
+                           removalForestType: ForestFluxModelRemovalForestType#OptionalITile,
                            drivers: TreeCoverLossDrivers#OptionalITile,
                            faoEcozones2000: FaoEcozones2000#OptionalITile,
                            landmark: Landmark#OptionalITile,
                            wdpa: ProtectedAreas#OptionalITile,
                            intactForestLandscapes2000: IntactForestLandscapes2000#OptionalITile,
-                           plantationsTypeFluxModel: PlantationsTypeFluxModel#OptionalITile,
+                           plantationsTypeFluxModel: ForestFluxModelPlantedForestType#OptionalITile,
                            intactPrimaryForest: IntactPrimaryForest#OptionalITile,
                            peatlands: Peatlands#OptionalITile,
-                           forestAgeCategory: ForestAgeCategory#OptionalITile,
+                           forestAgeCategory: ForestFluxModelAgeCategory#OptionalITile,
                            jplTropicsAbovegroundBiomassExtent2000: JplTropicsAbovegroundBiomassExtent2000#OptionalITile,
                            fiaRegionsUsExtent: FiaRegionsUsExtent#OptionalITile,
                            brazilBiomes: BrazilBiomes#OptionalITile,
@@ -57,7 +57,7 @@ case class CarbonFluxTile(
                            prodesLegalAmazonExtent2000: ProdesLegalAmazonExtent2000#OptionalITile,
                            tropicLatitudeExtent: TropicLatitudeExtent#OptionalITile,
                            treeCoverLossFromFires: TreeCoverLossFromFires#OptionalITile,
-                           grossEmissionsNodeCodes: GrossEmissionsNodeCodes#OptionalITile,
+                           grossEmissionsNodeCodes: ForestFluxModelGrossEmissionsNodeCodes#OptionalITile,
                            plantationsPre2000: PlantationsPre2000#OptionalITile
                          ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType

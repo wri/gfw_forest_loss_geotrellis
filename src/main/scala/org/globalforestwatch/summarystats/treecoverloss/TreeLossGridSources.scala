@@ -32,7 +32,7 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
   val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil = GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2BiomassSoil = GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile, kwargs = kwargs)
   val netFluxCo2e: NetFluxCo2e = NetFluxCo2e(gridTile, kwargs = kwargs)
-  val fluxModelExtent: FluxModelExtent = FluxModelExtent(gridTile, kwargs = kwargs)
+  val fluxModelExtent: ForestFluxModelExtent = ForestFluxModelExtent(gridTile, kwargs = kwargs)
 
 
   def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition):

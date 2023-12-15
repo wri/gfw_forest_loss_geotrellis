@@ -22,18 +22,18 @@ case class CarbonSensitivityTile(
                                   grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2BiomassSoil#OptionalFTile,
                                   jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000#OptionalFTile,
 
-                                  fluxModelExtent: FluxModelExtent#OptionalITile,
-                                  removalForestType: RemovalForestType#OptionalITile,
+                                  fluxModelExtent: ForestFluxModelExtent#OptionalITile,
+                                  removalForestType: ForestFluxModelRemovalForestType#OptionalITile,
                                   mangroveBiomassExtent: MangroveBiomassExtent#OptionalITile,
                                   drivers: TreeCoverLossDrivers#OptionalITile,
                                   ecozones: FaoEcozones2000#OptionalITile,
                                   landmark: Landmark#OptionalITile,
                                   wdpa: ProtectedAreas#OptionalITile,
                                   intactForestLandscapes: IntactForestLandscapes#OptionalITile,
-                                  plantationsTypeFluxModel: PlantationsTypeFluxModel#OptionalITile,
+                                  plantationsTypeFluxModel: ForestFluxModelPlantedForestType#OptionalITile,
                                   intactPrimaryForest: IntactPrimaryForest#OptionalITile,
                                   peatlandsExtentFluxModel: Peatlands#OptionalITile,
-                                  forestAgeCategory: ForestAgeCategory#OptionalITile,
+                                  forestAgeCategory: ForestFluxModelAgeCategory#OptionalITile,
                                   jplTropicsAbovegroundBiomassExtent2000: JplTropicsAbovegroundBiomassExtent2000#OptionalITile,
                                   fiaRegionsUsExtent: FiaRegionsUsExtent#OptionalITile,
                                   braBiomes: BrazilBiomes#OptionalITile,
@@ -43,7 +43,7 @@ case class CarbonSensitivityTile(
                                   prodesLegalAmazonExtent2000: ProdesLegalAmazonExtent2000#OptionalITile,
                                   tropicLatitudeExtent: TropicLatitudeExtent#OptionalITile,
                                   treeCoverLossFromFires: TreeCoverLossFromFires#OptionalITile,
-                                  grossEmissionsNodeCodes: GrossEmissionsNodeCodes#OptionalITile
+                                  grossEmissionsNodeCodes: ForestFluxModelGrossEmissionsNodeCodes#OptionalITile
                                 ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
 
