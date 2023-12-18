@@ -141,7 +141,7 @@
       "source_uri":"s3://gfw-data-lake/gfw_mining_concessions/v202203/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gmw_global_mangrove_extent_2016",
+      "name":"gmw_global_mangrove_extent",
       "source_uri":"s3://gfw-data-lake/gmw_global_mangrove_extent_2016/v20201210/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {

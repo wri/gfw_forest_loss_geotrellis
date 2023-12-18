@@ -18,6 +18,6 @@ case class FireAlertsDataGroup(threshold: Integer,
                                indonesiaForestArea: String,
                                peruForestConcessions: String,
                                oilGas: Boolean,
-                               mangroves2016: Boolean,
+                               mangrovesLatest: Boolean,
                                intactForestLandscapes2016: Boolean,
                                braBiomes: String)

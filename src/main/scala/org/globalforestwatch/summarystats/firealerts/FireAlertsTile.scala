@@ -3,6 +3,7 @@ package org.globalforestwatch.summarystats.firealerts
 import geotrellis.raster.{CellGrid, CellType, IntCellType}
 import org.globalforestwatch.grids.GridTile
 import org.globalforestwatch.layers.{TreeCoverDensityThreshold2000, _}
+import org.globalforestwatch.layers.MangrovesLatest
 
 /**
   *
@@ -27,7 +28,7 @@ case class FireAlertsTile(
                            indonesiaForestArea: IndonesiaForestArea#OptionalITile,
                            peruForestConcessions: PeruForestConcessions#OptionalITile,
                            oilGas: OilGas#OptionalITile,
-                           mangroves2016: Mangroves2016#OptionalITile,
+                           mangrovesLatest: MangrovesLatest#OptionalITile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
                            brazilBiomes: BrazilBiomes#OptionalITile,
                            tcd2000: TreeCoverDensityThreshold2000#ITile

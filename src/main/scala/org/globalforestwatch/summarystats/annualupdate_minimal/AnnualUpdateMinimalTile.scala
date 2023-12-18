@@ -2,6 +2,7 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 
 import geotrellis.raster.{CellGrid, CellType}
 import org.globalforestwatch.layers._
+import org.globalforestwatch.layers.MangrovesLatest
 
 /**
   *
@@ -20,7 +21,7 @@ case class AnnualUpdateMinimalTile(
                                     aze: Aze#OptionalITile,
                                     plantedForests: PlantedForests#OptionalITile,
                                     mangroves1996: Mangroves1996#OptionalITile,
-                                    mangroves2016: Mangroves2016#OptionalITile,
+                                    mangrovesLatest: MangrovesLatest#OptionalITile,
                                     tigerLandscapes: TigerLandscapes#OptionalITile,
                                     landmark: Landmark#OptionalITile,
                                     keyBiodiversityAreas: KeyBiodiversityAreas#OptionalITile,
