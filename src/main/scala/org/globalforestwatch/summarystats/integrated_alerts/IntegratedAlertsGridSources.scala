@@ -6,7 +6,7 @@ import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import org.globalforestwatch.grids.{GridId, GridSources, GridTile}
 import org.globalforestwatch.layers._
-import org.globalforestwatch.layers.Mangroves2016
+import org.globalforestwatch.layers.MangrovesLatest
 
 /**
   * @param gridTile top left corner, padded from east ex: "10N_010E"

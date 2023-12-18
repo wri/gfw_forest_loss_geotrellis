@@ -22,7 +22,7 @@ object GladAlertsDF {
     "idn_forest_area__class",
     "per_forest_concessions__type",
     "is__gfw_oil_gas",
-    "is__gmw_global_mangrove_extent_2016",
+    "is__gmw_global_mangrove_extent_latest",
     "is__ifl_intact_forest_landscapes_2016",
     "ibge_bra_biomes__name",
 
