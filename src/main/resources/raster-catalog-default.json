@@ -10,7 +10,7 @@
     },
     {
       "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202310/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202308/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
@@ -252,8 +252,6 @@
       "name":"umd_land_cover",
       "source_uri": "s3://gfw-data-lake/umd_land_cover/v2020/raster/epsg-4326/{grid_size}/{row_count}/ipcc_class/geotiff/{tile_id}.tif"
     },
-
-
     {
       "name":"gfw_forest_flux_full_extent_removal_factor_aboveground",
       "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_removal_factor_aboveground/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1_yr-1/geotiff/{tile_id}.tif"
