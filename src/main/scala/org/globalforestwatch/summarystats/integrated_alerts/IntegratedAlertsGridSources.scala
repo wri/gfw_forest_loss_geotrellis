@@ -6,7 +6,6 @@ import geotrellis.raster.Raster
 import geotrellis.vector.Extent
 import org.globalforestwatch.grids.{GridId, GridSources, GridTile}
 import org.globalforestwatch.layers._
-import org.globalforestwatch.layers.MangrovesLatest
 
 /**
   * @param gridTile top left corner, padded from east ex: "10N_010E"
@@ -34,7 +33,7 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
   val indonesiaForestArea: IndonesiaForestArea = IndonesiaForestArea(gridTile, kwargs)
   val peruForestConcessions: PeruForestConcessions = PeruForestConcessions(gridTile, kwargs)
   val oilGas: OilGas = OilGas(gridTile, kwargs)
-  val MangrovesLatest: MangrovesLatest = MangrovesLatest(gridTile, kwargs)
+  val mangrovesLatest: MangrovesLatest = MangrovesLatest(gridTile, kwargs)
   val intactForestLandscapes2016: IntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile, kwargs)
   val braBiomes: BrazilBiomes = BrazilBiomes(gridTile, kwargs)
 
