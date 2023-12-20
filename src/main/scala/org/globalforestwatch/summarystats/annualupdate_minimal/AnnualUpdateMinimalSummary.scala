@@ -51,7 +51,7 @@ object AnnualUpdateMinimalSummary {
         val aze: Boolean = raster.tile.aze.getData(col, row)
         val plantedForests: String = raster.tile.plantedForests.getData(col, row)
         val mangroves1996: Boolean = raster.tile.mangroves1996.getData(col, row)
-        val mangrovesLatest: Boolean = raster.tile.mangrovesLatest.getData(col, row)
+        val mangroves2020: Boolean = raster.tile.mangroves2020.getData(col, row)
         val tigerLandscapes: Boolean =
         raster.tile.tigerLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
@@ -124,7 +124,7 @@ object AnnualUpdateMinimalSummary {
             aze,
             plantedForests,
             mangroves1996,
-            mangrovesLatest,
+            mangroves2020,
             tigerLandscapes,
             landmark,
             keyBiodiversityAreas,

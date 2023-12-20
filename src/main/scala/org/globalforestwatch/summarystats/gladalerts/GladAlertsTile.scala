@@ -2,7 +2,6 @@ package org.globalforestwatch.summarystats.gladalerts
 
 import geotrellis.raster.{CellGrid, CellType, IntCellType}
 import org.globalforestwatch.layers._
-import org.globalforestwatch.layers.MangrovesLatest
 
 /**
   *
@@ -29,7 +28,7 @@ case class GladAlertsTile(
                            indonesiaForestArea: IndonesiaForestArea#OptionalITile,
                            peruForestConcessions: PeruForestConcessions#OptionalITile,
                            oilGas: OilGas#OptionalITile,
-                           mangrovesLatest: MangrovesLatest#OptionalITile,
+                           mangroves2020: Mangroves2020#OptionalITile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
                            brazilBiomes: BrazilBiomes#OptionalITile
                          ) extends CellGrid[Int] {

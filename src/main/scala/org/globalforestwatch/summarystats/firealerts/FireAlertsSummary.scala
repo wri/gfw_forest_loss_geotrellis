@@ -56,8 +56,8 @@ object FireAlertsSummary {
           val peruForestConcessions: String =
             raster.tile.peruForestConcessions.getData(col, row)
           val oilGas: Boolean = raster.tile.oilGas.getData(col, row)
-          val mangrovesLatest: Boolean =
-            raster.tile.mangrovesLatest.getData(col, row)
+          val mangroves2020: Boolean =
+            raster.tile.mangroves2020.getData(col, row)
           val intactForestLandscapes2016: Boolean =
             raster.tile.intactForestLandscapes2016.getData(col, row)
           val braBiomes: String = raster.tile.brazilBiomes.getData(col, row)
@@ -86,7 +86,7 @@ object FireAlertsSummary {
               indonesiaForestArea,
               peruForestConcessions,
               oilGas,
-              mangrovesLatest,
+              mangroves2020,
               intactForestLandscapes2016,
               braBiomes,
             )

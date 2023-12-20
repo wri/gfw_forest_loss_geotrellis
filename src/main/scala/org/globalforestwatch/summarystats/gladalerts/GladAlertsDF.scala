@@ -22,7 +22,7 @@ object GladAlertsDF {
     "idn_forest_area__class",
     "per_forest_concessions__type",
     "is__gfw_oil_gas",
-    "is__gmw_global_mangrove_extent_latest",
+    "is__gmw_global_mangrove_extent_2020",
     "is__ifl_intact_forest_landscapes_2016",
     "ibge_bra_biomes__name",
 
@@ -35,7 +35,7 @@ object GladAlertsDF {
     "is__peatland",
     "idn_forest_area__type",
     "per_forest_concession__type",
-    "is__gmw_mangroves_latest",
+    "is__gmw_mangroves_2020",
     "is__ifl_intact_forest_landscape_2016",
     "bra_biome__name"
   )
@@ -68,7 +68,7 @@ object GladAlertsDF {
         $"data_group.indonesiaForestArea" as "idn_forest_area__class",
         $"data_group.peruForestConcessions" as "per_forest_concessions__type",
         $"data_group.oilGas" as "is__gfw_oil_gas",
-        $"data_group.mangrovesLatest" as "is__gmw_global_mangrove_extent_latest",
+        $"data_group.mangroves2020" as "is__gmw_global_mangrove_extent_2020",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscapes_2016",
         $"data_group.braBiomes" as "ibge_bra_biomes__name",
         $"data.totalAlerts" as "alert__count",
@@ -85,7 +85,7 @@ object GladAlertsDF {
         $"data_group.peatlands" as "is__peatland",
         $"data_group.indonesiaForestArea" as "idn_forest_area__type",
         $"data_group.peruForestConcessions" as "per_forest_concession__type",
-        $"data_group.mangrovesLatest" as "is__gmw_mangroves_latest",
+        $"data_group.mangroves2020" as "is__gmw_mangroves_2020",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscape_2016",
         $"data_group.braBiomes" as "bra_biome__name"
       )
@@ -167,7 +167,7 @@ object GladAlertsDF {
       max(length($"per_forest_concessions__type"))
         .cast("boolean") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
-      max("is__gmw_global_mangrove_extent_latest") as "is__gmw_global_mangrove_extent_latest",
+      max("is__gmw_global_mangrove_extent_2020") as "is__gmw_global_mangrove_extent_2020",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
       max(length($"ibge_bra_biomes__name")).cast("boolean") as "ibge_bra_biomes__name",
 
@@ -183,7 +183,7 @@ object GladAlertsDF {
         .cast("boolean") as "idn_forest_area__type",
       max(length($"per_forest_concession__type"))
         .cast("boolean") as "per_forest_concession__type",
-      max("is__gmw_mangroves_latest") as "is__gmw_mangroves_latest",
+      max("is__gmw_mangroves_2020") as "is__gmw_mangroves_2020",
       max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
       max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name"
     )
@@ -219,7 +219,7 @@ object GladAlertsDF {
       max("idn_forest_area__class") as "idn_forest_area__class",
       max("per_forest_concessions__type") as "per_forest_concessions__type",
       max("is__gfw_oil_gas") as "is__gfw_oil_gas",
-      max("is__gmw_global_mangrove_extent_latest") as "is__gmw_global_mangrove_extent_latest",
+      max("is__gmw_global_mangrove_extent_2020") as "is__gmw_global_mangrove_extent_2020",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
       max("ibge_bra_biomes__name") as "ibge_bra_biomes__name",
 
@@ -232,7 +232,7 @@ object GladAlertsDF {
       max("is__peatland") as "is__peatland",
       max("idn_forest_area__type") as "idn_forest_area__type",
       max("per_forest_concession__type") as "per_forest_concession__type",
-      max("is__gmw_mangroves_latest") as "is__gmw_mangroves_latest",
+      max("is__gmw_mangroves_2020") as "is__gmw_mangroves_2020",
       max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
       max("bra_biome__name") as "bra_biome__name"
     )

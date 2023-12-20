@@ -205,7 +205,7 @@
       "source_uri":"s3://gfw-data-lake/gfw_peatlands/v20200807/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"gmw_global_mangrove_extent_latest",
+      "name":"gmw_global_mangrove_extent_2020",
       "source_uri":"s3://gfw-data-lake/gmw_global_mangrove_extent/v3/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {

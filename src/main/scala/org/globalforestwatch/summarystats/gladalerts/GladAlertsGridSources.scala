@@ -5,7 +5,6 @@ import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.Raster
 import org.globalforestwatch.grids.{GridSources, GridTile}
 import org.globalforestwatch.layers._
-import org.globalforestwatch.layers.MangrovesLatest
 
 /**
   * @param gridTile top left corner, padded from east ex: "10N_010E"
@@ -31,7 +30,7 @@ case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) e
   val indonesiaForestArea: IndonesiaForestArea = IndonesiaForestArea(gridTile, kwargs)
   val peruForestConcessions: PeruForestConcessions = PeruForestConcessions(gridTile, kwargs)
   val oilGas: OilGas = OilGas(gridTile, kwargs)
-  val mangrovesLatest: MangrovesLatest = MangrovesLatest(gridTile, kwargs)
+  val mangroves2020: Mangroves2020 = Mangroves2020(gridTile, kwargs)
   val intactForestLandscapes2016: IntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile, kwargs)
   val braBiomes: BrazilBiomes = BrazilBiomes(gridTile, kwargs)
 
@@ -65,7 +64,7 @@ case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) e
       val indonesiaForestAreaTile = indonesiaForestArea.fetchWindow(windowKey, windowLayout)
       val peruForestConcessionsTile = peruForestConcessions.fetchWindow(windowKey, windowLayout)
       val oilGasTile = oilGas.fetchWindow(windowKey, windowLayout)
-      val mangrovesLatestTile = mangrovesLatest.fetchWindow(windowKey, windowLayout)
+      val mangroves2020Tile = mangroves2020.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2016Tile =
         intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
       val braBiomesTile =
@@ -91,7 +90,7 @@ case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) e
         indonesiaForestAreaTile,
         peruForestConcessionsTile,
         oilGasTile,
-        mangrovesLatestTile,
+        mangroves2020Tile,
         intactForestLandscapes2016Tile,
         braBiomesTile
       )
