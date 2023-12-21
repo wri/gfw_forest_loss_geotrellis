@@ -27,7 +27,7 @@ case class FireAlertsTile(
                            indonesiaForestArea: IndonesiaForestArea#OptionalITile,
                            peruForestConcessions: PeruForestConcessions#OptionalITile,
                            oilGas: OilGas#OptionalITile,
-                           mangroves2016: Mangroves2016#OptionalITile,
+                           mangroves2020: Mangroves2020#OptionalITile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
                            brazilBiomes: BrazilBiomes#OptionalITile,
                            tcd2000: TreeCoverDensityThreshold2000#ITile

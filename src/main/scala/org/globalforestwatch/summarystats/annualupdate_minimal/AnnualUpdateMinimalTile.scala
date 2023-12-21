@@ -20,7 +20,7 @@ case class AnnualUpdateMinimalTile(
                                     aze: Aze#OptionalITile,
                                     plantedForests: PlantedForests#OptionalITile,
                                     mangroves1996: Mangroves1996#OptionalITile,
-                                    mangroves2016: Mangroves2016#OptionalITile,
+                                    mangroves2020: Mangroves2020#OptionalITile,
                                     tigerLandscapes: TigerLandscapes#OptionalITile,
                                     landmark: Landmark#OptionalITile,
                                     keyBiodiversityAreas: KeyBiodiversityAreas#OptionalITile,

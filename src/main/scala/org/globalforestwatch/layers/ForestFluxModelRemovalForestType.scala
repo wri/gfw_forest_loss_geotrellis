@@ -1,16 +1,23 @@
 package org.globalforestwatch.layers
+
 import org.globalforestwatch.grids.GridTile
 
-case class RemovalForestType(gridTile: GridTile, model: String = "standard", kwargs: Map[String, Any])
+case class ForestFluxModelRemovalForestType(gridTile: GridTile, model: String = "standard", kwargs: Map[String, Any])
   extends StringLayer
     with OptionalILayer {
 
-  val datasetName = "Na"
-
-  val model_suffix: String = if (model == "standard") "standard" else s"$model"
+  val datasetName = "gfw_forest_flux_removal_forest_type"
 
   val uri: String =
-      s"s3://gfw-files/flux_1_2_3/removal_forest_type/$model_suffix/${gridTile.tileId}.tif"
+    uriForGrid(gridTile, kwargs)
+
+
+  //  // For carbon_sensitivity run only (but not currently functional)
+  //  val datasetName = "Na"
+  //
+  //  val model_suffix: String = if (model == "standard") "standard" else s"$model"
+  ////  val uri: String =
+  ////      s"s3://gfw-data-lake/gfw_forest_flux_removal_forest_type/v20231114/v20231114/raster/epsg-4326/{grid_size}/{row_count}/source/geotiff/{tile_id}.tif"
 
   override val externalNoDataValue = "Not applicable"
 

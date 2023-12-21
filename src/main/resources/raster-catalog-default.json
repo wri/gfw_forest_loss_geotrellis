@@ -10,7 +10,7 @@
     },
     {
       "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202302/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202308/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
@@ -141,8 +141,8 @@
       "source_uri":"s3://gfw-data-lake/gfw_mining_concessions/v202203/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gmw_global_mangrove_extent_2016",
-      "source_uri":"s3://gfw-data-lake/gmw_global_mangrove_extent_2016/v20201210/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "name":"gmw_global_mangrove_extent_2020",
+      "source_uri":"s3://gfw-data-lake/gmw_global_mangrove_extent/v3/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
       "name":"umd_regional_primary_forest_2001",
@@ -162,11 +162,11 @@
     },
     {
       "name":"gfw_planted_forests",
-      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20201209/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20230911/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
     },
     {
       "name":"per_forest_concessions",
-      "source_uri":"s3://gfw-data-lake/per_forest_concessions/v201610/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/osinfor_per_forest_concessions/v2023/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
     },
     {
       "name":"osinfor_peru_permanent_production_forests",
@@ -252,39 +252,112 @@
       "name":"umd_land_cover",
       "source_uri": "s3://gfw-data-lake/umd_land_cover/v2020/raster/epsg-4326/{grid_size}/{row_count}/ipcc_class/geotiff/{tile_id}.tif"
     },
+    {
+      "name":"gfw_forest_flux_full_extent_removal_factor_aboveground",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_removal_factor_aboveground/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1_yr-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_full_extent_removal_factor_belowground",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_removal_factor_belowground/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1_yr-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_full_extent_gross_removals_aboveground",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_removals_aboveground/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_full_extent_gross_removals_belowground",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_removals_belowground/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_full_extent_gross_emissions_co2_only_biomass_soil",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_co2_only_biomass_soil/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_full_extent_gross_emissions_non_co2_biomass_soil",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_non_co2_biomass_soil/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_full_extent_gross_emissions_co2_only_soil_only",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_co2_only_soil_only/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_full_extent_gross_emissions_non_co2_soil_only",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_non_co2_soil_only/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_full_extent_net_flux",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_net_flux/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+    },
 
 
     {
-      "name":"gfw_aboveground_carbon",
-      "source_uri":"s3://gfw-data-lake/gfw_aboveground_carbon/v20230322/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+      "name":"gfw_forest_flux_aboveground_carbon_stock_in_emissions_year",
+      "source_uri":"s3://gfw-data-lake/gfw_forest_flux_aboveground_carbon_stock_in_emissions_year/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_belowground_carbon",
-      "source_uri":"s3://gfw-data-lake/gfw_belowground_carbon/v20230322/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+      "name":"gfw_forest_flux_belowground_carbon_stock_in_emissions_year",
+      "source_uri":"s3://gfw-data-lake/gfw_forest_flux_belowground_carbon_stock_in_emissions_year/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_soil_carbon",
-      "source_uri": "s3://gfw-data-lake/gfw_soil_carbon/v20230322.2/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+      "name":"gfw_forest_flux_deadwood_carbon_stock_in_emissions_year",
+      "source_uri":"s3://gfw-data-lake/gfw_forest_flux_deadwood_carbon_stock_in_emissions_year/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_full_extent_net_flux",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_net_flux/v20230407/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "name":"gfw_forest_flux_litter_carbon_stock_in_emissions_year",
+      "source_uri":"s3://gfw-data-lake/gfw_forest_flux_litter_carbon_stock_in_emissions_year/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_full_extent_aboveground_gross_removals",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_aboveground_gross_removals/v20230331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "name":"gfw_forest_flux_soil_carbon_stock_in_emissions_year",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_soil_carbon_stock_in_emissions_year/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_full_extent_belowground_gross_removals",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_belowground_gross_removals/v20230331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "name":"gfw_aboveground_carbon_stock_2000",
+      "source_uri":"s3://gfw-data-lake/gfw_aboveground_carbon_stock_2000/v20230222/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_full_extent_co2_gross_emissions_biomass_soil",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_co2_gross_emissions/v20230407/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "name":"gfw_belowground_carbon_stock_2000",
+      "source_uri":"s3://gfw-data-lake/gfw_belowground_carbon_stock_2000/v20230222/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_full_extent_non_co2_gross_emissions_biomass_soil",
-      "source_uri": "s3://gfw-data-lake/gfw_full_extent_non_co2_gross_emissions/v20230407/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "name":"gfw_deadwood_carbon_stock_2000",
+      "source_uri":"s3://gfw-data-lake/gfw_deadwood_carbon_stock_2000/v20230222/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_litter_carbon_stock_2000",
+      "source_uri":"s3://gfw-data-lake/gfw_litter_carbon_stock_2000/v20230222/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_soil_carbon_stock_2000",
+      "source_uri": "s3://gfw-data-lake/gfw_soil_carbon_stock_2000/v20231108/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
+    },
+
+    {
+      "name":"gfw_forest_flux_soil_carbon_stock_2000_stdev",
+      "source_uri":"s3://gfw-data-lake/gfw_forest_flux_soil_carbon_stock_2000_stdev/v20231108/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_removal_factor_aboveground_carbon_stdev",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_removal_factor_aboveground_carbon_stdev/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1_yr-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_model_extent",
+      "source_uri":"s3://gfw-data-lake/gfw_forest_flux_model_extent/v20231114/raster/epsg-4326/{grid_size}/{row_count}/ha/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_removal_forest_type",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_removal_forest_type/v20231114/raster/epsg-4326/{grid_size}/{row_count}/source/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_forest_age_category",
+      "source_uri":"s3://gfw-data-lake/gfw_forest_flux_forest_age_category/v20231114/raster/epsg-4326/{grid_size}/{row_count}/ageCategory/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_gross_emissions_node_codes",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_gross_emissions_node_codes/v20231114/raster/epsg-4326/{grid_size}/{row_count}/category/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_planted_forest_type",
+      "source_uri": "s3://gfw-data-lake/gfw_planted_forests/v20230911/raster/epsg-4326/{grid_size}/{row_count}/simpleName/geotiff/{tile_id}.tif"
     }
   ]
 }

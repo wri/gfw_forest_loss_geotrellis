@@ -22,7 +22,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val aze: Aze = Aze(gridTile, kwargs)
   val plantedForests: PlantedForests = PlantedForests(gridTile, kwargs)
   val mangroves1996: Mangroves1996 = Mangroves1996(gridTile, kwargs)
-  val mangroves2016: Mangroves2016 = Mangroves2016(gridTile, kwargs)
+  val mangroves2020: Mangroves2020 = Mangroves2020(gridTile, kwargs)
   val tigerLandscapes: TigerLandscapes = TigerLandscapes(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
   val keyBiodiversityAreas: KeyBiodiversityAreas = KeyBiodiversityAreas(gridTile, kwargs)
@@ -73,7 +73,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       val azeTile = aze.fetchWindow(windowKey, windowLayout)
       val plantedForestsTile = plantedForests.fetchWindow(windowKey, windowLayout)
       val mangroves1996Tile = mangroves1996.fetchWindow(windowKey, windowLayout)
-      val mangroves2016Tile = mangroves2016.fetchWindow(windowKey, windowLayout)
+      val mangroves2020Tile = mangroves2020.fetchWindow(windowKey, windowLayout)
       val tigerLandscapesTile = tigerLandscapes.fetchWindow(windowKey, windowLayout)
       val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
       val keyBiodiversityAreasTile = keyBiodiversityAreas.fetchWindow(windowKey, windowLayout)
@@ -112,7 +112,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         azeTile,
         plantedForestsTile,
         mangroves1996Tile,
-        mangroves2016Tile,
+        mangroves2020Tile,
         tigerLandscapesTile,
         landmarkTile,
         keyBiodiversityAreasTile,

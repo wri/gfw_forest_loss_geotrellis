@@ -6,15 +6,16 @@ case class GrossCumulAbovegroundRemovalsCo2(gridTile: GridTile, model: String = 
   extends FloatLayer
     with OptionalFLayer {
 
-  val datasetName = "gfw_full_extent_aboveground_gross_removals"
+  val datasetName = "gfw_forest_flux_full_extent_gross_removals_aboveground"
 
   val uri: String =
     uriForGrid(gridTile, kwargs)
 
-//  // For carbonflux package run only
+
+//  // For carbon_sensitivity run only (but not currently functional)
 //  val datasetName = "Na"
 //
 //  val model_suffix: String = if (model == "standard") "standard" else s"$model"
 //  val uri: String =
-//    s"s3://gfw-files/flux_1_2_3/gross_removals_AGCO2_all_forest_types/$model_suffix/${gridTile.tileId}.tif"
+//    s"s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_removals_aboveground/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
 }
