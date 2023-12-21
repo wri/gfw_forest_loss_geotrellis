@@ -269,7 +269,7 @@ sparkEmrConfigs := List(
     // Added some of these to resolve 503 errors using 200 worker instances.
     "spark.executorEnv.AWS_REQUEST_PAYER" -> "requester",
     "spark.yarn.appMasterEnv.AWS_REQUEST_PAYER" -> "requester",
-    "spark.executorEnv.GDAL_HTTP_MAX_RETRY" -> "3",
+    "spark.executorEnv.GDAL_HTTP_MAX_RETRY" -> "10",
     "spark.yarn.appMasterEnv.GDAL_HTTP_MAX_RETRY" -> "3",
     "spark.executorEnv.GDAL_DISABLE_READDIR_ON_OPEN" -> "EMPTY_DIR",
     "spark.yarn.appMasterEnv.GDAL_DISABLE_READDIR_ON_OPEN" -> "EMPTY_DIR",
