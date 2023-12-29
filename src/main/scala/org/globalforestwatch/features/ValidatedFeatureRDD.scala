@@ -4,21 +4,16 @@ import cats.data.{NonEmptyList, Validated}
 import org.apache.log4j.Logger
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector.{Geometry, Feature => GTFeature}
-import org.apache.sedona.core.formatMapper.WktReader
 import org.apache.spark.HashPartitioner
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.apache.sedona.sql.utils.Adapter
-import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
+import org.globalforestwatch.summarystats.{Location, ValidatedLocation,GeometryError}
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.validatedIntersection
 import org.locationtech.jts.geom._
-import org.locationtech.jts.io.WKTReader
-import org.locationtech.jts.operation.union.UnaryUnionOp
-
-import java.util.Collection
 
 object ValidatedFeatureRDD {
   val logger = Logger.getLogger("FeatureRDD")
@@ -64,9 +59,12 @@ object ValidatedFeatureRDD {
                                featureDF: DataFrame,
                                spark: SparkSession
                              ): RDD[ValidatedLocation[Geometry]] = {
+    // "polyshape" is the geometry column in featureDF, as created by
+    // SpatialFeatureDF.applyValidated
     val spatialFeatureRDD: SpatialRDD[Geometry] = Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialFeatureRDD.analyze()
 
+    // Switch userData from a string to a FeatureId
     spatialFeatureRDD.rawSpatialRDD = spatialFeatureRDD.rawSpatialRDD.rdd.map { geom: Geometry =>
       val featureId = FeatureId.fromUserData(featureType, geom.getUserData.asInstanceOf[String], delimiter = ",")
       geom.setUserData(featureId)
@@ -76,12 +74,34 @@ object ValidatedFeatureRDD {
     val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
     val spatialGridRDD = GridRDD(envelope, spark, clip = true)
 
+    // flatJoin is a flat list of pairs of (grid cell, featureGeom), giving all the
+    // grid cells that overlap any part of each feature geometry.
     val flatJoin: JavaPairRDD[Polygon, Geometry] =
       SpatialJoinRDD.flatSpatialJoin(
         spatialFeatureRDD,
         spatialGridRDD,
         considerBoundaryIntersection = true
       )
+
+    // Build a hash of all the feature ids that are in the intersection list. Since
+    // we are only collecting feature ids, there shouldn't be too much traffic back
+    // to the driver node.
+    var s = scala.collection.mutable.Set[FeatureId]()
+    flatJoin.rdd.map(x => x._2.getUserData().asInstanceOf[FeatureId]).
+      distinct().collect().foreach(fid => {
+      s += fid
+    })
+
+    // Then the feature ids that aren't in the hash did not fit the clipping extent
+    // of GridRDD (currently the TCL extent), so add to missing list.
+    var missing = new scala.collection.mutable.ArrayBuffer[ValidatedLocation[Geometry]]()
+    spatialFeatureRDD.rawSpatialRDD.rdd.
+      map(g => g.getUserData().asInstanceOf[FeatureId]).
+      collect().foreach(fid => {
+      if (!s.contains(fid)) {
+        missing += Validated.Invalid(Location(fid, GeometryError(s"Didn't intersect TCL extent")))
+      }
+    })
 
     /*
       partitions will come back very skewed and we will need to even them out for any downstream analysis
@@ -104,10 +124,9 @@ object ValidatedFeatureRDD {
         validatedIntersection(geom, gridCell)
           .leftMap { err => Location(fid, err) }
           .map { geoms => geoms.map { geom =>
-            // val gtGeom: Geometry = toGeotrellisGeometry(geom)
-            Location(fid, geom)
+            Location(fid, geom.asInstanceOf[Geometry])
           } }
           .traverse(identity)
-      }
+      }.union(spark.sparkContext.parallelize(missing.toList))
   }
 }

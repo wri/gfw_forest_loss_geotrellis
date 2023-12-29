@@ -70,9 +70,17 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
             val locationSummaries: RDD[ValidatedLocation[ForestChangeDiagnosticSummary]] = {
               val tmp = diffLocations.map { case Location(id, geom) => Feature(geom, id) }
+
+              // This is where the main analysis happens, in ErrorSummaryRDD.apply(),
+              // which eventually calls into ForestChangeDiagnosticSummary via
+              // runPolygonalSummary().
               ForestChangeDiagnosticRDD(tmp, ForestChangeDiagnosticGrid.blockTileGrid, kwargs)
             }
 
+            // For all rows that didn't get an error from the FCD analysis, do the
+            // transformation from ForestChangeDiagnosticSummary to
+            // ForestChangeDiagnosticData and add commodity risk,
+            // commodity_threat_fires, and tree_cover_loss_soy_yearly.
             ValidatedWorkflow(locationSummaries).mapValid { summaries =>
               summaries
                 .mapValues {
@@ -193,6 +201,13 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     spatialFeatureRDD.rawSpatialRDD = polyRDD.toJavaRDD()
     spatialFeatureRDD.fieldNames = seqAsJavaList(List("FeatureId"))
     spatialFeatureRDD.analyze()
+
+    // If there are no locations that intersect the TCL extent (spatialFeatureRDD is
+    // empty, has no envelope), then spatial join below will fail, so return without
+    // further analysis.
+    if (spatialFeatureRDD.boundaryEnvelope == null) {
+      return spark.sparkContext.parallelize(Seq.empty[Location[ForestChangeDiagnosticDataLossYearly]])
+    }
 
     val joinedRDD =
       SpatialJoinRDD.spatialjoin(
