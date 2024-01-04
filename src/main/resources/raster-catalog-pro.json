@@ -315,6 +315,10 @@
     {
       "name":"gfw_integrated_alerts",
       "source_uri": "s3://gfw-data-lake/gfw_integrated_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"arg_otbn_forest_loss",
+      "source_uri":"s3://gfw-data-lake/arg_otbn_forest_loss/v2022/raster/epsg-4326/{grid_size}/{row_count}/year/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }

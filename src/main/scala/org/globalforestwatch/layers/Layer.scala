@@ -8,15 +8,13 @@ import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
 import geotrellis.raster.gdal.GDALRasterSource
-import org.globalforestwatch.config.{GfwConfig, RasterCatalog}
+import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.util.Config
-import org.globalforestwatch.util.Util.{getAnyMapValue, jsonStrToMap}
+import org.globalforestwatch.util.Util.getAnyMapValue
 import geotrellis.raster.{CellType, IntCells, NoDataHandling, Tile, isNoData}
 import software.amazon.awssdk.services.s3.S3Client
-import scalaj.http._
 import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
 import org.globalforestwatch.grids.GridTile
-import geotrellis.raster.geotiff.GeoTiffRasterSource
 
 import java.time.LocalDate
 
@@ -575,4 +573,21 @@ trait MapFLayer extends FLayer {
   val internalNoDataValue: Float = 0
   val externalNoDataValue: Map[String, Boolean] = Map()
 
+}
+
+// Type representing a forest loss year which could be approximate. If approx is
+// value, the tree loss occurred exactly in the specified year. If approx is false,
+// then the tree loss occurred in a multi-year range ending in the specified year.
+//
+// We define compare() so ApproxYear can be a key in an OrderedMap.
+case class ApproxYear(year: Int, approx: Boolean) extends Ordered[ApproxYear] {
+
+  def compare(that: ApproxYear): Int = Ordering.Tuple2[Int, Boolean].compare((this.year, this.approx), (that.year, that.approx))
+}
+
+trait ApproxYearLayer extends ILayer {
+  type B = ApproxYear
+
+  val internalNoDataValue: Int = 0
+  val externalNoDataValue: ApproxYear = ApproxYear(0, false)
 }

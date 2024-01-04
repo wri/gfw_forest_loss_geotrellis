@@ -31,7 +31,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
       features,
       intermediateResultsRDD = None,
       fireAlerts = fireAlertsRdd,
-      saveIntermidateResults = identity,
+      saveIntermediateResults = identity,
       kwargs = Map("config" -> GfwConfig.get()))
   }
 
