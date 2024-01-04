@@ -119,24 +119,24 @@ object AnnualUpdateMinimalSummary {
             loss,
             tcdThreshold,
             drivers,
-            primaryForest,
-            wdpa,
-            aze,
-            plantedForests,
-            mangroves1996,
-            mangroves2020,
-            tigerLandscapes,
-            landmark,
-            keyBiodiversityAreas,
-            mining,
-            peatlands,
-            oilPalm,
-            idnForestMoratorium,
-            woodFiber,
-            resourceRights,
-            logging,
-            gain,
-            intactForestLandscapes2000,
+            primaryForest, // forest
+            wdpa, // land
+            aze, // land
+            "",
+            mangroves1996, // forest
+            false,
+            false,
+            landmark, // land
+            keyBiodiversityAreas, // land
+            mining, // land
+            false,
+            oilPalm, // land
+            idnForestMoratorium, // land
+            woodFiber, // land
+            false,
+            logging, // land
+            false,
+            intactForestLandscapes2000, // forest
             umdGlobalLandCover,
             tropicalTreeCover,
           )
@@ -208,13 +208,16 @@ object AnnualUpdateMinimalSummary {
 
           stats.updated(pKey, summary)
         }
-
-        val umdTcdThresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
+        val baselines = Range.inclusive(2000, 2022).toList
 
         val lossSummary
         : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
-          umdTcdThresholds.foldLeft(acc.stats) { (stats, threshold) =>
-            updateSummary(loss, tcd2000, threshold, -1, "", stats)
+          baselines.foldLeft(acc.stats) { (stats, baseline) =>
+            if (loss >= baseline) {
+              updateSummary(loss + (baseline << 16), tcd2000, tcd2000, tropicalTreeCover, "", stats)
+            } else {
+              stats
+            }
           }
 
         val ttcSummary = {
