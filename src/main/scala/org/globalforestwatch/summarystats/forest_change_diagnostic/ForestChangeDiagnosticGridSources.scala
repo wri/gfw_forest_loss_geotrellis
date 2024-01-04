@@ -1,6 +1,5 @@
 package org.globalforestwatch.summarystats.forest_change_diagnostic
 
-import cats.implicits._
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.Raster
 import org.globalforestwatch.grids.{GridSources, GridTile}
@@ -29,7 +28,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
   val argOTBN: ArgOTBN = ArgOTBN(gridTile, kwargs)
   val protectedAreasByCategory: DetailedProtectedAreas = DetailedProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
-
+  val argForestLoss: ArgForestLoss = ArgForestLoss(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,

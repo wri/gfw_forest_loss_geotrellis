@@ -58,11 +58,20 @@ object ForestChangeDiagnosticSummary {
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
         val areaHa = area / 10000.0
 
+        val gfwProCoverage: Map[String, Boolean] =
+          raster.tile.gfwProCoverage.getData(col, row)
+        val argPresence = gfwProCoverage.getOrElse("Argentina", false)
+
         // input layers
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
 
         val umdTreeCoverLossYear: Int = {
-          val loss = raster.tile.loss.getData(col, row)
+          val loss =
+            if (argPresence) {
+              raster.tile.argForestLoss.getData(col, row)
+            } else {
+              raster.tile.loss.getData(col, row)
+            }
           if (loss != null) {
             loss.toInt
           } else {
@@ -93,8 +102,6 @@ object ForestChangeDiagnosticSummary {
           raster.tile.isIDNForestMoratorium.getData(col, row)
         val braBiomes: String = raster.tile.braBiomes.getData(col, row)
         val isPlantation: Boolean = raster.tile.isPlantation.getData(col, row)
-        val gfwProCoverage: Map[String, Boolean] =
-          raster.tile.gfwProCoverage.getData(col, row)
         val argOTBN: String = raster.tile.argOTBN.getData(col, row)
 
         // compute Booleans
@@ -112,7 +119,6 @@ object ForestChangeDiagnosticSummary {
           gfwProCoverage.getOrElse("Cerrado Biomes", false)
         val seAsiaPresence = gfwProCoverage.getOrElse("South East Asia", false)
         val idnPresence = gfwProCoverage.getOrElse("Indonesia", false)
-        val argPresence = gfwProCoverage.getOrElse("Argentina", false)
 
         val protectedAreaCategory = raster.tile.protectedAreasByCategory.getData(col, row)
         val isProtectedArea = (protectedAreaCategory != "")
