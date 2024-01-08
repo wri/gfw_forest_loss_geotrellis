@@ -21,17 +21,21 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
   val name = "forest_change_diagnostic"
 
-  /** GFW Pro hand of a input features in a TSV file TSV file contains the individual list items, the merged list geometry and the
+  /** GFW Pro analysis of input features in a TSV file. The TSV file contains
+    * the individual list items, the merged list geometry, and the
     * geometric difference from the current merged list geometry and the former one.
     *   - Individual list items have location IDs >= 0
     *   - Merged list geometry has location ID -1
     *   - Geometric difference to previous version has location ID -2
     *
-    * Merged list and geometric difference may or may be not present. If geometric difference is present, we only need to process chunks
-    * of the merged list which fall into the same grid cells as the geometric difference. Later in the analysis we will then read cached
+    * Merged list and geometric difference may or may be not present. If geometric
+    * difference is present, we only need to process chunks
+    * of the merged list which fall into the same grid cells as the
+    * geometric difference. Later in the analysis we will then read cached
     * values for the remaining chunks and use them to aggregate list level results.
     *
-    * This function assumes that all features have already been split by 1x1 degree grid. This function will exclude diff geometry
+    * This function assumes that all features have already been split by 1x1 degree
+    * grid. This function will exclude diff geometry
     * locations from output (id=-2).
     */
   def apply(
