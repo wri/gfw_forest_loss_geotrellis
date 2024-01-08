@@ -10,7 +10,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.apache.sedona.sql.utils.Adapter
-import org.globalforestwatch.summarystats.{Location, ValidatedLocation,GeometryError}
+import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.validatedIntersection
 import org.locationtech.jts.geom._
@@ -83,26 +83,6 @@ object ValidatedFeatureRDD {
         considerBoundaryIntersection = true
       )
 
-    // Build a hash of all the feature ids that are in the intersection list. Since
-    // we are only collecting feature ids, there shouldn't be too much traffic back
-    // to the driver node.
-    var s = scala.collection.mutable.Set[FeatureId]()
-    flatJoin.rdd.map(x => x._2.getUserData().asInstanceOf[FeatureId]).
-      distinct().collect().foreach(fid => {
-      s += fid
-    })
-
-    // Then the feature ids that aren't in the hash did not fit the clipping extent
-    // of GridRDD (currently the TCL extent), so add to missing list.
-    var missing = new scala.collection.mutable.ArrayBuffer[ValidatedLocation[Geometry]]()
-    spatialFeatureRDD.rawSpatialRDD.rdd.
-      map(g => g.getUserData().asInstanceOf[FeatureId]).
-      collect().foreach(fid => {
-      if (!s.contains(fid)) {
-        missing += Validated.Invalid(Location(fid, GeometryError(s"Didn't intersect TCL extent")))
-      }
-    })
-
     /*
       partitions will come back very skewed and we will need to even them out for any downstream analysis
       For the summary analysis we will eventually use a range partitioner.
@@ -127,6 +107,6 @@ object ValidatedFeatureRDD {
             Location(fid, geom.asInstanceOf[Geometry])
           } }
           .traverse(identity)
-      }.union(spark.sparkContext.parallelize(missing.toList))
+      }
   }
 }
