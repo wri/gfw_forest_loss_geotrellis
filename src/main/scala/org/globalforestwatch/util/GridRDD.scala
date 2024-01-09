@@ -1,6 +1,6 @@
 package org.globalforestwatch.util
 
-import org.locationtech.jts.geom.{Envelope, Geometry, GeometryFactory, MultiPolygon, Polygon}
+import org.locationtech.jts.geom.{Envelope, Geometry, Polygon}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.sedona.core.spatialRDD.PolygonRDD
@@ -8,6 +8,10 @@ import org.globalforestwatch.grids.GridId.pointGridId
 import org.globalforestwatch.util.GeometryConstructor.createPolygon1x1
 
 object GridRDD {
+  /** Returns an RDD with the set of 1x1 grid cells (polygons) that cover envelope. If
+    * clip is true, then don't include any grid cells that are not covered by
+    * tcl_geom.
+    */
   def apply(envelope: Envelope, spark: SparkSession, clip: Boolean = false): PolygonRDD = {
     val gridCells = getGridCells(envelope)
 
@@ -32,6 +36,7 @@ object GridRDD {
     spatialGridRDD
   }
 
+  /** Returns sequence of all 1x1 grid cells that are needed to cover the entire envelope. */
   private def getGridCells(envelope: Envelope): IndexedSeq[(Int, Int)] = {
     {
       for (x <- envelope.getMinX.floor.toInt until envelope.getMaxX.ceil.toInt;

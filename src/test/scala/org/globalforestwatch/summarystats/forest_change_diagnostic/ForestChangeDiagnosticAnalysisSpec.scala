@@ -16,6 +16,7 @@ import org.globalforestwatch.config.GfwConfig
 
 class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameComparer {
   def palm32InputTsvPath = getClass.getResource("/palm-oil-32.tsv").toString()
+  def antarcticaInputTsvPath = getClass.getResource("/antarctica.tsv").toString()
   def palm32ExpectedOutputPath = getClass.getResource("/palm-32-fcd-output").toString()
 
   def FCD(features: RDD[ValidatedLocation[Geometry]]) = {
@@ -69,7 +70,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     assertSmallDataFrameEquality(fcdDF, expectedDF)
   }
 
-  it("reports invalid geoms") {
+  it("reports self-intersecting geometry as invalid") {
     // match it to tile of location 31 so we fetch less tiles
     val x = 114
     val y = -1
@@ -82,7 +83,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     res.head.isInvalid shouldBe true
   }
 
-  it("gives results for geometries with tiles that don't intersect") {
+  it("gives results for geometries with multiple polygons that don't intersect") {
     val featureLoc32RDD = ValidatedFeatureRDD(
       NonEmptyList.one(palm32InputTsvPath),
       "gfwpro",
@@ -97,8 +98,8 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     res.head.isValid shouldBe true
   }
 
-  it("reports no intersection geometries as invalid") {
-    // match it to tile of location 31 so we fetch less tiles
+  it("reports no-intersection geometry as invalid") {
+    // This still works, since we are not calling ValidatedFeatureRDD/splitFeatures here.
     val x = 60
     val y = 20
     val smallGeom = Polygon(LineString(Point(x+0,y+0), Point(x+0.00001,y+0), Point(x+0.00001,y+0.00001), Point(x+0,y+0.00001), Point(x+0,y+0)))
@@ -108,5 +109,20 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     val fcd = FCD(featureRDD)
     val res = fcd.collect()
     res.head.isInvalid shouldBe true
+  }
+
+  it("completes without error for list that doesn't intersect TCL at all") {
+    // The antarctica location will be completely removed by splitFeatures, since it
+    // doesn't intersect with the TCL extent (which is used as the splitting grid).
+    val antRDD = ValidatedFeatureRDD(
+      NonEmptyList.one(antarcticaInputTsvPath),
+      "gfwpro",
+      FeatureFilter.empty,
+      splitFeatures = true
+    )
+    val fcd = FCD(antRDD)
+    val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
+
+    fcdDF.count() shouldBe 0
   }
 }

@@ -4,7 +4,6 @@ import cats.data.{NonEmptyList, Validated}
 import org.apache.log4j.Logger
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector.{Geometry, Feature => GTFeature}
-import org.apache.sedona.core.formatMapper.WktReader
 import org.apache.spark.HashPartitioner
 import org.apache.spark.api.java.JavaPairRDD
 import org.apache.spark.rdd.RDD
@@ -15,10 +14,6 @@ import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.validatedIntersection
 import org.locationtech.jts.geom._
-import org.locationtech.jts.io.WKTReader
-import org.locationtech.jts.operation.union.UnaryUnionOp
-
-import java.util.Collection
 
 object ValidatedFeatureRDD {
   val logger = Logger.getLogger("FeatureRDD")
@@ -64,9 +59,12 @@ object ValidatedFeatureRDD {
                                featureDF: DataFrame,
                                spark: SparkSession
                              ): RDD[ValidatedLocation[Geometry]] = {
+    // "polyshape" is the geometry column in featureDF, as created by
+    // SpatialFeatureDF.applyValidated
     val spatialFeatureRDD: SpatialRDD[Geometry] = Adapter.toSpatialRdd(featureDF, "polyshape")
     spatialFeatureRDD.analyze()
 
+    // Switch userData from a string to a FeatureId
     spatialFeatureRDD.rawSpatialRDD = spatialFeatureRDD.rawSpatialRDD.rdd.map { geom: Geometry =>
       val featureId = FeatureId.fromUserData(featureType, geom.getUserData.asInstanceOf[String], delimiter = ",")
       geom.setUserData(featureId)
@@ -76,6 +74,8 @@ object ValidatedFeatureRDD {
     val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
     val spatialGridRDD = GridRDD(envelope, spark, clip = true)
 
+    // flatJoin is a flat list of pairs of (grid cell, featureGeom), giving all the
+    // grid cells that overlap any part of each feature geometry.
     val flatJoin: JavaPairRDD[Polygon, Geometry] =
       SpatialJoinRDD.flatSpatialJoin(
         spatialFeatureRDD,
@@ -104,8 +104,7 @@ object ValidatedFeatureRDD {
         validatedIntersection(geom, gridCell)
           .leftMap { err => Location(fid, err) }
           .map { geoms => geoms.map { geom =>
-            // val gtGeom: Geometry = toGeotrellisGeometry(geom)
-            Location(fid, geom)
+            Location(fid, geom.asInstanceOf[Geometry])
           } }
           .traverse(identity)
       }
