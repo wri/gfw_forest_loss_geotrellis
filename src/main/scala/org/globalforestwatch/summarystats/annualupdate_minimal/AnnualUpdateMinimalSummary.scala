@@ -113,6 +113,19 @@ object AnnualUpdateMinimalSummary {
 
         def updateSummary(
                           loss: Integer, tcd2000: Integer, tcdThreshold: Integer, tropicalTreeCover: Integer, umdGlobalLandCover: String,
+                          drivers: String,
+                          primaryForest: Boolean, // forest
+                          mangroves1996: Boolean, // forest
+                          intactForestLandscapes2000: Boolean,
+                          wdpa: String, // land
+                          aze: Boolean, // land
+                          landmark: Boolean, // land
+                          keyBiodiversityAreas: Boolean, // land
+                          mining: Boolean, // land
+                          oilPalm: Boolean, // land
+                          idnForestMoratorium: Boolean, // land
+                          woodFiber: Boolean, // land
+                          logging: Boolean, // land
                            stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData]
                          ): Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = {
           val pKey = AnnualUpdateMinimalDataGroup(
@@ -214,21 +227,69 @@ object AnnualUpdateMinimalSummary {
         : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
           baselines.foldLeft(acc.stats) { (stats, baseline) =>
             if (loss >= baseline) {
-              updateSummary(loss + (baseline << 16), tcd2000, tcd2000, tropicalTreeCover, "", stats)
+              val year = loss + (baseline << 16)
+
+              updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", drivers, false, false, false, "", false, false, false, false, false, false, false, false, stats)
+
+              if (primaryForest) {
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", primaryForest, false, false, wdpa, false, false, false, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", primaryForest, false, false, "", aze, false, false, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", primaryForest, false, false, "", false, landmark, false, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", primaryForest, false, false, "", false, false, keyBiodiversityAreas, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", primaryForest, false, false, "", false, false, false, mining, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", primaryForest, false, false, "", false, false, false, false, oilPalm, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", primaryForest, false, false, "", false, false, false, false, false, idnForestMoratorium, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", primaryForest, false, false, "", false, false, false, false, false, false, woodFiber, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", primaryForest, false, false, "", false, false, false, false, false, false, false, logging, stats)
+              }
+
+              if (mangroves1996) {
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, mangroves1996, false, wdpa, false, false, false, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, mangroves1996, false, "", aze, false, false, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, mangroves1996, false, "", false, landmark, false, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, mangroves1996, false, "", false, false, keyBiodiversityAreas, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, mangroves1996, false, "", false, false, false, mining, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, mangroves1996, false, "", false, false, false, false, oilPalm, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, mangroves1996, false, "", false, false, false, false, false, idnForestMoratorium, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, mangroves1996, false, "", false, false, false, false, false, false, woodFiber, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, mangroves1996, false, "", false, false, false, false, false, false, false, logging, stats)
+              }
+
+              if (intactForestLandscapes2000) {
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, intactForestLandscapes2000, wdpa, false, false, false, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, intactForestLandscapes2000, "", aze, false, false, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, intactForestLandscapes2000, "", false, landmark, false, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, intactForestLandscapes2000, "", false, false, keyBiodiversityAreas, false, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, intactForestLandscapes2000, "", false, false, false, mining, false, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, intactForestLandscapes2000, "", false, false, false, false, oilPalm, false, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, intactForestLandscapes2000, "", false, false, false, false, false, idnForestMoratorium, false, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, intactForestLandscapes2000, "", false, false, false, false, false, false, woodFiber, false, stats)
+                updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, intactForestLandscapes2000, "", false, false, false, false, false, false, false, logging, stats)
+              }
+
+              updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, false, wdpa, false, false, false, false, false, false, false, false, stats)
+              updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, false, "", aze, false, false, false, false, false, false, false, stats)
+              updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, false, "", false, landmark, false, false, false, false, false, false, stats)
+              updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, false, "", false, false, keyBiodiversityAreas, false, false, false, false, false, stats)
+              updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, false, "", false, false, false, mining, false, false, false, false, stats)
+              updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, false, "", false, false, false, false, oilPalm, false, false, false, stats)
+              updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, false, "", false, false, false, false, false, idnForestMoratorium, false, false, stats)
+              updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, false, "", false, false, false, false, false, false, woodFiber, false, stats)
+              updateSummary(year, tcd2000, tcd2000, tropicalTreeCover, "", "", false, false, false, "", false, false, false, false, false, false, false, logging, stats)
             } else {
               stats
             }
           }
 
-        val ttcSummary = {
-          if (tropicalTreeCover == 255) {
-            lossSummary
-          } else {
-            updateSummary(null, -2, -1, tropicalTreeCover, umdGlobalLandCover, lossSummary)
-          }
-        }
+//        val ttcSummary = {
+//          if (tropicalTreeCover == 255) {
+//            lossSummary
+//          } else {
+//            updateSummary(null, -2, -1, tropicalTreeCover, umdGlobalLandCover, lossSummary)
+//          }
+//        }
 
-        acc = AnnualUpdateMinimalSummary(ttcSummary)
+        acc = AnnualUpdateMinimalSummary(lossSummary)
       }
     }
 }
