@@ -27,7 +27,7 @@ case class ForestChangeDiagnosticData(
   /** treeCoverLossIDNForestAreaYearly */
   tree_cover_loss_idn_legal_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   tree_cover_loss_idn_forest_moratorium_yearly: ForestChangeDiagnosticDataLossYearly,
-  tree_cover_loss_prodes_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_country_specific_yearly: ForestChangeDiagnosticDataLossYearly,
   /** prodesLossProtectedAreasYearly */
   tree_cover_loss_prodes_wdpa_yearly: ForestChangeDiagnosticDataLossYearly,
   tree_cover_loss_prodes_primary_forest_yearly: ForestChangeDiagnosticDataLossYearly,
@@ -42,6 +42,7 @@ case class ForestChangeDiagnosticData(
   /** Intact Forest 2016 Area */
   natural_habitat_intact_forest: ForestChangeDiagnosticDataDouble,
   total_area: ForestChangeDiagnosticDataDouble,
+  country_code_area: ForestChangeDiagnosticDataDoubleCategory,
   protected_areas_area: ForestChangeDiagnosticDataDouble,
   /** Peatland Area */
   peat_area: ForestChangeDiagnosticDataDouble,
@@ -120,7 +121,7 @@ case class ForestChangeDiagnosticData(
       tree_cover_loss_idn_forest_moratorium_yearly.merge(
         other.tree_cover_loss_idn_forest_moratorium_yearly
       ),
-      tree_cover_loss_prodes_yearly.merge(other.tree_cover_loss_prodes_yearly),
+      tree_cover_loss_country_specific_yearly.merge(other.tree_cover_loss_country_specific_yearly),
       tree_cover_loss_prodes_wdpa_yearly.merge(
         other.tree_cover_loss_prodes_wdpa_yearly
       ),
@@ -136,6 +137,7 @@ case class ForestChangeDiagnosticData(
       natural_habitat_primary.merge(other.natural_habitat_primary),
       natural_habitat_intact_forest.merge(other.natural_habitat_intact_forest),
       total_area.merge(other.total_area),
+      country_code_area.merge(other.country_code_area),
       protected_areas_area.merge(other.protected_areas_area),
       peat_area.merge(other.peat_area),
       arg_otbn_area.merge(other.arg_otbn_area),
@@ -309,6 +311,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,

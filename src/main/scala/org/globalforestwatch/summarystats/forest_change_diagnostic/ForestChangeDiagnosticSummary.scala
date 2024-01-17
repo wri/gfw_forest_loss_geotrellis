@@ -61,17 +61,21 @@ object ForestChangeDiagnosticSummary {
         val gfwProCoverage: Map[String, Boolean] =
           raster.tile.gfwProCoverage.getData(col, row)
         val argPresence = gfwProCoverage.getOrElse("Argentina", false)
+        val braBiomes: String = raster.tile.braBiomes.getData(col, row)
+
+        val countryCode: String = if (argPresence) {
+          "ARG"
+        } else if (braBiomes != "Not applicable") {
+          "BRA"
+        } else {
+          ""
+        }
 
         // input layers
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
 
         val umdTreeCoverLossYear: Int = {
-          val loss =
-            if (argPresence) {
-              raster.tile.argForestLoss.getData(col, row)
-            } else {
-              raster.tile.loss.getData(col, row)
-            }
+          val loss = raster.tile.loss.getData(col, row)
           if (loss != null) {
             loss.toInt
           } else {
@@ -84,13 +88,30 @@ object ForestChangeDiagnosticSummary {
         val isPeatlands: Boolean = raster.tile.isPeatlands.getData(col, row)
         val isIntactForestLandscapes2000: Boolean =
           raster.tile.isIntactForestLandscapes2000.getData(col, row)
-        val prodesLossYear: Int = {
-          val loss = raster.tile.prodesLossYear.getData(col, row)
-          if (loss != null) {
-            loss.toInt
-          } else {
-            0
+        val countrySpecificLossYear: Int = {
+          val loss: Integer = {
+            if (countryCode == "ARG") {
+              raster.tile.argForestLoss.getData(col, row)
+            } else if (countryCode == "BRA") {
+              raster.tile.prodesLossYear.getData(col, row)
+            } else {
+              0
+            }
           }
+          if (countryCode != "BRA") {
+            val prodesLoss = raster.tile.prodesLossYear.getData(col, row)
+            if (prodesLoss != null && prodesLoss.toInt > 0) {
+              println("==================== prodesLoss not in brazil =======")
+            }
+          }
+              
+          val lossYear =
+            if (loss != null) {
+              loss.toInt
+              } else {
+              0
+            }
+          lossYear
         }
         val seAsiaLandCover: String =
           raster.tile.seAsiaLandCover.getData(col, row)
@@ -100,7 +121,6 @@ object ForestChangeDiagnosticSummary {
         val idnForestArea: String = raster.tile.idnForestArea.getData(col, row)
         val isIdnForestMoratorium: Boolean =
           raster.tile.isIDNForestMoratorium.getData(col, row)
-        val braBiomes: String = raster.tile.braBiomes.getData(col, row)
         val isPlantation: Boolean = raster.tile.isPlantation.getData(col, row)
         val argOTBN: String = raster.tile.argOTBN.getData(col, row)
 
@@ -108,7 +128,7 @@ object ForestChangeDiagnosticSummary {
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
         val isTreeCoverExtent90: Boolean = tcd2000 > 90
         val isUMDLoss: Boolean = isTreeCoverExtent30 && umdTreeCoverLossYear > 0
-        val isProdesLoss: Boolean = prodesLossYear > 0
+        val isCountrySpecificLoss: Boolean = countrySpecificLossYear > 0
 
         val southAmericaPresence =
           gfwProCoverage.getOrElse("South America", false)
@@ -143,8 +163,9 @@ object ForestChangeDiagnosticSummary {
         val groupKey = ForestChangeDiagnosticRawDataGroup(
           umdTreeCoverLossYear,
           isUMDLoss,
-          prodesLossYear,
-          isProdesLoss,
+          countryCode,
+          countrySpecificLossYear,
+          isCountrySpecificLoss,
           isTreeCoverExtent30,
           isTreeCoverExtent90,
           isPrimaryForest,

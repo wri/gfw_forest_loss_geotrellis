@@ -2,8 +2,9 @@ package org.globalforestwatch.summarystats.forest_change_diagnostic
 
 case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
                                               isUMDLoss: Boolean,
-                                              prodesLossYear: Int,
-                                              isProdesLoss: Boolean,
+                                              countryCode: String,
+                                              countrySpecificLossYear: Int,
+                                              isCountrySpecificLoss: Boolean,
                                               isTreeCoverExtent30: Boolean,
                                               isTreeCoverExtent90: Boolean,
                                               isPrimaryForest: Boolean,
@@ -105,22 +106,22 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isIdnForestMoratorium && isUMDLoss
       ),
-    tree_cover_loss_prodes_yearly = ForestChangeDiagnosticDataLossYearly.fill(
-      prodesLossYear,
+    tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      countrySpecificLossYear,
       totalArea,
-      isProdesLoss
+      isCountrySpecificLoss
     ),
     tree_cover_loss_prodes_wdpa_yearly =
       ForestChangeDiagnosticDataLossYearly.fill(
-        prodesLossYear,
+        countrySpecificLossYear,
         totalArea,
-        isProdesLoss && isProtectedArea
+        isCountrySpecificLoss && isProtectedArea
       ),
     tree_cover_loss_prodes_primary_forest_yearly =
       ForestChangeDiagnosticDataLossYearly.fill(
-        prodesLossYear,
+        countrySpecificLossYear,
         totalArea,
-        isProdesLoss && isPrimaryForest
+        isCountrySpecificLoss && isPrimaryForest
       ),
     tree_cover_loss_brazil_biomes_yearly =
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
@@ -152,6 +153,8 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
     natural_habitat_intact_forest = ForestChangeDiagnosticDataDouble
       .fill(totalArea, isIntactForestLandscapes2000),
     total_area = ForestChangeDiagnosticDataDouble.fill(totalArea),
+    country_code_area = ForestChangeDiagnosticDataDoubleCategory
+      .fill(countryCode, totalArea),
     protected_areas_area = ForestChangeDiagnosticDataDouble
       .fill(totalArea, isProtectedArea),
     peat_area = ForestChangeDiagnosticDataDouble
