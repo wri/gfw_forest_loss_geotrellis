@@ -66,7 +66,6 @@ object ForestChangeDiagnosticSummary {
         val countryCode: String = if (argPresence) {
           "ARG"
         } else if (braBiomes != "Not applicable") {
-          println(f"YYYYYYYYYYYYYYY ${braBiomes}")
           "BRA"
         } else {
           ""
