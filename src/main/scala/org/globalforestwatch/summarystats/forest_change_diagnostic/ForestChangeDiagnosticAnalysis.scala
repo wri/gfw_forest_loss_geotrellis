@@ -16,6 +16,7 @@ import org.globalforestwatch.summarystats.{Location, NoIntersectionError, Summar
 import org.globalforestwatch.util.SpatialJoinRDD
 import org.apache.spark.storage.StorageLevel
 import org.globalforestwatch.ValidatedWorkflow
+import org.globalforestwatch.summarystats.GeometryError
 
 object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
@@ -117,14 +118,25 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
           .persist(StorageLevel.MEMORY_AND_DISK)
       }
 
-      cachedIntermidateResultsRDD match {
+      (cachedIntermidateResultsRDD match {
         case Some(cachedResults) =>
           val mergedResults = partialResult.union(cachedResults)
           saveIntermidateResults(mergedResults)
           combineGridResults(mergedResults)
         case None =>
           combineGridResults(partialResult)
-      }
+      }).map(
+        (vl: ValidatedLocation[ForestChangeDiagnosticData]) => {
+          vl match {
+            case Valid(Location(id, dd)) => if (dd.country_code_area.value.size > 1) {
+              Invalid(Location(id, GeometryError("touches two countries")))
+            } else {
+              Valid(Location(id, dd))
+            }
+            case Invalid(i) => Invalid(i)
+          }
+        }
+      )
     } catch {
       case e: StackOverflowError =>
         e.printStackTrace()
