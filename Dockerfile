@@ -1,10 +1,10 @@
-FROM gcr.io/datamechanics/spark:platform-3.1.1-hadoop-3.2.0-java-11-scala-2.12-python-3.8-dm12
+FROM gcr.io/datamechanics/spark:platform-3.3.0-hadoop-3.3.2-java-11-scala-2.12-python-3.8-dm18
 
 ARG VERSION
 
 ENV SCALA_VERSION=2.12
 ENV PYTHON_VERSION=3.8
-ENV GDAL_VERSION=3.1.2
+ENV GDAL_VERSION=3.8.3
 
 USER root
 

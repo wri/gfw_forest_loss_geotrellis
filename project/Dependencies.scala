@@ -49,8 +49,8 @@ object Dependencies {
   val geotrellisSparkTestKit = "org.locationtech.geotrellis" %% "geotrellis-spark-testkit" % Version.geotrellis
   val geotrellisRasterTestkit = "org.locationtech.geotrellis" %% "geotrellis-raster-testkit" % Version.geotrellis
   val geotrellisGdal = "org.locationtech.geotrellis" %% "geotrellis-gdal" % Version.geotrellis
-  // 3.7.x warp bindings corresponds to gdal 3.7.x; this will not necessarily match `Version.geotrellis`
-  val geotrellisGdalWarp = "com.azavea.geotrellis" % "gdal-warp-bindings" % "3.7.0"
+  // 3.8.0 warp bindings corresponds to gdal 3.8.x; this will not necessarily match `Version.geotrellis`
+  val geotrellisGdalWarp = "com.azavea.geotrellis" % "gdal-warp-bindings" % "3.8.0"
 
   val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.9.1"
   val logging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
