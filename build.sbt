@@ -40,6 +40,7 @@ lazy val scalacOpts = Seq(
 lazy val commonSettings = Seq(
   Compile / scalacOptions ++= scalacOpts,
   Compile / console / scalacOptions -= "-Ywarn-unused-import",
+  unmanagedSources / excludeFilter := ".#*.scala",
   publishMavenStyle := true,
   Test / publishArtifact := false,
   pomIncludeRepository := { _ =>
