@@ -5,6 +5,7 @@ import cats.Functor
 import cats.Monoid
 import org.apache.spark.sql.{Column, DataFrame, Encoders, functions => F}
 import org.apache.spark.sql.types.StructType
+import org.globalforestwatch.udf._
 
 import scala.reflect.runtime.universe.TypeTag
 import scala.util.{Try, Success, Failure}
@@ -101,17 +102,17 @@ object Maybe {
     }
 
     val nestedFields: Seq[Column] = inner match {
-      case s: StructType => s.map(f => F.col(maybeColumnName + ".content" + f.name).as(f"${maybeColumnName}.${f.name}"))
+      case s: StructType => s.map(f => F.col(maybeColumnName + ".content." + f.name).as(f"${maybeColumnName}.${f.name}"))
       case f => Seq(F.col(f"${maybeColumnName}.content").as(maybeColumnName))
     }
 
     val combinedErrorColumn = if (df.columns.contains(errorColumnName)) {
-      F.concat(F.col(errorColumnName), F.col(maybeColumnName + ".error"))
+      concat_outer(F.lit("\n"), F.col(errorColumnName), F.col(maybeColumnName + ".error"))
     } else {
       F.col(maybeColumnName + ".error")
     }
 
-    val allColumns = Seq(combinedErrorColumn.as(errorColumnName)) ++ residFields ++ nestedFields
+    val allColumns = combinedErrorColumn.as(errorColumnName) +: (residFields ++ nestedFields)
     df.select(allColumns:_*)
   }
 

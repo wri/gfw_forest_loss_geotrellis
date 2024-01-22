@@ -38,4 +38,25 @@ package object udf {
 
   def whenValid(expr: Column, errorColumnName: String = "error"): Column =
     F.when(F.isnull(F.col(errorColumnName)), expr).otherwise(null)
+
+  def concat_outer = F.udf{ (sep: String, s1: String, s2: String) => (s1, s2) match {
+    case (null, null) => null
+    case (s, null) => s
+    case (null, s) => s
+    case (a, b) => f"${a}${sep}{$b}"
+  }}
+
+  def concat_array_outer = F.udf{ (sep: String, array: Array[String]) =>
+    if (array.isEmpty)
+      null: String
+    else
+      array.mkString(sep)
+  }
+
+  def maybeFilterByPattern(pattern: String, errorMessage: String) = F.udf{ str: String =>
+    if (pattern.r.findFirstMatchIn(str).isDefined)
+      Maybe(str)
+    else
+      Maybe.error[String](errorMessage)
+  }
 }

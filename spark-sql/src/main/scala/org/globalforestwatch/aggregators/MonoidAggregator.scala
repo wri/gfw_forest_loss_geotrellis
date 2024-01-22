@@ -1,35 +1,46 @@
 package org.globalforestwatch.aggregators
 
 import cats.Monoid
-import org.apache.spark.sql.Encoder
+import org.apache.spark.sql.{Encoder, Encoders}
 import org.apache.spark.sql.expressions.Aggregator
+import scala.reflect.runtime.universe.TypeTag
 
 abstract class MonoidAggregator[
-  IN, BUF : Monoid: Encoder, OUT: Encoder
-] extends Aggregator[IN, BUF, OUT] {
+  IN, BUF <: Product : Monoid : TypeTag, OUT <: Product : TypeTag
+] extends Aggregator[Option[IN], Option[BUF], Option[OUT]] {
   def convert(input: IN): BUF
-  def finish(buffer: BUF): OUT
+  def finish(buffer: Option[BUF]): Option[OUT]
 
-  val zero = implicitly[Monoid[BUF]].empty
+  val zero = Some(implicitly[Monoid[BUF]].empty)
 
-  def reduce(buffer: BUF, input: IN): BUF = implicitly[Monoid[BUF]].combine(
-    convert(input), buffer
-  )
+  def reduce(bufferOpt: Option[BUF], inputOpt: Option[IN]): Option[BUF] = {
+    for {
+      buffer <- bufferOpt
+      input <- inputOpt
+    } yield {
+      implicitly[Monoid[BUF]].combine(convert(input), buffer)
+    }
+  }
 
-  def merge(buffer1: BUF, buffer2: BUF): BUF = implicitly[Monoid[BUF]].combine(
-    buffer1, buffer2
-  )
+  def merge(buffer1Opt: Option[BUF], buffer2Opt: Option[BUF]): Option[BUF] = {
+    for {
+      buffer1 <- buffer1Opt
+      buffer2 <- buffer2Opt
+    } yield {
+      implicitly[Monoid[BUF]].combine(buffer1, buffer2)
+    }
+  }
 
-  @transient private val bufferEncoderInternal = implicitly[Encoder[BUF]]
-  @transient private val outputEncoderInternal = implicitly[Encoder[OUT]]
+  @transient private val bufferEncoderInternal = Encoders.product[Option[BUF]]
+  @transient private val outputEncoderInternal = Encoders.product[Option[OUT]]
 
   // Specifies the Encoder for the intermediate value type
-  def bufferEncoder: Encoder[BUF] = bufferEncoderInternal
+  def bufferEncoder: Encoder[Option[BUF]] = bufferEncoderInternal
   // Specifies the Encoder for the final output value type
-  def outputEncoder: Encoder[OUT] = outputEncoderInternal
+  def outputEncoder: Encoder[Option[OUT]] = outputEncoderInternal
 }
 
-class BasicMonoidAggregator[T: Monoid: Encoder] extends MonoidAggregator[T, T, T] {
+class BasicMonoidAggregator[T <: Product : Monoid : TypeTag] extends MonoidAggregator[T, T, T] {
   def convert(input: T): T = input
-  def finish(buffer: T): T = buffer
+  def finish(buffer: Option[T]): Option[T] = buffer
 }

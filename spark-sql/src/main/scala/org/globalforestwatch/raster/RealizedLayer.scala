@@ -6,12 +6,15 @@ import geotrellis.raster.RasterSource
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.layout.RasterLayerGrid
 import org.globalforestwatch.util.Maybe
+import org.log4s.getLogger
 
 case class RealizedLayer(
   layer: RasterLayer,
-  grid: RasterLayerGrid
+  grid: RasterLayerGrid,
+  catalog: String = "default"
 ) {
-  val uriTemplate = GfwConfig.get.rasterCatalog.getSourceUri(layer.name)
+  val uriTemplate = GfwConfig.read(catalog).rasterCatalog.getSourceUri(layer.name)
+  val logger = getLogger(getClass)
 
   def uri(key: SpatialKey): String = {
     val layout = grid.rasterFileGrid
@@ -30,7 +33,9 @@ case class RealizedLayer(
   }
 
   def read(key: SpatialKey): Maybe[Tile] = {
-    val source = LayoutTileSource.spatial(RasterSource(uri(key)), grid.segmentTileGrid)
+    val target = uri(key)
+    logger.warn(s"Reading tile for ${key} at URI=${target}")
+    val source = LayoutTileSource.spatial(RasterSource(target), grid.segmentTileGrid)
     val tile = source.read(key, Seq(0)).map(_.band(0))
     (layer.required, tile) match {
       case (true, None) => Maybe.error(f"Required layer ${layer.name} missing at ${key}")
