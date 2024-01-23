@@ -106,7 +106,7 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isIdnForestMoratorium && isUMDLoss
       ),
-    tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+    tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
       countrySpecificLossYear,
       totalArea,
       isCountrySpecificLoss

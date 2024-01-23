@@ -27,7 +27,7 @@ case class ForestChangeDiagnosticData(
   /** treeCoverLossIDNForestAreaYearly */
   tree_cover_loss_idn_legal_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   tree_cover_loss_idn_forest_moratorium_yearly: ForestChangeDiagnosticDataLossYearly,
-  tree_cover_loss_country_specific_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_country_specific_yearly: ForestChangeDiagnosticDataLossApproxYearly,
   /** prodesLossProtectedAreasYearly */
   tree_cover_loss_prodes_wdpa_yearly: ForestChangeDiagnosticDataLossYearly,
   tree_cover_loss_prodes_primary_forest_yearly: ForestChangeDiagnosticDataLossYearly,
@@ -299,7 +299,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
-      ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataLossApproxYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
