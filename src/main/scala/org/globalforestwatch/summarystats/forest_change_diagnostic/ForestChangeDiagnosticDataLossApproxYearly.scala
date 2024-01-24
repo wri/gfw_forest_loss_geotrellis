@@ -8,6 +8,9 @@ import io.circe.parser.decode
 import cats.kernel.Semigroup
 import cats.implicits._
 
+// This class is for recording forest loss yearly, but also marking cases where the
+// year of loss is approximate vs exact.
+
 case class ForestChangeDiagnosticDataLossApproxYearly(value: SortedMap[String, Double])
   extends ForestChangeDiagnosticDataParser[ForestChangeDiagnosticDataLossApproxYearly] {
 
@@ -15,7 +18,10 @@ case class ForestChangeDiagnosticDataLossApproxYearly(value: SortedMap[String, D
     ForestChangeDiagnosticDataLossApproxYearly(Semigroup[SortedMap[String, Double]].combine(value, other.value))
   }
 
-  def mergeApprox: ForestChangeDiagnosticDataLossApproxYearly = {
+  // This function combines years with both approximate and exact loss into a single
+  // year with the "approx" suffix, while a year with exact loss only is still put
+  // under the indicated year without the "approx" suffix.
+  def combineApprox: ForestChangeDiagnosticDataLossApproxYearly = {
     var out = scala.collection.mutable.SortedMap[String, Double]()
     for ((k, v) <- this.value) {
       if (k.toInt >= 2101) {
@@ -41,7 +47,7 @@ case class ForestChangeDiagnosticDataLossApproxYearly(value: SortedMap[String, D
   def round: SortedMap[String, Double] = this.value.map { case (key, value) => key -> this.round(value) }
 
   def toJson: String = {
-    this.mergeApprox.round.asJson.noSpaces
+    this.combineApprox.round.asJson.noSpaces
   }
 }
 
@@ -52,8 +58,10 @@ object ForestChangeDiagnosticDataLossApproxYearly {
     )
 
   def prefilled: ForestChangeDiagnosticDataLossApproxYearly = {
-    val kvList = (for (i <- 2001 to 2022) yield(i.toString -> 0.0)) ++
-       (for (i <- 2101 to 2122) yield(i.toString -> 0.0))
+    val minLossYear = ForestChangeDiagnosticCommand.ForestLossYearStart
+    val maxLossYear = ForestChangeDiagnosticCommand.ForestLossYearEnd
+    val kvList = (for (i <- minLossYear to maxLossYear) yield(i.toString -> 0.0)) ++
+       (for (i <- minLossYear+100 to maxLossYear+100) yield(i.toString -> 0.0))
 
     ForestChangeDiagnosticDataLossApproxYearly(
       SortedMap(kvList.toSeq: _*)
@@ -64,11 +72,12 @@ object ForestChangeDiagnosticDataLossApproxYearly {
            areaHa: Double,
            include: Boolean = true): ForestChangeDiagnosticDataLossApproxYearly = {
 
-    // Only except lossYear values within range of default map
-    val minLossYear: Int = 2001
-    val maxLossYear: Int = 2122
+    // Only accept lossYear values within range of default map
+    val minLossYear = ForestChangeDiagnosticCommand.ForestLossYearStart
+    val maxLossYear = ForestChangeDiagnosticCommand.ForestLossYearEnd
 
-    if (minLossYear <= lossYear && lossYear <= maxLossYear && include) {
+    if ((minLossYear <= lossYear && lossYear <= maxLossYear ||
+         minLossYear + 100 <= lossYear && lossYear <= maxLossYear + 100) && include) {
       ForestChangeDiagnosticDataLossApproxYearly.prefilled.merge(
         ForestChangeDiagnosticDataLossApproxYearly(
           SortedMap(

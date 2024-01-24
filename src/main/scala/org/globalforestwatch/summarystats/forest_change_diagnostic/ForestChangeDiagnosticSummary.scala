@@ -58,20 +58,6 @@ object ForestChangeDiagnosticSummary {
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
         val areaHa = area / 10000.0
 
-        val gfwProCoverage: Map[String, Boolean] =
-          raster.tile.gfwProCoverage.getData(col, row)
-        val argPresence = gfwProCoverage.getOrElse("Argentina", false)
-        val braBiomes: String = raster.tile.braBiomes.getData(col, row)
-
-        val countryCode: String = if (argPresence) {
-          "ARG"
-        } else if (braBiomes != "Not applicable") {
-          println(f"YYYYYYYYYYYYYYY ${braBiomes}")
-          "BRA"
-        } else {
-          ""
-        }
-
         // input layers
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
 
@@ -89,31 +75,37 @@ object ForestChangeDiagnosticSummary {
         val isPeatlands: Boolean = raster.tile.isPeatlands.getData(col, row)
         val isIntactForestLandscapes2000: Boolean =
           raster.tile.isIntactForestLandscapes2000.getData(col, row)
-        val countrySpecificLossYear: Int = {
-          val loss: Integer = {
-            if (countryCode == "ARG") {
-              raster.tile.argForestLoss.getData(col, row)
-            } else if (countryCode == "BRA") {
-              raster.tile.prodesLossYear.getData(col, row)
+
+        val gfwProCoverage: Map[String, Boolean] =
+          raster.tile.gfwProCoverage.getData(col, row)
+        val argPresence = gfwProCoverage.getOrElse("Argentina", false)
+        val braBiomes: String = raster.tile.braBiomes.getData(col, row)
+
+        // We compute country-specific forest loss using argForestLoss tile for
+        // Argentina, and prodesLossYear for Brazil. In the very unusual case where a
+        // location covers more than one country, we don't want to mix
+        // country-specific forest losses, so we record the country-code that the
+        // forest loss came from. We will convert the location to an error if we end
+        // up merging results from more than one country.
+        val (countrySpecificLossYear: Int, countryCode: String) =
+          if (argPresence) {
+            val possLoss = raster.tile.argForestLoss.getData(col, row)
+            if (possLoss != null && possLoss.toInt > 0) {
+              (possLoss.toInt, "ARG")
             } else {
-              0
+              (0, "ARG")
             }
-          }
-          if (countryCode != "BRA") {
-            val prodesLoss = raster.tile.prodesLossYear.getData(col, row)
-            if (prodesLoss != null && prodesLoss.toInt > 0) {
-              println("==================== prodesLoss not in brazil =======")
+          } else {
+            val possLoss = raster.tile.prodesLossYear.getData(col, row)
+            if (possLoss != null && possLoss.toInt > 0) {
+              (possLoss.toInt, "BRA")
+            } else if (braBiomes != "Not applicable") {
+              (0, "BRA")
+            } else {
+              (0, "")
             }
           }
               
-          val lossYear =
-            if (loss != null) {
-              loss.toInt
-              } else {
-              0
-            }
-          lossYear
-        }
         val seAsiaLandCover: String =
           raster.tile.seAsiaLandCover.getData(col, row)
         val idnLandCover: String = raster.tile.idnLandCover.getData(col, row)
