@@ -33,8 +33,8 @@ object ForestChangeDiagnosticDataLossYearly {
     )
 
   def prefilled: ForestChangeDiagnosticDataLossYearly = {
-    val minLossYear = ForestChangeDiagnosticCommand.ForestLossYearStart
-    val maxLossYear = ForestChangeDiagnosticCommand.ForestLossYearEnd
+    val minLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearStart
+    val maxLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearEnd
     val kvList = for (i <- minLossYear to maxLossYear) yield(i -> 0.0)
     ForestChangeDiagnosticDataLossYearly(
       SortedMap(kvList.toSeq: _*)
@@ -46,8 +46,8 @@ object ForestChangeDiagnosticDataLossYearly {
            include: Boolean = true): ForestChangeDiagnosticDataLossYearly = {
 
     // Only accept lossYear values within range of default map
-    val minLossYear = ForestChangeDiagnosticCommand.ForestLossYearStart
-    val maxLossYear = ForestChangeDiagnosticCommand.ForestLossYearEnd
+    val minLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearStart
+    val maxLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearEnd
 
     if (minLossYear <= lossYear && lossYear <= maxLossYear && include) {
       ForestChangeDiagnosticDataLossYearly.prefilled.merge(

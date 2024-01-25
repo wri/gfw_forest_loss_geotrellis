@@ -76,7 +76,6 @@ object ForestChangeDiagnosticSummary {
         val isPeatlands: Boolean = raster.tile.isPeatlands.getData(col, row)
         val isIntactForestLandscapes2000: Boolean =
           raster.tile.isIntactForestLandscapes2000.getData(col, row)
-
         val prodesLossYear: Int = {
           val loss = raster.tile.prodesLossYear.getData(col, row)
           if (loss != null) {
@@ -89,7 +88,6 @@ object ForestChangeDiagnosticSummary {
         val gfwProCoverage: Map[String, Boolean] =
           raster.tile.gfwProCoverage.getData(col, row)
         val argPresence = gfwProCoverage.getOrElse("Argentina", false)
-        val braBiomes: String = raster.tile.braBiomes.getData(col, row)
 
         // We compute country-specific forest loss using argForestLoss tile for
         // Argentina, and prodesLossYear for Brazil. In the very unusual case where a
@@ -105,8 +103,6 @@ object ForestChangeDiagnosticSummary {
             val possLoss = raster.tile.prodesLossYear.getData(col, row)
             if (possLoss != null && possLoss.toInt > 0) {
               (ApproxYear(possLoss.toInt, false), "BRA")
-            } else if (braBiomes != "Not applicable") {
-              (ApproxYear(0, false), "BRA")
             } else {
               (ApproxYear(0, false), "")
             }
@@ -120,6 +116,7 @@ object ForestChangeDiagnosticSummary {
         val idnForestArea: String = raster.tile.idnForestArea.getData(col, row)
         val isIdnForestMoratorium: Boolean =
           raster.tile.isIDNForestMoratorium.getData(col, row)
+        val braBiomes: String = raster.tile.braBiomes.getData(col, row)
         val isPlantation: Boolean = raster.tile.isPlantation.getData(col, row)
         val argOTBN: String = raster.tile.argOTBN.getData(col, row)
 

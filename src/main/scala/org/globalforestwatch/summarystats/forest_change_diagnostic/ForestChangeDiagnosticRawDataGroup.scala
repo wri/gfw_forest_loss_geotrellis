@@ -113,20 +113,22 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
     tree_cover_loss_prodes_yearly = ForestChangeDiagnosticDataLossYearly.fill(
       prodesLossYear,
       totalArea,
-      isCountrySpecificLoss
+      isProdesLoss
     ),
     tree_cover_loss_prodes_wdpa_yearly =
       ForestChangeDiagnosticDataLossYearly.fill(
-        countrySpecificLossYear.year,
+        prodesLossYear,
         totalArea,
-        isCountrySpecificLoss && isProtectedArea
+        isProdesLoss && isProtectedArea
       ),
     tree_cover_loss_prodes_primary_forest_yearly =
       ForestChangeDiagnosticDataLossYearly.fill(
-        countrySpecificLossYear.year,
+        prodesLossYear,
         totalArea,
-        isCountrySpecificLoss && isPrimaryForest
+        isProdesLoss && isPrimaryForest
       ),
+    country_code = ForestChangeDiagnosticDataDoubleCategory
+      .fill(countryCode, totalArea),
     tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
       countrySpecificLossYear,
       totalArea,
@@ -162,8 +164,6 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
     natural_habitat_intact_forest = ForestChangeDiagnosticDataDouble
       .fill(totalArea, isIntactForestLandscapes2000),
     total_area = ForestChangeDiagnosticDataDouble.fill(totalArea),
-    country_code_area = ForestChangeDiagnosticDataDoubleCategory
-      .fill(countryCode, totalArea),
     protected_areas_area = ForestChangeDiagnosticDataDouble
       .fill(totalArea, isProtectedArea),
     peat_area = ForestChangeDiagnosticDataDouble

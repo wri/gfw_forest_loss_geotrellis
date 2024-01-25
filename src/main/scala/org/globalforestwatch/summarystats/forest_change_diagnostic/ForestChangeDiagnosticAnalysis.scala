@@ -131,8 +131,8 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
         // country-specific forest loss.
         (vl: ValidatedLocation[ForestChangeDiagnosticData]) => {
           vl match {
-            case Valid(Location(id, dd)) => if (dd.country_code_area.value.size > 1) {
-              Valid(Location(id, dd.copy(country_code_area = ForestChangeDiagnosticDataDoubleCategory.fill("ERR", 0.0),
+            case Valid(Location(id, dd)) => if (dd.country_code.value.size > 1) {
+              Valid(Location(id, dd.copy(country_code = ForestChangeDiagnosticDataDoubleCategory.fill("ERR", 0.0),
               tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossApproxYearly.empty)))
             } else {
               vl

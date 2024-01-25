@@ -56,8 +56,8 @@ object ForestChangeDiagnosticDataValueYearly {
     ForestChangeDiagnosticDataValueYearly(SortedMap())
 
   def prefilled: ForestChangeDiagnosticDataValueYearly = {
-    val minLossYear = ForestChangeDiagnosticCommand.ForestLossYearStart
-    val maxLossYear = ForestChangeDiagnosticCommand.ForestLossYearEnd
+    val minLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearStart
+    val maxLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearEnd
     val kvList = (for (i <- minLossYear to maxLossYear) yield(i -> 0.0))
 
     ForestChangeDiagnosticDataValueYearly(

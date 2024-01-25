@@ -59,9 +59,9 @@ object ForestChangeDiagnosticDataLossApproxYearly {
     )
 
   def prefilled: ForestChangeDiagnosticDataLossApproxYearly = {
-    val minLossYear = ForestChangeDiagnosticCommand.ForestLossYearStart
-    val maxLossYear = ForestChangeDiagnosticCommand.ForestLossYearEnd
-    val kvList = (for (i <- minLossYear to maxLossYear) yield(ApproxYear(i, false) -> 0.0))
+    val minLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearStart
+    val maxLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearEnd
+    val kvList = for (i <- minLossYear to maxLossYear) yield(ApproxYear(i, false) -> 0.0)
 
     ForestChangeDiagnosticDataLossApproxYearly(
       SortedMap(kvList.toSeq: _*)
@@ -73,8 +73,8 @@ object ForestChangeDiagnosticDataLossApproxYearly {
            include: Boolean = true): ForestChangeDiagnosticDataLossApproxYearly = {
 
     // Only accept lossYear values within range of default map
-    val minLossYear = ForestChangeDiagnosticCommand.ForestLossYearStart
-    val maxLossYear = ForestChangeDiagnosticCommand.ForestLossYearEnd
+    val minLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearStart
+    val maxLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearEnd
 
     if (minLossYear <= lossYear.year && lossYear.year <= maxLossYear && include) {
       ForestChangeDiagnosticDataLossApproxYearly.prefilled.merge(
@@ -89,8 +89,8 @@ object ForestChangeDiagnosticDataLossApproxYearly {
   }
 
   def fromString(value: String): ForestChangeDiagnosticDataLossApproxYearly = {
-    // I'm not deriving the decoder for SortedMap[ApproxYear, Double], since
-    // we don't every decode any ForestChangeDiagnosticDataLossApproxYearly.
+    // We don't bother deriving the decoder for SortedMap[ApproxYear, Double], since
+    // we don't ever decode any ForestChangeDiagnosticDataLossApproxYearly jsons.
     ForestChangeDiagnosticDataLossApproxYearly(SortedMap())
   }
 
