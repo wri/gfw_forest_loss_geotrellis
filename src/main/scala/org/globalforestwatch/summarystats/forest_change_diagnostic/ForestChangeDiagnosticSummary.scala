@@ -77,6 +77,15 @@ object ForestChangeDiagnosticSummary {
         val isIntactForestLandscapes2000: Boolean =
           raster.tile.isIntactForestLandscapes2000.getData(col, row)
 
+        val prodesLossYear: Int = {
+          val loss = raster.tile.prodesLossYear.getData(col, row)
+          if (loss != null) {
+            loss.toInt
+          } else {
+            0
+          }
+        }
+
         val gfwProCoverage: Map[String, Boolean] =
           raster.tile.gfwProCoverage.getData(col, row)
         val argPresence = gfwProCoverage.getOrElse("Argentina", false)
@@ -118,6 +127,7 @@ object ForestChangeDiagnosticSummary {
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
         val isTreeCoverExtent90: Boolean = tcd2000 > 90
         val isUMDLoss: Boolean = isTreeCoverExtent30 && umdTreeCoverLossYear > 0
+        val isProdesLoss: Boolean = prodesLossYear > 0
         val isCountrySpecificLoss: Boolean = countrySpecificLossYear.year > 0
 
         val southAmericaPresence =
@@ -153,6 +163,8 @@ object ForestChangeDiagnosticSummary {
         val groupKey = ForestChangeDiagnosticRawDataGroup(
           umdTreeCoverLossYear,
           isUMDLoss,
+          prodesLossYear,
+          isProdesLoss,
           countryCode,
           countrySpecificLossYear,
           isCountrySpecificLoss,

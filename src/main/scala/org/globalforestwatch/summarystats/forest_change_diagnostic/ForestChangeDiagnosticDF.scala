@@ -101,9 +101,10 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "tree_cover_loss_soy_yearly", // treeCoverLossSoyPlanedAreasYearly
     "tree_cover_loss_idn_legal_yearly", // treeCoverLossIDNForestAreaYearly
     "tree_cover_loss_idn_forest_moratorium_yearly", // treeCoverLossIDNForestMoratoriumYearly
-    "tree_cover_loss_country_specific_yearly", // countrySpecificLossYearly
+    "tree_cover_loss_prodes_yearly", // prodesLossYearly
     "tree_cover_loss_prodes_wdpa_yearly", // prodesLossProtectedAreasYearly
     "tree_cover_loss_prodes_primary_forest_yearly", // prodesLossProdesPrimaryForestYearly
+    "tree_cover_loss_country_specific_yearly", // countrySpecificLossYearly
     "tree_cover_loss_brazil_biomes_yearly", // treeCoverLossBRABiomesYearly
     "tree_cover_extent_total", // treeCoverExtent
     "tree_cover_extent_primary_forest", // treeCoverExtentPrimaryForest

@@ -4,6 +4,8 @@ import org.globalforestwatch.layers.ApproxYear
 
 case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
                                               isUMDLoss: Boolean,
+                                              prodesLossYear: Int,
+                                              isProdesLoss: Boolean,
                                               countryCode: String,
                                               countrySpecificLossYear: ApproxYear,
                                               isCountrySpecificLoss: Boolean,
@@ -108,8 +110,8 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isIdnForestMoratorium && isUMDLoss
       ),
-    tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
-      countrySpecificLossYear,
+    tree_cover_loss_prodes_yearly = ForestChangeDiagnosticDataLossYearly.fill(
+      prodesLossYear,
       totalArea,
       isCountrySpecificLoss
     ),
@@ -125,6 +127,11 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isCountrySpecificLoss && isPrimaryForest
       ),
+    tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
+      countrySpecificLossYear,
+      totalArea,
+      isCountrySpecificLoss
+    ),
     tree_cover_loss_brazil_biomes_yearly =
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
         braBiomes,

@@ -16,7 +16,6 @@ import org.globalforestwatch.summarystats.{Location, NoIntersectionError, Summar
 import org.globalforestwatch.util.SpatialJoinRDD
 import org.apache.spark.storage.StorageLevel
 import org.globalforestwatch.ValidatedWorkflow
-import org.globalforestwatch.summarystats.GeometryError
 
 object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
@@ -128,15 +127,17 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       }).map(
         // We don't want to mix country-specific forest loss for two countries. In
         // the unusual case where location spans two countries and has forest loss in
-        // both countries, we convert the location results to an error.
+        // both countries, we convert the country code to "ERR" and zero out the
+        // country-specific forest loss.
         (vl: ValidatedLocation[ForestChangeDiagnosticData]) => {
           vl match {
             case Valid(Location(id, dd)) => if (dd.country_code_area.value.size > 1) {
-              Invalid(Location(id, GeometryError("location has forest loss in two countries")))
+              Valid(Location(id, dd.copy(country_code_area = ForestChangeDiagnosticDataDoubleCategory.fill("ERR", 0.0),
+              tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossApproxYearly.empty)))
             } else {
-              Valid(Location(id, dd))
+              vl
             }
-            case Invalid(i) => Invalid(i)
+            case Invalid(i) => vl
           }
         }
       )
