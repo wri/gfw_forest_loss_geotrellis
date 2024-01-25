@@ -10,7 +10,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-        image: quay.io/azavea/openjdk-gdal:3.1-jdk8-slim
+        image: docker.io/globalforestwatch/emr-serverless-3.8.3:latest
 
     steps:
       - uses: actions/checkout@v2
