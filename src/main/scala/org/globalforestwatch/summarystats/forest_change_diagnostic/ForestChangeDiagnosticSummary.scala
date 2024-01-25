@@ -5,6 +5,7 @@ import geotrellis.raster._
 import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.layers.ApproxYear
 
 /** LossData Summary by year */
 case class ForestChangeDiagnosticSummary(
@@ -87,22 +88,18 @@ object ForestChangeDiagnosticSummary {
         // country-specific forest losses, so we record the country-code that the
         // forest loss came from. We will convert the location to an error if we end
         // up merging results from more than one country.
-        val (countrySpecificLossYear: Int, countryCode: String) =
+        val (countrySpecificLossYear: ApproxYear, countryCode: String) =
           if (argPresence) {
             val possLoss = raster.tile.argForestLoss.getData(col, row)
-            if (possLoss != null && possLoss.toInt > 0) {
-              (possLoss.toInt, "ARG")
-            } else {
-              (0, "ARG")
-            }
+            (possLoss, "ARG")
           } else {
             val possLoss = raster.tile.prodesLossYear.getData(col, row)
             if (possLoss != null && possLoss.toInt > 0) {
-              (possLoss.toInt, "BRA")
+              (ApproxYear(possLoss.toInt, false), "BRA")
             } else if (braBiomes != "Not applicable") {
-              (0, "BRA")
+              (ApproxYear(0, false), "BRA")
             } else {
-              (0, "")
+              (ApproxYear(0, false), "")
             }
           }
               
@@ -121,7 +118,7 @@ object ForestChangeDiagnosticSummary {
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
         val isTreeCoverExtent90: Boolean = tcd2000 > 90
         val isUMDLoss: Boolean = isTreeCoverExtent30 && umdTreeCoverLossYear > 0
-        val isCountrySpecificLoss: Boolean = countrySpecificLossYear > 0
+        val isCountrySpecificLoss: Boolean = countrySpecificLossYear.year > 0
 
         val southAmericaPresence =
           gfwProCoverage.getOrElse("South America", false)
