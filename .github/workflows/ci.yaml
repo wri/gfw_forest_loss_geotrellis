@@ -11,10 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
         image: docker.io/globalforestwatch/emr-serverless-3.8.3:latest
-
-    defaults:
-      run:
-        working-directory: /root
+        options: --user root
 
     steps:
       - uses: actions/checkout@v2
