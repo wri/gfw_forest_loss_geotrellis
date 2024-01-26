@@ -134,6 +134,16 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
       totalArea,
       isCountrySpecificLoss
     ),
+    tree_cover_loss_country_specific_wdpa_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
+      countrySpecificLossYear,
+      totalArea,
+      isCountrySpecificLoss && isProtectedArea
+    ),
+    tree_cover_loss_country_specific_primary_forest_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
+      countrySpecificLossYear,
+      totalArea,
+      isCountrySpecificLoss && isPrimaryForest
+    ),
     tree_cover_loss_brazil_biomes_yearly =
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
         braBiomes,

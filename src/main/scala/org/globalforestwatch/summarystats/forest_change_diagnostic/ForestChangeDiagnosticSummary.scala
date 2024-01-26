@@ -88,13 +88,15 @@ object ForestChangeDiagnosticSummary {
         val gfwProCoverage: Map[String, Boolean] =
           raster.tile.gfwProCoverage.getData(col, row)
         val argPresence = gfwProCoverage.getOrElse("Argentina", false)
+        val braBiomesPresence = gfwProCoverage.getOrElse("Brazil Biomes", false)
 
         // We compute country-specific forest loss using argForestLoss tile for
         // Argentina, and prodesLossYear for Brazil. In the very unusual case where a
         // location covers more than one country, we don't want to mix
         // country-specific forest losses, so we record the country-code that the
-        // forest loss came from. We will convert the location to an error if we end
-        // up merging results from more than one country.
+        // forest loss came from. We will zero out the country-specific forest loss
+        // and mark it with an 'ERR' country code if we end up merging results from
+        // more than one country.
         val (countrySpecificLossYear: ApproxYear, countryCode: String) =
           if (argPresence) {
             val possLoss = raster.tile.argForestLoss.getData(col, row)
@@ -103,6 +105,11 @@ object ForestChangeDiagnosticSummary {
             val possLoss = raster.tile.prodesLossYear.getData(col, row)
             if (possLoss != null && possLoss.toInt > 0) {
               (ApproxYear(possLoss.toInt, false), "BRA")
+            } else if (braBiomesPresence) {
+              // braBiomesPresence is not all of Brazil, but we are using it as a
+              // proxy for pixel being in Brazil, so we catch any locations that
+              // intersect with both Argentina and Brazil.
+              (ApproxYear(0, false), "BRA")
             } else {
               (ApproxYear(0, false), "")
             }
@@ -131,7 +138,6 @@ object ForestChangeDiagnosticSummary {
           gfwProCoverage.getOrElse("South America", false)
         val legalAmazonPresence =
           gfwProCoverage.getOrElse("Legal Amazon", false)
-        val braBiomesPresence = gfwProCoverage.getOrElse("Brazil Biomes", false)
         val cerradoBiomesPresence =
           gfwProCoverage.getOrElse("Cerrado Biomes", false)
         val seAsiaPresence = gfwProCoverage.getOrElse("South East Asia", false)
