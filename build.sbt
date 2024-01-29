@@ -84,6 +84,13 @@ libraryDependencies ++= Seq(
 
 dependencyOverrides += "com.google.guava" % "guava" % "20.0"
 
+// This avoid a run-time warning (but with "error" markings) about multiple SLF4J
+// bindings, because of inclusion of both log4j-slf4j-impl-2.17.2 and
+// slf4j-log4j12-1.7.25.  Spark prefers to use log4j-slf4j-impl.
+excludeDependencies ++= Seq(
+  ExclusionRule("org.slf4j", "slf4j-log4j12")
+)
+
 assembly / assemblyShadeRules := {
   val shadePackage = "org.globalforestwatch.shaded"
   Seq(
