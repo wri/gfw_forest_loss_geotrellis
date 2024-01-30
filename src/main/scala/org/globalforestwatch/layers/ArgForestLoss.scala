@@ -20,5 +20,5 @@ case class ArgForestLoss(gridTile: GridTile, kwargs: Map[String, Any])
     else if (value < 100)
       ApproxYear(2000+value, false)
     else
-      ApproxYear(1900+value, true)
+      ApproxYear(2000+(value-100), true)
 }

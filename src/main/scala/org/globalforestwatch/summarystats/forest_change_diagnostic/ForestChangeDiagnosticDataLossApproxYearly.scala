@@ -24,22 +24,22 @@ case class ForestChangeDiagnosticDataLossApproxYearly(value: SortedMap[ApproxYea
   // under the indicated year without the "approx" suffix.
   def combineApprox: SortedMap[String, Double] = {
     var out = scala.collection.mutable.SortedMap[String, Double]()
-    for ((k, v) <- this.value) {
-      val yearString = k.year.toString
-      if (k.approx) {
-        if (v > 0) {
-          out(yearString + "approx") = v
+    for ((approxYear, lossArea) <- this.value) {
+      val yearString = approxYear.year.toString
+      if (approxYear.approx) {
+        if (lossArea > 0) {
+          out(yearString + "approx") = lossArea
           if (out.contains(yearString)) {
             out(yearString + "approx") += out(yearString)
             out -= yearString
           }
         }
       } else if (out.contains(yearString + "approx")) {
-          if (v > 0) {
-            out(yearString + "approx") += v
+          if (lossArea > 0) {
+            out(yearString + "approx") += lossArea
           }
       } else {
-        out(yearString) = v
+        out(yearString) = lossArea
       }
     }
     SortedMap(out.toSeq: _*)

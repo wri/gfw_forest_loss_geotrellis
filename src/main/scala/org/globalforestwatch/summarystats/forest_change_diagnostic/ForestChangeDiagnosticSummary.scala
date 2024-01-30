@@ -97,24 +97,24 @@ object ForestChangeDiagnosticSummary {
         // forest loss came from. We will zero out the country-specific forest loss
         // and mark it with an 'ERR' country code if we end up merging results from
         // more than one country.
-        val (countrySpecificLossYear: ApproxYear, countryCode: String) =
-          if (argPresence) {
-            val possLoss = raster.tile.argForestLoss.getData(col, row)
-            (possLoss, "ARG")
-          } else {
-            val possLoss = raster.tile.prodesLossYear.getData(col, row)
-            if (possLoss != null && possLoss.toInt > 0) {
-              (ApproxYear(possLoss.toInt, false), "BRA")
-            } else if (braBiomesPresence) {
-              // braBiomesPresence is not all of Brazil, but we are using it as a
-              // proxy for pixel being in Brazil, so we catch any locations that
-              // intersect with both Argentina and Brazil.
-              (ApproxYear(0, false), "BRA")
-            } else {
-              (ApproxYear(0, false), "")
-            }
+        var countrySpecificLossYear = ApproxYear(0, false)
+        var countryCode  = ""
+        if (argPresence) {
+          countrySpecificLossYear = raster.tile.argForestLoss.getData(col, row)
+          countryCode = "ARG"
+        } else {
+          val possLoss = raster.tile.prodesLossYear.getData(col, row)
+          if (possLoss != null && possLoss > 0) {
+            countrySpecificLossYear = ApproxYear(possLoss, false)
+            countryCode = "BRA"
+          } else if (braBiomesPresence) {
+            // braBiomesPresence is not all of Brazil, but we are using it as a
+            // proxy for pixel being in Brazil, so we catch any locations that
+            // intersect with both Argentina and Brazil.
+            countryCode = "BRA"
           }
-              
+        }
+
         val seAsiaLandCover: String =
           raster.tile.seAsiaLandCover.getData(col, row)
         val idnLandCover: String = raster.tile.idnLandCover.getData(col, row)

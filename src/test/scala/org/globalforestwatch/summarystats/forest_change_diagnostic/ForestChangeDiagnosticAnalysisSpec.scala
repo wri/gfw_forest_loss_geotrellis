@@ -13,10 +13,13 @@ import org.globalforestwatch.features.GfwProFeatureId
 import org.globalforestwatch.summarystats.{JobError, Location, ValidatedLocation}
 import org.globalforestwatch.TestEnvironment
 import org.globalforestwatch.config.GfwConfig
+import org.globalforestwatch.layers.ApproxYear
 
 class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameComparer {
   def palm32InputTsvPath = getClass.getResource("/palm-oil-32.tsv").toString()
   def antarcticaInputTsvPath = getClass.getResource("/antarctica.tsv").toString()
+  def argentinaInputTsvPath = getClass.getResource("/argentina.tsv").toString()
+  def argBraInputTsvPath = getClass.getResource("/argbra.tsv").toString()
   def palm32ExpectedOutputPath = getClass.getResource("/palm-32-fcd-output").toString()
 
   def FCD(features: RDD[ValidatedLocation[Geometry]]) = {
@@ -124,5 +127,38 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
 
     fcdDF.count() shouldBe 0
+  }
+
+  it("gives an approx loss year for Argentina location") {
+    val argentinaRDD = ValidatedFeatureRDD(
+      NonEmptyList.one(argentinaInputTsvPath),
+      "gfwpro",
+      FeatureFilter.empty,
+      splitFeatures = true
+    )
+    val fcd = FCD(argentinaRDD)
+    val loc: ValidatedLocation[ForestChangeDiagnosticData] = fcd.collect().head
+    loc.isValid shouldBe true
+    val fcdd: ForestChangeDiagnosticData = loc.getOrElse(null)._2
+    (fcdd.country_code.value.size == 1 && fcdd.country_code.value.contains("ARG")) shouldBe true
+    (fcdd.tree_cover_loss_country_specific_yearly.value(ApproxYear(2017, true)) > 0) shouldBe true
+
+    val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
+    val tcl: String = fcdDF.collect().head.getAs[String]("tree_cover_loss_country_specific_yearly")
+    tcl.contains("2017approx") shouldBe true
+  }
+
+  it("gives an ERR country code for a location in Brazil and Argentina") {
+    val argBraRDD = ValidatedFeatureRDD(
+      NonEmptyList.one(argBraInputTsvPath),
+      "gfwpro",
+      FeatureFilter.empty,
+      splitFeatures = true
+    )
+    val fcd = FCD(argBraRDD)
+    val loc: ValidatedLocation[ForestChangeDiagnosticData] = fcd.collect().head
+    loc.isValid shouldBe true
+    val fcdd: ForestChangeDiagnosticData = loc.getOrElse(null)._2
+    (fcdd.country_code.value.size == 1 && fcdd.country_code.value.contains("ERR")) shouldBe true
   }
 }
