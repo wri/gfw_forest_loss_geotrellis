@@ -36,7 +36,7 @@ object AFiDF extends SummaryDF {
               (rowId(fid), RowError.empty, dataGroup, data)
           }
         case Invalid(Location(fid, err)) =>
-          List((rowId(fid), RowError.fromJobError(err), AFiDataGroup.empty, AFiData.empty))
+         List((rowId(fid), RowError.fromJobError(err), AFiDataGroup.empty, AFiData.empty))
       }
       .toDF("id", "error", "dataGroup", "data")
       .select($"id.*", $"error.*", $"dataGroup.*", $"data.*")

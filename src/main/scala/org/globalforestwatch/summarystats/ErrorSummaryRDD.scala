@@ -140,6 +140,9 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
         .reduceByKey(Semigroup.combine)
         .map { case (fid, summary) =>
           summary match {
+            // If there was no intersection for any partial results, we consider this an invalid geometry
+            case Valid(GTSummary(result)) if result.isEmpty =>
+              Valid(Location(fid, result))
             case Invalid(error) =>
               Invalid(Location(fid, error))
             case Valid(GTSummary(result)) =>
