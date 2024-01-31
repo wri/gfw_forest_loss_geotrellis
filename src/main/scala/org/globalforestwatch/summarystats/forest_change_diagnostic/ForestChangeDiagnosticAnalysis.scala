@@ -21,17 +21,21 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
   val name = "forest_change_diagnostic"
 
-  /** GFW Pro hand of a input features in a TSV file TSV file contains the individual list items, the merged list geometry and the
+  /** GFW Pro analysis of input features in a TSV file. The TSV file contains
+    * the individual list items, the merged list geometry, and the
     * geometric difference from the current merged list geometry and the former one.
     *   - Individual list items have location IDs >= 0
     *   - Merged list geometry has location ID -1
     *   - Geometric difference to previous version has location ID -2
     *
-    * Merged list and geometric difference may or may be not present. If geometric difference is present, we only need to process chunks
-    * of the merged list which fall into the same grid cells as the geometric difference. Later in the analysis we will then read cached
+    * Merged list and geometric difference may or may be not present. If geometric
+    * difference is present, we only need to process chunks
+    * of the merged list which fall into the same grid cells as the
+    * geometric difference. Later in the analysis we will then read cached
     * values for the remaining chunks and use them to aggregate list level results.
     *
-    * This function assumes that all features have already been split by 1x1 degree grid. This function will exclude diff geometry
+    * This function assumes that all features have already been split by 1x1 degree
+    * grid. This function will exclude diff geometry
     * locations from output (id=-2).
     */
   def apply(
@@ -70,9 +74,17 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
             val locationSummaries: RDD[ValidatedLocation[ForestChangeDiagnosticSummary]] = {
               val tmp = diffLocations.map { case Location(id, geom) => Feature(geom, id) }
+
+              // This is where the main analysis happens, in ErrorSummaryRDD.apply(),
+              // which eventually calls into ForestChangeDiagnosticSummary via
+              // runPolygonalSummary().
               ForestChangeDiagnosticRDD(tmp, ForestChangeDiagnosticGrid.blockTileGrid, kwargs)
             }
 
+            // For all rows that didn't get an error from the FCD analysis, do the
+            // transformation from ForestChangeDiagnosticSummary to
+            // ForestChangeDiagnosticData and add commodity risk,
+            // commodity_threat_fires, and tree_cover_loss_soy_yearly.
             ValidatedWorkflow(locationSummaries).mapValid { summaries =>
               summaries
                 .mapValues {
@@ -95,7 +107,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
                       // March. So, the most recent data relates to soy planted late
                       // in previous year. So, we should only intersect with tree
                       // cover loss from previous year.
-                      tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2021)
+                      tree_cover_loss_soy_yearly = data.tree_cover_loss_soy_yearly.limitToMaxYear(2022)
                     )
                   }
                 }
@@ -194,6 +206,13 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     spatialFeatureRDD.fieldNames = seqAsJavaList(List("FeatureId"))
     spatialFeatureRDD.analyze()
 
+    // If there are no locations that intersect the TCL extent (spatialFeatureRDD is
+    // empty, has no envelope), then spatial join below will fail, so return without
+    // further analysis.
+    if (spatialFeatureRDD.boundaryEnvelope == null) {
+      return spark.sparkContext.parallelize(Seq.empty[Location[ForestChangeDiagnosticDataLossYearly]])
+    }
+
     val joinedRDD =
       SpatialJoinRDD.spatialjoin(
         spatialFeatureRDD,
@@ -201,7 +220,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
         usingIndex = true
       )
 
-    // This fire data is an input to the palm risk tool, so limit data to 2021 to sync
+    // This fire data is an input to the palm risk tool, so limit data to 2022 to sync
     // with the palm risk tool.
     joinedRDD.rdd
       .map { case (poly, points) =>
@@ -220,7 +239,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
       }
       .reduceByKey(_ merge _)
       .mapValues { fires =>
-        aggregateFireData(fires.merge(ForestChangeDiagnosticDataLossYearly.prefilled)).limitToMaxYear(2021)
+        aggregateFireData(fires.merge(ForestChangeDiagnosticDataLossYearly.prefilled)).limitToMaxYear(2022)
       }
   }
 

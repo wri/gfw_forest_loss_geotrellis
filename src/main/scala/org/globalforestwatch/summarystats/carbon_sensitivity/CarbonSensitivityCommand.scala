@@ -29,7 +29,7 @@ object CarbonSensitivityCommand extends SummaryCommand {
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "sensitivityType" -> sensitivityType,
-        "config" -> GfwConfig.get
+        "config" -> GfwConfig.get()
       )
 
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

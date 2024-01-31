@@ -9,16 +9,17 @@ case class PlantedForests(gridTile: GridTile, kwargs: Map[String, Any]) extends 
 
   def lookup(value: Int): String = value match {
     case 1 => "Fruit"
-    case 2 => "Fruit Mix"
-    case 3 => "Oil Palm "
-    case 4 => "Oil Palm Mix"
+    case 2 => "Fruit mix"
+    case 3 => "Oil palm "
+    case 4 => "Oil palm mix"
     case 5 => "Other"
-    case 6 => "Rubber"
-    case 7  => "Rubber Mix"
-    case 8  => "Unknown"
-    case 9  => "Unknown Mix"
-    case 10 => "Wood fiber / Timber"
-    case 11 => "Wood fiber / Timber Mix"
+    case 6 => "Other mix"
+    case 7 => "Rubber"
+    case 8  => "Rubber mix"
+    case 9  => "Unknown"
+    case 10  => "Unknown mix"
+    case 11 => "Wood fiber or timber"
+    case 12 => "Wood fiber or timber Mix"
     case _ => ""
   }
 }

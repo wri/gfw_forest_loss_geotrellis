@@ -5,5 +5,8 @@ case class TreeLossDataGroup(
                               tcdYear: Int,
                               isPrimaryForest: Boolean,
                               isPlantations: Boolean,
+                              isGlobalPeat: Boolean,
+                              tclDriverClass: String,
+                              isTreeCoverLossFire: Boolean,
                               isGain: Boolean
                         )

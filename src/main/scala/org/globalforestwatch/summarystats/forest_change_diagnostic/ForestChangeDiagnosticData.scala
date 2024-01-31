@@ -27,13 +27,10 @@ case class ForestChangeDiagnosticData(
   /** treeCoverLossIDNForestAreaYearly */
   tree_cover_loss_idn_legal_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   tree_cover_loss_idn_forest_moratorium_yearly: ForestChangeDiagnosticDataLossYearly,
-  tree_cover_loss_prodes_amazon_yearly: ForestChangeDiagnosticDataLossYearly,
-  tree_cover_loss_prodes_cerrado_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_prodes_yearly: ForestChangeDiagnosticDataLossYearly,
   /** prodesLossProtectedAreasYearly */
-  tree_cover_loss_prodes_amazon_wdpa_yearly: ForestChangeDiagnosticDataLossYearly,
-  tree_cover_loss_prodes_cerrado_wdpa_yearly: ForestChangeDiagnosticDataLossYearly,
-  tree_cover_loss_prodes_amazon_primary_forest_yearly: ForestChangeDiagnosticDataLossYearly,
-  tree_cover_loss_prodes_cerrado_primary_forest_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_prodes_wdpa_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_prodes_primary_forest_yearly: ForestChangeDiagnosticDataLossYearly,
   tree_cover_loss_brazil_biomes_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   tree_cover_extent_total: ForestChangeDiagnosticDataDouble,
   tree_cover_extent_primary_forest: ForestChangeDiagnosticDataDouble,
@@ -50,6 +47,10 @@ case class ForestChangeDiagnosticData(
   peat_area: ForestChangeDiagnosticDataDouble,
   /** OTBN category area */
   arg_otbn_area: ForestChangeDiagnosticDataDoubleCategory,
+  /** Detailed WDPA category area */
+  protected_areas_by_category_area: ForestChangeDiagnosticDataDoubleCategory,
+  /** Indigenous area (from Landmark dataset) */
+  landmark_by_category_area: ForestChangeDiagnosticDataDoubleCategory,
   brazil_biomes: ForestChangeDiagnosticDataDoubleCategory,
   /** IDN Forest Area */
   idn_legal_area: ForestChangeDiagnosticDataDoubleCategory,
@@ -119,19 +120,12 @@ case class ForestChangeDiagnosticData(
       tree_cover_loss_idn_forest_moratorium_yearly.merge(
         other.tree_cover_loss_idn_forest_moratorium_yearly
       ),
-      tree_cover_loss_prodes_amazon_yearly.merge(other.tree_cover_loss_prodes_amazon_yearly),
-      tree_cover_loss_prodes_cerrado_yearly.merge(other.tree_cover_loss_prodes_cerrado_yearly),
-      tree_cover_loss_prodes_amazon_wdpa_yearly.merge(
-        other.tree_cover_loss_prodes_amazon_wdpa_yearly
+      tree_cover_loss_prodes_yearly.merge(other.tree_cover_loss_prodes_yearly),
+      tree_cover_loss_prodes_wdpa_yearly.merge(
+        other.tree_cover_loss_prodes_wdpa_yearly
       ),
-      tree_cover_loss_prodes_cerrado_wdpa_yearly.merge(
-        other.tree_cover_loss_prodes_cerrado_wdpa_yearly
-      ),
-      tree_cover_loss_prodes_amazon_primary_forest_yearly.merge(
-        other.tree_cover_loss_prodes_amazon_primary_forest_yearly
-      ),
-      tree_cover_loss_prodes_cerrado_primary_forest_yearly.merge(
-        other.tree_cover_loss_prodes_cerrado_primary_forest_yearly
+      tree_cover_loss_prodes_primary_forest_yearly.merge(
+        other.tree_cover_loss_prodes_primary_forest_yearly
       ),
       tree_cover_loss_brazil_biomes_yearly.merge(other.tree_cover_loss_brazil_biomes_yearly),
       tree_cover_extent_total.merge(other.tree_cover_extent_total),
@@ -145,6 +139,8 @@ case class ForestChangeDiagnosticData(
       protected_areas_area.merge(other.protected_areas_area),
       peat_area.merge(other.peat_area),
       arg_otbn_area.merge(other.arg_otbn_area),
+      protected_areas_by_category_area.merge(other.protected_areas_by_category_area),
+      landmark_by_category_area.merge(other.landmark_by_category_area),
       brazil_biomes.merge(other.brazil_biomes),
       idn_legal_area.merge(other.idn_legal_area),
       sea_landcover_area.merge(other.sea_landcover_area),
@@ -181,27 +177,25 @@ case class ForestChangeDiagnosticData(
     )
   }
 
-  /** @see
-    *   https://docs.google.com/presentation/d/1nAq4mFNkv1q5vFvvXWReuLr4Znvr-1q-BDi6pl_5zTU/edit#slide=id.p
+  /**
+    * @see https://docs.google.com/presentation/d/1nAq4mFNkv1q5vFvvXWReuLr4Znvr-1q-BDi6pl_5zTU/edit#slide=id.p
     */
   def withUpdatedCommodityRisk(): ForestChangeDiagnosticData = {
 
-    /* Exclude the last year, limit data to 2021 to sync with palm risk tool:
+    /* Exclude the last year, limit data to 2022 to sync with palm risk tool:
     commodity_threat_deforestation, commodity_threat_peat, commodity_threat_protected_areas use year n and year n-1.
     Including information from the current year would under-represent these values as it's in progress.
-     */
+    */
     val minLossYear = ForestChangeDiagnosticDataLossYearly.prefilled.value.keys.min
-    val maxLossYear = 2021
+    val maxLossYear = 2022
     val years: List[Int] = List.range(minLossYear + 1, maxLossYear + 1)
 
     val forestValueIndicator: ForestChangeDiagnosticDataValueYearly =
-      ForestChangeDiagnosticDataValueYearly
-        .fill(
-          filtered_tree_cover_extent.value,
-          filtered_tree_cover_loss_yearly.value,
-          2
-        )
-        .limitToMaxYear(maxLossYear)
+      ForestChangeDiagnosticDataValueYearly.fill(
+        filtered_tree_cover_extent.value,
+        filtered_tree_cover_loss_yearly.value,
+        2
+      ).limitToMaxYear(maxLossYear)
 
     val peatValueIndicator: ForestChangeDiagnosticDataValueYearly =
       ForestChangeDiagnosticDataValueYearly.fill(peat_area.value).limitToMaxYear(maxLossYear)
@@ -212,22 +206,21 @@ case class ForestChangeDiagnosticData(
     val deforestationThreatIndicator: ForestChangeDiagnosticDataLossYearly =
       ForestChangeDiagnosticDataLossYearly(
         SortedMap(
-          years.map(year =>
-            (
-              year, {
+          years.map(
+            year =>
+              (year, {
                 // Somehow the compiler cannot infer the types correctly
                 // I hence declare them here explicitly to help him out.
                 val thisYearLoss: Double =
-                  filtered_tree_cover_loss_yearly.value
-                    .getOrElse(year, 0)
+                filtered_tree_cover_loss_yearly.value
+                  .getOrElse(year, 0)
 
                 val lastYearLoss: Double =
                   filtered_tree_cover_loss_yearly.value
                     .getOrElse(year - 1, 0)
 
                 thisYearLoss + lastYearLoss
-              }
-            )
+              })
           ): _*
         )
       ).limitToMaxYear(maxLossYear)
@@ -235,14 +228,14 @@ case class ForestChangeDiagnosticData(
     val peatThreatIndicator: ForestChangeDiagnosticDataLossYearly =
       ForestChangeDiagnosticDataLossYearly(
         SortedMap(
-          years.map(year =>
-            (
-              year, {
+          years.map(
+            year =>
+              (year, {
                 // Somehow the compiler cannot infer the types correctly
                 // I hence declare them here explicitly to help him out.
                 val thisYearPeatLoss: Double =
-                  filtered_tree_cover_loss_peat_yearly.value
-                    .getOrElse(year, 0)
+                filtered_tree_cover_loss_peat_yearly.value
+                  .getOrElse(year, 0)
 
                 val lastYearPeatLoss: Double =
                   filtered_tree_cover_loss_peat_yearly.value
@@ -250,8 +243,7 @@ case class ForestChangeDiagnosticData(
 
                 thisYearPeatLoss + lastYearPeatLoss + plantation_on_peat_area.value
 
-              }
-            )
+              })
           ): _*
         )
       ).limitToMaxYear(maxLossYear)
@@ -259,22 +251,21 @@ case class ForestChangeDiagnosticData(
     val protectedAreaThreatIndicator: ForestChangeDiagnosticDataLossYearly =
       ForestChangeDiagnosticDataLossYearly(
         SortedMap(
-          years.map(year =>
-            (
-              year, {
+          years.map(
+            year =>
+              (year, {
                 // Somehow the compiler cannot infer the types correctly
                 // I hence declare them here explicitly to help him out.
                 val thisYearProtectedAreaLoss: Double =
-                  filtered_tree_cover_loss_protected_areas_yearly.value
-                    .getOrElse(year, 0)
+                filtered_tree_cover_loss_protected_areas_yearly.value
+                  .getOrElse(year, 0)
 
                 val lastYearProtectedAreaLoss: Double =
                   filtered_tree_cover_loss_protected_areas_yearly.value
                     .getOrElse(year - 1, 0)
 
                 thisYearProtectedAreaLoss + lastYearProtectedAreaLoss + plantation_in_protected_areas_area.value
-              }
-            )
+              })
           ): _*
         )
       ).limitToMaxYear(maxLossYear)
@@ -285,8 +276,7 @@ case class ForestChangeDiagnosticData(
       commodity_value_protected_areas = protectedAreaValueIndicator,
       commodity_threat_deforestation = deforestationThreatIndicator,
       commodity_threat_peat = peatThreatIndicator,
-      commodity_threat_protected_areas = protectedAreaThreatIndicator
-    )
+      commodity_threat_protected_areas = protectedAreaThreatIndicator)
   }
 
 }
@@ -310,9 +300,6 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
-      ForestChangeDiagnosticDataLossYearly.empty,
-      ForestChangeDiagnosticDataLossYearly.empty,
-      ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
@@ -329,6 +316,8 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataBoolean.empty,
       ForestChangeDiagnosticDataBoolean.empty,
@@ -351,17 +340,17 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
-      ForestChangeDiagnosticDataLossYearly.empty
+      ForestChangeDiagnosticDataLossYearly.empty,
     )
 
   implicit val lossDataSemigroup: Semigroup[ForestChangeDiagnosticData] =
     new Semigroup[ForestChangeDiagnosticData] {
-      def combine(x: ForestChangeDiagnosticData, y: ForestChangeDiagnosticData): ForestChangeDiagnosticData =
+      def combine(x: ForestChangeDiagnosticData,
+                  y: ForestChangeDiagnosticData): ForestChangeDiagnosticData =
         x.merge(y)
     }
 
   implicit def dataExpressionEncoder: ExpressionEncoder[ForestChangeDiagnosticData] =
-    frameless
-      .TypedExpressionEncoder[ForestChangeDiagnosticData]
+    frameless.TypedExpressionEncoder[ForestChangeDiagnosticData]
       .asInstanceOf[ExpressionEncoder[ForestChangeDiagnosticData]]
 }

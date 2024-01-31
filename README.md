@@ -21,19 +21,22 @@ Currently the following analysis are implemented
 ### Tree Cover Loss
 
 A simple analysis which only looks at tree cover loss, tree cover density (2000 or 2010), aboveground biomass,
-gross GHG emissions, gross carbon removals, and net GHG flux. Aboveground carbon, belowground carbon, and soil carbon can be optionally analyzed.
+gross GHG emissions, gross carbon removals, and net GHG flux. Aboveground carbon, belowground carbon, and soil carbon stocks in 2000
+and annual emissions from aboveground biomass loss (old emissions model) can be optionally output.
 Users can select one or many tree cover thresholds. Output will be a flat file, with one row per input feature and tree cover density threshold.
-Optional contextual analysis layers include plantations and humid tropical primary forests. 
+Optional contextual analysis layers include plantations, humid tropical primary forests, global peat, drivers of tree cover loss, and tree cover loss due to fires.
+Contextual layers are lazily analyzed, meaning that they are not loaded into the analysis if the user does not request them (to save memory).
 The emissions outputs (annual and total) are from the forest carbon flux model (Harris et al. 2021 Nature Climate Change) [forest carbon flux model](https://github.com/wri/carbon-budget).
 Outputs also include carbon removals and carbon net flux (total only) (Harris et al. 2021). 
-Emissions, removals, and net flux are reported for (> tree cover density 2000 threshold OR Hansen gain) because the model results
+Emissions, removals, and net flux are reported for (> tree cover density 2000 threshold OR Hansen gain OR mangrove extent NOT pre-2000 plantations) 
+because the model results
 include not just pixels above a certain tree cover density threshold, but also Hansen gain pixels.
 Other outputs from this analysis (loss, gain, biomass, carbon pools, etc.) use the simple tree cover density threshold. 
 
 This type of analysis only supports simple features as input. Best used together with the [ArcPY Client](https://github.com/wri/gfw_forest_loss_geotrellis_arcpy_client).
 
 ```sbt
-test:runMain org.globalforestwatch.summarystats.SummaryMain treecoverloss --feature_type feature --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --tcd 2000 --threshold 0 --threshold 30 --contextual layer is__gfw_plantations --carbon_pools
+test:runMain org.globalforestwatch.summarystats.SummaryMain treecoverloss --feature_type feature --features s3://bucket/prefix/file.tsv --output s3://bucket/prefix --tcd 2000 --threshold 0 --threshold 30 --contextual_layer is__gfw_plantations --contextual_layer tsc_drivers__class --carbon_pools
 ```
 
 ### Annual Update minimal
@@ -192,38 +195,38 @@ Alternatively, use the `--split_features` opton.
 
 The following options are supported:
 
-|Option           |Type  |Analysis or Feature Type |Description                                                                                                                      |
-|-----------------|------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-|features         |string|all (required)           |URI of features in TSV format                                                                                                    |
-|output           |string|all (required)           |URI of output dir for CSV files                                                                                                  |
-|feature_type     |string|all (required)           |Feature type: one of 'gadm', 'wdpa', 'geostore', 'feature', or 'gfwpro'                                                          |
-|limit            |int   |all                      |Limit number of records processed                                                                                                |
-|iso_first        |string|`gadm` or `wdpa` features|Filter by first letter of ISO code                                                                                               |
-|iso_start        |string|`gadm` or `wdpa` features|Filter by ISO code larger than or equal to given value                                                                           |
-|iso_end          |string|`gadm` or `wdpa` features|Filter by ISO code smaller than given value                                                                                      |
-|iso              |string|`gadm` or `wdpa` features|Filter by country ISO code                                                                                                       |
-|admin1           |string|`gadm` features          |Filter by country Admin1 code                                                                                                    |
-|admin2           |string|`gadm` features          |Filter by country Admin2 code                                                                                                    |
-|id_start         |int   |`feature` analysis       |Filter by IDs greater than or equal to given value                                                                               |
-|id_end           |int   |`feature` analysis       |Filter by IDs less than or equal to given value                                                                                  |
-|wdpa_status      |string|`wdpa` features          |Filter by WDPA Status                                                                                                            |
-|iucn_cat         |string|`wdpa` features          |Filter by IUCS Category                                                                                                          |
-|tcd              |int   |`treecoverloss` analysis |Select tree cover density year                                                                                                   |
-|threshold        |int   |`treecoverloss` analysis |Treecover threshold to apply (multiple)                                                                                          |
-|contextual_layer |string|`treecoverloss` analysis |Include (multiple) selected contextual layers: `is__umd_regional_primary_forest_2001`, `is__gfw_plantations`                     |
-|carbon_pools     |flag  |`treecoverloss` analysis |Optionally calculate stock sums for multiple carbon pools in 2000 (aboveground, belowground, soil)                                    |
-|tcl              |flag  |all                      |Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class                                     |
-|glad             |flag  |all                      |Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class                                   |
-|change_only      |flag  |all except `treecover`   |Process change only                                                                                                              |
-|sensitivity_type |string|`carbon_sensitivity`     |Select carbon sensitivity model                                                                                                  |
-|fire_alert_type  |string|`firealerts` |Select Fire alert type                                                                                                                       |
-|fire_alert_source|string|`firealerts` |URI of fire alert TSV file                                                                                                                   |
-|overwrite        |flag  |all                      |Overwrite output location if already existing                                                                                    |
-|split_features   |flag  |all                      |Split input features along 1x1 degree grid                                                                                       |
-|no_output_path_suffix|flag |all                   |Do not autogenerate output path suffix at runtime                                                                                |
-|intermediate_list_source|flag |`forest_change_diagnostic` analysis |URI of intermediate list results in TSV format                                                                  |
-|contextual_feature_type|flag |`gfwpro_dashboard` analysis |type of contextual feature                                                                                               |
-|contextual_feature_url|flag |`gfwpro_dashboard` analysis |URI of contextual feature in TSV format                                                                                   |
+|Option           |Type  |Analysis or Feature Type | Description                                                                                                                                             |
+|-----------------|------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+|features         |string|all (required)           | URI of features in TSV format                                                                                                                           |
+|output           |string|all (required)           | URI of output dir for CSV files                                                                                                                         |
+|feature_type     |string|all (required)           | Feature type: one of 'gadm', 'wdpa', 'geostore', 'feature', or 'gfwpro'                                                                                 |
+|limit            |int   |all                      | Limit number of records processed                                                                                                                       |
+|iso_first        |string|`gadm` or `wdpa` features| Filter by first letter of ISO code                                                                                                                      |
+|iso_start        |string|`gadm` or `wdpa` features| Filter by ISO code larger than or equal to given value                                                                                                  |
+|iso_end          |string|`gadm` or `wdpa` features| Filter by ISO code smaller than given value                                                                                                             |
+|iso              |string|`gadm` or `wdpa` features| Filter by country ISO code                                                                                                                              |
+|admin1           |string|`gadm` features          | Filter by country Admin1 code                                                                                                                           |
+|admin2           |string|`gadm` features          | Filter by country Admin2 code                                                                                                                           |
+|id_start         |int   |`feature` analysis       | Filter by IDs greater than or equal to given value                                                                                                      |
+|id_end           |int   |`feature` analysis       | Filter by IDs less than or equal to given value                                                                                                         |
+|wdpa_status      |string|`wdpa` features          | Filter by WDPA Status                                                                                                                                   |
+|iucn_cat         |string|`wdpa` features          | Filter by IUCS Category                                                                                                                                 |
+|tcd              |int   |`treecoverloss` analysis | Select tree cover density year                                                                                                                          |
+|threshold        |int   |`treecoverloss` analysis | Treecover threshold to apply (multiple)                                                                                                                 |
+|contextual_layer |string|`treecoverloss` analysis | Include (multiple) selected contextual layers: `is__umd_regional_primary_forest_2001`, `is__gfw_plantations`, `is__global_peat`, `tsc_drivers__class`, `is__tree_cover_loss_fire` |
+|carbon_pools     |flag  |`treecoverloss` analysis | Optionally calculate stock sums for multiple carbon pools in 2000 (aboveground, belowground, soil)                                                      |
+|tcl              |flag  |all                      | Filter input feature by TCL tile extent, requires boolean `tcl` field in input feature class                                                            |
+|glad             |flag  |all                      | Filter input feature by GLAD tile extent, requires boolean `glad` field in input feature class                                                          |
+|change_only      |flag  |all except `treecover`   | Process change only                                                                                                                                     |
+|sensitivity_type |string|`carbon_sensitivity`     | Select carbon sensitivity model                                                                                                                         |
+|fire_alert_type  |string|`firealerts` | Select Fire alert type                                                                                                                                  |
+|fire_alert_source|string|`firealerts` | URI of fire alert TSV file                                                                                                                              |
+|overwrite        |flag  |all                      | Overwrite output location if already existing                                                                                                           |
+|split_features   |flag  |all                      | Split input features along 1x1 degree grid                                                                                                              |
+|no_output_path_suffix|flag |all                   | Do not autogenerate output path suffix at runtime                                                                                                       |
+|intermediate_list_source|flag |`forest_change_diagnostic` analysis | URI of intermediate list results in TSV format                                                                                                          |
+|contextual_feature_type|flag |`gfwpro_dashboard` analysis | type of contextual feature                                                                                                                              |
+|contextual_feature_url|flag |`gfwpro_dashboard` analysis | URI of contextual feature in TSV format                                                                                                                 |
 
 
 ## Inventory

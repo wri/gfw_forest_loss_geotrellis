@@ -16,11 +16,10 @@ case class PeruForestConcessions(gridTile: GridTile, kwargs: Map[String, Any])
   def lookup(value: Int): String = value match {
     case 1 => "Conservation"
     case 2 => "Ecotourism"
-    case 3 => "Nontimber Forest Poducts (Nuts)"
-    case 4 => "Nontimber Forest Poducts (Shiringa)"
-    case 5 => "Reforestation"
-    case 6 => "Timber Concession"
-    case 7 => "Wildlife"
+    case 3 => "Timber Concession"
+    case 4 => "Nontimber Forest Poducts (Chestnut)"
+    case 5 => "Native Community"
+    case 6 => "Private Property (Forest Permit)"
     case _ => ""
   }
 }

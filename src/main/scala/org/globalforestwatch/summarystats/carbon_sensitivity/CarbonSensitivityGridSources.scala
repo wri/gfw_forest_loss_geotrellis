@@ -18,33 +18,30 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
 
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
   val treeCoverDensity2000: TreeCoverDensityThreshold2000 = TreeCoverDensityThreshold2000(gridTile, kwargs)
-  val biomassPerHectar: BiomassPerHectar = BiomassPerHectar(gridTile, kwargs)
+  val biomassPerHectar: AbovegroundBiomass2000 = AbovegroundBiomass2000(gridTile, kwargs)
   val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 =
     GrossCumulAbovegroundRemovalsCo2(gridTile, model, kwargs)
   val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 =
     GrossCumulBelowgroundRemovalsCo2(gridTile, model, kwargs)
   val netFluxCo2: NetFluxCo2e = NetFluxCo2e(gridTile, model, kwargs)
-  val agcEmisYear: AgcEmisYear = AgcEmisYear(gridTile, model, kwargs)
+  val agcEmisYear: AbovegroundCarbonEmisYear = AbovegroundCarbonEmisYear(gridTile, model, kwargs)
   val soilCarbonEmisYear: SoilCarbonEmisYear = SoilCarbonEmisYear(gridTile, model, kwargs)
-  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil =
-    GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, model, kwargs)
-  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2eBiomassSoil =
-    GrossEmissionsCo2OnlyCo2eBiomassSoil(gridTile, model, kwargs)
-  val jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000 =
-    JplTropicsAbovegroundBiomassDensity2000(gridTile, kwargs)
-  val fluxModelExtent: FluxModelExtent = FluxModelExtent(gridTile, model, kwargs)
-  val removalForestType: RemovalForestType = RemovalForestType(gridTile, model, kwargs)
+  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil = GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, model, kwargs)
+  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2BiomassSoil = GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile, model, kwargs)
+  val jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000 = JplTropicsAbovegroundBiomassDensity2000(gridTile, kwargs)
+  val fluxModelExtent: ForestFluxModelExtent = ForestFluxModelExtent(gridTile, model, kwargs)
+  val removalForestType: ForestFluxModelRemovalForestType = ForestFluxModelRemovalForestType(gridTile, model, kwargs)
   val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
   val mangroveBiomassExtent: MangroveBiomassExtent = MangroveBiomassExtent(gridTile, kwargs)
   val treeCoverLossDrivers: TreeCoverLossDrivers = TreeCoverLossDrivers(gridTile, kwargs)
-  val ecozones: Ecozones = Ecozones(gridTile, kwargs)
+  val ecozones: FaoEcozones2000 = FaoEcozones2000(gridTile, kwargs = kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
   val intactForestLandscapes: IntactForestLandscapes = IntactForestLandscapes(gridTile, kwargs)
-  val plantationsTypeFluxModel: PlantationsTypeFluxModel = PlantationsTypeFluxModel(gridTile, kwargs)
+  val plantationsTypeFluxModel: ForestFluxModelPlantedForestType = ForestFluxModelPlantedForestType(gridTile, kwargs)
   val intactPrimaryForest: IntactPrimaryForest = IntactPrimaryForest(gridTile, kwargs)
-  val peatlandsExtentFluxModel: PeatlandsExtentFluxModel = PeatlandsExtentFluxModel(gridTile, kwargs)
-  val forestAgeCategory: ForestAgeCategory = ForestAgeCategory(gridTile, model, kwargs)
+  val peatlandsExtentFluxModel: Peatlands = Peatlands(gridTile, kwargs)
+  val forestAgeCategory: ForestFluxModelAgeCategory = ForestFluxModelAgeCategory(gridTile, model, kwargs)
   val jplTropicsAbovegroundBiomassExtent2000: JplTropicsAbovegroundBiomassExtent2000 =
     JplTropicsAbovegroundBiomassExtent2000(gridTile, kwargs)
   val fiaRegionsUsExtent: FiaRegionsUsExtent = FiaRegionsUsExtent(gridTile, kwargs)
@@ -55,8 +52,8 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
   val prodesLegalAmazonExtent2000: ProdesLegalAmazonExtent2000 =
     ProdesLegalAmazonExtent2000(gridTile, kwargs)
   val tropicLatitudeExtent: TropicLatitudeExtent = TropicLatitudeExtent(gridTile, kwargs)
-  val burnYearHansenLoss: BurnYearHansenLoss = BurnYearHansenLoss(gridTile, kwargs)
-  val grossEmissionsNodeCodes: GrossEmissionsNodeCodes = GrossEmissionsNodeCodes(gridTile, model, kwargs)
+  val treeCoverLossFromFires: TreeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
+  val grossEmissionsNodeCodes: ForestFluxModelGrossEmissionsNodeCodes = ForestFluxModelGrossEmissionsNodeCodes(gridTile, model, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,
@@ -114,7 +111,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
         plantationsTypeFluxModel.fetchWindow(windowKey, windowLayout)
       val intactPrimaryForestTile =
         intactPrimaryForest.fetchWindow(windowKey, windowLayout)
-      val peatlandsExtentFluxTile =
+      val peatlandsTile =
         peatlandsExtentFluxModel.fetchWindow(windowKey, windowLayout)
       val forestAgeCategoryTile =
         forestAgeCategory.fetchWindow(windowKey, windowLayout)
@@ -134,8 +131,8 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
         prodesLegalAmazonExtent2000.fetchWindow(windowKey, windowLayout)
       val tropicLatitudeExtentTile =
         tropicLatitudeExtent.fetchWindow(windowKey, windowLayout)
-      val burnYearHansenLossTile =
-        burnYearHansenLoss.fetchWindow(windowKey, windowLayout)
+      val treeCoverLossFromFiresTile =
+        treeCoverLossFromFires.fetchWindow(windowKey, windowLayout)
       val grossEmissionsNodeCodesTile =
         grossEmissionsNodeCodes.fetchWindow(windowKey, windowLayout)
 
@@ -162,7 +159,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
         intactForestLandscapesTile,
         plantationsTypeFluxTile,
         intactPrimaryForestTile,
-        peatlandsExtentFluxTile,
+        peatlandsTile,
         forestAgeCategoryTile,
         jplTropicsAbovegroundBiomassExtent2000Tile,
         fiaRegionsUsExtentTile,
@@ -172,7 +169,7 @@ case class CarbonSensitivityGridSources(gridTile: GridTile,
         treeCoverLossLegalAmazonTile,
         prodesLegalAmazonExtent2000Tile,
         tropicLatitudeExtentTile,
-        burnYearHansenLossTile,
+        treeCoverLossFromFiresTile,
         grossEmissionsNodeCodesTile
       )
 

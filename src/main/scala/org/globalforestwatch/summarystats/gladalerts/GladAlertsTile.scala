@@ -10,7 +10,7 @@ import org.globalforestwatch.layers._
   */
 case class GladAlertsTile(
                            glad: GladAlerts#OptionalITile,
-                           biomass: BiomassPerHectar#OptionalDTile,
+                           biomass: AbovegroundBiomass2000#OptionalDTile,
                            climateMask: ClimateMask#OptionalITile,
                            primaryForest: PrimaryForest#OptionalITile,
                            protectedAreas: ProtectedAreas#OptionalITile,
@@ -28,7 +28,7 @@ case class GladAlertsTile(
                            indonesiaForestArea: IndonesiaForestArea#OptionalITile,
                            peruForestConcessions: PeruForestConcessions#OptionalITile,
                            oilGas: OilGas#OptionalITile,
-                           mangroves2016: Mangroves2016#OptionalITile,
+                           mangroves2020: Mangroves2020#OptionalITile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
                            brazilBiomes: BrazilBiomes#OptionalITile
                          ) extends CellGrid[Int] {

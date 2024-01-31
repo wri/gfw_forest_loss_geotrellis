@@ -39,11 +39,11 @@ object GfwProDashboardSummary {
 
       def visit(raster: Raster[GfwProDashboardTile], col: Int, row: Int): Unit = {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
-        val gladAlertDate: Option[LocalDate] = raster.tile.gladAlerts.getData(col, row).map { case (date, _) => date }
-        val gladAlertCoverage = raster.tile.gladAlerts.t.isDefined
+        val integratedAlertDate: Option[LocalDate] = raster.tile.integratedAlerts.getData(col, row).map { case (date, _) => date }
+        val integratedAlertCoverage = raster.tile.integratedAlerts.t.isDefined
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
 
-        val groupKey = GfwProDashboardRawDataGroup(gladAlertDate, gladAlertsCoverage = gladAlertCoverage)
+        val groupKey = GfwProDashboardRawDataGroup(integratedAlertDate, integratedAlertsCoverage = integratedAlertCoverage)
         val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(treeCoverExtentArea = 0.0, alertCount = 0))
 
         if (isTreeCoverExtent30) {
@@ -51,7 +51,7 @@ object GfwProDashboardSummary {
           summaryData.treeCoverExtentArea += areaHa
         }
 
-        if (gladAlertDate.isDefined) {
+        if (integratedAlertDate.isDefined) {
           summaryData.alertCount += 1
         }
 

@@ -51,7 +51,7 @@ object AnnualUpdateMinimalSummary {
         val aze: Boolean = raster.tile.aze.getData(col, row)
         val plantedForests: String = raster.tile.plantedForests.getData(col, row)
         val mangroves1996: Boolean = raster.tile.mangroves1996.getData(col, row)
-        val mangroves2016: Boolean = raster.tile.mangroves2016.getData(col, row)
+        val mangroves2020: Boolean = raster.tile.mangroves2020.getData(col, row)
         val tigerLandscapes: Boolean =
         raster.tile.tigerLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
@@ -94,7 +94,7 @@ object AnnualUpdateMinimalSummary {
         val grossCumulBelowgroundRemovalsCo2: Float =
           raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
-        val soilCarbonPerHa: Integer = raster.tile.soilCarbon.getData(col, row)
+        val soilCarbon2000PerHa: Float = raster.tile.soilCarbon2000.getData(col, row)
         val abovegroundCarbon2000PerHa: Float = raster.tile.abovegroundCarbon2000.getData(col, row)
         val belowgroundCarbon2000PerHa: Float = raster.tile.belowgroundCarbon2000.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
@@ -107,7 +107,7 @@ object AnnualUpdateMinimalSummary {
         val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
         val grossEmissionsCo2e = grossEmissionsCo2eNonCo2 + grossEmissionsCo2eCo2Only
         val grossEmissionsCo2ePixel = grossEmissionsCo2e * areaHa
-        val totalCarbonSoil = soilCarbonPerHa * areaHa
+        val totalSoilCarbon2000 = soilCarbon2000PerHa * areaHa
         val abovegroundCarbon2000 = abovegroundCarbon2000PerHa * areaHa
         val belowgroundCarbon2000 = belowgroundCarbon2000PerHa * areaHa
 
@@ -124,7 +124,7 @@ object AnnualUpdateMinimalSummary {
             aze,
             plantedForests,
             mangroves1996,
-            mangroves2016,
+            mangroves2020,
             tigerLandscapes,
             landmark,
             keyBiodiversityAreas,
@@ -171,7 +171,7 @@ object AnnualUpdateMinimalSummary {
             summary.totalBiomass += biomassPixel
             summary.totalCo2 += co2Pixel
 
-            summary.totalSoilCarbon += totalCarbonSoil
+            summary.totalSoilCarbon2000 += totalSoilCarbon2000
             summary.abovegroundCarbon2000 += abovegroundCarbon2000
             summary.belowgroundCarbon2000 += belowgroundCarbon2000
 

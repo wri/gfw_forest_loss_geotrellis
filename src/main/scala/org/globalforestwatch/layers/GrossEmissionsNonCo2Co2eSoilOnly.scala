@@ -6,9 +6,15 @@ case class GrossEmissionsNonCo2Co2eSoilOnly(gridTile: GridTile, kwargs: Map[Stri
   extends FloatLayer
     with OptionalFLayer {
 
-  val datasetName = "Na"
-
+  val datasetName = "gfw_forest_flux_full_extent_gross_emissions_non_co2_soil_only"
 
   val uri: String =
-      s"s3://gfw-files/flux_1_2_2/gross_emissions_non_co2_co2e/soil_only/${gridTile.tileId}.tif"
+    uriForGrid(gridTile, kwargs)
+
+  //  // For carbon_sensitivity run only (but not currently functional)
+  //  val datasetName = "Na"
+  //
+  //  val model_suffix: String = if (model == "standard") "standard" else s"$model"
+  //  val uri: String =
+  //      s"s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_non_co2_soil_only/v20231114/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
 }
