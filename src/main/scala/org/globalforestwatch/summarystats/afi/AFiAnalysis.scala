@@ -1,5 +1,5 @@
 package org.globalforestwatch.summarystats.afi
-import org.apache.spark.sql.functions.{col, collect_list, concat_ws, lit, max, sum, when}
+import org.apache.spark.sql.functions.{col, lit, when, sum, max, concat_ws, collect_list}
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.{NonEmptyList, Validated}
 import geotrellis.vector.{Feature, Geometry}
@@ -53,8 +53,8 @@ object AFiAnalysis extends SummaryAnalysis {
       .filter($"location_id" === -1)
       .groupBy($"list_id"),
     )
-    .withColumn("gadm_id", lit(""))
-    .withColumn("location_id", lit(-1))
+      .withColumn("gadm_id", lit(""))
+      .withColumn("location_id", lit(-1))
 
     val combinedDF = summaryDF.unionByName(gadmAgg)
     val resultsDF = combinedDF

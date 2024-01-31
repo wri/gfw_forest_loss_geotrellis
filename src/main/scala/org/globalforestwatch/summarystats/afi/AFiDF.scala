@@ -30,8 +30,6 @@ object AFiDF extends SummaryDF {
 
     summaryRDD
       .flatMap {
-        case Valid(Location(fid, data)) if data.stats.equals(Map.empty) =>
-          List((rowId(fid), RowError.fromJobError(NoIntersectionError), AFiDataGroup.empty, AFiData.empty))
         case Valid(Location(fid, data)) =>
           data.stats.map {
             case (dataGroup, data) =>
