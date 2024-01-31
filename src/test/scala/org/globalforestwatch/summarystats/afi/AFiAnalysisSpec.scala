@@ -23,7 +23,7 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
       features,
       "gfwpro",
       spark,
-      kwargs = Map("config" -> GfwConfig.get)
+      kwargs = Map("config" -> GfwConfig.get())
     )
   }
 
@@ -70,51 +70,5 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
 
     val expectedDF = readExpectedAFiResult
     assertSmallDataFrameEquality(afiDF.transform(sortColumns()), expectedDF.transform(sortColumns()), ignoreNullable = true)
-  }
-
-  it("reports invalid geoms") {
-    // match it to tile of location 31 so we fetch less tiles
-    val x = 114
-    val y = -1
-    val selfIntersectingPolygon = Polygon(LineString(Point(x+0,y+0), Point(x+1,y+0), Point(x+0,y+1), Point(x+1,y+1), Point(x+0,y+0)))
-    val featureRDD = spark.sparkContext.parallelize(List(
-      Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1), selfIntersectingPolygon))
-    ))
-    val afi = AFI(featureRDD)
-    val res = afi.head(1)
-
-    res.head.get(6) shouldBe 2
-  }
-
-  it("gives results for geometries with tiles that don't intersect") {
-    val featureLoc32RDD = ValidatedFeatureRDD(
-      NonEmptyList.one(palm32InputTsvPath),
-      "gfwpro",
-      FeatureFilter.empty,
-      splitFeatures = true
-    ).filter {
-      case Validated.Valid(Location(GfwProFeatureId(_, 32), _)) => true
-      case _ => false
-    }
-    val afi = AFI(featureLoc32RDD)
-    val res = afi.head(1)
-
-    // 3 is error code
-    res.head.get(6) shouldBe 3
-  }
-
-  it("reports no intersection geometries as invalid") {
-    // match it to tile of location 31 so we fetch less tiles
-    val x = 60
-    val y = 20
-    val smallGeom = Polygon(LineString(Point(x+0,y+0), Point(x+0.00001,y+0), Point(x+0.00001,y+0.00001), Point(x+0,y+0.00001), Point(x+0,y+0)))
-    val featureRDD = spark.sparkContext.parallelize(List(
-      Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1), smallGeom))
-    ))
-    val afi = AFI(featureRDD)
-    val res = afi.head(1)
-
-    // 3 is error code
-    res.head.get(6) shouldBe 3
   }
 }

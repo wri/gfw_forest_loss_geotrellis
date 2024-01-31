@@ -38,7 +38,7 @@ object AFiCommand extends SummaryCommand {
           case _ => true
         }
 
-        AFiAnalysis(
+        val resultsDF = AFiAnalysis(
           filteredFeatureRDD,
           default.featureType,
           spark,
