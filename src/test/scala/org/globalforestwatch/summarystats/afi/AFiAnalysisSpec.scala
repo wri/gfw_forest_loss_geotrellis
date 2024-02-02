@@ -4,15 +4,14 @@ import cats.data.{NonEmptyList, Validated}
 import com.github.mrpowers.spark.daria.sql.transformations.sortColumns
 import com.github.mrpowers.spark.fast.tests.DataFrameComparer
 import geotrellis.vector._
-import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.globalforestwatch.TestEnvironment
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features.{FeatureFilter, GfwProFeatureId, ValidatedFeatureRDD}
-import org.globalforestwatch.summarystats.{JobError, Location, ValidatedLocation}
+import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
 
 class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
   def palm32InputTsvPath = getClass.getResource("/palm-oil-32.tsv").toString()
@@ -69,6 +68,10 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
     //saveExpectedAFiResult(afiDF)
 
     val expectedDF = readExpectedAFiResult
+
+    afiDF.show()
+    expectedDF.show()
+
     assertSmallDataFrameEquality(afiDF.transform(sortColumns()), expectedDF.transform(sortColumns()), ignoreNullable = true)
   }
 }
