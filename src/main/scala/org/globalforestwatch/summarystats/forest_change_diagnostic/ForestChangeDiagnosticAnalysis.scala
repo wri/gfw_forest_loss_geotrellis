@@ -42,7 +42,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     features: RDD[ValidatedLocation[Geometry]],
     intermediateResultsRDD: Option[RDD[ValidatedLocation[ForestChangeDiagnosticData]]],
     fireAlerts: SpatialRDD[Geometry],
-    saveIntermidateResults: RDD[ValidatedLocation[ForestChangeDiagnosticData]] => Unit,
+    saveIntermediateResults: RDD[ValidatedLocation[ForestChangeDiagnosticData]] => Unit,
     kwargs: Map[String, Any]
   )(implicit spark: SparkSession): RDD[ValidatedLocation[ForestChangeDiagnosticData]] = {
     features.persist(StorageLevel.MEMORY_AND_DISK)
@@ -53,7 +53,7 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
         else List.empty
 
       // These records are not covered by diff geometry, they're still valid and can be re-used
-      val cachedIntermidateResultsRDD = intermediateResultsRDD.map { rdd =>
+      val cachedIntermediateResultsRDD = intermediateResultsRDD.map { rdd =>
         rdd.filter {
           case Valid(Location(CombinedFeatureId(fid1, fid2), _)) =>
             !diffGridIds.contains(fid2)
@@ -117,14 +117,32 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
           .persist(StorageLevel.MEMORY_AND_DISK)
       }
 
-      cachedIntermidateResultsRDD match {
+      (cachedIntermediateResultsRDD match {
         case Some(cachedResults) =>
           val mergedResults = partialResult.union(cachedResults)
-          saveIntermidateResults(mergedResults)
+          saveIntermediateResults(mergedResults)
           combineGridResults(mergedResults)
         case None =>
           combineGridResults(partialResult)
-      }
+      }).map(
+        // We don't want to mix country-specific forest loss for two countries. In
+        // the unusual case where location spans two countries and has forest loss in
+        // both countries, we convert the country code to "ERR" and zero out the
+        // country-specific forest loss.
+        (vl: ValidatedLocation[ForestChangeDiagnosticData]) => {
+          vl match {
+            case Valid(Location(id, dd)) => if (dd.country_code.value.size > 1) {
+              Valid(Location(id, dd.copy(country_code = ForestChangeDiagnosticDataDoubleCategory.fill("ERR", 0.0),
+              tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossApproxYearly.empty,
+              tree_cover_loss_country_specific_wdpa_yearly = ForestChangeDiagnosticDataLossApproxYearly.empty,
+              tree_cover_loss_country_specific_primary_forest_yearly = ForestChangeDiagnosticDataLossApproxYearly.empty)))
+            } else {
+              vl
+            }
+            case Invalid(i) => vl
+          }
+        }
+      )
     } catch {
       case e: StackOverflowError =>
         e.printStackTrace()

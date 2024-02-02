@@ -5,6 +5,7 @@ import geotrellis.raster._
 import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.layers.ApproxYear
 
 /** LossData Summary by year */
 case class ForestChangeDiagnosticSummary(
@@ -83,6 +84,37 @@ object ForestChangeDiagnosticSummary {
             0
           }
         }
+
+        val gfwProCoverage: Map[String, Boolean] =
+          raster.tile.gfwProCoverage.getData(col, row)
+        val argPresence = gfwProCoverage.getOrElse("Argentina", false)
+        val braBiomesPresence = gfwProCoverage.getOrElse("Brazil Biomes", false)
+
+        // We compute country-specific forest loss using argForestLoss tile for
+        // Argentina, and prodesLossYear for Brazil. In the very unusual case where a
+        // location covers more than one country, we don't want to mix
+        // country-specific forest losses, so we record the country-code that the
+        // forest loss came from. We will zero out the country-specific forest loss
+        // and mark it with an 'ERR' country code if we end up merging results from
+        // more than one country.
+        var countrySpecificLossYear = ApproxYear(0, false)
+        var countryCode  = ""
+        if (argPresence) {
+          countrySpecificLossYear = raster.tile.argForestLoss.getData(col, row)
+          countryCode = "ARG"
+        } else {
+          val possLoss = raster.tile.prodesLossYear.getData(col, row)
+          if (possLoss != null && possLoss > 0) {
+            countrySpecificLossYear = ApproxYear(possLoss, false)
+            countryCode = "BRA"
+          } else if (braBiomesPresence) {
+            // braBiomesPresence is not all of Brazil, but we are using it as a
+            // proxy for pixel being in Brazil, so we catch any locations that
+            // intersect with both Argentina and Brazil.
+            countryCode = "BRA"
+          }
+        }
+
         val seAsiaLandCover: String =
           raster.tile.seAsiaLandCover.getData(col, row)
         val idnLandCover: String = raster.tile.idnLandCover.getData(col, row)
@@ -93,8 +125,6 @@ object ForestChangeDiagnosticSummary {
           raster.tile.isIDNForestMoratorium.getData(col, row)
         val braBiomes: String = raster.tile.braBiomes.getData(col, row)
         val isPlantation: Boolean = raster.tile.isPlantation.getData(col, row)
-        val gfwProCoverage: Map[String, Boolean] =
-          raster.tile.gfwProCoverage.getData(col, row)
         val argOTBN: String = raster.tile.argOTBN.getData(col, row)
 
         // compute Booleans
@@ -102,17 +132,16 @@ object ForestChangeDiagnosticSummary {
         val isTreeCoverExtent90: Boolean = tcd2000 > 90
         val isUMDLoss: Boolean = isTreeCoverExtent30 && umdTreeCoverLossYear > 0
         val isProdesLoss: Boolean = prodesLossYear > 0
+        val isCountrySpecificLoss: Boolean = countrySpecificLossYear.year > 0
 
         val southAmericaPresence =
           gfwProCoverage.getOrElse("South America", false)
         val legalAmazonPresence =
           gfwProCoverage.getOrElse("Legal Amazon", false)
-        val braBiomesPresence = gfwProCoverage.getOrElse("Brazil Biomes", false)
         val cerradoBiomesPresence =
           gfwProCoverage.getOrElse("Cerrado Biomes", false)
         val seAsiaPresence = gfwProCoverage.getOrElse("South East Asia", false)
         val idnPresence = gfwProCoverage.getOrElse("Indonesia", false)
-        val argPresence = gfwProCoverage.getOrElse("Argentina", false)
 
         val protectedAreaCategory = raster.tile.protectedAreasByCategory.getData(col, row)
         val isProtectedArea = (protectedAreaCategory != "")
@@ -139,6 +168,9 @@ object ForestChangeDiagnosticSummary {
           isUMDLoss,
           prodesLossYear,
           isProdesLoss,
+          countryCode,
+          countrySpecificLossYear,
+          isCountrySpecificLoss,
           isTreeCoverExtent30,
           isTreeCoverExtent90,
           isPrimaryForest,

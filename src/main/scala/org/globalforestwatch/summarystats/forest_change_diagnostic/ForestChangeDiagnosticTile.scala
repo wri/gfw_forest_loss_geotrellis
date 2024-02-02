@@ -33,6 +33,7 @@ case class ForestChangeDiagnosticTile(
 
   lazy val protectedAreasByCategory = sources.protectedAreasByCategory.fetchWindow(windowKey, windowLayout)
   lazy val landmark = sources.landmark.fetchWindow(windowKey, windowLayout)
+  lazy val argForestLoss = sources.argForestLoss.fetchWindow(windowKey, windowLayout)
 
   def cellType: CellType = loss.cellType
 

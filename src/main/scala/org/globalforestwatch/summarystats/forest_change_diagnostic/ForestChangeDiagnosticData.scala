@@ -31,6 +31,10 @@ case class ForestChangeDiagnosticData(
   /** prodesLossProtectedAreasYearly */
   tree_cover_loss_prodes_wdpa_yearly: ForestChangeDiagnosticDataLossYearly,
   tree_cover_loss_prodes_primary_forest_yearly: ForestChangeDiagnosticDataLossYearly,
+  country_code: ForestChangeDiagnosticDataDoubleCategory,
+  tree_cover_loss_country_specific_yearly: ForestChangeDiagnosticDataLossApproxYearly,
+  tree_cover_loss_country_specific_wdpa_yearly: ForestChangeDiagnosticDataLossApproxYearly,
+  tree_cover_loss_country_specific_primary_forest_yearly: ForestChangeDiagnosticDataLossApproxYearly,
   tree_cover_loss_brazil_biomes_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   tree_cover_extent_total: ForestChangeDiagnosticDataDouble,
   tree_cover_extent_primary_forest: ForestChangeDiagnosticDataDouble,
@@ -127,6 +131,10 @@ case class ForestChangeDiagnosticData(
       tree_cover_loss_prodes_primary_forest_yearly.merge(
         other.tree_cover_loss_prodes_primary_forest_yearly
       ),
+      country_code.merge(other.country_code),
+      tree_cover_loss_country_specific_yearly.merge(other.tree_cover_loss_country_specific_yearly),
+      tree_cover_loss_country_specific_wdpa_yearly.merge(other.tree_cover_loss_country_specific_wdpa_yearly),
+      tree_cover_loss_country_specific_primary_forest_yearly.merge(other.tree_cover_loss_country_specific_primary_forest_yearly),
       tree_cover_loss_brazil_biomes_yearly.merge(other.tree_cover_loss_brazil_biomes_yearly),
       tree_cover_extent_total.merge(other.tree_cover_extent_total),
       tree_cover_extent_primary_forest.merge(other.tree_cover_extent_primary_forest),
@@ -300,6 +308,10 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
+      ForestChangeDiagnosticDataDoubleCategory.empty,
+      ForestChangeDiagnosticDataLossApproxYearly.empty,
+      ForestChangeDiagnosticDataLossApproxYearly.empty,
+      ForestChangeDiagnosticDataLossApproxYearly.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,

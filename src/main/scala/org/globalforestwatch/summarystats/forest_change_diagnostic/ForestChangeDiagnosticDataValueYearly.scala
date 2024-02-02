@@ -55,32 +55,15 @@ object ForestChangeDiagnosticDataValueYearly {
   def empty: ForestChangeDiagnosticDataValueYearly =
     ForestChangeDiagnosticDataValueYearly(SortedMap())
 
-  def prefilled: ForestChangeDiagnosticDataValueYearly =
+  def prefilled: ForestChangeDiagnosticDataValueYearly = {
+    val minLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearStart
+    val maxLossYear = ForestChangeDiagnosticCommand.TreeCoverLossYearEnd
+    val kvList = (for (i <- minLossYear to maxLossYear) yield(i -> 0.0))
+
     ForestChangeDiagnosticDataValueYearly(
-      SortedMap(
-        2002 -> 0,
-        2003 -> 0,
-        2004 -> 0,
-        2005 -> 0,
-        2006 -> 0,
-        2007 -> 0,
-        2008 -> 0,
-        2009 -> 0,
-        2010 -> 0,
-        2011 -> 0,
-        2012 -> 0,
-        2013 -> 0,
-        2014 -> 0,
-        2015 -> 0,
-        2016 -> 0,
-        2017 -> 0,
-        2018 -> 0,
-        2019 -> 0,
-        2020 -> 0,
-        2021 -> 0,
-        2022 -> 0,
-      )
+      SortedMap(kvList.toSeq: _*)
     )
+  }
 
   def fromString(value: String): ForestChangeDiagnosticDataValueYearly = {
     val sortedMap = decode[SortedMap[Int, Double]](value)
