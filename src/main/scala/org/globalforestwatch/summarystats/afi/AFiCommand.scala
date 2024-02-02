@@ -8,6 +8,7 @@ import geotrellis.vector.Geometry
 import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features._
+import org.globalforestwatch.summarystats.afi.AFiAnalysis.getOutputUrl
 import org.locationtech.jts.geom.Geometry
 import cats.data.Validated.Valid
 
@@ -37,12 +38,15 @@ object AFiCommand extends SummaryCommand {
           case _ => true
         }
 
-        AFiAnalysis(
+        val resultsDF = AFiAnalysis(
           filteredFeatureRDD,
           default.featureType,
           spark,
           kwargs
         )
+
+        val runOutputUrl: String = getOutputUrl(kwargs)
+        AFiExport.export(default.featureType, resultsDF, runOutputUrl, kwargs)
       }
     }
   )

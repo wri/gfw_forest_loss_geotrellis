@@ -12,9 +12,9 @@ import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
 import org.globalforestwatch.util.RDDAdapter
 import org.globalforestwatch.ValidatedWorkflow
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types.IntegerType
+import org.apache.spark.sql.{DataFrame, RelationalGroupedDataset, SparkSession}
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.sql.RelationalGroupedDataset
 
 object AFiAnalysis extends SummaryAnalysis {
 
@@ -25,7 +25,7 @@ object AFiAnalysis extends SummaryAnalysis {
     featureType: String,
     spark: SparkSession,
     kwargs: Map[String, Any]
-  ): Unit = {
+  ): DataFrame = {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
     // TODO invalid should map to job error somehow, probably using ValidatedWorkflow
@@ -35,12 +35,6 @@ object AFiAnalysis extends SummaryAnalysis {
     }
 
     val summaryRDD: RDD[ValidatedLocation[AFiSummary]] = AFiRDD(validatedRDD, AFiGrid.blockTileGrid, kwargs)
-//    val dataRDD: RDD[ValidatedLocation[AFiData]] = ValidatedWorkflow(summaryRDD).mapValid { summaries =>
-//      summaries
-//        .mapValues {
-//          case summary: AFiSummary => summary.toAFiData()
-//        }
-//    }.unify
 
     // TODO somehow convert AFiSummary to AFiData
     import spark.implicits._
@@ -70,8 +64,9 @@ object AFiAnalysis extends SummaryAnalysis {
       )
       .drop("negligible_risk_area__ha")
 
-    val runOutputUrl: String = getOutputUrl(kwargs)
-    AFiExport.export(featureType, resultsDF, runOutputUrl, kwargs)
+    resultsDF
+      .withColumn("list_id", col("list_id").cast(IntegerType))
+      .withColumn("location_id", col("location_id").cast(IntegerType))
   }
 
   private def aggregateResults(group: RelationalGroupedDataset) = {
