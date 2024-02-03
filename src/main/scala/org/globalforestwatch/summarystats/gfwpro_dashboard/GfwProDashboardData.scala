@@ -15,6 +15,8 @@ case class GfwProDashboardData(
 
   /** Location intersects Integrated Alert tiles, integrated alerts are possible */
   glad_alerts_coverage: Boolean,
+  /** Total hectares of the location geometry */
+  total_area: ForestChangeDiagnosticDataDouble,
   /** How many hectares of location geometry had tree cover extent > 30%  in 2000 */
   tree_cover_extent_total: ForestChangeDiagnosticDataDouble,
   /** Integrated alert count within location geometry grouped by day */
@@ -30,6 +32,7 @@ case class GfwProDashboardData(
   def merge(other: GfwProDashboardData): GfwProDashboardData = {
     GfwProDashboardData(
       glad_alerts_coverage || other.glad_alerts_coverage,
+      total_area.merge(other.total_area),
       tree_cover_extent_total.merge(other.tree_cover_extent_total),
       glad_alerts_daily.merge(other.glad_alerts_daily),
       glad_alerts_weekly.merge(other.glad_alerts_weekly),
@@ -44,6 +47,7 @@ object GfwProDashboardData {
   def empty: GfwProDashboardData =
     GfwProDashboardData(
       glad_alerts_coverage = false,
+      total_area = ForestChangeDiagnosticDataDouble.empty,
       tree_cover_extent_total = ForestChangeDiagnosticDataDouble.empty,
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,

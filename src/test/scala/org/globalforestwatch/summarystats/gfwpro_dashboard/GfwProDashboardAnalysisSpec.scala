@@ -67,6 +67,8 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       splitFeatures = true
     )
     val fcd = Dashboard(featureLoc31RDD)
+    println(fcd.valid.collect().head._1)
+
     val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, spark)
     //saveExpectedFcdResult(summaryDF)
 

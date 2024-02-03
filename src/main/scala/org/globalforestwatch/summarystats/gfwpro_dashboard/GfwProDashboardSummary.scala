@@ -23,7 +23,7 @@ case class GfwProDashboardSummary(
   def toGfwProDashboardData(): GfwProDashboardData = {
     stats
       .map { case (group, data) => group.
-        toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
+        toGfwProDashboardData(data.totalArea, data.treeCoverExtentArea, data.alertCount) }
       .foldLeft(GfwProDashboardData.empty)( _ merge _)
   }
 }
@@ -44,16 +44,18 @@ object GfwProDashboardSummary {
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
 
         val groupKey = GfwProDashboardRawDataGroup(integratedAlertDate, integratedAlertsCoverage = integratedAlertCoverage)
-        val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(treeCoverExtentArea = 0.0, alertCount = 0))
+        val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(treeCoverExtentArea = 0.0, alertCount = 0, totalArea = 0.0))
+
+        val areaHa = Geodesy.pixelArea(lat = raster.rasterExtent.gridRowToMap(row), raster.cellSize) / 10000.0
 
         if (isTreeCoverExtent30) {
-          val areaHa = Geodesy.pixelArea(lat = raster.rasterExtent.gridRowToMap(row), raster.cellSize) / 10000.0
           summaryData.treeCoverExtentArea += areaHa
         }
 
         if (integratedAlertDate.isDefined) {
           summaryData.alertCount += 1
         }
+        summaryData.totalArea += areaHa
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
         acc = GfwProDashboardSummary(new_stats)
