@@ -17,6 +17,7 @@ import org.globalforestwatch.features.FeatureId
 import org.apache.sedona.sql.utils.Adapter
 import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
+import geotrellis.proj4.CRS
 
 import scala.collection.JavaConverters._
 import java.time.LocalDate
@@ -68,7 +69,17 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
         }
         .flatMap { enrichedRDD =>
           val fireStatsRDD = fireStats(enrichedRDD, fireAlertRDD, spark)
-          val tmp = enrichedRDD.map { case Location(id, geom) => Feature(geom, id) }
+          val tmp = enrichedRDD.map {
+            case Location(id, geom) =>
+              val combo = id.asInstanceOf[CombinedFeatureId]
+              val sourceCRS = CRS.fromEpsgCode(4326)
+              // This is ESRI:54009, the equal area projection.
+              val targetCRS = CRS.fromString("+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs")
+              import geotrellis.vector._  // Adds reproject to Geometry
+              val area = geom.reproject(sourceCRS, targetCRS).getArea / 10000
+              println(f"geom $geom area $area SRID ${geom.getSRID()}")
+              Feature(geom, AreaFeatureId(combo.featureId1, combo.featureId2, area))
+          }
           val validatedSummaryStatsRdd = GfwProDashboardRDD(tmp, GfwProDashboardGrid.blockTileGrid, kwargs)
           ValidatedWorkflow(validatedSummaryStatsRdd).mapValid { summaryStatsRDD =>
             // fold in fireStatsRDD after polygonal summary and accumulate the errors
