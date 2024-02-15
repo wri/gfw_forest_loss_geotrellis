@@ -585,6 +585,33 @@ case class ApproxYear(year: Int, approx: Boolean) extends Ordered[ApproxYear] {
   def compare(that: ApproxYear): Int = Ordering.Tuple2[Int, Boolean].compare((this.year, this.approx), (that.year, that.approx))
 }
 
+object ApproxYear {
+  import _root_.io.circe.{KeyEncoder, KeyDecoder}
+
+  // Creating KeyEncoders for ApproxYear, so encoders for a map type with ApproxYear
+  // as key can happen.  See https://circe.github.io/circe/codecs/custom-codecs.html.
+  implicit val approxYearKeyEncoder: KeyEncoder[ApproxYear] = new KeyEncoder[ApproxYear] {
+    override def apply(a: ApproxYear): String = {
+      if (a.approx) {
+        (-a.year).toString()
+      } else {
+        a.year.toString()
+      }
+    }
+  }
+
+  implicit val approxYearKeyDecoder: KeyDecoder[ApproxYear] = new KeyDecoder[ApproxYear] {
+    override def apply(key: String): Option[ApproxYear] = {
+      val n = key.toInt
+      if (n < 0) {
+        Some(ApproxYear(-n, true))
+      } else {
+        Some(ApproxYear(n, false))
+      }
+    }
+  }
+}
+
 trait ApproxYearLayer extends ILayer {
   type B = ApproxYear
 
