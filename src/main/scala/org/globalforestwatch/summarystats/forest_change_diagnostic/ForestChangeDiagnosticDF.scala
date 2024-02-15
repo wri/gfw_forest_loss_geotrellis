@@ -95,6 +95,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "tree_cover_loss_peat_yearly", //treeCoverLossPeatLandYearly
     "tree_cover_loss_intact_forest_yearly", // treeCoverLossIntactForestYearly
     "tree_cover_loss_protected_areas_yearly", // treeCoverLossProtectedAreasYearly
+    "tree_cover_loss_by_country_yearly", // treeCoverLossByCountryYearly
     "tree_cover_loss_arg_otbn_yearly", // treeCoverLossARGOTBNYearly
     "tree_cover_loss_sea_landcover_yearly", // treeCoverLossSEAsiaLandCoverYearly
     "tree_cover_loss_idn_landcover_yearly", // treeCoverLossIDNLandCoverYearly
@@ -108,6 +109,7 @@ object ForestChangeDiagnosticDF extends SummaryDF {
     "tree_cover_loss_country_specific_yearly", // countrySpecificLossYearly
     "tree_cover_loss_country_specific_wdpa_yearly", // countrySpecificLossProtectedAreasYearly
     "tree_cover_loss_country_specific_primary_forest_yearly", // countrySpecificLossPrimaryForestYearly
+    "tree_cover_loss_country_specific_landmark_yearly", // countrySpecificLossLandmarkYearly
     "tree_cover_loss_brazil_biomes_yearly", // treeCoverLossBRABiomesYearly
     "tree_cover_extent_total", // treeCoverExtent
     "tree_cover_extent_primary_forest", // treeCoverExtentPrimaryForest

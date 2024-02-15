@@ -108,9 +108,9 @@ object ForestChangeDiagnosticSummary {
             countrySpecificLossYear = ApproxYear(possLoss, false)
             countryCode = "BRA"
           } else if (braBiomesPresence) {
-            // braBiomesPresence is not all of Brazil, but we are using it as a
-            // proxy for pixel being in Brazil, so we catch any locations that
-            // intersect with both Argentina and Brazil.
+            // braBiomesPresence is not all of Brazil, but we are using it as a proxy
+            // for pixel being in Brazil. We are also in Brazil if there was prodes
+            // loss.
             countryCode = "BRA"
           }
         }

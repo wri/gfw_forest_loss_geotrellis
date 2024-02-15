@@ -17,6 +17,7 @@ case class ForestChangeDiagnosticData(
   tree_cover_loss_peat_yearly: ForestChangeDiagnosticDataLossYearly,
   tree_cover_loss_intact_forest_yearly: ForestChangeDiagnosticDataLossYearly,
   tree_cover_loss_protected_areas_yearly: ForestChangeDiagnosticDataLossYearly,
+  tree_cover_loss_by_country_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   /** Tree cover loss in Argentina Native Forest Land Plan (OTBN) categories */
   tree_cover_loss_arg_otbn_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   /** Tree cover loss in south east asia */
@@ -35,6 +36,7 @@ case class ForestChangeDiagnosticData(
   tree_cover_loss_country_specific_yearly: ForestChangeDiagnosticDataLossApproxYearly,
   tree_cover_loss_country_specific_wdpa_yearly: ForestChangeDiagnosticDataLossApproxYearly,
   tree_cover_loss_country_specific_primary_forest_yearly: ForestChangeDiagnosticDataLossApproxYearly,
+  tree_cover_loss_country_specific_landmark_yearly: ForestChangeDiagnosticDataLossApproxYearly,
   tree_cover_loss_brazil_biomes_yearly: ForestChangeDiagnosticDataLossYearlyCategory,
   tree_cover_extent_total: ForestChangeDiagnosticDataDouble,
   tree_cover_extent_primary_forest: ForestChangeDiagnosticDataDouble,
@@ -106,6 +108,9 @@ case class ForestChangeDiagnosticData(
       tree_cover_loss_protected_areas_yearly.merge(
         other.tree_cover_loss_protected_areas_yearly
       ),
+      tree_cover_loss_by_country_yearly.merge(
+        other.tree_cover_loss_by_country_yearly
+      ),
       tree_cover_loss_arg_otbn_yearly.merge(
         other.tree_cover_loss_arg_otbn_yearly
       ),
@@ -135,6 +140,7 @@ case class ForestChangeDiagnosticData(
       tree_cover_loss_country_specific_yearly.merge(other.tree_cover_loss_country_specific_yearly),
       tree_cover_loss_country_specific_wdpa_yearly.merge(other.tree_cover_loss_country_specific_wdpa_yearly),
       tree_cover_loss_country_specific_primary_forest_yearly.merge(other.tree_cover_loss_country_specific_primary_forest_yearly),
+      tree_cover_loss_country_specific_landmark_yearly.merge(other.tree_cover_loss_country_specific_landmark_yearly),
       tree_cover_loss_brazil_biomes_yearly.merge(other.tree_cover_loss_brazil_biomes_yearly),
       tree_cover_extent_total.merge(other.tree_cover_extent_total),
       tree_cover_extent_primary_forest.merge(other.tree_cover_extent_primary_forest),
@@ -302,6 +308,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
+      ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearlyCategory.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
@@ -309,6 +316,7 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataLossYearly.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
+      ForestChangeDiagnosticDataLossApproxYearly.empty,
       ForestChangeDiagnosticDataLossApproxYearly.empty,
       ForestChangeDiagnosticDataLossApproxYearly.empty,
       ForestChangeDiagnosticDataLossApproxYearly.empty,
