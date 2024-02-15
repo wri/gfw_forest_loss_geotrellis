@@ -46,10 +46,10 @@ case class ForestChangeDiagnosticDataLossApproxYearly(value: SortedMap[ApproxYea
     SortedMap(out.toSeq: _*)
   }
 
-  def round(m: SortedMap[String, Double]): SortedMap[String, Double] = m.map { case (key, value) => key -> this.round(value) }
+  def formatAndRound: SortedMap[String, Double] = this.combineApprox.map { case (key, value) => key -> this.round(value) }
 
   def toJson: String = {
-    this.round(this.combineApprox).asJson.noSpaces
+    this.formatAndRound.asJson.noSpaces
   }
 }
 

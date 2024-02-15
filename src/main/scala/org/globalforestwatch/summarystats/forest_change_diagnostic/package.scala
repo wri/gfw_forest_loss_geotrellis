@@ -14,4 +14,9 @@ package object forest_change_diagnostic {
 
   implicit def dataLossYearlyCategoryTypedEncoder: TypedEncoder[ForestChangeDiagnosticDataLossYearlyCategory] =
     TypedEncoder.usingInjection[ForestChangeDiagnosticDataLossYearlyCategory, String]
+
+  // Uses the injection defined in object ForestChangeDiagnosticDataLossApproxYearlyCategory
+  // See https://typelevel.org/frameless/Injection.html
+  implicit def dataLossApproxYearlyCategoryTypedEncoder: TypedEncoder[ForestChangeDiagnosticDataLossApproxYearlyCategory] =
+    TypedEncoder.usingInjection[ForestChangeDiagnosticDataLossApproxYearlyCategory, String]
 }

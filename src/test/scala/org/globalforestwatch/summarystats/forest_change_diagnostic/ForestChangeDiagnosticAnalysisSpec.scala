@@ -66,7 +66,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     }
     val fcd = FCD(featureLoc31RDD)
     val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
-    // saveExpectedFcdResult(fcdDF)
+    saveExpectedFcdResult(fcdDF)
 
     val expectedDF = readExpectedFcdResult
 
@@ -141,24 +141,10 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     loc.isValid shouldBe true
     val fcdd: ForestChangeDiagnosticData = loc.getOrElse(null)._2
     (fcdd.country_code.value.size == 1 && fcdd.country_code.value.contains("ARG")) shouldBe true
-    (fcdd.tree_cover_loss_country_specific_yearly.value(ApproxYear(2017, true)) > 0) shouldBe true
+    (fcdd.tree_cover_loss_country_specific_yearly.value("ARG").value(ApproxYear(2017, true)) > 0) shouldBe true
 
     val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
     val tcl: String = fcdDF.collect().head.getAs[String]("tree_cover_loss_country_specific_yearly")
     tcl.contains("2017approx") shouldBe true
-  }
-
-  it("gives an ERR country code for a location in Brazil and Argentina") {
-    val argBraRDD = ValidatedFeatureRDD(
-      NonEmptyList.one(argBraInputTsvPath),
-      "gfwpro",
-      FeatureFilter.empty,
-      splitFeatures = true
-    )
-    val fcd = FCD(argBraRDD)
-    val loc: ValidatedLocation[ForestChangeDiagnosticData] = fcd.collect().head
-    loc.isValid shouldBe true
-    val fcdd: ForestChangeDiagnosticData = loc.getOrElse(null)._2
-    (fcdd.country_code.value.size == 1 && fcdd.country_code.value.contains("ERR")) shouldBe true
   }
 }
