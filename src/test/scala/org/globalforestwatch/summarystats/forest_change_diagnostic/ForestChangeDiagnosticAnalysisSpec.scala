@@ -21,6 +21,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
   def argentinaInputTsvPath = getClass.getResource("/argentina.tsv").toString()
   def argBraInputTsvPath = getClass.getResource("/argbra.tsv").toString()
   def palm32ExpectedOutputPath = getClass.getResource("/palm-32-fcd-output").toString()
+  def argBraExpectedOutputPath = getClass.getResource("/argbra-fcd-output").toString()
 
   def FCD(features: RDD[ValidatedLocation[Geometry]]) = {
     val fireAlertsRdd = {
@@ -39,18 +40,18 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
   }
 
   /** Function to update expected results when this test becomes invalid */
-  def saveExpectedFcdResult(fcd: DataFrame): Unit = {
+  def saveExpectedFcdResult(fcd: DataFrame, outputPath: String): Unit = {
     fcd.repartition(1)
       .write
       .mode(SaveMode.Overwrite)
       .options(ForestChangeDiagnosticExport.csvOptions)
-      .csv(path = palm32ExpectedOutputPath)
+      .csv(path = outputPath)
   }
 
-  def readExpectedFcdResult = {
+  def readExpectedFcdResult(path: String) = {
     spark.read
       .options(ForestChangeDiagnosticExport.csvOptions)
-      .csv(palm32ExpectedOutputPath)
+      .csv(path)
       .withColumn("status_code", col("status_code").cast(IntegerType))
   }
 
@@ -66,9 +67,9 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     }
     val fcd = FCD(featureLoc31RDD)
     val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
-    saveExpectedFcdResult(fcdDF)
+    // saveExpectedFcdResult(fcdDF, palm32ExpectedOutputPath)
 
-    val expectedDF = readExpectedFcdResult
+    val expectedDF = readExpectedFcdResult(palm32ExpectedOutputPath)
 
     assertSmallDataFrameEquality(fcdDF, expectedDF)
   }
@@ -146,5 +147,21 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
     val tcl: String = fcdDF.collect().head.getAs[String]("tree_cover_loss_country_specific_yearly")
     tcl.contains("2017approx") shouldBe true
+  }
+
+  it("matches recorded output for location including ARG and BRA") {
+    val argBraRDD = ValidatedFeatureRDD(
+      NonEmptyList.one(argBraInputTsvPath),
+      "gfwpro",
+      FeatureFilter.empty,
+      splitFeatures = true
+    )
+    val fcd = FCD(argBraRDD)
+    val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
+    // saveExpectedFcdResult(fcdDF, argBraExpectedOutputPath)
+
+    val expectedDF = readExpectedFcdResult(argBraExpectedOutputPath)
+
+    assertSmallDataFrameEquality(fcdDF, expectedDF)
   }
 }
