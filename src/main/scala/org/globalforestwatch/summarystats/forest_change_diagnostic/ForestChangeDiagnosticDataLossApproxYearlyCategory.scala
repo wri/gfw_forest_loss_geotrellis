@@ -6,6 +6,8 @@ import io.circe.parser.decode
 
 import org.globalforestwatch.layers.ApproxYear
 
+// One level of categorization that leads to approximate yearly forest loss objects
+// (ForestChangeDiagnosticDataLossApproxYearly).
 case class ForestChangeDiagnosticDataLossApproxYearlyCategory(
                                                          value: Map[String, ForestChangeDiagnosticDataLossApproxYearly]
                                                        ) extends ForestChangeDiagnosticDataParser[
@@ -40,6 +42,8 @@ object ForestChangeDiagnosticDataLossApproxYearlyCategory {
   def empty: ForestChangeDiagnosticDataLossApproxYearlyCategory =
     ForestChangeDiagnosticDataLossApproxYearlyCategory(Map())
 
+  // There is a breakdown by one level of category before the breakdown into
+  // approx-yearly forest loss.
   def fill(
             className: String,
             lossYear: ApproxYear,

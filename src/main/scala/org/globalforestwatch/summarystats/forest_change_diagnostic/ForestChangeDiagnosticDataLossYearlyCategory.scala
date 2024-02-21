@@ -22,22 +22,25 @@ case class ForestChangeDiagnosticDataLossYearlyCategory(
     })
   }
 
-  def toJson: String = {
-    this.value
-      .map {
-        case (key, value) =>
+  def round: Map[String, Map[Int, Double]] =
+    this.value.map {
+      case (key, value) =>
           key -> value.round
-      }
-      .asJson
-      .noSpaces
+    }
+
+  def toJson: String = {
+    this.round.asJson.noSpaces
   }
+
 }
 
 object ForestChangeDiagnosticDataLossYearlyCategory {
   def empty: ForestChangeDiagnosticDataLossYearlyCategory =
     ForestChangeDiagnosticDataLossYearlyCategory(Map())
 
-  def fill(
+  // There is a breakdown by one level of category before the breakdown into
+  // yearly forest loss.
+ def fill(
             className: String,
             lossYear: Int,
             areaHa: Double,

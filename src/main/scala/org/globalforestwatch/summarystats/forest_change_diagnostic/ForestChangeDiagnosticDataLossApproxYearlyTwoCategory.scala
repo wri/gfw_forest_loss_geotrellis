@@ -81,5 +81,4 @@ object ForestChangeDiagnosticDataLossApproxYearlyTwoCategory {
   // https://typelevel.org/frameless/TypedEncoder.html
   // Has an implicit TypedEncoder based on this injection in package.scala
   implicit def injection: Injection[ForestChangeDiagnosticDataLossApproxYearlyTwoCategory, String] = Injection(_.toJson, fromString)
-
 }

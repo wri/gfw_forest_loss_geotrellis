@@ -110,7 +110,7 @@ object ForestChangeDiagnosticSummary {
           } else if (braBiomesPresence) {
             // braBiomesPresence is not all of Brazil, but we are using it as a proxy
             // for pixel being in Brazil. We are also in Brazil if there was prodes
-            // loss.
+            // loss. (We will have a true gfwProCoverage value for Brazil presence soon.)
             countryCode = "BRA"
           }
         }
