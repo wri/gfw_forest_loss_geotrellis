@@ -23,13 +23,14 @@ case class ForestChangeDiagnosticDataLossApproxYearlyCategory(
     })
   }
 
-  def toJson: String = {
-    val x = this.value
-      .map {
-        case (key, value) =>
+  def formatAndRound: Map[String, Map[String, Double]] =
+    this.value.map {
+      case (key, value) =>
           key -> value.formatAndRound
-      }
+    }
 
+  def toJson: String = {
+    val x = this.formatAndRound
     x.asJson
     .noSpaces
   }

@@ -134,29 +134,25 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isProdesLoss && isPrimaryForest
       ),
-    country_code = ForestChangeDiagnosticDataDoubleCategory
-      .fill(countryCode, totalArea),
-    tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossApproxYearlyCategory.fill(
+    country_specific_deforestation_yearly = ForestChangeDiagnosticDataLossApproxYearlyCategory.fill(
       countryCode,
       countrySpecificLossYear,
       totalArea,
       include = isCountrySpecificLoss
     ),
-    tree_cover_loss_country_specific_wdpa_yearly = ForestChangeDiagnosticDataLossApproxYearlyCategory.fill(
+    country_specific_deforestation_wdpa_yearly = ForestChangeDiagnosticDataLossApproxYearlyTwoCategory.fill(
+      countryCode,
       protectedAreaByCategory,
       countrySpecificLossYear,
       totalArea,
       include = isCountrySpecificLoss && isProtectedArea
     ),
-    tree_cover_loss_country_specific_primary_forest_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
+    country_specific_deforestation_landmark_yearly = ForestChangeDiagnosticDataLossApproxYearlyTwoCategory.fill(
+      countryCode,
+      landmarkByCategory,
       countrySpecificLossYear,
       totalArea,
-      isCountrySpecificLoss && isPrimaryForest
-    ),
-    tree_cover_loss_country_specific_landmark_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
-      countrySpecificLossYear,
-      totalArea,
-      isCountrySpecificLoss && landmarkByCategory != ""
+      include = isCountrySpecificLoss && landmarkByCategory != ""
     ),
     tree_cover_loss_brazil_biomes_yearly =
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
