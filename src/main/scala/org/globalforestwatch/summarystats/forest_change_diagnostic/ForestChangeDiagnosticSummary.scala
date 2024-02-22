@@ -55,8 +55,11 @@ object ForestChangeDiagnosticSummary {
         // This is a pixel by pixel operation
 
         // pixel Area
-        val lat: Double = raster.rasterExtent.gridRowToMap(row)
-        val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
+        val re: RasterExtent = raster.rasterExtent
+        val lat: Double = re.gridRowToMap(row)
+        // uses Pixel's center coordinate. +/- raster.cellSize.height/2
+        // doesn't make much of a difference
+        val area: Double = Geodesy.pixelArea(lat, re.cellSize)
         val areaHa = area / 10000.0
 
         // input layers

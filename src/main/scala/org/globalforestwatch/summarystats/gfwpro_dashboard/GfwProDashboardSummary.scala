@@ -47,7 +47,8 @@ object GfwProDashboardSummary {
         val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(treeCoverExtentArea = 0.0, alertCount = 0))
 
         if (isTreeCoverExtent30) {
-          val areaHa = Geodesy.pixelArea(lat = raster.rasterExtent.gridRowToMap(row), raster.cellSize) / 10000.0
+          val re: RasterExtent = raster.rasterExtent
+          val areaHa = Geodesy.pixelArea(lat = re.gridRowToMap(row), re.cellSize) / 10000.0
           summaryData.treeCoverExtentArea += areaHa
         }
 
