@@ -6,11 +6,11 @@
     },
     {
       "name":"rspo_oil_palm",
-      "source_uri":"s3://gfw-data-lake/rspo_oil_palm/v20200114/raster/epsg-4326/{grid_size}/{row_count}/certification_status/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/rspo_oil_palm/v20230120/raster/epsg-4326/{grid_size}/{row_count}/certification_status/geotiff/{tile_id}.tif"
     },
     {
       "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202308/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202402/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
@@ -90,7 +90,7 @@
     },
     {
       "name":"ibge_bra_biomes",
-      "source_uri":"s3://gfw-data-lake/ibge_bra_biomes/v2004/raster/epsg-4326/{grid_size}/{row_count}/name/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/ibge_bra_biomes/v2019/raster/epsg-4326/{grid_size}/{row_count}/name/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_peatlands",
