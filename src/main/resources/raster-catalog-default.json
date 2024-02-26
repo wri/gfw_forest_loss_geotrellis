@@ -69,10 +69,6 @@
       "source_uri":"s3://gfw-data-lake/birdlife_biodiversity_intactness/v201909/raster/epsg-4326/{grid_size}/{row_count}/intactness_index/geotiff/{tile_id}.tif"
     },
     {
-      "name":"idn_forest_area",
-      "source_uri":"s3://gfw-data-lake/idn_forest_area/v201709/raster/epsg-4326/{grid_size}/{row_count}/class_compressed/geotiff/{tile_id}.tif"
-    },
-    {
       "name":"umd_drivers",
       "source_uri":"s3://gfw-data-lake/umd_drivers/v2020/raster/epsg-4326/{grid_size}/{row_count}/drivers/geotiff/{tile_id}.tif"
     },
@@ -133,10 +129,6 @@
       "source_uri":"s3://gfw-data-lake/gfw_managed_forests/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
-      "name":"inpe_prodes",
-      "source_uri":"s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
-    },
-    {
       "name":"gfw_mining_concessions",
       "source_uri":"s3://gfw-data-lake/gfw_mining_concessions/v202203/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
@@ -151,10 +143,6 @@
     {
       "name":"jpl_mangrove_aboveground_biomass_stock_2000",
       "source_uri":"s3://gfw-data-lake/jpl_mangrove_aboveground_biomass_stock_2000/v201902/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"ifl_intact_forest_landscapes",
-      "source_uri":"s3://gfw-data-lake/ifl_intact_forest_landscapes/v2018/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
       "name":"birdlife_endemic_bird_areas",
@@ -203,10 +191,6 @@
     {
       "name":"umd_soy_planted_area",
       "source_uri": "s3://gfw-data-lake/umd_soy_planted_area/v1/raster/epsg-4326/{grid_size}/{row_count}/is__year_2020/geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"inpe_prodes",
-      "source_uri": "s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
       "name":"wwf_eco_regions",
