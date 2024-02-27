@@ -63,7 +63,7 @@ object CarbonFluxSummary {
         val stdevAnnualAbovegroundRemovalsCarbon: Float = raster.tile.stdevAnnualAbovegroundRemovalsCarbon.getData(col, row)
         val stdevSoilCarbon2000: Float = raster.tile.stdevSoilCarbon2000.getData(col, row)
 
-        val isGain: Boolean = raster.tile.gain.getData(col, row)
+        val isGain: Boolean = raster.tile.gain.getData(col, row).nonEmpty
         val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
         val removalForestType: String = raster.tile.removalForestType.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)

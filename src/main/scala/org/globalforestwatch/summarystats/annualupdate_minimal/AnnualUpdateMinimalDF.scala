@@ -24,7 +24,7 @@ object AnnualUpdateMinimalDF {
     "is__gfw_wood_fiber",
     "is__gfw_resource_rights",
     "is__gfw_managed_forests",
-    "is__umd_tree_cover_gain",
+    "umd_tree_cover_gain__period",
     "is__ifl_intact_forest_landscapes_2000",
     "wri_tropical_tree_cover__decile",
     "umd_global_land_cover__ipcc_class",
@@ -44,7 +44,6 @@ object AnnualUpdateMinimalDF {
     "is__peatland",
     "is__gfw_resource_right",
     "is__gfw_managed_forest",
-    "is__umd_tree_cover_gain_2000-2012"
   )
 
   def unpackValues(cols: List[Column],
@@ -73,7 +72,7 @@ object AnnualUpdateMinimalDF {
         $"data_group.woodFiber" as "is__gfw_wood_fiber",
         $"data_group.resourceRights" as "is__gfw_resource_rights",
         $"data_group.logging" as "is__gfw_managed_forests",
-        $"data_group.isGain" as "is__umd_tree_cover_gain",
+        $"data_group.gainPeriod" as "umd_tree_cover_gain__period",
         $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
         $"data_group.tmlDensity" as "wri_tropical_tree_cover__decile",
         $"data_group.landCover" as "umd_global_land_cover__ipcc_class",
@@ -114,8 +113,6 @@ object AnnualUpdateMinimalDF {
         $"data_group.peatlands" as "is__peatland",
         $"data_group.resourceRights" as "is__gfw_resource_right",
         $"data_group.logging" as "is__gfw_managed_forest",
-        $"data_group.isGain" as "is__umd_tree_cover_gain_2000-2012", // Kept old column name to not break frontend schema
-        $"data.totalGainArea" as "umd_tree_cover_gain_2000-2012__ha", // Kept old column name to not break frontend schema
         $"data.totalNetFluxCo2" as "gfw_net_flux_co2e__Mg",
         $"data.totalGrossEmissionsCo2e" as "gfw_gross_emissions_co2e_all_gases__Mg",
         $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
@@ -166,7 +163,6 @@ object AnnualUpdateMinimalDF {
         sum("gfw_soil_carbon_stocks_2000__Mg_C") as "gfw_soil_carbon_stocks_2000__Mg_C",
         sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
         sum("wri_tropical_tree_cover_extent__ha") as "wri_tropical_tree_cover_extent__ha",
-        sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
         sum("gfw_net_flux_co2e__Mg") as "gfw_net_flux_co2e__Mg",
         sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg",
@@ -208,7 +204,6 @@ object AnnualUpdateMinimalDF {
         sum("wri_tropical_tree_cover_extent__ha") as "wri_tropical_tree_cover_extent__ha",
         sum("gfw_aboveground_carbon_stocks_2000__Mg_C") as "gfw_aboveground_carbon_stocks_2000__Mg_C",
         sum("gfw_belowground_carbon_stocks_2000__Mg_C") as "gfw_belowground_carbon_stocks_2000__Mg_C",
-        sum("umd_tree_cover_gain_2000-2012__ha") as "umd_tree_cover_gain_2000-2012__ha",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
         sum("gfw_net_flux_co2e__Mg") as "gfw_net_flux_co2e__Mg",
         sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg",
@@ -264,7 +259,7 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
       max($"is__gfw_resource_rights") as "is__gfw_resource_rights",
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
-      max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
+      max($"umd_tree_cover_gain__period") as "umd_tree_cover_gain__period",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
 
       max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
@@ -281,7 +276,6 @@ object AnnualUpdateMinimalDF {
       max($"is__peatland") as "is__peatland",
       max($"is__gfw_resource_right") as "is__gfw_resource_right",
       max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
-      max($"is__umd_tree_cover_gain_2000-2012") as "is__umd_tree_cover_gain_2000-2012"
     )
 
     val aggCols =
@@ -322,7 +316,7 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
       max($"is__gfw_resource_rights") as "is__gfw_resource_rights",
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
-      max($"is__umd_tree_cover_gain") as "is__umd_tree_cover_gain",
+      max($"umd_tree_cover_gain__period") as "umd_tree_cover_gain__period",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
 
       max($"tsc_tree_cover_loss_drivers__type") as "tsc_tree_cover_loss_drivers__type",
@@ -338,7 +332,6 @@ object AnnualUpdateMinimalDF {
       max($"is__peatland") as "is__peatland",
       max($"is__gfw_resource_right") as "is__gfw_resource_right",
       max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
-      max($"is__umd_tree_cover_gain_2000-2012") as "is__umd_tree_cover_gain_2000-2012"
     )
 
     val aggCols = if (!wdpa)

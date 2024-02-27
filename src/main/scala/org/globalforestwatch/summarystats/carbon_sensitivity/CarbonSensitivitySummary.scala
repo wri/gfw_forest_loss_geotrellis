@@ -57,7 +57,7 @@ object CarbonSensitivitySummary {
         val grossEmissionsCo2eCo2Only: Float = raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
         val jplTropicsAbovegroundBiomassDensity2000: Float = raster.tile.jplTropicsAbovegroundBiomassDensity2000.getData(col, row)
 
-        val isGain: Boolean = raster.tile.gain.getData(col, row)
+        val isGain: Boolean = raster.tile.gain.getData(col, row).nonEmpty
         val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
         val removalForestType: String = raster.tile.removalForestType.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)

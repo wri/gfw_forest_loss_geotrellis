@@ -41,7 +41,7 @@ object AnnualUpdateMinimalSummary {
                ): Unit = {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
-        val gain: Boolean = raster.tile.gain.getData(col, row)
+        val gain: String = raster.tile.gain.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
@@ -81,7 +81,7 @@ object AnnualUpdateMinimalSummary {
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
         val areaHa = area / 10000.0
-        val gainArea: Double = gain * areaHa
+        val gainArea: Double = gain.nonEmpty * areaHa
         val biomassPixel = biomass * areaHa
 
         val co2Factor = 0.47 * 44 / 12
@@ -182,7 +182,7 @@ object AnnualUpdateMinimalSummary {
               summary.totalNetFluxCo2 += netFluxCo2Pixel
             }
           }
-          else if ((gain || mangroveBiomassExtent) && !plantationsPre2000) {
+          else if ((gain.nonEmpty || mangroveBiomassExtent) && !plantationsPre2000) {
             // Adds the gain pixels that don't have any tree cover density to the flux model outputs to get
             // the correct flux model outputs (TCD>=threshold OR Hansen gain=TRUE)
             summary.totalGrossCumulAbovegroundRemovalsCo2 += grossCumulAbovegroundRemovalsCo2Pixel
