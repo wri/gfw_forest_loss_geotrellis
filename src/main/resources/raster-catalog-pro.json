@@ -81,20 +81,12 @@
       "source_uri":"s3://gfw-data-lake/gfw_forest_carbon_gross_emissions/v20210331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_forest_carbon_net_flux",
-      "source_uri":"s3://gfw-data-lake/gfw_forest_carbon_net_flux/v20210331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha/gdal-geotiff/{tile_id}.tif"
-    },
-    {
       "name":"gfw_forest_carbon_gross_removals",
       "source_uri":"s3://gfw-data-lake/gfw_forest_carbon_gross_removals/v20210331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"birdlife_biodiversity_intactness",
       "source_uri":"s3://gfw-data-lake/birdlife_biodiversity_intactness/v201909/raster/epsg-4326/{grid_size}/{row_count}/intactness_index/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"idn_forest_area",
-      "source_uri":"s3://gfw-data-lake/idn_forest_area/v201709/raster/epsg-4326/{grid_size}/{row_count}/class_compressed/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"umd_drivers",
@@ -121,10 +113,6 @@
       "source_uri":"s3://gfw-data-lake/gfw_peatlands/v20230315/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_deadwood_carbon",
-      "source_uri":"s3://gfw-data-lake/gfw_deadwood_carbon/v20200824/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha/gdal-geotiff/{tile_id}.tif"
-    },
-    {
       "name":"gfw_belowground_carbon",
       "source_uri":"s3://gfw-data-lake/gfw_belowground_carbon/v20230322/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
     },
@@ -133,28 +121,12 @@
       "source_uri":"s3://gfw-data-lake/gfw_aboveground_carbon/v20230322/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_litter_carbon",
-      "source_uri":"s3://gfw-data-lake/gfw_litter_carbon/v20200824/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha/gdal-geotiff/{tile_id}.tif"
-    },
-    {
       "name":"birdlife_biodiversity_significance",
       "source_uri":"s3://gfw-data-lake/birdlife_biodiversity_significance/v201909/raster/epsg-4326/{grid_size}/{row_count}/significance/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_land_rights",
       "source_uri":"s3://gfw-data-lake/gfw_land_rights/v2019/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"gfw_forest_carbon_net_flux",
-      "source_uri":"s3://gfw-data-lake/gfw_forest_carbon_net_flux/v20210331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_px/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"gfw_forest_carbon_gross_emissions",
-      "source_uri":"s3://gfw-data-lake/gfw_forest_carbon_gross_emissions/v20210331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_px/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"gfw_forest_carbon_gross_removals",
-      "source_uri":"s3://gfw-data-lake/gfw_forest_carbon_gross_removals/v20210331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_px/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_resource_rights",
@@ -177,14 +149,6 @@
       "source_uri":"s3://gfw-data-lake/birdlife_alliance_for_zero_extinction_sites/v20200725/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"gfw_forest_carbon_gross_emissions",
-      "source_uri":"s3://gfw-data-lake/gfw_forest_carbon_gross_emissions/v20210331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"gfw_forest_carbon_gross_removals",
-      "source_uri":"s3://gfw-data-lake/gfw_forest_carbon_gross_removals/v20210331/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/gdal-geotiff/{tile_id}.tif"
-    },
-    {
       "name":"umd_tree_cover_loss",
       "source_uri":"s3://gfw-data-lake/umd_tree_cover_loss/v1.10/raster/epsg-4326/{grid_size}/{row_count}/year/gdal-geotiff/{tile_id}.tif"
     },
@@ -193,16 +157,8 @@
       "source_uri":"s3://gfw-data-lake/gfw_managed_forests/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"inpe_prodes",
-      "source_uri":"s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
-    },
-    {
       "name":"gfw_mining_concessions",
       "source_uri":"s3://gfw-data-lake/gfw_mining_concessions/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"gfw_peatlands",
-      "source_uri":"s3://gfw-data-lake/gfw_peatlands/v20200807/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gmw_global_mangrove_extent_2020",
@@ -215,14 +171,6 @@
     {
       "name":"jpl_mangrove_aboveground_biomass_stock_2000",
       "source_uri":"s3://gfw-data-lake/jpl_mangrove_aboveground_biomass_stock_2000/v201902/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"jpl_mangrove_aboveground_biomass_stock_2000",
-      "source_uri":"s3://gfw-data-lake/jpl_mangrove_aboveground_biomass_stock_2000/v201902/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"ifl_intact_forest_landscapes",
-      "source_uri":"s3://gfw-data-lake/ifl_intact_forest_landscapes/v20180628/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"birdlife_endemic_bird_areas",
@@ -267,10 +215,6 @@
     {
       "name":"umd_soy_planted_area",
       "source_uri": "s3://gfw-data-lake/umd_soy_planted_area/v2/raster/epsg-4326/{grid_size}/{row_count}/is__year_2021/gdal-geotiff/{tile_id}.tif"
-    },
-    {
-      "name":"inpe_prodes",
-      "source_uri": "s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"wwf_eco_regions",
