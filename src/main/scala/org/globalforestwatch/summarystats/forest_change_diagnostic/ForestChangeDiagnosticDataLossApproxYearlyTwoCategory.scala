@@ -44,21 +44,21 @@ object ForestChangeDiagnosticDataLossApproxYearlyTwoCategory {
   // There is a breakdown by two levels of categories before the breakdown into
   // approx-yearly forest loss.
   def fill(
-            className: String,
-            className2: String,
+            categoryName: String,
+            categoryName2: String,
             lossYear: ApproxYear,
             areaHa: Double,
             noData: List[String] = List("", "Unknown", "Not applicable"),
             include: Boolean = true
           ): ForestChangeDiagnosticDataLossApproxYearlyTwoCategory = {
 
-    if (noData.contains(className))
+    if (noData.contains(categoryName))
       ForestChangeDiagnosticDataLossApproxYearlyTwoCategory.empty
     else
       ForestChangeDiagnosticDataLossApproxYearlyTwoCategory(
         Map(
-          className -> ForestChangeDiagnosticDataLossApproxYearlyCategory
-            .fill(className2, lossYear, areaHa, include = include)
+          categoryName -> ForestChangeDiagnosticDataLossApproxYearlyCategory
+            .fill(categoryName2, lossYear, areaHa, include = include)
         )
       )
   }
