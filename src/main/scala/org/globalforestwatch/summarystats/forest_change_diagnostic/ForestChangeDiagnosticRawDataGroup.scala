@@ -70,6 +70,29 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isProtectedArea && isUMDLoss
       ),
+    tree_cover_loss_by_country_yearly =
+      ForestChangeDiagnosticDataLossYearlyCategory.fill(
+        countryCode,
+        umdTreeCoverLossYear,
+        totalArea,
+        include = isUMDLoss
+      ),
+    tree_cover_loss_by_country_wdpa_yearly =
+      ForestChangeDiagnosticDataLossYearlyTwoCategory.fill(
+        countryCode,
+        protectedAreaByCategory,
+        umdTreeCoverLossYear,
+        totalArea,
+        include = isProtectedArea && isUMDLoss
+      ),
+    tree_cover_loss_by_country_landmark_yearly =
+      ForestChangeDiagnosticDataLossYearlyTwoCategory.fill(
+        countryCode,
+        landmarkByCategory,
+        umdTreeCoverLossYear,
+        totalArea,
+        include = landmarkByCategory != "" && isUMDLoss
+      ),
     tree_cover_loss_arg_otbn_yearly = 
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
       argOTBN, 
@@ -127,23 +150,38 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isProdesLoss && isPrimaryForest
       ),
-    country_code = ForestChangeDiagnosticDataDoubleCategory
-      .fill(countryCode, totalArea),
-    tree_cover_loss_country_specific_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
+    country_specific_deforestation_yearly = ForestChangeDiagnosticDataLossApproxYearlyCategory.fill(
+      countryCode,
       countrySpecificLossYear,
       totalArea,
-      isCountrySpecificLoss
+      include = isCountrySpecificLoss
     ),
-    tree_cover_loss_country_specific_wdpa_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
+    country_specific_deforestation_wdpa_yearly = ForestChangeDiagnosticDataLossApproxYearlyTwoCategory.fill(
+      countryCode,
+      protectedAreaByCategory,
       countrySpecificLossYear,
       totalArea,
-      isCountrySpecificLoss && isProtectedArea
+      include = isCountrySpecificLoss && isProtectedArea
     ),
-    tree_cover_loss_country_specific_primary_forest_yearly = ForestChangeDiagnosticDataLossApproxYearly.fill(
+    country_specific_deforestation_landmark_yearly = ForestChangeDiagnosticDataLossApproxYearlyTwoCategory.fill(
+      countryCode,
+      landmarkByCategory,
       countrySpecificLossYear,
       totalArea,
-      isCountrySpecificLoss && isPrimaryForest
+      include = isCountrySpecificLoss && landmarkByCategory != ""
     ),
+    country_specific_deforestation_classified_region_yearly =
+      if (countryCode == "ARG") {
+        ForestChangeDiagnosticDataLossApproxYearlyTwoCategory.fill(
+          countryCode,
+          argOTBN,
+          countrySpecificLossYear,
+          totalArea,
+          include = isCountrySpecificLoss && argOTBN != ""
+        )
+      } else {
+        ForestChangeDiagnosticDataLossApproxYearlyTwoCategory.empty,
+      },
     tree_cover_loss_brazil_biomes_yearly =
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
         braBiomes,

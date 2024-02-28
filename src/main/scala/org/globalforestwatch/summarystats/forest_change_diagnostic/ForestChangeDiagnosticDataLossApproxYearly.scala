@@ -4,6 +4,7 @@ import frameless.Injection
 
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
+import io.circe.parser.decode
 import cats.kernel.Semigroup
 import cats.implicits._
 
@@ -45,10 +46,10 @@ case class ForestChangeDiagnosticDataLossApproxYearly(value: SortedMap[ApproxYea
     SortedMap(out.toSeq: _*)
   }
 
-  def round(m: SortedMap[String, Double]): SortedMap[String, Double] = m.map { case (key, value) => key -> this.round(value) }
+  def formatAndRound: SortedMap[String, Double] = this.combineApprox.map { case (key, value) => key -> this.round(value) }
 
   def toJson: String = {
-    this.round(this.combineApprox).asJson.noSpaces
+    this.formatAndRound.asJson.noSpaces
   }
 }
 
@@ -89,9 +90,8 @@ object ForestChangeDiagnosticDataLossApproxYearly {
   }
 
   def fromString(value: String): ForestChangeDiagnosticDataLossApproxYearly = {
-    // We don't bother deriving the decoder for SortedMap[ApproxYear, Double], since
-    // we don't ever decode any ForestChangeDiagnosticDataLossApproxYearly jsons.
-    ForestChangeDiagnosticDataLossApproxYearly(SortedMap())
+    val sortedMap = decode[SortedMap[ApproxYear, Double]](value)
+    ForestChangeDiagnosticDataLossApproxYearly(sortedMap.getOrElse(SortedMap()))
   }
 
   implicit def injection: Injection[ForestChangeDiagnosticDataLossApproxYearly, String] = Injection(_.toJson, fromString)
