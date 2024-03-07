@@ -65,7 +65,7 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
       case _ => false
     }
     val afiDF = AFI(featureLoc31RDD)
-    saveExpectedAFiResult(afiDF)
+    //saveExpectedAFiResult(afiDF)
 
     val expectedDF = readExpectedAFiResult
 
