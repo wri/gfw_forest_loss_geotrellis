@@ -8,10 +8,19 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, RelationalGroupedDataset, SparkSession}
 import org.apache.spark.storage.StorageLevel
+import breeze.linalg.svd
 
-object AFiAnalysis extends SummaryAnalysis {
+object AFiAnalysis extends SummaryAnalysis with SummaryDF {
 
   val name = "afi"
+
+  def combOp(a: (Int, String, AFiData), b: (Int, String, AFiData)): (Int, String, AFiData) = {
+    val status_code = if (a._1 >= b._1) a._1 else b._1
+    val loc_error = if (a._2 != "" && a._2 != null) {
+      if (b._2 != "" && b._2 != null) a._2 + ", " + b._2 else a._2
+    } else  if (b._2 != "" && b._2 != null) b._2 else ""
+    (status_code, loc_error, a._3.merge(b._3))
+  }
 
   def apply(
     featureRDD: RDD[ValidatedLocation[Geometry]],
@@ -27,43 +36,28 @@ object AFiAnalysis extends SummaryAnalysis {
       case Validated.Invalid(Location(id, geom: Geometry)) => Feature(geom, id)
     }
 
+    import spark.implicits._
     val summaryRDD: RDD[ValidatedLocation[AFiSummary]] = AFiRDD(validatedRDD, AFiGrid.blockTileGrid, kwargs)
 
-    val baseDF = AFiDF
-        .getFeatureDataFrame(summaryRDD, spark)
-    println("UUUU BaseDF", baseDF.schema)
-    baseDF.show(50, truncate = false)
-    // Null out gadm_id for all non-dissolved rows and then aggregate all results for
-    // each unique (list_id, location_id, gadm_id).
-    val summaryDF = AFiAnalysis.aggregateResults(
-        baseDF
-        .withColumn(
-          "gadm_id", when(col("location_id") =!= -1, lit("") ).otherwise(col("gadm_id"))
-        )
-        .groupBy(col("list_id"), col("location_id"), col("gadm_id"))
-    )
-    println("UUUU SummaryDF")
-    summaryDF.show(50, truncate = false)
+    val baseRDD = AFiDF.getFeatureDataFrame(summaryRDD, spark)
+    val reduceRDD = baseRDD.reduceByKey(combOp _)
+    println("====")
+    //reduceRDD.collect().foreach(println)
+    val aggRDD = reduceRDD.filter(a => a._1.location_id == "-1").map(a => (AFiDF.RowGadmId(a._1.list_id, a._1.location_id, ""), a._2)).reduceByKey(combOp _)
+    println("====")
+    aggRDD.collect().foreach(println)
+    println("====")
+    val finalRDD = reduceRDD.union(aggRDD)
+    finalRDD.collect().foreach(println)
+    val combinedDF = finalRDD.toDF("key", "value").select(col("key.*"), col("value.*")).select(col("list_id"), col("location_id"), col("gadm_id"),  col("_3.*"), col("_1").as("status_code"), col("_2").as("location_error"))
+    combinedDF.show(100, truncate=false)
 
-    // For each unique list_id, aggregate all dissolved rows with that list_id, and
-    // create a summary row (list_id, -1, "").
-    val gadmAgg = AFiAnalysis.aggregateResults(
-      summaryDF
-      .filter(col("location_id") === -1)
-      .groupBy(col("list_id")),
-    )
-      .withColumn("gadm_id", lit(""))
-      .withColumn("location_id", lit(-1))
-
-    // Add in the summary rows.
-    val combinedDF = summaryDF.unionByName(gadmAgg)
-    // Replace neglibible_risk_area__ha by neglible_risk__percent.
     val resultsDF = combinedDF
-      .withColumn(
-        "negligible_risk__percent",
-        col("negligible_risk_area__ha") / col("total_area__ha") * 100
-      )
-      .drop("negligible_risk_area__ha")
+       .withColumn(
+         "negligible_risk__percent",
+         col("negligible_risk_area__ha") / col("total_area__ha") * 100
+       )
+       .drop("negligible_risk_area__ha")
 
     resultsDF
       .withColumn("list_id", col("list_id").cast(IntegerType))

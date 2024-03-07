@@ -1,7 +1,7 @@
 package org.globalforestwatch.summarystats.afi
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.globalforestwatch.features.{FeatureId, GadmFeatureId, GfwProFeatureId, WdpaFeatureId}
 import org.globalforestwatch.summarystats._
 import cats.data.Validated.{Invalid, Valid}
@@ -13,8 +13,7 @@ object AFiDF extends SummaryDF {
   def getFeatureDataFrame(
     summaryRDD: RDD[ValidatedLocation[AFiSummary]],
     spark: SparkSession
-  ): DataFrame = {
-    import spark.implicits._
+  ): RDD[(RowGadmId, (Int, String, AFiData))] = {
 
     val rowId: FeatureId => RowId = {
       case gfwproId: GfwProFeatureId =>
@@ -31,13 +30,24 @@ object AFiDF extends SummaryDF {
       .flatMap {
         case Valid(Location(fid, data)) =>
           data.stats.map {
-            case (dataGroup, data) =>
-              (rowId(fid), RowError.empty, dataGroup, data)
+            case (dataGroup, data) => {
+              val r = rowId(fid)
+              val e = RowError.empty
+              val gadm_id = if (r.location_id == "-1") {
+                dataGroup.gadm_id
+              } else {
+                ""
+              }
+              (RowGadmId(r.list_id, r.location_id, gadm_id),
+                (e.status_code, e.location_error, data))
+            }
           }
-        case Invalid(Location(fid, err)) =>
-         List((rowId(fid), RowError.fromJobError(err), AFiDataGroup.empty, AFiData.empty))
+        case Invalid(Location(fid, err)) => {
+          val r = rowId(fid)
+          val e = RowError.empty
+          val d = AFiDataGroup.empty
+          List((RowGadmId(r.list_id, r.location_id, ""), (e.status_code, e.location_error, AFiData.empty)))
+        }
       }
-      .toDF("id", "error", "dataGroup", "data")
-      .select($"id.*", $"error.*", $"dataGroup.*", $"data.*")
   }
 }
