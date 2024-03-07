@@ -1,19 +1,18 @@
 package org.globalforestwatch.summarystats.afi
 
-import cats.data.NonEmptyList
 import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
-import geotrellis.vector.Geometry
-import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats.afi.AFiAnalysis.getOutputUrl
-import org.locationtech.jts.geom.Geometry
 import cats.data.Validated.Valid
 
 
 object AFiCommand extends SummaryCommand {
+  // Current range of years for UMD tree cover loss to include and break out during AFi analysis.
+  val TreeCoverLossYearStart: Int = 2021
+  val TreeCoverLossYearEnd: Int = 2023
 
   val afiCommand: Opts[Unit] = Opts.subcommand(
     name = AFiAnalysis.name,

@@ -6,7 +6,6 @@ import org.globalforestwatch.features.{FeatureId, GadmFeatureId, GfwProFeatureId
 import org.globalforestwatch.summarystats._
 import cats.data.Validated.{Invalid, Valid}
 import org.globalforestwatch.summarystats.SummaryDF.{RowError, RowId}
-import org.apache.spark.sql.functions.col
 
 object AFiDF extends SummaryDF {
   case class RowGadmId(list_id: String, location_id: String, gadm_id: String)
@@ -42,6 +41,7 @@ object AFiDF extends SummaryDF {
               } else {
                 ""
               }
+              // Convert null location_error values to ""
               val location_error = if (e.location_error == null) "" else e.location_error
               (RowGadmId(r.list_id, r.location_id, gadm_id),
                 AFiStatusAndData(e.status_code, location_error, data))
@@ -71,17 +71,19 @@ object AFiDF extends SummaryDF {
     val finalRDD = reducedRDD.union(aggRDD)
     //finalRDD.collect().foreach(println)
 
-    val combinedDF = finalRDD.toDF("key", "value").select(col("key.*"), col("value.*")).select(col("list_id"), col("location_id"), col("gadm_id"),  col("data.*"), col("status_code"), col("location_error"))
+    val combinedDF = finalRDD.toDF("key", "value").select($"key.*", $"value.*").select($"list_id", $"location_id", $"gadm_id",  $"data.*", $"status_code", $"location_error")
     combinedDF.show(100, truncate=false)
     combinedDF
   }
 
   // Function to combine rows of (RowGadmId, AFiStatusAndData) grouped by RowGadmId key.
   def reduceOp(a: AFiStatusAndData, b: AFiStatusAndData): AFiStatusAndData = {
+    // Take the max of the status code
     val status_code = if (a.status_code >= b.status_code)
       a.status_code
     else
       b.status_code
+    // Concatenate non-empty location_errors
     val location_error = if (a.location_error != "") {
       if (b.location_error != "")
         a.location_error + ", " + b.location_error
