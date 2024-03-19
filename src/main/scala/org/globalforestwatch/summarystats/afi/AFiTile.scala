@@ -1,6 +1,6 @@
 package org.globalforestwatch.summarystats.afi
 
-import geotrellis.raster.{CellGrid, CellType, IntCellType}
+import geotrellis.raster.{CellGrid, CellType}
 import org.globalforestwatch.layers._
 
 /**
@@ -14,7 +14,8 @@ case class AFiTile(
   negligibleRisk: NegligibleRisk#OptionalITile,
   gadmAdm0: GadmAdm0#OptionalITile,
   gadmAdm1: GadmAdm1#OptionalITile,
-  gadmAdm2: GadmAdm2#OptionalITile
+  gadmAdm2: GadmAdm2#OptionalITile,
+  jrcForestCover: JRCForestCover#OptionalITile
 ) extends CellGrid[Int] {
 
   def cellType: CellType = treeCoverLoss.cellType

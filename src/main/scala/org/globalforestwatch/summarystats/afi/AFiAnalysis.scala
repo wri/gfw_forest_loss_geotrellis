@@ -73,6 +73,8 @@ object AFiAnalysis extends SummaryAnalysis {
     group.agg(
         sum("natural_forest__extent").alias("natural_forest__extent"),
         sum("natural_forest_loss__ha").alias("natural_forest_loss__ha"),
+        sum("jrc_forest_cover__extent").alias("jrc_forest_cover__extent"),
+        sum("jrc_forest_cover_loss__ha").alias("jrc_forest_cover_loss__ha"),
         sum("negligible_risk_area__ha").alias("negligible_risk_area__ha"),
         sum("total_area__ha").alias("total_area__ha"),
         max("status_code").alias("status_code"),
