@@ -7,8 +7,6 @@ import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.{Summary, summarySemigroup}
 import org.globalforestwatch.util.Geodesy
 
-import java.time.LocalDate
-
 /** LossData Summary by year */
 case class AFiSummary(
                                    stats: Map[AFiDataGroup, AFiData] = Map.empty
@@ -36,6 +34,7 @@ object AFiSummary {
         val lossYear: Integer = raster.tile.treeCoverLoss.getData(col, row)
         val naturalForestCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
         val negligibleRisk: String = raster.tile.negligibleRisk.getData(col, row)
+        val jrcForestCover: Boolean = raster.tile.jrcForestCover.getData(col, row)
 
         val gadmAdm0: String = raster.tile.gadmAdm0.getData(col, row)
         // Skip processing this pixel if gadmAdm0 is empty
@@ -47,17 +46,18 @@ object AFiSummary {
         val gadmId: String = s"$gadmAdm0.$gadmAdm1.$gadmAdm2"
 
         // pixel Area
-        val lat: Double = raster.rasterExtent.gridRowToMap(row)
+        val extent = raster.rasterExtent
+        val lat: Double = extent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(
           lat,
-          raster.cellSize
+          extent.cellSize
         )
         val areaHa = area / 10000.0
         val isNaturalForest = naturalForestCategory == "Natural Forest"
 
 
         val groupKey = AFiDataGroup(gadmId)
-        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0))
+        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0, 0 , 0))
         summaryData.total_area__ha += areaHa
 
         if (negligibleRisk == "YES") {
@@ -68,8 +68,16 @@ object AFiSummary {
           summaryData.natural_forest__extent += areaHa
         }
 
-        if (lossYear >= 2021 && naturalForestCategory == "Natural Forest") {
-          summaryData.natural_forest_loss__ha += areaHa
+        if (jrcForestCover) {
+          summaryData.jrc_forest_cover__extent += areaHa
+        }
+        if (lossYear >= 2021) {
+          if (naturalForestCategory == "Natural Forest") {
+            summaryData.natural_forest_loss__ha += areaHa
+          }
+          if (jrcForestCover) {
+            summaryData.jrc_forest_cover_loss__ha += areaHa
+          }
         }
 
         val new_stats = acc.stats.updated(groupKey, summaryData)

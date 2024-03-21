@@ -263,6 +263,10 @@
     {
       "name":"arg_otbn_forest_loss",
       "source_uri":"s3://gfw-data-lake/arg_otbn_forest_loss/v2022/raster/epsg-4326/{grid_size}/{row_count}/year/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"jrc_global_forest_cover",
+      "source_uri":"s3://gfw-data-lake/jrc_global_forest_cover/v2020/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }
