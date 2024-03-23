@@ -6,6 +6,7 @@ import geotrellis.raster.Raster
 import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.{Summary, summarySemigroup}
 import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticDataLossYearly
 
 /** LossData Summary by year */
 case class AFiSummary(
@@ -57,7 +58,12 @@ object AFiSummary {
 
 
         val groupKey = AFiDataGroup(gadmId)
-        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0, 0 , 0))
+        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0,
+          ForestChangeDiagnosticDataLossYearly.prefilled(AFiCommand.TreeCoverLossYearStart,
+            AFiCommand.TreeCoverLossYearEnd),
+          0, 0, 
+          ForestChangeDiagnosticDataLossYearly.prefilled(AFiCommand.TreeCoverLossYearStart,
+            AFiCommand.TreeCoverLossYearEnd), 0, 0))
         summaryData.total_area__ha += areaHa
 
         if (negligibleRisk == "YES") {
@@ -71,12 +77,18 @@ object AFiSummary {
         if (jrcForestCover) {
           summaryData.jrc_forest_cover__extent += areaHa
         }
-        if (lossYear >= 2021) {
+        if (lossYear >= AFiCommand.TreeCoverLossYearStart) {
           if (naturalForestCategory == "Natural Forest") {
             summaryData.natural_forest_loss__ha += areaHa
+            summaryData.natural_forest_loss_by_year__ha = summaryData.natural_forest_loss_by_year__ha.merge(ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, include = true,
+            minLossYear = AFiCommand.TreeCoverLossYearStart,
+            maxLossYear = AFiCommand.TreeCoverLossYearEnd))
           }
           if (jrcForestCover) {
             summaryData.jrc_forest_cover_loss__ha += areaHa
+            summaryData.jrc_forest_loss_by_year__ha = summaryData.jrc_forest_loss_by_year__ha.merge(ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, include = true,
+            minLossYear = AFiCommand.TreeCoverLossYearStart,
+            maxLossYear = AFiCommand.TreeCoverLossYearEnd))
           }
         }
 
