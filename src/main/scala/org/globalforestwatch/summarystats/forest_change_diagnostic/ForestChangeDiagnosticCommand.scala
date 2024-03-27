@@ -14,7 +14,7 @@ object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
   // Current range of years for UMD tree cover loss and country-specific tree cover loss.
   // Update TreeCoverLossYearEnd when new data becomes available.
   val TreeCoverLossYearStart: Int = 2001
-  val TreeCoverLossYearEnd: Int = 2022
+  val TreeCoverLossYearEnd: Int = 2023
 
   val intermediateListSourceOpt: Opts[Option[NonEmptyList[String]]] = Opts
     .options[String](
