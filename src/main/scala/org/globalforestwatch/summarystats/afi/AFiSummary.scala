@@ -6,7 +6,6 @@ import geotrellis.raster.Raster
 import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.{Summary, summarySemigroup}
 import org.globalforestwatch.util.Geodesy
-import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticDataLossYearly
 
 /** LossData Summary by year */
 case class AFiSummary(
@@ -33,6 +32,7 @@ object AFiSummary {
 
       def visit(raster: Raster[AFiTile], col: Int, row: Int): Unit = {
         val lossYear: Integer = raster.tile.treeCoverLoss.getData(col, row)
+        val lossYearClipped: Integer = if (lossYear >= AFiCommand.TreeCoverLossYearStart) lossYear else 0
         val naturalForestCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
         val negligibleRisk: String = raster.tile.negligibleRisk.getData(col, row)
         val jrcForestCover: Boolean = raster.tile.jrcForestCover.getData(col, row)
@@ -57,13 +57,8 @@ object AFiSummary {
         val isNaturalForest = naturalForestCategory == "Natural Forest"
 
 
-        val groupKey = AFiDataGroup(gadmId)
-        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0,
-          ForestChangeDiagnosticDataLossYearly.prefilled(AFiCommand.TreeCoverLossYearStart,
-            AFiCommand.TreeCoverLossYearEnd),
-          0, 0, 
-          ForestChangeDiagnosticDataLossYearly.prefilled(AFiCommand.TreeCoverLossYearStart,
-            AFiCommand.TreeCoverLossYearEnd), 0, 0))
+        val groupKey = AFiDataGroup(gadmId, lossYearClipped)
+        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0))
         summaryData.total_area__ha += areaHa
 
         if (negligibleRisk == "YES") {
@@ -76,20 +71,6 @@ object AFiSummary {
 
         if (jrcForestCover) {
           summaryData.jrc_forest_cover__extent += areaHa
-        }
-        if (lossYear >= AFiCommand.TreeCoverLossYearStart) {
-          if (naturalForestCategory == "Natural Forest") {
-            summaryData.natural_forest_loss__ha += areaHa
-            summaryData.natural_forest_loss_by_year__ha = summaryData.natural_forest_loss_by_year__ha.merge(ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, include = true,
-            minLossYear = AFiCommand.TreeCoverLossYearStart,
-            maxLossYear = AFiCommand.TreeCoverLossYearEnd))
-          }
-          if (jrcForestCover) {
-            summaryData.jrc_forest_cover_loss__ha += areaHa
-            summaryData.jrc_forest_loss_by_year__ha = summaryData.jrc_forest_loss_by_year__ha.merge(ForestChangeDiagnosticDataLossYearly.fill(lossYear, areaHa, include = true,
-            minLossYear = AFiCommand.TreeCoverLossYearStart,
-            maxLossYear = AFiCommand.TreeCoverLossYearEnd))
-          }
         }
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
