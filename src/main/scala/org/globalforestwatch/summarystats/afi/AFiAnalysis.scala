@@ -1,25 +1,29 @@
 package org.globalforestwatch.summarystats.afi
 import org.apache.spark.sql.functions.{col, lit, when, sum, max, concat_ws, collect_list}
-import cats.data.Validated.{Invalid, Valid}
-import cats.data.{NonEmptyList, Validated}
+import cats.data.Validated
 import geotrellis.vector.{Feature, Geometry}
-import geotrellis.store.index.zcurve.Z2
-import org.apache.spark.HashPartitioner
 import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats._
-import org.globalforestwatch.util.GeometryConstructor.createPoint
-import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
-import org.globalforestwatch.util.RDDAdapter
-import org.globalforestwatch.ValidatedWorkflow
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, RelationalGroupedDataset, SparkSession}
 import org.apache.spark.storage.StorageLevel
+import org.apache.spark.sql.functions._
+import scala.collection.immutable.SortedMap
+import io.circe.syntax._
 
 object AFiAnalysis extends SummaryAnalysis {
 
   val name = "afi"
 
+  // UDF to convert unsorted map with some year-loss entries to SortedMap with all
+  // year entries (even if forest loss was zero), and then convert to JSON string.
+  val toSortedMapUDF = udf((map: Map[Int, Double]) => {
+    val yearList = (for (i <- AFiCommand.TreeCoverLossYearStart to AFiCommand.TreeCoverLossYearEnd) yield(i -> 0.0))
+    val populatedMap = SortedMap[Int, Double](yearList: _*) ++ map
+    populatedMap.asJson.noSpaces
+  })
+  
   def apply(
     featureRDD: RDD[ValidatedLocation[Geometry]],
     featureType: String,
@@ -36,45 +40,78 @@ object AFiAnalysis extends SummaryAnalysis {
 
     val summaryRDD: RDD[ValidatedLocation[AFiSummary]] = AFiRDD(validatedRDD, AFiGrid.blockTileGrid, kwargs)
 
-    // TODO somehow convert AFiSummary to AFiData
     import spark.implicits._
 
-    val summaryDF = AFiAnalysis.aggregateResults(
+    // Null out gadm_id for all non-dissolved rows and then aggregate all results for
+    // each unique (list_id, location_id, gadm_id, loss_year). Need to combine first
+    // with key including loss_year, so we don't have duplicate loss year entries
+    // when we create the map of loss years.
+    val summary1DF = AFiAnalysis.aggregateByLossYear(
         AFiDF
         .getFeatureDataFrame(summaryRDD, spark)
         .withColumn(
           "gadm_id", when(col("location_id") =!= -1, lit("") ).otherwise(col("gadm_id"))
         )
-        .groupBy($"list_id", $"location_id", $"gadm_id")
+        .groupBy($"list_id", $"location_id", $"gadm_id", $"loss_year")
     )
+    
+    // Now aggregate where we combine results for different loss_years, creating new
+    // columns with per-year forest loss.
+    val summaryDF= AFiAnalysis.aggregateResults(summary1DF
+      .groupBy($"list_id", $"location_id", $"gadm_id"))
 
+    // For each unique list_id, aggregate all dissolved rows with that list_id, and
+    // create a summary row (list_id, -1, "").
     val gadmAgg = AFiAnalysis.aggregateResults(
-      summaryDF
+      summary1DF
       .filter($"location_id" === -1)
       .groupBy($"list_id"),
     )
       .withColumn("gadm_id", lit(""))
       .withColumn("location_id", lit(-1))
 
+    // Add in the summary rows.
     val combinedDF = summaryDF.unionByName(gadmAgg)
+
+    // Replace negligible_risk_area__ha by neglible_risk__percent. Change
+    // natural_forest_loss_by_year__ha and jrc_forest_loss_by_year__ha to sorted maps
+    // with all year entries, then converted to json strings.
     val resultsDF = combinedDF
       .withColumn(
         "negligible_risk__percent",
         $"negligible_risk_area__ha" / $"total_area__ha" * 100
       )
       .drop("negligible_risk_area__ha")
+      .withColumn("natural_forest_loss_by_year__ha", toSortedMapUDF(col("natural_forest_loss_by_year__ha")))
+      .withColumn("jrc_forest_loss_by_year__ha", toSortedMapUDF(col("jrc_forest_loss_by_year__ha")))
 
     resultsDF
       .withColumn("list_id", col("list_id").cast(IntegerType))
       .withColumn("location_id", col("location_id").cast(IntegerType))
   }
 
+  // Aggregate all entries with same (list_id, location_id, gadm_id, loss_year)
+  private def aggregateByLossYear(group: RelationalGroupedDataset) = {
+    group.agg(
+        sum("natural_forest__extent").alias("natural_forest__extent"),
+        sum("jrc_forest_cover__extent").alias("jrc_forest_cover__extent"),
+        sum("negligible_risk_area__ha").alias("negligible_risk_area__ha"),
+        sum("total_area__ha").alias("total_area__ha"),
+        max("status_code").alias("status_code"),
+        concat_ws(", ", collect_list(when(col("location_error").isNotNull && col("location_error") =!= "", col("location_error")))).alias("location_error")
+      )
+  }
+
+  // Aggregate all entries with same (list_id, location_id, gadm_id), combining
+  // different loss_year entries in JSON objects showing loss per year.
   private def aggregateResults(group: RelationalGroupedDataset) = {
     group.agg(
         sum("natural_forest__extent").alias("natural_forest__extent"),
-        sum("natural_forest_loss__ha").alias("natural_forest_loss__ha"),
+        sum(when(col("loss_year") =!= 0, col("natural_forest__extent")).otherwise(0.0)).alias("natural_forest_loss__ha"),
+        map_from_arrays(collect_list(when(col("loss_year") =!= 0, col("loss_year"))), collect_list(when(col("loss_year") =!= 0, col("natural_forest__extent")))).alias("natural_forest_loss_by_year__ha"),
         sum("jrc_forest_cover__extent").alias("jrc_forest_cover__extent"),
-        sum("jrc_forest_cover_loss__ha").alias("jrc_forest_cover_loss__ha"),
+        sum(when(col("loss_year") =!= 0, col("jrc_forest_cover__extent")).otherwise(0.0)).alias("jrc_forest_cover_loss__ha"),
+        map_from_arrays(collect_list(when(col("loss_year") =!= 0, col("loss_year"))), collect_list(when(col("loss_year") =!= 0, col("jrc_forest_cover__extent")))).alias("jrc_forest_loss_by_year__ha"),
         sum("negligible_risk_area__ha").alias("negligible_risk_area__ha"),
         sum("total_area__ha").alias("total_area__ha"),
         max("status_code").alias("status_code"),
