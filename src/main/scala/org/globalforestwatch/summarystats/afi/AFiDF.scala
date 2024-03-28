@@ -2,11 +2,10 @@ package org.globalforestwatch.summarystats.afi
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GadmFeatureId, GfwProFeatureId, WdpaFeatureId}
+import org.globalforestwatch.features.{FeatureId, GadmFeatureId, GfwProFeatureId, WdpaFeatureId}
 import org.globalforestwatch.summarystats._
 import cats.data.Validated.{Invalid, Valid}
 import org.globalforestwatch.summarystats.SummaryDF.{RowError, RowId}
-import org.globalforestwatch.util.Util.fieldsFromCol
 
 object AFiDF extends SummaryDF {
   case class RowGadmId(list_id: String, location_id: String, gadm_id: String)
