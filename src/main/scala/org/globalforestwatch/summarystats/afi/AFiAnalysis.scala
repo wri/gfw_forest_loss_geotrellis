@@ -61,10 +61,17 @@ object AFiAnalysis extends SummaryAnalysis {
       .groupBy($"list_id", $"location_id", $"gadm_id"))
 
     // For each unique list_id, aggregate all dissolved rows with that list_id, and
-    // create a summary row (list_id, -1, "").
-    val gadmAgg = AFiAnalysis.aggregateResults(
+    // create a summary row (list_id, -1, ""). Must first aggregate with key
+    // including loss_year, to make sure there are no duplicate loss years from
+    // merging rows with different GADMs.
+    val gadmAgg1 = AFiAnalysis.aggregateByLossYear(
       summary1DF
       .filter($"location_id" === -1)
+      .withColumn("gadm_id", lit(""))
+      .groupBy($"list_id", $"location_id", $"gadm_id", $"loss_year")
+    )
+    val gadmAgg = AFiAnalysis.aggregateResults(
+      gadmAgg1
       .groupBy($"list_id"),
     )
       .withColumn("gadm_id", lit(""))
