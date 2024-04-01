@@ -439,6 +439,12 @@ trait DateConfLayer extends ILayer {
 
 // Encoding for IntegratedAlerts. Confidence value of 2 means "highest", 1 means
 // "high", and 0 means "nominal".
+object DateConfLevelsLayer {
+  val ConfLo = 0
+  val ConfMed = 1
+  val ConfHi = 2
+}
+
 trait DateConfLevelsLayer extends ILayer {
   type B = Option[(LocalDate, Int)]
 
@@ -448,7 +454,9 @@ trait DateConfLevelsLayer extends ILayer {
   val baseDate = LocalDate.of(2014,12,31)
 
   override def lookup(value: Int): Option[(LocalDate, Int)] = {
-    val confidence = if (value >= 40000) 2 else if (value >= 30000) 1 else 0
+    val confidence = if (value >= 40000) DateConfLevelsLayer.ConfHi
+      else if (value >= 30000) DateConfLevelsLayer.ConfMed
+      else DateConfLevelsLayer.ConfLo
     val days: Int = if (value >= 40000) value - 40000
       else if (value >= 30000) value - 30000
       else value - 20000

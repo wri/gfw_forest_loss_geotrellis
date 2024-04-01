@@ -41,12 +41,19 @@ object GfwProDashboardDataDateCount {
 
   def empty: GfwProDashboardDataDateCount = GfwProDashboardDataDateCount(SortedMap())
 
-  def fillDaily(alertDate: Option[LocalDate], alertCount: Int): GfwProDashboardDataDateCount =
-    fill(alertDate, alertCount, _.format(DateTimeFormatter.ISO_DATE))
+  /** Record alerts as a GfwProDashboardDataDateCount for the specified day if
+    * alertDate is not None and include is true, else return
+    * GfwProDashboardDataDateCount.empty. */
+  def fillDaily(alertDate: Option[LocalDate], include: Boolean, alertCount: Int): GfwProDashboardDataDateCount =
+    fill(if (include) alertDate else None, alertCount, _.format(DateTimeFormatter.ISO_DATE))
 
+  /** Record alerts as a GfwProDashboardDataDateCount for the appropriate week if
+    * alertDate is not None, else return GfwProDashboardDataDateCount.empty. */
   def fillWeekly(alertDate: Option[LocalDate], alertCount: Int): GfwProDashboardDataDateCount =
     fill(alertDate, alertCount, _.format(WeekOfYear))
 
+  /** Record alerts as a GfwProDashboardDataDateCount for the appropriate month if
+    * alertDate is not None, else return GfwProDashboardDataDateCount.empty. */
   def fillMonthly(alertDate: Option[LocalDate], alertCount: Int): GfwProDashboardDataDateCount =
     fill(alertDate, alertCount, _.format(MonthOfYear))
 

@@ -39,20 +39,24 @@ object GfwProDashboardSummary {
 
       def visit(raster: Raster[GfwProDashboardTile], col: Int, row: Int): Unit = {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
-        val integratedAlertDate: Option[LocalDate] = raster.tile.integratedAlerts.getData(col, row).map { case (date, _) => date }
+        val integratedAlertDateAndConf: Option[(LocalDate, Int)] = raster.tile.integratedAlerts.getData(col, row)
         val integratedAlertCoverage = raster.tile.integratedAlerts.t.isDefined
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
+        val naturalForestCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
+        val jrcForestCover: Boolean = raster.tile.jrcForestCover.getData(col, row)
 
-        val groupKey = GfwProDashboardRawDataGroup(integratedAlertDate, integratedAlertsCoverage = integratedAlertCoverage)
+        val groupKey = GfwProDashboardRawDataGroup(integratedAlertDateAndConf,
+          integratedAlertCoverage,
+          naturalForestCategory == "Natural Forest",
+          jrcForestCover,
+          isTreeCoverExtent30)
         val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(treeCoverExtentArea = 0.0, alertCount = 0))
 
-        if (isTreeCoverExtent30) {
-          val re: RasterExtent = raster.rasterExtent
-          val areaHa = Geodesy.pixelArea(lat = re.gridRowToMap(row), re.cellSize) / 10000.0
-          summaryData.treeCoverExtentArea += areaHa
-        }
+        val re: RasterExtent = raster.rasterExtent
+        val areaHa = Geodesy.pixelArea(lat = re.gridRowToMap(row), re.cellSize) / 10000.0
+        summaryData.treeCoverExtentArea += areaHa
 
-        if (integratedAlertDate.isDefined) {
+        if (integratedAlertDateAndConf.isDefined) {
           summaryData.alertCount += 1
         }
 
