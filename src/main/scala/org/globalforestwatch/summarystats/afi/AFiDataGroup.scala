@@ -1,11 +1,10 @@
 package org.globalforestwatch.summarystats.afi
 
 case class AFiDataGroup(
-                         gadm_id: String,
-                         loss_year: Integer
+                         gadm_id: String
 )
 
 object AFiDataGroup {
       def empty: AFiDataGroup =
-            AFiDataGroup("", 0)
+            AFiDataGroup("")
 }

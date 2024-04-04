@@ -32,7 +32,6 @@ object AFiSummary {
 
       def visit(raster: Raster[AFiTile], col: Int, row: Int): Unit = {
         val lossYear: Integer = raster.tile.treeCoverLoss.getData(col, row)
-        val lossYearClipped: Integer = if (lossYear >= AFiCommand.TreeCoverLossYearStart) lossYear else 0
         val naturalForestCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
         val negligibleRisk: String = raster.tile.negligibleRisk.getData(col, row)
         val jrcForestCover: Boolean = raster.tile.jrcForestCover.getData(col, row)
@@ -57,8 +56,8 @@ object AFiSummary {
         val isNaturalForest = naturalForestCategory == "Natural Forest"
 
 
-        val groupKey = AFiDataGroup(gadmId, lossYearClipped)
-        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0))
+        val groupKey = AFiDataGroup(gadmId)
+        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0, 0, 0, AFiDataLossYearly.prefilled, AFiDataLossYearly.prefilled))
         summaryData.total_area__ha += areaHa
 
         if (negligibleRisk == "YES") {
@@ -67,10 +66,18 @@ object AFiSummary {
 
         if (naturalForestCategory == "Natural Forest") {
           summaryData.natural_forest__extent += areaHa
+          if (lossYear >= 2021) {
+            summaryData.natural_forest_loss__ha += areaHa
+            summaryData.natural_forest_loss_by_year__ha = summaryData.natural_forest_loss_by_year__ha.merge(AFiDataLossYearly.fill(lossYear, areaHa, include = true))
+          }
         }
 
         if (jrcForestCover) {
           summaryData.jrc_forest_cover__extent += areaHa
+          if (lossYear >= 2021) {
+            summaryData.jrc_forest_cover_loss__ha += areaHa
+            summaryData.jrc_forest_loss_by_year__ha = summaryData.jrc_forest_loss_by_year__ha.merge(AFiDataLossYearly.fill(lossYear, areaHa, include = true))
+          }
         }
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
