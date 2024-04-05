@@ -13,21 +13,22 @@ import org.apache.spark.sql.Encoder
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.functions._
 import frameless.{TypedEncoder, TypedExpressionEncoder}
-import org.apache.avro.generic.GenericData.StringType
+import org.globalforestwatch.summarystats.forest_change_diagnostic.ForestChangeDiagnosticDataLossYearly
 
-object LossYearlySum extends Aggregator[String, AFiDataLossYearly, String] {
-  def zero: AFiDataLossYearly = AFiDataLossYearly.empty
-  def reduce(b: AFiDataLossYearly, a: String) = {
-    val a1 = AFiDataLossYearly.fromString(a)
+
+object LossYearlySum extends Aggregator[String, ForestChangeDiagnosticDataLossYearly, String] {
+  def zero: ForestChangeDiagnosticDataLossYearly = ForestChangeDiagnosticDataLossYearly.empty
+  def reduce(b: ForestChangeDiagnosticDataLossYearly, a: String) = {
+    val a1 = ForestChangeDiagnosticDataLossYearly.fromString(a)
     b.merge(a1)
   }
-  def merge(b1: AFiDataLossYearly, b2: AFiDataLossYearly) = {
+  def merge(b1: ForestChangeDiagnosticDataLossYearly, b2: ForestChangeDiagnosticDataLossYearly) = {
     b1.merge(b2)
   }
   implicit def typedEncoder[T: TypedEncoder]: ExpressionEncoder[T] =
     TypedExpressionEncoder[T].asInstanceOf[ExpressionEncoder[T]]
-  def finish(reduction: AFiDataLossYearly): String = reduction.toJson
-  def bufferEncoder: Encoder[AFiDataLossYearly] = typedEncoder[AFiDataLossYearly]
+  def finish(reduction: ForestChangeDiagnosticDataLossYearly): String = reduction.toJson
+  def bufferEncoder: Encoder[ForestChangeDiagnosticDataLossYearly] = typedEncoder[ForestChangeDiagnosticDataLossYearly]
   def outputEncoder: Encoder[String] = ExpressionEncoder()
 }
 
