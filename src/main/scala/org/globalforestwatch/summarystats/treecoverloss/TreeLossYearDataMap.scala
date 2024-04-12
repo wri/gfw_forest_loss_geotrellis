@@ -27,6 +27,7 @@ object TreeLossYearDataMap {
       2020 -> TreeLossYearData(2020, 0, 0, 0, 0, 0),
       2021 -> TreeLossYearData(2021, 0, 0, 0, 0, 0),
       2022 -> TreeLossYearData(2022, 0, 0, 0, 0, 0),
+      2023 -> TreeLossYearData(2023, 0, 0, 0, 0, 0),
     )
 
   //def mapValuesToList(map: Map[Int, LossYearData]): List[LossYearData] = ???

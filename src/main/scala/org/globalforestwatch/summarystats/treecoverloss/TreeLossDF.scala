@@ -8,7 +8,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object TreeLossDF {
 
   val treecoverLossMinYear = 2001
-  val treecoverLossMaxYear = 2022
+  val treecoverLossMaxYear = 2023
 
   def unpackValues(carbonPools: Boolean, simpleAGBEmis: Boolean, emisGasAnnual: Boolean)(df: DataFrame): DataFrame = {
     val spark: SparkSession = df.sparkSession
