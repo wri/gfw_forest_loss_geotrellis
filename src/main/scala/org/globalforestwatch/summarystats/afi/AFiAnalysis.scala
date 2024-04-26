@@ -95,6 +95,12 @@ object AFiAnalysis extends SummaryAnalysis {
     resultsDF
       .withColumn("list_id", col("list_id").cast(IntegerType))
       .withColumn("location_id", col("location_id").cast(IntegerType))
+      .withColumn("natural_forest__extent", round($"natural_forest__extent", 4))
+      .withColumn("natural_forest_loss__ha", round($"natural_forest_loss__ha", 4))
+      .withColumn("jrc_forest_cover__extent", round($"jrc_forest_cover__extent", 4))
+      .withColumn("jrc_forest_cover_loss__ha", round($"jrc_forest_cover_loss__ha", 4))
+      .withColumn("total_area__ha", round($"total_area__ha", 4))
+      .withColumn("negligible_risk__percent", round($"negligible_risk__percent", 4))
   }
 
   // Aggregate all entries with same (list_id, location_id, gadm_id, loss_year)
@@ -115,10 +121,10 @@ object AFiAnalysis extends SummaryAnalysis {
     group.agg(
         sum("natural_forest__extent").alias("natural_forest__extent"),
         sum(when(col("loss_year") =!= 0, col("natural_forest__extent")).otherwise(0.0)).alias("natural_forest_loss__ha"),
-        map_from_arrays(collect_list(when(col("loss_year") =!= 0, col("loss_year"))), collect_list(when(col("loss_year") =!= 0, col("natural_forest__extent")))).alias("natural_forest_loss_by_year__ha"),
+        map_from_arrays(collect_list(when(col("loss_year") =!= 0, col("loss_year"))), collect_list(when(col("loss_year") =!= 0, round(col("natural_forest__extent"), 4)))).alias("natural_forest_loss_by_year__ha"),
         sum("jrc_forest_cover__extent").alias("jrc_forest_cover__extent"),
         sum(when(col("loss_year") =!= 0, col("jrc_forest_cover__extent")).otherwise(0.0)).alias("jrc_forest_cover_loss__ha"),
-        map_from_arrays(collect_list(when(col("loss_year") =!= 0, col("loss_year"))), collect_list(when(col("loss_year") =!= 0, col("jrc_forest_cover__extent")))).alias("jrc_forest_loss_by_year__ha"),
+        map_from_arrays(collect_list(when(col("loss_year") =!= 0, col("loss_year"))), collect_list(when(col("loss_year") =!= 0, round(col("jrc_forest_cover__extent"), 4)))).alias("jrc_forest_loss_by_year__ha"),
         sum("negligible_risk_area__ha").alias("negligible_risk_area__ha"),
         sum("total_area__ha").alias("total_area__ha"),
         max("status_code").alias("status_code"),
