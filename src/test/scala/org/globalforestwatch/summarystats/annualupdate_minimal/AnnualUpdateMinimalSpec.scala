@@ -12,6 +12,8 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
   def idn1_5GadmInputTsvPath = getClass.getResource("/idn1_5Gadm.tsv").toString()
   def idn1_5GadmExpectedOutputPath = getClass.getResource("/idn1_5Gadm-aum-output").toString()
   def wdpaInputTsvPath = getClass.getResource("/mulanje.tsv").toString()
+  def wdpaOutputPath: String = "output/mulanje"
+  def wdpaExpectedOutputPath = getClass.getResource("/wdpa-aum-output").toString()
   
   
   val csvOptions: Map[String, String] = Map(
@@ -69,35 +71,68 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
   it("matches recorded output for GADM") {
     val gadmDF: DataFrame = AnnualUpdateMinimal(idn1_5GadmInputTsvPath, "gadm")
 
-    // Export and save results 
+    // Transform results to match expected output
     import spark.implicits._
-    val exportDF = gadmDF      
+    val unpackedDF = gadmDF      
       .transform(
         AnnualUpdateMinimalDF.unpackValues(
           List($"id.iso" as "iso", $"id.adm1" as "adm1", $"id.adm2" as "adm2")
         )
       )
-    val adm2DF: DataFrame = exportDF.transform(
+    val exportDF: DataFrame = unpackedDF.transform(
       AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2"))
     ) 
-    val top20Rows = adm2DF.limit(1)
-    top20Rows
+    val firstRow = exportDF.limit(1)
+    
+    // Export and save results
+    firstRow
       .write
       .options(csvOptions)
       .csv("output/idntest")
 
     // Read expected results and compare
     val expectedDF = readAumResult(idn1_5GadmExpectedOutputPath).limit(1)
-    val top20RowsDF = readAumResult("output/idntest")
-    top20Rows.show()
+    val firstRowDF = readAumResult("output/idntest")
+    firstRowDF.show()
     expectedDF.show()
 
-    assertSmallDataFrameEquality(top20RowsDF, expectedDF, ignoreNullable = true)
+    assertSmallDataFrameEquality(firstRowDF, expectedDF, ignoreNullable = true)
 
   }
 
   it("matches recorded output for WDPA") {
-    //val wdpaDF: DataFrame = AnnualUpdateMinimal(wdpaInputTsvPath, "wdpa")
+    val wdpaDF: DataFrame = AnnualUpdateMinimal(wdpaInputTsvPath, "wdpa")
+
+    // Transform results to match expected output
+    import spark.implicits._
+    val exportDF = wdpaDF      
+      .transform(
+        AnnualUpdateMinimalDF.unpackValues(
+          List(
+            $"id.wdpaId" as "wdpa_protected_area__id",
+            $"id.name" as "wdpa_protected_area__name",
+            $"id.iucnCat" as "wdpa_protected_area__iucn_cat",
+            $"id.iso" as "wdpa_protected_area__iso",
+            $"id.status" as "wdpa_protected_area__status"
+          )
+        )
+      )
+
+    val firstRow = exportDF.limit(1)
+    // Export and save results
+    firstRow
+      .write
+      .options(csvOptions)
+      .csv("output/mulanje")
+
+    // Read expected results and compare
+    val expectedDF = readAumResult(idn1_5GadmExpectedOutputPath).limit(1)
+    val firstRowDF = readAumResult("output/mulanje")
+    firstRowDF.show()
+    expectedDF.show()
+
+    assertSmallDataFrameEquality(firstRowDF, expectedDF, ignoreNullable = true)
+  
 
   }
 
