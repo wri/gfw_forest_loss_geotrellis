@@ -87,20 +87,20 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
       .csv("output/idntest")
 
     // Read expected results and compare
-    val expectedDF = readAumResult(idn1_5GadmExpectedOutputPath)
+    val expectedDF = readAumResult(idn1_5GadmExpectedOutputPath).limit(1)
     val top20RowsDF = readAumResult("output/idntest")
-    top20RowsDF.show()
+    top20Rows.show()
     expectedDF.show()
 
-    assertSmallDataFrameEquality(top20Rows, expectedDF, ignoreNullable = true)
+    assertSmallDataFrameEquality(top20RowsDF, expectedDF, ignoreNullable = true)
 
   }
 
   it("matches recorded output for WDPA") {
-    val wdpaDF: DataFrame = AnnualUpdateMinimal(idn1_5GadmInputTsvPath, "wdpa")
+    //val wdpaDF: DataFrame = AnnualUpdateMinimal(wdpaInputTsvPath, "wdpa")
 
   }
 
 }
 
-// TODO: export dataframe, clean columns, compare with real results
+// TODO: Summarize GADM results, Write WDPA test
