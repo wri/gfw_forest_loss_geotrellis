@@ -149,6 +149,12 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     spark: SparkSession
   ): RDD[Location[GfwProDashboardDataDateCount]] = {
     val featureSpatialRDD = RDDAdapter.toSpatialRDDfromLocationRdd(featureRDD, spark)
+    // If there are no locations that intersect the TCL extent (featureSpatialRDD is
+    // empty, has no envelope), then spatial join below will fail, so return without
+    // further analysis.
+    if (featureSpatialRDD.boundaryEnvelope == null) {
+      return spark.sparkContext.parallelize(Seq.empty[Location[GfwProDashboardDataDateCount]])
+    }
     val joinedRDD = SpatialJoinRDD.spatialjoin(featureSpatialRDD, fireAlertRDD)
 
     joinedRDD.rdd

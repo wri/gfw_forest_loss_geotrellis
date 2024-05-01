@@ -19,6 +19,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
   def dashExpectedOutputPath = getClass.getResource("/dash-output").toString()
   // This is a partial version of gadm36_adm2_1_1.tsv that only includes IDN.1.5
   def idn1_5GadmTsvPath = getClass.getResource("/idn1_5Gadm.tsv").toString()
+  def antarcticaInputTsvPath = getClass.getResource("/antarctica.tsv").toString()
 
   def Dashboard(features: RDD[ValidatedLocation[Geometry]]) = {
     val fireAlertsRdd = {
@@ -74,4 +75,20 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
 
     assertSmallDataFrameEquality(summaryDF, expectedDF)
   }
+
+  it("completes without error for list that doesn't intersect TCL at all") {
+    // The antarctica location will be completely removed by splitFeatures, since it
+    // doesn't intersect with the TCL extent (which is used as the splitting grid).
+    val antRDD = ValidatedFeatureRDD(
+      NonEmptyList.one(antarcticaInputTsvPath),
+      "gfwpro",
+      FeatureFilter.empty,
+      splitFeatures = true
+    )
+    val fcd = Dashboard(antRDD)
+    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, spark)
+
+    summaryDF.count() shouldBe 0
+  }
+
 }
