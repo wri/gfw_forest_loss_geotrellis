@@ -61,8 +61,8 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
         "delimiter" -> "\t",
         "escape" -> "\"",
         "quoteMode" -> "MINIMAL",
-        "nullValue" -> null,
-        "emptyValue" -> null,
+        "nullValue" -> "",
+        "emptyValue" -> "",
         "inferSchema" -> "true"
       ))
       .csv(path)
@@ -105,19 +105,28 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
 
     // Transform results to match expected output
     import spark.implicits._
-    val exportDF = wdpaDF      
+    val idCols: List[String] = List(
+      "wdpa_protected_area__id",
+      "wdpa_protected_area__name",
+      "wdpa_protected_area__iucn_cat",
+      "wdpa_protected_area__iso",
+      "wdpa_protected_area__status"
+    )
+    val unpackedDF = wdpaDF      
       .transform(
         AnnualUpdateMinimalDF.unpackValues(
           List(
             $"id.wdpaId" as "wdpa_protected_area__id",
             $"id.name" as "wdpa_protected_area__name",
-            $"id.iucnCat" as "wdpa_protected_area__iucn_cat",
+            $"id.iucnCat" as "wdpa_protected_area__iucn_cat", 
             $"id.iso" as "wdpa_protected_area__iso",
             $"id.status" as "wdpa_protected_area__status"
-          )
+          ),
+          wdpa = true
         )
       )
 
+    val exportDF = unpackedDF.transform(AnnualUpdateMinimalDF.aggChange(idCols, wdpa=true))
     val firstRow = exportDF.limit(1)
     // Export and save results
     firstRow
@@ -126,7 +135,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
       .csv("output/mulanje")
 
     // Read expected results and compare
-    val expectedDF = readAumResult(idn1_5GadmExpectedOutputPath).limit(1)
+    val expectedDF = readAumResult(wdpaExpectedOutputPath).limit(1)
     val firstRowDF = readAumResult("output/mulanje")
     firstRowDF.show()
     expectedDF.show()
