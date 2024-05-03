@@ -70,7 +70,7 @@
     },
     {
       "name":"umd_tree_cover_gain",
-      "source_uri":"s3://gfw-data-lake/umd_tree_cover_gain_from_height/v202206/raster/epsg-4326/{grid_size}/{row_count}/gain/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/umd_tree_cover_gain_from_height/v20240126/raster/epsg-4326/{grid_size}/{row_count}/period/geotiff/{tile_id}.tif"
     },
     {
       "name":"tsc_tree_cover_loss_drivers",

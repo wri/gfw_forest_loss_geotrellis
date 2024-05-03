@@ -41,7 +41,7 @@ object TreeLossSummary {
 
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
-        val gain: Boolean = raster.tile.gain.getData(col, row)
+        val gain: Boolean = raster.tile.gain.getData(col, row).nonEmpty
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
