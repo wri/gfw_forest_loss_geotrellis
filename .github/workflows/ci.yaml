@@ -24,9 +24,12 @@ jobs:
           role-to-assume: arn:aws:iam::617001639586:role/gfw-data-lake-read
 
       - name: run tests
-        run: ./sbt ++$SCALA_VERSION coverage test coverageReport
+        run: ./sbt ++$SCALA_VERSION coverage testOnly -- -l DefaultTag coverageReport
         env:
           GFW_FEATURE_FLAG: pro
+
+      - name: run annual-update-minimal tests
+        run: ./sbt ++$SCALA_VERSION coverage testOnly -- -n DefaultTag coverageReport
 
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@master

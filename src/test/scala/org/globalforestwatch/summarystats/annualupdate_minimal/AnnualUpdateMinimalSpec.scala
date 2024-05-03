@@ -1,5 +1,6 @@
 package org.globalforestwatch.summarystats.annualupdate_minimal
 
+import org.scalatest.Tag
 import com.github.mrpowers.spark.fast.tests.DataFrameComparer
 import org.apache.spark.rdd.RDD
 import cats.data.NonEmptyList
@@ -7,6 +8,8 @@ import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.globalforestwatch.TestEnvironment
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features.{FeatureId, FeatureRDD, FeatureFilter}
+
+object DefaultTag extends Tag("DefaultTag")
 
 class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
   def idn1_5GadmInputTsvPath = getClass.getResource("/idn1_5Gadm.tsv").toString()
@@ -68,7 +71,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
       .csv(path)
   }
 
-  it("matches recorded output for GADM") {
+  it("matches recorded output for GADM", DefaultTag) {
     val gadmDF: DataFrame = AnnualUpdateMinimal(idn1_5GadmInputTsvPath, "gadm")
 
     // Transform results to match expected output
@@ -100,7 +103,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
 
   }
 
-  it("matches recorded output for WDPA") {
+  it("matches recorded output for WDPA", DefaultTag) {
     val wdpaDF: DataFrame = AnnualUpdateMinimal(wdpaInputTsvPath, "wdpa")
 
     // Transform results to match expected output
