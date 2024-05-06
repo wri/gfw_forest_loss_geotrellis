@@ -1,15 +1,13 @@
 package org.globalforestwatch.summarystats.annualupdate_minimal
 
-import org.scalatest.Tag
 import com.github.mrpowers.spark.fast.tests.DataFrameComparer
 import org.apache.spark.rdd.RDD
 import cats.data.NonEmptyList
 import org.apache.spark.sql.{DataFrame, SaveMode}
-import org.globalforestwatch.TestEnvironment
+import org.globalforestwatch.{TestEnvironment, DefaultTag}
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features.{FeatureId, FeatureRDD, FeatureFilter}
 
-object DefaultTag extends Tag("DefaultTag")
 
 class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
   def idn1_5GadmInputTsvPath = getClass.getResource("/idn1_5Gadm.tsv").toString()

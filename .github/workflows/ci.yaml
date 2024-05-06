@@ -23,11 +23,11 @@ jobs:
           aws-region: us-east-1
           role-to-assume: arn:aws:iam::617001639586:role/gfw-data-lake-read
 
-      - name: run annual-update-minimal tests
-        run: ./sbt ++$SCALA_VERSION testOnly -- -n DefaultTag coverageReport coverage
+      - name: run default tests
+        run: ./sbt ++$SCALA_VERSION "testOnly -- -n DefaultTag" coverage coverageReport
 
-      - name: run tests
-        run: ./sbt ++$SCALA_VERSION testOnly -- -l DefaultTag coverageReport coverage
+      - name: run pro tests
+        run: ./sbt ++$SCALA_VERSION "testOnly -- -n ProTag" coverage coverageReport
         env:
           GFW_FEATURE_FLAG: pro
 

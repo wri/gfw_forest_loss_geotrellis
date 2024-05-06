@@ -5,11 +5,12 @@ import org.scalatest.funsuite.AnyFunSuite
 import geotrellis.vector.Point
 import org.globalforestwatch.grids.GridId._
 import org.globalforestwatch.summarystats.annualupdate_minimal.AnnualUpdateMinimalGrid
+import org.globalforestwatch.DefaultTag
 
 
 class AnnualUpdateGridSuits extends AnyFunSuite {
 
-  test("pointGridId") {
+  test("pointGridId", DefaultTag) {
 
     val gridSize = AnnualUpdateMinimalGrid.gridSize
 

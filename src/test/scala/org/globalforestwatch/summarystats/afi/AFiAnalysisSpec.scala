@@ -8,7 +8,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
 import org.apache.spark.sql.{DataFrame, SaveMode}
-import org.globalforestwatch.TestEnvironment
+import org.globalforestwatch.{TestEnvironment, ProTag}
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features.{FeatureFilter, GfwProFeatureId, ValidatedFeatureRDD}
 import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
@@ -54,7 +54,7 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
       .withColumn("location_error", lit(""))
   }
 
-  it("matches recorded output for palm oil mills location 31") {
+  it("matches recorded output for palm oil mills location 31", ProTag) {
     val featureLoc31RDD = ValidatedFeatureRDD(
       NonEmptyList.one(palm32InputTsvPath),
       "gfwpro",

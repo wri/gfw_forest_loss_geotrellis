@@ -10,7 +10,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{IntegerType,BooleanType}
 import org.globalforestwatch.features.{FeatureFilter, ValidatedFeatureRDD}
 import org.globalforestwatch.summarystats.ValidatedLocation
-import org.globalforestwatch.TestEnvironment
+import org.globalforestwatch.{TestEnvironment, ProTag}
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.util.Config
 
@@ -59,7 +59,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       .withColumn("glad_alerts_coverage", col("glad_alerts_coverage").cast(BooleanType))
   }
 
-  it("matches recorded output for dashboard") {
+  it("matches recorded output for dashboard", ProTag) {
     val featureLoc31RDD = ValidatedFeatureRDD(
       NonEmptyList.one(dashInputTsvPath),
       "gfwpro",
