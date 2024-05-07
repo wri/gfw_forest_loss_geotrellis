@@ -10,5 +10,5 @@ case class PlantationsPre2000(gridTile: GridTile, kwargs: Map[String, Any])
   val datasetName = "Na"
 
   val uri: String =
-    s"s3://gfw2-data/climate/carbon_model/other_emissions_inputs/IDN_MYS_plantation_pre_2000/processed/20200724/${gridTile.tileId}_plantation_2000_or_earlier_processed.tif"
+    s"s3://gfw-data-lake/gfw_pre_2000_plantations/v20200724/raw/${gridTile.tileId}_plantation_2000_or_earlier_processed.tif"
 }
