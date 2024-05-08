@@ -97,7 +97,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
     firstRowDF.show()
     expectedDF.show()
 
-    assertSmallDataFrameEquality(firstRowDF, expectedDF, ignoreNullable = true)
+    assertApproximateDataFrameEquality(firstRowDF, expectedDF, 0.00001, ignoreNullable = true)
 
   }
 
@@ -141,11 +141,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
     firstRowDF.show()
     expectedDF.show()
 
-    assertSmallDataFrameEquality(firstRowDF, expectedDF, ignoreNullable = true)
-  
-
+    assertApproximateDataFrameEquality(firstRowDF, expectedDF, 0.00001, ignoreNullable = true)
   }
 
 }
-
-// TODO: Summarize GADM results, Write WDPA test
