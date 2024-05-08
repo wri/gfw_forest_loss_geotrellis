@@ -71,24 +71,35 @@ object RasterCatalog {
     }
   }
 
-  def getLatestVersion(dataset: String, retries: Int = 0): String = {
+  // Internal function to do a "latest" request to the Data API, doing retries
+  // recursively as necessary. Return the JSON response. Throws an exception if there
+  // was no successful response.
+  def getLatestVersionResponse(dataset: String, retries: Int = 0): HttpResponse[String] = {
     val response: HttpResponse[String] = Http(
       s"https://data-api.globalforestwatch.org/dataset/${dataset}/latest"
     ).option(HttpOptions
       .followRedirects(true))
-      .option(HttpOptions.connTimeout(10000))
+      .option(HttpOptions.connTimeout(20000))
       .option(HttpOptions.readTimeout(50000)).asString
 
-    if (!response.isSuccess) {
-      if (retries <= 2) {
-        Thread.sleep(10000)
-        getLatestVersion(dataset, retries + 1)
-      } else {
-        throw new IllegalArgumentException(
-          s"Dataset ${dataset} has no latest version or does not exist. Data API response code: ${response.code}"
-        )
-      }
+    if (response.isSuccess) {
+      response
+    } else if (retries > 2) {
+      // Do 3 total tries to get a successful response, then throw an exception.
+      throw new IllegalArgumentException(
+        s"Problem accessing latest version of dataset ${dataset}. Data API response code: ${response.code}"
+      )
+    } else {
+      // Sleep for ten seconds and then return any successful retry.
+      Thread.sleep(10000)
+      getLatestVersionResponse(dataset, retries + 1)
     }
+  }
+
+  /** Get the latest version of a dataset, by calling the Data API.  Do several retries if there are errors.
+    */
+  def getLatestVersion(dataset: String): String = {
+    val response = getLatestVersionResponse(dataset)
 
     val json: Map[String, Any] = jsonStrToMap(response.body)
 
