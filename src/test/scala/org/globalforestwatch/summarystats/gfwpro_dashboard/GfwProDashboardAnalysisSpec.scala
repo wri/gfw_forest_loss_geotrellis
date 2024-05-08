@@ -58,6 +58,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
     // them to their correct integer/boolean type.
     csvFile.withColumn("status_code", col("status_code").cast(IntegerType))
       .withColumn("glad_alerts_coverage", col("glad_alerts_coverage").cast(BooleanType))
+      .withColumn("integrated_alerts_coverage", col("integrated_alerts_coverage").cast(BooleanType))
   }
 
   it("matches recorded output for dashboard") {

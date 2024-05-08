@@ -164,7 +164,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           // extract year from acq_date column is YYYY-MM-DD
           val acqDate = point.getUserData.asInstanceOf[String].split("\t")(2)
           val alertDate = LocalDate.parse(acqDate)
-          z.merge(GfwProDashboardDataDateCount.fillDaily(Some(alertDate), 1))
+          z.merge(GfwProDashboardDataDateCount.fillDaily(Some(alertDate), true, 1))
         }
         (fid, data)
       }

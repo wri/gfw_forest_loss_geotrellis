@@ -12,6 +12,8 @@ import org.globalforestwatch.layers._
 case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
   val integratedAlerts = IntegratedAlerts(gridTile, kwargs)
   val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
+  val sbtnNaturalForest: SBTNNaturalForests = SBTNNaturalForests(gridTile, kwargs)
+  val jrcForestCover: JRCForestCover = JRCForestCover(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,
@@ -26,8 +28,14 @@ case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, An
       tcd2000Tile <- Either
         .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
         .right
+      sbtnNaturalForestTile <- Either
+        .catchNonFatal(sbtnNaturalForest.fetchWindow(windowKey, windowLayout))
+        .right
+      jrcForestCoverTile <- Either
+        .catchNonFatal(jrcForestCover.fetchWindow(windowKey, windowLayout))
+        .right
     } yield {
-      val tile = GfwProDashboardTile(integratedAlertsTile, tcd2000Tile)
+      val tile = GfwProDashboardTile(integratedAlertsTile, tcd2000Tile, sbtnNaturalForestTile, jrcForestCoverTile)
       Raster(tile, windowKey.extent(windowLayout))
     }
   }

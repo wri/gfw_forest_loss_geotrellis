@@ -10,7 +10,9 @@ import org.globalforestwatch.layers._
   */
 case class GfwProDashboardTile(
   integratedAlerts: IntegratedAlerts#OptionalITile,
-  tcd2000: TreeCoverDensityPercent2000#ITile
+  tcd2000: TreeCoverDensityPercent2000#ITile,
+  sbtnNaturalForest: SBTNNaturalForests#OptionalITile,
+  jrcForestCover: JRCForestCover#OptionalITile
 ) extends CellGrid[Int] {
 
   def cellType: CellType = integratedAlerts.cellType.getOrElse(IntCellType)
