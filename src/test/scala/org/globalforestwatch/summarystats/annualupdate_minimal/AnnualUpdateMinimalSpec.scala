@@ -13,7 +13,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
   def idn1_5GadmInputTsvPath = getClass.getResource("/idn1_5Gadm.tsv").toString()
   def idn1_5GadmExpectedOutputPath = getClass.getResource("/idn1_5Gadm-aum-output").toString()
   def wdpaInputTsvPath = getClass.getResource("/mulanje.tsv").toString()
-  def wdpaOutputPath: String = "output/mulanje"
+  def wdpaOutputPath: String = "output/mulanje-aum-output"
   def wdpaExpectedOutputPath = getClass.getResource("/wdpa-aum-output").toString()
   
   
@@ -52,7 +52,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
       .write
       .mode(SaveMode.Overwrite)
       .options(AnnualUpdateMinimalExport.csvOptions)
-      .csv(path = idn1_5GadmExpectedOutputPath)
+      .csv(path = outputPath)
   }
   
   def readAumResult(path: String) = {
@@ -80,24 +80,23 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
           List($"id.iso" as "iso", $"id.adm1" as "adm1", $"id.adm2" as "adm2")
         )
       )
-    val exportDF: DataFrame = unpackedDF.transform(
-      AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2"))
-    ) 
-    val firstRow = exportDF.limit(1)
+    val exportDF: DataFrame = unpackedDF.transform(AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2"))) 
+    val top20Rows = exportDF.limit(20)
     
     // Export and save results
-    firstRow
+    top20Rows
       .write
       .options(csvOptions)
-      .csv("output/idntest")
+      .csv("output/gadm-aum-output")
+
+    // Uncomment to save new expected results
+    //saveExpectedAumResult(top20Rows, idn1_5GadmExpectedOutputPath)
 
     // Read expected results and compare
-    val expectedDF = readAumResult(idn1_5GadmExpectedOutputPath).limit(1)
-    val firstRowDF = readAumResult("output/idntest")
-    firstRowDF.show()
-    expectedDF.show()
+    val expectedDF = readAumResult(idn1_5GadmExpectedOutputPath)
+    val top20RowsDF = readAumResult("output/gadm-aum-output")
 
-    assertApproximateDataFrameEquality(firstRowDF, expectedDF, 0.00001, ignoreNullable = true)
+    assertApproximateDataFrameEquality(top20RowsDF, expectedDF, 0.00001, ignoreNullable = true)
 
   }
 
@@ -126,22 +125,23 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
           wdpa = true
         )
       )
+    val exportDF = unpackedDF.transform(AnnualUpdateMinimalDF.aggSummary(idCols, wdpa=true))
+    val top20Rows = exportDF.limit(20)
 
-    val exportDF = unpackedDF.transform(AnnualUpdateMinimalDF.aggChange(idCols, wdpa=true))
-    val firstRow = exportDF.limit(1)
     // Export and save results
-    firstRow
+    top20Rows
       .write
       .options(csvOptions)
-      .csv("output/mulanje")
+      .csv("output/wdpa-aum-output")
+
+    // Uncomment to save new expected results
+    //saveExpectedAumResult(top20Rows, wdpaExpectedOutputPath)
 
     // Read expected results and compare
-    val expectedDF = readAumResult(wdpaExpectedOutputPath).limit(1)
-    val firstRowDF = readAumResult("output/mulanje")
-    firstRowDF.show()
-    expectedDF.show()
+    val expectedDF = readAumResult(wdpaExpectedOutputPath)
+    val top20RowsDF = readAumResult("output/wdpa-aum-output")
 
-    assertApproximateDataFrameEquality(firstRowDF, expectedDF, 0.00001, ignoreNullable = true)
+    assertApproximateDataFrameEquality(top20RowsDF, expectedDF, 0.00001, ignoreNullable = true)
   }
 
 }
