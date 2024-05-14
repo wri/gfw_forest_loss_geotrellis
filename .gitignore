@@ -54,5 +54,4 @@ nohup.out
 derby.log
 metastore_db/
 *.log
-input/
-*2350.tsv
+*.tsv

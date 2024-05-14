@@ -8,7 +8,6 @@ import org.globalforestwatch.{TestEnvironment, DefaultTag}
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features.{FeatureId, FeatureRDD, FeatureFilter}
 
-
 class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
   def idn1_5GadmInputTsvPath = getClass.getResource("/idn1_5Gadm.tsv").toString()
   def idn1_5GadmExpectedOutputPath = getClass.getResource("/idn1_5Gadm-aum-output").toString()
@@ -73,6 +72,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
     val gadmDF: DataFrame = AnnualUpdateMinimal(idn1_5GadmInputTsvPath, "gadm")
 
     // Transform results to match expected output
+    // Emulating AnnualUpdateMinimalExport.export_gadm()
     import spark.implicits._
     val unpackedDF = gadmDF      
       .transform(
@@ -81,7 +81,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
         )
       )
     val exportDF: DataFrame = unpackedDF.transform(AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2"))) 
-    val top20Rows = exportDF.limit(20)
+    val top20Rows = exportDF.limit(20) // Due to size of output, compare top 20 rows
     
     // Export and save results
     top20Rows
@@ -104,6 +104,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
     val wdpaDF: DataFrame = AnnualUpdateMinimal(wdpaInputTsvPath, "wdpa")
 
     // Transform results to match expected output
+    // Emulating AnnualUpdateMinimalExport.export_wdpa()
     import spark.implicits._
     val idCols: List[String] = List(
       "wdpa_protected_area__id",
@@ -126,13 +127,13 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
         )
       )
     val exportDF = unpackedDF.transform(AnnualUpdateMinimalDF.aggSummary(idCols, wdpa=true))
-    val top20Rows = exportDF.limit(20)
+    val top20Rows = exportDF.limit(20) // Due to size of output, compare top 20 rows
 
     // Export and save results
     top20Rows
       .write
       .options(csvOptions)
-      .csv("output/wdpa-aum-output")
+      .csv(wdpaOutputPath)
 
     // Uncomment to save new expected results
     //saveExpectedAumResult(top20Rows, wdpaExpectedOutputPath)
