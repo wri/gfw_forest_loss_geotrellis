@@ -12,7 +12,6 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
   def idn1_5GadmInputTsvPath = getClass.getResource("/idn1_5Gadm.tsv").toString()
   def idn1_5GadmExpectedOutputPath = getClass.getResource("/idn1_5Gadm-aum-output").toString()
   def wdpaInputTsvPath = getClass.getResource("/mulanje.tsv").toString()
-  def wdpaOutputPath: String = "output/mulanje-aum-output"
   def wdpaExpectedOutputPath = getClass.getResource("/wdpa-aum-output").toString()
   
   
@@ -133,7 +132,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
     top20Rows
       .write
       .options(csvOptions)
-      .csv(wdpaOutputPath)
+      .csv("output/wdpa-aum-output")
 
     // Uncomment to save new expected results
     //saveExpectedAumResult(top20Rows, wdpaExpectedOutputPath)
