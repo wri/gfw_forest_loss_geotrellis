@@ -11,7 +11,7 @@ import org.apache.spark.sql.types.IntegerType
 import org.globalforestwatch.features.{FeatureFilter, ValidatedFeatureRDD}
 import org.globalforestwatch.features.GfwProFeatureId
 import org.globalforestwatch.summarystats.{JobError, Location, ValidatedLocation}
-import org.globalforestwatch.TestEnvironment
+import org.globalforestwatch.{TestEnvironment, ProTag}
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.layers.ApproxYear
 
@@ -55,7 +55,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
       .withColumn("status_code", col("status_code").cast(IntegerType))
   }
 
-  it("matches recorded output for palm oil mills location 31") {
+  it("matches recorded output for palm oil mills location 31", ProTag) {
     val featureLoc31RDD = ValidatedFeatureRDD(
       NonEmptyList.one(palm32InputTsvPath),
       "gfwpro",
@@ -87,7 +87,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     res.head.isInvalid shouldBe true
   }
 
-  it("gives results for geometries with multiple polygons that don't intersect") {
+  it("gives results for geometries with multiple polygons that don't intersect", ProTag) {
     val featureLoc32RDD = ValidatedFeatureRDD(
       NonEmptyList.one(palm32InputTsvPath),
       "gfwpro",
@@ -115,7 +115,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     res.head.isInvalid shouldBe true
   }
 
-  it("completes without error for list that doesn't intersect TCL at all") {
+  it("completes without error for list that doesn't intersect TCL at all", ProTag) {
     // The antarctica location will be completely removed by splitFeatures, since it
     // doesn't intersect with the TCL extent (which is used as the splitting grid).
     val antRDD = ValidatedFeatureRDD(
@@ -130,7 +130,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     fcdDF.count() shouldBe 0
   }
 
-  it("gives an approx loss year for Argentina location") {
+  it("gives an approx loss year for Argentina location", ProTag) {
     val argentinaRDD = ValidatedFeatureRDD(
       NonEmptyList.one(argentinaInputTsvPath),
       "gfwpro",
@@ -148,7 +148,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     tcl.contains("2017approx") shouldBe true
   }
 
-  it("matches recorded output for location including ARG and BRA") {
+  it("matches recorded output for location including ARG and BRA", ProTag) {
     val argBraRDD = ValidatedFeatureRDD(
       NonEmptyList.one(argBraInputTsvPath),
       "gfwpro",

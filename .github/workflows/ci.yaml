@@ -23,16 +23,13 @@ jobs:
           aws-region: us-east-1
           role-to-assume: arn:aws:iam::617001639586:role/gfw-data-lake-read
 
-      - name: run tests
-        run: ./sbt ++$SCALA_VERSION coverage test coverageReport
+      - name: run default tests
+        run: ./sbt ++$SCALA_VERSION "testOnly -- -n DefaultTag" coverage coverageReport
+
+      - name: run pro tests
+        run: ./sbt ++$SCALA_VERSION "testOnly -- -n ProTag" coverage coverageReport
         env:
           GFW_FEATURE_FLAG: pro
-
-      - name: Run codacy-coverage-reporter
-        uses: codacy/codacy-coverage-reporter-action@master
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: target/scala-2.12/coverage-report/cobertura.xml
 
       - name: Run CodeCOV action
         uses: codecov/codecov-action@v1
