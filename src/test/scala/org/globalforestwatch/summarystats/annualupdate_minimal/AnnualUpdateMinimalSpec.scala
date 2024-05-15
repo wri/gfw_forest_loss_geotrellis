@@ -82,7 +82,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
     val exportDF: DataFrame = unpackedDF.transform(AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2"))) 
     val top20Rows = exportDF.limit(20) // Due to size of output, compare top 20 rows
     
-    // Export and save results
+    // Write results to CSV (ensure that nulls are read the same way as expected results)
     top20Rows
       .write
       .options(csvOptions)
@@ -128,7 +128,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
     val exportDF = unpackedDF.transform(AnnualUpdateMinimalDF.aggSummary(idCols, wdpa=true))
     val top20Rows = exportDF.limit(20) // Due to size of output, compare top 20 rows
 
-    // Export and save results
+    // Write results to CSV (ensure that nulls are read the same way as expected results)
     top20Rows
       .write
       .options(csvOptions)
@@ -143,5 +143,4 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
 
     assertApproximateDataFrameEquality(top20RowsDF, expectedDF, 0.00001, ignoreNullable = true)
   }
-
 }
