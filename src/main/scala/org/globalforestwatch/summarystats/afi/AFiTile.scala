@@ -15,7 +15,9 @@ case class AFiTile(
   gadmAdm0: GadmAdm0#OptionalITile,
   gadmAdm1: GadmAdm1#OptionalITile,
   gadmAdm2: GadmAdm2#OptionalITile,
-  jrcForestCover: JRCForestCover#OptionalITile
+  jrcForestCover: JRCForestCover#OptionalITile,
+  detailedProtectedAreas: DetailedProtectedAreas#OptionalITile,
+  landmark: Landmark#OptionalITile
 ) extends CellGrid[Int] {
 
   def cellType: CellType = treeCoverLoss.cellType

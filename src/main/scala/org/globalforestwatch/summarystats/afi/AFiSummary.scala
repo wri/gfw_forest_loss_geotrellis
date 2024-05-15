@@ -36,6 +36,8 @@ object AFiSummary {
         val naturalForestCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
         val negligibleRisk: String = raster.tile.negligibleRisk.getData(col, row)
         val jrcForestCover: Boolean = raster.tile.jrcForestCover.getData(col, row)
+        val protectedArea: Boolean = raster.tile.detailedProtectedAreas.getData(col, row) != ""
+        val landmark: Boolean = raster.tile.landmark.getData(col, row)
 
         val gadmAdm0: String = raster.tile.gadmAdm0.getData(col, row)
         // Skip processing this pixel if gadmAdm0 is empty
@@ -58,7 +60,7 @@ object AFiSummary {
 
 
         val groupKey = AFiDataGroup(gadmId, lossYearClipped)
-        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0))
+        val summaryData = acc.stats.getOrElse(groupKey, AFiData(0, 0, 0, 0, 0, 0))
         summaryData.total_area__ha += areaHa
 
         if (negligibleRisk == "YES") {
@@ -73,6 +75,13 @@ object AFiSummary {
           summaryData.jrc_forest_cover__extent += areaHa
         }
 
+        if (protectedArea) {
+          summaryData.protected_areas_area__ha += areaHa
+        }
+
+        if (landmark) {
+          summaryData.landmark_area__ha += areaHa
+        }
         val new_stats = acc.stats.updated(groupKey, summaryData)
         acc = AFiSummary(new_stats)
       }

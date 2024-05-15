@@ -99,6 +99,8 @@ object AFiAnalysis extends SummaryAnalysis {
       .withColumn("natural_forest_loss__ha", round($"natural_forest_loss__ha", 4))
       .withColumn("jrc_forest_cover__extent", round($"jrc_forest_cover__extent", 4))
       .withColumn("jrc_forest_cover_loss__ha", round($"jrc_forest_cover_loss__ha", 4))
+      .withColumn("protected_areas_area__ha", round($"protected_areas_area__ha", 4))
+      .withColumn("landmark_area__ha", round($"landmark_area__ha", 4))
       .withColumn("total_area__ha", round($"total_area__ha", 4))
       .withColumn("negligible_risk__percent", round($"negligible_risk__percent", 4))
   }
@@ -109,6 +111,8 @@ object AFiAnalysis extends SummaryAnalysis {
         sum("natural_forest__extent").alias("natural_forest__extent"),
         sum("jrc_forest_cover__extent").alias("jrc_forest_cover__extent"),
         sum("negligible_risk_area__ha").alias("negligible_risk_area__ha"),
+        sum("protected_areas_area__ha").alias("protected_areas_area__ha"),
+        sum("landmark_area__ha").alias("landmark_area__ha"),
         sum("total_area__ha").alias("total_area__ha"),
         max("status_code").alias("status_code"),
         concat_ws(", ", collect_list(when(col("location_error").isNotNull && col("location_error") =!= "", col("location_error")))).alias("location_error")
@@ -126,6 +130,8 @@ object AFiAnalysis extends SummaryAnalysis {
         sum(when(col("loss_year") =!= 0, col("jrc_forest_cover__extent")).otherwise(0.0)).alias("jrc_forest_cover_loss__ha"),
         map_from_arrays(collect_list(when(col("loss_year") =!= 0, col("loss_year"))), collect_list(when(col("loss_year") =!= 0, round(col("jrc_forest_cover__extent"), 4)))).alias("jrc_forest_loss_by_year__ha"),
         sum("negligible_risk_area__ha").alias("negligible_risk_area__ha"),
+        sum("protected_areas_area__ha").alias("protected_areas_area__ha"),
+        sum("landmark_area__ha").alias("landmark_area__ha"),
         sum("total_area__ha").alias("total_area__ha"),
         max("status_code").alias("status_code"),
         concat_ws(", ", collect_list(when(col("location_error").isNotNull && col("location_error") =!= "", col("location_error")))).alias("location_error")

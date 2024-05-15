@@ -17,6 +17,8 @@ case class AFiGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends 
   val gadmAdm1: GadmAdm1 = GadmAdm1(gridTile, kwargs)
   val gadmAdm2: GadmAdm2 = GadmAdm2(gridTile, kwargs)
   val jrcForestCover: JRCForestCover = JRCForestCover(gridTile, kwargs)
+  val detailedProtectedAreas: DetailedProtectedAreas = DetailedProtectedAreas(gridTile, kwargs)
+  val landmark: Landmark = Landmark(gridTile, kwargs)
 
   def readWindow(
     windowKey: SpatialKey,
@@ -32,6 +34,8 @@ case class AFiGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends 
       val adm1Tile = gadmAdm1.fetchWindow(windowKey, windowLayout)
       val adm2Tile = gadmAdm2.fetchWindow(windowKey, windowLayout)
       val jrcForestCoverTile = jrcForestCover.fetchWindow(windowKey, windowLayout)
+      val detailedProtectedAreasTile = detailedProtectedAreas.fetchWindow(windowKey, windowLayout)
+      val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
 
       val tile = AFiTile(
         lossTile,
@@ -40,7 +44,9 @@ case class AFiGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends 
         adm0Tile,
         adm1Tile,
         adm2Tile,
-        jrcForestCoverTile
+        jrcForestCoverTile,
+        detailedProtectedAreasTile,
+        landmarkTile
       )
       Raster(tile, windowKey.extent(windowLayout))
     }
