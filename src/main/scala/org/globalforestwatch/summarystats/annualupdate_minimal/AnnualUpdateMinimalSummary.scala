@@ -7,10 +7,6 @@ import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import org.globalforestwatch.util.Implicits._
 
-import scala.annotation.tailrec
-
-import org.locationtech.jts.index.quadtree.Key
-
 /** LossData Summary by year */
 case class AnnualUpdateMinimalSummary(
                                        stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = Map.empty

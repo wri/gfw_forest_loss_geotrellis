@@ -5,7 +5,7 @@ import com.typesafe.scalalogging.LazyLogging
 import geotrellis.raster._
 import geotrellis.raster.rasterize.Rasterizer
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
-import geotrellis.raster.summary.polygonal.{NoIntersection, PolygonalSummaryResult, Summary => GTSummary}
+import geotrellis.raster.summary.polygonal.{PolygonalSummaryResult, Summary => GTSummary}
 import geotrellis.store.index.zcurve.Z2
 import geotrellis.vector._
 import org.apache.spark.rdd.RDD

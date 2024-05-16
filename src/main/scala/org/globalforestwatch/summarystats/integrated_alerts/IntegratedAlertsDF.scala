@@ -115,7 +115,6 @@ object IntegratedAlertsDF {
                      wdpa: Boolean = false)(df: DataFrame): DataFrame = {
 
     val spark = df.sparkSession
-    import spark.implicits._
 
     val cols =
       if (!wdpa)

@@ -2,8 +2,8 @@ package org.globalforestwatch.summarystats.firealerts
 
 import math.ceil
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
-import org.globalforestwatch.summarystats.{SummaryExport, SummarySparkSession}
-import org.globalforestwatch.util.Util.{countRecordsPerPartition, getAnyMapValue}
+import org.globalforestwatch.summarystats.SummaryExport
+import org.globalforestwatch.util.Util.getAnyMapValue
 
 object FireAlertsExport extends SummaryExport {
 
