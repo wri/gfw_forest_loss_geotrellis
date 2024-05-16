@@ -4,7 +4,6 @@ import org.globalforestwatch.summarystats.SummaryCommand
 import cats.implicits._
 import com.monovore.decline.Opts
 import org.globalforestwatch.features._
-import org.apache.sedona.core.enums.GridType
 import org.globalforestwatch.config.GfwConfig
 
 object FireAlertsCommand extends SummaryCommand {

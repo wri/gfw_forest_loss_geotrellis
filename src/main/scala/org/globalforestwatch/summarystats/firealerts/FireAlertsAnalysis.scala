@@ -29,8 +29,6 @@ object FireAlertsAnalysis extends SummaryAnalysis {
             spark: SparkSession,
             kwargs: Map[String, Any]): Unit = {
 
-    import spark.implicits._
-
     val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
     val layoutDefinition = fireAlertType match {
       case "viirs" | "burned_areas" => ViirsGrid.blockTileGrid

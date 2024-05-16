@@ -1,7 +1,6 @@
 package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
-import org.globalforestwatch.layers.{BooleanLayer, OptionalILayer}
 
 case class PlantationsPre2000(gridTile: GridTile, kwargs: Map[String, Any])
   extends BooleanLayer

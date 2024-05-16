@@ -2,8 +2,6 @@ package org.globalforestwatch.util
 import org.apache.log4j.Logger
 import geotrellis.vector.{GeomFactory, Geometry, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon}
 import geotrellis.vector.io.wkb.WKB
-import org.locationtech.jts.geom
-import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.util.GeotrellisGeometryReducer.{gpr, reduce}
 import org.locationtech.jts.geom.util.GeometryFixer
 

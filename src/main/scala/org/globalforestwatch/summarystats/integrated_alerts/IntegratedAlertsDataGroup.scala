@@ -1,8 +1,5 @@
 package org.globalforestwatch.summarystats.integrated_alerts
 
-import java.time.LocalDate
-
-import org.globalforestwatch.util.Mercantile
 
 case class IntegratedAlertsDataGroup(//gladLAlertDate: Option[String],
                                      gladS2AlertDate: Option[String],

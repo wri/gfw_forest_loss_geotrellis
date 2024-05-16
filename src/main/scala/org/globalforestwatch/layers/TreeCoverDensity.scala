@@ -1,7 +1,6 @@
 package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
-import org.globalforestwatch.config.GfwConfig
 
 trait TreeCoverDensityThreshold extends IntegerLayer with RequiredILayer {
 

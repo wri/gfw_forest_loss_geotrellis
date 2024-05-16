@@ -2,7 +2,6 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
-import java.time.LocalDate
 import org.globalforestwatch.grids.GridId.toGladGridId
 
 

@@ -4,12 +4,10 @@ import cats.implicits._
 import geotrellis.raster.summary.GridVisitor
 import geotrellis.raster._
 import org.globalforestwatch.summarystats.Summary
-import org.globalforestwatch.util.Util.getAnyMapValue
-import org.globalforestwatch.util.{Geodesy, Mercantile}
+import org.globalforestwatch.util.Geodesy
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import scala.annotation.tailrec
 
 /** LossData Summary by year */
 case class IntegratedAlertsSummary(stats: Map[IntegratedAlertsDataGroup, IntegratedAlertsData] = Map.empty)
