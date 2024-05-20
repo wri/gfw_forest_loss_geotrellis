@@ -41,9 +41,8 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
   ): ValidatedWorkflow[Location[JobError],(FeatureId, GfwProDashboardData)] = {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
-    import geotrellis.raster.summary.polygonal._
     val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
-      rdd.collect().foreach {
+      val augRDD = rdd.map {
         case Location(id, geom) => {
           val pt = createPoint(geom.getCentroid.getX, geom.getCentroid.getY)
           val windowLayout = GfwProDashboardGrid.blockTileGrid
@@ -61,24 +60,13 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           //})
           println(s"YYY $id $pt $key $raster $geom")
           println(s"ZZZ ${raster.tile.gadm0.getData(col, row)}.${raster.tile.gadm1.getData(col, row)}.${raster.tile.gadm2.getData(col, row)}")
+          Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId(raster.tile.gadm0.getData(col, row),
+            raster.tile.gadm1.getData(col, row),
+            raster.tile.gadm2.getData(col, row))), geom))
         }
       }
-      val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl, contextualFeatureType, FeatureFilter.empty, "geom", spark)
-      val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
-      val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(rdd, spark)
 
-      /* Enrich the feature RDD by intersecting it with contextual features
-       * The resulting FeatuerId carries combined identity of source fature and contextual geometry
-       */
-      val enrichedRDD =
-        SpatialJoinRDD
-          .flatSpatialJoin(spatialContextualRDD, spatialFeatureRDD, considerBoundaryIntersection = true, usingIndex = true)
-          .rdd
-          .flatMap { case (feature, context) =>
-            refineContextualIntersection(feature, context, contextualFeatureType)
-          }
-
-      ValidatedWorkflow(enrichedRDD)
+      ValidatedWorkflow(augRDD)
         .mapValidToValidated { rdd =>
           rdd.map { case row@Location(fid, geom) =>
             if (geom.isEmpty()) {
