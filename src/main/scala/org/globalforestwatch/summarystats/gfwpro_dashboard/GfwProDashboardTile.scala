@@ -12,7 +12,10 @@ case class GfwProDashboardTile(
   integratedAlerts: IntegratedAlerts#OptionalITile,
   tcd2000: TreeCoverDensityPercent2000#ITile,
   sbtnNaturalForest: SBTNNaturalForests#OptionalITile,
-  jrcForestCover: JRCForestCover#OptionalITile
+  jrcForestCover: JRCForestCover#OptionalITile,
+  gadm0: GadmAdm0#OptionalITile,
+  gadm1: GadmAdm1#OptionalITile,
+  gadm2: GadmAdm2#OptionalITile
 ) extends CellGrid[Int] {
 
   def cellType: CellType = integratedAlerts.cellType.getOrElse(IntCellType)
