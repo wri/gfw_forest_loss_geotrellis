@@ -23,6 +23,8 @@ import java.time.LocalDate
 import org.globalforestwatch.util.IntersectGeometry
 
 import scala.reflect.ClassTag
+import geotrellis.raster.summary.GridVisitor
+import geotrellis.raster.Raster
 
 object GfwProDashboardAnalysis extends SummaryAnalysis {
 
@@ -39,7 +41,28 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
   ): ValidatedWorkflow[Location[JobError],(FeatureId, GfwProDashboardData)] = {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
+    import geotrellis.raster.summary.polygonal._
     val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
+      rdd.collect().foreach {
+        case Location(id, geom) => {
+          val pt = createPoint(geom.getCentroid.getX, geom.getCentroid.getY)
+          val windowLayout = GfwProDashboardGrid.blockTileGrid
+          val key = windowLayout.mapTransform.keysForGeometry(pt).toList.head
+          val rasterSource = GfwProDashboardRDD.getSources(key, windowLayout, kwargs).getOrElse(null)
+          val raster = rasterSource.readWindow(key, windowLayout).getOrElse(null)
+          val re = raster.rasterExtent
+          val col = re.mapXToGrid(pt.getX())
+          val row = re.mapYToGrid(pt.getY())
+          //raster.polygonalSummary(pt, new GridVisitor[Raster[GfwProDashboardTile], Unit] {
+          //  def result:Unit = ()
+          //  def visit(raster: Raster[GfwProDashboardTile], col: Int, row: Int): Unit = {
+          //    println(raster.tile.gadm0.getData(col, row))
+          //  }
+          //})
+          println(s"YYY $id $pt $key $raster $geom")
+          println(s"ZZZ ${raster.tile.gadm0.getData(col, row)}.${raster.tile.gadm1.getData(col, row)}.${raster.tile.gadm2.getData(col, row)}")
+        }
+      }
       val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl, contextualFeatureType, FeatureFilter.empty, "geom", spark)
       val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
       val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(rdd, spark)
