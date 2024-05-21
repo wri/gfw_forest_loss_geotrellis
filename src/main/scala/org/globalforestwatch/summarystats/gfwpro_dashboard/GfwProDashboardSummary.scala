@@ -20,11 +20,21 @@ case class GfwProDashboardSummary(
   }
   def isEmpty = stats.isEmpty
 
-  def toGfwProDashboardData(): GfwProDashboardData = {
+  def toGfwProDashboardData(combineGadm: Boolean): List[GfwProDashboardData] = {
+    if (combineGadm) {
+      List(stats
+        .map { case (group, data) => group.
+          toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
+        .foldLeft(GfwProDashboardData.empty)( _ merge _))
+    } else {
     stats
-      .map { case (group, data) => group.
-        toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
-      .foldLeft(GfwProDashboardData.empty)( _ merge _)
+      .groupBy { case(group, data) => group.gadm_id }
+      .map { case(key, list) =>
+        list.map { case (group, data) => group.
+          toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
+         .foldLeft(GfwProDashboardData.empty)(_ merge _)
+      }.toList
+    }
   }
 }
 
@@ -45,7 +55,16 @@ object GfwProDashboardSummary {
         val naturalForestCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
         val jrcForestCover: Boolean = raster.tile.jrcForestCover.getData(col, row)
 
-        val groupKey = GfwProDashboardRawDataGroup(integratedAlertDateAndConf,
+        val gadmAdm0: String = raster.tile.gadm0.getData(col, row)
+        // Skip processing this pixel if gadmAdm0 is empty
+        if (gadmAdm0 == "") {
+          return
+        }
+        val gadmAdm1: Integer = raster.tile.gadm1.getData(col, row)
+        val gadmAdm2: Integer = raster.tile.gadm2.getData(col, row)
+        val gadmId: String = s"$gadmAdm0.$gadmAdm1.$gadmAdm2"
+
+        val groupKey = GfwProDashboardRawDataGroup(gadmId, integratedAlertDateAndConf,
           integratedAlertCoverage,
           naturalForestCategory == "Natural Forest",
           jrcForestCover,

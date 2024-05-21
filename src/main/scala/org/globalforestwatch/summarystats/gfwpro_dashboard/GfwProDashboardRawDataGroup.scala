@@ -6,6 +6,7 @@ import java.time.LocalDate
 
 
 case class GfwProDashboardRawDataGroup(
+  gadm_id: String,
   alertDateAndConf: Option[(LocalDate, Int)],
   integratedAlertsCoverage: Boolean,
   isNaturalForest: Boolean,
@@ -20,6 +21,7 @@ case class GfwProDashboardRawDataGroup(
       }
 
       GfwProDashboardData(
+        mygadm = gadm_id,
         glad_alerts_coverage = integratedAlertsCoverage,
         integrated_alerts_coverage = integratedAlertsCoverage,
         glad_alerts_daily = GfwProDashboardDataDateCount.fillDaily(alertDate, true, alertCount),

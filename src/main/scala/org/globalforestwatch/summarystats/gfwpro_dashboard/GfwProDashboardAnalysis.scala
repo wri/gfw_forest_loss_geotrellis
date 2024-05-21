@@ -43,7 +43,10 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
     val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
       val augRDD = rdd.map {
-        case Location(id, geom) => {
+        case Location(id@GfwProFeatureId(listId, locationId), geom) => {
+          if (locationId == -1) {
+            Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId("X", 0, 0)), geom))
+          } else {
           val pt = createPoint(geom.getCentroid.getX, geom.getCentroid.getY)
           val windowLayout = GfwProDashboardGrid.blockTileGrid
           val key = windowLayout.mapTransform.keysForGeometry(pt).toList.head
@@ -63,6 +66,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId(raster.tile.gadm0.getData(col, row),
             raster.tile.gadm1.getData(col, row),
             raster.tile.gadm2.getData(col, row))), geom))
+          }
         }
       }
 
@@ -84,7 +88,10 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           ValidatedWorkflow(validatedSummaryStatsRdd).mapValid { summaryStatsRDD =>
             // fold in fireStatsRDD after polygonal summary and accumulate the errors
             summaryStatsRDD
-              .mapValues(_.toGfwProDashboardData())
+              //.flatMapValues(_.toGfwProDashboardData())
+              //.flatMap { case (fid, summary) => summary.toGfwProDashboardData(true).map( x => (fid, x)) }
+              .flatMap { case (combo@CombinedFeatureId(GfwProFeatureId(listId, locationId), gadmId), summary) =>
+                summary.toGfwProDashboardData(locationId != -1).map( x => Location(combo, x)) }
               .leftOuterJoin(fireStatsRDD)
               .mapValues { case (data, fire) =>
                 data.copy(viirs_alerts_daily = fire.getOrElse(GfwProDashboardDataDateCount.empty))
