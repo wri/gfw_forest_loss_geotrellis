@@ -90,8 +90,17 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
             summaryStatsRDD
               //.flatMapValues(_.toGfwProDashboardData())
               //.flatMap { case (fid, summary) => summary.toGfwProDashboardData(true).map( x => (fid, x)) }
-              .flatMap { case (combo@CombinedFeatureId(GfwProFeatureId(listId, locationId), gadmId), summary) =>
-                summary.toGfwProDashboardData(locationId != -1).map( x => Location(combo, x)) }
+              .flatMap { case (CombinedFeatureId(fid@GfwProFeatureId(listId, locationId), gadmId), summary) =>
+                summary.toGfwProDashboardData(locationId != -1).map( x => {
+                  val newx = if (locationId == -1) {
+                    x
+                  } else {
+                    x.copy(mygadm = gadmId.toString)
+                  }
+                  Location(fid, newx)
+                }
+                )
+              }
               .leftOuterJoin(fireStatsRDD)
               .mapValues { case (data, fire) =>
                 data.copy(viirs_alerts_daily = fire.getOrElse(GfwProDashboardDataDateCount.empty))
