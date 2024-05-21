@@ -5,6 +5,8 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.globalforestwatch.features.{CombinedFeatureId, FeatureId, GadmFeatureId, GfwProFeatureId}
 import org.globalforestwatch.summarystats._
 import cats.data.Validated.{Valid, Invalid}
+import org.apache.spark.sql.functions.expr
+import org.globalforestwatch.summarystats.SummaryDF.RowId
 
 object GfwProDashboardDF extends SummaryDF {
   case class RowGadmId(list_id: String, location_id: String, gadm_id: String)
@@ -15,11 +17,9 @@ object GfwProDashboardDF extends SummaryDF {
   ): DataFrame = {
     import spark.implicits._
 
-    val rowId: FeatureId => RowGadmId = {
-      case CombinedFeatureId(proId: GfwProFeatureId, gadmId: GadmFeatureId) =>
-        RowGadmId(proId.listId, proId.locationId.toString, gadmId.toString())
+    val rowId: FeatureId => RowId = {
       case proId: GfwProFeatureId =>
-        RowGadmId(proId.listId, proId.locationId.toString, "none")
+        RowId(proId.listId, proId.locationId.toString)
       case _ =>
         throw new IllegalArgumentException("Not a CombinedFeatureId[GfwProFeatureId, GadmFeatureId]")
     }
@@ -30,7 +30,8 @@ object GfwProDashboardDF extends SummaryDF {
         (rowId(id), SummaryDF.RowError.fromJobError(err), GfwProDashboardData.empty)
     }
     .toDF("id", "error", "data")
-    .select($"id.*", $"error.*", $"data.*")
+    .select($"id.*", expr("data.mygadm as gadm_id"), $"error.*", $"data.*")
+    .drop($"mygadm")
   }
 
   def getFeatureDataFrame(
