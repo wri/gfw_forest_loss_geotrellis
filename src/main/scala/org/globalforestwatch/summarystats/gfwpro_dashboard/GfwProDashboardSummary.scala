@@ -8,32 +8,33 @@ import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import java.time.LocalDate
 
-/** LossData Summary by year */
 case class GfwProDashboardSummary(
                                    stats: Map[GfwProDashboardRawDataGroup, GfwProDashboardRawData] = Map.empty
                                  ) extends Summary[GfwProDashboardSummary] {
 
-  /** Combine two Maps and combine their LossData when a year is present in both */
   def merge(other: GfwProDashboardSummary): GfwProDashboardSummary = {
-    // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
+    // the stats.combine method uses GfwProDashboardRawData.lossDataSemigroup
+    // instance to perform per value combine on the map
     GfwProDashboardSummary(stats.combine(other.stats))
   }
   def isEmpty = stats.isEmpty
 
-  def toGfwProDashboardData(combineGadm: Boolean): List[GfwProDashboardData] = {
-    if (combineGadm) {
+  def toGfwProDashboardData(ignoreGadm: Boolean): List[GfwProDashboardData] = {
+    if (ignoreGadm) {
+      // Combine all GfwProDashboardData results ignoring different groupGadmIds.
       List(stats
         .map { case (group, data) => group.
           toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
         .foldLeft(GfwProDashboardData.empty)( _ merge _))
     } else {
-    stats
-      .groupBy { case(group, data) => group.gadm_id }
-      .map { case(key, list) =>
-        list.map { case (group, data) => group.
-          toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
-         .foldLeft(GfwProDashboardData.empty)(_ merge _)
-      }.toList
+      // Combine all GfwProDashboardData results into separate rows based on groupGadmI
+      stats
+        .groupBy { case(group, data) => group.groupGadmId }
+        .map { case(key, list) =>
+          list.map { case (group, data) => group.
+            toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
+            .foldLeft(GfwProDashboardData.empty)(_ merge _)
+        }.toList
     }
   }
 }

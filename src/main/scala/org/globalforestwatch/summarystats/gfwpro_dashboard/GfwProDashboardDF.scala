@@ -9,7 +9,6 @@ import org.apache.spark.sql.functions.expr
 import org.globalforestwatch.summarystats.SummaryDF.RowId
 
 object GfwProDashboardDF extends SummaryDF {
-  case class RowGadmId(list_id: String, location_id: String, gadm_id: String)
 
   def getFeatureDataFrameFromVerifiedRdd(
     dataRDD: RDD[ValidatedLocation[GfwProDashboardData]],
@@ -30,29 +29,8 @@ object GfwProDashboardDF extends SummaryDF {
         (rowId(id), SummaryDF.RowError.fromJobError(err), GfwProDashboardData.empty)
     }
     .toDF("id", "error", "data")
-    .select($"id.*", expr("data.mygadm as gadm_id"), $"error.*", $"data.*")
-    .drop($"mygadm")
-  }
-
-  def getFeatureDataFrame(
-    dataRDD: RDD[(FeatureId, ValidatedRow[GfwProDashboardData])],
-    spark: SparkSession
-  ): DataFrame = {
-    import spark.implicits._
-
-    dataRDD.mapValues {
-      case Valid(data) =>
-        (SummaryDF.RowError.empty, data)
-      case Invalid(err) =>
-        (SummaryDF.RowError.fromJobError(err), GfwProDashboardData.empty)
-    }.map {
-      case (CombinedFeatureId(proId: GfwProFeatureId, gadmId: GadmFeatureId), (error, data)) =>
-        val rowId = RowGadmId(proId.listId, proId.locationId.toString, gadmId.toString())
-        (rowId, error, data)
-      case _ =>
-        throw new IllegalArgumentException("Not a CombinedFeatureId[GfwProFeatureId, GadmFeatureId]")
-    }
-    .toDF("id", "error", "data")
-    .select($"id.*", $"error.*", $"data.*")
+    // Put data.group_gadm_id right after list/location and rename to gadm_id
+    .select($"id.*", expr("data.group_gadm_id as gadm_id"), $"error.*", $"data.*")
+    .drop($"group_gadm_id")
   }
 }

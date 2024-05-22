@@ -2,8 +2,6 @@ package org.globalforestwatch.summarystats.gfwpro_dashboard
 
 import cats.data.{NonEmptyList, Validated}
 import geotrellis.vector.{Feature, Geometry}
-import geotrellis.store.index.zcurve.Z2
-import org.apache.spark.HashPartitioner
 import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats._
 import org.globalforestwatch.util.GeometryConstructor.createPoint
@@ -14,17 +12,10 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
 import org.globalforestwatch.features.FeatureId
-import org.apache.sedona.sql.utils.Adapter
 import org.apache.sedona.core.spatialRDD.SpatialRDD
-import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 
 import scala.collection.JavaConverters._
 import java.time.LocalDate
-import org.globalforestwatch.util.IntersectGeometry
-
-import scala.reflect.ClassTag
-import geotrellis.raster.summary.GridVisitor
-import geotrellis.raster.Raster
 
 object GfwProDashboardAnalysis extends SummaryAnalysis {
 
@@ -42,35 +33,32 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
     val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
-      val augRDD = rdd.map {
+      val enrichedRDD = rdd.map {
         case Location(id@GfwProFeatureId(listId, locationId), geom) => {
-          if (locationId == -1) {
-            Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId("X", 0, 0)), geom))
+          if (locationId != -1) {
+            // For a non-dissolved location, determine the GadmFeatureId for the
+            // centroid of the location's geometry, and add that to the feature id.
+            val pt = createPoint(geom.getCentroid.getX, geom.getCentroid.getY)
+            val windowLayout = GfwProDashboardGrid.blockTileGrid
+            val key = windowLayout.mapTransform.keysForGeometry(pt).toList.head
+            val rasterSource = GfwProDashboardRDD.getSources(key, windowLayout, kwargs).getOrElse(null)
+            val raster = rasterSource.readWindow(key, windowLayout).getOrElse(null)
+            val re = raster.rasterExtent
+            val col = re.mapXToGrid(pt.getX())
+            val row = re.mapYToGrid(pt.getY())
+            //println(s"YYY $id $pt $key $raster $geom")
+            //println(s"ZZZ ${raster.tile.gadm0.getData(col, row)}.${raster.tile.gadm1.getData(col, row)}.${raster.tile.gadm2.getData(col, row)}")
+            Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId(raster.tile.gadm0.getData(col, row),
+              raster.tile.gadm1.getData(col, row),
+              raster.tile.gadm2.getData(col, row))), geom))
           } else {
-          val pt = createPoint(geom.getCentroid.getX, geom.getCentroid.getY)
-          val windowLayout = GfwProDashboardGrid.blockTileGrid
-          val key = windowLayout.mapTransform.keysForGeometry(pt).toList.head
-          val rasterSource = GfwProDashboardRDD.getSources(key, windowLayout, kwargs).getOrElse(null)
-          val raster = rasterSource.readWindow(key, windowLayout).getOrElse(null)
-          val re = raster.rasterExtent
-          val col = re.mapXToGrid(pt.getX())
-          val row = re.mapYToGrid(pt.getY())
-          //raster.polygonalSummary(pt, new GridVisitor[Raster[GfwProDashboardTile], Unit] {
-          //  def result:Unit = ()
-          //  def visit(raster: Raster[GfwProDashboardTile], col: Int, row: Int): Unit = {
-          //    println(raster.tile.gadm0.getData(col, row))
-          //  }
-          //})
-          println(s"YYY $id $pt $key $raster $geom")
-          println(s"ZZZ ${raster.tile.gadm0.getData(col, row)}.${raster.tile.gadm1.getData(col, row)}.${raster.tile.gadm2.getData(col, row)}")
-          Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId(raster.tile.gadm0.getData(col, row),
-            raster.tile.gadm1.getData(col, row),
-            raster.tile.gadm2.getData(col, row))), geom))
+            // For a dissolved location, add a dummy GadmFeatureId to the feature id.
+            Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId("X", 0, 0)), geom))
           }
         }
       }
 
-      ValidatedWorkflow(augRDD)
+      ValidatedWorkflow(enrichedRDD)
         .mapValidToValidated { rdd =>
           rdd.map { case row@Location(fid, geom) =>
             if (geom.isEmpty()) {
@@ -86,21 +74,26 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           val tmp = enrichedRDD.map { case Location(id, geom) => Feature(geom, id) }
           val validatedSummaryStatsRdd = GfwProDashboardRDD(tmp, GfwProDashboardGrid.blockTileGrid, kwargs)
           ValidatedWorkflow(validatedSummaryStatsRdd).mapValid { summaryStatsRDD =>
-            // fold in fireStatsRDD after polygonal summary and accumulate the errors
             summaryStatsRDD
               //.flatMapValues(_.toGfwProDashboardData())
               //.flatMap { case (fid, summary) => summary.toGfwProDashboardData(true).map( x => (fid, x)) }
+              // 
               .flatMap { case (CombinedFeatureId(fid@GfwProFeatureId(listId, locationId), gadmId), summary) =>
+                // For non-dissolved locations, merge all summaries ignoring any
+                // differing gadmId, and move the gadmId from the centroid into the
+                // group_gadm_id. For dissolved locations, merge summaries into multiple
+                // rows based on the group (per-pixel) gadmId.
                 summary.toGfwProDashboardData(locationId != -1).map( x => {
                   val newx = if (locationId == -1) {
                     x
                   } else {
-                    x.copy(mygadm = gadmId.toString)
+                    x.copy(group_gadm_id = gadmId.toString)
                   }
                   Location(fid, newx)
                 }
                 )
               }
+              // fold in fireStatsRDD after polygonal summary and accumulate the errors
               .leftOuterJoin(fireStatsRDD)
               .mapValues { case (data, fire) =>
                 data.copy(viirs_alerts_daily = fire.getOrElse(GfwProDashboardDataDateCount.empty))
@@ -110,64 +103,6 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     }
     summaryRDD
 
-  }
-
-  /** These geometries touch, apply application specific logic of how to treat that.
-    *   - For intersection of location geometries only keep those where centroid of location is in the contextual geom (this ensures that
-    *     any location is only assigned to a single contextual area even if it intersects more)
-    *   - For dissolved geometry of list report all contextual areas it intersects
-    */
-  private def refineContextualIntersection(
-    featureGeom: Geometry,
-    contextualGeom: Geometry,
-    contextualFeatureType: String
-  ): List[ValidatedLocation[Geometry]] = {
-    val featureId = featureGeom.getUserData.asInstanceOf[FeatureId]
-    val contextualId = FeatureId.fromUserData(contextualFeatureType, contextualGeom.getUserData.asInstanceOf[String], delimiter = ",")
-
-    featureId match {
-      case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>
-        val featureCentroid = createPoint(featureGeom.getCentroid.getX, featureGeom.getCentroid.getY)
-        if (contextualGeom.contains(featureCentroid)) {
-          val fid = CombinedFeatureId(gfwproId, contextualId)
-          // val gtGeom: Geometry = toGeotrellisGeometry(featureGeom)
-          val fixedGeom = makeValidGeom(featureGeom)
-          List(Validated.Valid(Location(fid, fixedGeom)))
-        } else Nil
-
-      case gfwproId: GfwProFeatureId if gfwproId.locationId < 0 =>
-        IntersectGeometry
-          .validatedIntersection(featureGeom, contextualGeom)
-          .leftMap { err => Location(featureId, err) }
-          .map { geometries =>
-            geometries.map { geom =>
-              // val gtGeom: Geometry = toGeotrellisGeometry(geom)
-              val fixedGeom = makeValidGeom(geom)
-              Location(CombinedFeatureId(gfwproId, contextualId), fixedGeom)
-            }
-          }
-          .traverse(identity) // turn validated list of geometries into list of validated geometries
-    }
-  }
-
-  private def partitionByZIndex[A: ClassTag](rdd: RDD[A])(getGeom: A => Geometry): RDD[A] = {
-    val hashPartitioner = new HashPartitioner(rdd.getNumPartitions)
-
-    rdd
-      .keyBy({ row =>
-        val geom = getGeom(row)
-        Z2(
-          (geom.getCentroid.getX * 100).toInt,
-          (geom.getCentroid.getY * 100).toInt
-        ).z
-      })
-      .partitionBy(hashPartitioner)
-      .mapPartitions(
-        { iter: Iterator[(Long, A)] =>
-          for (i <- iter) yield i._2
-        },
-        preservesPartitioning = true
-      )
   }
 
   private def fireStats(
