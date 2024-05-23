@@ -75,12 +75,14 @@ object RasterCatalog {
   // recursively as necessary. Return the JSON response. Throws an exception if there
   // was no successful response.
   def getLatestVersionResponse(dataset: String, retries: Int = 0): HttpResponse[String] = {
+    println("Sending data API 'latest' request")
     val response: HttpResponse[String] = Http(
       s"https://data-api.globalforestwatch.org/dataset/${dataset}/latest"
     ).option(HttpOptions
       .followRedirects(true))
       .option(HttpOptions.connTimeout(20000))
       .option(HttpOptions.readTimeout(50000)).asString
+    println("Got data API response")
 
     if (response.isSuccess) {
       response
@@ -90,6 +92,7 @@ object RasterCatalog {
         s"Problem accessing latest version of dataset ${dataset}. Data API response code: ${response.code}"
       )
     } else {
+      println(s"Retrying after problem accessing latest version of dataset ${dataset}. Data API response code: ${response.code}")
       // Sleep for ten seconds and then return any successful retry.
       Thread.sleep(10000)
       getLatestVersionResponse(dataset, retries + 1)

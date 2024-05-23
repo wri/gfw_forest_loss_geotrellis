@@ -7,7 +7,8 @@ import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats.afi.AFiAnalysis.getOutputUrl
 import cats.data.Validated.Valid
-
+import org.globalforestwatch.util.Config
+import cats.data.NonEmptyList
 
 object AFiCommand extends SummaryCommand {
   // Current range of years for UMD tree cover loss to include and break out during AFi analysis.
@@ -26,7 +27,8 @@ object AFiCommand extends SummaryCommand {
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "overwriteOutput" -> default.overwriteOutput,
-        "config" -> GfwConfig.get()
+        // Pin the version of gfw_integrated_alerts, so we don't make a data API request for 'latest'
+        "config" -> GfwConfig.get(Some(NonEmptyList.one(Config("gfw_integrated_alerts", "v20231121"))))
       )
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
