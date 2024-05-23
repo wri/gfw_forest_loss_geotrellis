@@ -12,7 +12,9 @@ class GladAlertsSuits extends AnyFunSuite {
 
   private val fullDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-  val glad = new GladAlerts(GridTile(10, 40000, 400, "10N_010E"), Map("config" -> GfwConfig.get()))
+  // Don't do GladAlerts initialization unless we are really running a DefaultTag test,
+  // since we don't have glad_alerts dataset in Pro's raster-catalog-pro.json file.
+  lazy val glad = new GladAlerts(GridTile(10, 40000, 400, "10N_010E"), Map("config" -> GfwConfig.get()))
 
   test("Unconfirmed date 1", DefaultTag) {
     assert(

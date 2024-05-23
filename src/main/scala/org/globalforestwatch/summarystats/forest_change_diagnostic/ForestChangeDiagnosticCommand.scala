@@ -9,6 +9,7 @@ import com.typesafe.scalalogging.LazyLogging
 import org.globalforestwatch.summarystats.ValidatedLocation
 import org.apache.spark.rdd.RDD
 import org.globalforestwatch.config.GfwConfig
+import org.globalforestwatch.util.Config
 
 object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
   // Current range of years for UMD tree cover loss and country-specific tree cover loss.
@@ -37,7 +38,8 @@ object ForestChangeDiagnosticCommand extends SummaryCommand with LazyLogging {
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "overwriteOutput" -> default.overwriteOutput,
-        "config" -> GfwConfig.get()
+        // Pin the version of gfw_integrated_alerts, so we don't make a data API request for 'latest'
+        "config" -> GfwConfig.get(Some(NonEmptyList.one(Config("gfw_integrated_alerts", "v20231121"))))
       )
 
       if (!default.splitFeatures) logger.warn("Forcing splitFeatures = true")

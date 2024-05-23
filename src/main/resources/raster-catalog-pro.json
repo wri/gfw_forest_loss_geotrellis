@@ -197,10 +197,6 @@
       "source_uri":"s3://gfw-data-lake/gfwpro_peatlands/v2019/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
-      "name":"umd_glad_landsat_alerts",
-      "source_uri":"s3://gfw-data-lake/umd_glad_landsat_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/gdal-geotiff/{tile_id}.tif"
-    },
-    {
       "name":"gfw_plantations",
       "source_uri":"s3://gfw-data-lake/gfw_plantations/v1.3/raster/epsg-4326/{grid_size}/{row_count}/type/gdal-geotiff/{tile_id}.tif"
     },
