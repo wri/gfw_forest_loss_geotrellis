@@ -1,2 +1,0 @@
-list_id	location_id	gadm_id	natural_forest__extent	natural_forest_loss__ha	natural_forest_loss_by_year__ha	jrc_forest_cover__extent	jrc_forest_cover_loss__ha	jrc_forest_loss_by_year__ha	total_area__ha	status_code	location_error	negligible_risk__percent
-1	31		19553.3958	485.8991	{"2021":181.7124,"2022":138.1413,"2023":166.0455}	31135.7425	1182.3486	{"2021":346.5172,"2022":362.7685,"2023":473.0629}	125582.722	2		0.0

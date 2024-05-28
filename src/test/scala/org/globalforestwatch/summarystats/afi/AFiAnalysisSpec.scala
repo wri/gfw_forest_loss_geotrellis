@@ -50,7 +50,7 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
       ))
       .csv(palm32ExpectedOutputPath)
       .withColumn("status_code", col("status_code").cast(IntegerType))
-      .withColumn("gadm_id", lit(""))
+      .withColumn("gadm_id", when(col("gadm_id").isNull, lit("")).otherwise(col("gadm_id")))
       .withColumn("location_error", lit(""))
   }
 
@@ -64,7 +64,21 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
       case Validated.Valid(Location(GfwProFeatureId(_, 31), _)) => true
       case _ => false
     }
-    val afiDF = AFI(featureLoc31RDD)
+
+    // Duplicate the single feature row, but change the location id to -1, so it is
+    // the dissolved summary. This exercises the code that creates extra dissolved
+    // result rows, including by gadm_id.
+    val augRDD = featureLoc31RDD.mapPartitions {partition => 
+      val data = partition.toList
+      (data ++ data.map { row =>
+        row match {
+          case Validated.Valid(Location(GfwProFeatureId(listId, locationId), geom)) => Validated.Valid(Location(GfwProFeatureId(listId, -1), geom))
+          case r => r
+        }
+      }).iterator
+    }
+
+    val afiDF = AFI(augRDD)
     //saveExpectedAFiResult(afiDF)
 
     val expectedDF = readExpectedAFiResult
