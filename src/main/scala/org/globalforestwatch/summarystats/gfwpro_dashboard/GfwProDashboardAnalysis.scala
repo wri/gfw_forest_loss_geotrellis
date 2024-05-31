@@ -32,7 +32,12 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
   ): ValidatedWorkflow[Location[JobError],(FeatureId, GfwProDashboardData)] = {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
-    val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
+    println(s"XXX ${featureRDD.getNumPartitions}")
+    featureRDD.glom().map(_.size).collect().foreach(println)
+    val xxRDD = featureRDD.repartition(spark.sparkContext.defaultParallelism)
+    println(s"YYY ${xxRDD.getNumPartitions}")
+    xxRDD.glom().map(_.size).collect().foreach(println)
+    val summaryRDD = ValidatedWorkflow(xxRDD).flatMap { rdd =>
       val enrichedRDD = rdd.map {
         case Location(id@GfwProFeatureId(listId, locationId), geom) => {
           if (locationId != -1) {
