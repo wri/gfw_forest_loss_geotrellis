@@ -16,6 +16,9 @@ import org.apache.sedona.core.spatialRDD.SpatialRDD
 
 import scala.collection.JavaConverters._
 import java.time.LocalDate
+import org.locationtech.jts.geom.Point
+
+case class PointFeatureId(pt: Point) extends FeatureId
 
 object GfwProDashboardAnalysis extends SummaryAnalysis {
 
@@ -44,21 +47,11 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
             // For a non-dissolved location, determine the GadmFeatureId for the
             // centroid of the location's geometry, and add that to the feature id.
             val pt = createPoint(geom.getCentroid.getX, geom.getCentroid.getY)
-            val windowLayout = GfwProDashboardGrid.blockTileGrid
-            val key = windowLayout.mapTransform.keysForGeometry(pt).toList.head
-            val rasterSource = GfwProDashboardRDD.getSources(key, windowLayout, kwargs).getOrElse(null)
-            val raster = rasterSource.readWindow(key, windowLayout).getOrElse(null)
-            val re = raster.rasterExtent
-            val col = re.mapXToGrid(pt.getX())
-            val row = re.mapYToGrid(pt.getY())
-            //println(s"YYY $id $pt $key $raster $geom")
-            //println(s"ZZZ ${raster.tile.gadm0.getData(col, row)}.${raster.tile.gadm1.getData(col, row)}.${raster.tile.gadm2.getData(col, row)}")
-            Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId(raster.tile.gadm0.getData(col, row),
-              raster.tile.gadm1.getData(col, row),
-              raster.tile.gadm2.getData(col, row))), geom))
+            //println(s"Loc ${id}, centroid ${pt}")
+            Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, PointFeatureId(pt)), geom))
           } else {
             // For a dissolved location, add a dummy GadmFeatureId to the feature id.
-            Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId("X", 0, 0)), geom))
+            Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, PointFeatureId(createPoint(0, 0))), geom))
           }
         }
       }
@@ -88,15 +81,8 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
                 // differing gadmId, and move the gadmId from the centroid into the
                 // group_gadm_id. For dissolved locations, merge summaries into multiple
                 // rows based on the group (per-pixel) gadmId.
-                summary.toGfwProDashboardData(locationId != -1).map( x => {
-                  val newx = if (locationId == -1) {
-                    x
-                  } else {
-                    x.copy(group_gadm_id = gadmId.toString)
-                  }
-                  Location(fid, newx)
-                }
-                )
+                summary.toGfwProDashboardData(locationId != -1).map( x => Location(fid, x))
+                case _ => throw new NotImplementedError("Missing case")
               }
               // fold in fireStatsRDD after polygonal summary and accumulate the errors
               .leftOuterJoin(fireStatsRDD)

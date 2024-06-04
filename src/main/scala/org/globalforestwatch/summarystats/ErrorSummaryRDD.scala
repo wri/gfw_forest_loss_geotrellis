@@ -110,7 +110,8 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
                           raster,
                           feature.geom,
                           ErrorSummaryRDD.rasterizeOptions,
-                          kwargs)
+                          // Pass in the featureId to the getGridVisitor function
+                          Map[String, Any]("featureId" ->  id))
                       }.left.map{
                         // TODO: these should be moved into left side of PolygonalSummaryResult in GT
                         case ise: java.lang.IllegalStateException =>

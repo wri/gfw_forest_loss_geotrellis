@@ -51,7 +51,12 @@ case class GfwProDashboardData(
 
   def merge(other: GfwProDashboardData): GfwProDashboardData = {
     GfwProDashboardData(
-      if (group_gadm_id != "") group_gadm_id else other.group_gadm_id,
+      if (group_gadm_id != "") {
+        assert(other.group_gadm_id == "" || other.group_gadm_id == group_gadm_id)
+        group_gadm_id
+      }
+      else
+        other.group_gadm_id,
       glad_alerts_coverage || other.glad_alerts_coverage,
       integrated_alerts_coverage || other.integrated_alerts_coverage,
       total_ha.merge(other.total_ha),

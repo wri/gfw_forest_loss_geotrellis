@@ -7,6 +7,8 @@ import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import java.time.LocalDate
+import org.globalforestwatch.features.CombinedFeatureId
+import org.globalforestwatch.features.GfwProFeatureId
 
 case class GfwProDashboardSummary(
                                    stats: Map[GfwProDashboardRawDataGroup, GfwProDashboardRawData] = Map.empty
@@ -49,21 +51,35 @@ object GfwProDashboardSummary {
       def result: GfwProDashboardSummary = acc
 
       def visit(raster: Raster[GfwProDashboardTile], col: Int, row: Int): Unit = {
+        val re: RasterExtent = raster.rasterExtent
+        val anyFid = kwargs("featureId")
+        val CombinedFeatureId(fid@GfwProFeatureId(listId, locId), PointFeatureId(pt)) = anyFid
+        // For locId == -1, compute gadmId exactly from the current pixel. For locId
+        // != -1, if the locations centroid maps directly to this pixel, then return
+        // gadmId for this pixel. But if it doesn't match the current pixel, just
+        // return "". (I.e. we only want the gadmId for the centroid for any
+        // locations with locId != -1).
+        val gadmId: String =
+          if (locId == -1 || (re.mapXToGrid(pt.getX()) == col && re.mapYToGrid(pt.getY()) == row)) {
+            val gadmAdm0: String = raster.tile.gadm0.getData(col, row)
+            if (gadmAdm0 == "") {
+              return
+            }
+            val gadmAdm1: Integer = raster.tile.gadm1.getData(col, row)
+            val gadmAdm2: Integer = raster.tile.gadm2.getData(col, row)
+            val x = s"$gadmAdm0.$gadmAdm1.$gadmAdm2"
+            //if (locId != -1) { println(s"Got match loc ${locId}, (${row}, ${col}), ${x}") }
+            x
+          } else {
+            ""
+          }
+
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val integratedAlertDateAndConf: Option[(LocalDate, Int)] = raster.tile.integratedAlerts.getData(col, row)
         val integratedAlertCoverage = raster.tile.integratedAlerts.t.isDefined
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
         val naturalForestCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
         val jrcForestCover: Boolean = raster.tile.jrcForestCover.getData(col, row)
-
-        val gadmAdm0: String = raster.tile.gadm0.getData(col, row)
-        // Skip processing this pixel if gadmAdm0 is empty
-        if (gadmAdm0 == "") {
-          return
-        }
-        val gadmAdm1: Integer = raster.tile.gadm1.getData(col, row)
-        val gadmAdm2: Integer = raster.tile.gadm2.getData(col, row)
-        val gadmId: String = s"$gadmAdm0.$gadmAdm1.$gadmAdm2"
 
         val groupKey = GfwProDashboardRawDataGroup(gadmId, integratedAlertDateAndConf,
           integratedAlertCoverage,
@@ -72,7 +88,6 @@ object GfwProDashboardSummary {
           isTreeCoverExtent30)
         val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(treeCoverExtentArea = 0.0, alertCount = 0))
 
-        val re: RasterExtent = raster.rasterExtent
         val areaHa = Geodesy.pixelArea(lat = re.gridRowToMap(row), re.cellSize) / 10000.0
         summaryData.treeCoverExtentArea += areaHa
 
