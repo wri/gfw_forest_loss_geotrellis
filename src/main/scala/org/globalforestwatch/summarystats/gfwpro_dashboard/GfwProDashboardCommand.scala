@@ -46,7 +46,7 @@ object GfwProDashboardCommand extends SummaryCommand {
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
       runAnalysis { implicit spark =>
-        val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures)
+        val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, default.splitFeatures, gfwProAddCentroid = true)
 
         val fireAlertRDD = fireAlert.alertSource match {
           case Some(alertSource) =>

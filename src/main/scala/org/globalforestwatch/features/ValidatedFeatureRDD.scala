@@ -14,6 +14,7 @@ import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
 import org.globalforestwatch.util.{GridRDD, SpatialJoinRDD}
 import org.globalforestwatch.util.IntersectGeometry.validatedIntersection
 import org.locationtech.jts.geom._
+import org.globalforestwatch.util.GeometryConstructor.createPoint
 
 object ValidatedFeatureRDD {
   val logger = Logger.getLogger("FeatureRDD")
@@ -22,18 +23,21 @@ object ValidatedFeatureRDD {
    * Reads features from source and optionally splits them by 1x1 degree grid.
    * - If the feature WKB is invalid, the feature will be dropped
    * - If there is a problem with intersection logic, the erroring feature id will propagate to output
+    *  If gfwProAddCentroid is true, then add the centroid of GFWPro location to the
+    *  featureId if its locationId is not -1.  This is used for GFWProDashboard.
    */
   def apply(
     input: NonEmptyList[String],
     featureType: String,
     filters: FeatureFilter,
-    splitFeatures: Boolean
+    splitFeatures: Boolean,
+    gfwProAddCentroid: Boolean = false
   )(implicit spark: SparkSession): RDD[ValidatedLocation[Geometry]] = {
 
     if (splitFeatures) {
       val featureObj: Feature = Feature(featureType)
       val featureDF: DataFrame = SpatialFeatureDF.applyValidated(input, featureObj, filters, "geom", spark)
-      splitGeometries(featureType, featureDF, spark)
+      splitGeometries(featureType, featureDF, spark, gfwProAddCentroid)
     } else {
       val featureObj: Feature = Feature(featureType)
       val featuresDF: DataFrame = FeatureDF(input, featureObj, filters, spark)
@@ -57,7 +61,8 @@ object ValidatedFeatureRDD {
   private def splitGeometries(
                                featureType: String,
                                featureDF: DataFrame,
-                               spark: SparkSession
+                               spark: SparkSession,
+                               gfwProAddCentroid: Boolean
                              ): RDD[ValidatedLocation[Geometry]] = {
     // "polyshape" is the geometry column in featureDF, as created by
     // SpatialFeatureDF.applyValidated
@@ -67,7 +72,18 @@ object ValidatedFeatureRDD {
     // Switch userData from a string to a FeatureId
     spatialFeatureRDD.rawSpatialRDD = spatialFeatureRDD.rawSpatialRDD.rdd.map { geom: Geometry =>
       val featureId = FeatureId.fromUserData(featureType, geom.getUserData.asInstanceOf[String], delimiter = ",")
-      geom.setUserData(featureId)
+      featureId match {
+        case gfwProId: GfwProFeatureId if gfwProAddCentroid =>
+          if (gfwProId.locationId >= 0) {
+            // Compute the centroid of locations before they are possibly split, and
+            // stash it in the FeatureId.
+            geom.setUserData(CombinedFeatureId(featureId, PointFeatureId(geom.getCentroid())))
+          } else {
+            geom.setUserData(CombinedFeatureId(featureId, PointFeatureId(createPoint(0, 0))))
+          }
+        case _ => geom.setUserData(featureId)
+      }
+      
       geom
     }
 
@@ -93,9 +109,10 @@ object ValidatedFeatureRDD {
 
     flatJoin.rdd
       .keyBy({ pair: (Polygon, Geometry) =>
+        val cent = pair._1.getCentroid()
         Z2(
-          (pair._1.getCentroid.getX * 100).toInt,
-          (pair._1.getCentroid.getY * 100).toInt
+          (cent.getX * 100).toInt,
+          (cent.getY * 100).toInt
         ).z
       })
       .partitionBy(hashPartitioner)

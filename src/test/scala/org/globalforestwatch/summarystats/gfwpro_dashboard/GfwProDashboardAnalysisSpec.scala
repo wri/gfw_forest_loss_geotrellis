@@ -66,7 +66,8 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       NonEmptyList.one(dashInputTsvPath),
       "gfwpro",
       FeatureFilter.empty,
-      splitFeatures = true
+      splitFeatures = true,
+      gfwProAddCentroid = true
     )
     val fcd = Dashboard(featureLoc31RDD)
     val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, spark)

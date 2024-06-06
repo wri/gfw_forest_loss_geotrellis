@@ -6,7 +6,6 @@ import geotrellis.store.index.zcurve.Z2
 import org.apache.spark.HashPartitioner
 import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats._
-import org.globalforestwatch.util.GeometryConstructor.createPoint
 import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
 import org.globalforestwatch.util.RDDAdapter
 import org.globalforestwatch.ValidatedWorkflow
@@ -99,16 +98,17 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     val contextualId = FeatureId.fromUserData(contextualFeatureType, contextualGeom.getUserData.asInstanceOf[String], delimiter = ",")
 
     featureId match {
-      case gfwproId: GfwProFeatureId if gfwproId.locationId >= 0 =>
-        val featureCentroid = createPoint(featureGeom.getCentroid.getX, featureGeom.getCentroid.getY)
-        if (contextualGeom.contains(featureCentroid)) {
+      // ValidateFeatureRDD already computed the centroid of the location (when
+      // locationId != -1) and stashed it in the FeatureId.
+      case CombinedFeatureId(gfwproId: GfwProFeatureId, featureCentroid: PointFeatureId) if gfwproId.locationId >= 0 =>
+        if (contextualGeom.contains(featureCentroid.pt)) {
           val fid = CombinedFeatureId(gfwproId, contextualId)
           // val gtGeom: Geometry = toGeotrellisGeometry(featureGeom)
           val fixedGeom = makeValidGeom(featureGeom)
           List(Validated.Valid(Location(fid, fixedGeom)))
         } else Nil
 
-      case gfwproId: GfwProFeatureId if gfwproId.locationId < 0 =>
+      case CombinedFeatureId(gfwproId: GfwProFeatureId, _) if gfwproId.locationId < 0 =>
         IntersectGeometry
           .validatedIntersection(featureGeom, contextualGeom)
           .leftMap { err => Location(featureId, err) }
