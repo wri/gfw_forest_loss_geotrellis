@@ -7,8 +7,7 @@ import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import java.time.LocalDate
-import org.globalforestwatch.features.CombinedFeatureId
-import org.globalforestwatch.features.GfwProFeatureId
+import org.globalforestwatch.features._
 
 case class GfwProDashboardSummary(
                                    stats: Map[GfwProDashboardRawDataGroup, GfwProDashboardRawData] = Map.empty

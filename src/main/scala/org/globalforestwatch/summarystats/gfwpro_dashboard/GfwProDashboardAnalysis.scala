@@ -18,8 +18,6 @@ import scala.collection.JavaConverters._
 import java.time.LocalDate
 import org.locationtech.jts.geom.Point
 
-case class PointFeatureId(pt: Point) extends FeatureId
-
 object GfwProDashboardAnalysis extends SummaryAnalysis {
 
   val name = "gfwpro_dashboard"
@@ -35,28 +33,29 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
   ): ValidatedWorkflow[Location[JobError],(FeatureId, GfwProDashboardData)] = {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
-    println(s"XXX ${featureRDD.getNumPartitions}")
-    featureRDD.glom().map(_.size).collect().foreach(println)
-    val xxRDD = featureRDD.repartition(spark.sparkContext.defaultParallelism)
-    println(s"YYY ${xxRDD.getNumPartitions}")
-    xxRDD.glom().map(_.size).collect().foreach(println)
-    val summaryRDD = ValidatedWorkflow(xxRDD).flatMap { rdd =>
-      val enrichedRDD = rdd.map {
-        case Location(id@GfwProFeatureId(listId, locationId), geom) => {
-          if (locationId != -1) {
-            // For a non-dissolved location, determine the GadmFeatureId for the
-            // centroid of the location's geometry, and add that to the feature id.
-            val pt = createPoint(geom.getCentroid.getX, geom.getCentroid.getY)
-            //println(s"Loc ${id}, centroid ${pt}")
-            Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, PointFeatureId(pt)), geom))
-          } else {
-            // For a dissolved location, add a dummy GadmFeatureId to the feature id.
-            Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, PointFeatureId(createPoint(0, 0))), geom))
-          }
-        }
-      }
+    //println(s"XXX ${featureRDD.getNumPartitions}")
+    //featureRDD.glom().map(_.size).collect().foreach(println)
+    val xxRDD = featureRDD.repartition(8)
+    //val xxRDD = featureRDD.repartition(spark.sparkContext.defaultParallelism)
+    //println(s"YYY ${xxRDD.getNumPartitions}")
+    //xxRDD.glom().map(_.size).collect().foreach(println)
+    val summaryRDD = //ValidatedWorkflow(featureRDD).flatMap { rdd =>
+      // val enrichedRDD = rdd.map {
+      //   case Location(id@GfwProFeatureId(listId, locationId), geom) => {
+      //     if (locationId != -1) {
+      //       // For a non-dissolved location, determine the GadmFeatureId for the
+      //       // centroid of the location's geometry, and add that to the feature id.
+      //       val pt = createPoint(geom.getCentroid.getX, geom.getCentroid.getY)
+      //       //println(s"Loc ${id}, centroid ${pt}")
+      //       Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, PointFeatureId(pt)), geom))
+      //     } else {
+      //       // For a dissolved location, add a dummy GadmFeatureId to the feature id.
+      //       Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, PointFeatureId(createPoint(0, 0))), geom))
+      //     }
+      //   }
+      // }
 
-      ValidatedWorkflow(enrichedRDD)
+      ValidatedWorkflow(xxRDD)
         .mapValidToValidated { rdd =>
           rdd.map { case row@Location(fid, geom) =>
             if (geom.isEmpty()) {
@@ -91,7 +90,6 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
               }
           }
         }
-    }
     summaryRDD
 
   }

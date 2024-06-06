@@ -67,7 +67,7 @@ object ValidatedFeatureRDD {
     // Switch userData from a string to a FeatureId
     spatialFeatureRDD.rawSpatialRDD = spatialFeatureRDD.rawSpatialRDD.rdd.map { geom: Geometry =>
       val featureId = FeatureId.fromUserData(featureType, geom.getUserData.asInstanceOf[String], delimiter = ",")
-      geom.setUserData(featureId)
+      geom.setUserData(CombinedFeatureId(featureId, PointFeatureId(geom.getCentroid())))
       geom
     }
 
