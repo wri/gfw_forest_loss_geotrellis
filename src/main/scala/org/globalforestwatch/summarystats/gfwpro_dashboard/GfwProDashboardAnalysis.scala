@@ -33,11 +33,11 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
   ): ValidatedWorkflow[Location[JobError],(FeatureId, GfwProDashboardData)] = {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
-    //println(s"XXX ${featureRDD.getNumPartitions}")
+    println(s"featureRDD ${featureRDD.getNumPartitions}")
     //featureRDD.glom().map(_.size).collect().foreach(println)
-    val xxRDD = featureRDD.repartition(8)
+    val xxRDD = featureRDD.coalesce(8)
     //val xxRDD = featureRDD.repartition(spark.sparkContext.defaultParallelism)
-    //println(s"YYY ${xxRDD.getNumPartitions}")
+    println(s"YYY ${xxRDD.getNumPartitions}")
     //xxRDD.glom().map(_.size).collect().foreach(println)
     val summaryRDD = //ValidatedWorkflow(featureRDD).flatMap { rdd =>
       // val enrichedRDD = rdd.map {
@@ -57,6 +57,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
       ValidatedWorkflow(xxRDD)
         .mapValidToValidated { rdd =>
+          println(s"ZZZ ${rdd.getNumPartitions}")
           rdd.map { case row@Location(fid, geom) =>
             if (geom.isEmpty()) {
               Validated.invalid[Location[JobError], Location[Geometry]](Location(fid, GeometryError(s"Empty Geometry")))
@@ -67,8 +68,10 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           }
         }
         .flatMap { enrichedRDD =>
+          println(s"UUU ${enrichedRDD.getNumPartitions}")
           val fireStatsRDD = fireStats(enrichedRDD, fireAlertRDD, spark)
           val tmp = enrichedRDD.map { case Location(id, geom) => Feature(geom, id) }
+          println(s"VV ${tmp.getNumPartitions}")
           val validatedSummaryStatsRdd = GfwProDashboardRDD(tmp, GfwProDashboardGrid.blockTileGrid, kwargs)
           ValidatedWorkflow(validatedSummaryStatsRdd).mapValid { summaryStatsRDD =>
             summaryStatsRDD
@@ -108,6 +111,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     }
     val joinedRDD = SpatialJoinRDD.spatialjoin(featureSpatialRDD, fireAlertRDD)
 
+    println(s"joinedRDD ${joinedRDD.getNumPartitions}")
     joinedRDD.rdd
       .map { case (poly, points) =>
         val fid = poly.getUserData.asInstanceOf[FeatureId]

@@ -64,6 +64,7 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
     } else {
       keyedFeatureRDD.values
     }
+    println(s"QQQ${partitionedFeatureRDD.getNumPartitions}")
 
     /*
      * Here we're going to work with the features one partition at a time.

@@ -89,6 +89,7 @@ object ValidatedFeatureRDD {
       However, the range partitioner uses sampling to come up with the  break points for the different partitions.
       If the input RDD is already heavily skewed, sampling will be off and the range partitioner won't do a good job.
      */
+    println(s"flatJoin.getNumPartitions ${flatJoin.getNumPartitions}")
     val hashPartitioner = new HashPartitioner(flatJoin.getNumPartitions)
 
     flatJoin.rdd
