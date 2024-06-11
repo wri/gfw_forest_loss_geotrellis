@@ -2,8 +2,6 @@ package org.globalforestwatch.summarystats.gfwpro_dashboard
 
 import cats.data.{NonEmptyList, Validated}
 import geotrellis.vector.{Feature, Geometry}
-import geotrellis.store.index.zcurve.Z2
-import org.apache.spark.HashPartitioner
 import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats._
 import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
@@ -20,8 +18,6 @@ import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 import scala.collection.JavaConverters._
 import java.time.LocalDate
 import org.globalforestwatch.util.IntersectGeometry
-
-import scala.reflect.ClassTag
 
 object GfwProDashboardAnalysis extends SummaryAnalysis {
 
@@ -121,26 +117,6 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           }
           .traverse(identity) // turn validated list of geometries into list of validated geometries
     }
-  }
-
-  private def partitionByZIndex[A: ClassTag](rdd: RDD[A])(getGeom: A => Geometry): RDD[A] = {
-    val hashPartitioner = new HashPartitioner(rdd.getNumPartitions)
-
-    rdd
-      .keyBy({ row =>
-        val geom = getGeom(row)
-        Z2(
-          (geom.getCentroid.getX * 100).toInt,
-          (geom.getCentroid.getY * 100).toInt
-        ).z
-      })
-      .partitionBy(hashPartitioner)
-      .mapPartitions(
-        { iter: Iterator[(Long, A)] =>
-          for (i <- iter) yield i._2
-        },
-        preservesPartitioning = true
-      )
   }
 
   private def fireStats(
