@@ -24,7 +24,7 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
   type SUMMARY <: Summary[SUMMARY]
   type TILE <: CellGrid[Int]
 
-  /** Produce RDD of tree cover loss from RDD of areas of interest*
+  /** Produce RDD of polygonal summary analysis from RDD of features.
     *
     * @param featureRDD areas of interest
     * @param windowLayout window layout used for distribution of IO, subdivision of 10x10 degree grid
@@ -38,8 +38,8 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
   )(implicit kt: ClassTag[SUMMARY], vt: ClassTag[FEATUREID]): RDD[ValidatedLocation[SUMMARY]] = {
 
     /* Intersect features with each tile from windowLayout grid and generate a record for each intersection.
-     * Each features will intersect one or more windows, possibly creating a duplicate record.
-     * Then create a key based off the Z curve value from the grid cell, to use for partitioning.
+     * Each feature will intersect one or more windows, possibly creating multiple records.
+     * Then create a key based off the Z curve value for each intersecting window, to use for partitioning.
      * Later we will calculate partial result for each intersection and merge them.
      */
 
@@ -100,15 +100,28 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
                   )
                 }
 
-              val partialSummaries: Array[(FEATUREID, ValidatedSummary[SUMMARY])] =
-                features.map { feature: Feature[Geometry, FEATUREID] =>
-                  val id: FEATUREID = feature.data
+             // Split features into those that completely contain the current window
+              // and those that only partially contain it
+              val windowGeom: Extent = windowLayout.mapTransform.keyToExtent(windowKey)
+              val (fullWindowFeatures, partialWindowFeatures) = features.partition {
+                feature =>
+                  try {
+                    feature.geom.contains(windowGeom)
+                  } catch {
+                    case e: org.locationtech.jts.geom.TopologyException =>
+                      // fallback if JTS can't do the intersection because of a wonky geometry,
+                      // just skip the optimization
+                      false
+                  }
+              }
+
+              def getSummaryForGeom(featureIds: List[FEATUREID], geom: Geometry): List[(FEATUREID, ValidatedSummary[SUMMARY])] = {
                   val summary: Either[JobError, PolygonalSummaryResult[SUMMARY]] =
                     maybeRaster.flatMap { raster =>
                       Either.catchNonFatal {
                         runPolygonalSummary(
                           raster,
-                          feature.geom,
+                          geom,
                           ErrorSummaryRDD.rasterizeOptions,
                           kwargs)
                       }.left.map{
@@ -125,10 +138,31 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
                     }
                   // Converting to Validated so errors across partial results can be accumulated
                   // @see https://typelevel.org/cats/datatypes/validated.html#validated-vs-either
-                  (id, summary.toValidated)
+                  featureIds.map { id => (id, summary.toValidated) }
+              }
+
+              // for partial windows, we need to calculate summary for each geometry,
+              // since they all may have unique intersections with the window
+              val partialWindowResults = partialWindowFeatures.flatMap {
+                case feature =>
+                  getSummaryForGeom(List(feature.data), feature.geom)
+              }
+
+              // if there are any full window intersections, we only need to calculate
+              // the summary for the window, and then tie it to each feature ID
+              val fullWindowIds = fullWindowFeatures.map { case feature => feature.data}.toList
+              //if (fullWindowIds.size >= 2) {
+              //  println(s"Re-using results from same full tile ${windowKey} for featureIds ${fullWindowIds}")
+              //}
+              val fullWindowResults =
+                if (fullWindowFeatures.nonEmpty) {
+                  getSummaryForGeom(fullWindowIds, windowGeom)
+                } else {
+                  List.empty
                 }
 
-              partialSummaries
+              // combine results
+              partialWindowResults ++ fullWindowResults
           }
       }
 
