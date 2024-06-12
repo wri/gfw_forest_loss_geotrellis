@@ -6,6 +6,7 @@ import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import org.globalforestwatch.layers.ApproxYear
+import org.globalforestwatch.layers.GFWProCoverage
 
 /** LossData Summary by year */
 case class ForestChangeDiagnosticSummary(
@@ -88,10 +89,11 @@ object ForestChangeDiagnosticSummary {
           }
         }
 
-        val gfwProCoverage: Map[String, Boolean] =
-          raster.tile.gfwProCoverage.getData(col, row)
-        val argPresence = gfwProCoverage.getOrElse("Argentina", false)
-        val braBiomesPresence = gfwProCoverage.getOrElse("Brazil Biomes", false)
+        val region: Int = raster.tile.gfwProCoverage.getData(col, row)
+        val argPresence = GFWProCoverage.isArgentina(region)
+        val colPresence = GFWProCoverage.isColombia(region)
+        val braBiomesPresence = GFWProCoverage.isBrazilBiomesPresence(region)
+        val argOTBN: String = raster.tile.argOTBN.getData(col, row)
 
         // We compute country-specific forest loss using argForestLoss tile for
         // Argentina, and prodesLossYear for Brazil. In the very unusual case where a
@@ -102,8 +104,14 @@ object ForestChangeDiagnosticSummary {
         // more than one country.
         var countrySpecificLossYear = ApproxYear(0, false)
         var countryCode  = ""
-        if (argPresence) {
+        var classifiedRegion = ""
+
+        if (colPresence) {
+          countryCode = "COL"
+          classifiedRegion = raster.tile.colFronteraAgricola.getData(col, row)
+        } else if (argPresence) {
           countrySpecificLossYear = raster.tile.argForestLoss.getData(col, row)
+          classifiedRegion = argOTBN
           countryCode = "ARG"
         } else {
           val possLoss = raster.tile.prodesLossYear.getData(col, row)
@@ -129,7 +137,6 @@ object ForestChangeDiagnosticSummary {
           raster.tile.isIDNForestMoratorium.getData(col, row)
         val braBiomes: String = raster.tile.braBiomes.getData(col, row)
         val isPlantation: Boolean = raster.tile.isPlantation.getData(col, row)
-        val argOTBN: String = raster.tile.argOTBN.getData(col, row)
 
         // compute Booleans
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
@@ -138,31 +145,28 @@ object ForestChangeDiagnosticSummary {
         val isProdesLoss: Boolean = prodesLossYear > 0
         val isCountrySpecificLoss: Boolean = countrySpecificLossYear.year > 0
 
-        val southAmericaPresence =
-          gfwProCoverage.getOrElse("South America", false)
-        val legalAmazonPresence =
-          gfwProCoverage.getOrElse("Legal Amazon", false)
-        val cerradoBiomesPresence =
-          gfwProCoverage.getOrElse("Cerrado Biomes", false)
-        val seAsiaPresence = gfwProCoverage.getOrElse("South East Asia", false)
-        val idnPresence = gfwProCoverage.getOrElse("Indonesia", false)
+        val southAmericaPresence = GFWProCoverage.isSouthAmerica(region)
+        val legalAmazonPresence = GFWProCoverage.isLegalAmazonPresence(region)
+        val cerradoBiomesPresence = GFWProCoverage.isCerradoBiomesPresence(region)
+        val seAsiaPresence = GFWProCoverage.isSouthEastAsia(region)
+        val idnPresence = GFWProCoverage.isIndonesia(region)
 
         val protectedAreaCategory = raster.tile.protectedAreasByCategory.getData(col, row)
         val isProtectedArea = (protectedAreaCategory != "")
 
         // Currently, only do the area intersection with the detailed WDPA categories
-        // if location is in Argentina. Similarly, only do area intersection with
-        // Landmark (indigenous territories) if in Argentina.
+        // if location is in ARG or COL. Similarly, only do area intersection with
+        // Landmark (indigenous territories) if in ARG or COL.
         // With lazy tile loading, the landmark tiles are only loaded if
-        // argPresence is true.
-        val detailedWdpa = if (argPresence)
+        // argPresence or colPresence is true.
+        val detailedWdpa = if (argPresence || colPresence)
           protectedAreaCategory
         else
           ""
         // We will likely have different Landmark categories for other countries, but
         // there is no distinction currently for Argentina, so we put all of the
         // indigenous area into the "Not Reported" category.
-        val landmarkCategory = if (argPresence)
+        val landmarkCategory = if (argPresence || colPresence)
           (if (raster.tile.landmark.getData(col, row)) "Not Reported" else "")
         else
           ""
@@ -198,6 +202,7 @@ object ForestChangeDiagnosticSummary {
           argPresence,
           detailedWdpa,
           landmarkCategory,
+          classifiedRegion,
         )
 
         val summaryData: ForestChangeDiagnosticRawData =

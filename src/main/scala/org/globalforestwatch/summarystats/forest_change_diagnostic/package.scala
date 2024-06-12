@@ -26,4 +26,7 @@ package object forest_change_diagnostic {
   implicit def dataLossYearlyTwoCategoryTypedEncoder: TypedEncoder[ForestChangeDiagnosticDataLossYearlyTwoCategory] =
     TypedEncoder.usingInjection[ForestChangeDiagnosticDataLossYearlyTwoCategory, String]
 
+  implicit def dataDoubleTwoCategoryTypedEncoder: TypedEncoder[ForestChangeDiagnosticDataDoubleTwoCategory] =
+    TypedEncoder.usingInjection[ForestChangeDiagnosticDataDoubleTwoCategory, String]
+
 }

@@ -20,8 +20,10 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
   def antarcticaInputTsvPath = getClass.getResource("/antarctica.tsv").toString()
   def argentinaInputTsvPath = getClass.getResource("/argentina.tsv").toString()
   def argBraInputTsvPath = getClass.getResource("/argbra.tsv").toString()
+  def colInputTsvPath = getClass.getResource("/colombia.tsv").toString()
   def palm32ExpectedOutputPath = getClass.getResource("/palm-32-fcd-output").toString()
   def argBraExpectedOutputPath = getClass.getResource("/argbra-fcd-output").toString()
+  def colExpectedOutputPath = getClass.getResource("/col-fcd-output").toString()
 
   def FCD(features: RDD[ValidatedLocation[Geometry]]) = {
     val fireAlertsRdd = {
@@ -160,6 +162,22 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     // saveExpectedFcdResult(fcdDF, argBraExpectedOutputPath)
 
     val expectedDF = readExpectedFcdResult(argBraExpectedOutputPath)
+
+    assertSmallDataFrameEquality(fcdDF, expectedDF)
+  }
+
+  it("matches recorded output for COL location", ProTag) {
+    val colRDD = ValidatedFeatureRDD(
+      NonEmptyList.one(colInputTsvPath),
+      "gfwpro",
+      FeatureFilter.empty,
+      splitFeatures = true
+    )
+    val fcd = FCD(colRDD)
+    val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
+    //saveExpectedFcdResult(fcdDF, colExpectedOutputPath)
+
+    val expectedDF = readExpectedFcdResult(colExpectedOutputPath)
 
     assertSmallDataFrameEquality(fcdDF, expectedDF)
   }
