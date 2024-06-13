@@ -48,7 +48,7 @@ object ForestChangeDiagnosticDataLossYearlyCategory {
             include: Boolean = true
           ): ForestChangeDiagnosticDataLossYearlyCategory = {
 
-    if (noData.contains(className))
+    if (noData.contains(className) || !include)
       ForestChangeDiagnosticDataLossYearlyCategory.empty
     else
       ForestChangeDiagnosticDataLossYearlyCategory(

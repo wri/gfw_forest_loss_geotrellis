@@ -32,6 +32,7 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
                                               argPresence: Boolean,
                                               protectedAreaByCategory: String,
                                               landmarkByCategory: String,
+                                              classifiedRegion: String,
 ) {
 
   /** Produce a partial ForestChangeDiagnosticData only for the loss year in this data group */
@@ -83,7 +84,7 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         protectedAreaByCategory,
         umdTreeCoverLossYear,
         totalArea,
-        include = isProtectedArea && isUMDLoss
+        include = protectedAreaByCategory != "" && isUMDLoss
       ),
     tree_cover_loss_by_country_landmark_yearly =
       ForestChangeDiagnosticDataLossYearlyTwoCategory.fill(
@@ -93,6 +94,14 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         include = landmarkByCategory != "" && isUMDLoss
       ),
+    tree_cover_loss_by_country_classified_region_yearly = 
+      ForestChangeDiagnosticDataLossYearlyTwoCategory.fill(
+        countryCode,
+        classifiedRegion,
+        umdTreeCoverLossYear,
+        totalArea,
+        include = classifiedRegion != "" && isUMDLoss
+    ),
     tree_cover_loss_arg_otbn_yearly = 
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
       argOTBN, 
@@ -150,6 +159,8 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
         totalArea,
         isProdesLoss && isPrimaryForest
       ),
+    country_area = ForestChangeDiagnosticDataDoubleCategory
+      .fill(countryCode, totalArea),
     country_specific_deforestation_yearly = ForestChangeDiagnosticDataLossApproxYearlyCategory.fill(
       countryCode,
       countrySpecificLossYear,
@@ -182,6 +193,17 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
       } else {
         ForestChangeDiagnosticDataLossApproxYearlyTwoCategory.empty,
       },
+      classified_region_area =
+        if (countryCode =="ARG" || countryCode == "COL") {
+          ForestChangeDiagnosticDataDoubleTwoCategory.fill(
+            countryCode,
+            classifiedRegion,
+            totalArea,
+            include = classifiedRegion != ""
+          )
+        } else {
+          ForestChangeDiagnosticDataDoubleTwoCategory.empty
+        },
     tree_cover_loss_brazil_biomes_yearly =
       ForestChangeDiagnosticDataLossYearlyCategory.fill(
         braBiomes,

@@ -29,6 +29,7 @@ case class ForestChangeDiagnosticGridSources(gridTile: GridTile, kwargs: Map[Str
   val protectedAreasByCategory: DetailedProtectedAreas = DetailedProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
   val argForestLoss: ArgForestLoss = ArgForestLoss(gridTile, kwargs)
+  val colFronteraAgricola: ColFronteraAgricola = ColFronteraAgricola(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,

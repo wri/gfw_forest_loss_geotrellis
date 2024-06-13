@@ -222,7 +222,7 @@
     },
     {
       "name":"gfwpro_forest_change_regions",
-      "source_uri": "s3://gfw-data-lake/gfwpro_forest_change_regions/v20230207/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfwpro_forest_change_regions/v20240529/raster/epsg-4326/{grid_size}/{row_count}/bit_encoding/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"ifl_intact_forest_landscapes_2000",
@@ -263,6 +263,10 @@
     {
       "name":"jrc_global_forest_cover",
       "source_uri":"s3://gfw-data-lake/jrc_global_forest_cover/v2020/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"col_frontera_agricola",
+      "source_uri":"s3://gfw-data-lake/col_frontera_agricola/v2024/raster/epsg-4326/{grid_size}/{row_count}/category/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }

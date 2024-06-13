@@ -19,14 +19,14 @@ case class ForestChangeDiagnosticDataDoubleCategory(
     })
   }
 
+  def round: Map[String, Double] =
+    this.value.map {
+      case (key, value) =>
+        key -> value.round
+    }
+
   def toJson: String = {
-    this.value
-      .map {
-        case (key, value) =>
-          key -> value.round
-      }
-      .asJson
-      .noSpaces
+    this.round.asJson.noSpaces
   }
 }
 

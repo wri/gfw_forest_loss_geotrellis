@@ -3,25 +3,24 @@ package org.globalforestwatch.layers
 import org.globalforestwatch.grids.GridTile
 
 case class GFWProCoverage(gridTile: GridTile, kwargs: Map[String, Any])
-  extends MapILayer
+  extends IntegerLayer
     with OptionalILayer {
 
   val datasetName = "gfwpro_forest_change_regions"
 
   val uri: String =
     uriForGrid(gridTile, kwargs)
+}
 
-  def lookup(value: Int): Map[String, Boolean] = {
-    val bits = "000000000" + value.toBinaryString takeRight 9
-    Map(
-      "Argentina" -> (bits(8) == '1'),
-      "Soy Coverage" -> (bits(7) == '1'),
-      "South America" -> (bits(6) == '1'),
-      "Legal Amazon" -> (bits(5) == '1'),
-      "Brazil Biomes" -> (bits(4) == '1'),
-      "Cerrado Biomes" -> (bits(3) == '1'),
-      "South East Asia" -> (bits(2) == '1'),
-      "Indonesia" -> (bits(1) == '1')
-    )
-  }
+object GFWProCoverage {
+  def isArgentina(v: Integer): Boolean = (v & (1 << 0)) != 0
+  def isColombia(v: Integer): Boolean  = (v & (1 << 1)) != 0
+  def isSouthAmerica(v: Integer): Boolean  = (v & (1 << 2)) != 0
+  def isLegalAmazonPresence(v: Integer): Boolean  = (v & (1 << 3)) != 0
+  // Brazil Biomes presence is true for all Brazil, except for a few narrow costal
+  // areas.
+  def isBrazilBiomesPresence(v: Integer): Boolean  = (v & (1 << 4)) != 0
+  def isCerradoBiomesPresence(v: Integer): Boolean  = (v & (1 << 5)) != 0
+  def isSouthEastAsia(v: Integer): Boolean  = (v & (1 << 6)) != 0
+  def isIndonesia(v: Integer): Boolean  = (v & (1 << 7)) != 0
 }
