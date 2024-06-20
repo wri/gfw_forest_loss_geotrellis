@@ -54,12 +54,14 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
       }
 
     /*
-     * Use a Range Partitioner based on the Z curve value to efficiently and evenly partition RDD for analysis,
+     * Use a Hash Partitioner based on the Z curve value to efficiently and evenly partition RDD for analysis,
      * but still preserving locality which will both reduce the S3 reads per executor and make it more likely
      * for features to be close together already during export.
      */
     val partitionedFeatureRDD = if (partition) {
-      // if a single tile has more than 4096 features, split it up over partitions
+      // Generally, features or parts of features intersecting the same window will
+      // go into the same partition. If a single window includes parts of more than
+      // 4096 features, then those parts will be split up over multiple partitions.
       RepartitionSkewedRDD.bySparseId(keyedFeatureRDD, 4096)
     } else {
       keyedFeatureRDD.values
@@ -166,8 +168,9 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
           }
       }
 
-    /* Group records by Id and combine their summaries
-     * The features may have intersected multiple grid blocks
+    /* Group records by Id and combine their summaries. The features may have intersected
+     * multiple grid blocks. The combine operation for a SUMMARY is defined in
+     * summaryStats.summarySemigroup, based on its merge method.
      */
     val featuresGroupedWithSummaries: RDD[ValidatedLocation[SUMMARY]] =
       featuresWithSummaries

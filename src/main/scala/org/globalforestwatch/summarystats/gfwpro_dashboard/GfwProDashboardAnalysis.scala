@@ -40,7 +40,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
       val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(rdd, spark)
 
       /* Enrich the feature RDD by intersecting it with contextual features
-       * The resulting FeatuerId carries combined identity of source fature and contextual geometry
+       * The resulting FeatureId carries combined identity of source feature and contextual geometry
        */
       val enrichedRDD =
         SpatialJoinRDD
@@ -81,9 +81,10 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
   }
 
   /** These geometries touch, apply application specific logic of how to treat that.
-    *   - For intersection of location geometries only keep those where centroid of location is in the contextual geom (this ensures that
-    *     any location is only assigned to a single contextual area even if it intersects more)
-    *   - For dissolved geometry of list report all contextual areas it intersects
+    *   - For intersection of location geometries, only keep those where centroid of
+    *     location is in the contextual geom (this ensures that any location is only
+    *     assigned to a single contextual area even if it intersects more).
+    *   - For dissolved geometry of list, report all contextual areas it intersects
     */
   private def refineContextualIntersection(
     featureGeom: Geometry,

@@ -8,17 +8,24 @@ import org.globalforestwatch.util.Geodesy
 import org.globalforestwatch.layers.ApproxYear
 import org.globalforestwatch.layers.GFWProCoverage
 
-/** LossData Summary by year */
+/** ForestChangeDiagnosticRawData broken down by ForestChangeDiagnosticRawDataGroup,
+  * which includes the loss year, but lots of other characteristics as well. */
 case class ForestChangeDiagnosticSummary(
                                           stats: Map[ForestChangeDiagnosticRawDataGroup,
                                             ForestChangeDiagnosticRawData] = Map.empty
                                         ) extends Summary[ForestChangeDiagnosticSummary] {
 
-  /** Combine two Maps and combine their LossData when a year is present in both */
+  /** Combine two Maps by combining ForestChangeDiagnosticRawDataGroup entries that
+    * have the same values. This merge function is used by
+    * summaryStats.summarySemigroup to define a combine operation on
+    * ForestChangeDiagnosticSummary, which is used to combine records with the same
+    * FeatureId in ErrorSummaryRDD. */
   def merge(
     other: ForestChangeDiagnosticSummary
   ): ForestChangeDiagnosticSummary = {
-    // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
+    // the stats.combine method uses the
+    // ForestChangeDiagnosticRawData.lossDataSemigroup instance to perform per-value
+    // combine on the map.
     ForestChangeDiagnosticSummary(stats.combine(other.stats))
   }
 
@@ -37,7 +44,7 @@ case class ForestChangeDiagnosticSummary(
 }
 
 object ForestChangeDiagnosticSummary {
-  // ForestChangeDiagnosticSummary from Raster[ForestChangeDiagnosticTile] -- cell types may not be the same
+  // Cell types of Raster[ForestChangeDiagnosticTile] may not be the same.
 
   def getGridVisitor(
     kwargs: Map[String, Any]

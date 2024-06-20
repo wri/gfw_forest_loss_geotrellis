@@ -7,14 +7,18 @@ import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.{Summary, summarySemigroup}
 import org.globalforestwatch.util.Geodesy
 
-/** LossData Summary by year */
+/** AFiData broken down by AFiDataGroup. */
 case class AFiSummary(
                                    stats: Map[AFiDataGroup, AFiData] = Map.empty
                                  ) extends Summary[AFiSummary] {
 
-  /** Combine two Maps and combine their LossData when a year is present in both */
+  /** Combine two Maps and combining AFIDataGroup entries that have the same values.
+    * This merge function is used by summaryStats.summarySemigroup to define a
+    * combine operation on AFiSummary, which is used to combine records with the same
+    * FeatureId in ErrorSummaryRDD. */
   def merge(other: AFiSummary): AFiSummary = {
-    // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
+    // the stats.combine method uses AFiData.afiDataSemigroup instance to perform
+    // per-value combine on the map.
     AFiSummary(stats.combine(other.stats))
   }
 

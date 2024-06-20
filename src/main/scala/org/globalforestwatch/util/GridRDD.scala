@@ -10,7 +10,7 @@ import org.globalforestwatch.util.GeometryConstructor.createPolygon1x1
 object GridRDD {
   /** Returns an RDD with the set of 1x1 grid cells (polygons) that cover envelope. If
     * clip is true, then don't include any grid cells that are not covered by
-    * tcl_geom.
+    * tcl_geom (which is the extent of the TreeCoverLoss data).
     */
   def apply(envelope: Envelope, spark: SparkSession, clip: Boolean = false): PolygonRDD = {
     val gridCells = getGridCells(envelope)

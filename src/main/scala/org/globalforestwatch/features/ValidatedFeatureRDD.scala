@@ -88,6 +88,8 @@ object ValidatedFeatureRDD {
     }
 
     val envelope: Envelope = spatialFeatureRDD.boundaryEnvelope
+    // Since clip is true, we are going to exclude part or all of geometries that
+    // don't intersect with the TreeCoverLoss extent (e.g. geometries in Antarctica).
     val spatialGridRDD = GridRDD(envelope, spark, clip = true)
 
     // flatJoin is a flat list of pairs of (grid cell, featureGeom), giving all the
@@ -101,7 +103,7 @@ object ValidatedFeatureRDD {
 
     /*
       partitions will come back very skewed and we will need to even them out for any downstream analysis
-      For the summary analysis we will eventually use a range partitioner.
+      For the summary analysis we will eventually use a range (or hash) partitioner.
       However, the range partitioner uses sampling to come up with the  break points for the different partitions.
       If the input RDD is already heavily skewed, sampling will be off and the range partitioner won't do a good job.
      */
@@ -118,6 +120,7 @@ object ValidatedFeatureRDD {
       .partitionBy(hashPartitioner)
       .flatMap { case (_, (gridCell, geom)) =>
         val fid = geom.getUserData.asInstanceOf[FeatureId]
+        // Here we do the actual intersection to split the geometry by the 1x1 tiles.
         validatedIntersection(geom, gridCell)
           .leftMap { err => Location(fid, err) }
           .map { geoms => geoms.map { geom =>
