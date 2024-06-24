@@ -220,7 +220,10 @@ case class ForestChangeDiagnosticData(
   }
 
   /**
+    *  Do the commodity risk calculations that are needed for the Palm Risk tool.
+    *
     * @see https://docs.google.com/presentation/d/1nAq4mFNkv1q5vFvvXWReuLr4Znvr-1q-BDi6pl_5zTU/edit#slide=id.p
+    * @see https://docs.google.com/document/d/16-3lMdI4HyjiuHxzEqIgR5p2H_jH3DT0wR9XV7XzuAo/edit#heading=h.vjm582nbtt1d
     */
   def withUpdatedCommodityRisk(): ForestChangeDiagnosticData = {
 

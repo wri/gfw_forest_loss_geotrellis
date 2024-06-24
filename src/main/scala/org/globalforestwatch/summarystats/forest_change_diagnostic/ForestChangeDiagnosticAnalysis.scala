@@ -76,8 +76,9 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
             // For all rows that didn't get an error from the FCD analysis, do the
             // transformation from ForestChangeDiagnosticSummary to
-            // ForestChangeDiagnosticData and add commodity risk,
-            // commodity_threat_fires, and tree_cover_loss_soy_yearly.
+            // ForestChangeDiagnosticData and add commodity risk and
+            // commodity_threat_fires (both used by the Palm Risk tool), and
+            // tree_cover_loss_soy_yearly.
             ValidatedWorkflow(locationSummaries).mapValid { summaries =>
               summaries
                 .mapValues {
