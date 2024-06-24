@@ -8,18 +8,24 @@ import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import java.time.LocalDate
 
-/** LossData Summary by year */
+/** GfwProDashboardRawData broken down by GfwProDashboardRawDataGroup, which includes
+  * alert date and confidence, but lots of other characteristics as well. */
 case class GfwProDashboardSummary(
                                    stats: Map[GfwProDashboardRawDataGroup, GfwProDashboardRawData] = Map.empty
                                  ) extends Summary[GfwProDashboardSummary] {
 
-  /** Combine two Maps and combine their LossData when a year is present in both */
+  /** Combine two Maps by combining GfwProDashboardRawDataGroup entries that have the
+    * same values. This merge function is used by summaryStats.summarySemigroup to
+    * define a combine operation on GfwProDashboardSummary, which is used to combine
+    * records with the same FeatureId in ErrorSummaryRDD. */
   def merge(other: GfwProDashboardSummary): GfwProDashboardSummary = {
-    // the years.combine method uses LossData.lossDataSemigroup instance to perform per value combine on the map
+    // the stats.combine method uses the GfwProDashboardRawData.lossDataSemigroup
+    // instance to perform per-value combine on the map.
     GfwProDashboardSummary(stats.combine(other.stats))
   }
   def isEmpty = stats.isEmpty
 
+  /** Pivot raw data to GfwProDashboardData and aggregate across alert dates. */
   def toGfwProDashboardData(): GfwProDashboardData = {
     stats
       .map { case (group, data) => group.

@@ -22,21 +22,14 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
   val name = "forest_change_diagnostic"
 
   /** GFW Pro analysis of input features in a TSV file. The TSV file contains
-    * the individual list items, the merged list geometry, and the
-    * geometric difference from the current merged list geometry and the former one.
+    * the individual list items and the merged ("dissolved") list geometry.
     *   - Individual list items have location IDs >= 0
     *   - Merged list geometry has location ID -1
-    *   - Geometric difference to previous version has location ID -2
     *
-    * Merged list and geometric difference may or may be not present. If geometric
-    * difference is present, we only need to process chunks
-    * of the merged list which fall into the same grid cells as the
-    * geometric difference. Later in the analysis we will then read cached
-    * values for the remaining chunks and use them to aggregate list level results.
+    * The merged list may or may be not present.
     *
     * This function assumes that all features have already been split by 1x1 degree
-    * grid. This function will exclude diff geometry
-    * locations from output (id=-2).
+    * grid, so each location and merged list may have a single or multiple rows.
     */
   def apply(
     features: RDD[ValidatedLocation[Geometry]],
@@ -83,8 +76,9 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
 
             // For all rows that didn't get an error from the FCD analysis, do the
             // transformation from ForestChangeDiagnosticSummary to
-            // ForestChangeDiagnosticData and add commodity risk,
-            // commodity_threat_fires, and tree_cover_loss_soy_yearly.
+            // ForestChangeDiagnosticData and add commodity risk and
+            // commodity_threat_fires (both used by the Palm Risk tool), and
+            // tree_cover_loss_soy_yearly.
             ValidatedWorkflow(locationSummaries).mapValid { summaries =>
               summaries
                 .mapValues {
@@ -132,8 +126,8 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
     }
   }
 
-  /** Filter only to those rows covered by gridFilter, these are areas where location geometries have changed If gridFilter is empty list,
-    * all locations except diff geom will be preserved
+  /** Filter only to those rows covered by gridFilter, these are areas where location
+    * geometries have changed. If gridFilter is empty, all locations will be preserved.
     */
   def filterDiffGridCells(
     rdd: RDD[Location[Geometry]],

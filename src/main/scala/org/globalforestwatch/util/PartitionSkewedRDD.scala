@@ -5,6 +5,13 @@ import scala.reflect.ClassTag
 import org.apache.spark.rdd.RDD
 import org.apache.spark.HashPartitioner
 
+// Hash partitioner, where we aim to group all rows with same id together and put
+// them into the same partition based on hashing. However, if a single id has more
+// than maxPartitionSize rows, we break it up into groups of at most maxPartitionSize
+// and features in each group go to the same partition. The number of partitions is
+// the max of rdd.sparkContext.defaultParallelism, or the number of id groups (which
+// is the number of unique ids, plus extra groups because of ids that have more than
+// maxPartitionSize rows).
 object RepartitionSkewedRDD {
   def bySparseId[A: ClassTag](rdd: RDD[(Long, A)], maxPartitionSize: Int): RDD[A] = {
     val counts = rdd.map{ case (id, _) => (id, 1l) }.reduceByKey(_ + _).collect().sortBy(_._2)
