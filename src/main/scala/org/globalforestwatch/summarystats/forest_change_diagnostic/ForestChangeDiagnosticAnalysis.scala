@@ -90,36 +90,16 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
           .persist(StorageLevel.MEMORY_AND_DISK)
       }
 
-      combineGridResults(partialResult)
+      partialResult.map {
+        case Valid(Location(fid, data)) if data.equals(ForestChangeDiagnosticData.empty) =>
+          Invalid(Location(fid, NoIntersectionError))
+        case data => data
+      }
     } catch {
       case e: StackOverflowError =>
         e.printStackTrace()
         throw e
     }
-  }
-
-  /** Combine per grid results named by CombinedFeatureId to per location results named by FeatureId Some of the per-grid results fo may
-    * be Invalid errors. Combining per-grid results will aggregate errors up to Location level.
-    */
-  def combineGridResults(
-    rdd: RDD[ValidatedLocation[ForestChangeDiagnosticData]]
-  )(implicit spark: SparkSession): RDD[ValidatedLocation[ForestChangeDiagnosticData]] = {
-    rdd
-      .map {
-        case Valid(Location(fid, data)) =>
-          (fid, Valid(data))
-        case Invalid(Location(fid, err)) =>
-          (fid, Invalid(err))
-      }
-      .reduceByKey(_ combine _)
-      .map {
-        case (fid, Valid(data)) if data.equals(ForestChangeDiagnosticData.empty) =>
-          Invalid(Location(fid, NoIntersectionError))
-        case (fid, Valid(data)) =>
-          Valid(Location(fid, data.withUpdatedCommodityRisk()))
-        case (fid, Invalid(err)) =>
-          Invalid(Location(fid, err))
-      }
   }
 
   def fireStats(
