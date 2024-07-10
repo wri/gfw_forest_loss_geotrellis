@@ -11,17 +11,17 @@ case class ColFronteraAgricola(gridTile: GridTile, kwargs: Map[String, Any]) ext
   val uri: String = uriForGrid(gridTile, kwargs)
 
   def lookup(value: Int): String = value match {
-    case 1 => "No condicionado;Frontera agricola nacional"
-    case 2 => "Condicionado;Ambiental"
-    case 3 => "Condicionado;Ambiental/Riesgo de desastres"
-    case 4 => "Condicionado;Ambiental/Riesgo de desastres/Étnico-Cultural'"
-    case 5 => "Condicionado;Ambiental/Étnico-Cultural"
-    case 6 => "Condicionado;Gestión riesgo de desastres"
-    case 7 => "Condicionado;Riesgo de desastres/Étnico-Cultural"
-    case 8 => "Condicionado;Étnico-Cultural"
-    case 9 => "Zona restricción;Restricciones acuerdo cero deforestación"
-    case 10 => "Zona restricción;Restricciones legales"
-    case 11 => "Zona restricción;Restricciones técnicas (Áreas no agropecuarias)"
+    case 1 => "Unconditioned;National Agricultural Frontier"
+    case 2 => "Conditioned;Environmental"
+    case 3 => "Conditioned;Environmental/Disaster Risk"
+    case 4 => "Conditioned;Environmental/Disaster Risk/Ethno-Cultural'"
+    case 5 => "Conditioned;Environmental/Ethno-Cultural"
+    case 6 => "Conditioned;Disaster Risk Management"
+    case 7 => "Conditioned;Disaster Risk/Ethno-Cultural"
+    case 8 => "Conditioned;Ethno-Cultural"
+    case 9 => "Restrictions;Zero Deforestation Agreement"
+    case 10 => "Restrictions;Legal"
+    case 11 => "Restrictions;Technical (Non-agricultural areas)"
     case _  => ""
   }
 }
