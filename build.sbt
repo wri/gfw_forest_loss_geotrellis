@@ -71,6 +71,7 @@ libraryDependencies ++= Seq(
   sparkFastTests % Test,
   geotrellisS3,
   geotrellisGdal,
+  geotrellisGdalWarp,
   sedonaCore,
   sedonaSQL,
   breeze,
