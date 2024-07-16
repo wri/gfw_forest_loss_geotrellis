@@ -22,33 +22,10 @@ case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, An
                   windowLayout: LayoutDefinition
                 ): Either[Throwable, Raster[GfwProDashboardTile]] = {
 
-    for {
-      // Integrated alerts are Optional Tiles, but we keep it this way to avoid signature changes
-      integratedAlertsTile <- Either
-        .catchNonFatal(integratedAlerts.fetchWindow(windowKey, windowLayout))
-        .right
-      tcd2000Tile <- Either
-        .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
-        .right
-      sbtnNaturalForestTile <- Either
-        .catchNonFatal(sbtnNaturalForest.fetchWindow(windowKey, windowLayout))
-        .right
-      jrcForestCoverTile <- Either
-        .catchNonFatal(jrcForestCover.fetchWindow(windowKey, windowLayout))
-        .right
-      gadm0Tile <- Either
-        .catchNonFatal(gadmAdm0.fetchWindow(windowKey, windowLayout))
-        .right
-      gadm1Tile <- Either
-        .catchNonFatal(gadmAdm1.fetchWindow(windowKey, windowLayout))
-        .right
-      gadm2Tile <- Either
-        .catchNonFatal(gadmAdm2.fetchWindow(windowKey, windowLayout))
-        .right
-    } yield {
-      val tile = GfwProDashboardTile(integratedAlertsTile, tcd2000Tile, sbtnNaturalForestTile, jrcForestCoverTile, gadm0Tile, gadm1Tile, gadm2Tile)
-      Raster(tile, windowKey.extent(windowLayout))
-    }
+    val tile = GfwProDashboardTile(
+      windowKey, windowLayout, this
+    )
+    Right(Raster(tile, windowKey.extent(windowLayout)))
   }
 }
 
