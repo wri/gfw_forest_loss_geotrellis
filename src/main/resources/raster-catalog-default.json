@@ -10,7 +10,7 @@
     },
     {
       "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202308/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202407/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
@@ -62,7 +62,7 @@
     },
     {
       "name":"landmark_indigenous_and_community_lands",
-      "source_uri":"s3://gfw-data-lake/landmark_indigenous_and_community_lands/v20201215/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/landmark_indigenous_and_community_lands/v202407/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
       "name":"birdlife_biodiversity_intactness",
@@ -82,7 +82,7 @@
     },
     {
       "name":"ibge_bra_biomes",
-      "source_uri":"s3://gfw-data-lake/ibge_bra_biomes/v2004/raster/epsg-4326/{grid_size}/{row_count}/name/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/ibge_bra_biomes/v2019/raster/epsg-4326/{grid_size}/{row_count}/name/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_peatlands",
@@ -146,7 +146,7 @@
     },
     {
       "name":"gfw_planted_forests",
-      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20230911/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_planted_forests/v20231128/raster/epsg-4326/{grid_size}/{row_count}/type/geotiff/{tile_id}.tif"
     },
     {
       "name":"per_forest_concessions",
@@ -337,7 +337,11 @@
     },
     {
       "name":"gfw_forest_flux_planted_forest_type",
-      "source_uri": "s3://gfw-data-lake/gfw_planted_forests/v20230911/raster/epsg-4326/{grid_size}/{row_count}/simpleName/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_planted_forests/v20231128/raster/epsg-4326/{grid_size}/{row_count}/simpleName/geotiff/{tile_id}.tif"
+    },
+    {
+      "name": "sbtn_natural_forests_map",
+      "source_uri": "s3://gfw-data-lake/sbtn_natural_forests_map/v202310/raster/epsg-4326/{grid_size}/{row_count}/class/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }
