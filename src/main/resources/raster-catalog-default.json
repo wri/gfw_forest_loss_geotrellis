@@ -268,8 +268,6 @@
       "name":"gfw_forest_flux_full_extent_net_flux",
       "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_net_flux/v20240402/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     },
-
-
     {
       "name":"gfw_forest_flux_aboveground_carbon_stock_in_emissions_year",
       "source_uri":"s3://gfw-data-lake/gfw_forest_flux_aboveground_carbon_stock_in_emissions_year/v20240308/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
@@ -310,7 +308,6 @@
       "name":"gfw_soil_carbon_stock_2000",
       "source_uri": "s3://gfw-data-lake/gfw_soil_carbon_stock_2000/v20231108/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"
     },
-
     {
       "name":"gfw_forest_flux_soil_carbon_stock_2000_stdev",
       "source_uri":"s3://gfw-data-lake/gfw_forest_flux_soil_carbon_stock_2000_stdev/v20231108/raster/epsg-4326/{grid_size}/{row_count}/Mg_C_ha-1/geotiff/{tile_id}.tif"

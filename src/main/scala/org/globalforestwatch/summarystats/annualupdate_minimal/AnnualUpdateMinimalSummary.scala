@@ -6,7 +6,6 @@ import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import org.globalforestwatch.util.Implicits._
-
 /** LossData Summary by year */
 case class AnnualUpdateMinimalSummary(
                                        stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = Map.empty
@@ -48,30 +47,22 @@ object AnnualUpdateMinimalSummary {
         val plantedForests: String = raster.tile.plantedForests.getData(col, row)
         val mangroves1996: Boolean = raster.tile.mangroves1996.getData(col, row)
         val mangroves2020: Boolean = raster.tile.mangroves2020.getData(col, row)
-        val tigerLandscapes: Boolean =
-        raster.tile.tigerLandscapes.getData(col, row)
+        val tigerLandscapes: Boolean = raster.tile.tigerLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
-        val keyBiodiversityAreas: Boolean =
-          raster.tile.keyBiodiversityAreas.getData(col, row)
+        val keyBiodiversityAreas: Boolean = raster.tile.keyBiodiversityAreas.getData(col, row)
         val mining: Boolean = raster.tile.mining.getData(col, row)
         val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
         val oilPalm: Boolean = raster.tile.oilPalm.getData(col, row)
-        val idnForestMoratorium: Boolean =
-          raster.tile.idnForestMoratorium.getData(col, row)
+        val idnForestMoratorium: Boolean = raster.tile.idnForestMoratorium.getData(col, row)
         val woodFiber: Boolean = raster.tile.woodFiber.getData(col, row)
-        val resourceRights: Boolean =
-          raster.tile.resourceRights.getData(col, row)
+        val resourceRights: Boolean = raster.tile.resourceRights.getData(col, row)
         val logging: Boolean = raster.tile.logging.getData(col, row)
-        val intactForestLandscapes2000: Boolean =
-          raster.tile.intactForestLandscapes2000.getData(col, row)
-        val treeCoverLossFromFires: Boolean =
-          raster.tile.treeCoverLossFromFires.getData(col, row)
-        val tropicalTreeCover: Int =
-          raster.tile.tropicalTreeCover.getData(col, row)
-        val umdGlobalLandCover: String =
-          raster.tile.umdGlobalLandCover.getData(col, row)
-        val plantationsPre2000: Boolean =
-          raster.tile.plantationsPre2000.getData(col, row)
+        val intactForestLandscapes2000: Boolean = raster.tile.intactForestLandscapes2000.getData(col, row)
+        val treeCoverLossFromFires: Boolean = raster.tile.treeCoverLossFromFires.getData(col, row)
+        val tropicalTreeCover: Int = raster.tile.tropicalTreeCover.getData(col, row)
+        val umdGlobalLandCover: String = raster.tile.umdGlobalLandCover.getData(col, row)
+        val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
+        val naturalForests: String = raster.tile.naturalForests.getData(col, row)
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
         val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordiate.  +- raster.cellSize.height/2 doesn't make much of a difference
@@ -85,10 +76,8 @@ object AnnualUpdateMinimalSummary {
 
         val grossEmissionsCo2eNonCo2: Float = raster.tile.grossEmissionsCo2eNonCo2.getData(col, row)
         val grossEmissionsCo2eCo2Only: Float =  raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
-        val grossCumulAbovegroundRemovalsCo2: Float =
-          raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
-        val grossCumulBelowgroundRemovalsCo2: Float =
-          raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
+        val grossCumulAbovegroundRemovalsCo2: Float = raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
+        val grossCumulBelowgroundRemovalsCo2: Float = raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
         val soilCarbon2000PerHa: Float = raster.tile.soilCarbon2000.getData(col, row)
         val abovegroundCarbon2000PerHa: Float = raster.tile.abovegroundCarbon2000.getData(col, row)
@@ -135,6 +124,7 @@ object AnnualUpdateMinimalSummary {
             intactForestLandscapes2000,
             umdGlobalLandCover,
             tropicalTreeCover,
+            naturalForests
           )
 
           val summary: AnnualUpdateMinimalData =
