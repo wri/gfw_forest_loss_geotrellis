@@ -25,6 +25,7 @@ object GladAlertsDF {
     "is__gmw_global_mangrove_extent_2020",
     "is__ifl_intact_forest_landscapes_2016",
     "ibge_bra_biomes__name",
+    "sbtn_natural_forests__class",
 
     "is__birdlife_alliance_for_zero_extinction_site",
     "is__birdlife_key_biodiversity_area",
@@ -87,7 +88,8 @@ object GladAlertsDF {
         $"data_group.peruForestConcessions" as "per_forest_concession__type",
         $"data_group.mangroves2020" as "is__gmw_mangroves_2020",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscape_2016",
-        $"data_group.braBiomes" as "bra_biome__name"
+        $"data_group.braBiomes" as "bra_biome__name",
+        $"data_group.naturalForests" as "sbtn_natural_forests__class"
       )
 
     val cols =
@@ -185,7 +187,8 @@ object GladAlertsDF {
         .cast("boolean") as "per_forest_concession__type",
       max("is__gmw_mangroves_2020") as "is__gmw_mangroves_2020",
       max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
-      max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name"
+      max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name",
+      max("sbtn_natural_forests") as "sbtn_natural_forests__class",
     )
 
     val aggCols =
