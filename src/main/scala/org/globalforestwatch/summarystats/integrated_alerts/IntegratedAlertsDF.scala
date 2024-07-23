@@ -45,7 +45,8 @@ object IntegratedAlertsDF {
     "per_forest_concession__type",
     "is__gmw_mangroves_2020",
     "is__ifl_intact_forest_landscape_2016",
-    "bra_biome__name"
+    "bra_biome__name",
+    "sbtn_natural_forests__class"
   )
 
   def unpackValues(unpackCols: List[Column],
@@ -100,7 +101,8 @@ object IntegratedAlertsDF {
         $"data_group.peruForestConcessions" as "per_forest_concession__type",
         $"data_group.mangroves2020" as "is__gmw_mangroves_2020",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscape_2016",
-        $"data_group.braBiomes" as "bra_biome__name"
+        $"data_group.braBiomes" as "bra_biome__name",
+        $"data_group.naturalForests" as "sbtn_natural_forests__class",
       )
 
     val cols =
@@ -237,7 +239,8 @@ object IntegratedAlertsDF {
       max("per_forest_concession__type") as "per_forest_concession__type",
       max("is__gmw_mangroves_2020") as "is__gmw_mangroves_2020",
       max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
-      max("bra_biome__name") as "bra_biome__name"
+      max("bra_biome__name") as "bra_biome__name",
+      max("sbtn_natural_forests__class") as "sbtn_natural_forests__class",
     )
 
     val aggCols =
