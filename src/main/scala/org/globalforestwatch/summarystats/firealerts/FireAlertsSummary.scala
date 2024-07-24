@@ -34,13 +34,10 @@ object FireAlertsSummary {
                      row: Int): Unit = {
           val fireAlertType = getAnyMapValue[String](kwargs, "fireAlertType")
 
-          val primaryForest: Boolean =
-            raster.tile.primaryForest.getData(col, row)
-          val protectedAreas: String =
-            raster.tile.protectedAreas.getData(col, row)
+          val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
+          val protectedAreas: String = raster.tile.protectedAreas.getData(col, row)
           val aze: Boolean = raster.tile.aze.getData(col, row)
-          val keyBiodiversityAreas: Boolean =
-            raster.tile.keyBiodiversityAreas.getData(col, row)
+          val keyBiodiversityAreas: Boolean = raster.tile.keyBiodiversityAreas.getData(col, row)
           val landmark: Boolean = raster.tile.landmark.getData(col, row)
           val plantedForests: String = raster.tile.plantedForests.getData(col, row)
           val mining: Boolean = raster.tile.mining.getData(col, row)
@@ -48,19 +45,15 @@ object FireAlertsSummary {
           val rspo: String = raster.tile.rspo.getData(col, row)
           val woodFiber: Boolean = raster.tile.woodFiber.getData(col, row)
           val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
-          val indonesiaForestMoratorium: Boolean =
-            raster.tile.indonesiaForestMoratorium.getData(col, row)
+          val indonesiaForestMoratorium: Boolean = raster.tile.indonesiaForestMoratorium.getData(col, row)
           val oilPalm: Boolean = raster.tile.oilPalm.getData(col, row)
-          val indonesiaForestArea: String =
-            raster.tile.indonesiaForestArea.getData(col, row)
-          val peruForestConcessions: String =
-            raster.tile.peruForestConcessions.getData(col, row)
+          val indonesiaForestArea: String = raster.tile.indonesiaForestArea.getData(col, row)
+          val peruForestConcessions: String = raster.tile.peruForestConcessions.getData(col, row)
           val oilGas: Boolean = raster.tile.oilGas.getData(col, row)
-          val mangroves2020: Boolean =
-            raster.tile.mangroves2020.getData(col, row)
-          val intactForestLandscapes2016: Boolean =
-            raster.tile.intactForestLandscapes2016.getData(col, row)
+          val mangroves2020: Boolean = raster.tile.mangroves2020.getData(col, row)
+          val intactForestLandscapes2016: Boolean = raster.tile.intactForestLandscapes2016.getData(col, row)
           val braBiomes: String = raster.tile.brazilBiomes.getData(col, row)
+          val naturalForests: String = raster.tile.naturalForests.getData(col, row)
           val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
 
           val lat: Double = raster.rasterExtent.gridRowToMap(row)
@@ -89,6 +82,7 @@ object FireAlertsSummary {
               mangroves2020,
               intactForestLandscapes2016,
               braBiomes,
+              naturalForests
             )
 
           val summary: FireAlertsData =
