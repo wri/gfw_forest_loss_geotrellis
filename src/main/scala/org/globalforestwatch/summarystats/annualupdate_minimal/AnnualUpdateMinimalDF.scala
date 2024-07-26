@@ -28,6 +28,7 @@ object AnnualUpdateMinimalDF {
     "is__ifl_intact_forest_landscapes_2000",
     "wri_tropical_tree_cover__decile",
     "umd_global_land_cover__ipcc_class",
+    "sbtn_natural_forests__class",
 
     // TODO delete next data update
     "umd_tree_cover_density__threshold",
@@ -76,6 +77,7 @@ object AnnualUpdateMinimalDF {
         $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
         $"data_group.tmlDensity" as "wri_tropical_tree_cover__decile",
         $"data_group.landCover" as "umd_global_land_cover__ipcc_class",
+        $"data_group.naturalForests" as "sbtn_natural_forests__class",
 
         $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
         $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
@@ -261,6 +263,7 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
       max($"umd_tree_cover_gain__period") as "umd_tree_cover_gain__period",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
+      max($"sbtn_natural_forests__class") as "sbtn_natural_forests__class",
 
       max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
@@ -318,6 +321,7 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
       max($"umd_tree_cover_gain__period") as "umd_tree_cover_gain__period",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
+      max($"sbtn_natural_forests__class") as "sbtn_natural_forests__class",
 
       max($"tsc_tree_cover_loss_drivers__type") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",

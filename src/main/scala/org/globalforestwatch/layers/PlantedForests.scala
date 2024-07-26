@@ -19,7 +19,7 @@ case class PlantedForests(gridTile: GridTile, kwargs: Map[String, Any]) extends 
     case 9  => "Unknown"
     case 10  => "Unknown mix"
     case 11 => "Wood fiber or timber"
-    case 12 => "Wood fiber or timber Mix"
+    case 12 => "Wood fiber or timber mix"
     case _ => ""
   }
 }

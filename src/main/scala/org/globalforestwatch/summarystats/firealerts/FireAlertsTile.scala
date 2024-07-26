@@ -30,6 +30,7 @@ case class FireAlertsTile(
                            mangroves2020: Mangroves2020#OptionalITile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
                            brazilBiomes: BrazilBiomes#OptionalITile,
+                           naturalForests: SBTNNaturalForests#OptionalITile,
                            tcd2000: TreeCoverDensityThreshold2000#ITile
                          ) extends CellGrid[Int] {
 

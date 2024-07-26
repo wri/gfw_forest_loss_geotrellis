@@ -30,7 +30,8 @@ case class GladAlertsTile(
                            oilGas: OilGas#OptionalITile,
                            mangroves2020: Mangroves2020#OptionalITile,
                            intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
-                           brazilBiomes: BrazilBiomes#OptionalITile
+                           brazilBiomes: BrazilBiomes#OptionalITile,
+                           naturalForests: SBTNNaturalForests#OptionalITile
                          ) extends CellGrid[Int] {
 
   def cellType: CellType = glad.cellType.getOrElse(IntCellType)

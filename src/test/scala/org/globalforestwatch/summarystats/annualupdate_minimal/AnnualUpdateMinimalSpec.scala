@@ -52,7 +52,7 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
       .options(AnnualUpdateMinimalExport.csvOptions)
       .csv(path = outputPath)
   }
-  
+
   def readAumResult(path: String) = {
     spark.read
       .options(Map(
@@ -82,14 +82,14 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
     val exportDF: DataFrame = unpackedDF.transform(AnnualUpdateMinimalDF.aggSummary(List("iso", "adm1", "adm2"))) 
     val top20Rows = exportDF.limit(20) // Due to size of output, compare top 20 rows
     
+    // Uncomment to save new expected results
+    //saveExpectedAumResult(top20Rows, idn1_5GadmExpectedOutputPath)
+
     // Write results to CSV (ensure that nulls are read the same way as expected results)
     top20Rows
       .write
       .options(csvOptions)
       .csv("output/gadm-aum-output")
-
-    // Uncomment to save new expected results
-    //saveExpectedAumResult(top20Rows, idn1_5GadmExpectedOutputPath)
 
     // Read expected results and compare
     val expectedDF = readAumResult(idn1_5GadmExpectedOutputPath)
@@ -128,14 +128,14 @@ class AnnualUpdateMinimalSpec extends TestEnvironment with DataFrameComparer {
     val exportDF = unpackedDF.transform(AnnualUpdateMinimalDF.aggSummary(idCols, wdpa=true))
     val top20Rows = exportDF.limit(20) // Due to size of output, compare top 20 rows
 
+    // Uncomment to save new expected results
+    //saveExpectedAumResult(top20Rows, wdpaExpectedOutputPath)
+
     // Write results to CSV (ensure that nulls are read the same way as expected results)
     top20Rows
       .write
       .options(csvOptions)
       .csv("output/wdpa-aum-output")
-
-    // Uncomment to save new expected results
-    //saveExpectedAumResult(top20Rows, wdpaExpectedOutputPath)
 
     // Read expected results and compare
     val expectedDF = readAumResult(wdpaExpectedOutputPath)

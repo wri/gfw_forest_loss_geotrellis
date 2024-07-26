@@ -74,6 +74,7 @@ object IntegratedAlertsSummary {
           val intactForestLandscapes2016: Boolean =
             raster.tile.intactForestLandscapes2016.getData(col, row)
           val braBiomes: String = raster.tile.brazilBiomes.getData(col, row)
+          val naturalForests: String = raster.tile.naturalForests.getData(col, row)
 
           val lat: Double = raster.rasterExtent.gridRowToMap(row)
 
@@ -185,7 +186,8 @@ object IntegratedAlertsSummary {
                   oilGas,
                   mangroves2020,
                   intactForestLandscapes2016,
-                  braBiomes
+                  braBiomes,
+                  naturalForests
                 )
 
               val summary: IntegratedAlertsData =

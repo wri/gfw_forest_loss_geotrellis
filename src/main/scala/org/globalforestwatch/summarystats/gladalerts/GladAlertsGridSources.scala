@@ -33,6 +33,7 @@ case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) e
   val mangroves2020: Mangroves2020 = Mangroves2020(gridTile, kwargs)
   val intactForestLandscapes2016: IntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile, kwargs)
   val braBiomes: BrazilBiomes = BrazilBiomes(gridTile, kwargs)
+  val naturalForests: SBTNNaturalForests = SBTNNaturalForests(gridTile, kwargs)
 
   def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[GladAlertsTile]] = {
 
@@ -58,17 +59,15 @@ case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) e
       val rspoTile = rspo.fetchWindow(windowKey, windowLayout)
       val woodFiberTile = woodFiber.fetchWindow(windowKey, windowLayout)
       val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
-      val indonesiaForestMoratoriumTile =
-        indonesiaForestMoratorium.fetchWindow(windowKey, windowLayout)
+      val indonesiaForestMoratoriumTile = indonesiaForestMoratorium.fetchWindow(windowKey, windowLayout)
       val oilPalmTile = oilPalm.fetchWindow(windowKey, windowLayout)
       val indonesiaForestAreaTile = indonesiaForestArea.fetchWindow(windowKey, windowLayout)
       val peruForestConcessionsTile = peruForestConcessions.fetchWindow(windowKey, windowLayout)
       val oilGasTile = oilGas.fetchWindow(windowKey, windowLayout)
       val mangroves2020Tile = mangroves2020.fetchWindow(windowKey, windowLayout)
-      val intactForestLandscapes2016Tile =
-        intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
-      val braBiomesTile =
-        braBiomes.fetchWindow(windowKey, windowLayout)
+      val intactForestLandscapes2016Tile = intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
+      val braBiomesTile = braBiomes.fetchWindow(windowKey, windowLayout)
+      val naturalForestsTile = naturalForests.fetchWindow(windowKey, windowLayout)
 
       val tile = GladAlertsTile(
         gladAlertsTile,
@@ -92,7 +91,8 @@ case class GladAlertsGridSources(gridTile: GridTile, kwargs: Map[String, Any]) e
         oilGasTile,
         mangroves2020Tile,
         intactForestLandscapes2016Tile,
-        braBiomesTile
+        braBiomesTile,
+        naturalForestsTile
       )
 
       Raster(tile, windowKey.extent(windowLayout))

@@ -26,6 +26,7 @@ object FireAlertsDF {
     "is__gmw_global_mangrove_extent_2020",
     "is__ifl_intact_forest_landscapes_2016",
     "ibge_bra_biomes__name",
+    "sbtn_natural_forests__class",
 
     "umd_tree_cover_density__threshold",
     "is__birdlife_alliance_for_zero_extinction_site",
@@ -71,6 +72,7 @@ object FireAlertsDF {
         $"data_group.mangroves2020" as "is__gmw_global_mangrove_extent_2020",
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscapes_2016",
         $"data_group.braBiomes" as "ibge_bra_biomes__name",
+        $"data_group.naturalForests" as "sbtn_natural_forests__class",
 
         $"data_group.threshold" as "umd_tree_cover_density__threshold",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
@@ -204,6 +206,7 @@ object FireAlertsDF {
       max("is__gmw_global_mangrove_extent_2020") as "is__gmw_global_mangrove_extent_2020",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
       max(length($"ibge_bra_biomes__name")).cast("boolean") as "ibge_bra_biomes__name",
+      max("sbtn_natural_forests__class") as "sbtn_natural_forests__class",
 
       max("is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
       max("is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",

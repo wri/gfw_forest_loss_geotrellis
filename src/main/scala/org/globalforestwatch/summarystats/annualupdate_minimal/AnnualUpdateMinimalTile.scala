@@ -45,6 +45,7 @@ case class AnnualUpdateMinimalTile(
                                     abovegroundCarbon2000: AbovegroundCarbon2000#OptionalFTile,
                                     belowgroundCarbon2000: BelowgroundCarbon2000#OptionalFTile,
                                     mangroveBiomassExtent: MangroveBiomassExtent#OptionalITile,
+                                    naturalForests: SBTNNaturalForests#OptionalITile
                                   ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
   def cols: Int = loss.cols
