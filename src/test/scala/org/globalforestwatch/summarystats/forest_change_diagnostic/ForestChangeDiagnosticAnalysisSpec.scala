@@ -157,7 +157,7 @@ class ForestChangeDiagnosticAnalysisSpec extends TestEnvironment with DataFrameC
     )
     val fcd = FCD(argBraRDD)
     val fcdDF = ForestChangeDiagnosticDF.getFeatureDataFrame(fcd, spark)
-    // saveExpectedFcdResult(fcdDF, argBraExpectedOutputPath)
+    saveExpectedFcdResult(fcdDF, argBraExpectedOutputPath)
 
     val expectedDF = readExpectedFcdResult(argBraExpectedOutputPath)
 

@@ -193,7 +193,9 @@ trait FLayer extends Layer {
 trait RequiredLayer extends Layer {
 
   /**
-    * Define how to read sources for required layers
+    * Define how to read sources for required layers. source is only evaluated (and
+    * so we only check the the associated tile exists) when fetchWindow is first
+    * called, and then source is used to fetch the relevant tile.
     */
   lazy val source: GDALRasterSource = {
     // Removes the expected 404 errors from console log
@@ -234,6 +236,7 @@ trait RequiredILayer extends RequiredLayer with ILayer {
     */
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): ITile = {
+    require(source.extent.intersects(windowKey.extent(windowLayout)))
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
 //    println(s"Fetching required int tile ${source.dataPath.value}, key ${windowKey}")
     val tile = source.synchronized {
@@ -251,6 +254,7 @@ trait RequiredDLayer extends RequiredLayer with DLayer {
     */
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): DTile = {
+    require(source.extent.intersects(windowKey.extent(windowLayout)))
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
 //    println(s"Fetching required int tile ${source.dataPath.value}, key ${windowKey}")
     val tile = source.synchronized {
@@ -268,6 +272,7 @@ trait RequiredFLayer extends RequiredLayer with FLayer {
     */
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): FTile = {
+    require(source.extent.intersects(windowKey.extent(windowLayout)))
     val layoutSource = LayoutTileSource.spatial(source, windowLayout)
 //    println(s"Fetching required float tile ${source.dataPath.value}, key ${windowKey}")
     val tile = source.synchronized {
@@ -281,9 +286,10 @@ trait RequiredFLayer extends RequiredLayer with FLayer {
 trait OptionalLayer extends Layer {
 
   /**
-    * Define how to read sources for optional Layers
+    * Define how to read sources for optional Layers. Check if URI exists before
+    * trying to open it, return None if no file found. source is only evaluated when
+    * fetchWindow is first called, and then is used to fetch the relevant tile.
     */
-  /** Check if URI exists before trying to open it, return None if no file found */
   lazy val source: Option[GDALRasterSource] = {
     // Removes the expected 404 errors from console log
 
@@ -326,6 +332,7 @@ trait OptionalILayer extends OptionalLayer with ILayer {
     */
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): OptionalITile = {
+    source.foreach(s => require(s.extent.intersects(windowKey.extent(windowLayout))))
 //    source.foreach(s => println(s"Fetching optional int tile ${s.dataPath.value}, key ${windowKey}"))
     new OptionalITile(for {
       source <- source
@@ -349,6 +356,7 @@ trait OptionalDLayer extends OptionalLayer with DLayer {
     */
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): OptionalDTile = {
+    source.foreach(s => require(s.extent.intersects(windowKey.extent(windowLayout))))
 //    source.foreach(s => println(s"Fetching optional double tile ${s.dataPath.value}, key ${windowKey}"))
     new OptionalDTile(for {
       source <- source
@@ -372,6 +380,7 @@ trait OptionalFLayer extends OptionalLayer with FLayer {
     */
   def fetchWindow(windowKey: SpatialKey,
                   windowLayout: LayoutDefinition): OptionalFTile = {
+    source.foreach(s => require(s.extent.intersects(windowKey.extent(windowLayout))))
 //    source.foreach(s => println(s"Fetching optional float tile ${s.dataPath.value}, key ${windowKey}"))
     new OptionalFTile(for {
       source <- source
