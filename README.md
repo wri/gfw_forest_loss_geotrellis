@@ -233,9 +233,16 @@ The following options are supported:
 
 *   [`build.sbt`](build.sbt): Scala Build Tool build configuration file
 *   [`.sbtopts`](.sbtopts): Command line options for SBT, including JVM parameters
-*   [`project`](project): Additional configuration for SBT project, plugins, utility, versions
+*   [`project`](project): Additional configuration for SBT project, plugins, utility,
+    versions, including metals and bloop
 *   [`src/main/scala`](src/main/scala): Application and utility code
 *   [`src/test/scala`](src/test/scala): Unit test files
+*   [`sbt`][sbt): Script used in github CI to download sbt and all the scala
+    dependencies during CI tests (`.github/workflow/ci.yaml`)
+*   [`ci/Dockerfile`](ci/Dockerfile): Dockerfile used to build the docker image for
+    CI tests
+*   [`scripts/gdal.sh`](scripts/gdal.sh): bootscript needed for EMR runs to update
+    the image to install and use the correct version of GDAL.
 
 ## Spark Job Commands
 
