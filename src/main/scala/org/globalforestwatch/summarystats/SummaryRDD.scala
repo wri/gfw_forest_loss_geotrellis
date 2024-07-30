@@ -216,6 +216,8 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
     featuresGroupedWithSummaries
   }
 
+  // Get the grid sources (subclass of GridSources) associated with a specified
+  // window key and windowLayout.
   def getSources(key: SpatialKey, windowLayout: LayoutDefinition, kwargs: Map[String, Any]): Either[Throwable, SOURCES]
 
   def readWindow(rs: SOURCES, windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[TILE]]
