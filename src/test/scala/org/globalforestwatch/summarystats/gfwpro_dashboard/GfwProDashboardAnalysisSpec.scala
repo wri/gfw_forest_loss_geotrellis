@@ -21,7 +21,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
   def idn1_5GadmTsvPath = getClass.getResource("/idn1_5Gadm.tsv").toString()
   def antarcticaInputTsvPath = getClass.getResource("/antarctica.tsv").toString()
 
-  def Dashboard(features: RDD[ValidatedLocation[Geometry]]) = {
+  def Dashboard(features: RDD[ValidatedLocation[Geometry]], doGadmIntersect: Boolean) = {
     val fireAlertsRdd = {
       // I guess this is how they do things in Java?
       val spatialRDD = new SpatialRDD[Geometry]
@@ -32,7 +32,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
     GfwProDashboardAnalysis(
       features,
       "gfwpro",
-      "gadm",
+      doGadmIntersect,
       NonEmptyList.one(idn1_5GadmTsvPath),
       fireAlertsRdd,
       spark,
@@ -61,7 +61,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       .withColumn("integrated_alerts_coverage", col("integrated_alerts_coverage").cast(BooleanType))
   }
 
-  it("matches recorded output for dashboard", ProTag) {
+  it("matches recorded output for dashboard for vector gadm", ProTag) {
     val featureLoc31RDD = ValidatedFeatureRDD(
       NonEmptyList.one(dashInputTsvPath),
       "gfwpro",
@@ -69,8 +69,27 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       splitFeatures = true,
       gfwProAddCentroid = true
     )
-    val fcd = Dashboard(featureLoc31RDD)
+    val fcd = Dashboard(featureLoc31RDD, true)
     val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, spark)
+    summaryDF.collect().foreach(println)
+    //saveExpectedFcdResult(summaryDF)
+
+    val expectedDF = readExpectedFcdResult
+
+    assertSmallDataFrameEquality(summaryDF, expectedDF)
+  }
+
+  it("matches recorded output for dashboard for raster gadm", ProTag) {
+    val featureLoc31RDD = ValidatedFeatureRDD(
+      NonEmptyList.one(dashInputTsvPath),
+      "gfwpro",
+      FeatureFilter.empty,
+      splitFeatures = true,
+      gfwProAddCentroid = true
+    )
+    val fcd = Dashboard(featureLoc31RDD, false)
+    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, spark)
+    summaryDF.collect().foreach(println)
     //saveExpectedFcdResult(summaryDF)
 
     val expectedDF = readExpectedFcdResult
@@ -87,7 +106,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       FeatureFilter.empty,
       splitFeatures = true
     )
-    val fcd = Dashboard(antRDD)
+    val fcd = Dashboard(antRDD, true)
     val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, spark)
 
     summaryDF.count() shouldBe 0

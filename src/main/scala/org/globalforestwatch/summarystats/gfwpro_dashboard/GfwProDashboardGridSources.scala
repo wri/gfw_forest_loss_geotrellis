@@ -1,6 +1,5 @@
 package org.globalforestwatch.summarystats.gfwpro_dashboard
 
-import cats.implicits._
 import geotrellis.layer.{LayoutDefinition, SpatialKey}
 import geotrellis.raster.Raster
 import org.globalforestwatch.grids.{GridSources, GridTile}
@@ -14,30 +13,19 @@ case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, An
   val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
   val sbtnNaturalForest: SBTNNaturalForests = SBTNNaturalForests(gridTile, kwargs)
   val jrcForestCover: JRCForestCover = JRCForestCover(gridTile, kwargs)
+  val gadmAdm0: GadmAdm0 = GadmAdm0(gridTile, kwargs)
+  val gadmAdm1: GadmAdm1 = GadmAdm1(gridTile, kwargs)
+  val gadmAdm2: GadmAdm2 = GadmAdm2(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,
                   windowLayout: LayoutDefinition
                 ): Either[Throwable, Raster[GfwProDashboardTile]] = {
 
-    for {
-      // Integrated alerts are Optional Tiles, but we keep it this way to avoid signature changes
-      integratedAlertsTile <- Either
-        .catchNonFatal(integratedAlerts.fetchWindow(windowKey, windowLayout))
-        .right
-      tcd2000Tile <- Either
-        .catchNonFatal(treeCoverDensity2000.fetchWindow(windowKey, windowLayout))
-        .right
-      sbtnNaturalForestTile <- Either
-        .catchNonFatal(sbtnNaturalForest.fetchWindow(windowKey, windowLayout))
-        .right
-      jrcForestCoverTile <- Either
-        .catchNonFatal(jrcForestCover.fetchWindow(windowKey, windowLayout))
-        .right
-    } yield {
-      val tile = GfwProDashboardTile(integratedAlertsTile, tcd2000Tile, sbtnNaturalForestTile, jrcForestCoverTile)
-      Raster(tile, windowKey.extent(windowLayout))
-    }
+    val tile = GfwProDashboardTile(
+      windowKey, windowLayout, this
+    )
+    Right(Raster(tile, windowKey.extent(windowLayout)))
   }
 }
 

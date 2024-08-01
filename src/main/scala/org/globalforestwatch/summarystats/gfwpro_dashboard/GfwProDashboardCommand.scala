@@ -12,17 +12,17 @@ import org.locationtech.jts.geom.Geometry
 
 object GfwProDashboardCommand extends SummaryCommand {
 
-  val contextualFeatureUrlOpt: Opts[NonEmptyList[String]] = Opts
+  val gadmFeatureUrl: Opts[NonEmptyList[String]] = Opts
     .options[String](
-      "contextual_feature_url",
-      help = "URI of contextual features in TSV format"
+      "gadm_feature_url",
+      help = "URI of GADM features in TSV format"
     )
 
-  val contextualFeatureTypeOpt: Opts[String] = Opts
-    .option[String](
-      "contextual_feature_type",
-      help = "Type of contextual features"
-    )
+  val gadmIntersectThreshold: Opts[Int] = Opts
+    .option[Int](
+      "gadm_intersect_threshold",
+      help = "Number of input features at which to intersect GADM"
+    ).withDefault(50)
 
   val gfwProDashboardCommand: Opts[Unit] = Opts.subcommand(
     name = GfwProDashboardAnalysis.name,
@@ -32,10 +32,10 @@ object GfwProDashboardCommand extends SummaryCommand {
       defaultOptions,
       optionalFireAlertOptions,
       featureFilterOptions,
-      contextualFeatureUrlOpt,
-      contextualFeatureTypeOpt,
+      gadmFeatureUrl,
+      gadmIntersectThreshold,
       pinnedVersionsOpts
-      ).mapN { (default, fireAlert, filterOptions, contextualFeatureUrl, contextualFeatureType, pinned) =>
+      ).mapN { (default, fireAlert, filterOptions, gadmFeatureUrl, gadmIntersectThreshold, pinned) =>
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
@@ -58,11 +58,19 @@ object GfwProDashboardCommand extends SummaryCommand {
             spatialRDD
         }
 
+        val featureCount = featureRDD.count()
+        val doGadmIntersect = featureCount > gadmIntersectThreshold
+        if (doGadmIntersect) {
+          println(s"Intersecting vector gadm for feature count $featureCount")
+        } else {
+          println(s"Using raster gadm for feature count $featureCount")
+        }
+          
         val dashRDD = GfwProDashboardAnalysis(
           featureRDD,
           default.featureType,
-          contextualFeatureType = contextualFeatureType,
-          contextualFeatureUrl = contextualFeatureUrl,
+          doGadmIntersect,
+          gadmFeatureUrl,
           fireAlertRDD,
           spark,
           kwargs

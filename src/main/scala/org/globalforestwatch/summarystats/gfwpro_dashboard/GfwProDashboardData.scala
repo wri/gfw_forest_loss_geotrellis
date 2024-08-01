@@ -9,6 +9,9 @@ import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
   * Note: This case class contains mutable values
   */
 case class GfwProDashboardData(
+  // Relevant for dissolved locations (locationId == -1)
+  group_gadm_id: String,
+
   /* NOTE: We are temporarily leaving the existing integrated alerts fields named as
    * glad_alerts_*, in order to reduce the number of moving pieces as we move from
    * Glad alerts to integrated alerts in GFWPro. */
@@ -48,6 +51,7 @@ case class GfwProDashboardData(
 
   def merge(other: GfwProDashboardData): GfwProDashboardData = {
     GfwProDashboardData(
+      if (group_gadm_id != "") group_gadm_id else other.group_gadm_id,
       glad_alerts_coverage || other.glad_alerts_coverage,
       integrated_alerts_coverage || other.integrated_alerts_coverage,
       total_ha.merge(other.total_ha),
@@ -73,6 +77,7 @@ object GfwProDashboardData {
 
   def empty: GfwProDashboardData =
     GfwProDashboardData(
+      group_gadm_id = "",
       glad_alerts_coverage = false,
       integrated_alerts_coverage = false,
       total_ha = ForestChangeDiagnosticDataDouble.empty,
