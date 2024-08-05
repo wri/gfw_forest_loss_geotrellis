@@ -188,7 +188,7 @@ object GladAlertsDF {
       max("is__gmw_mangroves_2020") as "is__gmw_mangroves_2020",
       max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
       max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name",
-      max("sbtn_natural_forests") as "sbtn_natural_forests__class",
+      max(length($"sbtn_natural_forests__class")).cast("boolean") as "sbtn_natural_forests__class",
     )
 
     val aggCols =
