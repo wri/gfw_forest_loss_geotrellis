@@ -261,9 +261,9 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_wood_fiber") as "is__gfw_wood_fiber",
       max($"is__gfw_resource_rights") as "is__gfw_resource_rights",
       max($"is__gfw_managed_forests") as "is__gfw_managed_forests",
-      max($"umd_tree_cover_gain__period") as "umd_tree_cover_gain__period",
+      max(length($"umd_tree_cover_gain__period")).cast("boolean") as "umd_tree_cover_gain__period",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
-      max($"sbtn_natural_forests__class") as "sbtn_natural_forests__class",
+      max(length($"sbtn_natural_forests__class")).cast("boolean") as "sbtn_natural_forests__class",
 
       max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
