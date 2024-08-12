@@ -47,8 +47,9 @@ object TreeLossDF {
       $"data_group.isPrimaryForest" as "is__umd_regional_primary_forest_2001",
       $"data_group.isPlantations" as "is__gfw_plantations",
       $"data_group.isGlobalPeat" as "is__global_peat",
-      $"data_group.tclDriverClass" as "tcl_driver__class",
       $"data_group.isTreeCoverLossFire" as "is__tree_cover_loss_from_fires",
+      $"data_group.isTreeCoverLoss" as "is__tree_cover_loss",
+      $"data_group.isIntactForestLandscapes2000" as "is__intact_forest_landscapes_2000",
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
@@ -107,8 +108,9 @@ object TreeLossDF {
                              includePrimaryForest: Boolean,
                              includePlantations: Boolean,
                              includeGlobalPeat: Boolean,
-                             includeTclDriverClass: Boolean,
                              includeTreeCoverLossFires: Boolean,
+                             includeIsTreeCoverLoss: Boolean,
+                             includeIntactForestLandscapes2000: Boolean,
                              carbonPools: Boolean,
                              simpleAGBEmis: Boolean,
                              emisGasAnnual: Boolean
@@ -210,18 +212,23 @@ object TreeLossDF {
       else List()
     }
 
-    val drGroupByCol = {
-      if (includeTclDriverClass) List($"tcl_driver__class")
-      else List()
-    }
-
     val fiGroupByCol = {
       if (includeTreeCoverLossFires) List($"is__tree_cover_loss_from_fires")
       else List()
     }
 
+    val tclGroupByCol = {
+      if (includeIsTreeCoverLoss) List($"is__tree_cover_loss")
+      else List()
+    }
 
-    df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol ::: ptGroupByCol ::: drGroupByCol ::: fiGroupByCol : _*)
+    val iflGroupByCol = {
+      if (includeIntactForestLandscapes2000) List($"is__intact_forest_landscapes_2000")
+      else List()
+    }
+
+
+    df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol ::: ptGroupByCol ::: fiGroupByCol ::: tclGroupByCol ::: iflGroupByCol: _*)
       .agg(
         cols.head,
         cols.tail ::: carbonPoolCols ::: treecoverLossCols ::: abovegroundBiomassLossCols

@@ -92,15 +92,22 @@ object TreeLossSummary {
           else false
         }
 
-        val tclDriverClass: String = {
-          if (contextualLayers contains "tcl_driver__class")
-            raster.tile.tclDriverClass.getData(col, row)
-          else ""
-        }
-
         val isTreeCoverLossFromFires: Boolean = {
           if (contextualLayers contains "is__tree_cover_loss_from_fires")
             raster.tile.treeCoverLossFromFires.getData(col, row)
+          else false
+        }
+
+        val isTreeCoverLoss: Boolean = {
+          if (contextualLayers contains "is__tree_cover_loss")
+//          val isLoss: Boolean = loss != null
+            raster.tile.treeCoverLoss.getData(col, row) != null
+          else false
+        }
+
+        val isIntactForestLandscapes2000: Boolean = {
+          if (contextualLayers contains "is__intact_forest_landscapes_2000")
+            raster.tile.intactForestLandscapes2000.getData(col, row)
           else false
         }
 
@@ -161,8 +168,9 @@ object TreeLossSummary {
                 isPrimaryForest,
                 isPlantations,
                 isGlobalPeat,
-                tclDriverClass,
                 isTreeCoverLossFromFires,
+                isTreeCoverLoss,
+                isIntactForestLandscapes2000,
                 gain
               )
 
