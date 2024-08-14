@@ -98,10 +98,11 @@ object TreeLossSummary {
           else false
         }
 
-        val isTreeCoverLoss: Boolean = {
-          if (contextualLayers contains "is__tree_cover_loss")
+        val isUmdTreeCoverLoss: Boolean = {
+          if (contextualLayers contains "is__umd_tree_cover_loss")
 //          val isLoss: Boolean = loss != null
-            raster.tile.treeCoverLoss.getData(col, row) != null
+            loss != null
+//            raster.tile.treeCoverLoss.getData(col, row) != null
           else false
         }
 
@@ -169,7 +170,7 @@ object TreeLossSummary {
                 isPlantations,
                 isGlobalPeat,
                 isTreeCoverLossFromFires,
-                isTreeCoverLoss,
+                isUmdTreeCoverLoss,
                 isIntactForestLandscapes2000,
                 gain
               )
@@ -188,7 +189,7 @@ object TreeLossSummary {
             if (((thresholds.head == 0 || tcd2000 > thresholds.head) && tcdYear == 2000) || ((thresholds.head == 0 || tcd2010 > thresholds.head) && tcdYear == 2010))
             {
 
-              if (loss != null) {
+              if (isUmdTreeCoverLoss != false) {
                 summary.lossYear(loss).treecoverLoss += areaHa
                 summary.lossYear(loss).biomassLoss += biomassPixel
 
@@ -241,7 +242,7 @@ object TreeLossSummary {
 
               summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
 
-              if (loss != null) {
+              if (isUmdTreeCoverLoss != false) {
                 summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
                 summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
                 summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel

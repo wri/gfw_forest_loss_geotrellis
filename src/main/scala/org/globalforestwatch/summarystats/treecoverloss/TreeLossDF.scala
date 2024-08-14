@@ -48,7 +48,7 @@ object TreeLossDF {
       $"data_group.isPlantations" as "is__gfw_plantations",
       $"data_group.isGlobalPeat" as "is__global_peat",
       $"data_group.isTreeCoverLossFire" as "is__tree_cover_loss_from_fires",
-      $"data_group.isTreeCoverLoss" as "is__tree_cover_loss",
+      $"data_group.isUmdTreeCoverLoss" as "is__umd_tree_cover_loss",
       $"data_group.isIntactForestLandscapes2000" as "is__intact_forest_landscapes_2000",
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
@@ -109,7 +109,7 @@ object TreeLossDF {
                              includePlantations: Boolean,
                              includeGlobalPeat: Boolean,
                              includeTreeCoverLossFires: Boolean,
-                             includeIsTreeCoverLoss: Boolean,
+                             includeIsUmdTreeCoverLoss: Boolean,
                              includeIntactForestLandscapes2000: Boolean,
                              carbonPools: Boolean,
                              simpleAGBEmis: Boolean,
@@ -218,7 +218,7 @@ object TreeLossDF {
     }
 
     val tclGroupByCol = {
-      if (includeIsTreeCoverLoss) List($"is__tree_cover_loss")
+      if (includeIsUmdTreeCoverLoss) List($"is__umd_tree_cover_loss")
       else List()
     }
 

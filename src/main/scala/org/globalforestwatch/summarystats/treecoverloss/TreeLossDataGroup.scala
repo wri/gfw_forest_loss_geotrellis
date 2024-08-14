@@ -8,6 +8,6 @@ case class TreeLossDataGroup(
                               isGlobalPeat: Boolean,
                               isTreeCoverLossFire: Boolean,
                               isGain: Boolean,
-                              isTreeCoverLoss: Boolean,
+                              isUmdTreeCoverLoss: Boolean,
                               isIntactForestLandscapes2000: Boolean
                         )

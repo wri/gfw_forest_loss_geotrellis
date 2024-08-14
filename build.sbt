@@ -200,9 +200,9 @@ sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
 )
 sparkEmrBootstrap := List(
   BootstrapAction(
-    "Install GDAL 3.1.2 dependencies",
-    "s3://gfw-pipelines/geotrellis/bootstrap/gdal.sh",
-    "3.1.2"
+    "Install GDAL 3.8.3 dependencies",
+    "s3://gfw-pipelines/geotrellis/bootstrap/gdal-3.8.3.sh",
+    "3.8.3"
   )
 )
 sparkRunJobFlowRequest := sparkRunJobFlowRequest.value
