@@ -23,11 +23,19 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
 
   val name = "gfwpro_dashboard"
 
+  /** Run the GFWPro dashboard analysis.
+    *
+    * If doGadmIntersect is true, read in the entire gadm feature dataset and
+    * intersect with the user feature list to determine the relevant gadm areas. If
+    * doGadmIntersect is false (usually for small number of user features), then
+    * determine the relevant gadm areas by using the raster gadm datasets GadmAdm0,
+    * GadmAdm1, and GadmAdm2.
+    */
   def apply(
     featureRDD: RDD[ValidatedLocation[Geometry]],
     featureType: String,
-    contextualFeatureType: String,
-    contextualFeatureUrl: NonEmptyList[String],
+    doGadmIntersect: Boolean,
+    gadmFeatureUrl: NonEmptyList[String],
     fireAlertRDD: SpatialRDD[Geometry],
     spark: SparkSession,
     kwargs: Map[String, Any]
@@ -35,20 +43,52 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
     val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
-      val spatialContextualDF = SpatialFeatureDF(contextualFeatureUrl, contextualFeatureType, FeatureFilter.empty, "geom", spark)
-      val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
-      val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(rdd, spark)
+      val enrichedRDD = if (doGadmIntersect) {
+        println("Doing intersect with vector gadm")
+        val spatialContextualDF = SpatialFeatureDF(gadmFeatureUrl, "gadm", FeatureFilter.empty, "geom", spark)
+        val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
+        val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(rdd, spark)
 
-      /* Enrich the feature RDD by intersecting it with contextual features
-       * The resulting FeatureId carries combined identity of source feature and contextual geometry
-       */
-      val enrichedRDD =
+        /* Enrich the feature RDD by intersecting it with contextual features
+         * The resulting FeatureId carries combined identity of source feature and contextual geometry
+         */
         SpatialJoinRDD
           .flatSpatialJoin(spatialContextualRDD, spatialFeatureRDD, considerBoundaryIntersection = true, usingIndex = true)
           .rdd
           .flatMap { case (feature, context) =>
-            refineContextualIntersection(feature, context, contextualFeatureType)
+            refineContextualIntersection(feature, context, "gadm")
           }
+      } else {
+        println("Using raster gadm")
+        rdd.map {
+          case Location(CombinedFeatureId(id@GfwProFeatureId(listId, locationId), featureCentroid: PointFeatureId), geom) => {
+            if (locationId != -1) {
+              // For a non-dissolved location, determine the GadmFeatureId for the
+              // centroid of the location's geometry, and add that to the feature id.
+              // This can be expensive, since the tile reads are not cached. So, we
+              // we only use this raster GADM approach for user inputs with a small
+              // number of locations (e.g. <50). In that case, we get significant
+              // performance improvement by not having to read in the entire vector
+              // GADM file, but instead only reading the GADM raster tiles for the
+              // relevant areas.
+              val pt = featureCentroid.pt
+              val windowLayout = GfwProDashboardGrid.blockTileGrid
+              val key = windowLayout.mapTransform.keysForGeometry(pt).toList.head
+              val rasterSource = GfwProDashboardRDD.getSources(key, windowLayout, kwargs).getOrElse(null)
+              val raster = rasterSource.readWindow(key, windowLayout).getOrElse(null)
+              val re = raster.rasterExtent
+              val col = re.mapXToGrid(pt.getX())
+              val row = re.mapYToGrid(pt.getY())
+              Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId(raster.tile.gadm0.getData(col, row),
+                raster.tile.gadm1.getData(col, row),
+                raster.tile.gadm2.getData(col, row))), geom))
+            } else {
+              // For a dissolved location, add a dummy GadmFeatureId to the feature id.
+              Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId("X", 0, 0)), geom))
+            }
+          }
+        }
+      }
 
       ValidatedWorkflow(enrichedRDD)
         .mapValidToValidated { rdd =>
@@ -64,11 +104,32 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
         .flatMap { enrichedRDD =>
           val fireStatsRDD = fireStats(enrichedRDD, fireAlertRDD, spark)
           val tmp = enrichedRDD.map { case Location(id, geom) => Feature(geom, id) }
-          val validatedSummaryStatsRdd = GfwProDashboardRDD(tmp, GfwProDashboardGrid.blockTileGrid, kwargs)
+          // This is where the main analysis happens, including calling
+          // GfwProDashboardSummary.getGridVisitor.visit on each pixel.
+          val validatedSummaryStatsRdd = GfwProDashboardRDD(tmp,
+               GfwProDashboardGrid.blockTileGrid,
+               kwargs + ("getRasterGadm" -> !doGadmIntersect))
           ValidatedWorkflow(validatedSummaryStatsRdd).mapValid { summaryStatsRDD =>
-            // fold in fireStatsRDD after polygonal summary and accumulate the errors
             summaryStatsRDD
-              .mapValues(_.toGfwProDashboardData())
+              .flatMap { case (CombinedFeatureId(fid@GfwProFeatureId(listId, locationId), gadmId), summary) =>
+                // For non-dissolved locations or vector gadm intersection, merge all
+                // summaries (ignoring any differing group_gadm_id), and move the
+                // gadmId from the featureId into the group_gadm_id. For dissolved
+                // locations for raster gadm, merge summaries into multiple rows
+                // based on the per-pixel group_gadm_id.
+                val ignoreRasterGadm = locationId != -1 || doGadmIntersect
+                summary.toGfwProDashboardData(ignoreRasterGadm).map( x => {
+                  val newx = if (ignoreRasterGadm) {
+                    x.copy(group_gadm_id = gadmId.toString)
+                  } else {
+                    x
+                  }
+                  Location(fid, newx)
+                }
+                )
+                case _ => throw new NotImplementedError("Missing case")
+              }
+              // fold in fireStatsRDD after polygonal summary and accumulate the errors
               .leftOuterJoin(fireStatsRDD)
               .mapValues { case (data, fire) =>
                 data.copy(viirs_alerts_daily = fire.getOrElse(GfwProDashboardDataDateCount.empty))
