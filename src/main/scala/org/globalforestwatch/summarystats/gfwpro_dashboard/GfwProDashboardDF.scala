@@ -2,7 +2,7 @@ package org.globalforestwatch.summarystats.gfwpro_dashboard
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{FeatureId, GfwProFeatureId}
+import org.globalforestwatch.features.{FeatureId, GfwProFeatureId, CombinedFeatureId, GadmFeatureId}
 import org.globalforestwatch.summarystats._
 import cats.data.Validated.{Valid, Invalid}
 import org.apache.spark.sql.functions.expr
@@ -18,6 +18,10 @@ object GfwProDashboardDF extends SummaryDF {
 
     val rowId: FeatureId => RowId = {
       case proId: GfwProFeatureId =>
+        RowId(proId.listId, proId.locationId.toString)
+      // The following case is to deal with Invalid rows, which have not had the gadm
+      // information moved out of the feature id.
+      case CombinedFeatureId(proId: GfwProFeatureId, _) =>
         RowId(proId.listId, proId.locationId.toString)
       case _ =>
         throw new IllegalArgumentException("Not a CombinedFeatureId[GfwProFeatureId, GadmFeatureId]")
