@@ -74,7 +74,7 @@
     },
     {
       "name":"landmark_indigenous_and_community_lands",
-      "source_uri":"s3://gfw-data-lake/landmark_indigenous_and_community_lands/v20201215/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_indigenous_community_and_indicative_lands/v202408/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_forest_carbon_gross_emissions",
