@@ -114,7 +114,7 @@
     },
     {
       "name":"gfw_belowground_carbon",
-      "source_uri":"s3://gfw-data-lake/gfw_belowground_carbon/v20230322/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_belowground_carbon/v20230322/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_aboveground_carbon",
@@ -226,7 +226,7 @@
     },
     {
       "name":"ifl_intact_forest_landscapes_2000",
-      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2000/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/ifl_intact_forest_landscapes_2000/v2021/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name": "arg_native_forest_land_plan",
@@ -234,15 +234,15 @@
     },
     {
       "name": "gadm_adm0",
-      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm0/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm0/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name": "gadm_adm1",
-      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm1/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm1/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name": "gadm_adm2",
-      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm2/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gadm_administrative_boundaries/v3.6/raster/epsg-4326/{grid_size}/{row_count}/adm2/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name": "sbtn_natural_forests_map",
@@ -250,11 +250,11 @@
     },
     {
       "name": "gfwpro_negligible_risk_analysis",
-      "source_uri": "s3://gfw-data-lake/gfwpro_negligible_risk_analysis/v20230726/raster/epsg-4326/{grid_size}/{row_count}/risk/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfwpro_negligible_risk_analysis/v20230726/raster/epsg-4326/{grid_size}/{row_count}/risk/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_integrated_alerts",
-      "source_uri": "s3://gfw-data-lake/gfw_integrated_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_integrated_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"arg_otbn_forest_loss",
