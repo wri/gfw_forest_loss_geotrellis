@@ -240,9 +240,9 @@ case class ForestChangeDiagnosticRawDataGroup(umdTreeCoverLossYear: Int,
       .fill(totalArea, isPeatlands),
     arg_otbn_area = ForestChangeDiagnosticDataDoubleCategory
       .fill(argOTBN, totalArea),
-    protected_areas_by_category_area = ForestChangeDiagnosticDataDoubleCategory
-      .fill(protectedAreaByCategory, totalArea),
-    landmark_by_category_area = ForestChangeDiagnosticDataDoubleCategory.fill(landmarkByCategory, totalArea),
+    protected_areas_by_category_area = ForestChangeDiagnosticDataDoubleTwoCategory
+      .fill(countryCode, protectedAreaByCategory, totalArea),
+    landmark_by_category_area = ForestChangeDiagnosticDataDoubleTwoCategory.fill(countryCode, landmarkByCategory, totalArea),
     brazil_biomes = ForestChangeDiagnosticDataDoubleCategory
       .fill(braBiomes, totalArea),
     idn_legal_area = ForestChangeDiagnosticDataDoubleCategory
