@@ -72,9 +72,9 @@ case class ForestChangeDiagnosticData(
   /** OTBN category area */
   arg_otbn_area: ForestChangeDiagnosticDataDoubleCategory,
   /** Detailed WDPA category area */
-  protected_areas_by_category_area: ForestChangeDiagnosticDataDoubleCategory,
+  protected_areas_by_category_area: ForestChangeDiagnosticDataDoubleTwoCategory,
   /** Indigenous area (from Landmark dataset) */
-  landmark_by_category_area: ForestChangeDiagnosticDataDoubleCategory,
+  landmark_by_category_area: ForestChangeDiagnosticDataDoubleTwoCategory,
   brazil_biomes: ForestChangeDiagnosticDataDoubleCategory,
   /** IDN Forest Area */
   idn_legal_area: ForestChangeDiagnosticDataDoubleCategory,
@@ -367,8 +367,8 @@ object ForestChangeDiagnosticData {
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDouble.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
-      ForestChangeDiagnosticDataDoubleCategory.empty,
-      ForestChangeDiagnosticDataDoubleCategory.empty,
+      ForestChangeDiagnosticDataDoubleTwoCategory.empty,
+      ForestChangeDiagnosticDataDoubleTwoCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
       ForestChangeDiagnosticDataDoubleCategory.empty,
