@@ -14,7 +14,7 @@
     },
     {
       "name":"detailed_wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_licensed_protected_areas/v202408/raster/epsg-4326/{grid_size}/{row_count}/detailed_iucn_cat/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_licensed_protected_areas/v202411/raster/epsg-4326/{grid_size}/{row_count}/detailed_iucn_cat/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
