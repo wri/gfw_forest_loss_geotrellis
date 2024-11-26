@@ -41,7 +41,7 @@ case class CarbonFluxTile(
                            fluxModelExtent: ForestFluxModelExtent#OptionalITile,
                            mangroveBiomassExtent: MangroveBiomassExtent#OptionalITile,
                            removalForestType: ForestFluxModelRemovalForestType#OptionalITile,
-                           drivers: TreeCoverLossDrivers#OptionalITile,
+                           drivers: TreeCoverLossDrivers1km#OptionalITile,
                            faoEcozones2000: FaoEcozones2000#OptionalITile,
                            landmark: Landmark#OptionalITile,
                            wdpa: ProtectedAreas#OptionalITile,
