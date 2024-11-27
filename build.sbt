@@ -38,7 +38,7 @@ addCompilerPlugin(
 resolvers ++= Seq(
   "GeoSolutions" at "https://maven.geo-solutions.it/",
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
-  "LT-snapshots" at "https://repo.locationtech.org/content/groups/snapshots",
+  "LT-snapshots" at "https://repo.eclipse.org/content/groups/snapshots",
   "OSGeo" at "https://repo.osgeo.org/repository/release/",
   "Open Source Geospatial Foundation Repository" at "https://repo.osgeo.org/repository/release/",
   "Apache Software Foundation Snapshots" at "https://repository.apache.org/content/groups/snapshots",
@@ -200,9 +200,9 @@ sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
 )
 sparkEmrBootstrap := List(
   BootstrapAction(
-    "Install GDAL 3.8.3 dependencies",
-    "s3://gfw-pipelines/geotrellis/bootstrap/gdal-3.8.3.sh",
-    "3.8.3"
+    "Install GDAL 3.1.2 dependencies",
+    "s3://gfw-pipelines/geotrellis/bootstrap/gdal.sh",
+    "3.1.2"
   )
 )
 sparkRunJobFlowRequest := sparkRunJobFlowRequest.value
