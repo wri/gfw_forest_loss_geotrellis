@@ -71,6 +71,7 @@ libraryDependencies ++= Seq(
   sparkFastTests % Test,
   geotrellisS3,
   geotrellisGdal,
+  geotrellisGdalWarp,  //May need to comment out to run with GDAL 3.1.2. For carbonflux package run using model v1.4.0, didn't have this line
   sedonaCore,
   sedonaSQL,
   breeze,
