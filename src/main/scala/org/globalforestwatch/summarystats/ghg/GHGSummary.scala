@@ -5,6 +5,8 @@ import geotrellis.raster._
 import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
+import org.apache.spark.broadcast.Broadcast
+import org.apache.spark.sql.Row
 
 /** GHGRawData broken down by GHGRawDataGroup, which includes the loss year and crop yield */
 case class GHGSummary(
@@ -84,6 +86,15 @@ object GHGSummary {
         var cropYield = raster.tile.cocoYield.getData(col, row)
         if (cropYield == 0) {
           println("Empty cocoa yield")
+          val backupArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Row]]].value
+          for (r <- backupArray) {
+            if (r.getAs[String]("FIPS2") == "ZI10007" && r.getAs[String]("commodity") == "BANA") {
+              println(s"Found row $r")
+            }
+          }
+          //val r = backupDF.filter(col("FIPS2") === "AC01001" && col("commodity") == "BANA")
+          //r.show()
+          println("OK")
         }
 
         // Compute gross emissions Co2-equivalent due to tree loss at this pixel.
