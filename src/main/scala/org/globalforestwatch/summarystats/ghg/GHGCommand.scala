@@ -15,14 +15,21 @@ object GHGCommand extends SummaryCommand with LazyLogging {
   val GHGYearStart: Int = 2020
   val GHGYearEnd: Int = 2023
 
+  val backupYieldOpt: Opts[NonEmptyList[String]] = Opts
+    .options[String](
+      "backup_yield_url",
+      help = "URI of GADM features in TSV format"
+    )
+
   val ghgCommand: Opts[Unit] = Opts.subcommand(
     name = GHGAnalysis.name,
     help = "Compute greenhouse gas emissions factors for GFW Pro locations."
   ) {
     (
       defaultOptions,
-      featureFilterOptions
-    ).mapN { (default, filterOptions) =>
+      featureFilterOptions,
+      backupYieldOpt
+    ).mapN { (default, filterOptions, backupYieldUrl) =>
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
@@ -35,11 +42,22 @@ object GHGCommand extends SummaryCommand with LazyLogging {
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
       runAnalysis { implicit spark =>
+        println("Starting read")
+        // Read in the backup yield file. Then we're arranging to broadcast a copy to
+        // each node once, rather than copying into each task. The broadcast makes
+        // sense (as opposed to a rasterization or spatial partitioning), because the
+        // file is currently only 26 megabytes.
+        val backupDF = spark.read
+          .options(Map("header" -> "true", "delimiter" -> ",", "escape" -> "\""))
+          .csv(backupYieldUrl.toList: _*)
+        backupDF.printSchema()
+        val broadcastArray = spark.sparkContext.broadcast(backupDF.collect())
+        println(s"Done read")
         val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, splitFeatures = true)
 
         val fcdRDD = GHGAnalysis(
           featureRDD,
-          kwargs
+          kwargs + ("backupYield" -> broadcastArray)
         )
 
         val fcdDF = GHGDF.getFeatureDataFrame(fcdRDD, spark)
