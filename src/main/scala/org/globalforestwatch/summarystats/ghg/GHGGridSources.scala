@@ -16,6 +16,10 @@ case class GHGGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil = GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2BiomassSoil = GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile, kwargs = kwargs)
   val mapspamCOCOYield: MapspamYield = MapspamYield("COCO", gridTile, kwargs = kwargs)
+  val mapspamCOFFYield: MapspamYield = MapspamYield("COFF", gridTile, kwargs = kwargs)
+  val mapspamOILPYield: MapspamYield = MapspamYield("OILP", gridTile, kwargs = kwargs)
+  val mapspamRUBBYield: MapspamYield = MapspamYield("RUBB", gridTile, kwargs = kwargs)
+  val mapspamSOYBYield: MapspamYield = MapspamYield("SOYB", gridTile, kwargs = kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,
