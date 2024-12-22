@@ -19,6 +19,10 @@ case class GHGTile(
   lazy val grossEmissionsCo2eNonCo2 = sources.grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
   lazy val grossEmissionsCo2eCo2Only = sources.grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
   lazy val cocoYield = sources.mapspamCOCOYield.fetchWindow(windowKey, windowLayout)
+  lazy val coffYield = sources.mapspamCOFFYield.fetchWindow(windowKey, windowLayout)
+  lazy val oilpYield = sources.mapspamOILPYield.fetchWindow(windowKey, windowLayout)
+  lazy val rubbYield = sources.mapspamRUBBYield.fetchWindow(windowKey, windowLayout)
+  lazy val soybYield = sources.mapspamSOYBYield.fetchWindow(windowKey, windowLayout)
 
   def cellType: CellType = loss.cellType
 

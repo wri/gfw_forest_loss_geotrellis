@@ -83,7 +83,8 @@ object GHGSummary {
         }
 
         // Get default yield based on commodity
-        var cropYield = raster.tile.cocoYield.getData(col, row)
+        var cropYield = raster.tile.soybYield.getData(col, row)
+        println(s"Yield ${cropYield}, (${col}, ${row})")
         if (cropYield == 0) {
           println("Empty cocoa yield")
           val backupArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Row]]].value
