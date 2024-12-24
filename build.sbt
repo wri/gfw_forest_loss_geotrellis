@@ -185,8 +185,8 @@ sparkS3JarFolder := "s3://wri-users/dgibbs/geotrellis/jars"
 sparkS3LogUri := Some("s3://wri-users/dgibbs/geotrellis/logs")
 sparkSubnetId := Some("subnet-8c2b5ea1")
 sparkSecurityGroupIds := Seq("sg-00ca15563a40c5687", "sg-6c6a5911")
-sparkInstanceCount := 201 // 201 for carbonflux and carbon_sensitivity
-//sparkInstanceCount := 10 // for running test areas in EMR
+//sparkInstanceCount := 201 // 201 for carbonflux and carbon_sensitivity
+sparkInstanceCount := 10 // for running test areas in EMR
 sparkMasterType := "r4.2xlarge"
 sparkCoreType := "r4.2xlarge"
 sparkMasterEbsSize := Some(10)
@@ -200,23 +200,23 @@ sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
   "dgibbs_wri"
 )
 
-// For carbonflux runs
-sparkEmrBootstrap := List(
-  BootstrapAction(
-    "Install GDAL 3.1.2 dependencies",
-    "s3://gfw-pipelines/geotrellis/bootstrap/gdal.sh",
-    "3.1.2"
-  )
-)
-
-//// For other runs
+//// For carbonflux runs
 //sparkEmrBootstrap := List(
 //  BootstrapAction(
-//    "Install GDAL 3.8.3 dependencies",
-//    "s3://gfw-pipelines/geotrellis/bootstrap/gdal-3.8.3.sh",
-//    "3.8.3"
+//    "Install GDAL 3.1.2 dependencies",
+//    "s3://gfw-pipelines/geotrellis/bootstrap/gdal.sh",
+//    "3.1.2"
 //  )
 //)
+
+// For other runs
+sparkEmrBootstrap := List(
+  BootstrapAction(
+    "Install GDAL 3.8.3 dependencies",
+    "s3://gfw-pipelines/geotrellis/bootstrap/gdal-3.8.3.sh",
+    "3.8.3"
+  )
+)
 
 sparkRunJobFlowRequest := sparkRunJobFlowRequest.value
   .withTags(new Tag("Project", "Global Forest Watch"))
