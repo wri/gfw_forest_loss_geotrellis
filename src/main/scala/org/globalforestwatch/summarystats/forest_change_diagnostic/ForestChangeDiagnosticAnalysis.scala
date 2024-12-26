@@ -90,6 +90,9 @@ object ForestChangeDiagnosticAnalysis extends SummaryAnalysis {
           .persist(StorageLevel.MEMORY_AND_DISK)
       }
 
+    // If a location has empty ForestChangeDiagnosticData results, then the geometry
+    // must not have intersected the centroid of any pixels, so report the location
+    // as NoIntersectionError.
       partialResult.map {
         case Valid(Location(fid, data)) if data.equals(ForestChangeDiagnosticData.empty) =>
           Invalid(Location(fid, NoIntersectionError))
