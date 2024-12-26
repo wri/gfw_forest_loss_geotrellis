@@ -18,6 +18,7 @@ import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
 import scala.collection.JavaConverters._
 import java.time.LocalDate
 import org.globalforestwatch.util.IntersectGeometry
+import cats.data.Validated.{Invalid, Valid}
 
 object GfwProDashboardAnalysis extends SummaryAnalysis {
 
@@ -109,7 +110,17 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
           val validatedSummaryStatsRdd = GfwProDashboardRDD(tmp,
                GfwProDashboardGrid.blockTileGrid,
                kwargs + ("getRasterGadm" -> !doGadmIntersect))
-          ValidatedWorkflow(validatedSummaryStatsRdd).mapValid { summaryStatsRDD =>
+
+          // If a location has no GfwProDashboardRawDataGroup entries, then the
+          // geometry must not have intersected the centroid of any pixels, so report
+          // the location as NoIntersectionError.
+          val validatedSummaryStatsRdd1 = validatedSummaryStatsRdd.map {
+            case Valid(Location(fid, data)) if data.isEmpty =>
+              Invalid(Location(fid, NoIntersectionError))
+            case data => data
+          }
+
+          ValidatedWorkflow(validatedSummaryStatsRdd1).mapValid { summaryStatsRDD =>
             summaryStatsRDD
               .flatMap { case (CombinedFeatureId(fid@GfwProFeatureId(listId, locationId), gadmId), summary) =>
                 // For non-dissolved locations or vector gadm intersection, merge all

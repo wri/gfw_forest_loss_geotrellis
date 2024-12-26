@@ -11,7 +11,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.globalforestwatch.{TestEnvironment, ProTag}
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.features.{FeatureFilter, GfwProFeatureId, ValidatedFeatureRDD}
-import org.globalforestwatch.summarystats.{Location, ValidatedLocation}
+import org.globalforestwatch.summarystats.{Location, ValidatedLocation,JobError}
 
 class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
   def palm32InputTsvPath = getClass.getResource("/palm-oil-32.tsv").toString()
@@ -52,6 +52,23 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
       .withColumn("status_code", col("status_code").cast(IntegerType))
       .withColumn("gadm_id", when(col("gadm_id").isNull, lit("")).otherwise(col("gadm_id")))
       .withColumn("location_error", lit(""))
+  }
+
+  it("reports no-intersection geometry as invalid") {
+    // This is an area in Paraguay (60W, 20S) that is so tiny (about 1m by 1m) that
+    // it doesn't intersect the centroid of any pixel, so it should return a row with
+    // a NoIntersectionError (rather than no row at all or a row with just empty/zero
+    // results).
+    val x = -60
+    val y = -20
+    val smallGeom = Polygon(LineString(Point(x+0,y+0), Point(x+0.00001,y+0), Point(x+0.00001,y+0.00001), Point(x+0,y+0.00001), Point(x+0,y+0)))
+    val featureRDD = spark.sparkContext.parallelize(List(
+      Validated.valid[Location[JobError], Location[Geometry]](Location(GfwProFeatureId("1", 1), smallGeom))
+    ))
+    val afi = AFI(featureRDD)
+    val res = afi.collect()
+    res.length shouldBe 1
+    res.head.getAs[String]("location_error") shouldBe "[\"NoIntersectionError\"]"
   }
 
   it("matches recorded output for palm oil mills location 31", ProTag) {
