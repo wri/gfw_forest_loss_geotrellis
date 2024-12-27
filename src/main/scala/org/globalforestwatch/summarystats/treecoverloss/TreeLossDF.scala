@@ -37,7 +37,7 @@ object TreeLossDF {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("grossEmissionsCo2eAllGases") as s"gfw_forest_carbon_gross_emissions_co2e_all_gases_${i}__Mg"
+          .getItem("grossEmissionsCo2eAllGases") as s"gfw_forest_carbon_gross_emissions_all_gases_${i}__Mg_CO2e"
       }).toList
 
     val cols = List(
@@ -58,10 +58,10 @@ object TreeLossDF {
       $"data.totalGrossCumulAbovegroundRemovalsCo2" as s"gfw_forest_carbon_gross_removals_aboveground_2001_${treecoverLossMaxYear}__Mg_CO2",
       $"data.totalGrossCumulBelowgroundRemovalsCo2" as s"gfw_forest_carbon_gross_removals_belowground_2001_${treecoverLossMaxYear}__Mg_CO2",
       $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as s"gfw_forest_carbon_gross_removals_2001_${treecoverLossMaxYear}__Mg_CO2",
-      $"data.totalGrossEmissionsCo2eCo2Only" as s"gfw_forest_carbon_gross_emissions_co2_only_2001_${treecoverLossMaxYear}__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eCo2Only" as s"gfw_forest_carbon_gross_emissions_CO2_2001_${treecoverLossMaxYear}__Mg_CO2",
       $"data.totalGrossEmissionsCo2eCh4" as s"gfw_forest_carbon_gross_emissions_CH4_2001_${treecoverLossMaxYear}__Mg_CO2e",
       $"data.totalGrossEmissionsCo2eN2o" as s"gfw_forest_carbon_gross_emissions_N2O_2001_${treecoverLossMaxYear}__Mg_CO2e",
-      $"data.totalGrossEmissionsCo2eAllGases" as s"gfw_forest_carbon_gross_emissions_2001_${treecoverLossMaxYear}__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eAllGases" as s"gfw_forest_carbon_gross_emissions_all_gases_2001_${treecoverLossMaxYear}__Mg_CO2e",
       $"data.totalNetFluxCo2" as s"gfw_forest_carbon_net_flux_2001_${treecoverLossMaxYear}__Mg_CO2e",
       $"data.totalFluxModelExtentArea" as "gfw_flux_model_extent__ha"
     )
@@ -80,7 +80,7 @@ object TreeLossDF {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("grossEmissionsCo2eCo2Only") as s"gfw_forest_carbon_gross_emissions_co2_only_${i}__Mg"
+          .getItem("grossEmissionsCo2eCo2Only") as s"gfw_forest_carbon_gross_emissions_CO2_${i}__Mg_CO2e"
       }).toList
     } else {
       List()
@@ -90,7 +90,7 @@ object TreeLossDF {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("grossEmissionsCo2eCh4") as s"gfw_forest_carbon_gross_emissions_CH4_${i}__Mg"
+          .getItem("grossEmissionsCo2eCh4") as s"gfw_forest_carbon_gross_emissions_CH4_${i}__Mg_CO2e"
       }).toList
     } else {
       List()
@@ -100,7 +100,7 @@ object TreeLossDF {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         $"data.lossYear"
           .getItem(i)
-          .getItem("grossEmissionsCo2eN2o") as s"gfw_forest_carbon_gross_emissions_N2O_${i}__Mg"
+          .getItem("grossEmissionsCo2eN2o") as s"gfw_forest_carbon_gross_emissions_N2O_${i}__Mg_CO2e"
       }).toList
     } else {
       List()
@@ -146,12 +146,12 @@ object TreeLossDF {
 
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"gfw_forest_carbon_gross_emissions_co2e_all_gases_${i}__Mg") as s"gfw_forest_carbon_gross_emissions_co2e_all_gases_${i}__Mg"
+        sum(s"gfw_forest_carbon_gross_emissions_all_gases_${i}__Mg_CO2e") as s"gfw_forest_carbon_gross_emissions_all_gases_${i}__Mg_CO2e"
       }).toList
 
     val totalGrossEmissionsCo2Co2OnlyCols = if (emisGasAnnual) {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"gfw_forest_carbon_gross_emissions_co2_only_${i}__Mg") as s"gfw_forest_carbon_gross_emissions_co2_only_${i}__Mg"
+        sum(s"gfw_forest_carbon_gross_emissions_CO2_${i}__Mg_CO2e") as s"gfw_forest_carbon_gross_emissions_CO2_${i}__Mg_CO2e"
       }).toList
     } else {
       List()
@@ -159,7 +159,7 @@ object TreeLossDF {
 
     val totalGrossEmissionsCo2eCh4Cols = if (emisGasAnnual) {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"gfw_forest_carbon_gross_emissions_CH4_${i}__Mg") as s"gfw_forest_carbon_gross_emissions_CH4_${i}__Mg"
+        sum(s"gfw_forest_carbon_gross_emissions_CH4_${i}__Mg_CO2e") as s"gfw_forest_carbon_gross_emissions_CH4_${i}__Mg_CO2e"
       }).toList
     } else {
       List()
@@ -167,7 +167,7 @@ object TreeLossDF {
 
     val totalGrossEmissionsCo2eN2oCols = if (emisGasAnnual) {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
-        sum(s"gfw_forest_carbon_gross_emissions_N2O_${i}__Mg") as s"gfw_forest_carbon_gross_emissions_N2O_${i}__Mg"
+        sum(s"gfw_forest_carbon_gross_emissions_N2O_${i}__Mg_CO2e") as s"gfw_forest_carbon_gross_emissions_N2O_${i}__Mg_CO2e"
       }).toList
     } else {
       List()
@@ -188,14 +188,14 @@ object TreeLossDF {
         as s"gfw_forest_carbon_gross_removals_belowground_2001_${treecoverLossMaxYear}__Mg_CO2",
       sum(s"gfw_forest_carbon_gross_removals_2001_${treecoverLossMaxYear}__Mg_CO2")
         as s"gfw_forest_carbon_gross_removals_2001_${treecoverLossMaxYear}__Mg_CO2",
-      sum(s"gfw_forest_carbon_gross_emissions_co2_only_2001_${treecoverLossMaxYear}__Mg_CO2e")
-        as s"gfw_forest_carbon_gross_emissions_co2_only_2001_${treecoverLossMaxYear}__Mg_CO2e",
+      sum(s"gfw_forest_carbon_gross_emissions_CO2_2001_${treecoverLossMaxYear}__Mg_CO2")
+        as s"gfw_forest_carbon_gross_emissions_CO2_2001_${treecoverLossMaxYear}__Mg_CO2",
       sum(s"gfw_forest_carbon_gross_emissions_CH4_2001_${treecoverLossMaxYear}__Mg_CO2e")
         as s"gfw_forest_carbon_gross_emissions_CH4_2001_${treecoverLossMaxYear}__Mg_CO2e",
       sum(s"gfw_forest_carbon_gross_emissions_N2O_2001_${treecoverLossMaxYear}__Mg_CO2e")
         as s"gfw_forest_carbon_gross_emissions_N2O_2001_${treecoverLossMaxYear}__Mg_CO2e",
-      sum(s"gfw_forest_carbon_gross_emissions_2001_${treecoverLossMaxYear}__Mg_CO2e")
-        as s"gfw_forest_carbon_gross_emissions_2001_${treecoverLossMaxYear}__Mg_CO2e",
+      sum(s"gfw_forest_carbon_gross_emissions_all_gases_2001_${treecoverLossMaxYear}__Mg_CO2e")
+        as s"gfw_forest_carbon_gross_emissions_all_gases_2001_${treecoverLossMaxYear}__Mg_CO2e",
       sum(s"gfw_forest_carbon_net_flux_2001_${treecoverLossMaxYear}__Mg_CO2e")
         as s"gfw_forest_carbon_net_flux_2001_${treecoverLossMaxYear}__Mg_CO2e",
       sum("gfw_flux_model_extent__ha") as "gfw_flux_model_extent__ha"
