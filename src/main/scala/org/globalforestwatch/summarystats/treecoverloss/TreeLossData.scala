@@ -21,7 +21,8 @@ case class TreeLossData(
                          var totalGrossCumulBelowgroundRemovalsCo2: Double,
                          var totalGrossCumulAboveBelowgroundRemovalsCo2: Double,
                          var totalGrossEmissionsCo2eCo2Only: Double,
-                         var totalGrossEmissionsCo2eNonCo2: Double,
+                         var totalGrossEmissionsCo2eCh4: Double,
+                         var totalGrossEmissionsCo2eN2o: Double,
                          var totalGrossEmissionsCo2eAllGases: Double,
                          var totalNetFluxCo2: Double,
                          var totalFluxModelExtentArea: Double
@@ -41,7 +42,8 @@ case class TreeLossData(
           otherLoss.treecoverLoss += loss.treecoverLoss
           otherLoss.biomassLoss += loss.biomassLoss
           otherLoss.grossEmissionsCo2eCo2Only += loss.grossEmissionsCo2eCo2Only
-          otherLoss.grossEmissionsCo2eNonCo2 += loss.grossEmissionsCo2eNonCo2
+          otherLoss.grossEmissionsCo2eCh4 += loss.grossEmissionsCo2eCh4
+          otherLoss.grossEmissionsCo2eN2o += loss.grossEmissionsCo2eN2o
           otherLoss.grossEmissionsCo2eAllGases += loss.grossEmissionsCo2eAllGases
           k -> otherLoss
         }
@@ -60,7 +62,8 @@ case class TreeLossData(
       totalGrossCumulBelowgroundRemovalsCo2 + other.totalGrossCumulBelowgroundRemovalsCo2,
       totalGrossCumulAboveBelowgroundRemovalsCo2 + other.totalGrossCumulAboveBelowgroundRemovalsCo2,
       totalGrossEmissionsCo2eCo2Only + other.totalGrossEmissionsCo2eCo2Only,
-      totalGrossEmissionsCo2eNonCo2 + other.totalGrossEmissionsCo2eNonCo2,
+      totalGrossEmissionsCo2eCh4 + other.totalGrossEmissionsCo2eCh4,
+      totalGrossEmissionsCo2eN2o + other.totalGrossEmissionsCo2eN2o,
       totalGrossEmissionsCo2eAllGases + other.totalGrossEmissionsCo2eAllGases,
       totalNetFluxCo2 + other.totalNetFluxCo2,
       totalFluxModelExtentArea + other.totalFluxModelExtentArea

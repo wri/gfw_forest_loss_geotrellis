@@ -42,7 +42,7 @@ object TreeCoverLossCommand extends SummaryCommand {
   val emisGasAnnualOpts: Opts[Boolean] = Opts
     .flag(
       "emissions_by_gas_annually",
-      "Output emissions for CO2 and non-CO2 gases (CH4 and N2O) separately"
+      "Output emissions for CO2, CH4, and N2O separately"
     )
     .orFalse
 
