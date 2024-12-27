@@ -36,6 +36,7 @@ case class TreeLossTile(
     lazy val globalPeat = sources.globalPeat.fetchWindow(windowKey, windowLayout)
     lazy val tclDriverClass = sources.tclDriver.fetchWindow(windowKey, windowLayout)
     lazy val treeCoverLossFromFires = sources.treeCoverLossFromFires.fetchWindow(windowKey, windowLayout)
+    lazy val ifl2000 = sources.ifl2000.fetchWindow(windowKey, windowLayout)
 
     lazy val plantationsPre2000 = sources.plantationsPre2000.fetchWindow(windowKey, windowLayout)
     lazy val mangroveBiomassExtent = sources.mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)

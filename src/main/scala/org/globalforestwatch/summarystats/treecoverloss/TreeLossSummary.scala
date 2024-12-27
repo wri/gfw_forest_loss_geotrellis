@@ -105,6 +105,12 @@ object TreeLossSummary {
           else false
         }
 
+        val isIFL2000: Boolean = {
+          if (contextualLayers contains "is__ifl_intact_forest_landscapes_2000")
+            raster.tile.ifl2000.getData(col, row)
+          else false
+        }
+
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
@@ -165,6 +171,7 @@ object TreeLossSummary {
                 isGlobalPeat,
                 tclDriverClass,
                 isTreeCoverLossFromFires,
+                isIFL2000,
                 gain
               )
 
