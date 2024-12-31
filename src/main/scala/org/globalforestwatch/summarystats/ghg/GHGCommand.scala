@@ -53,11 +53,14 @@ object GHGCommand extends SummaryCommand with LazyLogging {
         backupDF.printSchema()
         val broadcastArray = spark.sparkContext.broadcast(backupDF.collect())
         println(s"Done read")
-        val featureRDD = ValidatedFeatureRDD(default.featureUris, default.featureType, featureFilter, splitFeatures = true)
+        val featureRDD = ValidatedFeatureRDD(default.featureUris, "gfwpro_ext", featureFilter, splitFeatures = true)
 
+        // We add the option to include the featureId in the kwargs passed to the
+        // polygonalSummary for each feature. This allows use to use the commodity
+        // and yield columns to determine the yield to use for each pixel.
         val fcdRDD = GHGAnalysis(
           featureRDD,
-          kwargs + ("backupYield" -> broadcastArray)
+          kwargs + ("backupYield" -> broadcastArray) + ("includeFeatureId" -> true) 
         )
 
         val fcdDF = GHGDF.getFeatureDataFrame(fcdRDD, spark)

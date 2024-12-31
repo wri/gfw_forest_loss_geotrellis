@@ -7,6 +7,7 @@ import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.Row
+import org.globalforestwatch.features.GfwProFeatureExtId
 
 /** GHGRawData broken down by GHGRawDataGroup, which includes the loss year and crop yield */
 case class GHGSummary(
@@ -59,6 +60,8 @@ object GHGSummary {
                 col: Int,
                 row: Int): Unit = {
 
+        val featureId = kwargs("featureId").asInstanceOf[GfwProFeatureExtId]
+
         // This is a pixel by pixel operation
 
         // pixel Area
@@ -82,8 +85,19 @@ object GHGSummary {
           }
         }
 
-        // Get default yield based on commodity
-        var cropYield = raster.tile.soybYield.getData(col, row)
+        var cropYield = if (featureId.yieldVal > 0.0) {
+          featureId.yieldVal
+        } else {
+          // Get default yield based on commodity
+          featureId.commodity match {
+            case "COCO" => raster.tile.cocoYield.getData(col, row)
+            case "COFF" => raster.tile.coffYield.getData(col, row)
+            case "OILP" => raster.tile.oilpYield.getData(col, row)
+            case "RUBB" => raster.tile.rubbYield.getData(col, row)
+            case "SOYB" => raster.tile.soybYield.getData(col, row)
+            case _ => throw new Exception("Invalid commodity")
+          }
+        }
         println(s"Yield ${cropYield}, (${col}, ${row})")
         if (cropYield == 0) {
           println("Empty cocoa yield")

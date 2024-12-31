@@ -18,7 +18,7 @@ object GHGDF extends SummaryDF {
     import spark.implicits._
 
     val rowId: FeatureId => RowId = {
-      case gfwproId: GfwProFeatureId =>
+      case gfwproId: GfwProFeatureExtId =>
         RowId(gfwproId.listId, gfwproId.locationId.toString)
       case id =>
         throw new IllegalArgumentException(s"Can't produce DataFrame for $id")
