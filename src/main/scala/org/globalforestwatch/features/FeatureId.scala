@@ -12,6 +12,7 @@ object FeatureId {
       case "wdpa"         => WdpaFeature.getFeatureId(values, true)
       case "geostore"     => GeostoreFeature.getFeatureId(values, true)
       case "gfwpro"       => GfwProFeature.getFeatureId(values, true)
+      case "gfwpro_ext"   => GfwProFeatureExt.getFeatureId(values, true)
       case "burned_areas" => BurnedAreasFeature.getFeatureId(values, true)
       case "viirs"        => FireAlertViirsFeature.getFeatureId(values, true)
       case "modis"        => FireAlertModisFeature.getFeatureId(values, true)

@@ -52,6 +52,7 @@ object Feature {
     case "modis" => FireAlertModisFeature
     case "burned_areas" => BurnedAreasFeature
     case "gfwpro" => GfwProFeature
+    case "gfwpro_ext" => GfwProFeatureExt
     case value =>
       throw new IllegalArgumentException(
         s"FeatureType must be one of 'gadm', 'wdpa', 'geostore', 'gfwpro', 'feature', 'viirs', 'modis', or 'burned_areas'. Got $value."
