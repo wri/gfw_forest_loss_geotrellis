@@ -209,7 +209,7 @@ sparkJobFlowInstancesConfig := sparkJobFlowInstancesConfig.value.withEc2KeyName(
 //  )
 //)
 
-// For other runs
+// For other runs, including treecoverloss ArcPy client jars
 sparkEmrBootstrap := List(
   BootstrapAction(
     "Install GDAL 3.8.3 dependencies",

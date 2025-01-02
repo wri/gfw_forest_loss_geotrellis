@@ -21,7 +21,7 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
   val primaryForest = PrimaryForest(gridTile, kwargs)
   val plantedForestsBool = PlantedForestsBool(gridTile, kwargs)
   val globalPeat = Peatlands(gridTile, kwargs)
-  val tclDriver = TreeCoverLossDrivers(gridTile, kwargs)
+  val tclDriver = TreeCoverLossDrivers1km(gridTile, kwargs)
   val treeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
   val ifl2000 = IntactForestLandscapes2000(gridTile, kwargs)
 
