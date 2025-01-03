@@ -111,6 +111,14 @@ object TreeLossSummary {
           else false
         }
 
+        val isUmdTreeCoverLoss: Boolean = {
+          if (contextualLayers contains "is__umd_tree_cover_loss")
+            //          val isLoss: Boolean = loss != null
+            loss != null
+          //            raster.tile.treeCoverLoss.getData(col, row) != null
+          else false
+        }
+
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
@@ -163,6 +171,7 @@ object TreeLossSummary {
           if (thresholds == Nil) stats
           else {
             val pKey =
+              // Must be in the same order as TreeLossDataGroup elsewhere, like in TreeLossDataGroup.scala
               TreeLossDataGroup(
                 thresholds.head,
                 tcdYear,
@@ -172,6 +181,7 @@ object TreeLossSummary {
                 tclDriverClass,
                 isTreeCoverLossFromFires,
                 isIFL2000,
+                isUmdTreeCoverLoss,
                 gain
               )
 
