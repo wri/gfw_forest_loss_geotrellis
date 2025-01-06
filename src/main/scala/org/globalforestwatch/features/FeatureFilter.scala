@@ -22,6 +22,7 @@ object FeatureFilter extends LazyLogging {
       case "viirs" => FeatureFilter.empty
       case "modis" => FeatureFilter.empty
       case "burned_areas" => FeatureFilter.empty
+      case "gfwpro" => GfwProFeature.Filter(options.base, options.featureId)
       case value =>
         throw new IllegalArgumentException(
           s"FeatureType must be one of 'gadm', 'wdpa', 'geostore', 'gfwpro', 'feature', 'viirs', 'modis', or 'burned_areas'. Got $value."

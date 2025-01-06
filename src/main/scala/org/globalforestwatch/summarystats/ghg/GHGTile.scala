@@ -23,6 +23,7 @@ case class GHGTile(
   lazy val oilpYield = sources.mapspamOILPYield.fetchWindow(windowKey, windowLayout)
   lazy val rubbYield = sources.mapspamRUBBYield.fetchWindow(windowKey, windowLayout)
   lazy val soybYield = sources.mapspamSOYBYield.fetchWindow(windowKey, windowLayout)
+  lazy val sugcYield = sources.mapspamSUGCYield.fetchWindow(windowKey, windowLayout)
 
   def cellType: CellType = loss.cellType
 

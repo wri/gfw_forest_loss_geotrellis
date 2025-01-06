@@ -95,12 +95,13 @@ object GHGSummary {
             case "OILP" => raster.tile.oilpYield.getData(col, row)
             case "RUBB" => raster.tile.rubbYield.getData(col, row)
             case "SOYB" => raster.tile.soybYield.getData(col, row)
+            case "SUGC" => raster.tile.sugcYield.getData(col, row)
             case _ => throw new Exception("Invalid commodity")
           }
         }
         println(s"Yield ${cropYield}, (${col}, ${row})")
         if (cropYield == 0) {
-          println("Empty cocoa yield")
+          println(s"Empty ${featureId.commodity} yield")
           val backupArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Row]]].value
           for (r <- backupArray) {
             if (r.getAs[String]("FIPS2") == "ZI10007" && r.getAs[String]("commodity") == "BANA") {

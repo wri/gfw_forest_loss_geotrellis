@@ -295,6 +295,10 @@
     {
       "name":"mapspam_yield_soyb",
       "source_uri":"s3://gfw-data-lake/mapspam_yield_soyb/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"mapspam_yield_sugc",
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_sugc/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }
