@@ -106,7 +106,7 @@ object TreeLossSummary {
         }
 
         val isIFL2000: Boolean = {
-          if (contextualLayers contains "is__ifl_intact_forest_landscapes_2000")
+          if (contextualLayers contains "is__intact_forest_landscapes_2000")
             raster.tile.ifl2000.getData(col, row)
           else false
         }

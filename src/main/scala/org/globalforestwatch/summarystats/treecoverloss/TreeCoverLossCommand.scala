@@ -22,7 +22,7 @@ object TreeCoverLossCommand extends SummaryCommand {
     .options[String](
       "contextual_layer",
       "Contextual layers to filter by (currently supported: is__umd_regional_primary_forest_2001, is__gfw_plantations, is__global_peat, " +
-        "tcl_driver__class, is__tree_cover_loss_from_fires, is__ifl_intact_forest_landscapes_2000, is__umd_tree_cover_loss"
+        "tcl_driver__class, is__tree_cover_loss_from_fires, is__intact_forest_landscapes_2000, is__umd_tree_cover_loss"
     )
     .withDefault(NonEmptyList.of(""))
 

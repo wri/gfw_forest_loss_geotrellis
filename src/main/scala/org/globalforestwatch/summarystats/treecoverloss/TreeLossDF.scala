@@ -49,7 +49,7 @@ object TreeLossDF {
       $"data_group.isGlobalPeat" as "is__global_peat",
       $"data_group.tclDriverClass" as "tcl_driver__class",
       $"data_group.isTreeCoverLossFire" as "is__tree_cover_loss_from_fires",
-      $"data_group.isIFL2000" as "is__ifl_intact_forest_landscapes_2000",
+      $"data_group.isIFL2000" as "is__intact_forest_landscapes_2000",
       $"data_group.isUmdTreeCoverLoss" as "is__umd_tree_cover_loss",
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
@@ -247,7 +247,7 @@ object TreeLossDF {
     }
 
     val iflGroupByCol = {
-      if (includeIFL2000) List($"is__ifl_intact_forest_landscapes_2000")
+      if (includeIFL2000) List($"is__intact_forest_landscapes_2000")
       else List()
     }
 
