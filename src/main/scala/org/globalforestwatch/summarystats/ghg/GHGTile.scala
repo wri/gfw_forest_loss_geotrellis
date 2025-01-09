@@ -18,12 +18,19 @@ case class GHGTile(
   lazy val tcd2000 = sources.treeCoverDensity2000.fetchWindow(windowKey, windowLayout)
   lazy val grossEmissionsCo2eNonCo2 = sources.grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
   lazy val grossEmissionsCo2eCo2Only = sources.grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
+  // It is important that the fetches for the individual yield files and the gadm
+  // admin areas are lazy, since we will only need access to one commodity file for
+  // any particular location. And we only want to access the gadm area values if we
+  // can get a yield value from the relevant commodity file.
   lazy val cocoYield = sources.mapspamCOCOYield.fetchWindow(windowKey, windowLayout)
   lazy val coffYield = sources.mapspamCOFFYield.fetchWindow(windowKey, windowLayout)
   lazy val oilpYield = sources.mapspamOILPYield.fetchWindow(windowKey, windowLayout)
   lazy val rubbYield = sources.mapspamRUBBYield.fetchWindow(windowKey, windowLayout)
   lazy val soybYield = sources.mapspamSOYBYield.fetchWindow(windowKey, windowLayout)
   lazy val sugcYield = sources.mapspamSUGCYield.fetchWindow(windowKey, windowLayout)
+  lazy val gadmAdm0 = sources.gadmAdm0.fetchWindow(windowKey, windowLayout)
+  lazy val gadmAdm1 = sources.gadmAdm1.fetchWindow(windowKey, windowLayout)
+  lazy val gadmAdm2 = sources.gadmAdm2.fetchWindow(windowKey, windowLayout)
 
   def cellType: CellType = loss.cellType
 

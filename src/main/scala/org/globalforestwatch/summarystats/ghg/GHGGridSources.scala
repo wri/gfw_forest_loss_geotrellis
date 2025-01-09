@@ -21,6 +21,9 @@ case class GHGGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val mapspamRUBBYield: MapspamYield = MapspamYield("RUBB", gridTile, kwargs = kwargs)
   val mapspamSOYBYield: MapspamYield = MapspamYield("SOYB", gridTile, kwargs = kwargs)
   val mapspamSUGCYield: MapspamYield = MapspamYield("SUGC", gridTile, kwargs = kwargs)
+  val gadmAdm0: GadmAdm0 = GadmAdm0(gridTile, kwargs)
+  val gadmAdm1: GadmAdm1 = GadmAdm1(gridTile, kwargs)
+  val gadmAdm2: GadmAdm2 = GadmAdm2(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,

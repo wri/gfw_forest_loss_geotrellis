@@ -8,6 +8,7 @@ import org.globalforestwatch.util.Geodesy
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.Row
 import org.globalforestwatch.features.GfwProFeatureExtId
+import scala.collection.mutable
 
 /** GHGRawData broken down by GHGRawDataGroup, which includes the loss year and crop yield */
 case class GHGSummary(
@@ -43,9 +44,12 @@ case class GHGSummary(
   def isEmpty = stats.isEmpty
 }
 
-object GHGSummary {
-  // Cell types of Raster[GHGTile] may not be the same.
+case class CacheKey(commodity: String, gadmId: String)
 
+object GHGSummary {
+  val backupYieldCache = mutable.HashMap[CacheKey, Float]()
+
+  // Cell types of Raster[GHGTile] may not be the same.
   def getGridVisitor(
     kwargs: Map[String, Any]
   ): GridVisitor[Raster[GHGTile],
@@ -59,6 +63,22 @@ object GHGSummary {
       def visit(raster: Raster[GHGTile],
                 col: Int,
                 row: Int): Unit = {
+
+        // Look up the "backup" yield based on gadm area (possibly using a cached value).
+        def lookupBackupYield(backupArray: Array[Row], commodity: String, gadmId: String): Float = {
+          val cached = backupYieldCache.get(CacheKey(commodity, gadmId))
+          if (cached.isDefined) {
+            return cached.get
+          }
+          for (r <- backupArray) {
+            if (r.getAs[String]("GID_2") == gadmId && r.getAs[String]("commodity") == commodity) {
+              val cropYield = r.getAs[String]("yield_kg_ha").toFloat
+              backupYieldCache(CacheKey(commodity, gadmId)) = cropYield
+              return cropYield
+            }
+          }
+          throw new Exception(s"No yield found for $commodity in $gadmId")
+        }
 
         val featureId = kwargs("featureId").asInstanceOf[GfwProFeatureExtId]
 
@@ -101,16 +121,22 @@ object GHGSummary {
         }
         println(s"Yield ${cropYield}, (${col}, ${row})")
         if (cropYield == 0) {
-          println(s"Empty ${featureId.commodity} yield")
-          val backupArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Row]]].value
-          for (r <- backupArray) {
-            if (r.getAs[String]("FIPS2") == "ZI10007" && r.getAs[String]("commodity") == "BANA") {
-              println(s"Found row $r")
-            }
+          // If we don't have a yield for this commodity based on the specific pixel,
+          // then do a lookup for the default yield for the entire gadm2 area this
+          // location is in.
+          val gadmAdm0: String = raster.tile.gadmAdm0.getData(col, row)
+          // Skip processing this pixel if gadmAdm0 is empty
+          if (gadmAdm0 == "") {
+            return
           }
+          val gadmAdm1: Integer = raster.tile.gadmAdm1.getData(col, row)
+          val gadmAdm2: Integer = raster.tile.gadmAdm2.getData(col, row)
+          val gadmId: String = s"$gadmAdm0.$gadmAdm1.${gadmAdm2}_1"
+          println(s"Empty ${featureId.commodity} yield, checking gadm yield $gadmId")
+          val backupArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Row]]].value
+          cropYield = lookupBackupYield(backupArray, featureId.commodity, gadmId)
+          println(s"Found yield ${cropYield}")
           //val r = backupDF.filter(col("FIPS2") === "AC01001" && col("commodity") == "BANA")
-          //r.show()
-          println("OK")
         }
 
         // Compute gross emissions Co2-equivalent due to tree loss at this pixel.
