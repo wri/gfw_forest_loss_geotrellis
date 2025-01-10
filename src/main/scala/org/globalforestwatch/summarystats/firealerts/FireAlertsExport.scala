@@ -4,6 +4,8 @@ import math.ceil
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.globalforestwatch.summarystats.SummaryExport
 import org.globalforestwatch.util.Util.getAnyMapValue
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object FireAlertsExport extends SummaryExport {
 
@@ -39,9 +41,11 @@ object FireAlertsExport extends SummaryExport {
     gadmDF.cache()
 
     // only export all points for viirs gadm
+    val twoYearsAgo = LocalDate.now().minusYears(2)
     if (fireAlertType == "viirs") {
       gadmDF
         .coalesce(Integer.min(300, ceil (numPartitions / 20.0).toInt))
+        .filter($"alert__date" >= twoYearsAgo.format(DateTimeFormatter.ISO_LOCAL_DATE))
         .write
         .options (csvOptions)
         .csv (path = outputUrl + "/all")
