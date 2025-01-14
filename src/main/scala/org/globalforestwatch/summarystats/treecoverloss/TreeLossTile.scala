@@ -26,8 +26,9 @@ case class TreeLossTile(
     lazy val grossCumulAbovegroundRemovalsCo2 = sources.grossCumulAbovegroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
     lazy val grossCumulBelowgroundRemovalsCo2 = sources.grossCumulBelowgroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
     lazy val netFluxCo2 = sources.netFluxCo2e.fetchWindow(windowKey, windowLayout)
-    lazy val grossEmissionsCo2eNonCo2 = sources.grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
     lazy val grossEmissionsCo2eCo2Only = sources.grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
+    lazy val grossEmissionsCo2eCh4 = sources.grossEmissionsCo2eCh4.fetchWindow(windowKey, windowLayout)
+    lazy val grossEmissionsCo2eN2o = sources.grossEmissionsCo2eN2o.fetchWindow(windowKey, windowLayout)
     lazy val fluxModelExtent = sources.fluxModelExtent.fetchWindow(windowKey, windowLayout)
 
     lazy val primaryForest = sources.primaryForest.fetchWindow(windowKey, windowLayout)
@@ -35,6 +36,7 @@ case class TreeLossTile(
     lazy val globalPeat = sources.globalPeat.fetchWindow(windowKey, windowLayout)
     lazy val tclDriverClass = sources.tclDriver.fetchWindow(windowKey, windowLayout)
     lazy val treeCoverLossFromFires = sources.treeCoverLossFromFires.fetchWindow(windowKey, windowLayout)
+    lazy val ifl2000 = sources.ifl2000.fetchWindow(windowKey, windowLayout)
 
     lazy val plantationsPre2000 = sources.plantationsPre2000.fetchWindow(windowKey, windowLayout)
     lazy val mangroveBiomassExtent = sources.mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)

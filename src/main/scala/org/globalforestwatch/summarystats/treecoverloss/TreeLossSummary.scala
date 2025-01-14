@@ -48,8 +48,9 @@ object TreeLossSummary {
 
         val grossCumulAbovegroundRemovalsCo2: Float = raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
         val grossCumulBelowgroundRemovalsCo2: Float = raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
-        val grossEmissionsCo2eNonCo2: Float = raster.tile.grossEmissionsCo2eNonCo2.getData(col, row)
         val grossEmissionsCo2eCo2Only: Float =  raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
+        val grossEmissionsCo2eCh4: Float = raster.tile.grossEmissionsCo2eCh4.getData(col, row)
+        val grossEmissionsCo2eN2o: Float = raster.tile.grossEmissionsCo2eN2o.getData(col, row)
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
         val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
 
@@ -104,6 +105,20 @@ object TreeLossSummary {
           else false
         }
 
+        val isIFL2000: Boolean = {
+          if (contextualLayers contains "is__intact_forest_landscapes_2000")
+            raster.tile.ifl2000.getData(col, row)
+          else false
+        }
+
+        val isUmdTreeCoverLoss: Boolean = {
+          if (contextualLayers contains "is__umd_tree_cover_loss")
+            //          val isLoss: Boolean = loss != null
+            loss != null
+          //            raster.tile.treeCoverLoss.getData(col, row) != null
+          else false
+        }
+
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
@@ -135,9 +150,10 @@ object TreeLossSummary {
         val grossCumulBelowgroundRemovalsCo2Pixel = grossCumulBelowgroundRemovalsCo2 * areaHa
         val grossCumulAboveBelowgroundRemovalsCo2Pixel = grossCumulAbovegroundRemovalsCo2Pixel + grossCumulBelowgroundRemovalsCo2Pixel
 
-        val grossEmissionsCo2eNonCo2Pixel = grossEmissionsCo2eNonCo2 * areaHa
+        val grossEmissionsCo2eCh4Pixel = grossEmissionsCo2eCh4 * areaHa
+        val grossEmissionsCo2eN2oPixel = grossEmissionsCo2eN2o * areaHa
         val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
-        val grossEmissionsCo2eAllGasesPixel = grossEmissionsCo2eNonCo2Pixel + grossEmissionsCo2eCo2OnlyPixel
+        val grossEmissionsCo2eAllGasesPixel = grossEmissionsCo2eCh4Pixel + grossEmissionsCo2eN2oPixel + grossEmissionsCo2eCo2OnlyPixel
 
         val netFluxCo2Pixel = netFluxCo2 * areaHa
 
@@ -155,6 +171,7 @@ object TreeLossSummary {
           if (thresholds == Nil) stats
           else {
             val pKey =
+              // Must be in the same order as TreeLossDataGroup elsewhere, like in TreeLossDataGroup.scala
               TreeLossDataGroup(
                 thresholds.head,
                 tcdYear,
@@ -163,6 +180,8 @@ object TreeLossSummary {
                 isGlobalPeat,
                 tclDriverClass,
                 isTreeCoverLossFromFires,
+                isIFL2000,
+                isUmdTreeCoverLoss,
                 gain
               )
 
@@ -171,7 +190,7 @@ object TreeLossSummary {
                 key = pKey,
                 default =
                   TreeLossData(TreeLossYearDataMap.empty,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
               )
 
             summary.totalArea += areaHa
@@ -186,7 +205,8 @@ object TreeLossSummary {
 
                 if (!plantationsPre2000) {
                   summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-                  summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                  summary.lossYear(loss).grossEmissionsCo2eCh4 += grossEmissionsCo2eCh4Pixel
+                  summary.lossYear(loss).grossEmissionsCo2eN2o += grossEmissionsCo2eN2oPixel
                   summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
                 }
               }
@@ -211,7 +231,8 @@ object TreeLossSummary {
                 summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
 
                 summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-                summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                summary.totalGrossEmissionsCo2eCh4 += grossEmissionsCo2eCh4Pixel
+                summary.totalGrossEmissionsCo2eN2o += grossEmissionsCo2eN2oPixel
                 summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
 
                 summary.totalNetFluxCo2 += netFluxCo2Pixel
@@ -226,7 +247,8 @@ object TreeLossSummary {
               summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
 
               summary.totalGrossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-              summary.totalGrossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+              summary.totalGrossEmissionsCo2eCh4 += grossEmissionsCo2eCh4Pixel
+              summary.totalGrossEmissionsCo2eN2o += grossEmissionsCo2eN2oPixel
               summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
 
               summary.totalNetFluxCo2 += netFluxCo2Pixel
@@ -235,7 +257,8 @@ object TreeLossSummary {
 
               if (loss != null) {
                 summary.lossYear(loss).grossEmissionsCo2eCo2Only += grossEmissionsCo2eCo2OnlyPixel
-                summary.lossYear(loss).grossEmissionsCo2eNonCo2 += grossEmissionsCo2eNonCo2Pixel
+                summary.lossYear(loss).grossEmissionsCo2eCh4 += grossEmissionsCo2eCh4Pixel
+                summary.lossYear(loss).grossEmissionsCo2eN2o += grossEmissionsCo2eN2oPixel
                 summary.lossYear(loss).grossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
               }
             }

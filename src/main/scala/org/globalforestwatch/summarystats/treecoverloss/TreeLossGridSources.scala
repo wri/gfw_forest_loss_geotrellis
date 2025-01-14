@@ -21,16 +21,18 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
   val primaryForest = PrimaryForest(gridTile, kwargs)
   val plantedForestsBool = PlantedForestsBool(gridTile, kwargs)
   val globalPeat = Peatlands(gridTile, kwargs)
-  val tclDriver = TreeCoverLossDrivers(gridTile, kwargs)
+  val tclDriver = TreeCoverLossDrivers1km(gridTile, kwargs)
   val treeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
+  val ifl2000 = IntactForestLandscapes2000(gridTile, kwargs)
 
   val plantationsPre2000: PlantationsPre2000 = PlantationsPre2000(gridTile, kwargs)
   val mangroveBiomassExtent: MangroveBiomassExtent = MangroveBiomassExtent(gridTile, kwargs)
 
   val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile, kwargs = kwargs)
   val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eNonCo2: GrossEmissionsNonCo2Co2eBiomassSoil = GrossEmissionsNonCo2Co2eBiomassSoil(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2BiomassSoil = GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCh4: GrossEmissionsCH4Co2eBiomassSoil = GrossEmissionsCH4Co2eBiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eN2o: GrossEmissionsN2OCo2eBiomassSoil = GrossEmissionsN2OCo2eBiomassSoil(gridTile, kwargs = kwargs)
   val netFluxCo2e: NetFluxCo2e = NetFluxCo2e(gridTile, kwargs = kwargs)
   val fluxModelExtent: ForestFluxModelExtent = ForestFluxModelExtent(gridTile, kwargs = kwargs)
 
