@@ -42,22 +42,23 @@ object GHGCommand extends SummaryCommand with LazyLogging {
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
       runAnalysis { implicit spark =>
-        println("Starting read")
-        // Read in the backup yield file. Then we're arranging to broadcast a copy to
+        println("Reading backup yield file")
+        // Read in the backup yield file. Then arrange to broadcast a copy to
         // each node once, rather than copying into each task. The broadcast makes
         // sense (as opposed to a rasterization or spatial partitioning), because the
-        // file is currently only 26 megabytes.
+        // file is currently less than 26 megabytes.
         val backupDF = spark.read
           .options(Map("header" -> "true", "delimiter" -> ",", "escape" -> "\""))
           .csv(backupYieldUrl.toList: _*)
-        backupDF.printSchema()
         val broadcastArray = spark.sparkContext.broadcast(backupDF.collect())
-        println(s"Done read")
+
+        // We use the "gfwpro_ext" feature id, which includes the extra "commodity"
+        // and "yield" columns provided in the input feature file.
         val featureRDD = ValidatedFeatureRDD(default.featureUris, "gfwpro_ext", featureFilter, splitFeatures = true)
 
-        // We add the option to include the featureId in the kwargs passed to the
-        // polygonalSummary for each feature. This allows use to use the commodity
-        // and yield columns to determine the yield to use for each pixel.
+        // We set the option to include the featureId in the kwargs passed to the
+        // polygonalSummary for each feature. We need the commodity and yield columns
+        // in the featureId to determine the yield to use for each pixel.
         val fcdRDD = GHGAnalysis(
           featureRDD,
           kwargs + ("backupYield" -> broadcastArray) + ("includeFeatureId" -> true) 

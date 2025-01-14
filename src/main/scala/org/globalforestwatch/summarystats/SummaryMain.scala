@@ -32,10 +32,10 @@ object SummaryMain {
   val command = Command(name, header, true)(main)
 
   final def main(args: Array[String]): Unit = {
-    // Print out environment variables (for debugging purposes)
-    val environmentVars = System.getenv().forEach {
-      case (key, value) => println(s"$key = $value")
-    }
+    // Print out environment variables (if needed for debugging)
+    //val environmentVars = System.getenv().forEach {
+    //  case (key, value) => println(s"$key = $value")
+    //}
     
     command.parse(args, sys.env) match {
       case Left(help) =>

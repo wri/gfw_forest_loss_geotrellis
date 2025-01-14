@@ -8,6 +8,8 @@ import io.circe.parser.decode
 import cats.kernel.Semigroup
 import cats.implicits._
 
+/** Field value which is a map from years to doubles.
+  */
 case class GHGDataValueYearly(value: SortedMap[Int, Double])
   extends GHGDataParser[GHGDataValueYearly] {
 

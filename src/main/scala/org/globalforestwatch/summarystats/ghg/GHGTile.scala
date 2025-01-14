@@ -20,8 +20,8 @@ case class GHGTile(
   lazy val grossEmissionsCo2eCo2Only = sources.grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
   // It is important that the fetches for the individual yield files and the gadm
   // admin areas are lazy, since we will only need access to one commodity file for
-  // any particular location. And we only want to access the gadm area values if we
-  // can get a yield value from the relevant commodity file.
+  // any particular location. And we only need to access the gadm area values if we
+  // can't get a yield value from the relevant commodity file.
   lazy val cocoYield = sources.mapspamCOCOYield.fetchWindow(windowKey, windowLayout)
   lazy val coffYield = sources.mapspamCOFFYield.fetchWindow(windowKey, windowLayout)
   lazy val oilpYield = sources.mapspamOILPYield.fetchWindow(windowKey, windowLayout)

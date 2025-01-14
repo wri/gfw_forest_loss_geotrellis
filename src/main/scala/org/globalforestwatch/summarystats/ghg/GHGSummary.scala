@@ -74,10 +74,13 @@ object GHGSummary {
             if (r.getAs[String]("GID_2") == gadmId && r.getAs[String]("commodity") == commodity) {
               val cropYield = r.getAs[String]("yield_kg_ha").toFloat
               backupYieldCache(CacheKey(commodity, gadmId)) = cropYield
+              println(s"Found backupyield ${cropYield}")
               return cropYield
             }
           }
+          println(s"No yield found for $commodity in $gadmId")
           throw new Exception(s"No yield found for $commodity in $gadmId")
+          //0.toFloat
         }
 
         val featureId = kwargs("featureId").asInstanceOf[GfwProFeatureExtId]
@@ -92,10 +95,8 @@ object GHGSummary {
         val area: Double = Geodesy.pixelArea(lat, re.cellSize)
         val areaHa = area / 10000.0
 
-        // input layers
-        val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
-
         // Only count tree loss for canopy > 30%
+        val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val umdTreeCoverLossYear: Int = {
           val loss = raster.tile.loss.getData(col, row)
           if (loss != null && tcd2000 > 30) {
@@ -105,38 +106,47 @@ object GHGSummary {
           }
         }
 
-        var cropYield = if (featureId.yieldVal > 0.0) {
+        val cropYield = if (umdTreeCoverLossYear == 0) {
+          // If no tree loss, then there's no need to calculate yield, since there
+          // were no emissions.
+          //println("No tree loss")
+          0.0
+        } else if (featureId.yieldVal > 0.0) {
           featureId.yieldVal
         } else {
           // Get default yield based on commodity
-          featureId.commodity match {
+          val defaultYield = featureId.commodity match {
             case "COCO" => raster.tile.cocoYield.getData(col, row)
             case "COFF" => raster.tile.coffYield.getData(col, row)
             case "OILP" => raster.tile.oilpYield.getData(col, row)
             case "RUBB" => raster.tile.rubbYield.getData(col, row)
             case "SOYB" => raster.tile.soybYield.getData(col, row)
             case "SUGC" => raster.tile.sugcYield.getData(col, row)
-            case _ => throw new Exception("Invalid commodity")
+            case _ =>
+              println("Invalid commodity ${featureId.commodity}")
+              throw new Exception("Invalid commodity")
           }
-        }
-        println(s"Yield ${cropYield}, (${col}, ${row})")
-        if (cropYield == 0) {
-          // If we don't have a yield for this commodity based on the specific pixel,
-          // then do a lookup for the default yield for the entire gadm2 area this
-          // location is in.
-          val gadmAdm0: String = raster.tile.gadmAdm0.getData(col, row)
-          // Skip processing this pixel if gadmAdm0 is empty
-          if (gadmAdm0 == "") {
-            return
+          if (defaultYield != 0.0) {
+            //println(s"Yield ${defaultYield}, (${col}, ${row})")
+            defaultYield
+          } else {
+            // If we don't have a yield for this commodity based on the specific pixel,
+            // then do a lookup for the default yield for the entire gadm2 area this
+            // location is in.
+            val gadmAdm0: String = raster.tile.gadmAdm0.getData(col, row)
+            // Skip processing this pixel if gadmAdm0 is empty
+            if (gadmAdm0 == "") {
+              println("Empty gadmAdm0")
+              return
+            }
+            val gadmAdm1: Integer = raster.tile.gadmAdm1.getData(col, row)
+            val gadmAdm2: Integer = raster.tile.gadmAdm2.getData(col, row)
+            val gadmId: String = s"$gadmAdm0.$gadmAdm1.${gadmAdm2}_1"
+            //println(s"Empty ${featureId.commodity} default yield, checking gadm yield for $gadmId")
+            val backupArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Row]]].value
+            val backupYield = lookupBackupYield(backupArray, featureId.commodity, gadmId)
+            backupYield
           }
-          val gadmAdm1: Integer = raster.tile.gadmAdm1.getData(col, row)
-          val gadmAdm2: Integer = raster.tile.gadmAdm2.getData(col, row)
-          val gadmId: String = s"$gadmAdm0.$gadmAdm1.${gadmAdm2}_1"
-          println(s"Empty ${featureId.commodity} yield, checking gadm yield $gadmId")
-          val backupArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Row]]].value
-          cropYield = lookupBackupYield(backupArray, featureId.commodity, gadmId)
-          println(s"Found yield ${cropYield}")
-          //val r = backupDF.filter(col("FIPS2") === "AC01001" && col("commodity") == "BANA")
         }
 
         // Compute gross emissions Co2-equivalent due to tree loss at this pixel.
@@ -145,10 +155,7 @@ object GHGSummary {
         val grossEmissionsCo2eNonCo2Pixel = grossEmissionsCo2eNonCo2 * areaHa
         val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
 
-        val groupKey = GHGRawDataGroup(
-          umdTreeCoverLossYear,
-          cropYield
-        )
+        val groupKey = GHGRawDataGroup(umdTreeCoverLossYear, cropYield)
 
         // if (umdTreeCoverLossYear > 0) {
         //   println(s"Yield $cropYield, lossYear $umdTreeCoverLossYear, area $areaHa, co2e ${grossEmissionsCo2eNonCo2Pixel + grossEmissionsCo2eCo2OnlyPixel}")

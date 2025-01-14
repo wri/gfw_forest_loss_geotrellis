@@ -5,6 +5,7 @@ import org.globalforestwatch.summarystats.SummaryCommand
 import org.apache.spark.sql.Column
 
 object GfwProFeature extends Feature {
+
   val listIdPos = 0
   val locationIdPos = 1
   val geomPos = 2

@@ -12,7 +12,9 @@ case class GHGRawDataGroup(umdTreeCoverLossYear: Int,
     val minLossYear = GHGCommand.GHGYearStart
     val maxLossYear = GHGCommand.GHGYearEnd
 
-    // discounted emissions 2020 (tonsCO2e) =
+    // Emissions factor formula:
+    //
+    // 20-year discounted emissions for year 2020 (tonsCO2e) =
     //   (co2e emissions 2020 * 0.0975) + (co2e emissions 2019 * 0.0925) + (co2e emissions 2018 * 0.0875) + ... + (co2e emissions 2001 * 0.025)
     // production (kg) = yield * area
     // emissions factor (tonsCO2e/kg) = discounted emissions / production
@@ -30,9 +32,6 @@ case class GHGRawDataGroup(umdTreeCoverLossYear: Int,
       total_area = GHGDataDouble.fill(totalArea),
       emissions_factor_yearly = GHGDataValueYearly(SortedMap(efList.toSeq: _*))
     )
-    // if (umdTreeCoverLossYear > 0) {
-    //   println(s"year $umdTreeCoverLossYear yield $cropYield: $r")
-    // }
     r
   }
 }
