@@ -2,7 +2,7 @@ package org.globalforestwatch.summarystats.gfwpro_dashboard
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.globalforestwatch.features.{FeatureId, GfwProFeatureId, CombinedFeatureId, GadmFeatureId}
+import org.globalforestwatch.features.{FeatureId, GfwProFeatureId, CombinedFeatureId}
 import org.globalforestwatch.summarystats._
 import cats.data.Validated.{Valid, Invalid}
 import org.apache.spark.sql.functions.expr

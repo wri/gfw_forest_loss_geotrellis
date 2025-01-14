@@ -11,6 +11,7 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.sql.functions._
 import scala.collection.immutable.SortedMap
 import io.circe.syntax._
+import cats.data.Validated.{Invalid, Valid}
 
 object AFiAnalysis extends SummaryAnalysis {
 
@@ -42,13 +43,22 @@ object AFiAnalysis extends SummaryAnalysis {
 
     import spark.implicits._
 
+    // If a location has no AFiDataGroup entries, then the geometry must not have
+    // intersected the centroid of any pixels, so report the location as
+    // NoIntersectionError.
+     val summary1RDD = summaryRDD.map {
+       case Valid(Location(fid, data)) if data.isEmpty =>
+         Invalid(Location(fid, NoIntersectionError))
+       case data => data
+     }
+
     // Null out gadm_id for all non-dissolved rows and then aggregate all results for
     // each unique (list_id, location_id, gadm_id, loss_year). Need to combine first
     // with key including loss_year, so we don't have duplicate loss year entries
     // when we create the map of loss years.
     val summary1DF = AFiAnalysis.aggregateByLossYear(
         AFiDF
-        .getFeatureDataFrame(summaryRDD, spark)
+        .getFeatureDataFrame(summary1RDD, spark)
         .withColumn(
           "gadm_id", when(col("location_id") =!= -1, lit("") ).otherwise(col("gadm_id"))
         )
