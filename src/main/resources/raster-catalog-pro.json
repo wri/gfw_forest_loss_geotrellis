@@ -267,6 +267,38 @@
     {
       "name":"col_frontera_agricola",
       "source_uri":"s3://gfw-data-lake/col_frontera_agricola/v2024/raster/epsg-4326/{grid_size}/{row_count}/category/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_full_extent_gross_emissions_co2_only_biomass_soil",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_co2_only_biomass_soil/v20240402/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_forest_flux_full_extent_gross_emissions_non_co2_biomass_soil",
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_non_co2_biomass_soil/v20240402/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"mapspam_yield_coco",
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_coco/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"mapspam_yield_coff",
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_coff/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"mapspam_yield_oilp",
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_oilp/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"mapspam_yield_rubb",
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_rubb/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"mapspam_yield_soyb",
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_soyb/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"mapspam_yield_sugc",
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_sugc/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }

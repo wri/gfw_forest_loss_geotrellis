@@ -10,6 +10,7 @@ import org.globalforestwatch.summarystats.gladalerts.GladAlertsCommand.gladAlert
 import org.globalforestwatch.summarystats.treecoverloss.TreeCoverLossCommand.treeCoverLossCommand
 import org.globalforestwatch.summarystats.integrated_alerts.IntegratedAlertsCommand.integratedAlertsCommand
 import org.globalforestwatch.summarystats.afi.AFiCommand.afiCommand
+import org.globalforestwatch.summarystats.ghg.GHGCommand.ghgCommand
 import com.monovore.decline._
 
 object SummaryMain {
@@ -25,16 +26,18 @@ object SummaryMain {
       gladAlertsCommand orElse
       treeCoverLossCommand orElse
       integratedAlertsCommand orElse
-      afiCommand
+      afiCommand orElse
+      ghgCommand
   }
   val command = Command(name, header, true)(main)
 
   final def main(args: Array[String]): Unit = {
-    // Print out environment variables (for debugging purposes)
-    val environmentVars = System.getenv().forEach {
-      case (key, value) => println(s"$key = $value")
+    // Print out environment variables (if needed for debugging)
+    if (false) {
+      val environmentVars = System.getenv().forEach {
+        case (key, value) => println(s"$key = $value")
+      }
     }
-    
     command.parse(args, sys.env) match {
       case Left(help) =>
         System.err.println(help)
