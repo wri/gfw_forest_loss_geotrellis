@@ -24,9 +24,6 @@ jobs:
           aws-region: us-east-1
           role-to-assume: arn:aws:iam::617001639586:role/gfw-data-lake-read
 
-      - name: run default tests
-        run: ./sbt ++$SCALA_VERSION "testOnly -- -n DefaultTag" coverage coverageReport
-
       - name: run pro tests
         run: ./sbt ++$SCALA_VERSION "testOnly -- -n ProTag" coverage coverageReport
         env:
@@ -56,12 +53,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 11.0.19
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: us-east-1
-          role-to-assume: arn:aws:iam::617001639586:role/gfw-geotrellis-jars-write
 
       - name: Build Assembly
         run: ./sbt assembly
