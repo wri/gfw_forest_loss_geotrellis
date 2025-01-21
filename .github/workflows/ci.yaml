@@ -58,4 +58,4 @@ jobs:
         run: ./sbt assembly
 
       - name: Publish Assembly
-        run: aws s3 cp target/scala-2.12/*.jar s3://gfwpro-geotrellis-jars/release/
+        run: ls target/scala-2.12/*.jar
