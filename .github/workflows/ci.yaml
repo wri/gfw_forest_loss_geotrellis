@@ -54,8 +54,11 @@ jobs:
           distribution: temurin
           java-version: 11.0.19
 
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
+
       - name: Build Assembly
-        run: ./sbt assembly
+        run: sbt assembly
 
       - name: Publish Assembly
         run: ls -l target/scala-2.12/*.jar
