@@ -5,6 +5,9 @@ import scala.collection.immutable.SortedMap
 case class GHGRawDataGroup(umdTreeCoverLossYear: Int,
                            cropYield: Double
 ) {
+  val DiscountNumberOfYears = 20
+  val DiscountStartValue = 0.0975
+  val DiscountDecreasePerYear = 0.005
 
   /** Produce a partial GHGData for the loss year, yield, emissions, and area in this
     * data group */
@@ -21,8 +24,8 @@ case class GHGRawDataGroup(umdTreeCoverLossYear: Int,
     
     val efList = for (i <- minLossYear to maxLossYear) yield {
       val diff = i - umdTreeCoverLossYear
-      if (diff >= 0 && diff < 20) {
-        (i -> ((0.0975 - diff * 0.005) * emissionsCo2e) / (cropYield * totalArea))
+      if (diff >= 0 && diff < DiscountNumberOfYears) {
+        (i -> ((DiscountStartValue - diff * DiscountDecreasePerYear) * emissionsCo2e) / (cropYield * totalArea))
       } else {
         (i -> 0.0)
       }

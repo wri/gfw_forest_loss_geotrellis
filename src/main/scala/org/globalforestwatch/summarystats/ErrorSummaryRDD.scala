@@ -166,9 +166,6 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
                   // if there are any full window intersections, we only need to calculate
                   // the summary for the window, and then tie it to each feature ID
                   val fullWindowIds = fullWindowFeatures.map { case feature => feature.data}.toList
-                  //if (fullWindowIds.size >= 2) {
-                  //  println(s"Re-using results from same full tile ${windowKey} for featureIds ${fullWindowIds}")
-                  //}
                   val fullWindowResults =
                     if (fullWindowFeatures.nonEmpty) {
                       fullWindowIds.map { id => (id, getSummaryForGeom(windowGeom, kwargs)) }

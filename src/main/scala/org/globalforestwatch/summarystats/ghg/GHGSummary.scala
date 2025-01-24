@@ -66,12 +66,12 @@ object GHGSummary {
                 row: Int): Unit = {
 
         // Look up the "backup" yield based on gadm area (possibly using a cached value).
-        def lookupBackupYield(backupArray: Array[Row], commodity: String, gadmId: String): Float = {
+        def lookupBackupYield(backupYieldArray: Array[Row], commodity: String, gadmId: String): Float = {
           val cached = backupYieldCache.get(CacheKey(commodity, gadmId))
           if (cached.isDefined) {
             return cached.get
           }
-          for (r <- backupArray) {
+          for (r <- backupYieldArray) {
             if (r.getAs[String]("GID_2") == gadmId && r.getAs[String]("commodity") == commodity) {
               val cropYield = r.getAs[String]("yield_kg_ha").toFloat
               backupYieldCache(CacheKey(commodity, gadmId)) = cropYield
@@ -142,9 +142,8 @@ object GHGSummary {
             val gadmAdm1: Integer = raster.tile.gadmAdm1.getData(col, row)
             val gadmAdm2: Integer = raster.tile.gadmAdm2.getData(col, row)
             val gadmId: String = s"$gadmAdm0.$gadmAdm1.${gadmAdm2}_1"
-            //println(s"Empty ${featureId.commodity} default yield, checking gadm yield for $gadmId")
-            val backupArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Row]]].value
-            val backupYield = lookupBackupYield(backupArray, featureId.commodity, gadmId)
+            val backupYieldArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Row]]].value
+            val backupYield = lookupBackupYield(backupYieldArray, featureId.commodity, gadmId)
             backupYield
           }
         }
@@ -157,9 +156,6 @@ object GHGSummary {
 
         val groupKey = GHGRawDataGroup(umdTreeCoverLossYear, cropYield)
 
-        // if (umdTreeCoverLossYear > 0) {
-        //   println(s"Yield $cropYield, lossYear $umdTreeCoverLossYear, area $areaHa, co2e ${grossEmissionsCo2eNonCo2Pixel + grossEmissionsCo2eCo2OnlyPixel}")
-        // }
         val summaryData: GHGRawData =
           acc.stats.getOrElse(
             key = groupKey,
