@@ -17,7 +17,9 @@ import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
 import scala.reflect.runtime.universe._
-
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
+import java.io.{BufferedReader, InputStreamReader, FileInputStream}
+import java.lang.IllegalArgumentException
 
 object Util {
   def uploadFile(file: File, uri: AmazonS3URI): Unit = {
@@ -27,6 +29,41 @@ object Util {
       .key(uri.getKey)
       .build()
     S3ClientProducer.get().putObject(putObjectRequest, body)
+  }
+
+  /** Read a file from either S3 or the local file system into an array of lines, each
+    * of which is an array of comma-separated values. */
+  def readFile(path: String): Array[Array[String]] = {
+    var is: InputStreamReader = null
+    try {
+      val uri = new AmazonS3URI(path)
+      val getObjectRequest = GetObjectRequest.builder()
+        .bucket(uri.getBucket)
+        .key(uri.getKey)
+        .build()
+      val response = S3ClientProducer.get().getObject(getObjectRequest)
+      is = new InputStreamReader(response)
+    } catch {
+      case _: IllegalArgumentException =>
+        val path1 = if (path.startsWith("file:"))
+          path.substring(5)
+        else
+          path
+        val inputStream = new FileInputStream(path1)
+        is = new InputStreamReader(inputStream)
+      case e: Throwable => throw(e)
+    }
+    val reader = new BufferedReader(is)
+    val lines = scala.collection.mutable.ArrayBuffer.empty[Array[String]]
+    var line: String = null
+    while ({ line = reader.readLine(); line != null }) {
+      lines += line.split(",")
+    }
+    reader.close()
+    is.close()
+    val linesArr  = lines.toArray
+    println(s"${linesArr.length} lines")
+    linesArr
   }
 
   def sortByZIndex[G <: Geometry, A](

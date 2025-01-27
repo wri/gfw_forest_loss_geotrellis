@@ -4,7 +4,7 @@ import cats.data.NonEmptyList
 import com.github.mrpowers.spark.fast.tests.DataFrameComparer
 import geotrellis.vector._
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SaveMode,Row}
+import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.IntegerType
 import org.globalforestwatch.features.{FeatureFilter, ValidatedFeatureRDD}
@@ -12,13 +12,14 @@ import org.globalforestwatch.summarystats.ValidatedLocation
 import org.globalforestwatch.{TestEnvironment, ProTag}
 import org.globalforestwatch.config.GfwConfig
 import org.apache.spark.broadcast.Broadcast
+import org.globalforestwatch.util.Util
 
 class GHGAnalysisSpec extends TestEnvironment with DataFrameComparer {
   def ghgInputTsvPath = getClass.getResource("/ghg.tsv").toString()
   def gadm2YieldPath = getClass.getResource("/part_yield_spam_gadm2.csv").toString()
   def ghgExpectedOutputPath = getClass.getResource("/ghg-output").toString()
 
-  def Ghg(features: RDD[ValidatedLocation[Geometry]], broadcastArray: Broadcast[Array[Row]]) = {
+  def Ghg(features: RDD[ValidatedLocation[Geometry]], broadcastArray: Broadcast[Array[Array[String]]]) = {
     GHGAnalysis(
       features,
       kwargs = Map(
@@ -53,10 +54,11 @@ class GHGAnalysisSpec extends TestEnvironment with DataFrameComparer {
       FeatureFilter.empty,
       splitFeatures = true
     )
-    val backupDF = spark.read
-      .options(Map("header" -> "true", "delimiter" -> ",", "escape" -> "\""))
-      .csv(gadm2YieldPath)
-    val broadcastArray = spark.sparkContext.broadcast(backupDF.collect())
+    val backupArray = Util.readFile(gadm2YieldPath)
+    //val backupDF = spark.read
+    //  .options(Map("header" -> "true", "delimiter" -> ",", "escape" -> "\""))
+    //  .csv(gadm2YieldPath)
+    val broadcastArray = spark.sparkContext.broadcast(backupArray)
     val fcd = Ghg(ghgFeatures, broadcastArray)
     val summaryDF = GHGDF.getFeatureDataFrame(fcd, spark)
     summaryDF.collect().foreach(println)

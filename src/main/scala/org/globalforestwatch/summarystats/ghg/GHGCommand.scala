@@ -8,7 +8,8 @@ import org.globalforestwatch.features._
 import com.typesafe.scalalogging.LazyLogging
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.util.Config
-
+import org.globalforestwatch.util.Util
+ 
 object GHGCommand extends SummaryCommand with LazyLogging {
   // Current range of years to do emissions factors for.
   // Update GHGYearEnd when new tree loss data becomes available.
@@ -42,15 +43,16 @@ object GHGCommand extends SummaryCommand with LazyLogging {
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 
       runAnalysis { implicit spark =>
-        println("Reading backup yield file")
         // Read in the backup yield file. Then arrange to broadcast a copy to
         // each node once, rather than copying into each task. The broadcast makes
         // sense (as opposed to a rasterization or spatial partitioning), because the
         // file is currently less than 26 megabytes.
-        val backupDF = spark.read
-          .options(Map("header" -> "true", "delimiter" -> ",", "escape" -> "\""))
-          .csv(backupYieldUrl.toList: _*)
-        val broadcastArray = spark.sparkContext.broadcast(backupDF.collect())
+        println(s"Reading backup yield file: ${backupYieldUrl.toList(0)}")
+        val backupArray = Util.readFile(backupYieldUrl.toList(0))
+        //val backupDF = spark.read
+        //  .options(Map("header" -> "true", "delimiter" -> ",", "escape" -> "\""))
+        //  .csv(backupYieldUrl.toList: _*)
+        val broadcastArray = spark.sparkContext.broadcast(backupArray)
 
         // We use the "gfwpro_ext" feature id, which includes the extra "commodity"
         // and "yield" columns provided in the input feature file.

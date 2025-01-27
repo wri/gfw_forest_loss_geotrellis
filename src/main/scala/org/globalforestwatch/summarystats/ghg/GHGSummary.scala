@@ -6,7 +6,6 @@ import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
 import org.apache.spark.broadcast.Broadcast
-import org.apache.spark.sql.Row
 import org.globalforestwatch.features.GfwProFeatureExtId
 import scala.collection.mutable
 import org.globalforestwatch.summarystats.NoYieldException
@@ -66,14 +65,18 @@ object GHGSummary {
                 row: Int): Unit = {
 
         // Look up the "backup" yield based on gadm area (possibly using a cached value).
-        def lookupBackupYield(backupYieldArray: Array[Row], commodity: String, gadmId: String): Float = {
+        def lookupBackupYield(backupYieldArray: Array[Array[String]], commodity: String, gadmId: String): Float = {
           val cached = backupYieldCache.get(CacheKey(commodity, gadmId))
           if (cached.isDefined) {
             return cached.get
           }
+          val header = backupYieldArray.head
+          val gid2Index = header.indexOf("GID_2")
+          val commodityIndex = header.indexOf("commodity")
+          val yieldIndex = header.indexOf("yield_kg_ha")
           for (r <- backupYieldArray) {
-            if (r.getAs[String]("GID_2") == gadmId && r.getAs[String]("commodity") == commodity) {
-              val cropYield = r.getAs[String]("yield_kg_ha").toFloat
+            if (r(gid2Index) == gadmId && r(commodityIndex) == commodity) {
+              val cropYield = r(yieldIndex).toFloat
               backupYieldCache(CacheKey(commodity, gadmId)) = cropYield
               println(s"Found backupyield ${cropYield} for ${commodity} in ${gadmId}")
               return cropYield
@@ -142,7 +145,7 @@ object GHGSummary {
             val gadmAdm1: Integer = raster.tile.gadmAdm1.getData(col, row)
             val gadmAdm2: Integer = raster.tile.gadmAdm2.getData(col, row)
             val gadmId: String = s"$gadmAdm0.$gadmAdm1.${gadmAdm2}_1"
-            val backupYieldArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Row]]].value
+            val backupYieldArray = kwargs("backupYield").asInstanceOf[Broadcast[Array[Array[String]]]].value
             val backupYield = lookupBackupYield(backupYieldArray, featureId.commodity, gadmId)
             backupYield
           }
