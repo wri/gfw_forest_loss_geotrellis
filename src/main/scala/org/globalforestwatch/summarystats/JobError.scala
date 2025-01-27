@@ -11,7 +11,16 @@ trait JobError
 
 case class RasterReadError(msg: String) extends JobError
 case class GeometryError(msg: String) extends JobError
+
+/* Error indicating that the location did not intersect the centroid of any
+ * raster pixels, hence there are no results. */
 case object NoIntersectionError extends JobError
+
+/* Error and exception indicating that no yield  could be determined for the specified
+ * location for use in GHG analysis */
+case class NoYieldError(msg: String) extends JobError
+case class NoYieldException(msg: String) extends Exception(msg)
+
 case class MultiError(errors: Set[String]) extends JobError {
   def addError(err: JobError): MultiError = MultiError(errors + err.toString)
   def addError(other: MultiError): MultiError = MultiError(errors ++ other.errors)

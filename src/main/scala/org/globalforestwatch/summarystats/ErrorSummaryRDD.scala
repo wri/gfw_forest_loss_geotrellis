@@ -102,22 +102,7 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
                   )
                 }
 
-             // Split features into those that completely contain the current window
-              // and those that only partially contain it
-              val windowGeom: Extent = windowLayout.mapTransform.keyToExtent(windowKey)
-              val (fullWindowFeatures, partialWindowFeatures) = features.partition {
-                feature =>
-                  try {
-                    feature.geom.contains(windowGeom)
-                  } catch {
-                    case e: org.locationtech.jts.geom.TopologyException =>
-                      // fallback if JTS can't do the intersection because of a wonky geometry,
-                      // just skip the optimization
-                      false
-                  }
-              }
-
-              def getSummaryForGeom(featureIds: List[FEATUREID], geom: Geometry): List[(FEATUREID, ValidatedSummary[SUMMARY])] = {
+              def getSummaryForGeom(geom: Geometry, mykwargs: Map[String, Any]): ValidatedSummary[SUMMARY] = {
                   val summary: Either[JobError, PolygonalSummaryResult[SUMMARY]] =
                     maybeRaster.flatMap { raster =>
                       Either.catchNonFatal {
@@ -125,9 +110,9 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
                           raster,
                           geom,
                           ErrorSummaryRDD.rasterizeOptions,
-                          kwargs)
+                          mykwargs)
                       }.left.map{
-                        // TODO: these should be moved into left side of PolygonalSummaryResult in GT
+                        case NoYieldException(msg) => NoYieldError(msg)
                         case ise: java.lang.IllegalStateException =>
                           GeometryError(s"IllegalStateException")
                         case te: org.locationtech.jts.geom.TopologyException =>
@@ -140,31 +125,57 @@ trait ErrorSummaryRDD extends LazyLogging with java.io.Serializable {
                     }
                   // Converting to Validated so errors across partial results can be accumulated
                   // @see https://typelevel.org/cats/datatypes/validated.html#validated-vs-either
-                  featureIds.map { id => (id, summary.toValidated) }
+                  summary.toValidated
               }
 
-              // for partial windows, we need to calculate summary for each geometry,
-              // since they all may have unique intersections with the window
-              val partialWindowResults = partialWindowFeatures.flatMap {
-                case feature =>
-                  getSummaryForGeom(List(feature.data), feature.geom)
+              if (kwargs.get("includeFeatureId").isDefined) {
+                // Include the featureId in the kwargs passed to the polygonalSummary
+                // code. This is to handle the case where the featureId may include
+                // one or more columns that are used by the analysis. In that case,
+                // we can't do the optimization where we share fullWindow results
+                // across features.
+                val partialSummaries: Array[(FEATUREID, ValidatedSummary[SUMMARY])] =
+                  features.map { feature: Feature[Geometry, FEATUREID] =>
+                    val id: FEATUREID = feature.data
+                    (id, getSummaryForGeom(feature.geom, kwargs + ("featureId" -> id)))
+                  }
+                partialSummaries
+              } else {
+                // Split features into those that completely contain the current window
+                // and those that only partially contain it
+                  val windowGeom: Extent = windowLayout.mapTransform.keyToExtent(windowKey)
+                  val (fullWindowFeatures, partialWindowFeatures) = features.partition {
+                    feature =>
+                      try {
+                        feature.geom.contains(windowGeom)
+                      } catch {
+                        case e: org.locationtech.jts.geom.TopologyException =>
+                          // fallback if JTS can't do the intersection because of a wonky geometry,
+                          // just skip the optimization
+                          false
+                      }
+                  }
+
+                  // for partial windows, we need to calculate summary for each geometry,
+                  // since they all may have unique intersections with the window
+                  val partialWindowResults = partialWindowFeatures.map {
+                    case feature =>
+                      (feature.data, getSummaryForGeom(feature.geom, kwargs))
+                  }
+
+                  // if there are any full window intersections, we only need to calculate
+                  // the summary for the window, and then tie it to each feature ID
+                  val fullWindowIds = fullWindowFeatures.map { case feature => feature.data}.toList
+                  val fullWindowResults =
+                    if (fullWindowFeatures.nonEmpty) {
+                      fullWindowIds.map { id => (id, getSummaryForGeom(windowGeom, kwargs)) }
+                    } else {
+                      List.empty
+                    }
+
+                  // combine results
+                  partialWindowResults ++ fullWindowResults
               }
-
-              // if there are any full window intersections, we only need to calculate
-              // the summary for the window, and then tie it to each feature ID
-              val fullWindowIds = fullWindowFeatures.map { case feature => feature.data}.toList
-              //if (fullWindowIds.size >= 2) {
-              //  println(s"Re-using results from same full tile ${windowKey} for featureIds ${fullWindowIds}")
-              //}
-              val fullWindowResults =
-                if (fullWindowFeatures.nonEmpty) {
-                  getSummaryForGeom(fullWindowIds, windowGeom)
-                } else {
-                  List.empty
-                }
-
-              // combine results
-              partialWindowResults ++ fullWindowResults
           }
       }
 
