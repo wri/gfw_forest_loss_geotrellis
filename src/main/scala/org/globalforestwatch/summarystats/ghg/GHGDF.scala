@@ -36,6 +36,9 @@ object GHGDF extends SummaryDF {
 
   val featureFields = List(
     "total_area",
+    "ef_co2_yearly",
+    "ef_ch4_yearly",
+    "ef_n2o_yearly",
     "emissions_factor_yearly"
   )
 }

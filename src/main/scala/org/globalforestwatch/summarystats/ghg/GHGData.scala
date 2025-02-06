@@ -8,6 +8,9 @@ import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
   */
 case class GHGData(
   total_area: GHGDataDouble,
+  ef_co2_yearly: GHGDataValueYearly,
+  ef_ch4_yearly: GHGDataValueYearly,
+  ef_n2o_yearly: GHGDataValueYearly,
   emissions_factor_yearly: GHGDataValueYearly
 ) {
 
@@ -15,6 +18,9 @@ case class GHGData(
 
     GHGData(
       total_area.merge(other.total_area),
+      ef_co2_yearly.merge(other.ef_co2_yearly),
+      ef_ch4_yearly.merge(other.ef_ch4_yearly),
+      ef_n2o_yearly.merge(other.ef_n2o_yearly),
       emissions_factor_yearly.merge(other.emissions_factor_yearly)
     )
   }
@@ -26,6 +32,9 @@ object GHGData {
     GHGData(
       GHGDataDouble.empty,
       GHGDataValueYearly.empty,
+      GHGDataValueYearly.empty,
+      GHGDataValueYearly.empty,
+      GHGDataValueYearly.empty
     )
 
   implicit val lossDataSemigroup: Semigroup[GHGData] =

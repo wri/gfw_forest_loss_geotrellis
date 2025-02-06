@@ -8,9 +8,13 @@ import cats.Semigroup
   * Note: This case class contains mutable values to do accumulation by group
   * in GHGSummary.getGridVisitor.
   */
-case class GHGRawData(var totalArea: Double, var emissionsCo2e: Double) {
+case class GHGRawData(var totalArea: Double, var emissionsCo2eCO2: Double, var emissionsCo2eCH4: Double, var emissionsCo2eN2O: Double, var emissionsCo2e: Double) {
   def merge(other: GHGRawData): GHGRawData = {
-    GHGRawData(totalArea + other.totalArea, emissionsCo2e + other.emissionsCo2e)
+    GHGRawData(totalArea + other.totalArea,
+      emissionsCo2eCO2 + other.emissionsCo2eCO2,
+      emissionsCo2eCH4 + other.emissionsCo2eCH4,
+      emissionsCo2eN2O + other.emissionsCo2eN2O,
+      emissionsCo2e + other.emissionsCo2e)
   }
 }
 

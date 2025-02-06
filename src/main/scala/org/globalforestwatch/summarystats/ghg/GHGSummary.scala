@@ -36,7 +36,7 @@ case class GHGSummary(
       GHGData.empty
     } else {
       stats
-        .map { case (group, data) => group.toGHGData(data.totalArea, data.emissionsCo2e) }
+        .map { case (group, data) => group.toGHGData(data.totalArea, data.emissionsCo2eCO2, data.emissionsCo2eCH4, data.emissionsCo2eN2O, data.emissionsCo2e) }
         .foldLeft(GHGData.empty)(_ merge _)
     }
   }
@@ -152,21 +152,26 @@ object GHGSummary {
         }
 
         // Compute gross emissions Co2-equivalent due to tree loss at this pixel.
-        val grossEmissionsCo2eNonCo2: Float = raster.tile.grossEmissionsCo2eNonCo2.getData(col, row)
-        val grossEmissionsCo2eCo2Only: Float =  raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
-        val grossEmissionsCo2eNonCo2Pixel = grossEmissionsCo2eNonCo2 * areaHa
+        val grossEmissionsCo2eCo2Only: Float = raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
+        val grossEmissionsCo2eCH4: Float =  raster.tile.grossEmissionsCo2eCH4.getData(col, row)
+        val grossEmissionsCo2eN2O: Float =  raster.tile.grossEmissionsCo2eN2O.getData(col, row)
         val grossEmissionsCo2eCo2OnlyPixel = grossEmissionsCo2eCo2Only * areaHa
+        val grossEmissionsCo2eCH4Pixel = grossEmissionsCo2eCH4 * areaHa
+        val grossEmissionsCo2eN2OPixel = grossEmissionsCo2eN2O * areaHa
 
         val groupKey = GHGRawDataGroup(umdTreeCoverLossYear, cropYield)
 
         val summaryData: GHGRawData =
           acc.stats.getOrElse(
             key = groupKey,
-            default = GHGRawData(0, 0)
+            default = GHGRawData(0, 0, 0, 0, 0)
           )
 
         summaryData.totalArea += areaHa
-        summaryData.emissionsCo2e += grossEmissionsCo2eNonCo2Pixel + grossEmissionsCo2eCo2OnlyPixel
+        summaryData.emissionsCo2eCO2 += grossEmissionsCo2eCo2OnlyPixel
+        summaryData.emissionsCo2eCH4 += grossEmissionsCo2eCH4Pixel
+        summaryData.emissionsCo2eN2O += grossEmissionsCo2eN2OPixel
+        summaryData.emissionsCo2e += grossEmissionsCo2eCo2OnlyPixel + grossEmissionsCo2eCH4Pixel + grossEmissionsCo2eN2OPixel
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
         acc = GHGSummary(new_stats)

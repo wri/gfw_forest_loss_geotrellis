@@ -16,8 +16,9 @@ case class GHGTile(
 
   lazy val loss = sources.treeCoverLoss.fetchWindow(windowKey, windowLayout)
   lazy val tcd2000 = sources.treeCoverDensity2000.fetchWindow(windowKey, windowLayout)
-  lazy val grossEmissionsCo2eNonCo2 = sources.grossEmissionsCo2eNonCo2.fetchWindow(windowKey, windowLayout)
   lazy val grossEmissionsCo2eCo2Only = sources.grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
+  lazy val grossEmissionsCo2eCH4 = sources.grossEmissionsCo2eCH4.fetchWindow(windowKey, windowLayout)
+  lazy val grossEmissionsCo2eN2O = sources.grossEmissionsCo2eN2O.fetchWindow(windowKey, windowLayout)
   // It is important that the fetches for the individual yield files and the gadm
   // admin areas are lazy, since we will only need access to at most one commodity
   // file for any particular location. And we only need to access the gadm area
