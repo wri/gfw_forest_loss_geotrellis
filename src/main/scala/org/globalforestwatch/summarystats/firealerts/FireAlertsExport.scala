@@ -41,6 +41,7 @@ object FireAlertsExport extends SummaryExport {
     gadmDF.cache()
 
     // only export all points for viirs gadm
+    /*
     val twoYearsAgo = LocalDate.now().minusYears(2)
     if (fireAlertType == "viirs") {
       gadmDF
@@ -50,6 +51,7 @@ object FireAlertsExport extends SummaryExport {
         .options (csvOptions)
         .csv (path = outputUrl + "/all")
     }
+    */
 
     exportChange(gadmDF, aggCol, outputUrl, numPartitions)
     if (!changeOnly) {
