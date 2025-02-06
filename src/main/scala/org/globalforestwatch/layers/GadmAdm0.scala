@@ -6,7 +6,7 @@ case class GadmAdm0(gridTile: GridTile, kwargs: Map[String, Any])
   extends StringLayer
     with OptionalILayer {
     
-  val datasetName: String = "gadm_adm0"
+  val datasetName: String = "gadm_adm0_" + kwargs("gadmVers")
   val uri: String = 
       uriForGrid(gridTile, kwargs)
 

@@ -22,13 +22,15 @@ object AFiCommand extends SummaryCommand {
     (
       defaultOptions,
       featureFilterOptions,
-      ).mapN { (default, filterOptions) =>
+      gadmVersOpt
+      ).mapN { (default, filterOptions, gadmVersOpt) =>
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "overwriteOutput" -> default.overwriteOutput,
         // Pin the version of gfw_integrated_alerts, so we don't make a data API request for 'latest'
-        "config" -> GfwConfig.get(Some(NonEmptyList.one(Config("gfw_integrated_alerts", "v20231121"))))
+        "config" -> GfwConfig.get(Some(NonEmptyList.one(Config("gfw_integrated_alerts", "v20231121")))),
+        "gadmVers" -> gadmVersOpt
       )
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)
 

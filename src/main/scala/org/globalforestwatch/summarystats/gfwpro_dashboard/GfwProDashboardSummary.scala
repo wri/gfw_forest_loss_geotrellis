@@ -6,6 +6,7 @@ import geotrellis.raster.Raster
 import geotrellis.raster.summary.GridVisitor
 import org.globalforestwatch.summarystats.Summary
 import org.globalforestwatch.util.Geodesy
+import org.globalforestwatch.util.Util
 import java.time.LocalDate
 
 /** GfwProDashboardRawData broken down by GfwProDashboardRawDataGroup, which includes
@@ -71,7 +72,7 @@ object GfwProDashboardSummary {
           }
           val gadmAdm1: Integer = raster.tile.gadm1.getData(col, row)
           val gadmAdm2: Integer = raster.tile.gadm2.getData(col, row)
-          s"$gadmAdm0.$gadmAdm1.$gadmAdm2"
+          Util.getGadmId(gadmAdm0, gadmAdm1, gadmAdm2, kwargs("gadmVers").asInstanceOf[String])
         } else {
           ""
         }

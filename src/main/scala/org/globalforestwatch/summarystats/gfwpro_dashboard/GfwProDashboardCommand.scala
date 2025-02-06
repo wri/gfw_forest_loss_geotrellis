@@ -34,13 +34,15 @@ object GfwProDashboardCommand extends SummaryCommand {
       featureFilterOptions,
       gadmFeatureUrl,
       gadmIntersectThreshold,
+      gadmVersOpt,
       pinnedVersionsOpts
-      ).mapN { (default, fireAlert, filterOptions, gadmFeatureUrl, gadmIntersectThreshold, pinned) =>
+      ).mapN { (default, fireAlert, filterOptions, gadmFeatureUrl, gadmIntersectThreshold, gadmVersOpt, pinned) =>
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "overwriteOutput" -> default.overwriteOutput,
-        "config" -> GfwConfig.get(pinned)
+        "config" -> GfwConfig.get(pinned),
+        "gadmVers" -> gadmVersOpt
       )
       // TODO: move building the feature object into options
       val featureFilter = FeatureFilter.fromOptions(default.featureType, filterOptions)

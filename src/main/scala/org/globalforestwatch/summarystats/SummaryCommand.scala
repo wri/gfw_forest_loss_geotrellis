@@ -157,6 +157,9 @@ trait SummaryCommand {
 
   val pinnedVersionsOpts: Opts[Option[NonEmptyList[Config]]] = Opts.options[Config]("pin_version", "Pin version of contextual layer. Use syntax `--pin_version dataset:version`.").orNone
 
+  val gadmVersOpt: Opts[String] =
+    Opts.option[String]("gadm_version", help = "Gadm version for Pro analyses").withDefault("3.6")
+
   val featureFilterOptions: Opts[AllFilterOptions] = (
     defaultFilterOptions.orNone,
     featureIdFilterOptions.orNone,

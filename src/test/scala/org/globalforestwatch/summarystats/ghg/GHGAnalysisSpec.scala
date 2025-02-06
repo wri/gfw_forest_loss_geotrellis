@@ -25,7 +25,9 @@ class GHGAnalysisSpec extends TestEnvironment with DataFrameComparer {
       kwargs = Map(
         "config" -> GfwConfig.get(),
         "backupYield" -> broadcastArray,
-        "includeFeatureId" -> true)
+        "includeFeatureId" -> true,
+        "gadmVers" -> "3.6"
+      )
     )
   }
 

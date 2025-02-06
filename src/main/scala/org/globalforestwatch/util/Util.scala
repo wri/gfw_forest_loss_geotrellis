@@ -143,4 +143,15 @@ object Util {
   /** Select given fields from a struct column */
   def fieldsFromCol(col: Column, fields: List[String]): List[Column] =
     fields.map(name => col.getField(name).as(name))
+
+  /** Return gadmId based on adm0, adm1, and adm2 values. Distinguish different GADM
+    * dataset versions using a special prefix. */
+  def getGadmId(gadmAdm0: String, gadmAdm1: Integer, gadmAdm2: Integer, gadmVers: String): String = {
+    val base = s"$gadmAdm0.$gadmAdm1.$gadmAdm2"
+    gadmVers match {
+      case "3.6" => base
+      case "4.1" => s"4$base"
+      case _ => throw new Exception("Unhandled gadm version")
+    }
+  }
 }

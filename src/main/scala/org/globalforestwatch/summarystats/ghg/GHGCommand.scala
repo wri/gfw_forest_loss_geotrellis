@@ -29,14 +29,16 @@ object GHGCommand extends SummaryCommand with LazyLogging {
     (
       defaultOptions,
       featureFilterOptions,
-      backupYieldOpt
-    ).mapN { (default, filterOptions, backupYieldUrl) =>
+      backupYieldOpt,
+      gadmVersOpt
+    ).mapN { (default, filterOptions, backupYieldUrl, gadmVersOpt) =>
       val kwargs = Map(
         "outputUrl" -> default.outputUrl,
         "noOutputPathSuffix" -> default.noOutputPathSuffix,
         "overwriteOutput" -> default.overwriteOutput,
         // Pin the version of gfw_integrated_alerts, so we don't make a data API request for 'latest'
-        "config" -> GfwConfig.get(Some(NonEmptyList.one(Config("gfw_integrated_alerts", "v20231121"))))
+        "config" -> GfwConfig.get(Some(NonEmptyList.one(Config("gfw_integrated_alerts", "v20231121")))),
+        "gadmVers" -> gadmVersOpt
       )
 
       if (!default.splitFeatures) logger.warn("Forcing splitFeatures = true")

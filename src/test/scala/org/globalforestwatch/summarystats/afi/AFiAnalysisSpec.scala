@@ -22,7 +22,9 @@ class AFiAnalysisSpec extends TestEnvironment with DataFrameComparer {
       features,
       "gfwpro",
       spark,
-      kwargs = Map("config" -> GfwConfig.get())
+      kwargs = Map("config" -> GfwConfig.get(),
+        "gadmVers" -> "3.6"
+      )
     )
   }
 

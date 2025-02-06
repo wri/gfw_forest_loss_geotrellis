@@ -5,7 +5,6 @@ import geotrellis.vector.{Feature, Geometry}
 import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats._
 import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
-import org.globalforestwatch.util.RDDAdapter
 import org.globalforestwatch.ValidatedWorkflow
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
@@ -14,6 +13,7 @@ import org.globalforestwatch.features.FeatureId
 import org.apache.sedona.sql.utils.Adapter
 import org.apache.sedona.core.spatialRDD.SpatialRDD
 import org.globalforestwatch.util.GeotrellisGeometryValidator.makeValidGeom
+import org.globalforestwatch.util.Util
 
 import scala.collection.JavaConverters._
 import java.time.LocalDate
@@ -131,7 +131,9 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
                 val ignoreRasterGadm = locationId != -1 || doGadmIntersect
                 summary.toGfwProDashboardData(ignoreRasterGadm).map( x => {
                   val newx = if (ignoreRasterGadm) {
-                    x.copy(group_gadm_id = gadmId.toString)
+                    val gadmFeatureId = gadmId.asInstanceOf[GadmFeatureId]
+                    val gadmString = Util.getGadmId(gadmFeatureId.iso, gadmFeatureId.adm1, gadmFeatureId.adm2, kwargs("gadmVers").asInstanceOf[String])
+                    x.copy(group_gadm_id = gadmString)
                   } else {
                     x
                   }
