@@ -98,11 +98,11 @@ object GHGSummary {
         val area: Double = Geodesy.pixelArea(lat, re.cellSize)
         val areaHa = area / 10000.0
 
-        // Only count tree loss for canopy > 30%
+        // Only count tree loss for canopy > 10%
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val umdTreeCoverLossYear: Int = {
           val loss = raster.tile.loss.getData(col, row)
-          if (loss != null && tcd2000 > 30) {
+          if (loss != null && tcd2000 > 10) {
             loss.toInt
           } else {
             0
