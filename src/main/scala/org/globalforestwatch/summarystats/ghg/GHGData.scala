@@ -7,17 +7,34 @@ import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 /** Final data for each location.
   */
 case class GHGData(
-  total_area: GHGDataDouble,
+  total_area: GHGDataDouble,  // in hectares
+  production: GHGDataDouble,  // in Mg (metric tonnes)
+
+  // Before prodDivide, these fields are emissions in Mg CO2e.
+  // After prodDivide, these fields are the emissions factors, Mg CO2e / Mg yield.
   ef_co2_yearly: GHGDataValueYearly,
   ef_ch4_yearly: GHGDataValueYearly,
   ef_n2o_yearly: GHGDataValueYearly,
   emissions_factor_yearly: GHGDataValueYearly
 ) {
 
+  // Divide the emissions fields by production after all aggregation, so they
+  // become actual emission factors.
+  def prodDivide(): GHGData = {
+    GHGData(
+      total_area, production,
+      ef_co2_yearly.divide(production),
+      ef_ch4_yearly.divide(production),
+      ef_n2o_yearly.divide(production),
+      emissions_factor_yearly.divide(production)
+    )
+  }
+
   def merge(other: GHGData): GHGData = {
 
     GHGData(
       total_area.merge(other.total_area),
+      production.merge(other.production),
       ef_co2_yearly.merge(other.ef_co2_yearly),
       ef_ch4_yearly.merge(other.ef_ch4_yearly),
       ef_n2o_yearly.merge(other.ef_n2o_yearly),
@@ -30,6 +47,7 @@ object GHGData {
 
   def empty: GHGData =
     GHGData(
+      GHGDataDouble.empty,
       GHGDataDouble.empty,
       GHGDataValueYearly.empty,
       GHGDataValueYearly.empty,

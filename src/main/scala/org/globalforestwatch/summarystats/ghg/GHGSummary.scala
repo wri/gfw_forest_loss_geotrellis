@@ -30,7 +30,7 @@ case class GHGSummary(
     GHGSummary(stats.combine(other.stats))
   }
 
-  /** Pivot raw data to GHGData and aggregate across years */
+  /** Pivot raw data to GHGData and aggregate across groups */
   def toGHGData(): GHGData = {
     if (stats.isEmpty) {
       GHGData.empty
@@ -102,6 +102,9 @@ object GHGSummary {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val umdTreeCoverLossYear: Int = {
           val loss = raster.tile.loss.getData(col, row)
+          if (loss != null && tcd2000 <= 10) {
+            println(s"Pixel with TCL ${loss.toInt} but tcd2000  $tcd2000")
+          }
           if (loss != null && tcd2000 > 10) {
             loss.toInt
           } else {
@@ -109,12 +112,7 @@ object GHGSummary {
           }
         }
 
-        val cropYield = if (umdTreeCoverLossYear == 0) {
-          // If no tree loss, then there's no need to calculate yield, since there
-          // were no emissions.
-          //println("No tree loss")
-          0.0
-        } else if (featureId.yieldVal > 0.0) {
+        val cropYield = if (featureId.yieldVal > 0.0) {
           featureId.yieldVal
         } else {
           // Get default yield based on commodity
@@ -130,7 +128,7 @@ object GHGSummary {
               throw new Exception("Invalid commodity")
           }
           if (defaultYield != 0.0) {
-            //println(s"Yield ${defaultYield}, (${col}, ${row})")
+            //println(s"MapSpam Yield ${defaultYield}, (${col}, ${row}), featureId ${featureId}")
             defaultYield
           } else {
             // If we don't have a yield for this commodity based on the specific pixel,
@@ -172,6 +170,7 @@ object GHGSummary {
         summaryData.emissionsCo2eCH4 += grossEmissionsCo2eCH4Pixel
         summaryData.emissionsCo2eN2O += grossEmissionsCo2eN2OPixel
         summaryData.emissionsCo2e += grossEmissionsCo2eCo2OnlyPixel + grossEmissionsCo2eCH4Pixel + grossEmissionsCo2eN2OPixel
+        println(s"FeatureId ${featureId.listId}, ${featureId.locationId}, TCL ${umdTreeCoverLossYear}, yield ${cropYield}, emiss of pixel ${summaryData.emissionsCo2e}, pixel area: ${areaHa}, (${col}, ${row})")
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
         acc = GHGSummary(new_stats)

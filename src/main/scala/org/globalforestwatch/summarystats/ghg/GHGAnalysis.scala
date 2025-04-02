@@ -56,7 +56,8 @@ object GHGAnalysis extends SummaryAnalysis {
                 .mapValues {
                   case summary: GHGSummary =>
                     val data = summary.toGHGData()
-                    data
+                    // Divide by production now that everything is merged per feature.
+                    data.prodDivide()
                 }
             }
           }

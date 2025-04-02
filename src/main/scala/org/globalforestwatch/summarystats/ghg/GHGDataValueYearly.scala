@@ -22,6 +22,10 @@ case class GHGDataValueYearly(value: SortedMap[Int, Double])
   def toJson: String = {
     this.round.asJson.noSpaces
   }
+
+  def divide(num: GHGDataDouble): GHGDataValueYearly = {
+    GHGDataValueYearly(this.value.map { case (key, value) => (key, value / num.value) })
+  }
 }
 
 object GHGDataValueYearly {
