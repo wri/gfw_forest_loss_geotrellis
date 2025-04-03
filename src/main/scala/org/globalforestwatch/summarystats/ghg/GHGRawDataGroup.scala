@@ -30,7 +30,6 @@ case class GHGRawDataGroup(umdTreeCoverLossYear: Int,
       val r = for (i <- minLossYear to maxLossYear) yield {
         val diff = i - umdTreeCoverLossYear
         if (diff >= 0 && diff < DiscountNumberOfYears) {
-          println(s"${umdTreeCoverLossYear}, ${cropYield}, ${totalArea}, ${emissionsCo2e}, ${i}, ${((DiscountStartValue - diff * DiscountDecreasePerYear) * emissions) / (cropYield * totalArea)}")
           (i -> ((DiscountStartValue - diff * DiscountDecreasePerYear) * emissions))
         } else {
           (i -> 0.0)
