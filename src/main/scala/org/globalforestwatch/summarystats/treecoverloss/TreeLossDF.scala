@@ -8,7 +8,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 object TreeLossDF {
 
   val treecoverLossMinYear = 2001
-  val treecoverLossMaxYear = 2023
+  val treecoverLossMaxYear = 2024
 
   def unpackValues(carbonPools: Boolean, simpleAGBEmis: Boolean, emisGasAnnual: Boolean)(df: DataFrame): DataFrame = {
     val spark: SparkSession = df.sparkSession
@@ -144,9 +144,9 @@ object TreeLossDF {
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         sum(s"whrc_aboveground_biomass_loss_${i}__Mg") as s"whrc_aboveground_biomass_loss_${i}__Mg"
       }).toList
-      } else {
-        List()
-      }
+    } else {
+      List()
+    }
 
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
