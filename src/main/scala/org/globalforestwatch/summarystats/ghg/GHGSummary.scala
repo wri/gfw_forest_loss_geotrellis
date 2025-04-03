@@ -98,14 +98,14 @@ object GHGSummary {
         val area: Double = Geodesy.pixelArea(lat, re.cellSize)
         val areaHa = area / 10000.0
 
-        // Only count tree loss for canopy > 10%
+        // Only count tree loss for canopy > 10% OR if there was some tree gain OR
+        // if there are mangroves.
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
+        val treeGainFromHeight: Boolean = raster.tile.treeCoverGainFromHeight.getData(col, row)
+        val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
         val umdTreeCoverLossYear: Int = {
           val loss = raster.tile.loss.getData(col, row)
-          if (loss != null && tcd2000 <= 10) {
-            println(s"Pixel with TCL ${loss.toInt} but tcd2000  $tcd2000")
-          }
-          if (loss != null && tcd2000 > 10) {
+          if (loss != null && (tcd2000 > 10 || treeGainFromHeight || mangroveBiomassExtent)) {
             loss.toInt
           } else {
             0
@@ -157,6 +157,10 @@ object GHGSummary {
         val grossEmissionsCo2eCH4Pixel = grossEmissionsCo2eCH4 * areaHa
         val grossEmissionsCo2eN2OPixel = grossEmissionsCo2eN2O * areaHa
 
+        //if (raster.tile.loss.getData(col, row) != null && !(tcd2000 > 10 || treeGainFromHeight || mangroveBiomassExtent)) {
+        //  println(s"Pixel with TCL ${raster.tile.loss.getData(col, row).toInt} but tcd2000 $tcd2000, $treeGainFromHeight, $mangroveBiomassExtent, emissions ${grossEmissionsCo2eCo2OnlyPixel + grossEmissionsCo2eCH4Pixel + grossEmissionsCo2eN2OPixel}")
+        //}
+
         val groupKey = GHGRawDataGroup(umdTreeCoverLossYear, cropYield)
 
         val summaryData: GHGRawData =
@@ -170,7 +174,7 @@ object GHGSummary {
         summaryData.emissionsCo2eCH4 += grossEmissionsCo2eCH4Pixel
         summaryData.emissionsCo2eN2O += grossEmissionsCo2eN2OPixel
         summaryData.emissionsCo2e += grossEmissionsCo2eCo2OnlyPixel + grossEmissionsCo2eCH4Pixel + grossEmissionsCo2eN2OPixel
-        println(s"FeatureId ${featureId.listId}, ${featureId.locationId}, TCL ${umdTreeCoverLossYear}, yield ${cropYield}, emiss of pixel ${summaryData.emissionsCo2e}, pixel area: ${areaHa}, (${col}, ${row})")
+        //println(s"FeatureId ${featureId.listId}, ${featureId.locationId}, TCL ${umdTreeCoverLossYear}, yield ${cropYield}, emiss of pixel ${summaryData.emissionsCo2e}, pixel area: ${areaHa}, (${col}, ${row})")
 
         val new_stats = acc.stats.updated(groupKey, summaryData)
         acc = GHGSummary(new_stats)

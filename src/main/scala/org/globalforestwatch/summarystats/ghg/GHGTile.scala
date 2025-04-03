@@ -32,6 +32,8 @@ case class GHGTile(
   lazy val gadmAdm0 = sources.gadmAdm0.fetchWindow(windowKey, windowLayout)
   lazy val gadmAdm1 = sources.gadmAdm1.fetchWindow(windowKey, windowLayout)
   lazy val gadmAdm2 = sources.gadmAdm2.fetchWindow(windowKey, windowLayout)
+  lazy val treeCoverGainFromHeight = sources.treeCoverGainFromHeight.fetchWindow(windowKey, windowLayout)
+  lazy val mangroveBiomassExtent = sources.mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)
 
   def cellType: CellType = loss.cellType
 

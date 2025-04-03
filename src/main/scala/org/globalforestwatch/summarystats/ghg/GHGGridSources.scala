@@ -25,6 +25,8 @@ case class GHGGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val gadmAdm0: GadmAdm0 = GadmAdm0(gridTile, kwargs)
   val gadmAdm1: GadmAdm1 = GadmAdm1(gridTile, kwargs)
   val gadmAdm2: GadmAdm2 = GadmAdm2(gridTile, kwargs)
+  val treeCoverGainFromHeight: TreeCoverGainFromHeight = TreeCoverGainFromHeight(gridTile, kwargs)
+  val mangroveBiomassExtent: MangroveBiomassExtent  = MangroveBiomassExtent(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,
