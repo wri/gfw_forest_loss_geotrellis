@@ -60,7 +60,8 @@ case class CarbonFluxTile(
                            tropicLatitudeExtent: TropicLatitudeExtent#OptionalITile,
                            treeCoverLossFromFires: TreeCoverLossFromFires#OptionalITile,
                            grossEmissionsNodeCodes: ForestFluxModelGrossEmissionsNodeCodes#OptionalITile,
-                           plantationsPre2000: PlantationsPre2000#OptionalITile
+                           plantationsPre2000: PlantationsPre2000#OptionalITile,
+                           keyBiodiversityAreas: KeyBiodiversityAreas#OptionalITile
                          ) extends CellGrid[Int] {
   def cellType: CellType = loss.cellType
 

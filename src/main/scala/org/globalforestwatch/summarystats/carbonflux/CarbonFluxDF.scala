@@ -32,7 +32,8 @@ object CarbonFluxDF {
     "is__tropical_latitude_extent",
     "is__tree_cover_loss_from_fires",
     "gfw_full_extent_gross_emissions_code__type",
-    "is__gfw_pre_2000_plantations"
+    "is__gfw_pre_2000_plantations",
+    "is__birdlife_key_biodiversity_areas"
   )
 
   def unpackValues(df: DataFrame): DataFrame = {
@@ -73,6 +74,7 @@ object CarbonFluxDF {
       $"data_group.treeCoverLossFromFires" as "is__tree_cover_loss_from_fires",
       $"data_group.grossEmissionsNodeCodes" as "gfw_full_extent_gross_emissions_code__type",
       $"data_group.plantationsPre2000" as "is__gfw_pre_2000_plantations",
+      $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_areas",
 
 
       $"data.totalTreecoverLoss" as "umd_tree_cover_loss__ha",
@@ -274,7 +276,8 @@ object CarbonFluxDF {
         max($"is__tropical_latitude_extent") as "is__tropical_latitude_extent",
         max($"is__tree_cover_loss_from_fires") as "is__tree_cover_loss_from_fires",
         max(length($"gfw_full_extent_gross_emissions_code__type")).cast("boolean") as "gfw_full_extent_gross_emissions_code__type",
-        max($"is__gfw_pre_2000_plantations") as "is__gfw_pre_2000_plantations"
+        max($"is__gfw_pre_2000_plantations") as "is__gfw_pre_2000_plantations",
+        max($"is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas"
       )
   }
 
@@ -309,7 +312,8 @@ object CarbonFluxDF {
         max($"is__tropical_latitude_extent") as "is__tropical_latitude_extent",
         max($"is__tree_cover_loss_from_fires") as "is__tree_cover_loss_from_fires",
         max($"gfw_full_extent_gross_emissions_code__type") as "gfw_full_extent_gross_emissions_code__type",
-        max($"is__gfw_pre_2000_plantations") as "is__gfw_pre_2000_plantations"
+        max($"is__gfw_pre_2000_plantations") as "is__gfw_pre_2000_plantations",
+        max($"is__birdlife_key_biodiversity_areas") as "is__birdlife_key_biodiversity_areas"
       )
   }
 }
