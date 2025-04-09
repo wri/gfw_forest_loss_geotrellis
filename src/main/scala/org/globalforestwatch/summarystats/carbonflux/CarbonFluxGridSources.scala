@@ -65,6 +65,8 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val grossEmissionsNodeCodes: ForestFluxModelGrossEmissionsNodeCodes = ForestFluxModelGrossEmissionsNodeCodes(gridTile, kwargs = kwargs)
   val plantationsPre2000: PlantationsPre2000 = PlantationsPre2000(gridTile, kwargs)
   val keyBiodiversityAreas: KeyBiodiversityAreas = KeyBiodiversityAreas(gridTile, kwargs)
+  val aze: Aze = Aze(gridTile, kwargs)
+  val mangroves2020: Mangroves2020 = Mangroves2020(gridTile, kwargs)
 
   def readWindow(
                   windowKey: SpatialKey,
@@ -136,6 +138,8 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
       val grossEmissionsNodeCodesTile = grossEmissionsNodeCodes.fetchWindow(windowKey, windowLayout)
       val plantationsPre2000Tile = plantationsPre2000.fetchWindow(windowKey, windowLayout)
       val keyBiodiversityAreasTile = keyBiodiversityAreas.fetchWindow(windowKey, windowLayout)
+      val azeTile = aze.fetchWindow(windowKey, windowLayout)
+      val mangroves2020Tile = mangroves2020.fetchWindow(windowKey, windowLayout)
 
 
       val tile = CarbonFluxTile(
@@ -191,7 +195,9 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         treeCoverLossFromFiresTile,
         grossEmissionsNodeCodesTile,
         plantationsPre2000Tile,
-        keyBiodiversityAreasTile
+        keyBiodiversityAreasTile,
+        azeTile,
+        mangroves2020Tile
       )
 
       Raster(tile, windowKey.extent(windowLayout))

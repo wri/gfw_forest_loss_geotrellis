@@ -28,5 +28,7 @@ case class CarbonFluxDataGroup(
                                isGain: Boolean,
                                isLoss: Boolean,
                                plantationsPre2000: Boolean,
-                               keyBiodiversityAreas: Boolean
+                               keyBiodiversityAreas: Boolean,
+                               aze: Boolean,
+                               mangroves2020: Boolean
                               )

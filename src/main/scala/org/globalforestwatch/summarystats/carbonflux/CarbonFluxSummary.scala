@@ -90,6 +90,8 @@ object CarbonFluxSummary {
         val grossEmissionsNodeCodes: String = raster.tile.grossEmissionsNodeCodes.getData(col, row)
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val keyBiodiversityAreas: Boolean = raster.tile.keyBiodiversityAreas.getData(col, row)
+        val aze: Boolean = raster.tile.aze.getData(col, row)
+        val mangroves2020: Boolean = raster.tile.mangroves2020.getData(col, row)
 
 
         val lat: Double = raster.rasterExtent.gridRowToMap(row)
@@ -195,7 +197,9 @@ object CarbonFluxSummary {
               isGain,
               isLoss,
               plantationsPre2000,
-              keyBiodiversityAreas
+              keyBiodiversityAreas,
+              aze,
+              mangroves2020
             )
 
             // Number of 0s must match number of summary. items below (including summary.totalArea)
