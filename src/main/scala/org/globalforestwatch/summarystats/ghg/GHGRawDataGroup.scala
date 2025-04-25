@@ -38,6 +38,7 @@ case class GHGRawDataGroup(umdTreeCoverLossYear: Int,
       SortedMap(r.toSeq: _*)
     }
 
+    println(s"area $totalArea, cropYield $cropYield, tcl year $umdTreeCoverLossYear, emissions $emissionsCo2e")
     val r = GHGData(
       total_area = GHGDataDouble.fill(totalArea),
       // Extra divide by 1000, so production is in Mg (metric tonnes)

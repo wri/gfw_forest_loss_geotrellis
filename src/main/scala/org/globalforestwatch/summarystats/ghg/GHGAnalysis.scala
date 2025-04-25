@@ -65,6 +65,12 @@ object GHGAnalysis extends SummaryAnalysis {
           .persist(StorageLevel.MEMORY_AND_DISK)
       }
 
+      partialResult.foreach {
+        case Valid(Location(GfwProFeatureExtId(listId, locationId, commodity, _), data))  =>
+          println(s"Fid $listId, $locationId, $commodity, production ${data.production.value}")
+        case _ =>
+      }
+
     // If a location has empty GHGData results, then the geometry
     // must not have intersected the centroid of any pixels, so report the location
     // as NoIntersectionError.

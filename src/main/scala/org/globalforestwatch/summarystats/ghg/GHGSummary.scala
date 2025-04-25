@@ -45,9 +45,11 @@ case class GHGSummary(
 }
 
 case class CacheKey(commodity: String, gadmId: String)
+case class YieldKey(featureId: GfwProFeatureExtId, cropYield: Float)
 
 object GHGSummary {
   val backupYieldCache = mutable.HashMap[CacheKey, Float]()
+  val cropYieldCache = mutable.HashMap[YieldKey, Boolean]()
 
   // Cell types of Raster[GHGTile] may not be the same.
   def getGridVisitor(
@@ -64,6 +66,8 @@ object GHGSummary {
                 col: Int,
                 row: Int): Unit = {
 
+        val featureId = kwargs("featureId").asInstanceOf[GfwProFeatureExtId]
+
         // Look up the "backup" yield based on gadm area (possibly using a cached value).
         def lookupBackupYield(backupYieldArray: Array[Array[String]], commodity: String, gadmId: String): Float = {
           val cached = backupYieldCache.get(CacheKey(commodity, gadmId))
@@ -78,15 +82,13 @@ object GHGSummary {
             if (r(gid2Index) == gadmId && r(commodityIndex) == commodity) {
               val cropYield = r(yieldIndex).toFloat
               backupYieldCache(CacheKey(commodity, gadmId)) = cropYield
-              println(s"Found backupyield ${cropYield} for ${commodity} in ${gadmId}")
+              println(s"Found backupyield ${cropYield} for ${commodity} in ${gadmId}, feature ${featureId.listId}, ${featureId.locationId}")
               return cropYield
             }
           }
-          println(s"No yield found for $commodity in $gadmId")
+          println(s"No yield found for $commodity in $gadmId, feature ${featureId.listId}, ${featureId.locationId}")
           throw new NoYieldException(s"No yield found for $commodity in $gadmId")
         }
-
-        val featureId = kwargs("featureId").asInstanceOf[GfwProFeatureExtId]
 
         // This is a pixel by pixel operation
 
@@ -152,6 +154,11 @@ object GHGSummary {
             val backupYield = lookupBackupYield(backupYieldArray, featureId.commodity, gadmId)
             backupYield
           }
+        }
+        val y = cropYieldCache.get(YieldKey(featureId, cropYield))
+        if (!y.isDefined) {
+          //println(s"FeatureID $featureId, cropyYield $cropYield")
+          cropYieldCache(YieldKey(featureId, cropYield)) = true
         }
 
         // Compute gross emissions Co2-equivalent due to tree loss at this pixel.
