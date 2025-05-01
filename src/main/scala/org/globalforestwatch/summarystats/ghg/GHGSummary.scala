@@ -99,16 +99,21 @@ object GHGSummary {
         val areaHa = area / 10000.0
 
         // Only count tree loss for canopy > 10% OR if there was some tree gain OR
-        // if there are mangroves.
+        // if there are mangroves, but always ignore it if plantationsPre2000 is true.
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val treeGainFromHeight: Boolean = raster.tile.treeCoverGainFromHeight.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
         val umdTreeCoverLossYear: Int = {
-          val loss = raster.tile.loss.getData(col, row)
-          if (loss != null && (tcd2000 > 10 || treeGainFromHeight || mangroveBiomassExtent)) {
-            loss.toInt
-          } else {
+          val plantationsPre2000 = raster.tile.plantationsPre2000.getData(col, row)
+          if (plantationsPre2000) {
             0
+          } else {
+            val loss = raster.tile.loss.getData(col, row)
+            if (loss != null && (tcd2000 > 10 || treeGainFromHeight || mangroveBiomassExtent)) {
+              loss.toInt
+            } else {
+              0
+            }
           }
         }
 
