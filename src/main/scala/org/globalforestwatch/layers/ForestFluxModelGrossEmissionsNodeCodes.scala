@@ -74,12 +74,12 @@ case class ForestFluxModelGrossEmissionsNodeCodes(gridTile: GridTile, model: Str
     case 391=> "Shifting cultivation, not peat, not burned, temperate, plantation"
     case 392=> "Shifting cultivation, not peat, not burned, temperate, not plantation"
 
-    case 40=> "Forest management, peat, burned"
-    case 41=> "Forest management, peat, not burned, temperate/boreal"
-    case 42=> "Forest management, peat, not burned, tropical, plantation"
-    case 421=> "Forest management, peat, not burned, tropical, not plantation"
-    case 43=> "Forest management, not peat, burned"
-    case 44=> "Forest management, not peat, not burned"
+    case 40=> "Logging, peat, burned"
+    case 41=> "Logging, peat, not burned, temperate/boreal"
+    case 42=> "Logging, peat, not burned, tropical, plantation"
+    case 421=> "Logging, peat, not burned, tropical, not plantation"
+    case 43=> "Logging, not peat, burned"
+    case 44=> "Logging, not peat, not burned"
 
     case 50=> "Wildfire, peat, burned"
     case 51=> "Wildfire, peat, not burned, temperate/boreal"

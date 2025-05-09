@@ -17,7 +17,7 @@ case class TreeCoverLossDrivers1km(gridTile: GridTile, kwargs: Map[String, Any])
     case 1 => "Permanent agriculture"
     case 2 => "Hard commodities"
     case 3 => "Shifting cultivation"
-    case 4 => "Forest management"
+    case 4 => "Logging"
     case 5 => "Wildfire"
     case 6 => "Settlements & Infrastructure"
     case 7 => "Other natural disturbances"
