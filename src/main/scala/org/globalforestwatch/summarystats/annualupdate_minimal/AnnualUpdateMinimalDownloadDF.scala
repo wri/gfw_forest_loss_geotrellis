@@ -17,7 +17,7 @@ object AnnualUpdateMinimalDownloadDF {
 
     val annualDF = df
       .where($"umd_tree_cover_density_2000__threshold" >= 0)
-      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold")
+      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold", $"is__umd_regional_primary_forest_2001")
       .pivot("umd_tree_cover_loss__year", yearRange)
       .agg(
         sum("umd_tree_cover_loss__ha") as "umd_tree_cover_loss__ha",
@@ -28,7 +28,7 @@ object AnnualUpdateMinimalDownloadDF {
 
     val totalDF = df
       .where($"umd_tree_cover_density_2000__threshold" >= 0)
-      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold")
+      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold", $"is__umd_regional_primary_forest_2001")
       .agg(
         sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
         sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
