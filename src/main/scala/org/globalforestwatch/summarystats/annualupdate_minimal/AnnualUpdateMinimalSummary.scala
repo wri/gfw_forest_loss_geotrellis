@@ -40,7 +40,6 @@ object AnnualUpdateMinimalSummary {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
-        val drivers: String = raster.tile.drivers.getData(col, row)
         val primaryForest: Boolean = raster.tile.primaryForest.getData(col, row)
         val wdpa: String = raster.tile.wdpa.getData(col, row)
         val aze: Boolean = raster.tile.aze.getData(col, row)
@@ -103,7 +102,6 @@ object AnnualUpdateMinimalSummary {
           val pKey = AnnualUpdateMinimalDataGroup(
             loss,
             tcdThreshold,
-            drivers,
             primaryForest,
             wdpa,
             aze,
@@ -124,7 +122,7 @@ object AnnualUpdateMinimalSummary {
             intactForestLandscapes2000,
             umdGlobalLandCover,
             tropicalTreeCover,
-            naturalForests
+            naturalForests,
           )
 
           val summary: AnnualUpdateMinimalData =

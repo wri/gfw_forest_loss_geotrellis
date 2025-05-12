@@ -8,7 +8,6 @@ object AnnualUpdateMinimalDF {
 
   val contextualLayers = List(
     "umd_tree_cover_density_2000__threshold",
-    "tsc_tree_cover_loss_drivers__driver",
     "is__birdlife_alliance_for_zero_extinction_sites",
     "gfw_planted_forests__type",
     "is__gmw_global_mangrove_extent_1996",
@@ -32,7 +31,6 @@ object AnnualUpdateMinimalDF {
 
     // TODO delete next data update
     "umd_tree_cover_density__threshold",
-    "tsc_tree_cover_loss_drivers__type",
     "is__birdlife_alliance_for_zero_extinction_site",
     "gfw_plantation__type",
     "is__gmw_mangroves_1996",
@@ -57,7 +55,6 @@ object AnnualUpdateMinimalDF {
       List(
         $"data_group.lossYear" as "umd_tree_cover_loss__year",
         $"data_group.threshold" as "umd_tree_cover_density_2000__threshold",
-        $"data_group.drivers" as "tsc_tree_cover_loss_drivers__driver",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.plantedForests" as "gfw_planted_forests__type",
@@ -102,7 +99,6 @@ object AnnualUpdateMinimalDF {
         $"data.belowgroundCarbon2000" as "gfw_belowground_carbon_stocks_2000__Mg_C",
 
         $"data_group.threshold" as "umd_tree_cover_density__threshold",
-        $"data_group.drivers" as "tsc_tree_cover_loss_drivers__type",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
         $"data_group.plantedForests" as "gfw_plantation__type",
         $"data_group.mangroves1996" as "is__gmw_mangroves_1996",
@@ -244,7 +240,6 @@ object AnnualUpdateMinimalDF {
     import spark.implicits._
 
     val defaultAggCols = List(
-      max(length($"tsc_tree_cover_loss_drivers__driver")).cast("boolean") as "tsc_tree_cover_loss_drivers__driver",
       max($"is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max($"is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
       max(length($"gfw_planted_forests__type"))
@@ -265,7 +260,6 @@ object AnnualUpdateMinimalDF {
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
       max(length($"sbtn_natural_forests__class")).cast("boolean") as "sbtn_natural_forests__class",
 
-      max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
       max(length($"gfw_plantation__type"))
         .cast("boolean") as "gfw_plantation__type",
@@ -303,7 +297,6 @@ object AnnualUpdateMinimalDF {
     import spark.implicits._
 
     val defaultAggCols: List[Column] = List(
-      max($"tsc_tree_cover_loss_drivers__driver") as "tsc_tree_cover_loss_drivers__driver",
       max($"is__umd_regional_primary_forest_2001") as "is__umd_regional_primary_forest_2001",
       max($"is__birdlife_alliance_for_zero_extinction_sites") as "is__birdlife_alliance_for_zero_extinction_sites",
       max($"gfw_planted_forests__type") as "gfw_planted_forests__type",
@@ -323,7 +316,6 @@ object AnnualUpdateMinimalDF {
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
       max($"sbtn_natural_forests__class") as "sbtn_natural_forests__class",
 
-      max($"tsc_tree_cover_loss_drivers__type") as "tsc_tree_cover_loss_drivers__type",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
       max($"gfw_plantation__type") as "gfw_plantation__type",
       max($"is__gmw_mangroves_1996") as "is__gmw_mangroves_1996",
