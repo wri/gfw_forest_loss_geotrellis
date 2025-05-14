@@ -5,7 +5,7 @@ import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 object AnnualUpdateMinimalDownloadDF {
   val treecoverLossMinYear = 2001
-  val treecoverLossMaxYear = 2024
+  val treecoverLossMaxYear = 2023
   val fluxModelTotalYears = (treecoverLossMaxYear - treecoverLossMinYear) + 1
 
   def sumDownload(df: DataFrame): DataFrame = {
@@ -17,10 +17,11 @@ object AnnualUpdateMinimalDownloadDF {
 
     val annualDF = df
       .where($"umd_tree_cover_density_2000__threshold" >= 0)
-      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold")
+      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold", $"wri_google_tree_cover_loss_drivers__category")
       .pivot("umd_tree_cover_loss__year", yearRange)
       .agg(
         sum("umd_tree_cover_loss__ha") as "umd_tree_cover_loss__ha",
+        sum(when($"is__umd_regional_primary_forest_2001", $"umd_tree_cover_loss__ha").otherwise(0.0)) as "primary_tree_cover_loss__ha",
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_forest_carbon_gross_emissions__Mg_CO2e"
       )
       .as("annual")
@@ -28,9 +29,10 @@ object AnnualUpdateMinimalDownloadDF {
 
     val totalDF = df
       .where($"umd_tree_cover_density_2000__threshold" >= 0)
-      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold")
+      .groupBy($"iso", $"adm1", $"adm2", $"umd_tree_cover_density_2000__threshold", $"wri_google_tree_cover_loss_drivers__category")
       .agg(
         sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
+        sum(when($"is__umd_regional_primary_forest_2001", $"umd_tree_cover_extent_2000__ha").otherwise(0)) as "primary_tree_cover_extent_2001__ha",
         sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
         sum("area__ha") as "area__ha",
         sum("umd_tree_cover_gain__ha") as "umd_tree_cover_gain__ha",
@@ -48,7 +50,7 @@ object AnnualUpdateMinimalDownloadDF {
     totalDF
       .join(
         annualDF,
-        Seq("iso", "adm1", "adm2", "umd_tree_cover_density_2000__threshold"),
+        Seq("iso", "adm1", "adm2", "umd_tree_cover_density_2000__threshold", "wri_google_tree_cover_loss_drivers__category"),
         "inner"
       )
       .transform(setNullZero)
@@ -65,6 +67,11 @@ object AnnualUpdateMinimalDownloadDF {
         sum($"${i}_umd_tree_cover_loss__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
 
+    val primaryTreecoverLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        sum($"${i}_primary_tree_cover_loss__ha") as s"primary_tree_cover_loss_${i}__ha"
+      }).toList
+
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         sum($"${i}_gfw_forest_carbon_gross_emissions__Mg_CO2e") as s"gfw_forest_carbon_gross_emissions_${i}__Mg_CO2e"
@@ -74,6 +81,7 @@ object AnnualUpdateMinimalDownloadDF {
       df,
       groupByCols,
       treecoverLossCols,
+      primaryTreecoverLossCols,
       totalGrossEmissionsCo2eAllGasesCols
     )
   }
@@ -88,6 +96,11 @@ object AnnualUpdateMinimalDownloadDF {
         sum($"umd_tree_cover_loss_${i}__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
 
+    val primaryTreecoverLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        sum($"primary_tree_cover_loss_${i}__ha") as s"primary_tree_cover_loss_${i}__ha"
+      }).toList
+
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         sum($"gfw_forest_carbon_gross_emissions_${i}__Mg_CO2e") as s"gfw_forest_carbon_gross_emissions_${i}__Mg_CO2e"
@@ -97,6 +110,7 @@ object AnnualUpdateMinimalDownloadDF {
       df,
       groupByCols,
       treecoverLossCols,
+      primaryTreecoverLossCols,
       totalGrossEmissionsCo2eAllGasesCols
     )
   }
@@ -105,6 +119,7 @@ object AnnualUpdateMinimalDownloadDF {
                             df: DataFrame,
                             groupByCols: List[String],
                             treecoverLossCols: List[Column],
+                            primaryTreecoverLossCols: List[Column],
                             totalGrossEmissionsCo2eAllGasesCols: List[Column]
                           ): DataFrame = {
     val spark: SparkSession = df.sparkSession
@@ -121,12 +136,12 @@ object AnnualUpdateMinimalDownloadDF {
       sum($"gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1") as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
       sum($"gfw_forest_carbon_gross_removals__Mg_CO2_yr-1") as "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1",
       sum($"gfw_forest_carbon_net_flux__Mg_CO2e_yr-1") as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
-    ) ::: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
+    ) ::: treecoverLossCols ::: primaryTreecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
 
     df.where($"umd_tree_cover_density_2000__threshold" >= 0)
       .groupBy(
       groupByCols.head,
-      groupByCols.tail ::: List("umd_tree_cover_density_2000__threshold"): _*
+      groupByCols.tail ::: List("umd_tree_cover_density_2000__threshold", "wri_google_tree_cover_loss_drivers__category"): _*
     )
       .agg(aggCols.head, aggCols.tail: _*)
       .na.fill(0, Seq("avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1"))
@@ -142,6 +157,11 @@ object AnnualUpdateMinimalDownloadDF {
         round($"${i}_umd_tree_cover_loss__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
 
+    val primaryTreecoverLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        round($"${i}_primary_tree_cover_loss__ha") as s"primary_tree_cover_loss_${i}__ha"
+      }).toList
+
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         round($"${i}_gfw_forest_carbon_gross_emissions__Mg_CO2e") as s"gfw_forest_carbon_gross_emissions_${i}__Mg_CO2e"
@@ -151,6 +171,7 @@ object AnnualUpdateMinimalDownloadDF {
       df,
       roundCols,
       treecoverLossCols,
+      primaryTreecoverLossCols,
       totalGrossEmissionsCo2eAllGasesCols
     )
   }
@@ -165,6 +186,11 @@ object AnnualUpdateMinimalDownloadDF {
         round($"umd_tree_cover_loss_${i}__ha") as s"umd_tree_cover_loss_${i}__ha"
       }).toList
 
+    val primaryTreecoverLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        round($"primary_tree_cover_loss_${i}__ha") as s"primary_tree_cover_loss_${i}__ha"
+      }).toList
+
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         round($"gfw_forest_carbon_gross_emissions_${i}__Mg_CO2e") as s"gfw_forest_carbon_gross_emissions_${i}__Mg_CO2e"
@@ -174,6 +200,7 @@ object AnnualUpdateMinimalDownloadDF {
       df,
       roundCols,
       treecoverLossCols,
+      primaryTreecoverLossCols,
       totalGrossEmissionsCo2eAllGasesCols
     )
   }
@@ -182,6 +209,7 @@ object AnnualUpdateMinimalDownloadDF {
                               df: DataFrame,
                               roundCols: List[Column],
                               treecoverLossCols: List[Column],
+                              primaryTreecoverLossCols: List[Column],
                               totalGrossEmissionsCo2eAllGasesCols: List[Column],
                             ): DataFrame = {
     val spark: SparkSession = df.sparkSession
@@ -189,6 +217,7 @@ object AnnualUpdateMinimalDownloadDF {
 
     val cols = List(
       $"umd_tree_cover_density_2000__threshold",
+      $"wri_google_tree_cover_loss_drivers__category",
       round($"umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
       round($"umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
       round($"area__ha") as "area__ha",
@@ -201,7 +230,7 @@ object AnnualUpdateMinimalDownloadDF {
     )
 
     df.select(
-      roundCols ::: cols ::: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols : _*
+      roundCols ::: cols ::: treecoverLossCols ::: primaryTreecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols : _*
     )
   }
 
@@ -214,12 +243,17 @@ object AnnualUpdateMinimalDownloadDF {
         s"${i}_umd_tree_cover_loss__ha"
       }).toList
 
+    val primaryTreecoverLossCols =
+      (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
+        s"${i}_primary_tree_cover_loss__ha"
+      }).toList
+
     val totalGrossEmissionsCo2eAllGasesCols =
       (for (i <- treecoverLossMinYear to treecoverLossMaxYear) yield {
         s"${i}_gfw_forest_carbon_gross_emissions__Mg_CO2e"
       }).toList
 
-    val cols = "avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1" :: "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1" :: "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1" :: "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1" :: treecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
+    val cols = "avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1" :: "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1" :: "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1" :: "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1" :: treecoverLossCols ::: primaryTreecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
     val nullColumns = df
       .select(cols.head, cols.tail: _*)
       .columns
