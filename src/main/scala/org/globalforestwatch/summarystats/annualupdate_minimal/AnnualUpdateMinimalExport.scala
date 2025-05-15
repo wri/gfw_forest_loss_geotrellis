@@ -146,7 +146,8 @@ object AnnualUpdateMinimalExport extends SummaryExport {
         $"country",
         $"subnational1",
         $"subnational2",
-        $"umd_tree_cover_density_2000__threshold"
+        $"umd_tree_cover_density_2000__threshold",
+        $"wri_google_tree_cover_loss_drivers__category"
       )
       .write
       .options(csvOptions)
@@ -163,7 +164,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
           .roundDownload2(List($"iso" as "country", $"adm1" as "subnational1"))
       )
       .coalesce(1)
-      .orderBy($"country", $"subnational1", $"umd_tree_cover_density_2000__threshold")
+      .orderBy($"country", $"subnational1", $"umd_tree_cover_density_2000__threshold", $"wri_google_tree_cover_loss_drivers__category")
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/adm1/download")
@@ -179,7 +180,7 @@ object AnnualUpdateMinimalExport extends SummaryExport {
           .roundDownload2(List($"iso" as "country"))
       )
       .coalesce(1)
-      .orderBy($"country", $"umd_tree_cover_density_2000__threshold")
+      .orderBy($"country", $"umd_tree_cover_density_2000__threshold", $"wri_google_tree_cover_loss_drivers__category")
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/iso/download")

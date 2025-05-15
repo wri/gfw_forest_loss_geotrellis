@@ -16,7 +16,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val treeCoverDensity2000: TreeCoverDensityThreshold2000 = TreeCoverDensityThreshold2000(gridTile, kwargs)
   val treeCoverDensity2010: TreeCoverDensityThreshold2010 = TreeCoverDensityThreshold2010(gridTile, kwargs)
   val biomassPerHectar: AbovegroundBiomass2000 = AbovegroundBiomass2000(gridTile, kwargs)
-  val treeCoverLossDrivers = TreeCoverLossDrivers(gridTile, kwargs)
+  val treeCoverLossDrivers = TreeCoverLossDrivers1km(gridTile, kwargs)
   val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val aze: Aze = Aze(gridTile, kwargs)
