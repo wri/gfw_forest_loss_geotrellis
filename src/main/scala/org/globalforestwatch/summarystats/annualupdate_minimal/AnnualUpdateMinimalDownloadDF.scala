@@ -42,8 +42,7 @@ object AnnualUpdateMinimalDownloadDF {
         ) as "avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1",
         sum($"gfw_full_extent_gross_emissions__Mg_CO2e") / fluxModelTotalYears as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
         sum($"gfw_full_extent_gross_removals__Mg_CO2") / fluxModelTotalYears as "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1",
-        sum($"gfw_full_extent_net_flux__Mg_CO2e") / fluxModelTotalYears as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1",
-        sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
+        sum($"gfw_full_extent_net_flux__Mg_CO2e") / fluxModelTotalYears as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
       )
       .as("total")
       .na.fill(0, Seq("adm1", "adm2"))
@@ -136,8 +135,7 @@ object AnnualUpdateMinimalDownloadDF {
       ) as "avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1",
       sum($"gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1") as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
       sum($"gfw_forest_carbon_gross_removals__Mg_CO2_yr-1") as "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1",
-      sum($"gfw_forest_carbon_net_flux__Mg_CO2e_yr-1") as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1",
-      sum($"umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
+      sum($"gfw_forest_carbon_net_flux__Mg_CO2e_yr-1") as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
     ) ::: treecoverLossCols ::: primaryTreecoverLossCols ::: totalGrossEmissionsCo2eAllGasesCols
 
     df.where($"umd_tree_cover_density_2000__threshold" >= 0)
@@ -228,8 +226,7 @@ object AnnualUpdateMinimalDownloadDF {
       round($"avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1") as "avg_gfw_aboveground_carbon_stocks_2000__Mg_C_ha-1",
       round($"gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1") as "gfw_forest_carbon_gross_emissions__Mg_CO2e_yr-1",
       round($"gfw_forest_carbon_gross_removals__Mg_CO2_yr-1") as "gfw_forest_carbon_gross_removals__Mg_CO2_yr-1",
-      round($"gfw_forest_carbon_net_flux__Mg_CO2e_yr-1") as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1",
-      round($"umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
+      round($"gfw_forest_carbon_net_flux__Mg_CO2e_yr-1") as "gfw_forest_carbon_net_flux__Mg_CO2e_yr-1"
     )
 
     df.select(
