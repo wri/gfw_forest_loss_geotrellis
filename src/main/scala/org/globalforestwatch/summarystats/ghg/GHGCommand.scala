@@ -14,7 +14,7 @@ object GHGCommand extends SummaryCommand with LazyLogging {
   // Current range of years to do emissions factors for.
   // Update GHGYearEnd when new tree loss data becomes available.
   val GHGYearStart: Int = 2020
-  val GHGYearEnd: Int = 2023
+  val GHGYearEnd: Int = 2024
 
   val backupYieldOpt: Opts[NonEmptyList[String]] = Opts
     .options[String](

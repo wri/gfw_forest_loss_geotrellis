@@ -13,7 +13,7 @@ import cats.data.NonEmptyList
 object AFiCommand extends SummaryCommand {
   // Current range of years for UMD tree cover loss to include and break out during AFi analysis.
   val TreeCoverLossYearStart: Int = 2021
-  val TreeCoverLossYearEnd: Int = 2023
+  val TreeCoverLossYearEnd: Int = 2024
 
   val afiCommand: Opts[Unit] = Opts.subcommand(
     name = AFiAnalysis.name,

@@ -150,7 +150,7 @@
     },
     {
       "name":"umd_tree_cover_loss",
-      "source_uri":"s3://gfw-data-lake/umd_tree_cover_loss/v1.11/raster/epsg-4326/{grid_size}/{row_count}/year/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/umd_tree_cover_loss/v1.12/raster/epsg-4326/{grid_size}/{row_count}/year/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_managed_forests",
