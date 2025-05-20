@@ -259,6 +259,7 @@ object FireAlertsDF {
       max("is__gmw_global_mangrove_extent_2020") as "is__gmw_global_mangrove_extent_2020",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
       max("ibge_bra_biomes__name") as "ibge_bra_biomes__name",
+      max("sbtn_natural_forests__class") as "sbtn_natural_forests__class",
 
       max("is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
       max("is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
