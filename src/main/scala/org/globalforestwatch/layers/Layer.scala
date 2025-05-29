@@ -7,7 +7,6 @@ import cats.implicits._
 import com.amazonaws.services.s3.AmazonS3URI
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import geotrellis.layer.{LayoutDefinition, LayoutTileSource, SpatialKey}
-import geotrellis.raster.gdal.GDALRasterSource
 import org.globalforestwatch.config.GfwConfig
 import org.globalforestwatch.util.Config
 import org.globalforestwatch.util.Util.getAnyMapValue
@@ -15,6 +14,7 @@ import geotrellis.raster.{CellType, IntCells, NoDataHandling, Tile, isNoData}
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.{HeadObjectRequest, NoSuchKeyException, RequestPayer}
 import org.globalforestwatch.grids.GridTile
+import geotrellis.raster.geotiff.GeoTiffRasterSource
 
 import java.time.LocalDate
 
@@ -197,7 +197,7 @@ trait RequiredLayer extends Layer {
     * so we only check the the associated tile exists) when fetchWindow is first
     * called, and then source is used to fetch the relevant tile.
     */
-  lazy val source: GDALRasterSource = {
+  lazy val source: GeotiffRasterSource = {
     // Removes the expected 404 errors from console log
     val s3uri = new AmazonS3URI(uri)
     try {
@@ -225,7 +225,7 @@ trait RequiredLayer extends Layer {
     } catch {
       case e: AmazonS3Exception => throw new FileNotFoundException(uri)
     }
-    GDALRasterSource(uri)
+    GeoTiffRasterSource(uri)
   }
 }
 
@@ -290,7 +290,7 @@ trait OptionalLayer extends Layer {
     * trying to open it, return None if no file found. source is only evaluated when
     * fetchWindow is first called, and then is used to fetch the relevant tile.
     */
-  lazy val source: Option[GDALRasterSource] = {
+  lazy val source: Option[GeoTiffRasterSource] = {
     // Removes the expected 404 errors from console log
 
     val s3uri = new AmazonS3URI(uri)
@@ -312,7 +312,7 @@ trait OptionalLayer extends Layer {
 
       if (keyExists) {
         println(s"Opening: $uri")
-        Some(GDALRasterSource(uri))
+        Some(GeoTiffRasterSource(uri))
       } else {
         println(s"Cannot open: $uri")
         None
