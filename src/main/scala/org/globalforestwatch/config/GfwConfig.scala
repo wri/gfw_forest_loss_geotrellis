@@ -12,6 +12,16 @@ object GfwConfig {
     flag
   }
 
+  // True if the GFW_SKIP_GDAL environmental variable is set in any way. If this is
+  // true, then we avoid using GDAL by using GeoTiffRasterSource, rather than
+  // GDALRasterSource in loading tiffs. This is useful for local runs where the user
+  // doesn't have the right GDAL version, but results in much slower runs.
+  val skipGdalFlag: Boolean = {
+    val flag = scala.util.Properties.envOrNone("GFW_SKIP_GDAL") != None
+    println(s"GFW_SKIP_GDAL=$flag")
+    flag
+  }
+
   /** Read the configuration from the raster catalog. pinned specifies any entries using
    * 'latest' that should be pinned to a specified version, else use the actual
    * latest version of the dataset. */
