@@ -37,7 +37,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       fireAlertsRdd,
       spark,
       kwargs = Map(
-        "config" -> GfwConfig.get(Some(NonEmptyList.one(Config("gfw_integrated_alerts", "v20231121")))),
+        "config" -> GfwConfig.get(Some(NonEmptyList.one(Config("gfw_integrated_alerts", "v20250101")))),
         "gadmVers" -> "3.6"
       ),
     )
