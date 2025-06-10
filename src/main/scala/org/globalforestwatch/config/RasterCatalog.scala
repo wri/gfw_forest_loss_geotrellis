@@ -54,20 +54,30 @@ object RasterCatalog {
    * dataset in pinned, or determine the actual latest version and use that.
    */
   def getSourceUri(dataset: String, sourceUri: String, pinned: Option[NonEmptyList[Config]]): String = {
-    if (sourceUri.contains("latest")) {
+    // If we are skipping the use of GDAL, then replace any 'gdal-geotiff' folder in
+    // the URI with 'geotiff', since we won't be able to deal with special
+    // GDAL-optimized tiffs. This is a fairly special case, but it's only for local
+    // use where people don't want to set up the correct GDAL version.
+    val correctSourceUri = 
+      if (GfwConfig.skipGdalFlag) {
+        sourceUri.replace("/gdal-geotiff/", "/geotiff/")
+      } else {
+        sourceUri
+      }
+    if (correctSourceUri.contains("latest")) {
       pinned match {
         case Some(list) => {
           list.toList.foreach(c => {
             if (c.key == dataset) {
-              return sourceUri.replace("latest", c.value)
+              return correctSourceUri.replace("latest", c.value)
             }
           })
         }
         case None =>
       }
-      sourceUri.replace("latest", getLatestVersion(dataset))
+      correctSourceUri.replace("latest", getLatestVersion(dataset))
     } else {
-      sourceUri
+      correctSourceUri
     }
   }
 
