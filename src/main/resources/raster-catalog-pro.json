@@ -282,15 +282,15 @@
     },
     {
       "name":"gfw_forest_flux_full_extent_gross_emissions_co2_only_biomass_soil",
-      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_co2_only_biomass_soil/v20241230/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_co2_only_biomass_soil/v20250430/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2_ha-1/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_forest_flux_full_extent_gross_emissions_ch4_biomass_soil",
-      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_ch4_only_biomass_soil/v20241230/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_ch4_only_biomass_soil/v20250430/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_forest_flux_full_extent_gross_emissions_n2o_biomass_soil",
-      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_n2o_only_biomass_soil/v20241230/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_forest_flux_full_extent_gross_emissions_n2o_only_biomass_soil/v20250430/raster/epsg-4326/{grid_size}/{row_count}/Mg_CO2e_ha-1/geotiff/{tile_id}.tif"
     },
     {
       "name":"mapspam_yield_coco",
