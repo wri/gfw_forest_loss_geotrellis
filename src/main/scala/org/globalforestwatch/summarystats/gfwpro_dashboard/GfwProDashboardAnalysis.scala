@@ -94,6 +94,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
               val re = raster.rasterExtent
               val col = re.mapXToGrid(pt.getX())
               val row = re.mapYToGrid(pt.getY())
+              println(s"Centroid $pt, gadm ${raster.tile.gadm0.getData(col, row)}, ${raster.tile.gadm1.getData(col, row)}, ${raster.tile.gadm2.getData(col, row)}")
               Validated.valid[Location[JobError], Location[Geometry]](Location(CombinedFeatureId(id, GadmFeatureId(raster.tile.gadm0.getData(col, row),
                 raster.tile.gadm1.getData(col, row),
                 raster.tile.gadm2.getData(col, row))), geom))
