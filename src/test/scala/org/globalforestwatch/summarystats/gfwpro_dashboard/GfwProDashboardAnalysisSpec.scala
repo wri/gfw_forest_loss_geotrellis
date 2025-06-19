@@ -72,7 +72,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       gfwProAddCentroid = true
     )
     val fcd = Dashboard(featureLoc31RDD, true)
-    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, spark)
+    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, true, spark)
     summaryDF.collect().foreach(println)
     //saveExpectedFcdResult(summaryDF)
 
@@ -90,7 +90,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       gfwProAddCentroid = true
     )
     val fcd = Dashboard(featureLoc31RDD, false)
-    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, spark)
+    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, false, spark)
     summaryDF.collect().foreach(println)
     //saveExpectedFcdResult(summaryDF)
 
@@ -109,7 +109,7 @@ class GfwProDashboardAnalysisSpec extends TestEnvironment with DataFrameComparer
       splitFeatures = true
     )
     val fcd = Dashboard(antRDD, true)
-    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, spark)
+    val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(fcd.unify, true, spark)
 
     summaryDF.count() shouldBe 0
   }

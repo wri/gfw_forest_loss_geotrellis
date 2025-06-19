@@ -77,7 +77,7 @@ object GfwProDashboardCommand extends SummaryCommand {
           spark,
           kwargs
         )
-        val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(dashRDD.unify, spark)
+        val summaryDF = GfwProDashboardDF.getFeatureDataFrameFromVerifiedRdd(dashRDD.unify, doGadmIntersect, spark)
         GfwProDashboardExport.export(default.featureType, summaryDF, default.outputUrl, kwargs)
       }
     }

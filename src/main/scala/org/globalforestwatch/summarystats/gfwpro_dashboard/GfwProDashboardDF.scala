@@ -7,14 +7,47 @@ import org.globalforestwatch.summarystats._
 import cats.data.Validated.{Valid, Invalid}
 import org.apache.spark.sql.functions.expr
 import org.globalforestwatch.summarystats.SummaryDF.RowId
+import cats.kernel.Semigroup
 
 object GfwProDashboardDF extends SummaryDF {
 
   def getFeatureDataFrameFromVerifiedRdd(
     dataRDD: RDD[ValidatedLocation[GfwProDashboardData]],
+    doGadmIntersect: Boolean,
     spark: SparkSession
   ): DataFrame = {
     import spark.implicits._
+
+    def combineRows(v1: Object, v2: Object): Object = {
+      if (v1.isInstanceOf[GfwProDashboardData]) {
+        if (v2.isInstanceOf[GfwProDashboardData]) {
+          v1.asInstanceOf[GfwProDashboardData].merge(v2.asInstanceOf[GfwProDashboardData])
+        } else {
+          v2
+        }
+      } else {
+        v1
+      }
+    }
+
+    val reducedRDD = if (!doGadmIntersect) {
+      dataRDD
+    } else {
+      // In case of vector intersection, we need to do a final combine of rows with
+      // the same featureId, to handle the case where a feature geometry had to be
+      // split, because one of the split rows will have had the correct gadm2 id in
+      // its feature id, whereas the gadm2 id will be blank in the other split rows.
+      dataRDD.map {
+        case Valid(Location(id, data)) =>
+          (id, data)
+        case Invalid(Location(id, err)) =>
+          (id, err)
+      }.reduceByKey(combineRows).map {
+        case (id: FeatureId, data: GfwProDashboardData) => Valid(Location(id, data))
+        case (id: FeatureId, err: JobError) => Invalid(Location(id, err))
+        case _ => throw new IllegalArgumentException("Missing case")
+      }
+    }
 
     val rowId: FeatureId => RowId = {
       case proId: GfwProFeatureId =>
@@ -26,7 +59,7 @@ object GfwProDashboardDF extends SummaryDF {
       case _ =>
         throw new IllegalArgumentException("Not a CombinedFeatureId[GfwProFeatureId, GadmFeatureId]")
     }
-    dataRDD.map {
+    reducedRDD.map {
       case Valid(Location(id, data)) =>
         (rowId(id), SummaryDF.RowError.empty, data)
       case Invalid(Location(id, err)) =>

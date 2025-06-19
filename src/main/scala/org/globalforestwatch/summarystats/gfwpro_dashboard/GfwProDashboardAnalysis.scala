@@ -4,6 +4,7 @@ import cats.data.{NonEmptyList, Validated}
 import geotrellis.vector.{Feature, Geometry}
 import org.globalforestwatch.features._
 import org.globalforestwatch.summarystats._
+import org.globalforestwatch.util.GeometryConstructor.createPoint
 import org.globalforestwatch.util.{RDDAdapter, SpatialJoinRDD}
 import org.globalforestwatch.ValidatedWorkflow
 import org.apache.spark.rdd.RDD
@@ -48,7 +49,20 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
         println("Doing intersect with vector gadm")
         val spatialContextualDF = SpatialFeatureDF(gadmFeatureUrl, "gadm", FeatureFilter.empty, "geom", spark)
         val spatialContextualRDD = Adapter.toSpatialRdd(spatialContextualDF, "polyshape")
-        val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(rdd, spark)
+        // For features that have been split into multiple rows, remove the centroid
+        // from all but the one whose geometry contains the actual centroid. This will
+        // ensure we get the one gadmid which contains the centroid of the feature's
+        // whole geometry.
+        val adjustedRdd = rdd.map({
+          case loc@Location(CombinedFeatureId(fid, centroid:PointFeatureId), geom) =>
+            if (geom.contains(centroid.pt)) {
+              loc
+            } else {
+              Location(CombinedFeatureId(fid, PointFeatureId(createPoint(0, 0))), geom)
+            }
+          case loc => loc
+        })
+        val spatialFeatureRDD = RDDAdapter.toSpatialRDDfromLocationRdd(adjustedRdd, spark)
 
         /* Enrich the feature RDD by intersecting it with contextual features
          * The resulting FeatureId carries combined identity of source feature and contextual geometry
@@ -132,7 +146,11 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
                 summary.toGfwProDashboardData(ignoreRasterGadm).map( x => {
                   val newx = if (ignoreRasterGadm) {
                     val gadmFeatureId = gadmId.asInstanceOf[GadmFeatureId]
-                    val gadmString = Util.getGadmId(gadmFeatureId.iso, gadmFeatureId.adm1, gadmFeatureId.adm2, kwargs("gadmVers").asInstanceOf[String])
+                    val gadmString = if (gadmFeatureId != null) {
+                      Util.getGadmId(gadmFeatureId.iso, gadmFeatureId.adm1, gadmFeatureId.adm2, kwargs("gadmVers").asInstanceOf[String])
+                    } else {
+                      ""
+                    }
                     x.copy(group_gadm_id = gadmString)
                   } else {
                     x
@@ -171,13 +189,25 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     featureId match {
       // ValidateFeatureRDD already computed the centroid of the location (when
       // locationId != -1) and stashed it in the FeatureId.
-      case CombinedFeatureId(gfwproId: GfwProFeatureId, featureCentroid: PointFeatureId) if gfwproId.locationId >= 0 =>
-        if (contextualGeom.contains(featureCentroid.pt)) {
+      case CombinedFeatureId(gfwproId: GfwProFeatureId, mainCentroid: PointFeatureId) if gfwproId.locationId >= 0 =>
+        val hasMainCentroid = (mainCentroid.pt.getX() != 0 && mainCentroid.pt.getY() != 0)
+        val featureCentroid =
+          if (hasMainCentroid) {
+            null
+          } else {
+            val centroid = featureGeom.getCentroid
+            createPoint(centroid.getX, centroid.getY)
+          }
+        val fixedGeom = makeValidGeom(featureGeom)
+        if (hasMainCentroid && contextualGeom.contains(mainCentroid.pt)) {
           val fid = CombinedFeatureId(gfwproId, contextualId)
-          // val gtGeom: Geometry = toGeotrellisGeometry(featureGeom)
-          val fixedGeom = makeValidGeom(featureGeom)
           List(Validated.Valid(Location(fid, fixedGeom)))
-        } else Nil
+        } else if (!hasMainCentroid && contextualGeom.contains(featureCentroid)) {
+          val fid = CombinedFeatureId(gfwproId, null)
+          List(Validated.Valid(Location(fid, fixedGeom)))
+        } else {
+          Nil
+        }
 
       case CombinedFeatureId(gfwproId: GfwProFeatureId, _) if gfwproId.locationId < 0 =>
         IntersectGeometry
