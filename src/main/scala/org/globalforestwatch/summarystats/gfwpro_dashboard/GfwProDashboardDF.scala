@@ -7,7 +7,6 @@ import org.globalforestwatch.summarystats._
 import cats.data.Validated.{Valid, Invalid}
 import org.apache.spark.sql.functions.expr
 import org.globalforestwatch.summarystats.SummaryDF.RowId
-import cats.kernel.Semigroup
 
 object GfwProDashboardDF extends SummaryDF {
 
@@ -33,11 +32,23 @@ object GfwProDashboardDF extends SummaryDF {
     val reducedRDD = if (!doGadmIntersect) {
       dataRDD
     } else {
-      // In case of vector intersection, we need to do a final combine of rows with
-      // the same featureId, to handle the case where a feature geometry had to be
-      // split, because one of the split rows will have had the correct gadm2 id in
-      // its feature id, whereas the gadm2 id will be blank in the other split rows.
-      dataRDD.map {
+      val nonDissolved = dataRDD.filter(loc =>
+        loc match {
+          case Valid(Location(GfwProFeatureId(listId, locId), data)) => locId != -1
+          case Invalid((Location(GfwProFeatureId(listId, locId), err))) => locId != -1
+        })
+      // Split out the dissolved rows, which should not be combined below.
+      val dissolved = dataRDD.filter(loc =>
+        loc match {
+          case Valid(Location(GfwProFeatureId(listId, locId), data)) => locId == -1
+          case Invalid((Location(GfwProFeatureId(listId, locId), err))) => locId == -1
+        })
+      // In case of vector intersection, we need to do a final combine of
+      // non-dissolved rows with the same featureId, to handle the case where a
+      // feature geometry had to be split, because one of the split rows will have
+      // had the correct gadm2 id for the whole geometry in its feature id, whereas
+      // the gadm2 id will be blank in the other split rows.
+      nonDissolved.map {
         case Valid(Location(id, data)) =>
           (id, data)
         case Invalid(Location(id, err)) =>
@@ -46,7 +57,7 @@ object GfwProDashboardDF extends SummaryDF {
         case (id: FeatureId, data: GfwProDashboardData) => Valid(Location(id, data))
         case (id: FeatureId, err: JobError) => Invalid(Location(id, err))
         case _ => throw new IllegalArgumentException("Missing case")
-      }
+      } ++ dissolved
     }
 
     val rowId: FeatureId => RowId = {
