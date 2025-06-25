@@ -149,7 +149,7 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
                     val gadmString = if (gadmFeatureId != null) {
                       Util.getGadmId(gadmFeatureId.iso, gadmFeatureId.adm1, gadmFeatureId.adm2, kwargs("gadmVers").asInstanceOf[String])
                     } else {
-                      ""
+                      Util.getGadmId("", null, null, kwargs("gadmVers").asInstanceOf[String])
                     }
                     x.copy(group_gadm_id = gadmString)
                   } else {

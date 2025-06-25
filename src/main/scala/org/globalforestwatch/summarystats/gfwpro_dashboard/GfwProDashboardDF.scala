@@ -35,13 +35,13 @@ object GfwProDashboardDF extends SummaryDF {
       val nonDissolved = dataRDD.filter(loc =>
         loc match {
           case Valid(Location(GfwProFeatureId(listId, locId), data)) => locId != -1
-          case Invalid((Location(GfwProFeatureId(listId, locId), err))) => locId != -1
+          case Invalid((Location(CombinedFeatureId(GfwProFeatureId(listId, locId), _), err))) => locId != -1
         })
       // Split out the dissolved rows, which should not be combined below.
       val dissolved = dataRDD.filter(loc =>
         loc match {
           case Valid(Location(GfwProFeatureId(listId, locId), data)) => locId == -1
-          case Invalid((Location(GfwProFeatureId(listId, locId), err))) => locId == -1
+          case Invalid((Location(CombinedFeatureId(GfwProFeatureId(listId, locId), _), err))) => locId == -1
         })
       // In case of vector intersection, we need to do a final combine of
       // non-dissolved rows with the same featureId, to handle the case where a

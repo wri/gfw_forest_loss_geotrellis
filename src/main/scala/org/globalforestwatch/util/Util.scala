@@ -147,7 +147,12 @@ object Util {
   /** Return gadmId based on adm0, adm1, and adm2 values. Distinguish different GADM
     * dataset versions using a special prefix. */
   def getGadmId(gadmAdm0: String, gadmAdm1: Integer, gadmAdm2: Integer, gadmVers: String): String = {
-    val base = if (gadmAdm2 == null) {
+    val base = if (gadmAdm0 == "") {
+      // This may be because a particular pixel was not on land (e.g. the centroid of
+      // a location).
+      ""
+    } else if (gadmAdm2 == null) {
+      // Handle case of where a country has only gadm1, but not gadm2.
       s"$gadmAdm0.$gadmAdm1"
     } else {
       s"$gadmAdm0.$gadmAdm1.$gadmAdm2"
