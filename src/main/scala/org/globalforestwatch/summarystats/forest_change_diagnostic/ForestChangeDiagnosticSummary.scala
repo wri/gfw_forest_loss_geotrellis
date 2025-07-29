@@ -165,22 +165,11 @@ object ForestChangeDiagnosticSummary {
         val protectedAreaCategory = raster.tile.protectedAreasByCategory.getData(col, row)
         val isProtectedArea = (protectedAreaCategory != "")
 
-        // Currently, only do the area intersection with the detailed WDPA categories
-        // if location is in ARG or COL. Similarly, only do area intersection with
-        // Landmark (indigenous territories) if in ARG or COL.
-        // With lazy tile loading, the landmark tiles are only loaded if
-        // argPresence or colPresence is true.
-        val detailedWdpa = if (argPresence || colPresence)
-          protectedAreaCategory
-        else
-          ""
         // We will likely have different Landmark categories for other countries, but
         // there is no distinction currently for Argentina, so we put all of the
         // indigenous area into the "Not Reported" category.
-        val landmarkCategory = if (argPresence || colPresence)
-          (if (raster.tile.landmark.getData(col, row)) "Not Reported" else "")
-        else
-          ""
+        val landmarkCategory =
+          if (raster.tile.landmark.getData(col, row)) "Not Reported" else ""
 
         val groupKey = ForestChangeDiagnosticRawDataGroup(
           umdTreeCoverLossYear,
@@ -211,7 +200,7 @@ object ForestChangeDiagnosticSummary {
           seAsiaPresence,
           idnPresence,
           argPresence,
-          detailedWdpa,
+          protectedAreaCategory,
           landmarkCategory,
           classifiedRegion,
         )

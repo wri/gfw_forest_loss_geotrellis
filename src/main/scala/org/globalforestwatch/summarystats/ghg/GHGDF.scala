@@ -1,5 +1,6 @@
 package org.globalforestwatch.summarystats.ghg
 
+import org.apache.spark.sql.functions.round
 import cats.data.Validated.{Invalid, Valid}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -32,6 +33,7 @@ object GHGDF extends SummaryDF {
     }
       .toDF("id", "error", "data")
       .select($"id.*" :: $"error.*" :: fieldsFromCol($"data", featureFields): _*)
+      .withColumn("weighted_avg_yield", round($"production" * 1000 / $"total_area", 4))
   }
 
   val featureFields = List(
@@ -39,6 +41,11 @@ object GHGDF extends SummaryDF {
     "ef_co2_yearly",
     "ef_ch4_yearly",
     "ef_n2o_yearly",
-    "emissions_factor_yearly"
+    "emissions_factor_yearly",
+    "emissions_co2_yearly",
+    "emissions_ch4_yearly",
+    "emissions_n2o_yearly",
+    "emissions_yearly",
+    "production",
   )
 }

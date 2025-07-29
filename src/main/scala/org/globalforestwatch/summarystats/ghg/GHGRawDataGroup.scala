@@ -26,7 +26,7 @@ case class GHGRawDataGroup(umdTreeCoverLossYear: Int,
     // (no tree cover loss), so we don't divide by production until all data is
     // merged.
 
-    def emissionsMap(emissions: Double): SortedMap[Int, Double] = {
+    def emissionsFactorMap(emissions: Double): SortedMap[Int, Double] = {
       val r = for (i <- minLossYear to maxLossYear) yield {
         val diff = i - umdTreeCoverLossYear
         if (diff >= 0 && diff < DiscountNumberOfYears) {
@@ -38,14 +38,26 @@ case class GHGRawDataGroup(umdTreeCoverLossYear: Int,
       SortedMap(r.toSeq: _*)
     }
 
+    def emissionsMap(emissions: Double): SortedMap[Int, Double] = {
+      if (umdTreeCoverLossYear != 0) {
+        SortedMap(umdTreeCoverLossYear -> emissions)
+      } else {
+        SortedMap()
+      }
+    }
+
     val r = GHGData(
       total_area = GHGDataDouble.fill(totalArea),
       // Extra divide by 1000, so production is in Mg (metric tonnes)
       production = GHGDataDouble.fill(totalArea * cropYield / 1000),
-      ef_co2_yearly = GHGDataValueYearly(emissionsMap(emissionsCo2eCO2)),
-      ef_ch4_yearly = GHGDataValueYearly(emissionsMap(emissionsCo2eCH4)),
-      ef_n2o_yearly = GHGDataValueYearly(emissionsMap(emissionsCo2eN2O)),
-      emissions_factor_yearly = GHGDataValueYearly(emissionsMap(emissionsCo2e))
+      ef_co2_yearly = GHGDataValueYearly(emissionsFactorMap(emissionsCo2eCO2)),
+      ef_ch4_yearly = GHGDataValueYearly(emissionsFactorMap(emissionsCo2eCH4)),
+      ef_n2o_yearly = GHGDataValueYearly(emissionsFactorMap(emissionsCo2eN2O)),
+      emissions_factor_yearly = GHGDataValueYearly(emissionsFactorMap(emissionsCo2e)),
+      emissions_co2_yearly = GHGDataValueYearly(emissionsMap(emissionsCo2eCO2)),
+      emissions_ch4_yearly = GHGDataValueYearly(emissionsMap(emissionsCo2eCH4)),
+      emissions_n2o_yearly = GHGDataValueYearly(emissionsMap(emissionsCo2eN2O)),
+      emissions_yearly = GHGDataValueYearly(emissionsMap(emissionsCo2e)),
     )
     r
   }
