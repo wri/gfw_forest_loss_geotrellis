@@ -13,6 +13,7 @@ import org.globalforestwatch.{TestEnvironment, ProTag}
 import org.globalforestwatch.config.GfwConfig
 import org.apache.spark.broadcast.Broadcast
 import org.globalforestwatch.util.Util
+import org.apache.spark.sql.types.DoubleType
 
 class GHGAnalysisSpec extends TestEnvironment with DataFrameComparer {
   def ghgInputTsvPath = getClass.getResource("/ghg.tsv").toString()
@@ -47,6 +48,7 @@ class GHGAnalysisSpec extends TestEnvironment with DataFrameComparer {
     // status_code gets interpreted as string type, so cast
     // it to its correct integer type.
     csvFile.withColumn("status_code", col("status_code").cast(IntegerType))
+    .withColumn("weighted_avg_yield", col("weighted_avg_yield").cast(DoubleType))
   }
 
   it("matches recorded output for various locations and commodities", ProTag) {
