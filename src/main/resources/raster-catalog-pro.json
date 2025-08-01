@@ -294,27 +294,27 @@
     },
     {
       "name":"mapspam_yield_coco",
-      "source_uri":"s3://gfw-data-lake/mapspam_yield_coco/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_coco/v2020.2/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"mapspam_yield_coff",
-      "source_uri":"s3://gfw-data-lake/mapspam_yield_coff/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_coff/v2020.2/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"mapspam_yield_oilp",
-      "source_uri":"s3://gfw-data-lake/mapspam_yield_oilp/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_oilp/v2020.2/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"mapspam_yield_rubb",
-      "source_uri":"s3://gfw-data-lake/mapspam_yield_rubb/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_rubb/v2020.2/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"mapspam_yield_soyb",
-      "source_uri":"s3://gfw-data-lake/mapspam_yield_soyb/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_soyb/v2020.2/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"mapspam_yield_sugc",
-      "source_uri":"s3://gfw-data-lake/mapspam_yield_sugc/v2020/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/mapspam_yield_sugc/v2020.2/raster/epsg-4326/{grid_size}/{row_count}/yield/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"umd_tree_cover_gain_from_height",

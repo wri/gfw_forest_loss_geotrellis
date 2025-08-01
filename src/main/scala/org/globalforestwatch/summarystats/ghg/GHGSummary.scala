@@ -73,10 +73,10 @@ object GHGSummary {
           val header = backupYieldArray.head
           val gid2Index = header.indexOf("GID_2")
           val commodityIndex = header.indexOf("commodity")
-          val yieldIndex = header.indexOf("yield_kg_ha")
+          val yieldIndex = header.indexOf("yield_mt_ha")
           for (r <- backupYieldArray) {
             if (r(gid2Index) == gadmId && r(commodityIndex) == commodity) {
-              val cropYield = r(yieldIndex).toFloat
+              val cropYield = r(yieldIndex).toFloat * 1000.0f
               backupYieldCache(CacheKey(commodity, gadmId)) = cropYield
               println(s"Found backupyield ${cropYield} for ${commodity} in ${gadmId}")
               return cropYield
@@ -134,7 +134,8 @@ object GHGSummary {
           }
           if (defaultYield != 0.0) {
             //println(s"MapSpam Yield ${defaultYield}, (${col}, ${row}), featureId ${featureId}")
-            defaultYield
+            // The yield from mapspam_yield_*/v2020.2 is in Mg/ha, convert to Kg/ha
+            defaultYield * 1000.0f
           } else {
             // If we don't have a yield for this commodity based on the specific pixel,
             // then do a lookup for the default yield for the entire gadm2 area this
