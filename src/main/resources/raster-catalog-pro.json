@@ -274,7 +274,7 @@
     },
     {
       "name":"jrc_global_forest_cover",
-      "source_uri":"s3://gfw-data-lake/jrc_global_forest_cover/v2020/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/jrc_global_forest_cover/v2020.2/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"col_frontera_agricola",
