@@ -10,8 +10,10 @@ import org.globalforestwatch.layers._
   */
 case class GfwProDashboardGridSources(gridTile: GridTile, kwargs: Map[String, Any]) extends GridSources {
   val integratedAlerts = IntegratedAlerts(gridTile, kwargs)
+  val intDistAlerts = IntDistAlerts(gridTile, kwargs)
   val treeCoverDensity2000 = TreeCoverDensityPercent2000(gridTile, kwargs)
   val sbtnNaturalForest: SBTNNaturalForests = SBTNNaturalForests(gridTile, kwargs)
+  val sbtnNaturalLands: SBTNNaturalLands = SBTNNaturalLands(gridTile, kwargs)
   val jrcForestCover: JRCForestCover = JRCForestCover(gridTile, kwargs)
   val gadmAdm0: GadmAdm0 = GadmAdm0(gridTile, kwargs)
   val gadmAdm1: GadmAdm1 = GadmAdm1(gridTile, kwargs)

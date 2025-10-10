@@ -319,6 +319,14 @@
     {
       "name":"umd_tree_cover_gain_from_height",
       "source_uri":"s3://gfw-data-lake/umd_tree_cover_gain_from_height/v20240126/raster/epsg-4326/{grid_size}/{row_count}/period/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"sbtn_natural_lands_classification",
+      "source_uri":"s3://gfw-data-lake/sbtn_natural_lands_classification/v1.1/raster/epsg-4326/{grid_size}/{row_count}/class/geotiff/{tile_id}.tif"
+    },
+    {
+      "name":"gfw_integrated_dist_alerts",
+      "source_uri": "s3://gfw-data-lake/gfw_integrated_alerts/v20251001/raster/epsg-4326/{grid_size}/{row_count}/intdist/geotiff/{tile_id}.tif"
     }
   ]
 }

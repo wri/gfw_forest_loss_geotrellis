@@ -41,6 +41,21 @@ case class GfwProDashboardData(
   integrated_alerts_daily_jrc_nominal: GfwProDashboardDataDateCount,
   integrated_alerts_daily_jrc_high: GfwProDashboardDataDateCount,
   integrated_alerts_daily_jrc_highest: GfwProDashboardDataDateCount,
+
+  /** Area of Integrated dist alerts within location geometry grouped by day, and further subdivided by cross-product of cover area (all, SBTN natural forest, SBTN natural open ecosystem, JRC area) x alert confidence (nominal, high, highest) */
+  intdist_alerts_area_all_nominal: GfwProDashboardDataDateArea,
+  intdist_alerts_area_all_high: GfwProDashboardDataDateArea,
+  intdist_alerts_area_all_highest: GfwProDashboardDataDateArea,
+  intdist_alerts_area_sbtn_natural_forests_nominal: GfwProDashboardDataDateArea,
+  intdist_alerts_area_sbtn_natural_forests_high: GfwProDashboardDataDateArea,
+  intdist_alerts_area_sbtn_natural_forests_highest: GfwProDashboardDataDateArea,
+  intdist_alerts_area_sbtn_natural_ecosystem_nominal: GfwProDashboardDataDateArea,
+  intdist_alerts_area_sbtn_natural_ecosystem_high: GfwProDashboardDataDateArea,
+  intdist_alerts_area_sbtn_natural_ecosystem_highest: GfwProDashboardDataDateArea,
+  intdist_alerts_area_jrc_nominal: GfwProDashboardDataDateArea,
+  intdist_alerts_area_jrc_high: GfwProDashboardDataDateArea,
+  intdist_alerts_area_jrc_highest: GfwProDashboardDataDateArea,
+
   /** Integrated alert count within location geometry grouped by ISO year-week */
   glad_alerts_weekly: GfwProDashboardDataDateCount,
   /** Integrated alert count within location geometry grouped by year-month */
@@ -57,6 +72,7 @@ case class GfwProDashboardData(
       total_ha.merge(other.total_ha),
       tree_cover_extent_total.merge(other.tree_cover_extent_total),
       glad_alerts_daily.merge(other.glad_alerts_daily),
+
       integrated_alerts_daily_all_nominal.merge(other.integrated_alerts_daily_all_nominal),
       integrated_alerts_daily_all_high.merge(other.integrated_alerts_daily_all_high),
       integrated_alerts_daily_all_highest.merge(other.integrated_alerts_daily_all_highest),
@@ -66,6 +82,20 @@ case class GfwProDashboardData(
       integrated_alerts_daily_jrc_nominal.merge(other.integrated_alerts_daily_jrc_nominal),
       integrated_alerts_daily_jrc_high.merge(other.integrated_alerts_daily_jrc_high),
       integrated_alerts_daily_jrc_highest.merge(other.integrated_alerts_daily_jrc_highest),
+
+      intdist_alerts_area_all_nominal.merge(other.intdist_alerts_area_all_nominal),
+      intdist_alerts_area_all_high.merge(other.intdist_alerts_area_all_high),
+      intdist_alerts_area_all_highest.merge(other.intdist_alerts_area_all_highest),
+      intdist_alerts_area_sbtn_natural_forests_nominal.merge(other.intdist_alerts_area_sbtn_natural_forests_nominal),
+      intdist_alerts_area_sbtn_natural_forests_high.merge(other.intdist_alerts_area_sbtn_natural_forests_high),
+      intdist_alerts_area_sbtn_natural_forests_highest.merge(other.intdist_alerts_area_sbtn_natural_forests_highest),
+      intdist_alerts_area_sbtn_natural_ecosystem_nominal.merge(other.intdist_alerts_area_sbtn_natural_ecosystem_nominal),
+      intdist_alerts_area_sbtn_natural_ecosystem_high.merge(other.intdist_alerts_area_sbtn_natural_ecosystem_high),
+      intdist_alerts_area_sbtn_natural_ecosystem_highest.merge(other.intdist_alerts_area_sbtn_natural_ecosystem_highest),
+      intdist_alerts_area_jrc_nominal.merge(other.intdist_alerts_area_jrc_nominal),
+      intdist_alerts_area_jrc_high.merge(other.intdist_alerts_area_jrc_high),
+      intdist_alerts_area_jrc_highest.merge(other.intdist_alerts_area_jrc_highest),
+
       glad_alerts_weekly.merge(other.glad_alerts_weekly),
       glad_alerts_monthly.merge(other.glad_alerts_monthly),
       viirs_alerts_daily.merge(other.viirs_alerts_daily)
@@ -83,6 +113,7 @@ object GfwProDashboardData {
       total_ha = ForestChangeDiagnosticDataDouble.empty,
       tree_cover_extent_total = ForestChangeDiagnosticDataDouble.empty,
       GfwProDashboardDataDateCount.empty,
+
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,
@@ -92,6 +123,20 @@ object GfwProDashboardData {
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,
+
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+      GfwProDashboardDataDateArea.empty,
+
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty,
       GfwProDashboardDataDateCount.empty

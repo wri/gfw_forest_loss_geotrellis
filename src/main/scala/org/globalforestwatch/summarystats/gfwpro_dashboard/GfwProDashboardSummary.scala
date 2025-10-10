@@ -32,7 +32,7 @@ case class GfwProDashboardSummary(
       // Combine all GfwProDashboardData results ignoring different groupGadmIds.
       List(stats
         .map { case (group, data) => group.
-          toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
+          toGfwProDashboardData(data.totalArea, data.alertCount, data.intDistAlertArea) }
         .foldLeft(GfwProDashboardData.empty)( _ merge _))
     } else {
       // Combine all GfwProDashboardData results into separate rows based on groupGadmI
@@ -40,7 +40,7 @@ case class GfwProDashboardSummary(
         .groupBy { case(group, data) => group.groupGadmId }
         .map { case(key, list) =>
           list.map { case (group, data) => group.
-            toGfwProDashboardData(data.alertCount, data.treeCoverExtentArea) }
+            toGfwProDashboardData(data.totalArea, data.alertCount, data.intDistAlertArea) }
             .foldLeft(GfwProDashboardData.empty)(_ merge _)
         }.toList
     }
@@ -59,9 +59,11 @@ object GfwProDashboardSummary {
       def visit(raster: Raster[GfwProDashboardTile], col: Int, row: Int): Unit = {
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
         val integratedAlertDateAndConf: Option[(LocalDate, Int)] = raster.tile.integratedAlerts.getData(col, row)
+        val intDistAlertDateAndConf: Option[(LocalDate, Int)] = raster.tile.intDistAlerts.getData(col, row)
         val integratedAlertCoverage = raster.tile.integratedAlerts.t.isDefined
         val isTreeCoverExtent30: Boolean = tcd2000 > 30
         val naturalForestCategory: String = raster.tile.sbtnNaturalForest.getData(col, row)
+        val naturalLandsClass: Integer = raster.tile.sbtnNaturalLands.getData(col, row)
         val jrcForestCover: Boolean = raster.tile.jrcForestCover.getData(col, row)
 
         val gadmId: String = if (kwargs("getRasterGadm") == true) {
@@ -82,15 +84,20 @@ object GfwProDashboardSummary {
           integratedAlertCoverage,
           naturalForestCategory == "Natural Forest",
           jrcForestCover,
-          isTreeCoverExtent30)
-        val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(treeCoverExtentArea = 0.0, alertCount = 0))
+          isTreeCoverExtent30,
+          naturalLandsClass,
+          intDistAlertDateAndConf)
+        val summaryData = acc.stats.getOrElse(groupKey, GfwProDashboardRawData(totalArea = 0.0, alertCount = 0, intDistAlertArea = 0.0))
 
         val re: RasterExtent = raster.rasterExtent
         val areaHa = Geodesy.pixelArea(lat = re.gridRowToMap(row), re.cellSize) / 10000.0
-        summaryData.treeCoverExtentArea += areaHa
+        summaryData.totalArea += areaHa
 
         if (integratedAlertDateAndConf.isDefined) {
           summaryData.alertCount += 1
+        }
+        if (intDistAlertDateAndConf.isDefined) {
+          summaryData.intDistAlertArea += areaHa
         }
 
         val new_stats = acc.stats.updated(groupKey, summaryData)

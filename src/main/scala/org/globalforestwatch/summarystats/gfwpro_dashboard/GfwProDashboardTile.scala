@@ -15,8 +15,10 @@ case class GfwProDashboardTile(
 ) extends CellGrid[Int] {
 
   lazy val integratedAlerts = sources.integratedAlerts.fetchWindow(windowKey, windowLayout)
+  lazy val intDistAlerts = sources.intDistAlerts.fetchWindow(windowKey, windowLayout)
   lazy val tcd2000 = sources.treeCoverDensity2000.fetchWindow(windowKey, windowLayout)
   lazy val sbtnNaturalForest = sources.sbtnNaturalForest.fetchWindow(windowKey, windowLayout)
+  lazy val sbtnNaturalLands = sources.sbtnNaturalLands.fetchWindow(windowKey, windowLayout)
   lazy val jrcForestCover = sources.jrcForestCover.fetchWindow(windowKey, windowLayout)
   lazy val gadm0 = sources.gadmAdm0.fetchWindow(windowKey, windowLayout)
   lazy val gadm1 = sources.gadmAdm1.fetchWindow(windowKey, windowLayout)

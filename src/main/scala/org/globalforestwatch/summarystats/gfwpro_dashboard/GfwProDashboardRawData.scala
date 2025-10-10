@@ -6,9 +6,13 @@ import cats.Semigroup
   *
   * Note: This case class contains mutable values
   */
-case class GfwProDashboardRawData(var treeCoverExtentArea: Double, var alertCount: Int) {
+case class GfwProDashboardRawData(
+  var totalArea: Double,            // area of the group of pixels
+  var alertCount: Int,              // total integrated alert counts for the pixels
+  var intDistAlertArea: Double      // total integrated dist alert area for the pixels
+) {
   def merge(other: GfwProDashboardRawData): GfwProDashboardRawData = {
-    GfwProDashboardRawData(treeCoverExtentArea + other.treeCoverExtentArea, alertCount + other.alertCount)
+    GfwProDashboardRawData(totalArea + other.totalArea, alertCount + other.alertCount, intDistAlertArea + other.intDistAlertArea)
   }
 }
 
