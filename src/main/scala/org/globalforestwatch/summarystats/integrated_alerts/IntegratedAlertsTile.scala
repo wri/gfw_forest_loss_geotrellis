@@ -12,6 +12,7 @@ case class IntegratedAlertsTile(
                                  gladL: GladAlerts#OptionalITile,
                                  gladS2: GladAlertsS2#OptionalITile,
                                  radd: RaddAlerts#OptionalITile,
+                                 dist: DistAlerts#OptionalITile,
                                  biomass: AbovegroundBiomass2000#OptionalDTile,
                                  primaryForest: PrimaryForest#OptionalITile,
                                  protectedAreas: ProtectedAreas#OptionalITile,
