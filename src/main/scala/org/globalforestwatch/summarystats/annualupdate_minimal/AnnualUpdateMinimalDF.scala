@@ -32,7 +32,7 @@ object AnnualUpdateMinimalDF {
 
     // TODO delete next data update
     "umd_tree_cover_density__threshold",
-    "tsc_tree_cover_loss_drivers__type",
+    "wri_google_tree_cover_loss_drivers__category",
     "is__birdlife_alliance_for_zero_extinction_site",
     "gfw_plantation__type",
     "is__gmw_mangroves_1996",
@@ -102,7 +102,7 @@ object AnnualUpdateMinimalDF {
         $"data.belowgroundCarbon2000" as "gfw_belowground_carbon_stocks_2000__Mg_C",
 
         $"data_group.threshold" as "umd_tree_cover_density__threshold",
-        $"data_group.drivers" as "tsc_tree_cover_loss_drivers__type",
+        $"data_group.drivers" as "wri_google_tree_cover_loss_drivers__category",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_site",
         $"data_group.plantedForests" as "gfw_plantation__type",
         $"data_group.mangroves1996" as "is__gmw_mangroves_1996",
@@ -265,7 +265,7 @@ object AnnualUpdateMinimalDF {
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
       max(length($"sbtn_natural_forests__class")).cast("boolean") as "sbtn_natural_forests__class",
 
-      max(length($"tsc_tree_cover_loss_drivers__type")).cast("boolean") as "tsc_tree_cover_loss_drivers__type",
+      max(length($"wri_google_tree_cover_loss_drivers__category")).cast("boolean") as "wri_google_tree_cover_loss_drivers__category",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
       max(length($"gfw_plantation__type"))
         .cast("boolean") as "gfw_plantation__type",
@@ -323,7 +323,7 @@ object AnnualUpdateMinimalDF {
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
       max($"sbtn_natural_forests__class") as "sbtn_natural_forests__class",
 
-      max($"tsc_tree_cover_loss_drivers__type") as "tsc_tree_cover_loss_drivers__type",
+      max($"wri_google_tree_cover_loss_drivers__category") as "wri_google_tree_cover_loss_drivers__category",
       max($"is__birdlife_alliance_for_zero_extinction_site") as "is__birdlife_alliance_for_zero_extinction_site",
       max($"gfw_plantation__type") as "gfw_plantation__type",
       max($"is__gmw_mangroves_1996") as "is__gmw_mangroves_1996",
