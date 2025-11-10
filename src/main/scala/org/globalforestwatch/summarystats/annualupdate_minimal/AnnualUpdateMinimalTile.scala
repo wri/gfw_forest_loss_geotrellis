@@ -14,7 +14,7 @@ case class AnnualUpdateMinimalTile(
                                     tcd2000: TreeCoverDensityThreshold#ITile,
                                     tcd2010: TreeCoverDensityThreshold#ITile,
                                     biomass: AbovegroundBiomass2000#OptionalDTile,
-                                    drivers: TreeCoverLossDrivers1km#OptionalITile,
+                                    drivers: TreeCoverLossDrivers#OptionalITile,
                                     primaryForest: PrimaryForest#OptionalITile,
                                     wdpa: ProtectedAreas#OptionalITile,
                                     aze: Aze#OptionalITile,
