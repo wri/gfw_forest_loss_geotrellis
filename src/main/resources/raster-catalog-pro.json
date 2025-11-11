@@ -14,7 +14,7 @@
     },
     {
       "name":"detailed_wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_licensed_protected_areas/v202508/raster/epsg-4326/{grid_size}/{row_count}/detailed_iucn_cat/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_licensed_protected_areas/v202511/raster/epsg-4326/{grid_size}/{row_count}/detailed_iucn_cat/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
@@ -326,7 +326,7 @@
     },
     {
       "name":"gfw_integrated_dist_alerts",
-      "source_uri": "s3://gfw-data-lake/gfw_integrated_alerts/v20251001/raster/epsg-4326/{grid_size}/{row_count}/intdist/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_integrated_dist_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/default/geotiff/{tile_id}.tif"
     }
   ]
 }
