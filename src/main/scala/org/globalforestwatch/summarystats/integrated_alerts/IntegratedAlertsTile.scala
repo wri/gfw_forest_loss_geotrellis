@@ -14,7 +14,6 @@ case class IntegratedAlertsTile(
                                  radd: RaddAlerts#OptionalITile,
                                  dist: DistAlerts#OptionalITile,
                                  biomass: AbovegroundBiomass2000#OptionalDTile,
-                                 climateMask: ClimateMask#OptionalITile,
                                  primaryForest: PrimaryForest#OptionalITile,
                                  protectedAreas: ProtectedAreas#OptionalITile,
                                  aze: Aze#OptionalITile,

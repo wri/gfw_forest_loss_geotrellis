@@ -48,7 +48,6 @@ object IntegratedAlertsSummary {
 
         if (!(gladL.isEmpty && gladS2.isEmpty && radd.isEmpty)) {
           val biomass: Double = raster.tile.biomass.getData(col, row)
-          val climateMask: Boolean = raster.tile.climateMask.getData(col, row)
           val primaryForest: Boolean =
             raster.tile.primaryForest.getData(col, row)
           val protectedAreas: String =
@@ -62,14 +61,20 @@ object IntegratedAlertsSummary {
           val logging: Boolean = raster.tile.logging.getData(col, row)
           val rspo: String = raster.tile.rspo.getData(col, row)
           val woodFiber: Boolean = raster.tile.woodFiber.getData(col, row)
+          // peatlands is always false for IntAlerts, because a 10/100000 raster tile
+          // set doesn't exist.
           val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
           val indonesiaForestMoratorium: Boolean =
             raster.tile.indonesiaForestMoratorium.getData(col, row)
           val oilPalm: Boolean = raster.tile.oilPalm.getData(col, row)
           val indonesiaForestArea: String =
             raster.tile.indonesiaForestArea.getData(col, row)
+          // peruForestConcessions is always false for IntAlerts, because a 10/100000
+          // raster tile set doesn't exist.
           val peruForestConcessions: String =
             raster.tile.peruForestConcessions.getData(col, row)
+          // oilGas is always false for IntAlerts, because the 10/100000 raster tile
+          // set has no tiles.
           val oilGas: Boolean = raster.tile.oilGas.getData(col, row)
           val mangroves2020: Boolean =
             raster.tile.mangroves2020.getData(col, row)
@@ -209,7 +214,6 @@ object IntegratedAlertsSummary {
                   integratedConfidence,
                   intDistAlertDate,
                   intDistConfidence,
-                  climateMask,
                   primaryForest,
                   protectedAreas,
                   aze,
