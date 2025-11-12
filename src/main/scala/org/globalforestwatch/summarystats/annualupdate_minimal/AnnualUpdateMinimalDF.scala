@@ -41,7 +41,6 @@ object AnnualUpdateMinimalDF {
     "is__gfw_land_right",
     "is__birdlife_key_biodiversity_area",
     "is__gfw_mining",
-    "is__peatland",
     "is__gfw_resource_right",
     "is__gfw_managed_forest",
   )
@@ -110,7 +109,6 @@ object AnnualUpdateMinimalDF {
         $"data_group.landmark" as "is__gfw_land_right",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_area",
         $"data_group.mining" as "is__gfw_mining",
-        $"data_group.peatlands" as "is__peatland",
         $"data_group.resourceRights" as "is__gfw_resource_right",
         $"data_group.logging" as "is__gfw_managed_forest",
         $"data.totalNetFluxCo2" as "gfw_net_flux_co2e__Mg",
@@ -273,7 +271,6 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_land_right") as "is__gfw_land_right",
       max($"is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
       max($"is__gfw_mining") as "is__gfw_mining",
-      max($"is__peatland") as "is__peatland",
       max($"is__gfw_resource_right") as "is__gfw_resource_right",
       max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
     )
@@ -329,7 +326,6 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_land_right") as "is__gfw_land_right",
       max($"is__birdlife_key_biodiversity_area") as "is__birdlife_key_biodiversity_area",
       max($"is__gfw_mining") as "is__gfw_mining",
-      max($"is__peatland") as "is__peatland",
       max($"is__gfw_resource_right") as "is__gfw_resource_right",
       max($"is__gfw_managed_forest") as "is__gfw_managed_forest",
     )
