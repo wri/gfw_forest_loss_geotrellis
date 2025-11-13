@@ -186,8 +186,6 @@ object IntegratedAlertsSummary {
                   //gladLConfidence,
                   gladS2Confidence,
                   raddConfidence,
-                  integratedAlertDate,
-                  integratedConfidence,
                   intDistAlertDate,
                   intDistConfidence,
                   primaryForest,
@@ -216,6 +214,9 @@ object IntegratedAlertsSummary {
               stats.updated(pKey, summary)
             }
 
+          // For each pixel, record all three alerts/confidences (if non-None), but
+          // do them in separate IntegratedAlertsDataGroups (which will aggregate to
+          // different rows), so they don't multiply the number of rows.
           val updatedSummaryInt =
             updateSummary(acc.stats, integratedAlertDate = integratedAlertDate, integratedConfidence = integratedConfidence)
 

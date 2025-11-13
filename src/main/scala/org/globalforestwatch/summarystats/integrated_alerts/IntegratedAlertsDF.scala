@@ -36,6 +36,9 @@ object IntegratedAlertsDF {
         //$"data_group.gladLAlertDate" as "umd_glad_landsat_alerts__date",
         $"data_group.gladS2AlertDate" as "umd_glad_sentinel2_alerts__date",
         $"data_group.raddAlertDate" as "wur_radd_alerts__date",
+        // Integrated disturbance alerts just replaces the previous integrated alerts
+        // (no new columns). Still to be determined if we will change the column
+        // names.
         $"data_group.intDistAlertDate" as "gfw_integrated_alerts__date",
         //$"data_group.gladLConfidence" as "umd_glad_landsat_alerts__confidence",
         $"data_group.gladS2Confidence" as "umd_glad_sentinel2_alerts__confidence",
