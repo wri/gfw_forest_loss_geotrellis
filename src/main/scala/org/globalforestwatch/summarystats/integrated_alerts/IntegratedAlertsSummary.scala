@@ -69,8 +69,6 @@ object IntegratedAlertsSummary {
           val oilPalm: Boolean = raster.tile.oilPalm.getData(col, row)
           val indonesiaForestArea: String =
             raster.tile.indonesiaForestArea.getData(col, row)
-          // peruForestConcessions is always false for IntAlerts, because a 10/100000
-          // raster tile set doesn't exist.
           val peruForestConcessions: String =
             raster.tile.peruForestConcessions.getData(col, row)
           // oilGas is always false for IntAlerts, because the 10/100000 raster tile
@@ -210,8 +208,6 @@ object IntegratedAlertsSummary {
                   //gladLConfidence,
                   gladS2Confidence,
                   raddConfidence,
-                  integratedAlertDate,
-                  integratedConfidence,
                   intDistAlertDate,
                   intDistConfidence,
                   primaryForest,
@@ -253,6 +249,9 @@ object IntegratedAlertsSummary {
               stats.updated(pKey, summary)
             }
 
+          // For each pixel, record all three alerts/confidences (if non-None), but
+          // do them in separate IntegratedAlertsDataGroups (which will aggregate to
+          // different rows), so they don't multiply the number of rows.
           val updatedSummaryInt =
             updateSummary(acc.stats, integratedAlertDate = integratedAlertDate, integratedConfidence = integratedConfidence)
 
