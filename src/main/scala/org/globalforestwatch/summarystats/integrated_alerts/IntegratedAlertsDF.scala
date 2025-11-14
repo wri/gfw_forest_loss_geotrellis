@@ -25,7 +25,7 @@ object IntegratedAlertsDF {
     "rspo_oil_palm__certification_status",
     "is__gfw_wood_fiber",
     "is__gfw_peatlands",
-    "is__idn_forest_moratorium",
+    "is__idn_forest_moratorium", 
     "is__gfw_oil_palm",
     "idn_forest_area__class",
     "per_forest_concessions__type",
@@ -62,11 +62,14 @@ object IntegratedAlertsDF {
         //$"data_group.gladLAlertDate" as "umd_glad_landsat_alerts__date",
         $"data_group.gladS2AlertDate" as "umd_glad_sentinel2_alerts__date",
         $"data_group.raddAlertDate" as "wur_radd_alerts__date",
-        $"data_group.integratedAlertDate" as "gfw_integrated_alerts__date",
+        // Integrated disturbance alerts just replaces the previous integrated alerts
+        // (no new columns). Still to be determined if we will change the column
+        // names.
+        $"data_group.intDistAlertDate" as "gfw_integrated_alerts__date",
         //$"data_group.gladLConfidence" as "umd_glad_landsat_alerts__confidence",
         $"data_group.gladS2Confidence" as "umd_glad_sentinel2_alerts__confidence",
         $"data_group.raddConfidence" as "wur_radd_alerts__confidence",
-        $"data_group.integratedConfidence" as "gfw_integrated_alerts__confidence",
+        $"data_group.intDistConfidence" as "gfw_integrated_alerts__confidence",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.aze" as "is__birdlife_alliance_for_zero_extinction_sites",
         $"data_group.keyBiodiversityAreas" as "is__birdlife_key_biodiversity_areas",

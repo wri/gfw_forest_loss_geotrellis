@@ -14,8 +14,8 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
   val gladAlertsL: GladAlerts = GladAlerts(gridTile, kwargs)
   val gladAlertsS2: GladAlertsS2 = GladAlertsS2(gridTile, kwargs)
   val raddAlerts: RaddAlerts = RaddAlerts(gridTile, kwargs)
+  val distAlerts: DistAlerts = DistAlerts(gridTile, kwargs)
   val biomassPerHectar: AbovegroundBiomass2000 = AbovegroundBiomass2000(gridTile, kwargs)
-  val climateMask: ClimateMask = ClimateMask(gridTile, kwargs)
   val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val aze: Aze = Aze(gridTile, kwargs)
@@ -49,8 +49,8 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
     } yield {
       val gladAlertsS2Tile = gladAlertsS2.fetchWindow(windowKey, windowLayout)
       val raddAlertsTile = raddAlerts.fetchWindow(windowKey, windowLayout)
+      val distAlertsTile = distAlerts.fetchWindow(windowKey, windowLayout)
       val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
-      val climateMaskTile = climateMask.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val protectedAreasTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val azeTile = aze.fetchWindow(windowKey, windowLayout)
@@ -76,8 +76,8 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
         gladAlertsLTile,
         gladAlertsS2Tile,
         raddAlertsTile,
+        distAlertsTile,
         biomassTile,
-        climateMaskTile,
         primaryForestTile,
         protectedAreasTile,
         azeTile,
