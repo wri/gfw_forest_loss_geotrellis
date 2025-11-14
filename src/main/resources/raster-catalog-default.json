@@ -62,7 +62,7 @@
     },
     {
       "name":"landmark_indigenous_and_community_lands",
-      "source_uri":"s3://gfw-data-lake/landmark_indigenous_and_community_lands/v202407/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/landmark_ip_lc_and_indicative_poly/v20250909/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
       "name":"birdlife_biodiversity_intactness",
