@@ -76,8 +76,8 @@ object IntegratedAlertsDF {
       .groupBy(cols.head, cols.tail: _*)
       .agg(
         sum("alert__count") as "alert__count",
-        sum("alert_area__ha") as "alert_area__ha",
-        sum("whrc_aboveground_co2_emissions__Mg") as "whrc_aboveground_co2_emissions__Mg"
+        round(sum("alert_area__ha"), 4) as "alert_area__ha",
+        round(sum("whrc_aboveground_co2_emissions__Mg"), 4) as "whrc_aboveground_co2_emissions__Mg"
       )
   }
 
