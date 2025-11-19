@@ -10,7 +10,7 @@
     },
     {
       "name":"wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202407.2/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_protected_areas/v202510/raster/epsg-4326/{grid_size}/{row_count}/iucn_cat/geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
@@ -30,7 +30,7 @@
     },
     {
       "name":"birdlife_key_biodiversity_areas",
-      "source_uri":"s3://gfw-data-lake/birdlife_key_biodiversity_areas/v202106/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/birdlife_key_biodiversity_areas/v20240903/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
       "name":"ifl_intact_forest_landscapes",
@@ -62,7 +62,7 @@
     },
     {
       "name":"landmark_indigenous_and_community_lands",
-      "source_uri":"s3://gfw-data-lake/landmark_indigenous_and_community_lands/v202407/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/landmark_ip_lc_and_indicative_poly/v20250909/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
     },
     {
       "name":"birdlife_biodiversity_intactness",
@@ -358,7 +358,7 @@
     },
     {
       "name": "sbtn_natural_forests_map",
-      "source_uri": "s3://gfw-data-lake/sbtn_natural_forests_map/v202310/raster/epsg-4326/{grid_size}/{row_count}/class/gdal-geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/sbtn_natural_forests_map/v202504/raster/epsg-4326/{grid_size}/{row_count}/natural_forest/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }

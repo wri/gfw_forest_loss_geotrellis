@@ -40,7 +40,6 @@ object IntegratedAlertsDF {
     "gfw_plantation__type",
     "is__gfw_mining",
     "is__gfw_managed_forest",
-    "is__peatland",
     "idn_forest_area__type",
     "per_forest_concession__type",
     "is__gmw_mangroves_2020",
@@ -96,7 +95,6 @@ object IntegratedAlertsDF {
         $"data_group.plantedForests" as "gfw_plantation__type",
         $"data_group.mining" as "is__gfw_mining",
         $"data_group.logging" as "is__gfw_managed_forest",
-        $"data_group.peatlands" as "is__peatland",
         $"data_group.indonesiaForestArea" as "idn_forest_area__type",
         $"data_group.peruForestConcessions" as "per_forest_concession__type",
         $"data_group.mangroves2020" as "is__gmw_mangroves_2020",
@@ -183,7 +181,6 @@ object IntegratedAlertsDF {
         .cast("boolean") as "gfw_plantation__type",
       max("is__gfw_mining") as "is__gfw_mining",
       max("is__gfw_managed_forest") as "is__gfw_managed_forest",
-      max("is__peatland") as "is__peatland",
       max(length($"idn_forest_area__type"))
         .cast("boolean") as "idn_forest_area__type",
       max(length($"per_forest_concession__type"))
@@ -235,7 +232,6 @@ object IntegratedAlertsDF {
       max("gfw_plantation__type") as "gfw_plantation__type",
       max("is__gfw_mining") as "is__gfw_mining",
       max("is__gfw_managed_forest") as "is__gfw_managed_forest",
-      max("is__peatland") as "is__peatland",
       max("idn_forest_area__type") as "idn_forest_area__type",
       max("per_forest_concession__type") as "per_forest_concession__type",
       max("is__gmw_mangroves_2020") as "is__gmw_mangroves_2020",
