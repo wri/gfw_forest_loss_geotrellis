@@ -34,8 +34,6 @@ object IntegratedAlertsSummary {
                 col: Int,
                 row: Int): Unit = {
 
-        // val changeOnly: Boolean = getAnyMapValue[Boolean](kwargs, "changeOnly")
-
         // This is a pixel by pixel operation
         val gladL: Option[(LocalDate, Boolean)] =
           raster.tile.gladL.getData(col, row)
@@ -58,9 +56,10 @@ object IntegratedAlertsSummary {
             raster.tile.intactForestLandscapes2016.getData(col, row)
           val naturalForests: String = raster.tile.naturalForests.getData(col, row)
 
-          val lat: Double = raster.rasterExtent.gridRowToMap(row)
+          val re: RasterExtent = raster.rasterExtent
+          val lat: Double = re.gridRowToMap(row)
 
-          val area: Double = Geodesy.pixelArea(lat, raster.cellSize) // uses Pixel's center coordinate.  +- raster.cellSize.height/2 doesn't make much of a difference
+          val area: Double = Geodesy.pixelArea(lat, re.cellSize) // uses Pixel's center coordinate.  +- raster.cellSize.height/2 doesn't make much of a difference
 
           val areaHa = area / 10000.0
           val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
