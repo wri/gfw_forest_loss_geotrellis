@@ -15,4 +15,5 @@ case class IntegratedAlertsDataGroup(//gladLAlertDate: Option[String],
                                      peatlands: Boolean,
                                      mangroves2020: Boolean,
                                      intactForestLandscapes2016: Boolean,
-                                     naturalForests: String)
+                                     naturalForests: String,
+                                     treeCover2022: Boolean)

@@ -20,7 +20,8 @@ case class IntegratedAlertsTile(
                                  peatlands: Peatlands#OptionalITile,
                                  mangroves2020: Mangroves2020#OptionalITile,
                                  intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
-                                 naturalForests: SBTNNaturalForests#OptionalITile
+                                 naturalForests: SBTNNaturalForests#OptionalITile,
+                                 treeCover2022: TreeCover2022#OptionalITile
                          ) extends CellGrid[Int] {
 
   def cellType: CellType = gladL.cellType.getOrElse(IntCellType)

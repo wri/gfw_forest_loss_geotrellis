@@ -23,6 +23,7 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
   val mangroves2020: Mangroves2020 = Mangroves2020(gridTile, kwargs)
   val intactForestLandscapes2016: IntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile, kwargs)
   val naturalForests: SBTNNaturalForests = SBTNNaturalForests(gridTile, kwargs)
+  val treeCover2022: TreeCover2022 = TreeCover2022(gridTile, kwargs)
 
   def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[IntegratedAlertsTile]] = {
 
@@ -45,6 +46,7 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
       val mangroves2020Tile = mangroves2020.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2016Tile = intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
       val naturalForestsTile = naturalForests.fetchWindow(windowKey, windowLayout)
+      val treeCover2022Tile = treeCover2022.fetchWindow(windowKey, windowLayout)
 
       val tile = IntegratedAlertsTile(
         gladAlertsLTile,
@@ -58,7 +60,8 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
         peatlandsTile,
         mangroves2020Tile,
         intactForestLandscapes2016Tile,
-        naturalForestsTile
+        naturalForestsTile,
+        treeCover2022Tile
       )
 
       Raster(tile, windowKey.extent(windowLayout))

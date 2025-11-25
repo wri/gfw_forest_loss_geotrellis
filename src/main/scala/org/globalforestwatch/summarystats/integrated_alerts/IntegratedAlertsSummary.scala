@@ -57,6 +57,7 @@ object IntegratedAlertsSummary {
           val intactForestLandscapes2016: Boolean =
             raster.tile.intactForestLandscapes2016.getData(col, row)
           val naturalForests: String = raster.tile.naturalForests.getData(col, row)
+          val treeCover2022: Boolean = raster.tile.treeCover2022.getData(col, row)
 
           val re: RasterExtent = raster.rasterExtent
           val lat: Double = re.gridRowToMap(row)
@@ -194,7 +195,8 @@ object IntegratedAlertsSummary {
                   peatlands,
                   mangroves2020,
                   intactForestLandscapes2016,
-                  naturalForests
+                  naturalForests,
+                  treeCover2022
                 )
 
               val summary: IntegratedAlertsData =
