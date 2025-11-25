@@ -50,7 +50,7 @@
     },
     {
       "name":"whrc_aboveground_biomass_density_2000",
-      "source_uri":"s3://gfw-data-lake/whrc_aboveground_biomass_stock_2000/v4/raster/epsg-4326/{grid_size}/{row_count}/Mg_ha-1/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/whrc_aboveground_biomass_stock_2000/v4/raster/epsg-4326/{grid_size}/{row_count}/Mg_ha-1/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"umd_tree_cover_density_2000",
@@ -90,7 +90,7 @@
     },
     {
       "name":"gfw_peatlands",
-      "source_uri":"s3://gfw-data-lake/gfw_peatlands/v20230315/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gfw_peatlands/v20230315/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"birdlife_biodiversity_significance",
@@ -134,11 +134,11 @@
     },
     {
       "name":"gmw_global_mangrove_extent_2020",
-      "source_uri":"s3://gfw-data-lake/gmw_global_mangrove_extent/v3/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/gmw_global_mangrove_extent/v3/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"umd_regional_primary_forest_2001",
-      "source_uri":"s3://gfw-data-lake/umd_regional_primary_forest_2001/v201901/raster/epsg-4326/{grid_size}/{row_count}/is/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/umd_regional_primary_forest_2001/v201901/raster/epsg-4326/{grid_size}/{row_count}/is/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"jpl_mangrove_aboveground_biomass_stock_2000",
@@ -170,15 +170,15 @@
     },
     {
       "name":"umd_glad_landsat_alerts",
-      "source_uri":"s3://gfw-data-lake/umd_glad_landsat_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/umd_glad_landsat_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"umd_glad_sentinel2_alerts",
-      "source_uri":"s3://gfw-data-lake/umd_glad_sentinel2_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/umd_glad_sentinel2_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"wur_radd_alerts",
-      "source_uri":"s3://gfw-data-lake/wur_radd_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wur_radd_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_wood_fiber",
