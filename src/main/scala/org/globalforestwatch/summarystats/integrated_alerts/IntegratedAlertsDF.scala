@@ -46,7 +46,8 @@ object IntegratedAlertsDF {
     "is__gmw_mangroves_2020",
     "is__ifl_intact_forest_landscape_2016",
     "bra_biome__name",
-    "sbtn_natural_forests__class"
+    "sbtn_natural_forests__class",
+    "is__tree_cover_2022"
   )
 
   def unpackValues(unpackCols: List[Column],
@@ -106,6 +107,7 @@ object IntegratedAlertsDF {
         $"data_group.intactForestLandscapes2016" as "is__ifl_intact_forest_landscape_2016",
         $"data_group.braBiomes" as "bra_biome__name",
         $"data_group.naturalForests" as "sbtn_natural_forests__class",
+        $"data_group.treeCover2022" as "is__tree_cover_2022",
       )
 
     val cols =
@@ -194,7 +196,8 @@ object IntegratedAlertsDF {
       max("is__gmw_mangroves_2020") as "is__gmw_mangroves_2020",
       max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
       max(length($"bra_biome__name")).cast("boolean") as "bra_biome__name",
-      max(length($"sbtn_natural_forests__class")).cast("boolean") as "sbtn_natural_forests__class"
+      max(length($"sbtn_natural_forests__class")).cast("boolean") as "sbtn_natural_forests__class",
+      max("is__tree_cover_2022") as "is__tree_cover_2022",
     )
 
     val aggCols =
@@ -245,6 +248,7 @@ object IntegratedAlertsDF {
       max("is__ifl_intact_forest_landscape_2016") as "is__ifl_intact_forest_landscape_2016",
       max("bra_biome__name") as "bra_biome__name",
       max("sbtn_natural_forests__class") as "sbtn_natural_forests__class",
+      max("is__tree_cover_2022") as "is__tree_cover_2022",
     )
 
     val aggCols =
