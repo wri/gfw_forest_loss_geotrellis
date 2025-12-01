@@ -54,6 +54,10 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
           }
         } catch {
           case _: NullPointerException =>
+            /* Geotrellis can throw a NullPointerException when accessing point coordinates in geometries with malformed/null data.
+             * This can occur with edge cases that appear valid in QGIS/geopandas but trigger a null pointer exception in Geotrellis.
+             * Skip this feature and continue processing others rather than failing the entire job.
+             */
             logger.error(s"Feature ${feature.data}: NullPointerException for geometry, skipping")
             Seq.empty
         }
