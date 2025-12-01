@@ -61,7 +61,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
     val partitionedFeatureRDD =
       if (partitionType.equals("SKEWED")) {
-        RepartitionSkewedRDD.bySparseId(keyedFeatureRDD, 4096)
+        RepartitionSkewedRDD.bySparseId(keyedFeatureRDD, 64)
       } else if (partitionType.equals("RANGE")) {
         val rangePartitioner =
           new RangePartitioner(featureRDD.sparkContext.defaultParallelism, keyedFeatureRDD)
