@@ -185,6 +185,12 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                           )
                           None
                         }
+                        case npe: java.lang.NullPointerException => {
+                          println(
+                            s"There is an issue with geometry for feature(s) $featureIds: ${geom}"
+                          )
+                          None
+                        }
                       }
 
                     summary match {
