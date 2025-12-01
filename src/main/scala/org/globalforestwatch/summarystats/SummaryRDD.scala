@@ -45,11 +45,17 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
     val keyedFeatureRDD: RDD[(Long, (SpatialKey, Feature[Geometry, FEATUREID]))] = featureRDD
       .flatMap { feature: Feature[Geometry, FEATUREID] =>
-        val keys: Set[SpatialKey] =
-          windowLayout.mapTransform.keysForGeometry(feature.geom)
-        keys.toSeq.map { key =>
-          val z = Z2(key.col, key.row).z
-          (z, (key, feature))
+        try {
+          val keys: Set[SpatialKey] =
+            windowLayout.mapTransform.keysForGeometry(feature.geom)
+          keys.toSeq.map { key =>
+            val z = Z2(key.col, key.row).z
+            (z, (key, feature))
+          }
+        } catch {
+          case _: NullPointerException =>
+            logger.error(s"Feature ${feature.data}: Error processing geometry: ${e.getMessage}")
+            Seq.empty
         }
       }
 
