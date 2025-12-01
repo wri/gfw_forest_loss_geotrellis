@@ -54,7 +54,7 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
           }
         } catch {
           case _: NullPointerException =>
-            logger.error(s"Feature ${feature.data}: Error processing geometry: ${e.getMessage}")
+            logger.error(s"Feature ${feature.data}: NullPointerException for geometry, skipping")
             Seq.empty
         }
       }
