@@ -456,6 +456,8 @@ trait DateConfLayer extends ILayer {
   }
 }
 
+// Encoding for DistAlerts. This is the same as the alerts above, except the origin
+// date is 2020/12/31, instead of 2014/12/31.
 trait DistDateConfLayer extends ILayer {
   type B = Option[(LocalDate, Boolean)]
 
