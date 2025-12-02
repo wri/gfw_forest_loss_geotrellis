@@ -45,11 +45,21 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
 
     val keyedFeatureRDD: RDD[(Long, (SpatialKey, Feature[Geometry, FEATUREID]))] = featureRDD
       .flatMap { feature: Feature[Geometry, FEATUREID] =>
-        val keys: Set[SpatialKey] =
-          windowLayout.mapTransform.keysForGeometry(feature.geom)
-        keys.toSeq.map { key =>
-          val z = Z2(key.col, key.row).z
-          (z, (key, feature))
+        try {
+          val keys: Set[SpatialKey] =
+            windowLayout.mapTransform.keysForGeometry(feature.geom)
+          keys.toSeq.map { key =>
+            val z = Z2(key.col, key.row).z
+            (z, (key, feature))
+          }
+        } catch {
+          case _: NullPointerException =>
+            /* Geotrellis can throw a NullPointerException when accessing point coordinates in geometries with malformed/null data.
+             * This can occur with edge cases that appear valid in QGIS/geopandas but trigger a null pointer exception in Geotrellis.
+             * Skip this feature and continue processing others rather than failing the entire job.
+             */
+            logger.error(s"Feature ${feature.data}: NullPointerException for geometry, skipping")
+            Seq.empty
         }
       }
 
@@ -170,6 +180,12 @@ trait SummaryRDD extends LazyLogging with java.io.Serializable {
                           None
                         }
                         case ise: java.lang.IllegalArgumentException => {
+                          println(
+                            s"There is an issue with geometry for feature(s) $featureIds: ${geom}"
+                          )
+                          None
+                        }
+                        case npe: java.lang.NullPointerException => {
                           println(
                             s"There is an issue with geometry for feature(s) $featureIds: ${geom}"
                           )
