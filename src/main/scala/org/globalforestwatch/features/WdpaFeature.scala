@@ -15,7 +15,7 @@ object WdpaFeature extends Feature {
   val featureCount = 4
 
   val featureIdExpr =
-    "cast(siteid as int) as siteId, name as name, iucn_cat as iucnCat, iso3 as iso, status"
+    "cast(site_id as int) as siteId, name as name, iucn_cat as iucnCat, iso3 as iso, status"
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
 
