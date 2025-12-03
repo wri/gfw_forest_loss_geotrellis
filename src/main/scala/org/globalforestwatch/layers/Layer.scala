@@ -456,6 +456,28 @@ trait DateConfLayer extends ILayer {
   }
 }
 
+// Encoding for DistAlerts. This is the same as the alerts above, except the origin
+// date is 2020/12/31, instead of 2014/12/31.
+trait DistDateConfLayer extends ILayer {
+  type B = Option[(LocalDate, Boolean)]
+
+  val internalNoDataValue: Int = 0
+  val externalNoDataValue: B = None
+
+  val baseDate = LocalDate.of(2020,12,31)
+
+  override def lookup(value: Int): Option[(LocalDate, Boolean)] = {
+    val confidence = value >= 30000
+    val days: Int = if (confidence) value - 30000 else value - 20000
+    if (days < 0) {
+      None
+    } else {
+      val date = baseDate.plusDays(days)
+      Some((date, confidence))
+    }
+  }
+}
+
 // Encoding for IntegratedAlerts. Confidence value of 0 means "nominal", 1 means
 // "high", and 2 means "highest".
 object DateConfLevelsLayer {

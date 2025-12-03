@@ -14,6 +14,7 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
   val gladAlertsL: GladAlerts = GladAlerts(gridTile, kwargs)
   val gladAlertsS2: GladAlertsS2 = GladAlertsS2(gridTile, kwargs)
   val raddAlerts: RaddAlerts = RaddAlerts(gridTile, kwargs)
+  val distAlerts: DistAlerts = DistAlerts(gridTile, kwargs)
   val biomassPerHectar: AbovegroundBiomass2000 = AbovegroundBiomass2000(gridTile, kwargs)
   val primaryForest: PrimaryForest = PrimaryForest(gridTile, kwargs)
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
@@ -22,6 +23,7 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
   val mangroves2020: Mangroves2020 = Mangroves2020(gridTile, kwargs)
   val intactForestLandscapes2016: IntactForestLandscapes2016 = IntactForestLandscapes2016(gridTile, kwargs)
   val naturalForests: SBTNNaturalForests = SBTNNaturalForests(gridTile, kwargs)
+  val treeCover2022: TreeCover2022 = TreeCover2022(gridTile, kwargs)
 
   def readWindow(windowKey: SpatialKey, windowLayout: LayoutDefinition): Either[Throwable, Raster[IntegratedAlertsTile]] = {
 
@@ -35,6 +37,7 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
     } yield {
       val gladAlertsS2Tile = gladAlertsS2.fetchWindow(windowKey, windowLayout)
       val raddAlertsTile = raddAlerts.fetchWindow(windowKey, windowLayout)
+      val distAlertsTile = distAlerts.fetchWindow(windowKey, windowLayout)
       val biomassTile = biomassPerHectar.fetchWindow(windowKey, windowLayout)
       val primaryForestTile = primaryForest.fetchWindow(windowKey, windowLayout)
       val protectedAreasTile = protectedAreas.fetchWindow(windowKey, windowLayout)
@@ -43,11 +46,13 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
       val mangroves2020Tile = mangroves2020.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2016Tile = intactForestLandscapes2016.fetchWindow(windowKey, windowLayout)
       val naturalForestsTile = naturalForests.fetchWindow(windowKey, windowLayout)
+      val treeCover2022Tile = treeCover2022.fetchWindow(windowKey, windowLayout)
 
       val tile = IntegratedAlertsTile(
         gladAlertsLTile,
         gladAlertsS2Tile,
         raddAlertsTile,
+        distAlertsTile,
         biomassTile,
         primaryForestTile,
         protectedAreasTile,
@@ -55,7 +60,8 @@ case class IntegratedAlertsGridSources(gridTile: GridTile, kwargs: Map[String, A
         peatlandsTile,
         mangroves2020Tile,
         intactForestLandscapes2016Tile,
-        naturalForestsTile
+        naturalForestsTile,
+        treeCover2022Tile
       )
 
       Raster(tile, windowKey.extent(windowLayout))

@@ -20,7 +20,8 @@ object IntegratedAlertsDF {
     "is__gfw_peatlands",
     "is__gmw_global_mangrove_extent_2020",
     "is__ifl_intact_forest_landscapes_2016",
-    "sbtn_natural_forests__class"
+    "sbtn_natural_forests__class",
+    "is__tree_cover_2022"
   )
 
   def unpackValues(unpackCols: List[Column],
@@ -36,11 +37,14 @@ object IntegratedAlertsDF {
         //$"data_group.gladLAlertDate" as "umd_glad_landsat_alerts__date",
         $"data_group.gladS2AlertDate" as "umd_glad_sentinel2_alerts__date",
         $"data_group.raddAlertDate" as "wur_radd_alerts__date",
-        $"data_group.integratedAlertDate" as "gfw_integrated_alerts__date",
+        // Integrated disturbance alerts just replaces the previous integrated alerts
+        // (no new columns). Still to be determined if we will change the column
+        // names.
+        $"data_group.intDistAlertDate" as "gfw_integrated_alerts__date",
         //$"data_group.gladLConfidence" as "umd_glad_landsat_alerts__confidence",
         $"data_group.gladS2Confidence" as "umd_glad_sentinel2_alerts__confidence",
         $"data_group.raddConfidence" as "wur_radd_alerts__confidence",
-        $"data_group.integratedConfidence" as "gfw_integrated_alerts__confidence",
+        $"data_group.intDistConfidence" as "gfw_integrated_alerts__confidence",
         $"data_group.primaryForest" as "is__umd_regional_primary_forest_2001",
         $"data_group.landmark" as "is__landmark_indigenous_and_community_lands",
         $"data_group.peatlands" as "is__gfw_peatlands",
@@ -51,6 +55,7 @@ object IntegratedAlertsDF {
         $"data.co2Emissions" as "whrc_aboveground_co2_emissions__Mg",
         $"data.totalArea" as "area__ha",
         $"data_group.naturalForests" as "sbtn_natural_forests__class",
+        $"data_group.treeCover2022" as "is__tree_cover_2022",
       )
 
     val cols =
@@ -106,7 +111,8 @@ object IntegratedAlertsDF {
       max("is__gfw_peatlands") as "is__gfw_peatlands",
       max("is__gmw_global_mangrove_extent_2020") as "is__gmw_global_mangrove_extent_2020",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
-      max(length($"sbtn_natural_forests__class")).cast("boolean") as "sbtn_natural_forests__class"
+      max(length($"sbtn_natural_forests__class")).cast("boolean") as "sbtn_natural_forests__class",
+      max("is__tree_cover_2022") as "is__tree_cover_2022",
     )
 
     val aggCols =
@@ -129,6 +135,7 @@ object IntegratedAlertsDF {
       max("is__gmw_global_mangrove_extent_2020") as "is__gmw_global_mangrove_extent_2020",
       max("is__ifl_intact_forest_landscapes_2016") as "is__ifl_intact_forest_landscapes_2016",
       max("sbtn_natural_forests__class") as "sbtn_natural_forests__class",
+      max("is__tree_cover_2022") as "is__tree_cover_2022",
     )
 
     val aggCols =

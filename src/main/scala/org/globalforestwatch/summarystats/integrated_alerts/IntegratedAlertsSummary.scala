@@ -41,6 +41,8 @@ object IntegratedAlertsSummary {
           raster.tile.gladS2.getData(col, row)
         val radd: Option[(LocalDate, Boolean)] =
           raster.tile.radd.getData(col, row)
+        val dist: Option[(LocalDate, Boolean)] =
+          raster.tile.dist.getData(col, row)
 
         if (!(gladL.isEmpty && gladS2.isEmpty && radd.isEmpty)) {
           val biomass: Double = raster.tile.biomass.getData(col, row)
@@ -55,6 +57,7 @@ object IntegratedAlertsSummary {
           val intactForestLandscapes2016: Boolean =
             raster.tile.intactForestLandscapes2016.getData(col, row)
           val naturalForests: String = raster.tile.naturalForests.getData(col, row)
+          val treeCover2022: Boolean = raster.tile.treeCover2022.getData(col, row)
 
           val re: RasterExtent = raster.rasterExtent
           val lat: Double = re.gridRowToMap(row)
@@ -109,6 +112,21 @@ object IntegratedAlertsSummary {
             }
           }
 
+          val distAlertDate: Option[String] = {
+            dist match {
+              case Some((date, _)) => Some(date.format(DateTimeFormatter.ISO_DATE))
+              case _ => None
+            }
+          }
+
+          val distConfidence: Option[String] = {
+            dist match {
+              case Some((_, conf)) =>
+                if (conf) Some("high") else Some("nominal")
+              case _ => None
+            }
+          }
+
           // remove Nones from date
           val alertDates: List[String] = List(gladLAlertDate, gladS2AlertDate, raddAlertDate).flatten
 
@@ -129,6 +147,29 @@ object IntegratedAlertsSummary {
             }
           })
 
+          var (intDistAlertDate, intDistConfidence): (Option[String], Option[String]) = 
+            if (integratedAlertDate.isDefined && distAlertDate.isDefined) {
+              // Alerts are defined for both integrated and dist alerts. If one alert
+              // is 180 days newer than the other, take that newest date/confidence
+              // (assuming this is a distinct new disturbance.) Otherwise, take the
+              // older date, but with a "highest" confidence, since at least two
+              // alert systems show an alert.
+              if (integratedAlertDate.get > distAlertDate.get + 180) {
+                (integratedAlertDate, integratedConfidence)
+              } else if (distAlertDate.get > integratedAlertDate.get + 180) {
+                (distAlertDate, distConfidence)
+              } else {
+                (List(distAlertDate, integratedAlertDate).min, Some("highest"))
+              }
+            } else if (integratedAlertDate.isDefined) {
+              (integratedAlertDate, integratedConfidence)
+            } else if (distAlertDate.isDefined) {
+              (distAlertDate, distConfidence)
+            } else {
+              (None, None)
+            } 
+
+
           def updateSummary(
              stats: Map[IntegratedAlertsDataGroup, IntegratedAlertsData],
              integratedAlertDate: Option[String] = None,
@@ -146,15 +187,16 @@ object IntegratedAlertsSummary {
                   //gladLConfidence,
                   gladS2Confidence,
                   raddConfidence,
-                  integratedAlertDate,
-                  integratedConfidence,
+                  intDistAlertDate,
+                  intDistConfidence,
                   primaryForest,
                   protectedAreas,
                   landmark,
                   peatlands,
                   mangroves2020,
                   intactForestLandscapes2016,
-                  naturalForests
+                  naturalForests,
+                  treeCover2022
                 )
 
               val summary: IntegratedAlertsData =
@@ -174,6 +216,9 @@ object IntegratedAlertsSummary {
               stats.updated(pKey, summary)
             }
 
+          // For each pixel, record all three alerts/confidences (if non-None), but
+          // do them in separate IntegratedAlertsDataGroups (which will aggregate to
+          // different rows), so they don't multiply the number of rows.
           val updatedSummaryInt =
             updateSummary(acc.stats, integratedAlertDate = integratedAlertDate, integratedConfidence = integratedConfidence)
 
