@@ -225,13 +225,13 @@ object FireAlertsExport extends SummaryExport {
     }
 
     df.transform(FireAlertsDF.aggChangeDaily(cols, aggCol, wdpa = wdpa))
-      .coalesce(Integer.min(200, ceil(numPartitions / 100.0).toInt))
+      .coalesce(300)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/daily_alerts")
 
     df.transform(FireAlertsDF.aggChangeWeekly(cols, aggCol, wdpa = wdpa))
-      .coalesce(Integer.min(200, ceil(numPartitions / 150.0).toInt))
+      .coalesce(300)
       .write
       .options(csvOptions)
       .csv(path = outputUrl + "/weekly_alerts")
