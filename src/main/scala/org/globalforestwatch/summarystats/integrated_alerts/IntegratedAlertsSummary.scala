@@ -8,6 +8,7 @@ import org.globalforestwatch.util.Geodesy
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 /** LossData Summary by year */
 case class IntegratedAlertsSummary(stats: Map[IntegratedAlertsDataGroup, IntegratedAlertsData] = Map.empty)
@@ -23,6 +24,8 @@ case class IntegratedAlertsSummary(stats: Map[IntegratedAlertsDataGroup, Integra
 }
 
 object IntegratedAlertsSummary {
+  val twoYearsAgo = LocalDate.now().minus(2, ChronoUnit.YEARS)
+
   // TreeLossSummary form Raster[TreeLossTile] -- cell types may not be the same
   def getGridVisitor(kwargs: Map[String, Any]): GridVisitor[Raster[IntegratedAlertsTile], IntegratedAlertsSummary] = {
     new GridVisitor[Raster[IntegratedAlertsTile], IntegratedAlertsSummary] {
@@ -35,14 +38,34 @@ object IntegratedAlertsSummary {
                 row: Int): Unit = {
 
         // This is a pixel by pixel operation
-        val gladL: Option[(LocalDate, Boolean)] =
-          raster.tile.gladL.getData(col, row)
-        val gladS2: Option[(LocalDate, Boolean)] =
-          raster.tile.gladS2.getData(col, row)
-        val radd: Option[(LocalDate, Boolean)] =
-          raster.tile.radd.getData(col, row)
-        val dist: Option[(LocalDate, Boolean)] =
-          raster.tile.dist.getData(col, row)
+        val gladL: Option[(LocalDate, Boolean)] = {
+          val x = raster.tile.gladL.getData(col, row)
+          x match {
+            case Some((date, conf)) => if (date.isAfter(twoYearsAgo)) x else None
+            case _ => None
+          }
+        }
+        val gladS2: Option[(LocalDate, Boolean)] = {
+          val x = raster.tile.gladS2.getData(col, row)
+          x match {
+            case Some((date, conf)) => if (date.isAfter(twoYearsAgo)) x else None
+            case _ => None
+          }
+        }
+        val radd: Option[(LocalDate, Boolean)] = {
+          val x = raster.tile.radd.getData(col, row)
+          x match {
+            case Some((date, conf)) => if (date.isAfter(twoYearsAgo)) x else None
+            case _ => None
+          }
+        }
+        val dist: Option[(LocalDate, Boolean)] = {
+          val x = raster.tile.dist.getData(col, row)
+          x match {
+            case Some((date, conf)) => if (date.isAfter(twoYearsAgo)) x else None
+            case _ => None
+          }
+        }
 
         if (!(gladL.isEmpty && gladS2.isEmpty && radd.isEmpty)) {
           val biomass: Double = raster.tile.biomass.getData(col, row)
