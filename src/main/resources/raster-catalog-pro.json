@@ -326,7 +326,7 @@
     },
     {
       "name":"gfw_integrated_dist_alerts",
-      "source_uri": "s3://gfw-data-lake/gfw_integrated_dist_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/default/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_integrated_dist_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
     }
   ]
 }
