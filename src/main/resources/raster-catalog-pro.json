@@ -26,7 +26,7 @@
     },
     {
       "name":"inpe_prodes",
-      "source_uri":"s3://gfw-data-lake/inpe_prodes/v202107/raster/epsg-4326/{grid_size}/{row_count}/year/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/inpe_prodes/v202507/raster/epsg-4326/{grid_size}/{row_count}/year/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"birdlife_key_biodiversity_areas",
