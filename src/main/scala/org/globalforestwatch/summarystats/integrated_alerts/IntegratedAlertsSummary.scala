@@ -172,14 +172,17 @@ object IntegratedAlertsSummary {
 
           var (intDistAlertDate, intDistConfidence): (Option[String], Option[String]) = 
             if (integratedAlertDate.isDefined && distAlertDate.isDefined) {
+              val i = LocalDate.parse(integratedAlertDate.get)
+              val d = LocalDate.parse(distAlertDate.get)
+              val daysBetween = ChronoUnit.DAYS.between(d, i)
               // Alerts are defined for both integrated and dist alerts. If one alert
               // is 180 days newer than the other, take that newest date/confidence
               // (assuming this is a distinct new disturbance.) Otherwise, take the
               // older date, but with a "highest" confidence, since at least two
               // alert systems show an alert.
-              if (integratedAlertDate.get > distAlertDate.get + 180) {
+              if (daysBetween > 180) {
                 (integratedAlertDate, integratedConfidence)
-              } else if (distAlertDate.get > integratedAlertDate.get + 180) {
+              } else if (daysBetween < -180) {
                 (distAlertDate, distConfidence)
               } else {
                 (List(distAlertDate, integratedAlertDate).min, Some("highest"))
