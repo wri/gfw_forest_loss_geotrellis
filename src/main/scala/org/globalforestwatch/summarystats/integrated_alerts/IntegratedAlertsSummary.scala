@@ -68,7 +68,7 @@ object IntegratedAlertsSummary {
         }
 
         // Note: this check causes all remaining code to be skipped (if all input
-        // alerts are NONE)!
+        // alerts are NONE)!!
         if (!(gladL.isEmpty && gladS2.isEmpty && radd.isEmpty && dist.isEmpty)) {
           val biomass: Double = raster.tile.biomass.getData(col, row)
           val primaryForest: Boolean =
