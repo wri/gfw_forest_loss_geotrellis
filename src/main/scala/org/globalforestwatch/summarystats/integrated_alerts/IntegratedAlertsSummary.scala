@@ -215,8 +215,8 @@ object IntegratedAlertsSummary {
                   //gladLConfidence,
                   gladS2Confidence,
                   raddConfidence,
-                  intDistAlertDate,
-                  intDistConfidence,
+                  integratedAlertDate,
+                  integratedConfidence,
                   primaryForest,
                   protectedAreas,
                   landmark,
@@ -248,7 +248,7 @@ object IntegratedAlertsSummary {
           // do them in separate IntegratedAlertsDataGroups (which will aggregate to
           // different rows), so they don't multiply the number of rows.
           val updatedSummaryInt =
-            updateSummary(acc.stats, integratedAlertDate = integratedAlertDate, integratedConfidence = integratedConfidence)
+            updateSummary(acc.stats, integratedAlertDate = intDistAlertDate, integratedConfidence = intDistConfidence)
 
           val updatedSummaryRadd = raddAlertDate match {
             case Some(_) => updateSummary(updatedSummaryInt, raddAlertDate = raddAlertDate, raddConfidence = raddConfidence)
