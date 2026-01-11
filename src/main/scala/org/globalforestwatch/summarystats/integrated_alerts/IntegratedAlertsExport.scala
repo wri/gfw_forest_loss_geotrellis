@@ -164,7 +164,7 @@ object IntegratedAlertsExport extends SummaryExport {
     val groupByCols = List("geostore__id")
     val unpackCols = List($"id.geostoreId" as "geostore__id")
 
-    _export(summaryDF, outputUrl + "/geostore", kwargs, groupByCols, unpackCols, numExportParts = 500)
+    _export(summaryDF, outputUrl + "/geostore", kwargs, groupByCols, unpackCols, numExportParts = 350)
   }
 
   private def _export(summaryDF: DataFrame,
