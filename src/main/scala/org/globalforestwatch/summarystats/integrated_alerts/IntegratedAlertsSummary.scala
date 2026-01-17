@@ -37,39 +37,55 @@ object IntegratedAlertsSummary {
                 col: Int,
                 row: Int): Unit = {
 
-        // This is a pixel by pixel operation
-        val gladL: Option[(LocalDate, Boolean)] = {
+        // Drop any alerts older than two year ago.
+        val (gladLAlertDate, gladLConfidence): (Option[LocalDate], Option[String]) = {
           val x = raster.tile.gladL.getData(col, row)
           x match {
-            case Some((date, conf)) => if (date.isAfter(twoYearsAgo)) x else None
-            case _ => None
+            case Some((date, conf)) =>
+              if (date.isAfter(twoYearsAgo))
+                (Some(date), if (conf) Some("high") else Some("low"))
+              else
+                  (None, None)
+            case _ => (None, None)
           }
         }
-        val gladS2: Option[(LocalDate, Boolean)] = {
+        val (gladS2AlertDate, gladS2Confidence): (Option[LocalDate], Option[String]) = {
           val x = raster.tile.gladS2.getData(col, row)
           x match {
-            case Some((date, conf)) => if (date.isAfter(twoYearsAgo)) x else None
-            case _ => None
+            case Some((date, conf)) =>
+              if (date.isAfter(twoYearsAgo))
+                (Some(date), if (conf) Some("high") else Some("nominal"))
+              else
+                (None, None)
+            case _ => (None, None)
           }
         }
-        val radd: Option[(LocalDate, Boolean)] = {
+        val (raddAlertDate, raddConfidence): (Option[LocalDate], Option[String]) = {
           val x = raster.tile.radd.getData(col, row)
           x match {
-            case Some((date, conf)) => if (date.isAfter(twoYearsAgo)) x else None
-            case _ => None
+            case Some((date, conf)) =>
+              if (date.isAfter(twoYearsAgo))
+                (Some(date), if (conf) Some("high") else Some("nominal"))
+              else
+                (None, None)
+            case _ => (None, None)
           }
         }
-        val dist: Option[(LocalDate, Boolean)] = {
+        val (distAlertDate, distConfidence): (Option[LocalDate], Option[String]) = {
           val x = raster.tile.dist.getData(col, row)
           x match {
-            case Some((date, conf)) => if (date.isAfter(twoYearsAgo)) x else None
-            case _ => None
+            case Some((date, conf)) =>
+              if (date.isAfter(twoYearsAgo))
+                (Some(date), if (conf) Some("high") else Some("nominal"))
+              else
+                (None, None)
+            case _ => (None, None)
           }
         }
 
         // Note: this check causes all remaining code to be skipped (if all input
         // alerts are NONE)!!
-        if (!(gladL.isEmpty && gladS2.isEmpty && radd.isEmpty && dist.isEmpty)) {
+        if (!(gladLAlertDate.isEmpty && gladS2AlertDate.isEmpty && raddAlertDate.isEmpty && distAlertDate.isEmpty)) {
           val biomass: Double = raster.tile.biomass.getData(col, row)
           val primaryForest: Boolean =
             raster.tile.primaryForest.getData(col, row)
@@ -92,91 +108,33 @@ object IntegratedAlertsSummary {
           val areaHa = area / 10000.0
           val co2Pixel = ((biomass * areaHa) * 0.5) * 44 / 12
 
-          val gladLAlertDate: Option[String] = {
-            gladL match {
-              case Some((date, _)) => Some(date.format(DateTimeFormatter.ISO_DATE))
-              case _ => None
+          // remove Nones from list of dates
+          val alertDates: List[LocalDate] = List(gladLAlertDate, gladS2AlertDate, raddAlertDate).flatten
+
+          val (integratedAlertDate, integratedConfidence): (Option[LocalDate], Option[String]) = {
+            if (alertDates.isEmpty) (None, None)
+            else {
+              // return min if any date exists
+              val date = Some(alertDates.minBy(_.toEpochDay))
+              val confidences = List(gladLConfidence, gladS2Confidence, raddConfidence).flatten
+              val conf = Some({
+                // highest if more than one system detected alert
+                if (confidences.size > 1) {
+                  "highest"
+                } else if (confidences.contains("high")) {
+                  "high"
+                } else {
+                  "nominal"
+                }
+              })
+              (date, conf)
             }
           }
 
-          val gladLConfidence: Option[String] = {
-            gladL match {
-              case Some((_, conf)) =>
-                if (conf) Some("high") else Some("low")
-              case _ => None
-            }
-          }
 
-          val gladS2AlertDate: Option[String] = {
-            gladS2 match {
-              case Some((date, _)) => Some(date.format(DateTimeFormatter.ISO_DATE))
-              case _ => None
-            }
-          }
-
-          val gladS2Confidence: Option[String] = {
-            gladS2 match {
-              case Some((_, conf)) =>
-                if (conf) Some("high") else Some("nominal")
-              case _ => None
-            }
-          }
-
-          val raddAlertDate: Option[String] = {
-            radd match {
-              case Some((date, _)) => Some(date.format(DateTimeFormatter.ISO_DATE))
-              case _ => None
-            }
-          }
-
-          val raddConfidence: Option[String] = {
-            radd match {
-              case Some((_, conf)) =>
-                if (conf) Some("high") else Some("nominal")
-              case _ => None
-            }
-          }
-
-          val distAlertDate: Option[String] = {
-            dist match {
-              case Some((date, _)) => Some(date.format(DateTimeFormatter.ISO_DATE))
-              case _ => None
-            }
-          }
-
-          val distConfidence: Option[String] = {
-            dist match {
-              case Some((_, conf)) =>
-                if (conf) Some("high") else Some("nominal")
-              case _ => None
-            }
-          }
-
-          // remove Nones from date
-          val alertDates: List[String] = List(gladLAlertDate, gladS2AlertDate, raddAlertDate).flatten
-
-          // return min if any date exists
-          val integratedAlertDate =
-            if (alertDates.isEmpty) None
-            else Some(alertDates.min)
-
-          val confidences = List(gladLConfidence, gladS2Confidence, raddConfidence)
-          val integratedConfidence = Some({
-            // highest if more than one system detected alert
-            if (confidences.flatten.size > 1) {
-              "highest"
-            } else if (confidences.contains(Some("high"))) {
-              "high"
-            } else {
-              "nominal"
-            }
-          })
-
-          var (intDistAlertDate, intDistConfidence): (Option[String], Option[String]) = 
+          val (intDistAlertDate, intDistConfidence): (Option[LocalDate], Option[String]) = 
             if (integratedAlertDate.isDefined && distAlertDate.isDefined) {
-              val i = LocalDate.parse(integratedAlertDate.get)
-              val d = LocalDate.parse(distAlertDate.get)
-              val daysBetween = ChronoUnit.DAYS.between(d, i)
+              val daysBetween = ChronoUnit.DAYS.between(distAlertDate.get, integratedAlertDate.get)
               // Alerts are defined for both integrated and dist alerts. If one alert
               // is 180 days newer than the other, take that newest date/confidence
               // (assuming this is a distinct new disturbance.) Otherwise, take the
@@ -187,15 +145,14 @@ object IntegratedAlertsSummary {
               } else if (daysBetween < -180) {
                 (distAlertDate, distConfidence)
               } else {
-                (List(distAlertDate, integratedAlertDate).min, Some("highest"))
+                (Some(List(distAlertDate.get, integratedAlertDate.get).minBy(_.toEpochDay)), Some("highest"))
               }
             } else if (integratedAlertDate.isDefined) {
               (integratedAlertDate, integratedConfidence)
-            } else if (distAlertDate.isDefined) {
-              (distAlertDate, distConfidence)
             } else {
-              (None, None)
-            } 
+              assert(distAlertDate.isDefined)
+              (distAlertDate, distConfidence)
+            }
 
 
           def updateSummary(
@@ -209,10 +166,8 @@ object IntegratedAlertsSummary {
            ): Map[IntegratedAlertsDataGroup, IntegratedAlertsData] = {
               val pKey =
                 IntegratedAlertsDataGroup(
-                  //gladLAlertDate,
                   gladS2AlertDate,
                   raddAlertDate,
-                  //gladLConfidence,
                   gladS2Confidence,
                   raddConfidence,
                   integratedAlertDate,
@@ -233,30 +188,33 @@ object IntegratedAlertsSummary {
                   default = IntegratedAlertsData(0, 0, 0, 0)
                 )
 
-              summary.totalArea += areaHa
+              // totalArea would not be accurate (since we skip all this code if the
+              // pixel has no alerts), but it isn't put in the output anyway.
+              //summary.totalArea += areaHa
 
-              if (gladL != null || gladS2 != null || radd != null) {
-                summary.totalAlerts += 1
-                summary.alertArea += areaHa
-                summary.co2Emissions += co2Pixel
-              }
+              summary.totalAlerts += 1
+              summary.alertArea += areaHa
+              summary.co2Emissions += co2Pixel
 
               stats.updated(pKey, summary)
             }
 
-          // For each pixel, record all three alerts/confidences (if non-None), but
-          // do them in separate IntegratedAlertsDataGroups (which will aggregate to
-          // different rows), so they don't multiply the number of rows.
+          // For each pixel, record an IntegratedAlertsDataGroup (which will
+          // aggregate to a separate row) with just int-dist alerts date/confidence,
+          // which must be non-None, since at least one alert is non-None. Then
+          // record separate IntegratedAlertsDataGroups for radd and gladS2 alerts,
+          // if none-None. We do separate IntegratedAlertsDataGroups to avoid
+          // multiplying the number of rows.
           val updatedSummaryInt =
-            updateSummary(acc.stats, integratedAlertDate = intDistAlertDate, integratedConfidence = intDistConfidence)
+            updateSummary(acc.stats, integratedAlertDate = Some(intDistAlertDate.get.format(DateTimeFormatter.ISO_DATE)), integratedConfidence = intDistConfidence)
 
           val updatedSummaryRadd = raddAlertDate match {
-            case Some(_) => updateSummary(updatedSummaryInt, raddAlertDate = raddAlertDate, raddConfidence = raddConfidence)
+            case Some(_) => updateSummary(updatedSummaryInt, raddAlertDate = Some(raddAlertDate.get.format(DateTimeFormatter.ISO_DATE)), raddConfidence = raddConfidence)
             case None => updatedSummaryInt
           }
 
           val updatedSummaryS2 = gladS2AlertDate match {
-            case Some(_) => updateSummary(updatedSummaryRadd, gladS2AlertDate = gladS2AlertDate, gladS2Confidence = gladS2Confidence)
+            case Some(_) => updateSummary(updatedSummaryRadd, gladS2AlertDate = Some(gladS2AlertDate.get.format(DateTimeFormatter.ISO_DATE)), gladS2Confidence = gladS2Confidence)
             case None => updatedSummaryRadd
           }
 
