@@ -42,9 +42,15 @@ object GfwProDashboardAnalysis extends SummaryAnalysis {
     spark: SparkSession,
     kwargs: Map[String, Any]
   ): ValidatedWorkflow[Location[JobError],(FeatureId, GfwProDashboardData)] = {
-    featureRDD.persist(StorageLevel.MEMORY_AND_DISK)
+    // Drop any rows for dissolved lists. We don't want to analyze them anymore for alerts.
+    val dropDissolvedRowsRDD = featureRDD.filter{
+      case Valid(Location(CombinedFeatureId(GfwProFeatureId(_, locationId), _), geom)) => {
+        locationId != -1
+      }
+    }
+    dropDissolvedRowsRDD.persist(StorageLevel.MEMORY_AND_DISK)
 
-    val summaryRDD = ValidatedWorkflow(featureRDD).flatMap { rdd =>
+    val summaryRDD = ValidatedWorkflow(dropDissolvedRowsRDD).flatMap { rdd =>
       val enrichedRDD = if (doGadmIntersect) {
         println("Doing intersect with vector gadm")
         val spatialContextualDF = SpatialFeatureDF(gadmFeatureUrl, "gadm", FeatureFilter.empty, "geom", spark)
