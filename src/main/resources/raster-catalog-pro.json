@@ -14,7 +14,7 @@
     },
     {
       "name":"detailed_wdpa_protected_areas",
-      "source_uri":"s3://gfw-data-lake/wdpa_licensed_protected_areas/v202511/raster/epsg-4326/{grid_size}/{row_count}/detailed_iucn_cat/gdal-geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/wdpa_licensed_protected_areas/v202602/raster/epsg-4326/{grid_size}/{row_count}/detailed_iucn_cat/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_oil_gas",
@@ -318,15 +318,15 @@
     },
     {
       "name":"umd_tree_cover_gain_from_height",
-      "source_uri":"s3://gfw-data-lake/umd_tree_cover_gain_from_height/v20240126/raster/epsg-4326/{grid_size}/{row_count}/period/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/umd_tree_cover_gain_from_height/v20240126/raster/epsg-4326/{grid_size}/{row_count}/period/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"sbtn_natural_lands_classification",
-      "source_uri":"s3://gfw-data-lake/sbtn_natural_lands_classification/v1.1/raster/epsg-4326/{grid_size}/{row_count}/class/geotiff/{tile_id}.tif"
+      "source_uri":"s3://gfw-data-lake/sbtn_natural_lands_classification/v1.1/raster/epsg-4326/{grid_size}/{row_count}/class/gdal-geotiff/{tile_id}.tif"
     },
     {
       "name":"gfw_integrated_dist_alerts",
-      "source_uri": "s3://gfw-data-lake/gfw_integrated_dist_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/geotiff/{tile_id}.tif"
+      "source_uri": "s3://gfw-data-lake/gfw_integrated_dist_alerts/latest/raster/epsg-4326/{grid_size}/{row_count}/date_conf/gdal-geotiff/{tile_id}.tif"
     }
   ]
 }
