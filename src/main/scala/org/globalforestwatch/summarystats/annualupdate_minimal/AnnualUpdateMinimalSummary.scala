@@ -50,7 +50,6 @@ object AnnualUpdateMinimalSummary {
         val idnForestMoratorium: Boolean = raster.tile.idnForestMoratorium.getData(col, row)
         val intactForestLandscapes2000: Boolean = raster.tile.intactForestLandscapes2000.getData(col, row)
         val treeCoverLossFromFires: Boolean = raster.tile.treeCoverLossFromFires.getData(col, row)
-        val tropicalTreeCover: Int = raster.tile.tropicalTreeCover.getData(col, row)
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val naturalForests: String = raster.tile.naturalForests.getData(col, row)
 
@@ -166,10 +165,6 @@ object AnnualUpdateMinimalSummary {
             summary.treecoverExtent2010 += areaHa
           }
 
-          if (tropicalTreeCover >= 0) {
-            summary.tropicalTreeCoverExtent += areaHa
-          }
-
           stats.updated(pKey, summary)
         }
 
@@ -181,15 +176,7 @@ object AnnualUpdateMinimalSummary {
             updateSummary(loss, tcd2000, threshold, stats)
           }
 
-        val ttcSummary = {
-          if (tropicalTreeCover == 255) {
-            lossSummary
-          } else {
-            updateSummary(null, -2, -1, lossSummary)
-          }
-        }
-
-        acc = AnnualUpdateMinimalSummary(ttcSummary)
+        acc = AnnualUpdateMinimalSummary(lossSummary)
       }
     }
 }
