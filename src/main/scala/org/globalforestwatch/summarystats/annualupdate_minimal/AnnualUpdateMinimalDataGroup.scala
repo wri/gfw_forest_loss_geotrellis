@@ -11,5 +11,6 @@ case class AnnualUpdateMinimalDataGroup(lossYear: Integer,
                                         peatlands: Boolean,
                                         idnForestMoratorium: Boolean,
                                         intactForestLandscapes2000: Boolean,
+                                        drivers: String,
                                         naturalForests: String
                                        )

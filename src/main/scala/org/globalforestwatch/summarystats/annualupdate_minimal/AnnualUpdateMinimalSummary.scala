@@ -50,6 +50,7 @@ object AnnualUpdateMinimalSummary {
         val idnForestMoratorium: Boolean = raster.tile.idnForestMoratorium.getData(col, row)
         val intactForestLandscapes2000: Boolean = raster.tile.intactForestLandscapes2000.getData(col, row)
         val treeCoverLossFromFires: Boolean = raster.tile.treeCoverLossFromFires.getData(col, row)
+        val drivers: String = raster.tile.drivers.getData(col, row)
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val naturalForests: String = raster.tile.naturalForests.getData(col, row)
 
@@ -101,13 +102,14 @@ object AnnualUpdateMinimalSummary {
             peatlands,
             idnForestMoratorium,
             intactForestLandscapes2000,
+            drivers,
             naturalForests
           )
 
           val summary: AnnualUpdateMinimalData =
             stats.getOrElse(
               key = pKey,
-              default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+              default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             )
 
           summary.totalArea += areaHa

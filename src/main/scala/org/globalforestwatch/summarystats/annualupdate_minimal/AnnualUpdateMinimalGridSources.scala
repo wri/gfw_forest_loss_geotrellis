@@ -32,6 +32,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
   val soilCarbon2000: SoilCarbon2000 = SoilCarbon2000(gridTile, kwargs = kwargs)
   val intactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
   val treeCoverLossFromFires: TreeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
+  val treeCoverLossDrivers: TreeCoverLossDrivers1km = TreeCoverLossDrivers1km(gridTile, kwargs)
   val plantationsPre2000: PlantationsPre2000 = PlantationsPre2000(gridTile, kwargs)
   val abovegroundCarbon2000: AbovegroundCarbon2000 = AbovegroundCarbon2000(gridTile, kwargs = kwargs)
   val belowgroundCarbon2000: BelowgroundCarbon2000 = BelowgroundCarbon2000(gridTile, kwargs = kwargs)
@@ -73,6 +74,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
       val soilCarbon2000Tile = soilCarbon2000.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2000Tile = intactForestLandscapes2000.fetchWindow(windowKey, windowLayout)
       val treeCoverLossFromFiresTile = treeCoverLossFromFires.fetchWindow(windowKey, windowLayout)
+      val driversTile = treeCoverLossDrivers.fetchWindow(windowKey, windowLayout)
       val plantationsPre2000Tile = plantationsPre2000.fetchWindow(windowKey, windowLayout)
       val abovegroundCarbon2000Tile = abovegroundCarbon2000.fetchWindow(windowKey, windowLayout)
       val belowgroundCarbon2000Tile = belowgroundCarbon2000.fetchWindow(windowKey, windowLayout)
@@ -101,6 +103,7 @@ case class AnnualUpdateMinimalGridSources(gridTile: GridTile, kwargs: Map[String
         soilCarbon2000Tile,
         intactForestLandscapes2000Tile,
         treeCoverLossFromFiresTile,
+        driversTile,
         plantationsPre2000Tile,
         abovegroundCarbon2000Tile,
         belowgroundCarbon2000Tile,

@@ -16,6 +16,7 @@ object AnnualUpdateMinimalDF {
     "is__gfw_peatlands",
     "is__idn_forest_moratorium",
     "is__ifl_intact_forest_landscapes_2000",
+    "wri_google_tree_cover_loss_drivers__driver",
     "sbtn_natural_forests__class",
   )
 
@@ -37,6 +38,7 @@ object AnnualUpdateMinimalDF {
         $"data_group.peatlands" as "is__gfw_peatlands",
         $"data_group.idnForestMoratorium" as "is__idn_forest_moratorium",
         $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
+        $"data_group.drivers" as "wri_google_tree_cover_loss_drivers__driver",
         $"data_group.naturalForests" as "sbtn_natural_forests__class",
 
         $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
@@ -57,7 +59,6 @@ object AnnualUpdateMinimalDF {
         $"data.totalSoilCarbon2000" as "gfw_soil_carbon_stocks_2000__Mg_C",
         $"data.totalGrossCumulAboveBelowgroundRemovalsCo2" as "gfw_full_extent_gross_removals__Mg_CO2",
         $"data.treeCoverLossFromFires" as "umd_tree_cover_loss_from_fires__ha",
-        $"data.tropicalTreeCoverExtent" as "wri_tropical_tree_cover_extent__ha",
         $"data.abovegroundCarbon2000" as "gfw_aboveground_carbon_stocks_2000__Mg_C",
         $"data.belowgroundCarbon2000" as "gfw_belowground_carbon_stocks_2000__Mg_C",
         $"data.totalNetFluxCo2" as "gfw_net_flux_co2e__Mg",
@@ -109,7 +110,6 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
         sum("gfw_soil_carbon_stocks_2000__Mg_C") as "gfw_soil_carbon_stocks_2000__Mg_C",
         sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
-        sum("wri_tropical_tree_cover_extent__ha") as "wri_tropical_tree_cover_extent__ha",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
         sum("gfw_net_flux_co2e__Mg") as "gfw_net_flux_co2e__Mg",
         sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg",
@@ -148,7 +148,6 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
         sum("gfw_soil_carbon_stocks_2000__Mg_C") as "gfw_soil_carbon_stocks_2000__Mg_C",
         sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
-        sum("wri_tropical_tree_cover_extent__ha") as "wri_tropical_tree_cover_extent__ha",
         sum("gfw_aboveground_carbon_stocks_2000__Mg_C") as "gfw_aboveground_carbon_stocks_2000__Mg_C",
         sum("gfw_belowground_carbon_stocks_2000__Mg_C") as "gfw_belowground_carbon_stocks_2000__Mg_C",
         sum("gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg") as "gfw_gross_cumulative_aboveground_belowground_co2_removals__Mg",
@@ -178,7 +177,6 @@ object AnnualUpdateMinimalDF {
         sum("gfw_full_extent_gross_emissions__Mg_CO2e") as "gfw_full_extent_gross_emissions__Mg_CO2e",
         sum("gfw_gross_emissions_co2e_all_gases__Mg") as "gfw_gross_emissions_co2e_all_gases__Mg",
         sum("umd_tree_cover_loss_from_fires__ha") as "umd_tree_cover_loss_from_fires__ha",
-        sum("wri_tropical_tree_cover_extent__ha") as "wri_tropical_tree_cover_extent__ha",
       )
   }
 
@@ -198,6 +196,8 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_peatlands") as "is__gfw_peatlands",
       max($"is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
+      max(length($"wri_google_tree_cover_loss_drivers__driver"))
+        .cast("boolean") as "wri_google_tree_cover_loss_drivers__driver",
       max(length($"sbtn_natural_forests__class")).cast("boolean") as "sbtn_natural_forests__class",
     )
 
@@ -231,6 +231,7 @@ object AnnualUpdateMinimalDF {
       max($"is__gfw_peatlands") as "is__gfw_peatlands",
       max($"is__idn_forest_moratorium") as "is__idn_forest_moratorium",
       max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
+      max($"wri_google_tree_cover_loss_drivers__driver") as "wri_google_tree_cover_loss_drivers__driver",
       max($"sbtn_natural_forests__class") as "sbtn_natural_forests__class",
     )
 
