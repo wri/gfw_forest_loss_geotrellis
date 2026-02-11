@@ -168,7 +168,7 @@ object AnnualUpdateMinimalSummary {
           stats.updated(pKey, summary)
         }
 
-        val umdTcdThresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
+        val umdTcdThresholds = List(10, 15, 20, 25, 30, 50, 75)
 
         val lossSummary
         : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
