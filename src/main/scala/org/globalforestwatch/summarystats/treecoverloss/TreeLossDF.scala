@@ -9,6 +9,7 @@ object TreeLossDF {
 
   val treecoverLossMinYear = 2001
   val treecoverLossMaxYear = 2024
+  //TODO - Update max years
 
   def unpackValues(carbonPools: Boolean, simpleAGBEmis: Boolean, emisGasAnnual: Boolean)(df: DataFrame): DataFrame = {
     val spark: SparkSession = df.sparkSession
