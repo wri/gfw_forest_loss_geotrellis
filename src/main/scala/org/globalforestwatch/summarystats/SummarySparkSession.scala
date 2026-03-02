@@ -19,6 +19,9 @@ object SummarySparkSession {
       .set("spark.kryo.registrator", classOf[SedonaKryoRegistrator].getName)
       .set("spark.debug.maxToStringFields", "255")
       .set("sedona.join.gridtype", "quadtree")
+      .set("spark.hadoop.fs.s3a.connection.maximum", "100")
+      .set("spark.hadoop.fs.s3a.retry.limit", "20")
+      .set("spark.hadoop.fs.s3a.connection.timeout", "200000")
     //    .set("spark.sql.crossJoin.enabled", "true")
 
     val localConf: SparkConf = conf

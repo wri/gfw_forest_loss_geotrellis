@@ -2,7 +2,6 @@ package org.globalforestwatch.summarystats.annualupdate_minimal
 
 case class AnnualUpdateMinimalDataGroup(lossYear: Integer,
                                         threshold: Integer,
-                                        drivers: String,
                                         primaryForest: Boolean,
                                         wdpa: String,
                                         aze: Boolean,

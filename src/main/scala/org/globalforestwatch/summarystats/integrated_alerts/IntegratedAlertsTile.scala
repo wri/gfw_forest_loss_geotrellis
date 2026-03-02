@@ -12,28 +12,16 @@ case class IntegratedAlertsTile(
                                  gladL: GladAlerts#OptionalITile,
                                  gladS2: GladAlertsS2#OptionalITile,
                                  radd: RaddAlerts#OptionalITile,
+                                 dist: DistAlerts#OptionalITile,
                                  biomass: AbovegroundBiomass2000#OptionalDTile,
-                                 climateMask: ClimateMask#OptionalITile,
                                  primaryForest: PrimaryForest#OptionalITile,
                                  protectedAreas: ProtectedAreas#OptionalITile,
-                                 aze: Aze#OptionalITile,
-                                 keyBiodiversityAreas: KeyBiodiversityAreas#OptionalITile,
                                  landmark: Landmark#OptionalITile,
-                                 plantedForests: PlantedForests#OptionalITile,
-                                 mining: Mining#OptionalITile,
-                                 logging: Logging#OptionalITile,
-                                 rspo: RSPO#OptionalITile,
-                                 woodFiber: WoodFiber#OptionalITile,
                                  peatlands: Peatlands#OptionalITile,
-                                 indonesiaForestMoratorium: IndonesiaForestMoratorium#OptionalITile,
-                                 oilPalm: OilPalm#OptionalITile,
-                                 indonesiaForestArea: IndonesiaForestArea#OptionalITile,
-                                 peruForestConcessions: PeruForestConcessions#OptionalITile,
-                                 oilGas: OilGas#OptionalITile,
                                  mangroves2020: Mangroves2020#OptionalITile,
                                  intactForestLandscapes2016: IntactForestLandscapes2016#OptionalITile,
-                                 brazilBiomes: BrazilBiomes#OptionalITile,
-                                 naturalForests: SBTNNaturalForests#OptionalITile
+                                 naturalForests: SBTNNaturalForests#OptionalITile,
+                                 treeCover2022: TreeCover2022#OptionalITile
                          ) extends CellGrid[Int] {
 
   def cellType: CellType = gladL.cellType.getOrElse(IntCellType)

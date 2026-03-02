@@ -6,7 +6,7 @@ import org.apache.spark.sql.Column
 
 object WdpaFeature extends Feature {
 
-  val wdpaIdPos = 0
+  val siteIdPos = 0
   val namePos = 1
   val iucnCatPos = 2
   val isoPos = 3
@@ -15,17 +15,17 @@ object WdpaFeature extends Feature {
   val featureCount = 4
 
   val featureIdExpr =
-    "cast(wdpaid as int) as wdpaId, name as name, iucn_cat as iucnCat, iso3 as iso, status"
+    "cast(site_id as int) as siteId, name as name, iucn_cat as iucnCat, iso3 as iso, status"
 
   def getFeatureId(i: Array[String], parsed: Boolean = false): FeatureId = {
 
-    val wdpaId: Int = i(wdpaIdPos).toInt
+    val siteId: Int = i(siteIdPos).toInt
     val name: String = i(namePos)
     val iucnCat: String = i(iucnCatPos)
     val iso: String = i(isoPos)
     val status: String = i(statusPos)
 
-    WdpaFeatureId(wdpaId, name, iucnCat, iso, status)
+    WdpaFeatureId(siteId, name, iucnCat, iso, status)
   }
 
   case class Filter(
