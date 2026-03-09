@@ -38,7 +38,7 @@ object CarbonFluxSummary {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
-        val tcd2010: Integer = raster.tile.tcd2010.getData(col, row)    //TODO: Should this be int?
+        val tcd2010: Boolean = raster.tile.tcd2010.getData(col, row)    //TODO: Should this be int?
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
         val grossAnnualAbovegroundRemovalsCarbon: Float = raster.tile.grossAnnualAbovegroundRemovalsCarbon.getData(col, row)
@@ -199,6 +199,7 @@ object CarbonFluxSummary {
               grossEmissionsNodeCodes,
               loss,
               thresholds.head,
+              30,   // Only use TCD>= 30 for 2010 tree cover extent
               isGain,
               isLoss,
               plantationsPre2000,
@@ -265,7 +266,6 @@ object CarbonFluxSummary {
                 // Non-flux model statistics not by loss year using TCD threshold
                 if (isLossLegalAmazon) summary.totalTreecoverLossLegalAmazon += areaHa
                 summary.totalTreecoverExtent2000 += areaHa
-                if (thresholds.head == 30 && tcd2010 >= 30) summary.totalTreecoverExtent2010 += areaHa
                 summary.totalBiomass += biomassPixel
 
                 // Carbon data in 2000, so not actually flux model
@@ -300,6 +300,11 @@ object CarbonFluxSummary {
                     summary.totalGrossCumulAboveBelowgroundRemovalsCo2 += grossCumulAboveBelowgroundRemovalsCo2Pixel
                   }
                 }
+              }
+
+              // Statistics not using 2000 TCD thresholds and not by loss year
+              else if (tcd2010) {
+                summary.totalTreecoverExtent2010 += areaHa
               }
 
               // Flux model statistics without using tree cover density threshold
