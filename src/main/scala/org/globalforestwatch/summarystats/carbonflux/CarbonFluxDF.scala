@@ -18,6 +18,8 @@ object CarbonFluxDF {
     "is__landmark_indigenous_and_community_lands",
     "wdpa_protected_areas__iucn_cat",
     "is__ifl_intact_forest_landscapes_2000",
+    //TODO: Update with 2025 IFL when ready from Engineering
+    "is__ifl_intact_forest_landscapes_2020",
     "gfw_plantation_flux_model__type",
     "is__intact_primary_forest",
     "is__gfw_peatlands",
@@ -61,6 +63,8 @@ object CarbonFluxDF {
       $"data_group.landmark" as "is__landmark_indigenous_and_community_lands",
       $"data_group.wdpa" as "wdpa_protected_areas__iucn_cat",
       $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
+      //TODO: Update with 2025 IFL when ready from Engineering
+      $"data_group.intactForestLandscapes2020" as "is__ifl_intact_forest_landscapes_2020",
       $"data_group.plantationsTypeFluxModel" as "gfw_plantation_flux_model__type",
       $"data_group.intactPrimaryForest" as "is__intact_primary_forest",
       $"data_group.peatlands" as "is__gfw_peatlands",
@@ -104,6 +108,7 @@ object CarbonFluxDF {
       $"data.totalCarbonEmisYear" as "gfw_total_carbon_stock_in_emissions_year__Mg",
 
       $"data.totalTreecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
+      $"data.totalTreecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
       $"data.totalBiomass" as "whrc_aboveground_biomass_stock_2000__Mg",
       $"data.totalGrossAnnualAbovegroundRemovalsCarbon" as "gfw_full_extent_aboveground_annual_removals__Mg_C",
@@ -134,6 +139,7 @@ object CarbonFluxDF {
     df.groupBy(groupByCols.head, groupByCols.tail ::: contextualLayers: _*)
       .agg(
         sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
+        sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
         sum("area__ha") as "area__ha",
         sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
         sum("gfw_full_extent_aboveground_annual_removals__Mg_C") as "gfw_full_extent_aboveground_annual_removals__Mg_C",
@@ -178,6 +184,7 @@ object CarbonFluxDF {
     df.groupBy(groupByCols.head, groupByCols.tail ::: contextualLayers: _*)
       .agg(
         sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
+        sum("umd_tree_cover_extent_2010__ha") as "umd_tree_cover_extent_2010__ha",
         sum("area__ha") as "area__ha",
         sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
         sum("gfw_full_extent_aboveground_annual_removals__Mg_C") as "gfw_full_extent_aboveground_annual_removals__Mg_C",
@@ -266,6 +273,8 @@ object CarbonFluxDF {
         max($"is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
         max(length($"wdpa_protected_areas__iucn_cat")).cast("boolean") as "wdpa_protected_areas__iucn_cat",
         max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
+        //TODO: Update with 2025 IFL when ready from Engineering
+        max($"is__ifl_intact_forest_landscapes_2020") as "is__ifl_intact_forest_landscapes_2020",
         max(length($"gfw_plantation_flux_model__type")).cast("boolean") as "gfw_plantation_flux_model__type",
         max($"is__intact_primary_forest") as "is__intact_primary_forest",
         max($"is__gfw_peatlands") as "is__gfw_peatlands",
@@ -304,6 +313,8 @@ object CarbonFluxDF {
         max($"is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
         max($"wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat",
         max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
+        //TODO: Update with 2025 IFL when ready from Engineering
+        max($"is__ifl_intact_forest_landscapes_2020") as "is__ifl_intact_forest_landscapes_2020",
         max($"gfw_plantation_flux_model__type") as "gfw_plantation_flux_model__type",
         max($"is__intact_primary_forest") as "is__intact_primary_forest",
         max($"is__gfw_peatlands") as "is__gfw_peatlands",

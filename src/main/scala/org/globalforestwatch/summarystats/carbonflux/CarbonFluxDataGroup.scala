@@ -9,6 +9,8 @@ case class CarbonFluxDataGroup(
                                wdpa: String,
                                landmark: Boolean,
                                intactForestLandscapes2000: Boolean,
+                               //TODO: Update with 2025 IFL when ready from Engineering
+                               intactForestLandscapes2020: Boolean,
                                plantationsTypeFluxModel: String,
                                intactPrimaryForest: Boolean,
                                peatlands: Boolean,

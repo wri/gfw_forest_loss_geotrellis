@@ -15,6 +15,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
   val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
   val treeCoverDensity2000: TreeCoverDensityThreshold2000 = TreeCoverDensityThreshold2000(gridTile, kwargs)
+  val treeCoverDensity2010: TreeCoverDensity2010_30 = TreeCoverDensity2010_30(gridTile, kwargs)
   val biomassPerHectar: AbovegroundBiomass2000 = AbovegroundBiomass2000(gridTile, kwargs)
   val grossAnnualAbovegroundRemovalsCarbon: AnnualAbovegroundRemovalFactorCarbon = AnnualAbovegroundRemovalFactorCarbon(gridTile, kwargs = kwargs)
   val grossAnnualBelowgroundRemovalsCarbon: AnnualBelowgroundRemovalFactorCarbon = AnnualBelowgroundRemovalFactorCarbon(gridTile, kwargs = kwargs)
@@ -49,6 +50,8 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
   val intactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
+  //TODO: Update with 2025 IFL when ready from Engineering
+  val intactForestLandscapes2020: IntactForestLandscapes2025 = IntactForestLandscapes2020(gridTile, kwargs)
   val plantationsTypeFluxModel: ForestFluxModelPlantedForestType = ForestFluxModelPlantedForestType(gridTile, kwargs)
   val intactPrimaryForest: IntactPrimaryForest = IntactPrimaryForest(gridTile, kwargs)
   val peatlands: Peatlands = Peatlands(gridTile, kwargs)
@@ -84,7 +87,11 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
           treeCoverDensity2000.fetchWindow(windowKey, windowLayout)
         )
         .right
-
+      tcd2010Tile <- Either
+        .catchNonFatal(
+          treeCoverDensity2010.fetchWindow(windowKey, windowLayout)
+        )
+        .right
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
       val gainTile = treeCoverGain.fetchWindow(windowKey, windowLayout)
@@ -122,6 +129,8 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2000Tile = intactForestLandscapes2000.fetchWindow(windowKey, windowLayout)
+      //TODO: Update with 2025 IFL when ready from Engineering
+      val intactForestLandscapes2020Tile = intactForestLandscapes2020.fetchWindow(windowKey, windowLayout)
       val plantationsTypeFluxTile = plantationsTypeFluxModel.fetchWindow(windowKey, windowLayout)
       val intactPrimaryForestTile = intactPrimaryForest.fetchWindow(windowKey, windowLayout)
       val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
@@ -146,6 +155,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         lossTile,
         gainTile,
         tcd2000Tile,
+        tcd2010Tile,
         biomassTile,
         grossAnnualAbovegroundRemovalsCarbonTile,
         grossAnnualBelowgroundRemovalsCarbonTile,
@@ -180,6 +190,8 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         landmarkTile,
         wdpaTile,
         intactForestLandscapes2000Tile,
+        //TODO: Update with 2025 IFL when ready from Engineering
+        intactForestLandscapes2020Tile,
         plantationsTypeFluxTile,
         intactPrimaryForestTile,
         peatlandsTile,

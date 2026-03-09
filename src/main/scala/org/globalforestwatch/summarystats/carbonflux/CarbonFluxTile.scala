@@ -12,6 +12,7 @@ case class CarbonFluxTile(
                            loss: TreeCoverLoss#ITile,
                            gain: TreeCoverGain#OptionalITile,
                            tcd2000: TreeCoverDensityThreshold#ITile,
+                           tcd2010: TreeCoverDensity2010_30#ITile,  //TODO:Check this. Why is tcd2000TreeCoverDensityThreshold and not TreeCoverDensityThreshold2000
                            biomass: AbovegroundBiomass2000#OptionalDTile,
                            grossAnnualAbovegroundRemovalsCarbon: AnnualAbovegroundRemovalFactorCarbon#OptionalFTile,
                            grossAnnualBelowgroundRemovalsCarbon: AnnualBelowgroundRemovalFactorCarbon#OptionalFTile,
@@ -46,6 +47,8 @@ case class CarbonFluxTile(
                            landmark: Landmark#OptionalITile,
                            wdpa: ProtectedAreas#OptionalITile,
                            intactForestLandscapes2000: IntactForestLandscapes2000#OptionalITile,
+                           //TODO: Update with 2025 IFL when ready from Engineering
+                           intactForestLandscapes2020: IntactForestLandscapes2020#OptionalITile,
                            plantationsTypeFluxModel: ForestFluxModelPlantedForestType#OptionalITile,
                            intactPrimaryForest: IntactPrimaryForest#OptionalITile,
                            peatlands: Peatlands#OptionalITile,

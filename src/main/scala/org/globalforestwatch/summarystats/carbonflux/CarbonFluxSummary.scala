@@ -38,6 +38,7 @@ object CarbonFluxSummary {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
+        val tcd2010: Boolean = raster.tile.tcd2010.getData(col, row)    //TODO: Should this be int?
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
         val grossAnnualAbovegroundRemovalsCarbon: Float = raster.tile.grossAnnualAbovegroundRemovalsCarbon.getData(col, row)
@@ -74,6 +75,8 @@ object CarbonFluxSummary {
         val plantationsTypeFluxModel: String = raster.tile.plantationsTypeFluxModel.getData(col, row)
         val faoEcozones2000: String = raster.tile.faoEcozones2000.getData(col, row)
         val intactForestLandscapes2000: Boolean = raster.tile.intactForestLandscapes2000.getData(col, row)
+        //TODO: Update with 2025 IFL when ready from Engineering
+        val intactForestLandscapes2020: Boolean = raster.tile.intactForestLandscapes2020.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
         val intactPrimaryForest: Boolean = raster.tile.intactPrimaryForest.getData(col, row)
         val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
@@ -178,6 +181,8 @@ object CarbonFluxSummary {
               wdpa,
               landmark,
               intactForestLandscapes2000,
+              //TODO: Update with 2025 IFL when ready from Engineering
+              intactForestLandscapes2020,
               plantationsTypeFluxModel,
               intactPrimaryForest,
               peatlands,
@@ -213,7 +218,7 @@ object CarbonFluxSummary {
                   0, 0, 0, 0, 0, 0,
                   0, 0, 0, 0, 0, 0,
                   0, 0, 0, 0, 0, 0,
-                  0, 0, 0, 0, 0)
+                  0, 0, 0, 0, 0, 0)
               )
 
               summary.totalArea += areaHa
@@ -260,6 +265,7 @@ object CarbonFluxSummary {
                 // Non-flux model statistics not by loss year using TCD threshold
                 if (isLossLegalAmazon) summary.totalTreecoverLossLegalAmazon += areaHa
                 summary.totalTreecoverExtent2000 += areaHa
+                if (thresholds.head == 30 && tcd2010) summary.totalTreecoverExtent2010 += areaHa
                 summary.totalBiomass += biomassPixel
 
                 // Carbon data in 2000, so not actually flux model

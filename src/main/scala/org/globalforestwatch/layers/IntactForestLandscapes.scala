@@ -48,3 +48,5 @@ case class IntactForestLandscapes2020(gridTile: GridTile, kwargs: Map[String, An
   val uri: String =
     uriForGrid(gridTile, kwargs)
 }
+
+//TODO: Update with 2025 IFL when ready from Engineering
