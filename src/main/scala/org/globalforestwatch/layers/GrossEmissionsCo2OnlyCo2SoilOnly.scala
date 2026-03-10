@@ -2,6 +2,7 @@ package org.globalforestwatch.layers
 
 import org.globalforestwatch.grids.GridTile
 
+//TODO: Update name and s3 path in json to biomass_only. Update here to biomass_only. Refactor this layer's name to biomass_only.
 case class GrossEmissionsCo2OnlyCo2SoilOnly(gridTile: GridTile, kwargs: Map[String, Any])
   extends FloatLayer
     with OptionalFLayer {

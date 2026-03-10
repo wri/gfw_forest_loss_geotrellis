@@ -42,7 +42,7 @@ case class TreeCoverDensity2010_30(gridTile: GridTile, kwargs: Map[String, Any])
   val uri: String =
     uriForGrid(gridTile, kwargs)
 
-  override def lookup(value: Int): Boolean = value >= 30
+  override def lookup(value: Int): Boolean = value > 30
 }
 
 case class TreeCoverDensity2010_60(gridTile: GridTile, kwargs: Map[String, Any])

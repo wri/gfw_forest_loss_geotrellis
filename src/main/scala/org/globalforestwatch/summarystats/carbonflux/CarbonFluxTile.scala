@@ -12,7 +12,7 @@ case class CarbonFluxTile(
                            loss: TreeCoverLoss#ITile,
                            gain: TreeCoverGain#OptionalITile,
                            tcd2000: TreeCoverDensityThreshold#ITile,
-                           tcd2010: TreeCoverDensity2010_30#ITile,  //TODO:Check this. Why is tcd2000TreeCoverDensityThreshold and not TreeCoverDensityThreshold2000
+                           tcd2010_30: TreeCoverDensity2010_30#ITile,
                            biomass: AbovegroundBiomass2000#OptionalDTile,
                            grossAnnualAbovegroundRemovalsCarbon: AnnualAbovegroundRemovalFactorCarbon#OptionalFTile,
                            grossAnnualBelowgroundRemovalsCarbon: AnnualBelowgroundRemovalFactorCarbon#OptionalFTile,
@@ -32,6 +32,7 @@ case class CarbonFluxTile(
                            grossEmissionsCo2eCh4BiomassSoil: GrossEmissionsCH4Co2eBiomassSoil#OptionalFTile,
                            grossEmissionsCo2eN2oBiomassSoil: GrossEmissionsN2OCo2eBiomassSoil#OptionalFTile,
                            grossEmissionsCo2eCo2OnlyBiomassSoil: GrossEmissionsCo2OnlyCo2BiomassSoil#OptionalFTile,
+                           //TODO: Update soil_only to biomass_only when ready.
                            grossEmissionsCo2eCh4SoilOnly: GrossEmissionsCH4Co2eSoilOnly#OptionalFTile,
                            grossEmissionsCo2eN2oSoilOnly: GrossEmissionsN2OCo2eSoilOnly#OptionalFTile,
                            grossEmissionsCo2eCo2OnlySoilOnly: GrossEmissionsCo2OnlyCo2SoilOnly#OptionalFTile,

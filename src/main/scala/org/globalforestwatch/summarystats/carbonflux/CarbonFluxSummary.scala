@@ -38,7 +38,7 @@ object CarbonFluxSummary {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
-        val tcd2010: Boolean = raster.tile.tcd2010.getData(col, row)    //TODO: Should this be int?
+        val tcd2010_30: Boolean = raster.tile.tcd2010_30.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
         val grossAnnualAbovegroundRemovalsCarbon: Float = raster.tile.grossAnnualAbovegroundRemovalsCarbon.getData(col, row)
@@ -59,6 +59,7 @@ object CarbonFluxSummary {
         val grossEmissionsCo2eCh4BiomassSoil: Float = raster.tile.grossEmissionsCo2eCh4BiomassSoil.getData(col, row)
         val grossEmissionsCo2eN2oBiomassSoil: Float = raster.tile.grossEmissionsCo2eN2oBiomassSoil.getData(col, row)
         val grossEmissionsCo2eCo2OnlyBiomassSoil: Float =  raster.tile.grossEmissionsCo2eCo2OnlyBiomassSoil.getData(col, row)
+        //TODO: Update soil_only to biomass_only when ready.
         val grossEmissionsCo2eCh4SoilOnly: Float = raster.tile.grossEmissionsCo2eCh4SoilOnly.getData(col, row)
         val grossEmissionsCo2eN2oSoilOnly: Float = raster.tile.grossEmissionsCo2eN2oSoilOnly.getData(col, row)
         val grossEmissionsCo2eCo2OnlySoilOnly: Float =  raster.tile.grossEmissionsCo2eCo2OnlySoilOnly.getData(col, row)
@@ -142,6 +143,7 @@ object CarbonFluxSummary {
         val grossEmissionsCo2eNonCo2BiomassSoilPixel = grossEmissionsCo2eCh4BiomassSoilPixel + grossEmissionsCo2eN2oBiomassSoilPixel
         val grossEmissionsCo2eBiomassSoilPixel = grossEmissionsCo2eNonCo2BiomassSoilPixel + grossEmissionsCo2eCo2OnlyBiomassSoilPixel
 
+        //TODO: Update soil_only to biomass_only when ready.
         val grossEmissionsCo2eCo2OnlySoilOnlyPixel = grossEmissionsCo2eCo2OnlySoilOnly * areaHa
         val grossEmissionsCo2eCh4SoilOnlyPixel = grossEmissionsCo2eCh4SoilOnly * areaHa
         val grossEmissionsCo2eN2oSoilOnlyPixel = grossEmissionsCo2eN2oSoilOnly * areaHa
@@ -199,7 +201,6 @@ object CarbonFluxSummary {
               grossEmissionsNodeCodes,
               loss,
               thresholds.head,
-              30,   // Only use TCD>= 30 for 2010 tree cover extent
               isGain,
               isLoss,
               plantationsPre2000,
@@ -224,8 +225,13 @@ object CarbonFluxSummary {
 
               summary.totalArea += areaHa
 
-              // Statistics using tree cover density threshold
+              // Statistics using 2000 tree cover density threshold
               if (tcd2000 >= thresholds.head) {
+
+                // Statistics using 2010 tree cover density threshold
+                if (tcd2010_30) {
+                  summary.totalTreecoverExtent2010_30 += areaHa
+                }
 
                 // Statistics by loss year using TCD threshold
                 if (loss != null) {
@@ -242,6 +248,7 @@ object CarbonFluxSummary {
                     summary.totalGrossEmissionsCo2eNonCo2BiomassSoil += grossEmissionsCo2eNonCo2BiomassSoilPixel
                     summary.totalGrossEmissionsCo2eBiomassSoil += grossEmissionsCo2eBiomassSoilPixel
 
+                    //TODO: Update soil_only to biomass_only when ready.
                     summary.totalGrossEmissionsCo2eCo2OnlySoilOnly += grossEmissionsCo2eCo2OnlySoilOnlyPixel
                     summary.totalGrossEmissionsCo2eCh4SoilOnly += grossEmissionsCo2eCh4SoilOnlyPixel
                     summary.totalGrossEmissionsCo2eN2oSoilOnly += grossEmissionsCo2eN2oSoilOnlyPixel
@@ -302,10 +309,6 @@ object CarbonFluxSummary {
                 }
               }
 
-              // Statistics not using 2000 TCD thresholds and not by loss year
-              else if (tcd2010) {
-                summary.totalTreecoverExtent2010 += areaHa
-              }
 
               // Flux model statistics without using tree cover density threshold
               // (based on gain, mangrove, and pre-2000 plantations).
@@ -315,6 +318,11 @@ object CarbonFluxSummary {
               // Only flux model statistics use these rules.
               else if ((isGain || mangroveBiomassExtent) && !plantationsPre2000) {
 
+                // Statistics using 2010 tree cover density threshold
+                if (tcd2010_30) {
+                  summary.totalTreecoverExtent2010_30 += areaHa
+                }
+
                 // Flux model statistics by loss year without using TCD threshold
                 if (loss != null) {
                   summary.totalGrossEmissionsCo2eCo2OnlyBiomassSoil += grossEmissionsCo2eCo2OnlyBiomassSoilPixel
@@ -323,6 +331,7 @@ object CarbonFluxSummary {
                   summary.totalGrossEmissionsCo2eNonCo2BiomassSoil += grossEmissionsCo2eNonCo2BiomassSoilPixel
                   summary.totalGrossEmissionsCo2eBiomassSoil += grossEmissionsCo2eBiomassSoilPixel
 
+                  //TODO: Update soil_only to biomass_only when ready.
                   summary.totalGrossEmissionsCo2eCo2OnlySoilOnly += grossEmissionsCo2eCo2OnlySoilOnlyPixel
                   summary.totalGrossEmissionsCo2eCh4SoilOnly += grossEmissionsCo2eCh4SoilOnlyPixel
                   summary.totalGrossEmissionsCo2eN2oSoilOnly += grossEmissionsCo2eN2oSoilOnlyPixel

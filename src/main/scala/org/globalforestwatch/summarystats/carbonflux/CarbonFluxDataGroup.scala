@@ -27,7 +27,6 @@ case class CarbonFluxDataGroup(
                                grossEmissionsNodeCodes: String,
                                lossYear: Integer,
                                threshold: Integer,
-                               tcd2010Threshold: Integer,
                                isGain: Boolean,
                                isLoss: Boolean,
                                plantationsPre2000: Boolean,
