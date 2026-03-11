@@ -49,4 +49,10 @@ case class IntactForestLandscapes2020(gridTile: GridTile, kwargs: Map[String, An
     uriForGrid(gridTile, kwargs)
 }
 
-//TODO: Update with 2025 IFL when ready from Engineering
+case class IntactForestLandscapes2025(gridTile: GridTile, kwargs: Map[String, Any])
+  extends BooleanLayer
+    with OptionalILayer{
+  val datasetName = "ifl_intact_forest_landscapes_2025"
+  val uri: String =
+    uriForGrid(gridTile, kwargs)
+}

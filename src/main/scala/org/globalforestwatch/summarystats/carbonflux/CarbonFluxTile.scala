@@ -48,8 +48,7 @@ case class CarbonFluxTile(
                            landmark: Landmark#OptionalITile,
                            wdpa: ProtectedAreas#OptionalITile,
                            intactForestLandscapes2000: IntactForestLandscapes2000#OptionalITile,
-                           //TODO: Update with 2025 IFL when ready from Engineering
-                           intactForestLandscapes2020: IntactForestLandscapes2020#OptionalITile,
+                           intactForestLandscapes2025: IntactForestLandscapes2025#OptionalITile,
                            plantationsTypeFluxModel: ForestFluxModelPlantedForestType#OptionalITile,
                            intactPrimaryForest: IntactPrimaryForest#OptionalITile,
                            peatlands: Peatlands#OptionalITile,

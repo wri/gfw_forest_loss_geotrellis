@@ -18,8 +18,7 @@ object CarbonFluxDF {
     "is__landmark_indigenous_and_community_lands",
     "wdpa_protected_areas__iucn_cat",
     "is__ifl_intact_forest_landscapes_2000",
-    //TODO: Update with 2025 IFL when ready from Engineering
-    "is__ifl_intact_forest_landscapes_2020",
+    "is__ifl_intact_forest_landscapes_2025",
     "gfw_plantation_flux_model__type",
     "is__intact_primary_forest",
     "is__gfw_peatlands",
@@ -63,8 +62,7 @@ object CarbonFluxDF {
       $"data_group.landmark" as "is__landmark_indigenous_and_community_lands",
       $"data_group.wdpa" as "wdpa_protected_areas__iucn_cat",
       $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
-      //TODO: Update with 2025 IFL when ready from Engineering
-      $"data_group.intactForestLandscapes2020" as "is__ifl_intact_forest_landscapes_2020",
+      $"data_group.intactForestLandscapes2025" as "is__ifl_intact_forest_landscapes_2025",
       $"data_group.plantationsTypeFluxModel" as "gfw_plantation_flux_model__type",
       $"data_group.intactPrimaryForest" as "is__intact_primary_forest",
       $"data_group.peatlands" as "is__gfw_peatlands",
@@ -277,8 +275,7 @@ object CarbonFluxDF {
         max($"is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
         max(length($"wdpa_protected_areas__iucn_cat")).cast("boolean") as "wdpa_protected_areas__iucn_cat",
         max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
-        //TODO: Update with 2025 IFL when ready from Engineering
-        max($"is__ifl_intact_forest_landscapes_2020") as "is__ifl_intact_forest_landscapes_2020",
+        max($"is__ifl_intact_forest_landscapes_2025") as "is__ifl_intact_forest_landscapes_2025",
         max(length($"gfw_plantation_flux_model__type")).cast("boolean") as "gfw_plantation_flux_model__type",
         max($"is__intact_primary_forest") as "is__intact_primary_forest",
         max($"is__gfw_peatlands") as "is__gfw_peatlands",
@@ -317,8 +314,7 @@ object CarbonFluxDF {
         max($"is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
         max($"wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat",
         max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
-        //TODO: Update with 2025 IFL when ready from Engineering
-        max($"is__ifl_intact_forest_landscapes_2020") as "is__ifl_intact_forest_landscapes_2020",
+        max($"is__ifl_intact_forest_landscapes_2025") as "is__ifl_intact_forest_landscapes_2025",
         max($"gfw_plantation_flux_model__type") as "gfw_plantation_flux_model__type",
         max($"is__intact_primary_forest") as "is__intact_primary_forest",
         max($"is__gfw_peatlands") as "is__gfw_peatlands",

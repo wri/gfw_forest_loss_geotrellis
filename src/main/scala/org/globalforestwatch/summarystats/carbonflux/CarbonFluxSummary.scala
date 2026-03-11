@@ -76,8 +76,7 @@ object CarbonFluxSummary {
         val plantationsTypeFluxModel: String = raster.tile.plantationsTypeFluxModel.getData(col, row)
         val faoEcozones2000: String = raster.tile.faoEcozones2000.getData(col, row)
         val intactForestLandscapes2000: Boolean = raster.tile.intactForestLandscapes2000.getData(col, row)
-        //TODO: Update with 2025 IFL when ready from Engineering
-        val intactForestLandscapes2020: Boolean = raster.tile.intactForestLandscapes2020.getData(col, row)
+        val intactForestLandscapes2025: Boolean = raster.tile.intactForestLandscapes2025.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
         val intactPrimaryForest: Boolean = raster.tile.intactPrimaryForest.getData(col, row)
         val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
@@ -183,8 +182,7 @@ object CarbonFluxSummary {
               wdpa,
               landmark,
               intactForestLandscapes2000,
-              //TODO: Update with 2025 IFL when ready from Engineering
-              intactForestLandscapes2020,
+              intactForestLandscapes2025,
               plantationsTypeFluxModel,
               intactPrimaryForest,
               peatlands,

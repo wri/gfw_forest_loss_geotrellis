@@ -51,8 +51,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
   val intactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
-  //TODO: Update with 2025 IFL when ready from Engineering
-  val intactForestLandscapes2020: IntactForestLandscapes2020 = IntactForestLandscapes2020(gridTile, kwargs)
+  val intactForestLandscapes2025: IntactForestLandscapes2025 = IntactForestLandscapes2025(gridTile, kwargs)
   val plantationsTypeFluxModel: ForestFluxModelPlantedForestType = ForestFluxModelPlantedForestType(gridTile, kwargs)
   val intactPrimaryForest: IntactPrimaryForest = IntactPrimaryForest(gridTile, kwargs)
   val peatlands: Peatlands = Peatlands(gridTile, kwargs)
@@ -131,8 +130,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2000Tile = intactForestLandscapes2000.fetchWindow(windowKey, windowLayout)
-      //TODO: Update with 2025 IFL when ready from Engineering
-      val intactForestLandscapes2020Tile = intactForestLandscapes2020.fetchWindow(windowKey, windowLayout)
+      val intactForestLandscapes2025Tile = intactForestLandscapes2025.fetchWindow(windowKey, windowLayout)
       val plantationsTypeFluxTile = plantationsTypeFluxModel.fetchWindow(windowKey, windowLayout)
       val intactPrimaryForestTile = intactPrimaryForest.fetchWindow(windowKey, windowLayout)
       val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
@@ -193,8 +191,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         landmarkTile,
         wdpaTile,
         intactForestLandscapes2000Tile,
-        //TODO: Update with 2025 IFL when ready from Engineering
-        intactForestLandscapes2020Tile,
+        intactForestLandscapes2025Tile,
         plantationsTypeFluxTile,
         intactPrimaryForestTile,
         peatlandsTile,
