@@ -65,7 +65,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggSummary(List("iso", "adm1", "adm2")))
 //      .coalesce(375) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
       .coalesce(1) // for local testing: produces one output csv
-
+//TODO: Switch back before full run
 
     adm2ApiDF.write
       .options(csvOptions)
@@ -75,7 +75,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggSummary2(List("iso", "adm1")))
 //      .coalesce(120) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
       .coalesce(1) // for local testing: produces one output csv
-
+//TODO: Switch back before full run
 
     adm1ApiDF.write
       .options(csvOptions)
@@ -85,7 +85,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggSummary2(List("iso")))
 //      .coalesce(60) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
       .coalesce(1) // for local testing: produces one output csv
-
+//TODO: Switch back before full run
 
     isoApiDF.write
       .options(csvOptions)
@@ -103,7 +103,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggChange(List("iso", "adm1", "adm2")))
 //      .coalesce(525) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
       .coalesce(1) // for local testing: produces one output csv
-
+//TODO: Switch back before full run
 
     adm2ApiDF.write
       .options(csvOptions)
@@ -113,7 +113,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggChange(List("iso", "adm1")))
 //      .coalesce(300) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
       .coalesce(1) // for local testing: produces one output csv
-
+//TODO: Switch back before full run
 
     adm1ApiDF.write
       .options(csvOptions)
@@ -123,7 +123,7 @@ object CarbonFluxExport extends SummaryExport {
       .transform(CarbonFluxDF.aggChange(List("iso")))
 //      .coalesce(100) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
       .coalesce(1) // for local testing: produces one output csv
-
+//TODO: Switch back before full run
 
     isoApiDF.write
       .options(csvOptions)
