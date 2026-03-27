@@ -92,12 +92,11 @@ object CarbonFluxDF {
       $"data.totalGrossEmissionsCo2eNonCo2BiomassSoil" as "gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e",
       $"data.totalGrossEmissionsCo2eBiomassSoil" as "gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e",
 
-      //TODO: Update soil_only to biomass_only when ready.
-      $"data.totalGrossEmissionsCo2eCo2OnlySoilOnly" as "gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2",
-      $"data.totalGrossEmissionsCo2eCh4SoilOnly" as "gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e",
-      $"data.totalGrossEmissionsCo2eN2oSoilOnly" as "gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e",
-      $"data.totalGrossEmissionsCo2eNonCo2SoilOnly" as "gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e",
-      $"data.totalGrossEmissionsCo2eSoilOnly" as "gfw_full_extent_gross_emissions_soil_only__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eCo2OnlySoilOnly" as "gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2",
+      $"data.totalGrossEmissionsCo2eCh4SoilOnly" as "gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eN2oSoilOnly" as "gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eNonCo2SoilOnly" as "gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eSoilOnly" as "gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e",
 
       $"data.totalAgcEmisYear" as "gfw_aboveground_carbon_stock_in_emissions_year__Mg",
       $"data.totalBgcEmisYear" as "gfw_belowground_carbon_stock_in_emissions_year__Mg",
@@ -162,12 +161,11 @@ object CarbonFluxDF {
         sum("gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e",
 
-        //TODO: Update soil_only to biomass_only when ready.
-        sum("gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2",
-        sum("gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_soil_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2",
+        sum("gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e",
 
         sum("jpl_tropics_aboveground_biomass_2000__Mg") as "jpl_tropics_aboveground_biomass_2000__Mg",
         sum("legal_amazon_umd_tree_cover_loss__ha") as "legal_amazon_umd_tree_cover_loss__ha",
@@ -208,12 +206,11 @@ object CarbonFluxDF {
         sum("gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e",
 
-        //TODO: Update soil_only to biomass_only when ready.
-        sum("gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2",
-        sum("gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_soil_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2",
+        sum("gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e",
 
         sum("jpl_tropics_aboveground_biomass_2000__Mg") as "jpl_tropics_aboveground_biomass_2000__Mg",
         sum("legal_amazon_umd_tree_cover_loss__ha") as "legal_amazon_umd_tree_cover_loss__ha",
@@ -241,12 +238,11 @@ object CarbonFluxDF {
         sum("gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e",
 
-        //TODO: Update soil_only to biomass_only when ready.
-        sum("gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2",
-        sum("gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_soil_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2",
+        sum("gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e",
 
         sum("gfw_aboveground_carbon_stock_in_emissions_year__Mg") as "gfw_aboveground_carbon_stock_in_emissions_year__Mg",
         sum("gfw_belowground_carbon_stock_in_emissions_year__Mg") as "gfw_belowground_carbon_stock_in_emissions_year__Mg",

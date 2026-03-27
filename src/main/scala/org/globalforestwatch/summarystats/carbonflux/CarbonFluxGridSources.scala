@@ -35,10 +35,9 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val grossEmissionsCo2eCh4BiomassSoil: GrossEmissionsCH4Co2eBiomassSoil = GrossEmissionsCH4Co2eBiomassSoil(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eN2oBiomassSoil: GrossEmissionsN2OCo2eBiomassSoil = GrossEmissionsN2OCo2eBiomassSoil(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eCo2OnlyBiomassSoil: GrossEmissionsCo2OnlyCo2BiomassSoil = GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile, kwargs = kwargs)
-  //TODO: Update soil_only to biomass_only when ready.
-  val grossEmissionsCo2eCh4SoilOnly: GrossEmissionsCH4Co2eSoilOnly = GrossEmissionsCH4Co2eSoilOnly(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eN2oSoilOnly: GrossEmissionsN2OCo2eSoilOnly = GrossEmissionsN2OCo2eSoilOnly(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eCo2OnlySoilOnly: GrossEmissionsCo2OnlyCo2SoilOnly = GrossEmissionsCo2OnlyCo2SoilOnly(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCh4BiomassOnly: GrossEmissionsCH4Co2eBiomassOnly = GrossEmissionsCH4Co2eBiomassOnly(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eN2oBiomassOnly: GrossEmissionsN2OCo2eBiomassOnly = GrossEmissionsN2OCo2eBiomassOnly(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2OnlyBiomassOnly: GrossEmissionsCo2OnlyCo2BiomassOnly = GrossEmissionsCo2OnlyCo2BiomassOnly(gridTile, kwargs = kwargs)
   val jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000 = JplTropicsAbovegroundBiomassDensity2000(gridTile, kwargs)
   val stdevAnnualAbovegroundRemovalsCarbon: StdevAnnualAbovegroundRemovalsCarbon = StdevAnnualAbovegroundRemovalsCarbon(gridTile, kwargs = kwargs)
   val stdevSoilCarbon2000: StdevSoilCarbon2000 = StdevSoilCarbon2000(gridTile, kwargs = kwargs)
@@ -114,10 +113,9 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
       val grossEmissionsCo2eCh4BiomassSoilTile = grossEmissionsCo2eCh4BiomassSoil.fetchWindow(windowKey, windowLayout)
       val grossEmissionsCo2eN2oBiomassSoilTile = grossEmissionsCo2eN2oBiomassSoil.fetchWindow(windowKey, windowLayout)
       val grossEmissionsCo2eCo2OnlyBiomassSoilTile = grossEmissionsCo2eCo2OnlyBiomassSoil.fetchWindow(windowKey, windowLayout)
-      //TODO: Update soil_only to biomass_only when ready.
-      val grossEmissionsCo2eCh4SoilOnlyTile = grossEmissionsCo2eCh4SoilOnly.fetchWindow(windowKey, windowLayout)
-      val grossEmissionsCo2eN2oSoilOnlyTile = grossEmissionsCo2eN2oSoilOnly.fetchWindow(windowKey, windowLayout)
-      val grossEmissionsCo2eCo2OnlySoilOnlyTile = grossEmissionsCo2eCo2OnlySoilOnly.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eCh4BiomassOnlyTile = grossEmissionsCo2eCh4BiomassOnly.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eN2oBiomassOnlyTile = grossEmissionsCo2eN2oBiomassOnly.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eCo2OnlyBiomassOnlyTile = grossEmissionsCo2eCo2OnlyBiomassOnly.fetchWindow(windowKey, windowLayout)
       val jplTropicsAbovegroundBiomassDensity2000Tile = jplTropicsAbovegroundBiomassDensity2000.fetchWindow(windowKey, windowLayout)
       val stdevAnnualAbovegroundRemovalsCarbonTile = stdevAnnualAbovegroundRemovalsCarbon.fetchWindow(windowKey, windowLayout)
       val stdevSoilCarbon2000Tile = stdevSoilCarbon2000.fetchWindow(windowKey, windowLayout)
@@ -175,10 +173,9 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         grossEmissionsCo2eCh4BiomassSoilTile,
         grossEmissionsCo2eN2oBiomassSoilTile,
         grossEmissionsCo2eCo2OnlyBiomassSoilTile,
-        //TODO: Update soil_only to biomass_only when ready.
-        grossEmissionsCo2eCh4SoilOnlyTile,
-        grossEmissionsCo2eN2oSoilOnlyTile,
-        grossEmissionsCo2eCo2OnlySoilOnlyTile,
+        grossEmissionsCo2eCh4BiomassOnlyTile,
+        grossEmissionsCo2eN2oBiomassOnlyTile,
+        grossEmissionsCo2eCo2OnlyBiomassOnlyTile,
         jplTropicsAbovegroundBiomassDensity2000Tile,
         stdevAnnualAbovegroundRemovalsCarbonTile,
         stdevSoilCarbon2000Tile,
