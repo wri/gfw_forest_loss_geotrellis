@@ -63,9 +63,8 @@ object CarbonFluxExport extends SummaryExport {
 
     val adm2ApiDF = df
       .transform(CarbonFluxDF.aggSummary(List("iso", "adm1", "adm2")))
-//      .coalesce(375) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-      .coalesce(1) // for local testing: produces one output csv
-//TODO: Switch back before full run
+      .coalesce(375) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
+//      .coalesce(1) // for local testing: produces one output csv
 
     adm2ApiDF.write
       .options(csvOptions)
@@ -73,9 +72,8 @@ object CarbonFluxExport extends SummaryExport {
 
     val adm1ApiDF = adm2ApiDF
       .transform(CarbonFluxDF.aggSummary2(List("iso", "adm1")))
-//      .coalesce(120) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-      .coalesce(1) // for local testing: produces one output csv
-//TODO: Switch back before full run
+      .coalesce(120) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
+//      .coalesce(1) // for local testing: produces one output csv
 
     adm1ApiDF.write
       .options(csvOptions)
@@ -83,9 +81,8 @@ object CarbonFluxExport extends SummaryExport {
 
     val isoApiDF = adm1ApiDF
       .transform(CarbonFluxDF.aggSummary2(List("iso")))
-//      .coalesce(60) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-      .coalesce(1) // for local testing: produces one output csv
-//TODO: Switch back before full run
+      .coalesce(60) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
+//      .coalesce(1) // for local testing: produces one output csv
 
     isoApiDF.write
       .options(csvOptions)
@@ -101,9 +98,8 @@ object CarbonFluxExport extends SummaryExport {
       .filter($"umd_tree_cover_loss__year".isNotNull &&
         ($"umd_tree_cover_loss__ha" > 0 || $"gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e" > 0))
       .transform(CarbonFluxDF.aggChange(List("iso", "adm1", "adm2")))
-//      .coalesce(525) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-      .coalesce(1) // for local testing: produces one output csv
-//TODO: Switch back before full run
+      .coalesce(525) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
+//      .coalesce(1) // for local testing: produces one output csv
 
     adm2ApiDF.write
       .options(csvOptions)
@@ -111,9 +107,8 @@ object CarbonFluxExport extends SummaryExport {
 
     val adm1ApiDF = adm2ApiDF
       .transform(CarbonFluxDF.aggChange(List("iso", "adm1")))
-//      .coalesce(300) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-      .coalesce(1) // for local testing: produces one output csv
-//TODO: Switch back before full run
+      .coalesce(300) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
+//      .coalesce(1) // for local testing: produces one output csv
 
     adm1ApiDF.write
       .options(csvOptions)
@@ -121,9 +116,8 @@ object CarbonFluxExport extends SummaryExport {
 
     val isoApiDF = adm1ApiDF
       .transform(CarbonFluxDF.aggChange(List("iso")))
-//      .coalesce(100) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
-      .coalesce(1) // for local testing: produces one output csv
-//TODO: Switch back before full run
+      .coalesce(100) // this should result in an avg file size of 50MB. We try to keep filesize small due to memory issues
+//      .coalesce(1) // for local testing: produces one output csv
 
     isoApiDF.write
       .options(csvOptions)
