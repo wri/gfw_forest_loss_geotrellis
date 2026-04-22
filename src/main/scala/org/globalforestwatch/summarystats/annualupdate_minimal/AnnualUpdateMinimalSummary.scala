@@ -44,22 +44,13 @@ object AnnualUpdateMinimalSummary {
         val wdpa: String = raster.tile.wdpa.getData(col, row)
         val aze: Boolean = raster.tile.aze.getData(col, row)
         val plantedForests: String = raster.tile.plantedForests.getData(col, row)
-        val mangroves1996: Boolean = raster.tile.mangroves1996.getData(col, row)
-        val mangroves2020: Boolean = raster.tile.mangroves2020.getData(col, row)
-        val tigerLandscapes: Boolean = raster.tile.tigerLandscapes.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
         val keyBiodiversityAreas: Boolean = raster.tile.keyBiodiversityAreas.getData(col, row)
-        val mining: Boolean = raster.tile.mining.getData(col, row)
         val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
-        val oilPalm: Boolean = raster.tile.oilPalm.getData(col, row)
         val idnForestMoratorium: Boolean = raster.tile.idnForestMoratorium.getData(col, row)
-        val woodFiber: Boolean = raster.tile.woodFiber.getData(col, row)
-        val resourceRights: Boolean = raster.tile.resourceRights.getData(col, row)
-        val logging: Boolean = raster.tile.logging.getData(col, row)
         val intactForestLandscapes2000: Boolean = raster.tile.intactForestLandscapes2000.getData(col, row)
         val treeCoverLossFromFires: Boolean = raster.tile.treeCoverLossFromFires.getData(col, row)
-        val tropicalTreeCover: Int = raster.tile.tropicalTreeCover.getData(col, row)
-        val umdGlobalLandCover: String = raster.tile.umdGlobalLandCover.getData(col, row)
+        val drivers: String = raster.tile.drivers.getData(col, row)
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val naturalForests: String = raster.tile.naturalForests.getData(col, row)
 
@@ -96,7 +87,7 @@ object AnnualUpdateMinimalSummary {
         val belowgroundCarbon2000 = belowgroundCarbon2000PerHa * areaHa
 
         def updateSummary(
-                          loss: Integer, tcd2000: Integer, tcdThreshold: Integer, tropicalTreeCover: Integer, umdGlobalLandCover: String,
+                          loss: Integer, tcd2000: Integer, tcdThreshold: Integer,
                            stats: Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData]
                          ): Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] = {
           val pKey = AnnualUpdateMinimalDataGroup(
@@ -106,29 +97,19 @@ object AnnualUpdateMinimalSummary {
             wdpa,
             aze,
             plantedForests,
-            mangroves1996,
-            mangroves2020,
-            tigerLandscapes,
             landmark,
             keyBiodiversityAreas,
-            mining,
             peatlands,
-            oilPalm,
             idnForestMoratorium,
-            woodFiber,
-            resourceRights,
-            logging,
-            gain,
             intactForestLandscapes2000,
-            umdGlobalLandCover,
-            tropicalTreeCover,
+            drivers,
             naturalForests
           )
 
           val summary: AnnualUpdateMinimalData =
             stats.getOrElse(
               key = pKey,
-              default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+              default = AnnualUpdateMinimalData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
             )
 
           summary.totalArea += areaHa
@@ -186,30 +167,18 @@ object AnnualUpdateMinimalSummary {
             summary.treecoverExtent2010 += areaHa
           }
 
-          if (tropicalTreeCover >= 0) {
-            summary.tropicalTreeCoverExtent += areaHa
-          }
-
           stats.updated(pKey, summary)
         }
 
-        val umdTcdThresholds = List(0, 10, 15, 20, 25, 30, 50, 75)
+        val umdTcdThresholds = List(10, 15, 20, 25, 30, 50, 75)
 
         val lossSummary
         : Map[AnnualUpdateMinimalDataGroup, AnnualUpdateMinimalData] =
           umdTcdThresholds.foldLeft(acc.stats) { (stats, threshold) =>
-            updateSummary(loss, tcd2000, threshold, -1, "", stats)
+            updateSummary(loss, tcd2000, threshold, stats)
           }
 
-        val ttcSummary = {
-          if (tropicalTreeCover == 255) {
-            lossSummary
-          } else {
-            updateSummary(null, -2, -1, tropicalTreeCover, umdGlobalLandCover, lossSummary)
-          }
-        }
-
-        acc = AnnualUpdateMinimalSummary(ttcSummary)
+        acc = AnnualUpdateMinimalSummary(lossSummary)
       }
     }
 }
