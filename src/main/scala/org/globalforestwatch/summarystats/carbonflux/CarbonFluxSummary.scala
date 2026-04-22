@@ -38,6 +38,7 @@ object CarbonFluxSummary {
         // This is a pixel by pixel operation
         val loss: Integer = raster.tile.loss.getData(col, row)
         val tcd2000: Integer = raster.tile.tcd2000.getData(col, row)
+        val tcd2010_30: Boolean = raster.tile.tcd2010_30.getData(col, row)
         val biomass: Double = raster.tile.biomass.getData(col, row)
 
         val grossAnnualAbovegroundRemovalsCarbon: Float = raster.tile.grossAnnualAbovegroundRemovalsCarbon.getData(col, row)
@@ -58,9 +59,9 @@ object CarbonFluxSummary {
         val grossEmissionsCo2eCh4BiomassSoil: Float = raster.tile.grossEmissionsCo2eCh4BiomassSoil.getData(col, row)
         val grossEmissionsCo2eN2oBiomassSoil: Float = raster.tile.grossEmissionsCo2eN2oBiomassSoil.getData(col, row)
         val grossEmissionsCo2eCo2OnlyBiomassSoil: Float =  raster.tile.grossEmissionsCo2eCo2OnlyBiomassSoil.getData(col, row)
-        val grossEmissionsCo2eCh4SoilOnly: Float = raster.tile.grossEmissionsCo2eCh4SoilOnly.getData(col, row)
-        val grossEmissionsCo2eN2oSoilOnly: Float = raster.tile.grossEmissionsCo2eN2oSoilOnly.getData(col, row)
-        val grossEmissionsCo2eCo2OnlySoilOnly: Float =  raster.tile.grossEmissionsCo2eCo2OnlySoilOnly.getData(col, row)
+        val grossEmissionsCo2eCh4BiomassOnly: Float = raster.tile.grossEmissionsCo2eCh4BiomassOnly.getData(col, row)
+        val grossEmissionsCo2eN2oBiomassOnly: Float = raster.tile.grossEmissionsCo2eN2oBiomassOnly.getData(col, row)
+        val grossEmissionsCo2eCo2OnlyBiomassOnly: Float =  raster.tile.grossEmissionsCo2eCo2OnlyBiomassOnly.getData(col, row)
         val jplTropicsAbovegroundBiomassDensity2000: Float = raster.tile.jplTropicsAbovegroundBiomassDensity2000.getData(col, row)
         val stdevAnnualAbovegroundRemovalsCarbon: Float = raster.tile.stdevAnnualAbovegroundRemovalsCarbon.getData(col, row)
         val stdevSoilCarbon2000: Float = raster.tile.stdevSoilCarbon2000.getData(col, row)
@@ -74,6 +75,7 @@ object CarbonFluxSummary {
         val plantationsTypeFluxModel: String = raster.tile.plantationsTypeFluxModel.getData(col, row)
         val faoEcozones2000: String = raster.tile.faoEcozones2000.getData(col, row)
         val intactForestLandscapes2000: Boolean = raster.tile.intactForestLandscapes2000.getData(col, row)
+        val intactForestLandscapes2025: Boolean = raster.tile.intactForestLandscapes2025.getData(col, row)
         val landmark: Boolean = raster.tile.landmark.getData(col, row)
         val intactPrimaryForest: Boolean = raster.tile.intactPrimaryForest.getData(col, row)
         val peatlands: Boolean = raster.tile.peatlands.getData(col, row)
@@ -139,11 +141,11 @@ object CarbonFluxSummary {
         val grossEmissionsCo2eNonCo2BiomassSoilPixel = grossEmissionsCo2eCh4BiomassSoilPixel + grossEmissionsCo2eN2oBiomassSoilPixel
         val grossEmissionsCo2eBiomassSoilPixel = grossEmissionsCo2eNonCo2BiomassSoilPixel + grossEmissionsCo2eCo2OnlyBiomassSoilPixel
 
-        val grossEmissionsCo2eCo2OnlySoilOnlyPixel = grossEmissionsCo2eCo2OnlySoilOnly * areaHa
-        val grossEmissionsCo2eCh4SoilOnlyPixel = grossEmissionsCo2eCh4SoilOnly * areaHa
-        val grossEmissionsCo2eN2oSoilOnlyPixel = grossEmissionsCo2eN2oSoilOnly * areaHa
-        val grossEmissionsCo2eNonCo2SoilOnlyPixel = grossEmissionsCo2eCh4SoilOnlyPixel + grossEmissionsCo2eN2oSoilOnlyPixel
-        val grossEmissionsCo2eSoilOnlyPixel = grossEmissionsCo2eNonCo2SoilOnlyPixel + grossEmissionsCo2eCo2OnlySoilOnlyPixel
+        val grossEmissionsCo2eCo2OnlyBiomassOnlyPixel = grossEmissionsCo2eCo2OnlyBiomassOnly * areaHa
+        val grossEmissionsCo2eCh4BiomassOnlyPixel = grossEmissionsCo2eCh4BiomassOnly * areaHa
+        val grossEmissionsCo2eN2oBiomassOnlyPixel = grossEmissionsCo2eN2oBiomassOnly * areaHa
+        val grossEmissionsCo2eNonCo2BiomassOnlyPixel = grossEmissionsCo2eCh4BiomassOnlyPixel + grossEmissionsCo2eN2oBiomassOnlyPixel
+        val grossEmissionsCo2eBiomassOnlyPixel = grossEmissionsCo2eNonCo2BiomassOnlyPixel + grossEmissionsCo2eCo2OnlyBiomassOnlyPixel
 
         val jplTropicsAbovegroundBiomassDensity2000Pixel = jplTropicsAbovegroundBiomassDensity2000 * areaHa
 
@@ -178,6 +180,7 @@ object CarbonFluxSummary {
               wdpa,
               landmark,
               intactForestLandscapes2000,
+              intactForestLandscapes2025,
               plantationsTypeFluxModel,
               intactPrimaryForest,
               peatlands,
@@ -213,13 +216,18 @@ object CarbonFluxSummary {
                   0, 0, 0, 0, 0, 0,
                   0, 0, 0, 0, 0, 0,
                   0, 0, 0, 0, 0, 0,
-                  0, 0, 0, 0, 0)
+                  0, 0, 0, 0, 0, 0)
               )
 
               summary.totalArea += areaHa
 
-              // Statistics using tree cover density threshold
+              // Statistics using 2000 tree cover density threshold
               if (tcd2000 >= thresholds.head) {
+
+                // Statistics using 2010 tree cover density threshold
+                if (tcd2010_30) {
+                  summary.totalTreecoverExtent2010_30 += areaHa
+                }
 
                 // Statistics by loss year using TCD threshold
                 if (loss != null) {
@@ -236,11 +244,11 @@ object CarbonFluxSummary {
                     summary.totalGrossEmissionsCo2eNonCo2BiomassSoil += grossEmissionsCo2eNonCo2BiomassSoilPixel
                     summary.totalGrossEmissionsCo2eBiomassSoil += grossEmissionsCo2eBiomassSoilPixel
 
-                    summary.totalGrossEmissionsCo2eCo2OnlySoilOnly += grossEmissionsCo2eCo2OnlySoilOnlyPixel
-                    summary.totalGrossEmissionsCo2eCh4SoilOnly += grossEmissionsCo2eCh4SoilOnlyPixel
-                    summary.totalGrossEmissionsCo2eN2oSoilOnly += grossEmissionsCo2eN2oSoilOnlyPixel
-                    summary.totalGrossEmissionsCo2eNonCo2SoilOnly += grossEmissionsCo2eNonCo2SoilOnlyPixel
-                    summary.totalGrossEmissionsCo2eSoilOnly += grossEmissionsCo2eSoilOnlyPixel
+                    summary.totalGrossEmissionsCo2eCo2OnlyBiomassOnly += grossEmissionsCo2eCo2OnlyBiomassOnlyPixel
+                    summary.totalGrossEmissionsCo2eCh4BiomassOnly += grossEmissionsCo2eCh4BiomassOnlyPixel
+                    summary.totalGrossEmissionsCo2eN2oBiomassOnly += grossEmissionsCo2eN2oBiomassOnlyPixel
+                    summary.totalGrossEmissionsCo2eNonCo2BiomassOnly += grossEmissionsCo2eNonCo2BiomassOnlyPixel
+                    summary.totalGrossEmissionsCo2eBiomassOnly += grossEmissionsCo2eBiomassOnlyPixel
 
                     summary.totalAgcEmisYear += agcEmisYearPixel
                     summary.totalBgcEmisYear += bgcEmisYearPixel
@@ -296,6 +304,7 @@ object CarbonFluxSummary {
                 }
               }
 
+
               // Flux model statistics without using tree cover density threshold
               // (based on gain, mangrove, and pre-2000 plantations).
               // Adds the gain or mangrove pixels that don't have sufficient TCD AND are outside pre-2000 plantations
@@ -303,6 +312,11 @@ object CarbonFluxSummary {
               // ((TCD>=threshold OR Hansen gain=TRUE OR mangrove=TRUE) AND pre-2000plant=FALSE).
               // Only flux model statistics use these rules.
               else if ((isGain || mangroveBiomassExtent) && !plantationsPre2000) {
+
+                // Statistics using 2010 tree cover density threshold
+                if (tcd2010_30) {
+                  summary.totalTreecoverExtent2010_30 += areaHa
+                }
 
                 // Flux model statistics by loss year without using TCD threshold
                 if (loss != null) {
@@ -312,11 +326,11 @@ object CarbonFluxSummary {
                   summary.totalGrossEmissionsCo2eNonCo2BiomassSoil += grossEmissionsCo2eNonCo2BiomassSoilPixel
                   summary.totalGrossEmissionsCo2eBiomassSoil += grossEmissionsCo2eBiomassSoilPixel
 
-                  summary.totalGrossEmissionsCo2eCo2OnlySoilOnly += grossEmissionsCo2eCo2OnlySoilOnlyPixel
-                  summary.totalGrossEmissionsCo2eCh4SoilOnly += grossEmissionsCo2eCh4SoilOnlyPixel
-                  summary.totalGrossEmissionsCo2eN2oSoilOnly += grossEmissionsCo2eN2oSoilOnlyPixel
-                  summary.totalGrossEmissionsCo2eNonCo2SoilOnly += grossEmissionsCo2eNonCo2SoilOnlyPixel
-                  summary.totalGrossEmissionsCo2eSoilOnly += grossEmissionsCo2eSoilOnlyPixel
+                  summary.totalGrossEmissionsCo2eCo2OnlyBiomassOnly += grossEmissionsCo2eCo2OnlyBiomassOnlyPixel
+                  summary.totalGrossEmissionsCo2eCh4BiomassOnly += grossEmissionsCo2eCh4BiomassOnlyPixel
+                  summary.totalGrossEmissionsCo2eN2oBiomassOnly += grossEmissionsCo2eN2oBiomassOnlyPixel
+                  summary.totalGrossEmissionsCo2eNonCo2BiomassOnly += grossEmissionsCo2eNonCo2BiomassOnlyPixel
+                  summary.totalGrossEmissionsCo2eBiomassOnly += grossEmissionsCo2eBiomassOnlyPixel
 
                   summary.totalAgcEmisYear += agcEmisYearPixel
                   summary.totalBgcEmisYear += bgcEmisYearPixel

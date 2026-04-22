@@ -18,6 +18,7 @@ object CarbonFluxDF {
     "is__landmark_indigenous_and_community_lands",
     "wdpa_protected_areas__iucn_cat",
     "is__ifl_intact_forest_landscapes_2000",
+    "is__ifl_intact_forest_landscapes_2025",
     "gfw_plantation_flux_model__type",
     "is__intact_primary_forest",
     "is__gfw_peatlands",
@@ -61,6 +62,7 @@ object CarbonFluxDF {
       $"data_group.landmark" as "is__landmark_indigenous_and_community_lands",
       $"data_group.wdpa" as "wdpa_protected_areas__iucn_cat",
       $"data_group.intactForestLandscapes2000" as "is__ifl_intact_forest_landscapes_2000",
+      $"data_group.intactForestLandscapes2025" as "is__ifl_intact_forest_landscapes_2025",
       $"data_group.plantationsTypeFluxModel" as "gfw_plantation_flux_model__type",
       $"data_group.intactPrimaryForest" as "is__intact_primary_forest",
       $"data_group.peatlands" as "is__gfw_peatlands",
@@ -90,11 +92,11 @@ object CarbonFluxDF {
       $"data.totalGrossEmissionsCo2eNonCo2BiomassSoil" as "gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e",
       $"data.totalGrossEmissionsCo2eBiomassSoil" as "gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e",
 
-      $"data.totalGrossEmissionsCo2eCo2OnlySoilOnly" as "gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2",
-      $"data.totalGrossEmissionsCo2eCh4SoilOnly" as "gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e",
-      $"data.totalGrossEmissionsCo2eN2oSoilOnly" as "gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e",
-      $"data.totalGrossEmissionsCo2eNonCo2SoilOnly" as "gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e",
-      $"data.totalGrossEmissionsCo2eSoilOnly" as "gfw_full_extent_gross_emissions_soil_only__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eCo2OnlyBiomassOnly" as "gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2",
+      $"data.totalGrossEmissionsCo2eCh4BiomassOnly" as "gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eN2oBiomassOnly" as "gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eNonCo2BiomassOnly" as "gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e",
+      $"data.totalGrossEmissionsCo2eBiomassOnly" as "gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e",
 
       $"data.totalAgcEmisYear" as "gfw_aboveground_carbon_stock_in_emissions_year__Mg",
       $"data.totalBgcEmisYear" as "gfw_belowground_carbon_stock_in_emissions_year__Mg",
@@ -104,6 +106,7 @@ object CarbonFluxDF {
       $"data.totalCarbonEmisYear" as "gfw_total_carbon_stock_in_emissions_year__Mg",
 
       $"data.totalTreecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
+      $"data.totalTreecoverExtent2010_30" as "umd_tree_cover_extent_2010_tcd30__ha",
       $"data.totalArea" as "area__ha",
       $"data.totalBiomass" as "whrc_aboveground_biomass_stock_2000__Mg",
       $"data.totalGrossAnnualAbovegroundRemovalsCarbon" as "gfw_full_extent_aboveground_annual_removals__Mg_C",
@@ -134,6 +137,7 @@ object CarbonFluxDF {
     df.groupBy(groupByCols.head, groupByCols.tail ::: contextualLayers: _*)
       .agg(
         sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
+        sum("umd_tree_cover_extent_2010_tcd30__ha") as "umd_tree_cover_extent_2010_tcd30__ha",
         sum("area__ha") as "area__ha",
         sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
         sum("gfw_full_extent_aboveground_annual_removals__Mg_C") as "gfw_full_extent_aboveground_annual_removals__Mg_C",
@@ -157,11 +161,11 @@ object CarbonFluxDF {
         sum("gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e",
 
-        sum("gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2",
-        sum("gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_soil_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2",
+        sum("gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e",
 
         sum("jpl_tropics_aboveground_biomass_2000__Mg") as "jpl_tropics_aboveground_biomass_2000__Mg",
         sum("legal_amazon_umd_tree_cover_loss__ha") as "legal_amazon_umd_tree_cover_loss__ha",
@@ -178,6 +182,7 @@ object CarbonFluxDF {
     df.groupBy(groupByCols.head, groupByCols.tail ::: contextualLayers: _*)
       .agg(
         sum("umd_tree_cover_extent_2000__ha") as "umd_tree_cover_extent_2000__ha",
+        sum("umd_tree_cover_extent_2010_tcd30__ha") as "umd_tree_cover_extent_2010_tcd30__ha",
         sum("area__ha") as "area__ha",
         sum("whrc_aboveground_biomass_stock_2000__Mg") as "whrc_aboveground_biomass_stock_2000__Mg",
         sum("gfw_full_extent_aboveground_annual_removals__Mg_C") as "gfw_full_extent_aboveground_annual_removals__Mg_C",
@@ -201,11 +206,11 @@ object CarbonFluxDF {
         sum("gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e",
 
-        sum("gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2",
-        sum("gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_soil_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2",
+        sum("gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e",
 
         sum("jpl_tropics_aboveground_biomass_2000__Mg") as "jpl_tropics_aboveground_biomass_2000__Mg",
         sum("legal_amazon_umd_tree_cover_loss__ha") as "legal_amazon_umd_tree_cover_loss__ha",
@@ -233,11 +238,11 @@ object CarbonFluxDF {
         sum("gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_soil__Mg_CO2e",
         sum("gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_soil__Mg_CO2e",
 
-        sum("gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_soil_only__Mg_CO2",
-        sum("gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_soil_only__Mg_CO2e",
-        sum("gfw_full_extent_gross_emissions_soil_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_soil_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2") as "gfw_full_extent_gross_emissions_CO2_only_biomass_only__Mg_CO2",
+        sum("gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_CH4_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_N2O_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_non_CO2_biomass_only__Mg_CO2e",
+        sum("gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e") as "gfw_full_extent_gross_emissions_biomass_only__Mg_CO2e",
 
         sum("gfw_aboveground_carbon_stock_in_emissions_year__Mg") as "gfw_aboveground_carbon_stock_in_emissions_year__Mg",
         sum("gfw_belowground_carbon_stock_in_emissions_year__Mg") as "gfw_belowground_carbon_stock_in_emissions_year__Mg",
@@ -266,6 +271,7 @@ object CarbonFluxDF {
         max($"is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
         max(length($"wdpa_protected_areas__iucn_cat")).cast("boolean") as "wdpa_protected_areas__iucn_cat",
         max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
+        max($"is__ifl_intact_forest_landscapes_2025") as "is__ifl_intact_forest_landscapes_2025",
         max(length($"gfw_plantation_flux_model__type")).cast("boolean") as "gfw_plantation_flux_model__type",
         max($"is__intact_primary_forest") as "is__intact_primary_forest",
         max($"is__gfw_peatlands") as "is__gfw_peatlands",
@@ -304,6 +310,7 @@ object CarbonFluxDF {
         max($"is__landmark_indigenous_and_community_lands") as "is__landmark_indigenous_and_community_lands",
         max($"wdpa_protected_areas__iucn_cat") as "wdpa_protected_areas__iucn_cat",
         max($"is__ifl_intact_forest_landscapes_2000") as "is__ifl_intact_forest_landscapes_2000",
+        max($"is__ifl_intact_forest_landscapes_2025") as "is__ifl_intact_forest_landscapes_2025",
         max($"gfw_plantation_flux_model__type") as "gfw_plantation_flux_model__type",
         max($"is__intact_primary_forest") as "is__intact_primary_forest",
         max($"is__gfw_peatlands") as "is__gfw_peatlands",

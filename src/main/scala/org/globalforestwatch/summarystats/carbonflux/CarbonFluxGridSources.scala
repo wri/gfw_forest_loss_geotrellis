@@ -15,6 +15,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val treeCoverLoss: TreeCoverLoss = TreeCoverLoss(gridTile, kwargs)
   val treeCoverGain: TreeCoverGain = TreeCoverGain(gridTile, kwargs)
   val treeCoverDensity2000: TreeCoverDensityThreshold2000 = TreeCoverDensityThreshold2000(gridTile, kwargs)
+  val treeCoverDensity2010_30: TreeCoverDensity2010_30 = TreeCoverDensity2010_30(gridTile, kwargs)
   val biomassPerHectar: AbovegroundBiomass2000 = AbovegroundBiomass2000(gridTile, kwargs)
   val grossAnnualAbovegroundRemovalsCarbon: AnnualAbovegroundRemovalFactorCarbon = AnnualAbovegroundRemovalFactorCarbon(gridTile, kwargs = kwargs)
   val grossAnnualBelowgroundRemovalsCarbon: AnnualBelowgroundRemovalFactorCarbon = AnnualBelowgroundRemovalFactorCarbon(gridTile, kwargs = kwargs)
@@ -34,9 +35,9 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val grossEmissionsCo2eCh4BiomassSoil: GrossEmissionsCH4Co2eBiomassSoil = GrossEmissionsCH4Co2eBiomassSoil(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eN2oBiomassSoil: GrossEmissionsN2OCo2eBiomassSoil = GrossEmissionsN2OCo2eBiomassSoil(gridTile, kwargs = kwargs)
   val grossEmissionsCo2eCo2OnlyBiomassSoil: GrossEmissionsCo2OnlyCo2BiomassSoil = GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eCh4SoilOnly: GrossEmissionsCH4Co2eSoilOnly = GrossEmissionsCH4Co2eSoilOnly(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eN2oSoilOnly: GrossEmissionsN2OCo2eSoilOnly = GrossEmissionsN2OCo2eSoilOnly(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eCo2OnlySoilOnly: GrossEmissionsCo2OnlyCo2SoilOnly = GrossEmissionsCo2OnlyCo2SoilOnly(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCh4BiomassOnly: GrossEmissionsCH4Co2eBiomassOnly = GrossEmissionsCH4Co2eBiomassOnly(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eN2oBiomassOnly: GrossEmissionsN2OCo2eBiomassOnly = GrossEmissionsN2OCo2eBiomassOnly(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2OnlyBiomassOnly: GrossEmissionsCo2OnlyCo2BiomassOnly = GrossEmissionsCo2OnlyCo2BiomassOnly(gridTile, kwargs = kwargs)
   val jplTropicsAbovegroundBiomassDensity2000: JplTropicsAbovegroundBiomassDensity2000 = JplTropicsAbovegroundBiomassDensity2000(gridTile, kwargs)
   val stdevAnnualAbovegroundRemovalsCarbon: StdevAnnualAbovegroundRemovalsCarbon = StdevAnnualAbovegroundRemovalsCarbon(gridTile, kwargs = kwargs)
   val stdevSoilCarbon2000: StdevSoilCarbon2000 = StdevSoilCarbon2000(gridTile, kwargs = kwargs)
@@ -49,6 +50,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
   val protectedAreas: ProtectedAreas = ProtectedAreas(gridTile, kwargs)
   val landmark: Landmark = Landmark(gridTile, kwargs)
   val intactForestLandscapes2000: IntactForestLandscapes2000 = IntactForestLandscapes2000(gridTile, kwargs)
+  val intactForestLandscapes2025: IntactForestLandscapes2025 = IntactForestLandscapes2025(gridTile, kwargs)
   val plantationsTypeFluxModel: ForestFluxModelPlantedForestType = ForestFluxModelPlantedForestType(gridTile, kwargs)
   val intactPrimaryForest: IntactPrimaryForest = IntactPrimaryForest(gridTile, kwargs)
   val peatlands: Peatlands = Peatlands(gridTile, kwargs)
@@ -84,7 +86,11 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
           treeCoverDensity2000.fetchWindow(windowKey, windowLayout)
         )
         .right
-
+      tcd2010_30Tile <- Either
+        .catchNonFatal(
+          treeCoverDensity2010_30.fetchWindow(windowKey, windowLayout)
+        )
+        .right
     } yield {
       // Failure for these will be converted to optional result and propagated with TreeLossTile
       val gainTile = treeCoverGain.fetchWindow(windowKey, windowLayout)
@@ -107,9 +113,9 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
       val grossEmissionsCo2eCh4BiomassSoilTile = grossEmissionsCo2eCh4BiomassSoil.fetchWindow(windowKey, windowLayout)
       val grossEmissionsCo2eN2oBiomassSoilTile = grossEmissionsCo2eN2oBiomassSoil.fetchWindow(windowKey, windowLayout)
       val grossEmissionsCo2eCo2OnlyBiomassSoilTile = grossEmissionsCo2eCo2OnlyBiomassSoil.fetchWindow(windowKey, windowLayout)
-      val grossEmissionsCo2eCh4SoilOnlyTile = grossEmissionsCo2eCh4SoilOnly.fetchWindow(windowKey, windowLayout)
-      val grossEmissionsCo2eN2oSoilOnlyTile = grossEmissionsCo2eN2oSoilOnly.fetchWindow(windowKey, windowLayout)
-      val grossEmissionsCo2eCo2OnlySoilOnlyTile = grossEmissionsCo2eCo2OnlySoilOnly.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eCh4BiomassOnlyTile = grossEmissionsCo2eCh4BiomassOnly.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eN2oBiomassOnlyTile = grossEmissionsCo2eN2oBiomassOnly.fetchWindow(windowKey, windowLayout)
+      val grossEmissionsCo2eCo2OnlyBiomassOnlyTile = grossEmissionsCo2eCo2OnlyBiomassOnly.fetchWindow(windowKey, windowLayout)
       val jplTropicsAbovegroundBiomassDensity2000Tile = jplTropicsAbovegroundBiomassDensity2000.fetchWindow(windowKey, windowLayout)
       val stdevAnnualAbovegroundRemovalsCarbonTile = stdevAnnualAbovegroundRemovalsCarbon.fetchWindow(windowKey, windowLayout)
       val stdevSoilCarbon2000Tile = stdevSoilCarbon2000.fetchWindow(windowKey, windowLayout)
@@ -122,6 +128,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
       val wdpaTile = protectedAreas.fetchWindow(windowKey, windowLayout)
       val landmarkTile = landmark.fetchWindow(windowKey, windowLayout)
       val intactForestLandscapes2000Tile = intactForestLandscapes2000.fetchWindow(windowKey, windowLayout)
+      val intactForestLandscapes2025Tile = intactForestLandscapes2025.fetchWindow(windowKey, windowLayout)
       val plantationsTypeFluxTile = plantationsTypeFluxModel.fetchWindow(windowKey, windowLayout)
       val intactPrimaryForestTile = intactPrimaryForest.fetchWindow(windowKey, windowLayout)
       val peatlandsTile = peatlands.fetchWindow(windowKey, windowLayout)
@@ -146,6 +153,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         lossTile,
         gainTile,
         tcd2000Tile,
+        tcd2010_30Tile,
         biomassTile,
         grossAnnualAbovegroundRemovalsCarbonTile,
         grossAnnualBelowgroundRemovalsCarbonTile,
@@ -165,9 +173,9 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         grossEmissionsCo2eCh4BiomassSoilTile,
         grossEmissionsCo2eN2oBiomassSoilTile,
         grossEmissionsCo2eCo2OnlyBiomassSoilTile,
-        grossEmissionsCo2eCh4SoilOnlyTile,
-        grossEmissionsCo2eN2oSoilOnlyTile,
-        grossEmissionsCo2eCo2OnlySoilOnlyTile,
+        grossEmissionsCo2eCh4BiomassOnlyTile,
+        grossEmissionsCo2eN2oBiomassOnlyTile,
+        grossEmissionsCo2eCo2OnlyBiomassOnlyTile,
         jplTropicsAbovegroundBiomassDensity2000Tile,
         stdevAnnualAbovegroundRemovalsCarbonTile,
         stdevSoilCarbon2000Tile,
@@ -180,6 +188,7 @@ case class CarbonFluxGridSources(gridTile: GridTile, kwargs: Map[String, Any])
         landmarkTile,
         wdpaTile,
         intactForestLandscapes2000Tile,
+        intactForestLandscapes2025Tile,
         plantationsTypeFluxTile,
         intactPrimaryForestTile,
         peatlandsTile,

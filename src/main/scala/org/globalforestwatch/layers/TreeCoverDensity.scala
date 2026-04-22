@@ -35,6 +35,16 @@ case class TreeCoverDensityThreshold2010(gridTile: GridTile, kwargs: Map[String,
     uriForGrid(gridTile, kwargs)
 }
 
+case class TreeCoverDensity2010_30(gridTile: GridTile, kwargs: Map[String, Any])
+  extends BooleanLayer
+    with RequiredILayer {
+  val datasetName = "umd_tree_cover_density_2010"
+  val uri: String =
+    uriForGrid(gridTile, kwargs)
+
+  override def lookup(value: Int): Boolean = value > 30
+}
+
 case class TreeCoverDensity2010_60(gridTile: GridTile, kwargs: Map[String, Any])
   extends BooleanLayer
     with RequiredILayer {
