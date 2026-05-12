@@ -36,18 +36,13 @@ addCompilerPlugin(
 )
 
 resolvers ++= Seq(
-  "maven2" at "https://repo1.maven.org/maven2",
-  "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/snapshots/",
+  Resolver.mavenCentral,
+  "OSGeo" at "https://repo.osgeo.org/repository/release/",
   "GeoSolutions" at "https://maven.geo-solutions.it/",
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
   "LT-snapshots" at "https://repo.eclipse.org/content/groups/snapshots",
-  "Open Source Geospatial Foundation Repository" at "https://repo.osgeo.org/repository/release/",
-  "Apache Software Foundation Snapshots" at "https://repository.apache.org/content/groups/snapshots",
-  "Java.net repository" at "https://download.java.net/maven/2",
-  "jitpack" at "https://jitpack.io",
-  Resolver.bintrayRepo("azavea", "geotrellis")
+  "jitpack" at "https://jitpack.io"
 )
-
 
 libraryDependencies ++= Seq(
   sparkCore,
