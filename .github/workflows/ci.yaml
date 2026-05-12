@@ -58,6 +58,7 @@ jobs:
           distribution: temurin
           java-version: 11.0.19
           cache: 'sbt'
+	  key: ${{ runner.os }}-sbt-v3-${{ hashFiles('**/*.sbt') }} 
 
       - name: Setup sbt launcher
         uses: sbt/setup-sbt@v1
