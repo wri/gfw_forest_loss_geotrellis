@@ -36,7 +36,7 @@ addCompilerPlugin(
 )
 
 resolvers ++= Seq(
-  Resolver.mavenCentral,
+  "Aliyun Mirror" at "https://maven.aliyun.com/repository/public",
   "OSGeo" at "https://repo.osgeo.org/repository/release/",
   "GeoSolutions" at "https://maven.geo-solutions.it/",
   "LT-releases" at "https://repo.locationtech.org/content/groups/releases",
