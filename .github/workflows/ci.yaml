@@ -57,7 +57,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 11.0.19
-	  cache: 'sbt'
+          cache: 'sbt'
 
       - name: Setup sbt launcher
         uses: sbt/setup-sbt@v1
