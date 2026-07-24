@@ -38,6 +38,12 @@ case class TreeLossTile(
     lazy val treeCoverLossFromFires = sources.treeCoverLossFromFires.fetchWindow(windowKey, windowLayout)
     lazy val ifl2000 = sources.ifl2000.fetchWindow(windowKey, windowLayout)
 
+    lazy val gpwGrasslandExtent2020 = sources.gpwGrasslandExtent2020.fetchWindow(windowKey, windowLayout)
+    lazy val gpwGrasslandExtent2021 = sources.gpwGrasslandExtent2021.fetchWindow(windowKey, windowLayout)
+    lazy val gpwGrasslandExtent2022 = sources.gpwGrasslandExtent2022.fetchWindow(windowKey, windowLayout)
+    lazy val gpwGrasslandExtent2023 = sources.gpwGrasslandExtent2023.fetchWindow(windowKey, windowLayout)
+    lazy val gpwGrasslandExtent2024 = sources.gpwGrasslandExtent2024.fetchWindow(windowKey, windowLayout)
+
     lazy val plantationsPre2000 = sources.plantationsPre2000.fetchWindow(windowKey, windowLayout)
     lazy val mangroveBiomassExtent = sources.mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)
 

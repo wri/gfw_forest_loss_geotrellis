@@ -119,6 +119,34 @@ object TreeLossSummary {
           else false
         }
 
+        val includeGPWGrasslandExtent: Boolean =
+          contextualLayers contains "gpw_grassland_extent"
+
+        val gpwGrasslandExtent2020: String =
+          if (includeGPWGrasslandExtent)
+            raster.tile.gpwGrasslandExtent2020.getData(col, row)
+          else ""
+
+        val gpwGrasslandExtent2021: String =
+          if (includeGPWGrasslandExtent)
+            raster.tile.gpwGrasslandExtent2021.getData(col, row)
+          else ""
+
+        val gpwGrasslandExtent2022: String =
+          if (includeGPWGrasslandExtent)
+            raster.tile.gpwGrasslandExtent2022.getData(col, row)
+          else ""
+
+        val gpwGrasslandExtent2023: String =
+          if (includeGPWGrasslandExtent)
+            raster.tile.gpwGrasslandExtent2023.getData(col, row)
+         else ""
+
+        val gpwGrasslandExtent2024: String =
+          if (includeGPWGrasslandExtent)
+            raster.tile.gpwGrasslandExtent2024.getData(col, row)
+          else ""
+
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
 
@@ -182,7 +210,12 @@ object TreeLossSummary {
                 isTreeCoverLossFromFires,
                 isIFL2000,
                 isUmdTreeCoverLoss,
-                gain
+                gain,
+                gpwGrasslandExtent2020,
+                gpwGrasslandExtent2021,
+                gpwGrasslandExtent2022,
+                gpwGrasslandExtent2023,
+                gpwGrasslandExtent2024
               )
 
             val summary: TreeLossData =

@@ -51,6 +51,11 @@ object TreeLossDF {
       $"data_group.isTreeCoverLossFire" as "is__tree_cover_loss_from_fires",
       $"data_group.isIFL2000" as "is__intact_forest_landscapes_2000",
       $"data_group.isUmdTreeCoverLoss" as "is__umd_tree_cover_loss",
+      $"data_group.gpwGrasslandExtent2020".as("gpw_grassland_extent_2020"),
+      $"data_group.gpwGrasslandExtent2021".as("gpw_grassland_extent_2021"),
+      $"data_group.gpwGrasslandExtent2022".as("gpw_grassland_extent_2022"),
+      $"data_group.gpwGrasslandExtent2023".as("gpw_grassland_extent_2023"),
+      $"data_group.gpwGrasslandExtent2024".as("gpw_grassland_extent_2024")
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
@@ -125,6 +130,7 @@ object TreeLossDF {
                              includeTreeCoverLossFires: Boolean,
                              includeIFL2000: Boolean,
                              includeIsUmdTreeCoverLoss: Boolean,
+                             includeGPWGrasslandExtent: Boolean,
                              carbonPools: Boolean,
                              simpleAGBEmis: Boolean,
                              emisGasAnnual: Boolean
@@ -256,9 +262,22 @@ object TreeLossDF {
       else List()
     }
 
+    val gpwGroupByCols =
+      if (includeGPWGrasslandExtent) {
+        List(
+          $"gpw_grassland_extent_2020",
+          $"gpw_grassland_extent_2021",
+          $"gpw_grassland_extent_2022",
+          $"gpw_grassland_extent_2023",
+          $"gpw_grassland_extent_2024"
+        )
+      } else {
+        List()
+      }
+
 
     df.groupBy(groupByCols ::: pfGroupByCol ::: plGroupByCol ::: ptGroupByCol :::
-        drGroupByCol ::: fiGroupByCol ::: iflGroupByCol ::: tclGroupByCol : _*)
+        drGroupByCol ::: fiGroupByCol ::: iflGroupByCol ::: tclGroupByCol ::: gpwGroupByCols: _*)
       .agg(
         cols.head,
         cols.tail ::: carbonPoolCols ::: treecoverLossCols ::: abovegroundBiomassLossCols
