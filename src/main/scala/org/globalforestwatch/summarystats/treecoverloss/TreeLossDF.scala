@@ -55,7 +55,7 @@ object TreeLossDF {
       $"data_group.gpwGrasslandExtent2021".as("gpw_grassland_extent_2021"),
       $"data_group.gpwGrasslandExtent2022".as("gpw_grassland_extent_2022"),
       $"data_group.gpwGrasslandExtent2023".as("gpw_grassland_extent_2023"),
-      $"data_group.gpwGrasslandExtent2024".as("gpw_grassland_extent_2024")
+      $"data_group.gpwGrasslandExtent2024".as("gpw_grassland_extent_2024"),
       $"data.treecoverExtent2000" as "umd_tree_cover_extent_2000__ha",
       $"data.treecoverExtent2010" as "umd_tree_cover_extent_2010__ha",
       $"data.totalArea" as "area__ha",
