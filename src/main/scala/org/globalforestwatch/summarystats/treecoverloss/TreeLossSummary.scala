@@ -48,9 +48,7 @@ object TreeLossSummary {
 
         val grossCumulAbovegroundRemovalsCo2: Float = raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
         val grossCumulBelowgroundRemovalsCo2: Float = raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
-        val grossEmissionsCo2eCo2Only: Float =  raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
-        val grossEmissionsCo2eCh4: Float = raster.tile.grossEmissionsCo2eCh4.getData(col, row)
-        val grossEmissionsCo2eN2o: Float = raster.tile.grossEmissionsCo2eN2o.getData(col, row)
+
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
         val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
 
@@ -71,6 +69,24 @@ object TreeLossSummary {
           raster.tile.soilCarbon2000.getData(col, row)
         else
           0.0
+
+        val emisBiomassOnly: Boolean = getAnyMapValue[Boolean](kwargs, "emisBiomassOnly")
+
+        // Optionally calculate emissions for non-soil carbon pools only
+        val grossEmissionsCo2eCo2Only: Float = if (emisBiomassOnly)
+            raster.tile.grossEmissionsCo2eCo2OnlyBiomassOnly.getData(col, row)
+        else
+            raster.tile.grossEmissionsCo2eCo2OnlyBiomassSoil.getData(col, row)
+
+        val grossEmissionsCo2eCh4: Float = if (emisBiomassOnly)
+            raster.tile.grossEmissionsCo2eCh4BiomassOnly.getData(col, row)
+        else
+            raster.tile.grossEmissionsCo2eCh4BiomassSoil.getData(col, row)
+
+        val grossEmissionsCo2eN2o: Float = if (emisBiomassOnly)
+            raster.tile.grossEmissionsCo2eN2oBiomassOnly.getData(col, row)
+        else
+            raster.tile.grossEmissionsCo2eN2oBiomassSoil.getData(col, row)
 
         val contextualLayers: List[String] =
           getAnyMapValue[NonEmptyList[String]](kwargs, "contextualLayers").toList
