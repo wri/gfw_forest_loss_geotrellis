@@ -284,7 +284,11 @@ object TreeLossSummary {
                 summary.totalGrossEmissionsCo2eN2o += grossEmissionsCo2eN2oPixel
                 summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
 
-                summary.totalNetFluxCo2 += netFluxCo2Pixel
+                if (emisBiomassOnly) {
+                  summary.totalNetFluxCo2 += grossEmissionsCo2eAllGasesPixel - grossCumulAboveBelowgroundRemovalsCo2Pixel
+                } else {
+                  summary.totalNetFluxCo2 += netFluxCo2Pixel
+                }
 
                 summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
               }
@@ -300,7 +304,11 @@ object TreeLossSummary {
               summary.totalGrossEmissionsCo2eN2o += grossEmissionsCo2eN2oPixel
               summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
 
-              summary.totalNetFluxCo2 += netFluxCo2Pixel
+              if (emisBiomassOnly) {
+                summary.totalNetFluxCo2 += grossEmissionsCo2eAllGasesPixel - grossCumulAboveBelowgroundRemovalsCo2Pixel
+              } else {
+                summary.totalNetFluxCo2 += netFluxCo2Pixel
+              }
 
               summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
 
