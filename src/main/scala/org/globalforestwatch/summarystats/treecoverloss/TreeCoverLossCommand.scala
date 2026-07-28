@@ -49,7 +49,7 @@ object TreeCoverLossCommand extends SummaryCommand {
 
   val emisBiomassOnlyOpts: Opts[Boolean] = Opts
     .flag(
-      "emissions_from_non_soil_carbon_pools_only",
+      "biomass_emissions_only",
       "Use non-soil emissions layers instead of emissions from non-soil + soil"
     )
     .orFalse
