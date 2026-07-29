@@ -12,9 +12,9 @@ case class TreeLossDataGroup(
                               isIFL2000: Boolean,
                               isUmdTreeCoverLoss: Boolean,
                               isGain: Boolean,
-                              gpwGrasslandExtent2020: String,
-                              gpwGrasslandExtent2021: String,
-                              gpwGrasslandExtent2022: String,
-                              gpwGrasslandExtent2023: String,
-                              gpwGrasslandExtent2024: String
+                              gpwCultivatedGrasslandExtent2020: Boolean,
+                              gpwCultivatedGrasslandExtent2021: Boolean,
+                              gpwCultivatedGrasslandExtent2022: Boolean,
+                              gpwCultivatedGrasslandExtent2023: Boolean,
+                              gpwCultivatedGrasslandExtent2024: Boolean
                         )

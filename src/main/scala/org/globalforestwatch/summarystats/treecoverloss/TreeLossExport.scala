@@ -18,7 +18,7 @@ object TreeLossExport extends SummaryExport {
       getAnyMapValue[NonEmptyList[String]](kwargs, "contextualLayers").toList
 
     val (includePrimaryForest, includePlantations, includeGlobalPeat, includeTclDriverClass,
-         includeTreeCoverLossFires, includeIFL2000, includeTreeCoverLoss, includeGPWGrasslandExtent) = {
+         includeTreeCoverLossFires, includeIFL2000, includeTreeCoverLoss, includeGPWCultivatedGrasslandExtent) = {
       (
         contextualLayers contains "is__umd_regional_primary_forest_2001",
         contextualLayers contains "is__gfw_plantations",
@@ -27,7 +27,7 @@ object TreeLossExport extends SummaryExport {
         contextualLayers contains "is__tree_cover_loss_from_fires",
         contextualLayers contains "is__intact_forest_landscapes_2000",
         contextualLayers contains "is__umd_tree_cover_loss",
-        contextualLayers contains "gpw_grassland_extent"
+        contextualLayers contains "gpw_cultivated_grassland_extent"
       )
     }
 
@@ -48,7 +48,7 @@ object TreeLossExport extends SummaryExport {
       .transform(TreeLossDF.unpackValues(carbonPools, simpleAGBEmis, emisGasAnnual, emisBiomassOnly))
       .transform(TreeLossDF.contextualLayerFilter(
         includePrimaryForest, includePlantations, includeGlobalPeat, includeTclDriverClass,
-        includeTreeCoverLossFires, includeIFL2000, includeTreeCoverLoss, includeGPWGrasslandExtent,
+        includeTreeCoverLossFires, includeIFL2000, includeTreeCoverLoss, includeGPWCultivatedGrasslandExtent,
         carbonPools, simpleAGBEmis, emisGasAnnual, emisBiomassOnly))
       .coalesce(1)
       .orderBy($"feature__id", $"umd_tree_cover_density__threshold")

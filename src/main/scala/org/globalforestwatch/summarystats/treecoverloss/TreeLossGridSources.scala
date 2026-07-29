@@ -25,11 +25,11 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
   val treeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
   val ifl2000 = IntactForestLandscapes2000(gridTile, kwargs)
 
-  val gpwGrasslandExtent2020 = GPWGrasslandExtent2020(gridTile, kwargs)
-  val gpwGrasslandExtent2021 = GPWGrasslandExtent2021(gridTile, kwargs)
-  val gpwGrasslandExtent2022 = GPWGrasslandExtent2022(gridTile, kwargs)
-  val gpwGrasslandExtent2023 = GPWGrasslandExtent2023(gridTile, kwargs)
-  val gpwGrasslandExtent2024 = GPWGrasslandExtent2024(gridTile, kwargs)
+  val gpwCultivatedGrasslandExtent2020 = GPWCultivatedGrasslandExtent2020(gridTile, kwargs)
+  val gpwCultivatedGrasslandExtent2021 = GPWCultivatedGrasslandExtent2021(gridTile, kwargs)
+  val gpwCultivatedGrasslandExtent2022 = GPWCultivatedGrasslandExtent2022(gridTile, kwargs)
+  val gpwCultivatedGrasslandExtent2023 = GPWCultivatedGrasslandExtent2023(gridTile, kwargs)
+  val gpwCultivatedGrasslandExtent2024 = GPWCultivatedGrasslandExtent2024(gridTile, kwargs)
 
   val plantationsPre2000: PlantationsPre2000 = PlantationsPre2000(gridTile, kwargs)
   val mangroveBiomassExtent: MangroveBiomassExtent = MangroveBiomassExtent(gridTile, kwargs)

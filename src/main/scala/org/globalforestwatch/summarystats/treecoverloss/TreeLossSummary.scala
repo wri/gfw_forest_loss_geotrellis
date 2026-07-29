@@ -135,33 +135,33 @@ object TreeLossSummary {
           else false
         }
 
-        val includeGPWGrasslandExtent: Boolean =
-          contextualLayers contains "gpw_grassland_extent"
+        val includeGPWCultivatedGrasslandExtent: Boolean =
+          contextualLayers contains "gpw_cultivated_grassland_extent"
 
-        val gpwGrasslandExtent2020: String =
-          if (includeGPWGrasslandExtent)
-            raster.tile.gpwGrasslandExtent2020.getData(col, row)
-          else ""
+        val gpwCultivatedGrasslandExtent2020: Boolean =
+          if (includeGPWCultivatedGrasslandExtent)
+            raster.tile.gpwCultivatedGrasslandExtent2020.getData(col, row)
+          else false
 
-        val gpwGrasslandExtent2021: String =
-          if (includeGPWGrasslandExtent)
-            raster.tile.gpwGrasslandExtent2021.getData(col, row)
-          else ""
+        val gpwCultivatedGrasslandExtent2021: Boolean =
+          if (includeGPWCultivatedGrasslandExtent)
+            raster.tile.gpwCultivatedGrasslandExtent2021.getData(col, row)
+          else false
 
-        val gpwGrasslandExtent2022: String =
-          if (includeGPWGrasslandExtent)
-            raster.tile.gpwGrasslandExtent2022.getData(col, row)
-          else ""
+        val gpwCultivatedGrasslandExtent2022: Boolean =
+          if (includeGPWCultivatedGrasslandExtent)
+            raster.tile.gpwCultivatedGrasslandExtent2022.getData(col, row)
+          else false
 
-        val gpwGrasslandExtent2023: String =
-          if (includeGPWGrasslandExtent)
-            raster.tile.gpwGrasslandExtent2023.getData(col, row)
-         else ""
+        val gpwCultivatedGrasslandExtent2023: Boolean =
+          if (includeGPWCultivatedGrasslandExtent)
+            raster.tile.gpwCultivatedGrasslandExtent2023.getData(col, row)
+         else false
 
-        val gpwGrasslandExtent2024: String =
-          if (includeGPWGrasslandExtent)
-            raster.tile.gpwGrasslandExtent2024.getData(col, row)
-          else ""
+        val gpwCultivatedGrasslandExtent2024: Boolean =
+          if (includeGPWCultivatedGrasslandExtent)
+            raster.tile.gpwCultivatedGrasslandExtent2024.getData(col, row)
+          else false
 
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
@@ -227,11 +227,11 @@ object TreeLossSummary {
                 isIFL2000,
                 isUmdTreeCoverLoss,
                 gain,
-                gpwGrasslandExtent2020,
-                gpwGrasslandExtent2021,
-                gpwGrasslandExtent2022,
-                gpwGrasslandExtent2023,
-                gpwGrasslandExtent2024
+                gpwCultivatedGrasslandExtent2020,
+                gpwCultivatedGrasslandExtent2021,
+                gpwCultivatedGrasslandExtent2022,
+                gpwCultivatedGrasslandExtent2023,
+                gpwCultivatedGrasslandExtent2024
               )
 
             val summary: TreeLossData =
