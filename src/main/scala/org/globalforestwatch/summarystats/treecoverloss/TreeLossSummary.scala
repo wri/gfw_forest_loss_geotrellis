@@ -140,27 +140,27 @@ object TreeLossSummary {
 
         val gpwCultivatedGrasslandExtent2020: Boolean =
           if (includeGPWCultivatedGrasslandExtent)
-            raster.tile.gpwCultivatedGrasslandExtent2020.getData(col, row) == 1
+            raster.tile.gpwGrasslandExtent2020.getData(col, row) == 1
           else false
 
         val gpwCultivatedGrasslandExtent2021: Boolean =
           if (includeGPWCultivatedGrasslandExtent)
-            raster.tile.gpwCultivatedGrasslandExtent2021.getData(col, row) == 1
+            raster.tile.gpwGrasslandExtent2021.getData(col, row) == 1
           else false
 
         val gpwCultivatedGrasslandExtent2022: Boolean =
           if (includeGPWCultivatedGrasslandExtent)
-            raster.tile.gpwCultivatedGrasslandExtent2022.getData(col, row) == 1
+            raster.tile.gpwGrasslandExtent2022.getData(col, row) == 1
           else false
 
         val gpwCultivatedGrasslandExtent2023: Boolean =
           if (includeGPWCultivatedGrasslandExtent)
-            raster.tile.gpwCultivatedGrasslandExtent2023.getData(col, row) == 1
+            raster.tile.gpwGrasslandExtent2023.getData(col, row) == 1
          else false
 
         val gpwCultivatedGrasslandExtent2024: Boolean =
           if (includeGPWCultivatedGrasslandExtent)
-            raster.tile.gpwCultivatedGrasslandExtent2024.getData(col, row) == 1
+            raster.tile.gpwGrasslandExtent2024.getData(col, row) == 1
           else false
 
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
