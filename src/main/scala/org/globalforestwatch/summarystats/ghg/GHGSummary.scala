@@ -109,7 +109,7 @@ object GHGSummary {
             0
           } else {
             val loss = raster.tile.loss.getData(col, row)
-            if (loss != null && (tcd2000 > 10 || treeGainFromHeight || mangroveBiomassExtent)) {
+            if (loss != null && (tcd2000 >= 10 || treeGainFromHeight || mangroveBiomassExtent)) {
               loss.toInt
             } else {
               0
