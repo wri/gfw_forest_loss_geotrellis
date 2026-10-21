@@ -18,7 +18,7 @@ case class GHGRawDataGroup(umdTreeCoverLossYear: Int,
     // Emissions factor formula:
     //
     // 20-year discounted emissions for year 2020 (tonsCO2e) =
-    //   (co2e emissions 2020 * 0.0975) + (co2e emissions 2019 * 0.0925) + (co2e emissions 2018 * 0.0875) + ... + (co2e emissions 2001 * 0.025)
+    //   (co2e emissions 2020 * 0.0975) + (co2e emissions 2019 * 0.0925) + (co2e emissions 2018 * 0.0875) + ... + (co2e emissions 2001 * 0.0025)
     // production (tons) = yield * area / 1000
     // emissions factor (tonsCO2e/tons yield) = discounted emissions / production
 
