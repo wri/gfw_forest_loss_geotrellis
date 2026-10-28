@@ -26,9 +26,12 @@ case class TreeLossTile(
     lazy val grossCumulAbovegroundRemovalsCo2 = sources.grossCumulAbovegroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
     lazy val grossCumulBelowgroundRemovalsCo2 = sources.grossCumulBelowgroundRemovalsCo2.fetchWindow(windowKey, windowLayout)
     lazy val netFluxCo2 = sources.netFluxCo2e.fetchWindow(windowKey, windowLayout)
-    lazy val grossEmissionsCo2eCo2Only = sources.grossEmissionsCo2eCo2Only.fetchWindow(windowKey, windowLayout)
-    lazy val grossEmissionsCo2eCh4 = sources.grossEmissionsCo2eCh4.fetchWindow(windowKey, windowLayout)
-    lazy val grossEmissionsCo2eN2o = sources.grossEmissionsCo2eN2o.fetchWindow(windowKey, windowLayout)
+    lazy val grossEmissionsCo2eCo2OnlyBiomassSoil = sources.grossEmissionsCo2eCo2OnlyBiomassSoil.fetchWindow(windowKey, windowLayout)
+    lazy val grossEmissionsCo2eCh4BiomassSoil = sources.grossEmissionsCo2eCh4BiomassSoil.fetchWindow(windowKey, windowLayout)
+    lazy val grossEmissionsCo2eN2oBiomassSoil = sources.grossEmissionsCo2eN2oBiomassSoil.fetchWindow(windowKey, windowLayout)
+    lazy val grossEmissionsCo2eCo2OnlyBiomassOnly = sources.grossEmissionsCo2eCo2OnlyBiomassOnly.fetchWindow(windowKey, windowLayout)
+    lazy val grossEmissionsCo2eCh4BiomassOnly = sources.grossEmissionsCo2eCh4BiomassOnly.fetchWindow(windowKey, windowLayout)
+    lazy val grossEmissionsCo2eN2oBiomassOnly = sources.grossEmissionsCo2eN2oBiomassOnly.fetchWindow(windowKey, windowLayout)
     lazy val fluxModelExtent = sources.fluxModelExtent.fetchWindow(windowKey, windowLayout)
 
     lazy val primaryForest = sources.primaryForest.fetchWindow(windowKey, windowLayout)
@@ -37,6 +40,12 @@ case class TreeLossTile(
     lazy val tclDriverClass = sources.tclDriver.fetchWindow(windowKey, windowLayout)
     lazy val treeCoverLossFromFires = sources.treeCoverLossFromFires.fetchWindow(windowKey, windowLayout)
     lazy val ifl2000 = sources.ifl2000.fetchWindow(windowKey, windowLayout)
+
+    lazy val gpwGrasslandExtent2020 = sources.gpwGrasslandExtent2020.fetchWindow(windowKey, windowLayout)
+    lazy val gpwGrasslandExtent2021 = sources.gpwGrasslandExtent2021.fetchWindow(windowKey, windowLayout)
+    lazy val gpwGrasslandExtent2022 = sources.gpwGrasslandExtent2022.fetchWindow(windowKey, windowLayout)
+    lazy val gpwGrasslandExtent2023 = sources.gpwGrasslandExtent2023.fetchWindow(windowKey, windowLayout)
+    lazy val gpwGrasslandExtent2024 = sources.gpwGrasslandExtent2024.fetchWindow(windowKey, windowLayout)
 
     lazy val plantationsPre2000 = sources.plantationsPre2000.fetchWindow(windowKey, windowLayout)
     lazy val mangroveBiomassExtent = sources.mangroveBiomassExtent.fetchWindow(windowKey, windowLayout)

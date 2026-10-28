@@ -48,9 +48,7 @@ object TreeLossSummary {
 
         val grossCumulAbovegroundRemovalsCo2: Float = raster.tile.grossCumulAbovegroundRemovalsCo2.getData(col, row)
         val grossCumulBelowgroundRemovalsCo2: Float = raster.tile.grossCumulBelowgroundRemovalsCo2.getData(col, row)
-        val grossEmissionsCo2eCo2Only: Float =  raster.tile.grossEmissionsCo2eCo2Only.getData(col, row)
-        val grossEmissionsCo2eCh4: Float = raster.tile.grossEmissionsCo2eCh4.getData(col, row)
-        val grossEmissionsCo2eN2o: Float = raster.tile.grossEmissionsCo2eN2o.getData(col, row)
+
         val netFluxCo2: Float = raster.tile.netFluxCo2.getData(col, row)
         val fluxModelExtent: Boolean = raster.tile.fluxModelExtent.getData(col, row)
 
@@ -71,6 +69,24 @@ object TreeLossSummary {
           raster.tile.soilCarbon2000.getData(col, row)
         else
           0.0
+
+        val emisBiomassOnly: Boolean = getAnyMapValue[Boolean](kwargs, "emisBiomassOnly")
+
+        // Optionally calculate emissions for non-soil carbon pools only
+        val grossEmissionsCo2eCo2Only: Float = if (emisBiomassOnly)
+            raster.tile.grossEmissionsCo2eCo2OnlyBiomassOnly.getData(col, row)
+        else
+            raster.tile.grossEmissionsCo2eCo2OnlyBiomassSoil.getData(col, row)
+
+        val grossEmissionsCo2eCh4: Float = if (emisBiomassOnly)
+            raster.tile.grossEmissionsCo2eCh4BiomassOnly.getData(col, row)
+        else
+            raster.tile.grossEmissionsCo2eCh4BiomassSoil.getData(col, row)
+
+        val grossEmissionsCo2eN2o: Float = if (emisBiomassOnly)
+            raster.tile.grossEmissionsCo2eN2oBiomassOnly.getData(col, row)
+        else
+            raster.tile.grossEmissionsCo2eN2oBiomassSoil.getData(col, row)
 
         val contextualLayers: List[String] =
           getAnyMapValue[NonEmptyList[String]](kwargs, "contextualLayers").toList
@@ -118,6 +134,34 @@ object TreeLossSummary {
           //            raster.tile.treeCoverLoss.getData(col, row) != null
           else false
         }
+
+        val includeGPWCultivatedGrasslandExtent: Boolean =
+          contextualLayers contains "gpw_cultivated_grassland_extent"
+
+        val gpwCultivatedGrasslandExtent2020: Boolean =
+          if (includeGPWCultivatedGrasslandExtent)
+            raster.tile.gpwGrasslandExtent2020.getData(col, row) == 1
+          else false
+
+        val gpwCultivatedGrasslandExtent2021: Boolean =
+          if (includeGPWCultivatedGrasslandExtent)
+            raster.tile.gpwGrasslandExtent2021.getData(col, row) == 1
+          else false
+
+        val gpwCultivatedGrasslandExtent2022: Boolean =
+          if (includeGPWCultivatedGrasslandExtent)
+            raster.tile.gpwGrasslandExtent2022.getData(col, row) == 1
+          else false
+
+        val gpwCultivatedGrasslandExtent2023: Boolean =
+          if (includeGPWCultivatedGrasslandExtent)
+            raster.tile.gpwGrasslandExtent2023.getData(col, row) == 1
+         else false
+
+        val gpwCultivatedGrasslandExtent2024: Boolean =
+          if (includeGPWCultivatedGrasslandExtent)
+            raster.tile.gpwGrasslandExtent2024.getData(col, row) == 1
+          else false
 
         val plantationsPre2000: Boolean = raster.tile.plantationsPre2000.getData(col, row)
         val mangroveBiomassExtent: Boolean = raster.tile.mangroveBiomassExtent.getData(col, row)
@@ -182,7 +226,12 @@ object TreeLossSummary {
                 isTreeCoverLossFromFires,
                 isIFL2000,
                 isUmdTreeCoverLoss,
-                gain
+                gain,
+                gpwCultivatedGrasslandExtent2020,
+                gpwCultivatedGrasslandExtent2021,
+                gpwCultivatedGrasslandExtent2022,
+                gpwCultivatedGrasslandExtent2023,
+                gpwCultivatedGrasslandExtent2024
               )
 
             val summary: TreeLossData =
@@ -235,7 +284,11 @@ object TreeLossSummary {
                 summary.totalGrossEmissionsCo2eN2o += grossEmissionsCo2eN2oPixel
                 summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
 
-                summary.totalNetFluxCo2 += netFluxCo2Pixel
+                if (emisBiomassOnly) {
+                  summary.totalNetFluxCo2 += grossEmissionsCo2eAllGasesPixel - grossCumulAboveBelowgroundRemovalsCo2Pixel
+                } else {
+                  summary.totalNetFluxCo2 += netFluxCo2Pixel
+                }
 
                 summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
               }
@@ -251,7 +304,11 @@ object TreeLossSummary {
               summary.totalGrossEmissionsCo2eN2o += grossEmissionsCo2eN2oPixel
               summary.totalGrossEmissionsCo2eAllGases += grossEmissionsCo2eAllGasesPixel
 
-              summary.totalNetFluxCo2 += netFluxCo2Pixel
+              if (emisBiomassOnly) {
+                summary.totalNetFluxCo2 += grossEmissionsCo2eAllGasesPixel - grossCumulAboveBelowgroundRemovalsCo2Pixel
+              } else {
+                summary.totalNetFluxCo2 += netFluxCo2Pixel
+              }
 
               summary.totalFluxModelExtentArea += fluxModelExtentAreaPixel
 

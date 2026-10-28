@@ -25,14 +25,23 @@ case class TreeLossGridSources(gridTile: GridTile, kwargs: Map[String, Any]) ext
   val treeCoverLossFromFires = TreeCoverLossFromFires(gridTile, kwargs)
   val ifl2000 = IntactForestLandscapes2000(gridTile, kwargs)
 
+  val gpwGrasslandExtent2020 = GPWGrasslandExtent2020(gridTile, kwargs)
+  val gpwGrasslandExtent2021 = GPWGrasslandExtent2021(gridTile, kwargs)
+  val gpwGrasslandExtent2022 = GPWGrasslandExtent2022(gridTile, kwargs)
+  val gpwGrasslandExtent2023 = GPWGrasslandExtent2023(gridTile, kwargs)
+  val gpwGrasslandExtent2024 = GPWGrasslandExtent2024(gridTile, kwargs)
+
   val plantationsPre2000: PlantationsPre2000 = PlantationsPre2000(gridTile, kwargs)
   val mangroveBiomassExtent: MangroveBiomassExtent = MangroveBiomassExtent(gridTile, kwargs)
 
   val grossCumulAbovegroundRemovalsCo2: GrossCumulAbovegroundRemovalsCo2 = GrossCumulAbovegroundRemovalsCo2(gridTile, kwargs = kwargs)
   val grossCumulBelowgroundRemovalsCo2: GrossCumulBelowgroundRemovalsCo2 = GrossCumulBelowgroundRemovalsCo2(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eCo2Only: GrossEmissionsCo2OnlyCo2BiomassSoil = GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eCh4: GrossEmissionsCH4Co2eBiomassSoil = GrossEmissionsCH4Co2eBiomassSoil(gridTile, kwargs = kwargs)
-  val grossEmissionsCo2eN2o: GrossEmissionsN2OCo2eBiomassSoil = GrossEmissionsN2OCo2eBiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2OnlyBiomassSoil: GrossEmissionsCo2OnlyCo2BiomassSoil = GrossEmissionsCo2OnlyCo2BiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCh4BiomassSoil: GrossEmissionsCH4Co2eBiomassSoil = GrossEmissionsCH4Co2eBiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eN2oBiomassSoil: GrossEmissionsN2OCo2eBiomassSoil = GrossEmissionsN2OCo2eBiomassSoil(gridTile, kwargs = kwargs)
+  val grossEmissionsCo2eCo2OnlyBiomassOnly: GrossEmissionsCo2OnlyCo2BiomassOnly = GrossEmissionsCo2OnlyCo2BiomassOnly(gridTile, kwargs)
+  val grossEmissionsCo2eCh4BiomassOnly: GrossEmissionsCH4Co2eBiomassOnly = GrossEmissionsCH4Co2eBiomassOnly(gridTile, kwargs)
+  val grossEmissionsCo2eN2oBiomassOnly: GrossEmissionsN2OCo2eBiomassOnly = GrossEmissionsN2OCo2eBiomassOnly(gridTile, kwargs)
   val netFluxCo2e: NetFluxCo2e = NetFluxCo2e(gridTile, kwargs = kwargs)
   val fluxModelExtent: ForestFluxModelExtent = ForestFluxModelExtent(gridTile, kwargs = kwargs)
 
